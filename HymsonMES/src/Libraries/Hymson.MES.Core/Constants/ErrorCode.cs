@@ -192,7 +192,7 @@
         public const string MES10513 = "参数类型不合法，请检查！";
         public const string MES10514 = "参数ID不能为空";
         public const string MES10515 = "标准参数名称最大长度为50";
-
+        public const string MES10516 = "参数{Code}的规格上限和规格下限配置异常，上限不能小于下限！";
         #endregion
 
         #region Bom 10600
@@ -959,6 +959,7 @@
         public const string MES18407 = "地址最大长度为255";
         public const string MES18408 = "描述最大长度为255";
         public const string MES18409 = "电话最大长度为50";
+        public const string MES18410 = "客户编码不允许有空格";
 
         #endregion
 
@@ -1003,6 +1004,7 @@
         public const string MES18615 = "载具该单元格已装载了条码:{sfc}";
         public const string MES18616 = "载具：重复装载该条码:{sfc},托盘码:{palletNo}";
         public const string MES18617 = "载具不存在或者载具未激活";
+        public const string MES18618 = "载具编码不允许有空格";
 
         #endregion
 

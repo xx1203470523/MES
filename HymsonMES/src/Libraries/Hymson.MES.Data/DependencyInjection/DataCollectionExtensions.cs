@@ -100,6 +100,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInteVehicleFreightRepository, InteVehicleFreightRepository>();
             services.AddSingleton<IInteVehiceFreightStackRepository, InteVehiceFreightStackRepository>();
+            services.AddSingleton<IInteVehicleFreightRecordRepository, InteVehicleFreightRecordRepository>();
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
@@ -108,6 +109,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #region InteSystemToken
             services.AddSingleton<IInteSystemTokenRepository, InteSystemTokenRepository>();
             #endregion
+
+            //InteUnit
+            services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
             #endregion
 
             #region Process
@@ -184,6 +188,9 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Quality
+            services.AddSingleton<IQualEnvParameterGroupRepository, QualEnvParameterGroupRepository>();
+            services.AddSingleton<IQualEnvParameterGroupDetailRepository, QualEnvParameterGroupDetailRepository>();
+
             services.AddSingleton<IQualUnqualifiedCodeRepository, QualUnqualifiedCodeRepository>();
             services.AddSingleton<IQualUnqualifiedGroupRepository, QualUnqualifiedGroupRepository>();
             #endregion

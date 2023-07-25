@@ -33,6 +33,8 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -253,7 +255,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteVehicleVerifyEntity, InteVehicleVerifyDto>();
 
             CreateMap<InteVehicleFreightEntity, InteVehicleFreightDto>();
-            
+
             #endregion
         }
 
@@ -446,6 +448,15 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateQualityMaps()
         {
+            #region QualEnvParameterGroup
+            CreateMap<QualEnvParameterGroupSaveDto, QualEnvParameterGroupEntity>();
+            CreateMap<QualEnvParameterGroupPagedQueryDto, QualEnvParameterGroupPagedQuery>();
+            CreateMap<QualEnvParameterGroupView, QualEnvParameterGroupDto>();
+            CreateMap<QualEnvParameterGroupEntity, QualEnvParameterGroupInfoDto>();
+            CreateMap<QualEnvParameterGroupDetailSaveDto, QualEnvParameterGroupDetailEntity>();
+            CreateMap<QualEnvParameterGroupDetailEntity, QualEnvParameterGroupDetailDto>();
+            #endregion
+
             #region QualUnqualifiedCode
             CreateMap<QualUnqualifiedCodeEntity, QualUnqualifiedCodeDto>();
             CreateMap<QualUnqualifiedCodeCreateDto, QualUnqualifiedCodeEntity>();
@@ -578,7 +589,10 @@ namespace Hymson.MES.Services.Mapper
 
         }
 
-        protected virtual void CreateReportMaps() 
+        /// <summary>
+        /// 报表
+        /// </summary>
+        protected virtual void CreateReportMaps()
         {
             #region BadRecordReport
             CreateMap<BadRecordReportDto, ManuProductBadRecordReportPagedQuery>();
@@ -590,13 +604,13 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
-            
+
             CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
             #region ComUsageReport
             CreateMap<ComUsageReportPagedQueryDto, ComUsageReportPagedQuery>();
-            
+
             #endregion
 
         }

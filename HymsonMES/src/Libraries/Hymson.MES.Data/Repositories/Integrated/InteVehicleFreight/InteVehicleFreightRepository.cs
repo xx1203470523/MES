@@ -113,10 +113,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteVehicleFreightEntitiesSqlTemplate);
             sqlBuilder.Where("SiteId =@SiteId");
-            if(inteVehicleFreightQuery.Sfcs!=null&&inteVehicleFreightQuery.Sfcs.Any())
-            {
-                sqlBuilder.Where("BarCode IN @Sfcs");
-            }
+            //if(inteVehicleFreightQuery.Sfcs!=null&&inteVehicleFreightQuery.Sfcs.Any())
+            //{
+            //    //sqlBuilder.Where("BarCode IN @Sfcs");
+            //}
             using var conn = GetMESDbConnection();
             var inteVehicleFreightEntities = await conn.QueryAsync<InteVehicleFreightEntity>(template.RawSql, inteVehicleFreightQuery);
             return inteVehicleFreightEntities;
@@ -189,11 +189,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return await conn.ExecuteAsync(DeletesTrueByVehicleIdsSql, new { VehicleIds = vehicleIds });
         }
 
-        public async Task<InteVehicleFreightEntity> GetBySFCAsync(string sfc)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightEntity>(GetBySFCSql, new { BarCode = sfc });
-        }
     }
 
     public partial class InteVehicleFreightRepository
@@ -205,23 +200,23 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_vehicle_freight` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Location, @BarCode, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Location, @BarCode, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location,  @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `inte_vehicle_freight` SET   SiteId = @SiteId, VehicleId = @VehicleId, Location = @Location, BarCode = @BarCode, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte_vehicle_freight` SET   SiteId = @SiteId, VehicleId = @VehicleId, Location = @Location, BarCode = @BarCode, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_vehicle_freight` SET   SiteId = @SiteId, VehicleId = @VehicleId, Row=@Row, Column=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `inte_vehicle_freight` SET   SiteId = @SiteId, VehicleId = @VehicleId, Row=@Row, Column=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_vehicle_freight` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_vehicle_freight` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id = @Id ";
         const string GetBySFCSql = @"SELECT 
-                               `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_vehicle_freight`  WHERE BarCode = @BarCode ";
+                               `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `inte_vehicle_freight` ";//需要修改
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `VehicleId`, `Location`, `BarCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id IN @Ids ";
         #endregion
 

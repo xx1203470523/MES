@@ -36,7 +36,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 行
@@ -46,12 +46,12 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 列
         /// </summary>
-        public int Arrange { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
         /// 单元数量
         /// </summary>
-        public int UnitNumber { get; set; }
+        public int CellQty { get; set; }
         
         /// <summary>
         /// 说明

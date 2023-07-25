@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Data.Repositories.Common.Command
+﻿namespace Hymson.MES.Data.Repositories.Common.Command
 {
     /// <summary>
     /// 删除实体

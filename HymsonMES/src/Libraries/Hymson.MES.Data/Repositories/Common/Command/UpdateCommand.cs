@@ -4,6 +4,8 @@ namespace Hymson.MES.Data.Repositories.Common.Command
 {
     /// <summary>
     /// 实体（更新）
+    /// @author Czhipu
+    /// @date 2023-02-11 04:45:25
     /// </summary>
     public class UpdateCommand
     {

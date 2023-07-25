@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 载具类型id
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 载具类型id
@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum Status { get; set; }
+        public DisableOrEnableEnum Status { get; set; }
 
        /// <summary>
         /// 载具类型id
@@ -183,7 +183,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
-        public EnableEnum? Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         ///// <summary>
         ///// 载具类型id
@@ -276,14 +276,19 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long VehicleId { get; set; }
 
         /// <summary>
+        /// x位置
+        /// </summary>
+        public int Column { get; set; } 
+
+        /// <summary>
+        /// y位置
+        /// </summary>
+        public int Row { get; set; }
+
+        /// <summary>
         /// 位置号
         /// </summary>
         public string Location { get; set; }
-
-        /// <summary>
-        /// 装载条码
-        /// </summary>
-        public string BarCode { get; set; }
 
         /// <summary>
         /// 状态;0-禁用 1-启用
@@ -322,6 +327,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record InteVehicleFreightCreateDto : BaseEntityDto
     {
+        /// <summary>
+        /// x位置
+        /// </summary>
+        public int Column { get; set; }
+
+        /// <summary>
+        /// y位置
+        /// </summary>
+        public int Row { get; set; }
+
         /// <summary>
         /// 位置号
         /// </summary>
