@@ -123,17 +123,17 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (noProduceSfcs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
 
-            //排队中的条码没进站不允许绑定
-            if (sfcProduceList.Any())
-            {
-                //必须进站再绑定
-                var outBoundMoreSfcs = sfcCirculationBindDto.BindSFCs.Where(w =>
-                                            sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.Activity)
-                                            .Select(s => s.SFC)
-                                            .Contains(w.SFC));
-                if (outBoundMoreSfcs.Any())
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19132)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
-            }
+            //排队中的条码也允许绑定
+            //if (sfcProduceList.Any())
+            //{
+            //    //必须进站再绑定
+            //    var outBoundMoreSfcs = sfcCirculationBindDto.BindSFCs.Where(w =>
+            //                                sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.Activity)
+            //                                .Select(s => s.SFC)
+            //                                .Contains(w.SFC));
+            //    if (outBoundMoreSfcs.Any())
+            //        throw new CustomerValidationException(nameof(ErrorCode.MES19132)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
+            //}
             //模组/PACK码信息
             var mpManuSfc = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
 
