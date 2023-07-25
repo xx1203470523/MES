@@ -21,5 +21,13 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <param name="targetTotal"></param>
         /// <returns></returns>
         Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal);
+
+        /// <summary>
+        /// 获取当天工序直通率和良品率
+        /// </summary>
+        /// <param name="procedureCodes"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(string[] procedureCodes, long siteId);
     }
 }

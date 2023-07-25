@@ -113,6 +113,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId = @SiteId");
+            if (manuSfcSummaryQuery.ProcedureIds != null && manuSfcSummaryQuery.ProcedureIds.Any())
+            {
+                sqlBuilder.Where("ProcedureId in @ProcedureIds");
+            }
             if (manuSfcSummaryQuery.EquipmentId.HasValue)
             {
                 sqlBuilder.Where("EquipmentId = @EquipmentId");

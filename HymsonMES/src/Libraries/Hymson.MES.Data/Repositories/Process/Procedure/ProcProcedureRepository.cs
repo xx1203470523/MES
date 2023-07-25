@@ -124,6 +124,18 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据Codes批量获取数据
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>> GetByCodesAsync(string[] codes, long siteId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcedureEntity>(GetByCodesSql, new { Codes = codes, SiteId = siteId });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -236,6 +248,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM `proc_procedure`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_procedure`  WHERE Id IN @ids and IsDeleted=0  ";
         const string GetByCodeSql = @"SELECT * FROM `proc_procedure`  WHERE Code = @Code and SiteId=@SiteId LIMIT 1";
+        const string GetByCodesSql = @"SELECT * FROM `proc_procedure`  WHERE Code in @Codes and SiteId=@SiteId ";
 
         const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId  WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";
     }

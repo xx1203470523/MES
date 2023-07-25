@@ -18,9 +18,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long SiteId { get; set; }
         /// <summary>
-        /// 工序ID
+        /// 工序Id集合
         /// </summary>
-        public long? ProcedureId { get; set; }
+        public long[]? ProcedureIds { get; set; }
         /// <summary>
         /// 设备ID
         /// </summary>

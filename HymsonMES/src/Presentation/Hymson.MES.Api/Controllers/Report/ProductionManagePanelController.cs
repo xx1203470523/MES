@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Data;
 using System.Dynamic;
+using System.Security.Policy;
 
 namespace Hymson.MES.Api.Controllers.Report
 {
@@ -44,8 +45,7 @@ namespace Hymson.MES.Api.Controllers.Report
         [Route("getModuleAchievingInfo")]
         public async Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(long siteId, string procedureCode, decimal targetTotal)
         {
-            var managePanelModuleDtos = await _productionManagePanelService.GetModuleAchievingInfoAsync(siteId, procedureCode, targetTotal);
-            return managePanelModuleDtos;
+            return await _productionManagePanelService.GetModuleAchievingInfoAsync(siteId, procedureCode, targetTotal);
         }
         /// <summary>
         /// 获取模组达成详细信息
@@ -196,57 +196,14 @@ namespace Hymson.MES.Api.Controllers.Report
         }
 
         /// <summary>
-        /// 获取设备性能稼动率
+        /// 获取工序良品率相关信息
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getEquipmentUtilizationRate")]
-        public Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync()
+        [Route("getProcessQualityRate")]
+        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(string[] procedureCodes, long siteId)
         {
-            IEnumerable<EquipmentUtilizationRateDto> equipmentUtilizationRateDtos = new List<EquipmentUtilizationRateDto>()
-            {
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN001",
-                    EquipmentName="电芯分档设备",
-                    UtilizationRate=10
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN002",
-                    EquipmentName="电芯堆叠设备",
-                    UtilizationRate=60
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN003",
-                    EquipmentName="烤炉",
-                    UtilizationRate=40
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN004",
-                    EquipmentName="机型绝缘检测",
-                    UtilizationRate=80
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN005",
-                    EquipmentName="极柱清洗",
-                    UtilizationRate=50
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN006",
-                    EquipmentName="焊接",
-                    UtilizationRate=30
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN007",
-                    EquipmentName="DCIR测试",
-                    UtilizationRate=70
-                },
-                new EquipmentUtilizationRateDto {
-                    EquipmentCode="AN008",
-                    EquipmentName="捆扎",
-                    UtilizationRate=90
-                }
-            };
-            return Task.FromResult(equipmentUtilizationRateDtos);
+            return await _productionManagePanelService.GetProcessQualityRateAsync(procedureCodes, siteId);
         }
 
         /// <summary>

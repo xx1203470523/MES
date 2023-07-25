@@ -44,6 +44,14 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param);
 
         /// <summary>
+        /// 根据Codes批量获取工序信息
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetByCodesAsync(string[] codes, long siteId);
+
+        /// <summary>
         /// 判断工序是否存在
         /// </summary>
         /// <param name="query"></param>

@@ -162,22 +162,26 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     /// <summary>
-    /// 设备性能稼动率Dto
+    /// 工序合格率Dto
     /// </summary>
-    public record EquipmentUtilizationRateDto : BaseEntityDto
+    public record ProcessQualityRateDto : BaseEntityDto
     {
         /// <summary>
-        /// 设备编码
+        /// 工序编码
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string ProccessCode { get; set; }
         /// <summary>
-        /// 设备名称
+        /// 工序名称
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string ProcessName { get; set; }
         /// <summary>
-        /// 稼动率
+        /// 直通率
         /// </summary>
-        public decimal UtilizationRate { get; set; }
+        public decimal FirstPassYieldRate { get; set; }
+        /// <summary>
+        /// 良率
+        /// </summary>
+        public decimal YieldRate { get; set; }
     }
 
     /// <summary>
