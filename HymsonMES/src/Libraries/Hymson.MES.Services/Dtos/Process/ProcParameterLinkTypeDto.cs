@@ -1,18 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数关联类型表    Dto | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 05:06:17
- */
-
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -161,14 +148,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public ParameterUnitEnum ParameterUnit { get; set; }
 
         /// <summary>
-        /// 创建人
+        /// 数据类型（字典定义） 
         /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
+        public DataTypeEnum DataType { get; set; }
 
         /// <summary>
         /// 更新人

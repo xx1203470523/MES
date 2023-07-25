@@ -100,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where(" g.IsDeleted=0 ");
+            sqlBuilder.Where(" g.IsDeleted = 0 ");
             //sqlBuilder.Select("*");
 
             sqlBuilder.Where(" g.SiteId=@SiteId ");
@@ -244,11 +244,14 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcParameterLinkTypeRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
                                 g.Id, g.SiteId, g.ParameterType, o.Id as ParameterID,
-                                o.ParameterCode, o.ParameterName, o.ParameterUnit,
+                                o.ParameterCode, o.ParameterName, o.ParameterUnit, o.DataType,
                                 g.Remark, g.CreatedBy, g.CreatedOn, g.UpdatedBy, g.UpdatedOn
                                 FROM `proc_parameter_link_type` g 
                                 LEFT JOIN proc_parameter o ON g.ParameterID = o.Id 
