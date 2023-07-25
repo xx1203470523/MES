@@ -208,48 +208,9 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessYieldRate")]
-        public async Task<List<ProcessYieldRateDto>> GetProcessYieldRateAsync([FromQuery] ProcessYieldRateQuery param)
+        public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync([FromQuery] ProcessYieldRateQuery param)
         {
-            List<ProcessYieldRateDto> yieldRateDtos = new List<ProcessYieldRateDto>();
-            int year = HymsonClock.Now().Year;
-            int month = HymsonClock.Now().Month;
-            int daysInMonth = DateTime.DaysInMonth(year, month);
-            var processYieldRateDtos = await _productionManagePanelService.GetProcessYieldRateAsync(param);
-            for (int i = 1; i <= daysInMonth; i++)
-            {
-                var dayStr = i < 10 ? i.ToString().PadLeft(2, '0') : i.ToString();
-                var processYields = processYieldRateDtos.Where(c => c.Day == dayStr)
-                    .Select(c => new ProcessYieldRateDto
-                    {
-                        Day = dayStr,
-                        ProccessCode = c.ProccessCode,
-                        ProcessName = c.ProcessName,
-                        YieldQty = c.YieldQty,
-                        YieldRate = c.YieldRate
-
-                    });
-                //添加不存在数据的月份指标
-                if (!processYields.Any())
-                {
-                    foreach (var item in param.ProcedureCodes)
-                    {
-                        //查询工序信息（有缓存）
-                        var procProcedure = await _productionManagePanelService.GetProcProcedure(item, param.SiteId);
-                        yieldRateDtos.Add(new ProcessYieldRateDto
-                        {
-                            Day = dayStr,
-                            ProccessCode = item,
-                            ProcessName = procProcedure?.Name ?? item,
-                            Total = 0,
-                            YieldQty = 0,
-                            YieldRate = 0
-                        });
-                    }
-                }
-                //添加存在数据的指标
-                yieldRateDtos.AddRange(processYields);
-            }
-            return yieldRateDtos;
+            return  await _productionManagePanelService.GetProcessYieldRateAsync(param);
         }
 
         /// <summary>
