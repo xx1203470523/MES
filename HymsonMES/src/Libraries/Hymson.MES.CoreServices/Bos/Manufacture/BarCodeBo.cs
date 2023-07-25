@@ -105,7 +105,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 条码
         /// </summary>
-        public string BarCode { get; set; }
+        public IEnumerable<string> BarCodes { get; set; }
 
         /// <summary>
         /// 条码流水号
@@ -113,4 +113,44 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public string SerialNumber { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class SerialNumberBo
+    {
+        /// <summary>
+        /// 参数key
+        /// </summary>
+        public string CodeRuleKey { get; set; }
+
+        /// <summary>
+        /// 是否测试
+        /// </summary>
+        public bool IsTest { get; set; } = false;
+
+        /// <summary>
+        /// 是否模拟（默认模拟）
+        /// </summary>
+        public bool IsSimulation { get; set; } = false;
+
+        /// <summary>
+        /// 增量
+        /// </summary>
+        public int Increment { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// 重置序号;1：从不；2：每天；3：每周；4：每月；5：每年；
+        /// </summary>
+        public SerialNumberTypeEnum ResetType { get; set; }
+
+        /// <summary>
+        /// 起始
+        /// </summary>
+        public int StartNumber { get; set; }
+    }
 }

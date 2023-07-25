@@ -15,17 +15,22 @@ namespace Hymson.MES.Core.Enums
         /// <summary>
         /// 开始
         /// </summary>
-        [Description("开始")]
-        Start = 1,
+        [Description("开始前")]
+        BeforeStart = 1,
         /// <summary>
-        /// 停止
+        /// 开始
         /// </summary>
-        [Description("停止")]
-        Stop = 2,
+        [Description("开始后")]
+        AfterStart = 2,
         /// <summary>
-        /// 完成
+        /// 完成前
         /// </summary>
-        [Description("完成")]
-        Finish = 3
+        [Description("完成前")]
+        BeforeFinish = 3,
+        /// <summary>
+        /// 完成后
+        /// </summary>
+        [Description("完成后")]
+        AfterFinish = 4
     }
 }

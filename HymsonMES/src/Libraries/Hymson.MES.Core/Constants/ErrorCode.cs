@@ -192,7 +192,7 @@
         public const string MES10513 = "参数类型不合法，请检查！";
         public const string MES10514 = "参数ID不能为空";
         public const string MES10515 = "标准参数名称最大长度为50";
-
+        public const string MES10516 = "参数{Code}的规格上限和规格下限配置异常，上限不能小于下限！";
         #endregion
 
         #region Bom 10600
