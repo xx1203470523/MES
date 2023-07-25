@@ -199,7 +199,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.Start
+                LinkPoint = ResourceJobLinkPointEnum.BeforeStart
             });
         }
 
@@ -402,7 +402,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.Finish
+                LinkPoint = ResourceJobLinkPointEnum.AfterStart
             });
         }
 
