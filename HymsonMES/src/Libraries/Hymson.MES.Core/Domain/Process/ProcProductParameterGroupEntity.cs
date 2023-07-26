@@ -1,9 +1,10 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
     /// <summary>
-    /// 数据实体（产品工序参数组）   
+    /// 数据实体（产品检验参数组）   
     /// proc_product_parameter_group
     /// @author Czhipu
     /// @date 2023-07-25 01:58:43
@@ -28,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 物料id

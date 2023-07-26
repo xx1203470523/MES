@@ -118,7 +118,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcMaskCodeRuleRepository, ProcMaskCodeRuleRepository>();
             services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
             services.AddSingleton<IProcProductSetRepository, ProcProductSetRepository>();
-
+            services.AddSingleton<IProcProductParameterGroupRepository, ProcProductParameterGroupRepository>();
+            services.AddSingleton<IProcProductParameterGroupDetailRepository, ProcProductParameterGroupDetailRepository>();
 
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();

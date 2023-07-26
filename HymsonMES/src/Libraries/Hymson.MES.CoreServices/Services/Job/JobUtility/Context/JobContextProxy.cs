@@ -1,13 +1,7 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Hymson.Infrastructure;
-using Hymson.Kafka.Debezium;
+﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.Utils;
-using MySqlX.XDevAPI.Common;
-using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.X509;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -348,7 +342,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         {
             var name = typeof(IEnumerable<TResult>);
             var cacheKey = (uint)$"{typeof(IEnumerable<TResult>)}".GetHashCode();
-
+            
             if (Has(cacheKey))
             {
                 var cacheObj = Get(cacheKey);
@@ -358,7 +352,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 if (expectCount != 0 && cacheResult.Count() < expectCount)
                 {
                     var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
-       
+
                     if (obj != null)
                     {
                         var incompleteKey = (uint)$"{IncompleteKey}{typeof(IEnumerable<TResult>)}".GetHashCode();

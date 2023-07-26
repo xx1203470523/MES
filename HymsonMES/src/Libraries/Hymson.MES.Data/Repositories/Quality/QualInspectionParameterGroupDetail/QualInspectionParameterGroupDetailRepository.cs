@@ -49,7 +49,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<IEnumerable<QualInspectionParameterGroupDetailEntity>> GetEntitiesAsync(QualInspectionParameterGroupDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualInspectionParameterGroupDetailEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("ParameterGroupId = @ParameterGroupId");
             sqlBuilder.Select("*");
@@ -66,11 +66,11 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualInspectionParameterGroupDetailRepository
     {
-       const string GetQualInspectionParameterGroupDetailEntitiesSqlTemplate = @"SELECT 
+       const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_inspection_parameter_group_detail` /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @InspectionParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string DeleteByParentId = "DELETE FROM qual_inspection_parameter_group_detail WHERE ParameterGroupId = @ParentId";
 

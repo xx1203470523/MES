@@ -46,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [Route("create")]
         [PermissionDescription("quality:qualInspectionParameterGroup:insert")]
-        public async Task AddQualInspectionParameterGroupAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
+        public async Task AddAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
         {
-            await _qualInspectionParameterGroupService.CreateQualInspectionParameterGroupAsync(saveDto);
+            await _qualInspectionParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPut]
         [Route("update")]
         [PermissionDescription("quality:qualInspectionParameterGroup:update")]
-        public async Task UpdateQualInspectionParameterGroupAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
+        public async Task UpdateAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
         {
-            await _qualInspectionParameterGroupService.ModifyQualInspectionParameterGroupAsync(saveDto);
+            await _qualInspectionParameterGroupService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpDelete]
         [Route("delete")]
         [PermissionDescription("quality:qualInspectionParameterGroup:delete")]
-        public async Task DeleteQualInspectionParameterGroupAsync([FromBody] long[] ids)
+        public async Task DeletesAsync([FromBody] long[] ids)
         {
-            await _qualInspectionParameterGroupService.DeletesQualInspectionParameterGroupAsync(ids);
+            await _qualInspectionParameterGroupService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<QualInspectionParameterGroupInfoDto?> QueryQualInspectionParameterGroupByIdAsync(long id)
+        public async Task<QualInspectionParameterGroupInfoDto?> QueryByIdAsync(long id)
         {
-            return await _qualInspectionParameterGroupService.QueryQualInspectionParameterGroupByIdAsync(id);
+            return await _qualInspectionParameterGroupService.QueryByIdAsync(id);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<QualInspectionParameterGroupDto>> QueryPagedQualInspectionParameterGroupAsync([FromQuery] QualInspectionParameterGroupPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<QualInspectionParameterGroupDto>> QueryPagedListAsync([FromQuery] QualInspectionParameterGroupPagedQueryDto pagedQueryDto)
         {
             return await _qualInspectionParameterGroupService.GetPagedListAsync(pagedQueryDto);
         }
