@@ -8,12 +8,12 @@ namespace Hymson.MES.Services.Validators.Quality
     /// <summary>
     /// 全检参数表 验证
     /// </summary>
-    internal class QualInspectionParameterGroupSaveValidator : AbstractValidator<QualInspectionParameterGroupSaveDto>
+    internal class QualInspectionParameterGroupValidator : AbstractValidator<QualInspectionParameterGroupSaveDto>
     {
         /// <summary>
         /// 
         /// </summary>
-        public QualInspectionParameterGroupSaveValidator()
+        public QualInspectionParameterGroupValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10113));
@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10117));
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10118));
             RuleFor(x => x.Version).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10119));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES10120));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10120));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES10121));
 
             RuleFor(x => x.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10518));

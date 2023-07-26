@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto)
+        public async Task<int> CreateAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto)
+        public async Task<int> ModifyAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -243,7 +243,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteQualEnvParameterGroupAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             return await _qualEnvParameterGroupRepository.DeleteAsync(id);
         }
@@ -253,7 +253,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesQualEnvParameterGroupAsync(long[] ids)
+        public async Task<int> DeletesAsync(long[] ids)
         {
             return await _qualEnvParameterGroupRepository.DeletesAsync(new DeleteCommand
             {
@@ -268,7 +268,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
+        public async Task<QualEnvParameterGroupInfoDto?> QueryByIdAsync(long id)
         {
             var qualEnvParameterGroupEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(id);
             if (qualEnvParameterGroupEntity == null) return null;

@@ -1,26 +1,26 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Quality;
+using Hymson.MES.Services.Dtos.Process;
 
-namespace Hymson.MES.Services.Services.Quality
+namespace Hymson.MES.Services.Services.Process
 {
     /// <summary>
-    /// 服务接口（全检参数表）
+    /// 服务接口（产品检验参数组）
     /// </summary>
-    public interface IQualInspectionParameterGroupService
+    public interface IProcProductParameterGroupService
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualInspectionParameterGroupSaveDto saveDto);
+        Task<int> CreateAsync(ProcProductParameterGroupSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(QualInspectionParameterGroupSaveDto saveDto);
+        Task<int> ModifyAsync(ProcProductParameterGroupSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -41,21 +41,21 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualInspectionParameterGroupInfoDto?> QueryByIdAsync(long id);
+        Task<ProcProductParameterGroupInfoDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 根据ID获取项目明细列表
         /// </summary>
         /// <param name="parameterGroupId"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualInspectionParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId);
+        Task<IEnumerable<ProcProductParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId);
 
         /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualInspectionParameterGroupDto>> GetPagedListAsync(QualInspectionParameterGroupPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<ProcProductParameterGroupDto>> GetPagedListAsync(ProcProductParameterGroupPagedQueryDto pagedQueryDto);
 
     }
 }

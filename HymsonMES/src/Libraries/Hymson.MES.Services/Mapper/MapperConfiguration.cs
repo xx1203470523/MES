@@ -28,9 +28,11 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
+using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -417,6 +419,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcSortingRuleCreateDto, ProcLabelTemplateEntity>();
             CreateMap<ProcSortingRuleModifyDto, ProcLabelTemplateEntity>();
             CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
+            #endregion
+
+            #region ProcProductParameterGroup
+            CreateMap<ProcProductParameterGroupSaveDto, ProcProductParameterGroupEntity>();
+            CreateMap<ProcProductParameterGroupPagedQueryDto, ProcProductParameterGroupPagedQuery>();
+            CreateMap<ProcProductParameterGroupView, ProcProductParameterGroupDto>();
+            CreateMap<ProcProductParameterGroupEntity, ProcProductParameterGroupInfoDto>();
+            CreateMap<ProcProductParameterGroupDetailSaveDto, ProcProductParameterGroupDetailEntity>();
+            CreateMap<ProcProductParameterGroupDetailEntity, ProcProductParameterGroupDetailDto>();
             #endregion
         }
 

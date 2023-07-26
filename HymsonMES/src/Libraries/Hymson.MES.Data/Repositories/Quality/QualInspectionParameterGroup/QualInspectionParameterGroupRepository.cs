@@ -128,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<IEnumerable<QualInspectionParameterGroupEntity>> GetEntitiesAsync(QualInspectionParameterGroupQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualInspectionParameterGroupEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualInspectionParameterGroupEntity>(template.RawSql, query);
         }
@@ -215,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**where**/ ";
-        const string GetQualInspectionParameterGroupEntitiesSqlTemplate = @"SELECT 
+        const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_inspection_parameter_group` /**where**/  ";
 

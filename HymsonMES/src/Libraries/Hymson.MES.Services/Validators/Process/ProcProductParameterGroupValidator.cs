@@ -1,19 +1,19 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Services.Dtos.Quality;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Validators.Quality
 {
     /// <summary>
-    /// 环境检验参数表 验证
+    /// 产品检验参数表 验证
     /// </summary>
-    internal class QualEnvParameterGroupValidator : AbstractValidator<QualEnvParameterGroupSaveDto>
+    internal class ProcProductParameterGroupValidator : AbstractValidator<ProcProductParameterGroupSaveDto>
     {
         /// <summary>
         /// 
         /// </summary>
-        public QualEnvParameterGroupValidator()
+        public ProcProductParameterGroupValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10113));
@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10120));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES10121));
 
-            RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10517));
+            RuleFor(x => x.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10518));
             RuleFor(x => x.ProcedureId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10519));
         }
     }
