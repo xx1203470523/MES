@@ -59,31 +59,16 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 }
             }
 
-            // 执行参数校验
             foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
+                // 执行参数校验
                 await service.VerifyParamAsync(param);
-            }
 
-            // 执行数据组装
-            foreach (var job in execJobBos)
-            {
-                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
-                if (service == null) continue;
-
-                /*
-                var dataAssembling = await service.DataAssemblingAsync(param);
-                if (dataAssembling == null) continue;
-
-                param.Proxy.SetValue(job.Name, dataAssembling);
-                */
-
-                await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
-                //await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
-                //param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
+                // 执行数据组装
+                await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
             }
 
             // 执行入库
