@@ -63,6 +63,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcParameterEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procParameterPagedQuery"></param>
@@ -177,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `proc_parameter` WHERE Id = @Id ";
-
+        const string GetByIdsSql = @"SELECT * FROM `proc_parameter` WHERE Id IN @ids and IsDeleted=0 ";
     }
 
 }

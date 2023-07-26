@@ -65,8 +65,6 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 等级
         /// </summary>
-        public string Rating { get; set; }
-
-       
+        public string Rating { get; set; }       
     }
 }
