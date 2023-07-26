@@ -145,11 +145,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = T.MaterialId");
             sqlBuilder.LeftJoin("proc_procedure PP ON PP.Id = T.ProcedureId");
-            sqlBuilder.Where("T.IsDeleted = 0");
-            sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.Select("T.*");
             sqlBuilder.Select("PM.MaterialCode, PM.MaterialName");
             sqlBuilder.Select("PP.Code AS ProcedureCode, PP.Name AS ProcedureName");
+            sqlBuilder.OrderBy("T.UpdatedOn DESC");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
 
             if (pagedQuery.Status.HasValue)
             {
@@ -213,7 +214,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualInspectionParameterGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**where**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
