@@ -1,13 +1,10 @@
 ﻿using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Utils;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Policy;
 
 namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 {
@@ -225,7 +222,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             get
             {
                 DateTime checkTime = NowTime; // 当前时间
-                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, 01, StartHour, StartMinute, 0);
+                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, 01, 00, 00, 00);
                 return startTime;
             }
         }
@@ -238,7 +235,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             get
             {
                 DateTime checkTime = NowTime.AddMonths(1); //结束时间在次月
-                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, 01, StartHour, StartMinute, 0);
+                DateTime startTime = new DateTime(checkTime.Year, checkTime.Month, 01, 00, 00, 00);
                 return startTime;
             }
         }
@@ -443,7 +440,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 return processYieldRateDtos;
             }
             var procProcedureIds = procProcedureEntities.Select(c => c.Id).ToArray();
-            //查询当天汇总数据 包含良品和不良
+            //查询汇总数据 包含良品和不良
             var manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 SiteId = param.SiteId,
@@ -527,6 +524,100 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 yieldRateDtos.AddRange(processYields);
             }
             return yieldRateDtos;
+        }
+
+
+        /// <summary>
+        /// 获取工序指数数据信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsDataAsync(ProcessIndicatorsQuery param)
+        {
+            List<ProcessIndicatorsDto> processIndicatorsDtos = new List<ProcessIndicatorsDto>();
+            var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(param.ProcedureCodes, param.SiteId);
+            if (!procProcedureEntities.Any())
+            {
+                return processIndicatorsDtos;
+            }
+            var procProcedureIds = procProcedureEntities.Select(c => c.Id).ToArray();
+            //查询汇总数据 只包含良品
+            var manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = param.SiteId,
+                ProcedureIds = procProcedureIds,
+                StartTime = MonthStartTime,
+                EndTime = MonthEndTime,
+                QualityStatus = 1,
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            var dailyPassList = manuSfcSummaryEntities
+                .Where(s => s.IsDeleted == 0)
+                .GroupBy(s => new { s.CreatedOn.Date, s.ProductId })
+                .Select(g => new
+                {
+                    ProcedureId = g.Max(c => c.ProcedureId),
+                    Day = g.Key,
+                    Total = g.Sum(s => s.Qty) ?? 0,//总数
+                })
+                .Select(x =>
+                {
+                    var procProcedure = procProcedureEntities.Where(c => c.Id == x.ProcedureId).FirstOrDefault();
+                    return new ProcessIndicatorsDto
+                    {
+                        ProccessCode = procProcedure?.Code ?? string.Empty,
+                        ProcessName = procProcedure?.Name ?? string.Empty,
+                        Day = x.Day.Date.Day.ToString().PadLeft(2, '0'),
+                        Indicators = x.Total,
+                    };
+                })
+                .OrderBy(x => x.Day).ToList();
+            return dailyPassList;
+        }
+
+        /// <summary>
+        /// 统计工序指数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync(ProcessIndicatorsQuery param)
+        {
+            List<ProcessIndicatorsDto> processIndicators = new List<ProcessIndicatorsDto>();
+            int year = HymsonClock.Now().Year;
+            int month = HymsonClock.Now().Month;
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+            var processIndicatorsDtos = await GetProcessIndicatorsDataAsync(param);
+            for (int i = 1; i <= daysInMonth; i++)
+            {
+                var dayStr = i < 10 ? i.ToString().PadLeft(2, '0') : i.ToString();
+                var processIndicator = processIndicatorsDtos.Where(c => c.Day == dayStr)
+                    .Select(c => new ProcessIndicatorsDto
+                    {
+                        Day = dayStr,
+                        ProccessCode = c.ProccessCode,
+                        ProcessName = c.ProcessName,
+                        Indicators = c.Indicators
+                    });
+                //添加不存在数据的月份指标
+                if (!processIndicator.Any())
+                {
+                    foreach (var item in param.ProcedureCodes)
+                    {
+                        //查询工序信息（有缓存）
+                        var procProcedure = await _procProcedureRepository.GetByCodeAsync(item, param.SiteId);
+                        processIndicators.Add(new ProcessIndicatorsDto
+                        {
+                            Day = dayStr,
+                            ProccessCode = item,
+                            ProcessName = procProcedure?.Name ?? item,
+                            Indicators = 0
+                        });
+                    }
+                }
+                //添加存在数据的指标
+                processIndicators.AddRange(processIndicator);
+            }
+            return processIndicators;
         }
     }
 }

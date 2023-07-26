@@ -210,7 +210,7 @@ namespace Hymson.MES.Api.Controllers.Report
         [Route("getProcessYieldRate")]
         public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync([FromQuery] ProcessYieldRateQuery param)
         {
-            return  await _productionManagePanelService.GetProcessYieldRateAsync(param);
+            return await _productionManagePanelService.GetProcessYieldRateAsync(param);
         }
 
         /// <summary>
@@ -219,59 +219,9 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessIndicators")]
-        public Task<List<ProcessIndicatorsDto>> GetProcessIndicatorsAsync()
+        public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync([FromQuery] ProcessIndicatorsQuery param)
         {
-            List<ProcessIndicatorsDto> indicatorsDtos = new List<ProcessIndicatorsDto>();
-            int year = HymsonClock.Now().Year;
-            int month = HymsonClock.Now().Month;
-            int daysInMonth = DateTime.DaysInMonth(year, month);
-            for (int i = 1; i <= daysInMonth; i++)
-            {
-                var dayStr = i < 10 ? i.ToString().PadLeft(2, '0') : i.ToString();
-                Random random = new Random(i);
-                int minValue = 1;
-                int maxValue = 100;
-                int randomInRange = random.Next(minValue, maxValue + 1);
-                var processIndicators = new ProcessIndicatorsDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST",
-                    ProcessName = "测试工序",
-                    Indicators = randomInRange
-                };
-                indicatorsDtos.Add(processIndicators);
-
-                int randomInRange2 = random.Next(minValue, maxValue + 1);
-                var processIndicators2 = new ProcessIndicatorsDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST2",
-                    ProcessName = "测试工序2",
-                    Indicators = randomInRange2
-                };
-                indicatorsDtos.Add(processIndicators2);
-
-                int randomInRange3 = random.Next(minValue, maxValue + 1);
-                var processIndicators3 = new ProcessIndicatorsDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST3",
-                    ProcessName = "测试工序3",
-                    Indicators = randomInRange3
-                };
-                indicatorsDtos.Add(processIndicators3);
-
-                int randomInRange4 = random.Next(minValue, maxValue + 1);
-                var processIndicators4 = new ProcessIndicatorsDto
-                {
-                    Day = dayStr,
-                    ProccessCode = "TEST4",
-                    ProcessName = "测试工序4",
-                    Indicators = randomInRange4
-                };
-                indicatorsDtos.Add(processIndicators4);
-            }
-            return Task.FromResult(indicatorsDtos);
+            return await _productionManagePanelService.GetProcessIndicatorsAsync(param);
         }
     }
 }

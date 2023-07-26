@@ -268,6 +268,21 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public string[] ProcedureCodes { get; set; }
     }
+
+    /// <summary>
+    /// 工序指数查询
+    /// </summary>
+    public record ProcessIndicatorsQuery
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string[] ProcedureCodes { get; set; }
+    }
     /// <summary>
     /// 工序指数
     /// </summary>
