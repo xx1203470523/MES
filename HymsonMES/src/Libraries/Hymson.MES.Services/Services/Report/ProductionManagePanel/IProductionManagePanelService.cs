@@ -14,11 +14,17 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <returns></returns>
         Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId);
         /// <summary>
-        /// 获取模组达成信息
+        /// 获取模组达成信息明细
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<ProductionManagePanelModuleDto>> GetModuleAchievingInfoAsync(ModuleAchievingQueryDto param);
+        /// <summary>
+        /// 获取模组达成信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<List<dynamic>> GetModuleInfoDynamicAsync(ModuleAchievingQueryDto param);
 
         /// <summary>
         /// 获取当天工序直通率和良品率
@@ -40,5 +46,12 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync(ProcessIndicatorsQuery param);
+
+        /// <summary>
+        /// 获取设备稼动率信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQuery param);
     }
 }

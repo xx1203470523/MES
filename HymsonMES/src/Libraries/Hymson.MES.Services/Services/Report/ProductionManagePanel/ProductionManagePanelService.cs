@@ -1,10 +1,16 @@
 ﻿using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Utils;
+using System.Collections;
+using System.Data;
+using System.Dynamic;
 
 namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 {
@@ -21,12 +27,14 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
+        private readonly IEquEquipmentRepository _equipmentRepository;
+        private readonly IEquStatusRepository _equStatusRepository;
         public ProductionManagePanelService(IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository, IProcProcessRouteRepository procProcessRouteRepository,
             IProcMaterialRepository procMaterialRepository, IInteWorkCenterRepository inteWorkCenterRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IProcProcedureRepository procProcedureRepository, IEquEquipmentRepository equipmentRepository, IEquStatusRepository equStatusRepository)
         {
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -36,6 +44,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcedureRepository = procProcedureRepository;
+            _equipmentRepository = equipmentRepository;
+            _equStatusRepository = equStatusRepository;
         }
 
         /// <summary>
@@ -215,7 +225,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 
         /// <summary>
         /// 当月开始时间
-        /// 如2023-07-01 08:30:00
+        /// 如2023-07-01 00:00:00
         /// </summary>
         private DateTime MonthStartTime
         {
@@ -229,6 +239,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 
         /// <summary>
         /// 当月结束时间
+        /// 如小于2023-08-01 00:00:00
         /// </summary>
         private DateTime MonthEndTime
         {
@@ -241,6 +252,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         }
         #endregion
 
+        #region 获取综合信息
         /// <summary>
         /// 获取综合信息
         /// </summary>
@@ -319,6 +331,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             };
             return managePanelReportDto;
         }
+        #endregion
+
+        #region 获取模组达成信息
         /// <summary>
         /// 获取模组达成信息
         /// 特定工序投入量 和 目标数（固定数值）计算得到达成率
@@ -379,6 +394,79 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         }
 
         /// <summary>
+        /// Table转Dynamic
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="filterFields"></param>
+        /// <param name="includeOrExclude"></param>
+        /// <returns></returns>
+        private List<dynamic> ToDynamicList(DataTable table, string[] filterFields = null, bool includeOrExclude = true)
+        {
+            var modelList = new List<dynamic>();
+            var isFilter = filterFields != null && filterFields.Any();
+            IEnumerable reservedColumns = table.Columns;
+            if (isFilter)
+                reservedColumns = table.Columns.Cast<DataColumn>().Where(c => filterFields?.Contains(c.ColumnName) == includeOrExclude);
+            foreach (DataRow row in table.Rows)
+            {
+                dynamic model = new ExpandoObject();
+                var dict = (IDictionary<string, object>)model;
+                foreach (DataColumn column in reservedColumns)
+                {
+                    dict[column.ColumnName] = row[column];
+                }
+                modelList.Add(model);
+            }
+            return modelList;
+        }
+
+        /// <summary>
+        /// 动态返回dynamic
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<List<dynamic>> GetModuleInfoDynamicAsync(ModuleAchievingQueryDto param)
+        {
+            Dictionary<string, string> keyValues = new Dictionary<string, string>();
+            var managePanelModuleDtos = await GetModuleAchievingInfoAsync(param); ;
+            var managePanelPackDtos = managePanelModuleDtos.GroupBy(c => c.DateTimeRange);
+            DataTable dt = new();
+            //空列头
+            string NullColNmae = " ";
+            dt.Columns.Add(NullColNmae, typeof(string));
+            foreach (var item in managePanelPackDtos)
+            {
+                dt.Columns.Add(item.Key, typeof(string));
+            }
+
+            DataRow inputRow = dt.NewRow();
+            DataRow targetRow = dt.NewRow();
+            DataRow achievingRow = dt.NewRow();
+            inputRow[NullColNmae] = "投入数";
+            targetRow[NullColNmae] = "目标数";
+            achievingRow[NullColNmae] = "达成率";
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                var col = dt.Columns[i];
+                if (col.ColumnName != NullColNmae)
+                {
+                    var managePanelPackDto = managePanelModuleDtos.Where(c => c.DateTimeRange == col.ColumnName).FirstOrDefault();
+                    if (managePanelPackDto == null) { continue; }
+                    inputRow[col.ColumnName] = managePanelPackDto?.InputQty;
+                    targetRow[col.ColumnName] = managePanelPackDto?.TargetQty;
+                    achievingRow[col.ColumnName] = managePanelPackDto?.AchievingRate;
+
+                }
+            }
+            dt.Rows.Add(inputRow);
+            dt.Rows.Add(targetRow);
+            dt.Rows.Add(achievingRow);
+            return ToDynamicList(dt);
+        }
+        #endregion
+
+        #region 获取当天工序直通率和良品率
+        /// <summary>
         /// 获取当天工序直通率和良品率
         /// </summary>
         /// <param name="param"></param>
@@ -425,7 +513,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             }
             return processQualityRateDtos;
         }
+        #endregion
 
+        #region 获取工序良品数据信息
         /// <summary>
         /// 获取工序良品数据信息
         /// </summary>
@@ -525,8 +615,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             }
             return yieldRateDtos;
         }
+        #endregion
 
-
+        #region 获取工序指数数据信息
         /// <summary>
         /// 获取工序指数数据信息
         /// </summary>
@@ -619,5 +710,125 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             }
             return processIndicators;
         }
+        #endregion
+
+        #region 获取设备稼动率数据
+        /// <summary>
+        /// 统计设备每日稼动率信息
+        /// 永泰设备每日OEE计算公式
+        /// 必要条件：
+        ///     正常出勤时间 默认 10H/班，共两班，可外部传入更改。
+        ///     计划时间 = 正常出勤时间，两个班次共计20H。
+        ///     操作时间 = 计划时间 - 设备异常时长（停机时间，故障停机设备调试时间）。
+        ///     理想加工周期 = 设备加工完产品需要的时间，默认100，可以外部传入更改。
+        /// 计算方法：
+        ///     设备OEE=可用率*表现性*质量指数 = （操作时间/计划工作时间）* （理想加工周期 * 生产数量/实际运行时间） * （良品总数/总产量）*100%
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQuery param)
+        {
+            List<EquipmentUtilizationRateDto> equipmentUtilizationRateDtos = new List<EquipmentUtilizationRateDto>();
+            //查询需要统计的设备信息
+            var equEquipmentEntities = await _equipmentRepository.GetEntitiesAsync(new EquEquipmentQuery { SiteId = param.SiteId, EquipmentCodes = param.EquipmentCodes });
+            var equIds = equEquipmentEntities.Select(c => c.Id).ToArray();
+            if (!equIds.Any())
+            {
+                return equipmentUtilizationRateDtos;
+            }
+            //查询设备当天异常时长汇总（除了运行以外的状态）
+            var equipmentStopTimeDtos = await GetEquipmentStopTimeAsync(param.SiteId, equIds);
+            //查询设备当天生产数据汇总
+            var equipmentYieldDtos = await GetEquipmentYieldAsync(param.SiteId, equIds);
+            //统计设备OEE
+            foreach (var equCode in param.EquipmentCodes)
+            {
+                var theoryCycle = param.TheoryCycle;//理想加工周期
+                var workingHours = param.WorkingHours;//正常出勤时间/计划时间(小时)
+                //当前设备
+                var equEquipmentEntity = equEquipmentEntities.Where(c => c.EquipmentCode == equCode).First();
+                //获取当前设备异常时长
+                var equipmentStopTime = equipmentStopTimeDtos.Where(c => c.EquipmentId == equEquipmentEntity.Id).FirstOrDefault();
+                //获取当前设备生产数据
+                var equipmentYield = equipmentYieldDtos.Where(c => c.EquipmentId == equEquipmentEntity.Id).FirstOrDefault();
+                //计划工作秒
+                var workingSeconds = workingHours * 3600;
+                //操作时间
+                var operateTime = workingSeconds - equipmentStopTime?.StopSeconds ?? 0;
+                //可用率
+                var availability = operateTime / (equipmentStopTime?.StopSeconds ?? 1);
+                //表现性 实际运行实际取操作时间
+                var expressive = theoryCycle * (equipmentYield?.Total ?? 0) / (operateTime == 0 ? 1 : operateTime);
+                //质量指数
+                var qualityIndex = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
+                //OEE
+                var utilizationRate = decimal.Parse((availability * expressive * qualityIndex).ToString("0.00"));
+                var equipmentUtilizationRateDto = new EquipmentUtilizationRateDto
+                {
+                    EquipmentCode = equCode,
+                    EquipmentName = equEquipmentEntity.EquipmentName,
+                    UtilizationRate = utilizationRate
+                };
+                equipmentUtilizationRateDtos.Add(equipmentUtilizationRateDto);
+            }
+            return equipmentUtilizationRateDtos;
+        }
+
+        /// <summary>
+        /// 查询当天设备停机时长汇总
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="equipentIds"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<EquipmentStopTimeDto>> GetEquipmentStopTimeAsync(long siteId, long[] equipentIds)
+        {
+            //查询设备状态变化记录
+            var equStatusQuery = new EquStatusStatisticsQuery
+            {
+                SiteId = siteId,
+                EquipmentIds = equipentIds,
+                StartTime = DayStartTime,
+                EndTime = DayEndTime
+            };
+            var equStatusStatisticsEntities = await _equStatusRepository.GetEquStatusStatisticsEntitiesAsync(equStatusQuery);
+            var equipmentStopTimeDtos = equStatusStatisticsEntities
+                            .Where(c => c.EquipmentStatus != Core.Enums.EquipmentStateEnum.AutoRun)//过滤正常状态
+                            .OrderBy(c => c.CreatedOn)
+                            .GroupBy(c => c.EquipmentId)
+                            .Select(group => new EquipmentStopTimeDto
+                            {
+                                EquipmentId = group.Max(c => c.EquipmentId),
+                                StopSeconds = group.Sum(c => (c.EndTime - c.BeginTime)?.TotalSeconds ?? 0).ParseToDecimal()//停机总时长
+                            });
+            return equipmentStopTimeDtos;
+        }
+
+        /// <summary>
+        /// 获取设备当天生产数据
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="equipentIds"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<EquipmentYieldDto>> GetEquipmentYieldAsync(long siteId, long[] equipentIds)
+        {
+            //查询当天汇总数据 包含良品和不良
+            var manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = siteId,
+                EquipmentIds = equipentIds,
+                StartTime = DayStartTime,
+                EndTime = DayEndTime
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            var equipmentYieldDtos = manuSfcSummaryEntities
+                                    .GroupBy(c => c.EquipmentId)
+                                    .Select(group => new EquipmentYieldDto
+                                    {
+                                        EquipmentId = group.Max(c => c.EquipmentId),
+                                        Total = group.Count(),//总数
+                                        YieldQty = group.Where(c => c.QualityStatus == 1).Count()//良品数
+                                    });
+            return equipmentYieldDtos;
+        }
+        #endregion
     }
 }

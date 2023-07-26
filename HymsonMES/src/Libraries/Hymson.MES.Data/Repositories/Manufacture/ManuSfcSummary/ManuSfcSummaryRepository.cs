@@ -121,6 +121,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("EquipmentId = @EquipmentId");
             }
+            if (manuSfcSummaryQuery.EquipmentIds != null && manuSfcSummaryQuery.EquipmentIds.Length > 0)
+            {
+                sqlBuilder.Where("EquipmentId IN @EquipmentIds");
+            }
             if (manuSfcSummaryQuery.WorkOrderId.HasValue)
             {
                 sqlBuilder.Where("WorkOrderId = @WorkOrderId");

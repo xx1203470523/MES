@@ -42,18 +42,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 日志
         /// </summary>
         private readonly ILogger<EquipmentController> _logger;
-
         /// <summary>
         /// 进站
         /// </summary>
         private readonly IInStationService _InStationService;
-
         /// <summary>
         /// 条码绑定
         /// </summary>
         private readonly ISfcBindingService _sfcBindingService;
-
-
         /// <summary>
         /// 业务接口（设备监控服务）
         /// </summary>
@@ -73,8 +69,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IOutBoundService _outBoundService;
         private readonly INGDataService _ngDataService;
         private readonly ISfcCirculationService _sfcCirculationService;
-
-
 
         /// <summary>
         /// 构造函数
@@ -119,11 +113,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             ISfcCirculationService sfcCirculationService)
         {
             _logger = logger;
-
             _InStationService = manuInStationService;
             _sfcBindingService = sfcBindingService;
-
-
             _equipmentService = equipmentService;
             _bindSFCService = bindSFCService;
             _bindContainerService = bindContainerService;
@@ -140,13 +131,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _outBoundService = outBoundService;
             _ngDataService = ngDataService;
             _sfcCirculationService = sfcCirculationService;
-
-
-
         }
-
-
-
 
         /// <summary>
         ///进站
@@ -171,8 +156,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcBindingService.SfcBindingAsync(sfcBindingDto);
         }
-
-
 
         /// <summary>
         /// 设备心跳
@@ -222,7 +205,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _equipmentService.EquipmentDownReasonAsync(request);
         }
 
-
         /// <summary>
         /// 设备过程参数采集（无在制品条码）
         /// HY-MES-EQU-010
@@ -259,7 +241,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _equipmentService.EquipmentProductProcessParamAsync(request);
         }
 
-
         /// <summary>
         /// 上料-原材料上料
         /// HY-MES-EQU-013
@@ -283,7 +264,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _feedingService.FeedingUnloadingAsync(request);
         }
-
 
         /// <summary>
         /// 进站 HY-MES-EQU-015
@@ -328,7 +308,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _outBoundService.OutBoundMore(request);
         }
-
 
         ///// <summary>
         ///// 容器绑定
@@ -423,7 +402,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         //    await _inboundInSFCContainerService.InboundInSFCContainerAsync(request);
         //}
 
-
         /// <summary>
         /// CCD文件上传完成
         /// HY-MES-EQU-026  
@@ -451,7 +429,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         //    await _feedingConsumptionService.FeedingConsumptionAsync(request);
         //}
 
-
         /// <summary>
         /// 单体条码上料校验
         /// HY-MES-EQU-028
@@ -466,7 +443,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
         }
 
-
         /// <summary>
         ///产出上报数量
         ///HY-MES-EQU-029   
@@ -480,7 +456,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _logger.LogInformation("产出上报数量：OutPutQty,msg:{request}", request);
             await _outPutQtyService.OutPutQtyAsync(request);
         }
-
 
         ///// <summary>
         /////容器内条码查询
@@ -556,9 +531,5 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcCirculationService.SfcCirculationModuleRemove(request);
         }
-
-
-
-
     }
 }

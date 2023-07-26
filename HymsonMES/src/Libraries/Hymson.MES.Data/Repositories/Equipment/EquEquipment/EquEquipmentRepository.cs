@@ -167,6 +167,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("EE.*");
+            sqlBuilder.Where("EE.IsDeleted = 0");
+            sqlBuilder.Where("EE.SiteId = @SiteId");
+            if (equipmentQuery.EquipmentCodes != null && equipmentQuery.EquipmentCodes.Length > 0)
+            {
+                sqlBuilder.Where("EE.EquipmentCode IN @EquipmentCodes");
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, equipmentQuery);
             return equipmentEntities;
@@ -259,7 +266,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/";
-        const string GetEntitiesSqlTemplate = "";
+        const string GetEntitiesSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
         /// <summary>
         /// 
         /// </summary>

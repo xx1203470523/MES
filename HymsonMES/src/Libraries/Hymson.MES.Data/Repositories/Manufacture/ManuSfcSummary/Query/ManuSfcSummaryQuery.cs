@@ -27,6 +27,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long? EquipmentId { get; set; }
 
         /// <summary>
+        /// 设备Ids
+        /// </summary>
+        public long[]? EquipmentIds { get; set; }
+
+        /// <summary>
         /// 工单ID
         /// </summary>
         public long? WorkOrderId { get; set; }

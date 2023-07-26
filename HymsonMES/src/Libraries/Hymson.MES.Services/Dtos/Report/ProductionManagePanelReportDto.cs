@@ -158,26 +158,83 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     /// <summary>
-    /// 工序稼动率Dto
+    /// 设备稼动率查询
     /// </summary>
-    public record ProcessUtilizationRateDto : BaseEntityDto
+    public record EquipmentUtilizationRateQuery
     {
         /// <summary>
-        /// 工序编码
+        /// 站点Id
         /// </summary>
-        public string ProccessCode { get; set; }
+        public long SiteId { get; set; }
         /// <summary>
-        /// 工序名称
+        /// 设备理论加工周期
+        /// 暂时只设置总理论值 默认100
         /// </summary>
-        public string ProcessName { get; set; }
+        public decimal TheoryCycle { get; set; } = 100;
         /// <summary>
-        /// 数值
+        /// 工作周期
+        /// 默认20小时
         /// </summary>
-        public decimal Utilization { get; set; }
+        public decimal WorkingHours { get; set; } = 20;
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string[] EquipmentCodes { get; set; }
+    }
+
+    /// <summary>
+    /// 设备稼动率Dto
+    /// </summary>
+    public record EquipmentUtilizationRateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
         /// <summary>
         /// 稼动率
         /// </summary>
         public decimal UtilizationRate { get; set; }
+    }
+
+    /// <summary>
+    /// 设备停机时长Dto
+    /// </summary>
+    public class EquipmentStopTimeDto
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 总停机秒数
+        /// </summary>
+        public decimal StopSeconds { get; set; }
+    }
+
+    /// <summary>
+    /// 设备良品信息
+    /// </summary>
+    public class EquipmentYieldDto
+    {
+        /// <summary>
+        /// 设备Id
+        /// </summary>
+        public long EquipmentId { get; set; }
+        /// <summary>
+        /// 总数
+        /// </summary>
+        public decimal Total { get; set; }
+        /// <summary>
+        /// 良品数
+        /// </summary>
+        public decimal YieldQty { get; set; }
     }
 
     /// <summary>
