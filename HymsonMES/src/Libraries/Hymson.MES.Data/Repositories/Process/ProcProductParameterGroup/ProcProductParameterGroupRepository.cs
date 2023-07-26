@@ -229,7 +229,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_product_parameter_group` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_product_parameter_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByCodeSql = "SELECT * FROM proc_product_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM proc_product_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code AND Version = @Version LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM `proc_product_parameter_group`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_product_parameter_group`  WHERE Id IN @Ids ";
 

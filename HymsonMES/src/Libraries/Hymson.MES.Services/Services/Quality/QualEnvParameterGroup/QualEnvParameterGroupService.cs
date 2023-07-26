@@ -132,8 +132,13 @@ namespace Hymson.MES.Services.Services.Quality
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
-            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.Code);
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
 
             // 判断规格上限和规格下限（数据类型为数值）
             List<ValidationFailure> validationFailures = new();
@@ -205,6 +210,44 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = saveDto.ToEntity<QualEnvParameterGroupEntity>();
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.SiteId = _currentSite.SiteId ?? 0;
+
+            // 编码唯一性验证
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
+            }
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit >= item.LowerLimit) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                    ErrorCode = nameof(ErrorCode.MES10516)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
 
             var details = saveDto.Details.Select(s =>
             {
