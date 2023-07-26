@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 分选规则    Dto | 代码由框架生成
+ *describe: 档次    Dto | 代码由框架生成
  *builder:  zhaoqing
- *build datetime: 2023-07-25 03:24:54
+ *build datetime: 2023-07-25 03:34:14
  */
 
 using Hymson.Infrastructure;
@@ -11,9 +11,9 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// 分选规则Dto
+    /// 档次Dto
     /// </summary>
-    public record ProcSortingRuleDto : BaseEntityDto
+    public record ProcSortingRuleGradeDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -26,34 +26,78 @@ namespace Hymson.MES.Services.Dtos.Process
         public long SiteId { get; set; }
 
        /// <summary>
-        /// 规则编码
+        /// proc_sorting_rules 分选规则id
         /// </summary>
-        public string Code { get; set; }
+        public long SortingRuleId { get; set; }
 
        /// <summary>
-        /// 规则名称
+        /// 档位
         /// </summary>
-        public string Name { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-       /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
+        public string Grade { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string remark { get; set; }
+
+       /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+       /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+       /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+       /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+
+       /// <summary>
+        /// 删除标识
+        /// </summary>
+        public long IsDeleted { get; set; }
+
+       
+    }
+
+
+    /// <summary>
+    /// 档次新增Dto
+    /// </summary>
+    public record ProcSortingRuleGradeCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+       /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+       /// <summary>
+        /// proc_sorting_rules 分选规则id
+        /// </summary>
+        public long SortingRuleId { get; set; }
+
+       /// <summary>
+        /// 档位
+        /// </summary>
+        public string Grade { get; set; }
+
+       /// <summary>
+        /// 备注
+        /// </summary>
+        public string remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -84,9 +128,9 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 分选规则新增Dto
+    /// 档次更新Dto
     /// </summary>
-    public record ProcSortingRuleCreateDto : BaseEntityDto
+    public record ProcSortingRuleGradeModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -99,107 +143,19 @@ namespace Hymson.MES.Services.Dtos.Process
         public long SiteId { get; set; }
 
        /// <summary>
-        /// 规则编码
+        /// proc_sorting_rules 分选规则id
         /// </summary>
-        public string Code { get; set; }
+        public long SortingRuleId { get; set; }
 
        /// <summary>
-        /// 规则名称
+        /// 档位
         /// </summary>
-        public string Name { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-       /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
+        public string Grade { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
-    }
-
-    /// <summary>
-    /// 分选规则更新Dto
-    /// </summary>
-    public record ProcSortingRuleModifyDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
-        /// 规则编码
-        /// </summary>
-        public string Code { get; set; }
-
-       /// <summary>
-        /// 规则名称
-        /// </summary>
-        public string Name { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-       /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
-
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
+        public string remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -231,9 +187,9 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 分选规则分页Dto
+    /// 档次分页Dto
     /// </summary>
-    public class ProcSortingRulePagedQueryDto : PagerInfo
+    public class ProcSortingRuleGradePagedQueryDto : PagerInfo
     {
     }
 }

@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Microsoft.Extensions.Options;
@@ -87,6 +88,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<QualInspectionParameterGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<QualInspectionParameterGroupEntity>(GetByCodeSql, query);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -116,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<IEnumerable<QualInspectionParameterGroupEntity>> GetEntitiesAsync(QualInspectionParameterGroupQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualInspectionParameterGroupEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualInspectionParameterGroupEntity>(template.RawSql, query);
         }
@@ -133,11 +145,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = T.MaterialId");
             sqlBuilder.LeftJoin("proc_procedure PP ON PP.Id = T.ProcedureId");
-            sqlBuilder.Where("T.IsDeleted = 0");
-            sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.Select("T.*");
             sqlBuilder.Select("PM.MaterialCode, PM.MaterialName");
             sqlBuilder.Select("PP.Code AS ProcedureCode, PP.Name AS ProcedureName");
+            sqlBuilder.OrderBy("T.UpdatedOn DESC");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
 
             if (pagedQuery.Status.HasValue)
             {
@@ -201,21 +214,22 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualInspectionParameterGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**where**/ ";
-        const string GetQualInspectionParameterGroupEntitiesSqlTemplate = @"SELECT 
+        const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_inspection_parameter_group` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `qual_inspection_parameter_group`(  `Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group`(  `Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `qual_inspection_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO `qual_inspection_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE `qual_inspection_parameter_group` SET   Code = @Code, Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `qual_inspection_parameter_group` SET   Code = @Code, Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `qual_inspection_parameter_group` SET Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `qual_inspection_parameter_group` SET Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `qual_inspection_parameter_group` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `qual_inspection_parameter_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
+        const string GetByCodeSql = "SELECT * FROM qual_inspection_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM `qual_inspection_parameter_group`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `qual_inspection_parameter_group`  WHERE Id IN @Ids ";
 

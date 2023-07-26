@@ -19,6 +19,15 @@
         public const string MES10110 = "名称最大长度为50";
         public const string MES10111 = "参数不能为空";
         public const string MES10112 = "站点不能为空";
+        public const string MES10113 = "编码不能为空";
+        public const string MES10114 = "编码不允许有空格";
+        public const string MES10115 = "编码最大长度为100";
+        public const string MES10116 = "名称不能为空";
+        public const string MES10117 = "名称最大长度为100";
+        public const string MES10118 = "版本不能为空";
+        public const string MES10119 = "版本最大长度为100";
+        public const string MES10120 = "状态不合法";
+        public const string MES10121 = "描述最大长度为255";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -193,6 +202,10 @@
         public const string MES10514 = "参数ID不能为空";
         public const string MES10515 = "标准参数名称最大长度为50";
         public const string MES10516 = "参数{Code}的规格上限和规格下限配置异常，上限不能小于下限！";
+
+        public const string MES10517 = "工作中心不能为空";
+        public const string MES10518 = "产品不能为空";
+        public const string MES10519 = "工序不能为空";
         #endregion
 
         #region Bom 10600

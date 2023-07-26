@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -110,6 +111,15 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcSortingRuleDetailEntity>> GetProcSortingRuleDetailEntitiesAsync(ProcSortingRuleDetailQuery procSortingRuleDetailQuery)
         {
             var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (procSortingRuleDetailQuery.SortingRuleId > 0)
+            {
+                sqlBuilder.Where("SortingRuleId=@SortingRuleId");
+            }
+
             var template = sqlBuilder.AddTemplate(GetProcSortingRuleDetailEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             var procSortingRuleDetailEntities = await conn.QueryAsync<ProcSortingRuleDetailEntity>(template.RawSql, procSortingRuleDetailQuery);

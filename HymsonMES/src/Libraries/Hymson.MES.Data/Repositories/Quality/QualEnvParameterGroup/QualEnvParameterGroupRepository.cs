@@ -128,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<IEnumerable<QualEnvParameterGroupEntity>> GetEntitiesAsync(QualEnvParameterGroupQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualEnvParameterGroupEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualEnvParameterGroupEntity>(template.RawSql, query);
         }
@@ -145,11 +145,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = T.WorkCenterId");
             sqlBuilder.LeftJoin("proc_procedure PP ON PP.Id = T.ProcedureId");
-            sqlBuilder.Where("T.IsDeleted = 0");
-            sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.Select("T.*");
             sqlBuilder.Select("IWC.Code AS WorkCenterCode, IWC.Name AS WorkCenterName");
             sqlBuilder.Select("PP.Code AS ProcedureCode, PP.Name AS ProcedureName");
+            sqlBuilder.OrderBy("T.UpdatedOn DESC");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
 
             if (pagedQuery.Status.HasValue)
             {
@@ -213,9 +214,9 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualEnvParameterGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_env_parameter_group T /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_env_parameter_group T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM qual_env_parameter_group T /**where**/ ";
-        const string GetQualEnvParameterGroupEntitiesSqlTemplate = @"SELECT 
+        const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_env_parameter_group /**where**/  ";
 

@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcSortingRuleDetailQuery
     {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 分选规则id
+        /// </summary>
+        public long SortingRuleId { get; set; }
     }
 }

@@ -1,9 +1,9 @@
 /*
  *creator: Karl
  *
- *describe: 分选规则    Dto | 代码由框架生成
+ *describe: 档位详情    Dto | 代码由框架生成
  *builder:  zhaoqing
- *build datetime: 2023-07-25 03:24:54
+ *build datetime: 2023-07-25 03:34:23
  */
 
 using Hymson.Infrastructure;
@@ -11,9 +11,9 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// 分选规则Dto
+    /// 档位详情Dto
     /// </summary>
-    public record ProcSortingRuleDto : BaseEntityDto
+    public record ProcSortingRuleGradeDetailsDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -26,34 +26,78 @@ namespace Hymson.MES.Services.Dtos.Process
         public long SiteId { get; set; }
 
        /// <summary>
-        /// 规则编码
+        /// proc_sorting_rule_grade分选规则档位id
         /// </summary>
-        public string Code { get; set; }
+        public long SortingRuleGradeId { get; set; }
 
        /// <summary>
-        /// 规则名称
+        /// sorting_rule_detail 分选规则详情Id
         /// </summary>
-        public string Name { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-       /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
+        public long SortingRuleDetailId { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string remark { get; set; }
+
+       /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+       /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+       /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+       /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+
+       /// <summary>
+        /// 删除标识
+        /// </summary>
+        public long IsDeleted { get; set; }
+
+       
+    }
+
+
+    /// <summary>
+    /// 档位详情新增Dto
+    /// </summary>
+    public record ProcSortingRuleGradeDetailsCreateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+       /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+       /// <summary>
+        /// proc_sorting_rule_grade分选规则档位id
+        /// </summary>
+        public long SortingRuleGradeId { get; set; }
+
+       /// <summary>
+        /// sorting_rule_detail 分选规则详情Id
+        /// </summary>
+        public long SortingRuleDetailId { get; set; }
+
+       /// <summary>
+        /// 备注
+        /// </summary>
+        public string remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -84,9 +128,9 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 分选规则新增Dto
+    /// 档位详情更新Dto
     /// </summary>
-    public record ProcSortingRuleCreateDto : BaseEntityDto
+    public record ProcSortingRuleGradeDetailsModifyDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
@@ -99,107 +143,19 @@ namespace Hymson.MES.Services.Dtos.Process
         public long SiteId { get; set; }
 
        /// <summary>
-        /// 规则编码
+        /// proc_sorting_rule_grade分选规则档位id
         /// </summary>
-        public string Code { get; set; }
+        public long SortingRuleGradeId { get; set; }
 
        /// <summary>
-        /// 规则名称
+        /// sorting_rule_detail 分选规则详情Id
         /// </summary>
-        public string Name { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-       /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
+        public long SortingRuleDetailId { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
-    }
-
-    /// <summary>
-    /// 分选规则更新Dto
-    /// </summary>
-    public record ProcSortingRuleModifyDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
-        /// 规则编码
-        /// </summary>
-        public string Code { get; set; }
-
-       /// <summary>
-        /// 规则名称
-        /// </summary>
-        public string Name { get; set; }
-
-       /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-       /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public bool Status { get; set; }
-
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
+        public string remark { get; set; }
 
        /// <summary>
         /// 创建人
@@ -231,9 +187,9 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 分选规则分页Dto
+    /// 档位详情分页Dto
     /// </summary>
-    public class ProcSortingRulePagedQueryDto : PagerInfo
+    public class ProcSortingRuleGradeDetailsPagedQueryDto : PagerInfo
     {
     }
 }

@@ -1,5 +1,4 @@
 using Dapper;
-using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
-    /// 仓储（产品工序参数项目表）
+    /// 仓储（产品检验参数项目表）
     /// </summary>
     public partial class ProcProductParameterGroupDetailRepository : BaseRepository, IProcProductParameterGroupDetailRepository
     {
@@ -18,17 +17,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="connectionOptions"></param>
         public ProcProductParameterGroupDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
-
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public async Task<int> InsertAsync(ProcProductParameterGroupDetailEntity entity)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, entity);
-        }
 
         /// <summary>
         /// 新增（批量）
@@ -42,69 +30,14 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcProductParameterGroupDetailEntity entity)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, entity);
-        }
-
-        /// <summary>
-        /// 更新（批量）
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<ProcProductParameterGroupDetailEntity> entities)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, entities);
-        }
-
-        /// <summary>
-        /// 软删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 软删除（批量）
+        /// 删除（批量）
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, command);
-        }
-
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ProcProductParameterGroupDetailEntity> GetByIdAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcProductParameterGroupDetailEntity>(GetByIdSql, new { Id = id });
-        }
-
-        /// <summary>
-        /// 根据IDs获取数据（批量）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcProductParameterGroupDetailEntity>> GetByIdsAsync(long[] ids) 
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcProductParameterGroupDetailEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.ExecuteAsync(DeleteByParentId, command);
         }
 
         /// <summary>
@@ -115,35 +48,13 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcProductParameterGroupDetailEntity>> GetEntitiesAsync(ProcProductParameterGroupDetailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetProcProductParameterGroupDetailEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("ParameterGroupId = @ParameterGroupId");
+            sqlBuilder.Select("*");
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProductParameterGroupDetailEntity>(template.RawSql, query);
-        }
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="pagedQuery"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<ProcProductParameterGroupDetailEntity>> GetPagedInfoAsync(ProcProductParameterGroupDetailPagedQuery pagedQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Select("*");
-           
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
-
-            using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<ProcProductParameterGroupDetailEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var entities = await entitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProductParameterGroupDetailEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -154,23 +65,13 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcProductParameterGroupDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_product_parameter_group_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_product_parameter_group_detail` /**where**/ ";
-        const string GetProcProductParameterGroupDetailEntitiesSqlTemplate = @"SELECT 
+       const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_product_parameter_group_detail` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_product_parameter_group_detail`(  `Id`, `ParameterGroupId`, `ProductParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ParameterGroupId, @ProductParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `proc_product_parameter_group_detail`(  `Id`, `ParameterGroupId`, `ProductParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ParameterGroupId, @ProductParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertsSql = "INSERT INTO `proc_product_parameter_group_detail`(`Id`, `ParameterGroupId`, `ParameterId`, `UpperLimit`, `CenterValue`, `LowerLimit`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ParameterGroupId, @ParameterId, @UpperLimit, @CenterValue, @LowerLimit, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE `proc_product_parameter_group_detail` SET   ParameterGroupId = @ParameterGroupId, ProductParameterId = @ProductParameterId, UpperLimit = @UpperLimit, CenterValue = @CenterValue, LowerLimit = @LowerLimit, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_product_parameter_group_detail` SET   ParameterGroupId = @ParameterGroupId, ProductParameterId = @ProductParameterId, UpperLimit = @UpperLimit, CenterValue = @CenterValue, LowerLimit = @LowerLimit, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-
-        const string DeleteSql = "UPDATE `proc_product_parameter_group_detail` SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE `proc_product_parameter_group_detail` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-
-        const string GetByIdSql = @"SELECT * FROM `proc_product_parameter_group_detail`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM `proc_product_parameter_group_detail`  WHERE Id IN @Ids ";
+        const string DeleteByParentId = "DELETE FROM proc_product_parameter_group_detail WHERE ParameterGroupId = @ParentId";
 
     }
 }

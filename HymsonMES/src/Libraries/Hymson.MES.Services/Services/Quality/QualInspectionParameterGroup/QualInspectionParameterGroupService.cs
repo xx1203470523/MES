@@ -1,20 +1,23 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -106,7 +109,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateQualInspectionParameterGroupAsync(QualInspectionParameterGroupSaveDto saveDto)
+        public async Task<int> CreateAsync(QualInspectionParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -127,8 +130,57 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 保存
-            return await _qualInspectionParameterGroupRepository.InsertAsync(entity);
+            // 编码唯一性验证
+            var checkEntity = await _qualInspectionParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.Code);
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit >= item.LowerLimit) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                    ErrorCode = nameof(ErrorCode.MES10516)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
+
+            var details = saveDto.Details.Select(s =>
+            {
+                var detailEntity = s.ToEntity<QualInspectionParameterGroupDetailEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.ParameterGroupId = entity.Id;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                detailEntity.SiteId = entity.SiteId;
+
+                return detailEntity;
+            });
+
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _qualInspectionParameterGroupRepository.InsertAsync(entity);
+                rows += await _qualInspectionParameterGroupDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
@@ -136,7 +188,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyQualInspectionParameterGroupAsync(QualInspectionParameterGroupSaveDto saveDto)
+        public async Task<int> ModifyAsync(QualInspectionParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -144,12 +196,45 @@ namespace Hymson.MES.Services.Services.Quality
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
             // DTO转换实体
             var entity = saveDto.ToEntity<QualInspectionParameterGroupEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
 
-            return await _qualInspectionParameterGroupRepository.UpdateAsync(entity);
+            var details = saveDto.Details.Select(s =>
+            {
+                var detailEntity = s.ToEntity<QualInspectionParameterGroupDetailEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.ParameterGroupId = entity.Id;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                detailEntity.SiteId = entity.SiteId;
+
+                return detailEntity;
+            });
+
+            var command = new DeleteByParentIdCommand
+            {
+                ParentId = entity.Id,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            };
+
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _qualInspectionParameterGroupRepository.UpdateAsync(entity);
+                rows += await _qualInspectionParameterGroupDetailRepository.DeleteByParentIdAsync(command);
+                rows += await _qualInspectionParameterGroupDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
@@ -157,7 +242,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteQualInspectionParameterGroupAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             return await _qualInspectionParameterGroupRepository.DeleteAsync(id);
         }
@@ -167,7 +252,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesQualInspectionParameterGroupAsync(long[] ids)
+        public async Task<int> DeletesAsync(long[] ids)
         {
             return await _qualInspectionParameterGroupRepository.DeletesAsync(new DeleteCommand
             {
@@ -182,7 +267,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualInspectionParameterGroupInfoDto?> QueryQualInspectionParameterGroupByIdAsync(long id)
+        public async Task<QualInspectionParameterGroupInfoDto?> QueryByIdAsync(long id)
         {
             var qualEnvParameterGroupEntity = await _qualInspectionParameterGroupRepository.GetByIdAsync(id);
             if (qualEnvParameterGroupEntity == null) return null;

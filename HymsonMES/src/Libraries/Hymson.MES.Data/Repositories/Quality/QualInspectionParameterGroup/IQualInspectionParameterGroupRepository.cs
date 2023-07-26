@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 
@@ -52,6 +53,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<QualInspectionParameterGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 根据ID获取数据
