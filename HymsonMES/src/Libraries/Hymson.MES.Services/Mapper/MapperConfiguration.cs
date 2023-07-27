@@ -432,6 +432,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialInventoryPagedQueryDto, WhMaterialInventoryPagedQuery>();
             CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDto>();
             CreateMap<WhMaterialInventoryPageListView, WhMaterialInventoryPageListViewDto>();
+
+            CreateMap<WhMaterialInventoryEntity, WhMaterialInventoryDetailDto>();
             #endregion
 
             #region WhMaterialStandingbook

@@ -74,6 +74,9 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// </summary>
         public long SiteId { get; set; }
 
-
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
     }
 }

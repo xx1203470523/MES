@@ -174,5 +174,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="materialCode"></param>
         /// <returns></returns>
         Task<IEnumerable<WhSupplierInfoView>> GetWhSupplierByMaterialIdAsync(WhSupplierByMaterialCommand command);
+
+        /// <summary>
+        /// 修改外部来源库存
+        /// </summary>
+        /// <param name="whMaterialInventoryEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateOutsideWhMaterilInventoryAsync(WhMaterialInventoryEntity whMaterialInventoryEntity);
     }
 }

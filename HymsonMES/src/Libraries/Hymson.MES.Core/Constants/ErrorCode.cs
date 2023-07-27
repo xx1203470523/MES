@@ -463,6 +463,11 @@
         public const string MES15107 = " 重复扫描！";
         public const string MES15108 = " 供应商不能为空";
 
+        public const string MES15120 = " 没有查询到对应原材料库存数据";
+        public const string MES15121 = " 维护库存剩余数量要不大于接收数量且不小于0";
+        public const string MES15122 = " 物料条码{materialBarCode}状态{status},不允许执行该操作！";
+        public const string MES15123 = " 不允许操作非原材料库存！";
+        public const string MES15124 = " 没有查询到对应库存数据";
         #endregion
 
         #region 物料台账 15200

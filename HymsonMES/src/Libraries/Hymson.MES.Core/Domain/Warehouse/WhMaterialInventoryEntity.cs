@@ -44,6 +44,11 @@ namespace Hymson.MES.Core.Domain.Warehouse
         public decimal QuantityResidue { get; set; }
 
         /// <summary>
+        /// 接收数量 (一开始的数量)
+        /// </summary>
+        public decimal ReceivedQty { get; set; }
+
+        /// <summary>
         /// 状态;待使用/使用中/锁定
         /// </summary>
         public WhMaterialInventoryStatusEnum Status { get; set; }

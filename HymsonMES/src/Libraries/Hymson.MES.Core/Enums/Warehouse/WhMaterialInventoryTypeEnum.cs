@@ -33,6 +33,12 @@ namespace Hymson.MES.Core.Enums
         /// 步骤控制
         /// </summary>
         [Description("步骤控制")]
-        StepControl = 5
+        StepControl = 5,
+
+        /// <summary>
+        /// 库存维护   (仅仅做记录使用)
+        /// </summary>
+        [Description("库存维护")]
+        InventoryModify = 6
     }
 }
