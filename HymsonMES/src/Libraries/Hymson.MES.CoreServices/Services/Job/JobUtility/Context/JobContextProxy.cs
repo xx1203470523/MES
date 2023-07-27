@@ -76,12 +76,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         }
                         else
                         {
-                            var newCacheValue = cacheValue as IEnumerable<BaseEntity>;
-                            if (newCacheValue == null)
-                            {
-                                throw new Exception();//报错
-                            }
-
+                            var newCacheValue = cacheValue as IEnumerable<BaseEntity> ?? throw new Exception();
                             var newCacheValuelist = newCacheValue.ToList();
 
                             foreach (var valueItem in (IEnumerable<BaseEntity>)value)
@@ -201,17 +196,12 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             var incompleteCache = Get(incompleteKey);
             if (incompleteCache == null)
             {
-                var incompleteValueList = new List<object>();
-                incompleteValueList.Add(value);
+                var incompleteValueList = new List<object> { value };
                 Set(incompleteKey, incompleteValueList);
             }
             else
             {
-                var incompletelist = ((IList<object>)incompleteCache);
-                if (incompletelist == null)
-                {
-                    throw new Exception();
-                }
+                var incompletelist = ((IList<object>)incompleteCache) ?? throw new Exception();
                 if (Merge(value, incompletelist))
                 {
                     Set(incompleteKey, incompletelist);
@@ -230,7 +220,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <param name="source">合并原</param>
         /// <param name="target">目标</param>
         /// <returns></returns>
-        private bool Merge(object? source, object? target)
+        private static bool Merge(object? source, object? target)
         {
             if (target == null || source == null) return false;
             var dicConditionField = new Dictionary<string, object?>();
@@ -342,7 +332,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         {
             var name = typeof(IEnumerable<TResult>);
             var cacheKey = (uint)$"{typeof(IEnumerable<TResult>)}".GetHashCode();
-            
+
             if (Has(cacheKey))
             {
                 var cacheObj = Get(cacheKey);
@@ -358,7 +348,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         var incompleteKey = (uint)$"{IncompleteKey}{typeof(IEnumerable<TResult>)}".GetHashCode();
                         IncompleteDatabaseMerge(cacheKey, obj);
 
-                        cacheResult.Concat(obj.Where(x => !cacheResult.Any(o => o.Id == x.Id)));
+                        _ = cacheResult.Concat(obj.Where(x => !cacheResult.Any(o => o.Id == x.Id)));
                         Set(cacheKey, cacheResult);
                     }
                 }
@@ -485,7 +475,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 //_semaphores[hash].Release();
             }
         }
-
 
         /// <summary>
         /// 取值

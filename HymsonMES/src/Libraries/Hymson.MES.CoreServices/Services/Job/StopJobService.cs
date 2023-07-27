@@ -197,7 +197,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return responseBo;
         }
 
-
         /// <summary>
         /// 执行后节点
         /// </summary>
@@ -208,5 +207,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
+
     }
 }
