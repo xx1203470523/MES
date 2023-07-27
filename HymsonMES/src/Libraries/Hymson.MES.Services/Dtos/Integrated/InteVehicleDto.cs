@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 载具类型id
         /// </summary>
-        public long VehicleTypeId { get; set; }
+        public long? VehicleTypeId { get; set; }
 
        /// <summary>
         /// 存放位置
@@ -149,7 +149,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 载具类型id
         /// </summary>
-        public long VehicleTypeId { get; set; }
+        public long? VehicleTypeId { get; set; }
 
        /// <summary>
         /// 存放位置
