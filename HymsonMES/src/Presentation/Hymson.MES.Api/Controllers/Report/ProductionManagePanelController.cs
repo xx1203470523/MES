@@ -21,12 +21,14 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <summary>
         /// 获取综合信息
         /// </summary>
+        /// <param name="siteId">站点Id</param>
+        /// <param name="procedureCode">完工标识工序</param>
         /// <returns></returns>
         [HttpGet]
         [Route("getOverallInfo")]
-        public async Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId)
+        public async Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId, string procedureCode)
         {
-            return await _productionManagePanelService.GetOverallInfoAsync(siteId);
+            return await _productionManagePanelService.GetOverallInfoAsync(siteId, procedureCode);
         }
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getEquipmentUtilizationRate")]
-        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync([FromQuery] EquipmentUtilizationRateQuery param)
+        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync([FromQuery] EquipmentUtilizationRateQueryDto param)
         {
             return await _productionManagePanelService.GetEquipmentUtilizationRateAsync(param);
         }
@@ -68,7 +70,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessQualityRate")]
-        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync([FromQuery] ProcessQualityRateQuery param)
+        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync([FromQuery] ProcessQualityRateQueryDto param)
         {
             return await _productionManagePanelService.GetProcessQualityRateAsync(param);
         }
@@ -79,7 +81,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessYieldRate")]
-        public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync([FromQuery] ProcessYieldRateQuery param)
+        public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync([FromQuery] ProcessYieldRateQueryDto param)
         {
             return await _productionManagePanelService.GetProcessYieldRateAsync(param);
         }
@@ -90,7 +92,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getProcessIndicators")]
-        public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync([FromQuery] ProcessIndicatorsQuery param)
+        public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync([FromQuery] ProcessIndicatorsQueryDto param)
         {
             return await _productionManagePanelService.GetProcessIndicatorsAsync(param);
         }

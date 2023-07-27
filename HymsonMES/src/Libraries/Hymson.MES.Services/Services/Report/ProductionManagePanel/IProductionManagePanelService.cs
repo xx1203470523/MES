@@ -11,8 +11,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// 获取综合信息
         /// </summary>
         /// <param name="siteId"></param>
+        /// <param name="procedureCode"></param>
         /// <returns></returns>
-        Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId);
+        Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId, string procedureCode);
         /// <summary>
         /// 获取模组达成信息明细
         /// </summary>
@@ -31,27 +32,27 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(ProcessQualityRateQuery param);
+        Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(ProcessQualityRateQueryDto param);
 
         /// <summary>
         /// 获取工序良品趋势
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync(ProcessYieldRateQuery param);
+        Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync(ProcessYieldRateQueryDto param);
 
         /// <summary>
         /// 获取工序指数
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync(ProcessIndicatorsQuery param);
+        Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync(ProcessIndicatorsQueryDto param);
 
         /// <summary>
         /// 获取设备稼动率信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQuery param);
+        Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQueryDto param);
     }
 }

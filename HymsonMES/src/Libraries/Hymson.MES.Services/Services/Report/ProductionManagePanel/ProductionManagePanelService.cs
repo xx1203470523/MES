@@ -257,8 +257,9 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// 获取综合信息
         /// </summary>
         /// <param name="siteId"></param>
+        /// <param name="procedureCode"></param>
         /// <returns></returns>
-        public async Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId)
+        public async Task<ProductionManagePanelReportDto?> GetOverallInfoAsync(long siteId, string procedureCode)
         {
             //获取最新的一个激活工单
             var planWorkOrderEntity = await GetPlanWorkOrderFirstActivation(siteId);
@@ -288,18 +289,25 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 StartTime = DayStartTime,
                 EndTime = DayEndTime,
             });
+            //完成数量
+            decimal completedQty = 0;
+            //查询工单完工数量
+            var processCompletedDataQuery = new ProcessCompletedDataQueryDto { SiteId = siteId, WorkOrderId = planWorkOrderEntity.Id, ProcedureCode = procedureCode };
+            var processCompletedData = await GetProcessCompletedDataAsync(processCompletedDataQuery);
+            if (processCompletedData != null)
+            {
+                completedQty = processCompletedData.CompletedQty;
+            }
             //当天投入量(当前班次)
             decimal dayConsume = firstProcedureSummaryEntities.Count();
             //投入数
             decimal inputQty = workOrderRecord?.InputQty ?? 0;
-            //完成数量
-            decimal completedQty = workOrderRecord?.FinishProductQuantity ?? 0;
             //完成率
             decimal completedRate = decimal.Parse((completedQty / (inputQty == 0 ? 1 : inputQty) * 100).ToString("#0.00"));
             //计划数量
             decimal planQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
             //计划达成率
-            decimal planAchievingRate = completedQty / (planQuantity == 0 ? 1 : planQuantity);
+            decimal planAchievingRate = completedQty / (planQuantity == 0 ? 1 : planQuantity) * 100;
             //Ng数量
             decimal summaryNoPassQty = manuSfcSummaryEntities.Count();
             //录入报废数量
@@ -330,6 +338,48 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 WorkOrderQty = planWorkOrderEntity?.Qty
             };
             return managePanelReportDto;
+        }
+
+        /// <summary>
+        /// 根据工单和工序查询完成数量
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        private async Task<ProcessCompletedDataDto> GetProcessCompletedDataAsync(ProcessCompletedDataQueryDto param)
+        {
+            ProcessCompletedDataDto processCompletedDataDto = new ProcessCompletedDataDto();
+            var procProcedureEntitie = await _procProcedureRepository.GetByCodeAsync(param.ProcedureCode, param.SiteId);
+            if (procProcedureEntitie != null)
+            {
+                return processCompletedDataDto;
+            }
+            //查询汇总数据 只包含良品
+            var manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = param.SiteId,
+                ProcedureIds = new long[] { procProcedureEntitie?.Id ?? 0 },
+                WorkOrderId = param.WorkOrderId,
+                QualityStatus = 1,
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            processCompletedDataDto = manuSfcSummaryEntities
+                .Where(s => s.IsDeleted == 0)
+                .GroupBy(s => new { s.WorkOrderId })
+                .Select(g => new
+                {
+                    WorkOrderId = g.Max(c => c.WorkOrderId),
+                    ProcedureId = g.Max(c => c.ProcedureId),
+                    CompletedQty = g.Sum(s => s.Qty) ?? 0,//总数
+                })
+                .Select(x =>
+                {
+                    return new ProcessCompletedDataDto
+                    {
+                        WorkOrderId = x.WorkOrderId,
+                        CompletedQty = x.CompletedQty
+                    };
+                }).First();
+            return processCompletedDataDto;
         }
         #endregion
 
@@ -471,7 +521,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(ProcessQualityRateQuery param)
+        public async Task<IEnumerable<ProcessQualityRateDto>> GetProcessQualityRateAsync(ProcessQualityRateQueryDto param)
         {
             List<ProcessQualityRateDto> processQualityRateDtos = new List<ProcessQualityRateDto>();
             var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(param.ProcedureCodes, param.SiteId);
@@ -521,7 +571,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateDataAsync(ProcessYieldRateQuery param)
+        private async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateDataAsync(ProcessYieldRateQueryDto param)
         {
             List<ProcessYieldRateDto> processYieldRateDtos = new List<ProcessYieldRateDto>();
             var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(param.ProcedureCodes, param.SiteId);
@@ -572,7 +622,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync(ProcessYieldRateQuery param)
+        public async Task<IEnumerable<ProcessYieldRateDto>> GetProcessYieldRateAsync(ProcessYieldRateQueryDto param)
         {
             List<ProcessYieldRateDto> yieldRateDtos = new List<ProcessYieldRateDto>();
             int year = HymsonClock.Now().Year;
@@ -623,7 +673,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsDataAsync(ProcessIndicatorsQuery param)
+        private async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsDataAsync(ProcessIndicatorsQueryDto param)
         {
             List<ProcessIndicatorsDto> processIndicatorsDtos = new List<ProcessIndicatorsDto>();
             var procProcedureEntities = await _procProcedureRepository.GetByCodesAsync(param.ProcedureCodes, param.SiteId);
@@ -671,7 +721,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync(ProcessIndicatorsQuery param)
+        public async Task<IEnumerable<ProcessIndicatorsDto>> GetProcessIndicatorsAsync(ProcessIndicatorsQueryDto param)
         {
             List<ProcessIndicatorsDto> processIndicators = new List<ProcessIndicatorsDto>();
             int year = HymsonClock.Now().Year;
@@ -725,7 +775,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         ///     设备OEE=可用率*表现性*质量指数 = （操作时间/计划工作时间）* （理想加工周期 * 生产数量/实际运行时间） * （良品总数/总产量）*100%
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQuery param)
+        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync(EquipmentUtilizationRateQueryDto param)
         {
             List<EquipmentUtilizationRateDto> equipmentUtilizationRateDtos = new List<EquipmentUtilizationRateDto>();
             //查询需要统计的设备信息

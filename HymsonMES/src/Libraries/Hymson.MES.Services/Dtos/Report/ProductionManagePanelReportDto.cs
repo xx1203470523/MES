@@ -86,6 +86,35 @@ namespace Hymson.MES.Services.Dtos.Report
     }
 
     /// <summary>
+    /// 工序完成数据查询
+    /// </summary>
+    public record ProcessCompletedDataQueryDto
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        public long WorkOrderId { get; set; }
+    }
+
+    /// <summary>
+    /// 工序完工数量
+    /// </summary>
+    public class ProcessCompletedDataDto
+    {
+        public long WorkOrderId { get; set; }
+
+        public decimal CompletedQty { get; set; }
+    }
+
+    /// <summary>
     /// 模组信息统计区间Dto
     /// </summary>
     public class ProductionManagePanelModuleRangeDto
@@ -160,7 +189,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 设备稼动率查询
     /// </summary>
-    public record EquipmentUtilizationRateQuery
+    public record EquipmentUtilizationRateQueryDto
     {
         /// <summary>
         /// 站点Id
@@ -299,7 +328,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 工序良率查询
     /// </summary>
-    public record ProcessQualityRateQuery
+    public record ProcessQualityRateQueryDto
     {
         /// <summary>
         /// 站点Id
@@ -314,7 +343,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 工序当月良品波动查询
     /// </summary>
-    public record ProcessYieldRateQuery
+    public record ProcessYieldRateQueryDto
     {
         /// <summary>
         /// 站点Id
@@ -329,7 +358,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 工序指数查询
     /// </summary>
-    public record ProcessIndicatorsQuery
+    public record ProcessIndicatorsQueryDto
     {
         /// <summary>
         /// 站点Id
