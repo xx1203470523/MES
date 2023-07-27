@@ -88,8 +88,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult(new PackageResponseBo { });
         }
 
         /// <summary>
