@@ -52,7 +52,7 @@ namespace Hymson.MES.Api.Controllers.Report
             return await _productionManagePanelService.GetModuleInfoDynamicAsync(param);
         }
         /// <summary>
-        /// 获取工序稼动率
+        /// 获取设备稼动率
         /// </summary>
         /// <returns></returns>
         [HttpGet]
