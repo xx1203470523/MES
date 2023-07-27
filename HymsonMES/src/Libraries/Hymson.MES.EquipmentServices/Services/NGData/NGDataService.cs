@@ -47,7 +47,7 @@ namespace Hymson.MES.EquipmentServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));
             }
-            NGDataDto nGDataDto = new();
+            NGDataDto nGDataDto = new NGDataDto { Passed = true };
             long? procedureId = null;
             if (!string.IsNullOrEmpty(param.ProcedureCode))
             {
@@ -104,7 +104,7 @@ namespace Hymson.MES.EquipmentServices.Services
                     return ngUnqualifiedDto;
                 });
                 nGDataDto.NGList = ngUnqualifieds.ToArray();
-                nGDataDto.Passed = ngUnqualifieds.Any();
+                nGDataDto.Passed = !ngUnqualifieds.Any();
             }
             return nGDataDto;
         }

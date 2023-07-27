@@ -479,7 +479,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpGet]
         [Route("GetNGData")]
         [ProducesResponseType(typeof(NGDataDto), 200)]
-        public async Task<NGDataDto> GetNGDataAsync(NGDataQueryDto param)
+        public async Task<NGDataDto> GetNGDataAsync([FromQuery] NGDataQueryDto param)
         {
             return await _ngDataService.GetNGDataAsync(param);
         }
