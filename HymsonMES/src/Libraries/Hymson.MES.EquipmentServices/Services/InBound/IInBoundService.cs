@@ -17,13 +17,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// </summary>
         /// <param name="inBoundDto"></param>
         /// <returns></returns>
-        Task InBound(InBoundDto inBoundDto);
+        Task InBoundAsync(InBoundDto inBoundDto);
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
         /// <param name="inBoundMoreDto"></param>
         /// <returns></returns>
-        Task InBoundMore(InBoundMoreDto inBoundMoreDto);
+        Task InBoundMoreAsync(InBoundMoreDto inBoundMoreDto);
     }
 }

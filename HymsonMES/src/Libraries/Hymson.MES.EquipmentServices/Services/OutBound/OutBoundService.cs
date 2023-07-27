@@ -109,7 +109,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// </summary>
         /// <param name="outBoundDto"></param>
         /// <returns></returns>
-        public async Task OutBound(OutBoundDto outBoundDto)
+        public async Task OutBoundAsync(OutBoundDto outBoundDto)
         {
             await _validationOutBoundDtoRules.ValidateAndThrowAsync(outBoundDto);
             if (outBoundDto == null)
@@ -134,7 +134,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     }
                 }
             };
-            await SFCOutBound(outBoundMoreDto);
+            await SFCOutBoundAsync(outBoundMoreDto);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// </summary>
         /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
-        public async Task OutBoundMore(OutBoundMoreDto outBoundMoreDto)
+        public async Task OutBoundMoreAsync(OutBoundMoreDto outBoundMoreDto)
         {
             await _validationOutBoundMoreDtoRules.ValidateAndThrowAsync(outBoundMoreDto);
             if (outBoundMoreDto == null)
@@ -154,7 +154,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 throw new CustomerValidationException(nameof(ErrorCode.MES19101));
             }
 
-            await SFCOutBound(outBoundMoreDto);
+            await SFCOutBoundAsync(outBoundMoreDto);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
 
-        public async Task SFCOutBound(OutBoundMoreDto outBoundMoreDto)
+        public async Task SFCOutBoundAsync(OutBoundMoreDto outBoundMoreDto)
         {
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = outBoundMoreDto.ResourceCode });
@@ -411,7 +411,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             }
 
             //虚拟条码绑定流转信息处理
-            var manuSfcCirculationUpdateEntities = await BindVirtualSFCCirculation(outBoundMoreDto);
+            var manuSfcCirculationUpdateEntities = await BindVirtualSFCCirculationAsync(outBoundMoreDto);
             //虚拟条码更新为实际模组条码
             var manuProductParameterUpdateEntities = await BindBirtualProductParameter(outBoundMoreDto);
 
@@ -451,9 +451,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             }
 
             //标准参数
-            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntity(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
+            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntityAsync(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
             //NG
-            List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntity(outBoundMoreDto, manuSfcStepEntities);
+            List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntityAsync(outBoundMoreDto, manuSfcStepEntities);
             //批次码信息
             List<ManuSfcStepMaterialEntity> manuProductMaterialEntities = PrepareProductMaterialEntity(outBoundMoreDto, manuSfcStepEntities);
 
@@ -559,7 +559,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// </summary>
         /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ManuSfcCirculationEntity>> BindVirtualSFCCirculation(OutBoundMoreDto outBoundMoreDto)
+        private async Task<IEnumerable<ManuSfcCirculationEntity>> BindVirtualSFCCirculationAsync(OutBoundMoreDto outBoundMoreDto)
         {
             //虚拟码绑定处理
             List<ManuSfcCirculationEntity> manuSfcCirculationUpdateEntities = new List<ManuSfcCirculationEntity>();
@@ -706,7 +706,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <param name="manuSfcStepEntities"></param>
         /// <param name="procResourceId"></param>
         /// <returns></returns>
-        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntity(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities, long procResourceId)
+        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntityAsync(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities, long procResourceId)
         {
             List<ManuProductParameterEntity> manuProductParameterEntities = new();
             //所有参数
@@ -778,7 +778,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <param name="outBoundMoreDto"></param>
         /// <param name="manuSfcStepEntities"></param>
         /// <returns></returns>
-        private async Task<List<ManuSfcStepNgEntity>> PrepareProductNgEntity(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities)
+        private async Task<List<ManuSfcStepNgEntity>> PrepareProductNgEntityAsync(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities)
         {
             List<ManuSfcStepNgEntity> manuSfcStepNgEntities = new();
             //所有NG编码

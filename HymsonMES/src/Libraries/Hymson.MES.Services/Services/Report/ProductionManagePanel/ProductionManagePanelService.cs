@@ -349,7 +349,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
         {
             ProcessCompletedDataDto processCompletedDataDto = new ProcessCompletedDataDto();
             var procProcedureEntitie = await _procProcedureRepository.GetByCodeAsync(param.ProcedureCode, param.SiteId);
-            if (procProcedureEntitie != null)
+            if (procProcedureEntitie == null)
             {
                 return processCompletedDataDto;
             }

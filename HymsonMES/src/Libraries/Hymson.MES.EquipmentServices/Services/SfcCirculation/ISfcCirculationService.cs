@@ -28,13 +28,13 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// </summary>
         /// <param name="sfcCirculationBindDto"></param>
         /// <returns></returns>
-        Task SfcCirculationModuleAdd(SfcCirculationBindDto sfcCirculationBindDto);
+        Task SfcCirculationModuleAddAsync(SfcCirculationBindDto sfcCirculationBindDto);
 
         /// <summary>
         /// 组件移除
         /// </summary>
         /// <param name="sfcCirculationUnBindDto"></param>
         /// <returns></returns>
-        Task SfcCirculationModuleRemove(SfcCirculationUnBindDto sfcCirculationUnBindDto);
+        Task SfcCirculationModuleRemoveAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto);
     }
 }

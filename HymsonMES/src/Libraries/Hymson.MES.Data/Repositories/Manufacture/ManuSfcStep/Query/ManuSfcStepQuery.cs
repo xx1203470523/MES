@@ -28,6 +28,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public string SFC { get; set; }
 
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
     }
 
     public class SfcInOutStepQuery

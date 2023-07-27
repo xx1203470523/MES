@@ -271,9 +271,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InBound")]
-        public async Task InBound(InBoundDto request)
+        public async Task InBoundAsync(InBoundDto request)
         {
-            await _inBoundService.InBound(request);
+            await _inBoundService.InBoundAsync(request);
         }
 
         /// <summary>
@@ -282,9 +282,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InBoundMore")]
-        public async Task InBoundMore(InBoundMoreDto request)
+        public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
-            await _inBoundService.InBoundMore(request);
+            await _inBoundService.InBoundMoreAsync(request);
         }
 
         /// <summary>
@@ -293,9 +293,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBound")]
-        public async Task OutBound(OutBoundDto request)
+        public async Task OutBoundAsync(OutBoundDto request)
         {
-            await _outBoundService.OutBound(request);
+            await _outBoundService.OutBoundAsync(request);
         }
 
         /// <summary>
@@ -304,9 +304,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBoundMore")]
-        public async Task OutBoundMore(OutBoundMoreDto request)
+        public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
-            await _outBoundService.OutBoundMore(request);
+            await _outBoundService.OutBoundMoreAsync(request);
         }
 
         ///// <summary>
@@ -474,14 +474,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 获取NG数据
         /// </summary>
-        /// <param name="sfc">产品条码</param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetNGData")]
         [ProducesResponseType(typeof(NGDataDto), 200)]
-        public async Task<NGDataDto> GetNGDataAsync(string sfc)
+        public async Task<NGDataDto> GetNGDataAsync(NGDataQueryDto param)
         {
-            return await _ngDataService.GetNGData(sfc);
+            return await _ngDataService.GetNGDataAsync(param);
         }
 
         /// <summary>
@@ -491,7 +491,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationBind")]
-        public async Task SfcCirculationBind(SfcCirculationBindDto request)
+        public async Task SfcCirculationBindAsync(SfcCirculationBindDto request)
         {
             await _sfcCirculationService.SfcCirculationBindAsync(request);
         }
@@ -503,7 +503,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationUnBind")]
-        public async Task SfcCirculationUnBind(SfcCirculationUnBindDto request)
+        public async Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto request)
         {
             await _sfcCirculationService.SfcCirculationUnBindAsync(request, SfcCirculationTypeEnum.Merge);
         }
@@ -515,9 +515,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationModuleAdd")]
-        public async Task SfcCirculationModuleAdd(SfcCirculationBindDto request)
+        public async Task SfcCirculationModuleAddAsync(SfcCirculationBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationModuleAdd(request);
+            await _sfcCirculationService.SfcCirculationModuleAddAsync(request);
         }
 
         /// <summary>
@@ -527,9 +527,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationModuleRemove")]
-        public async Task SfcCirculationModuleRemove(SfcCirculationUnBindDto request)
+        public async Task SfcCirculationModuleRemoveAsync(SfcCirculationUnBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationModuleRemove(request);
+            await _sfcCirculationService.SfcCirculationModuleRemoveAsync(request);
         }
     }
 }

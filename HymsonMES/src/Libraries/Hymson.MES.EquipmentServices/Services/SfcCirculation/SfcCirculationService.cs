@@ -106,7 +106,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 sfcCirculationBindDto.SFC = ManuProductParameter.DefaultSFC;
             }
 
-            await GetPubInfoByResourceCode(sfcCirculationBindDto.ResourceCode);
+            await GetPubInfoByResourceCodeAsync(sfcCirculationBindDto.ResourceCode);
 
             var sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray();
             //条码信息
@@ -354,9 +354,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcCirculationBindDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task SfcCirculationModuleAdd(SfcCirculationBindDto sfcCirculationBindDto)
+        public async Task SfcCirculationModuleAddAsync(SfcCirculationBindDto sfcCirculationBindDto)
         {
-            await GetPubInfoByResourceCode(sfcCirculationBindDto.ResourceCode);
+            await GetPubInfoByResourceCodeAsync(sfcCirculationBindDto.ResourceCode);
             if (sfcCirculationBindDto.IsVirtualSFC == true && !string.IsNullOrEmpty(sfcCirculationBindDto.SFC))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19133));
@@ -409,7 +409,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcCirculationUnBindDto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task SfcCirculationModuleRemove(SfcCirculationUnBindDto sfcCirculationUnBindDto)
+        public async Task SfcCirculationModuleRemoveAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto)
         {
             await SfcCirculationUnBindAsync(sfcCirculationUnBindDto, SfcCirculationTypeEnum.ModuleAdd);
         }
@@ -419,7 +419,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// </summary>
         /// <param name="resourceCode"></param>
         /// <returns></returns>
-        private async Task GetPubInfoByResourceCode(string resourceCode)
+        private async Task GetPubInfoByResourceCodeAsync(string resourceCode)
         {
             //已经验证过资源是否存在直接使用
             procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = resourceCode });

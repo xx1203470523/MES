@@ -89,7 +89,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// </summary>
         /// <param name="inBoundDto"></param>
         /// <returns></returns>
-        public async Task InBound(InBoundDto inBoundDto)
+        public async Task InBoundAsync(InBoundDto inBoundDto)
         {
             await _validationInBoundDtoRules.ValidateAndThrowAsync(inBoundDto);
             if (inBoundDto == null)
@@ -104,7 +104,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 LocalTime = inBoundDto.LocalTime,
                 IsVerifyVirtualSFC = inBoundDto.IsVerifyVirtualSFC
             };
-            await SFCInBound(inBoundMore);
+            await SFCInBoundAsync(inBoundMore);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// </summary>
         /// <param name="inBoundMoreDto"></param>
         /// <returns></returns>
-        public async Task InBoundMore(InBoundMoreDto inBoundMoreDto)
+        public async Task InBoundMoreAsync(InBoundMoreDto inBoundMoreDto)
         {
             await _validationInBoundMoreDtoRules.ValidateAndThrowAsync(inBoundMoreDto);
             if (inBoundMoreDto == null)
@@ -123,7 +123,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19101));
             }
-            await SFCInBound(inBoundMoreDto);
+            await SFCInBoundAsync(inBoundMoreDto);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         /// <exception cref="ValidationException"></exception>
-        public async Task SFCInBound(InBoundMoreDto inBoundMoreDto)
+        public async Task SFCInBoundAsync(InBoundMoreDto inBoundMoreDto)
         {
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundMoreDto.ResourceCode });
@@ -156,7 +156,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //验证虚拟条码
             if (inBoundMoreDto.IsVerifyVirtualSFC == true)
             {
-                await VerifyVirtualSFC(inBoundMoreDto);
+                await VerifyVirtualSFCAsync(inBoundMoreDto);
             }
 
             //查找当前工作中心（产线）
@@ -508,7 +508,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// </summary>
         /// <param name="inBoundMoreDto"></param>
         /// <returns></returns>
-        private async Task VerifyVirtualSFC(InBoundMoreDto inBoundMoreDto)
+        private async Task VerifyVirtualSFCAsync(InBoundMoreDto inBoundMoreDto)
         {
             //SFC流转信息处理
             var manuSfcCirculationBarCodeQuery = new ManuSfcCirculationBarCodeQuery

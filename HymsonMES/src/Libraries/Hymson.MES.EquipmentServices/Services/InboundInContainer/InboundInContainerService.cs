@@ -54,7 +54,7 @@ namespace Hymson.MES.EquipmentServices.Services.InboundInContainer
                 list.Add(item.SFC);
             }
             // 进站
-            await _inBoundService.InBoundMore(new InBoundMoreDto { SFCs = list.ToArray(), EquipmentCode = inboundInContainerDto.EquipmentCode, LocalTime = inboundInContainerDto.LocalTime, ResourceCode = inboundInContainerDto.ResourceCode });
+            await _inBoundService.InBoundMoreAsync(new InBoundMoreDto { SFCs = list.ToArray(), EquipmentCode = inboundInContainerDto.EquipmentCode, LocalTime = inboundInContainerDto.LocalTime, ResourceCode = inboundInContainerDto.ResourceCode });
         }
     }
 }

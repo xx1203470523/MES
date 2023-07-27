@@ -10,8 +10,8 @@ namespace Hymson.MES.EquipmentServices.Services
         /// <summary>
         /// 获取条码NG数据
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<NGDataDto> GetNGData(string sfc);
+        Task<NGDataDto> GetNGDataAsync(NGDataQueryDto param);
     }
 }
