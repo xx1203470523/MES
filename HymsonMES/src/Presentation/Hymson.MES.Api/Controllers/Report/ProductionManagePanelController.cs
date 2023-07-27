@@ -56,8 +56,8 @@ namespace Hymson.MES.Api.Controllers.Report
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getProcessUtilizationRate")]
-        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetProcessUtilizationRateAsync([FromQuery] EquipmentUtilizationRateQuery param)
+        [Route("getEquipmentUtilizationRate")]
+        public async Task<IEnumerable<EquipmentUtilizationRateDto>> GetEquipmentUtilizationRateAsync([FromQuery] EquipmentUtilizationRateQuery param)
         {
             return await _productionManagePanelService.GetEquipmentUtilizationRateAsync(param);
         }
