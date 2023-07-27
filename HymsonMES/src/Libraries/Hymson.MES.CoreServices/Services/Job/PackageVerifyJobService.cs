@@ -31,7 +31,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>

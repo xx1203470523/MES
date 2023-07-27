@@ -48,7 +48,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -92,7 +91,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }
-
 
         /// <summary>
         /// 执行前节点

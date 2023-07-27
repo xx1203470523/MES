@@ -559,5 +559,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 LinkPoint = ResourceJobLinkPointEnum.AfterFinish
             });
         }
+
     }
 }
