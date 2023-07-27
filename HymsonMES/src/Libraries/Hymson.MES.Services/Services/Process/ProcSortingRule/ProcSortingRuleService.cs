@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 读取分选规则列表信息
+        /// 根据物料读取分选规则列表信息
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
