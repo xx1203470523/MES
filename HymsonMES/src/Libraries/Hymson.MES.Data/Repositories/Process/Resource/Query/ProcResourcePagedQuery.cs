@@ -80,9 +80,14 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         public long? SiteId { get; set; }
 
         /// <summary>
-        /// 工序编码
+        /// 工序id
         /// </summary>
         public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
 
         /// <summary>
         /// 描述 :状态 

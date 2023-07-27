@@ -108,6 +108,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _localizationService = localizationService;
         }
 
+
         /// <summary>
         /// 参数校验
         /// </summary>

@@ -82,8 +82,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                     var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                     if (service == null) continue;
 
-                    //var obj = param.Proxy.GetValueOnly(job.Name);
-                    //var obj = param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
                     var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                     if (obj == null) continue;
 

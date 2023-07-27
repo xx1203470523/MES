@@ -98,7 +98,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             });
         }
 
-
         /// <summary>
         /// 数据组装
         /// </summary>

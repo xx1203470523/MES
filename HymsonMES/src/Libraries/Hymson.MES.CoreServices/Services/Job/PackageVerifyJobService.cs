@@ -31,7 +31,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -109,7 +108,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             });
         }
 
-
         /// <summary>
         /// 执行后节点
         /// </summary>
@@ -120,5 +118,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
+
     }
 }
