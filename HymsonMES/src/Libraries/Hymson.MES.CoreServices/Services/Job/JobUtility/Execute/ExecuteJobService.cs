@@ -59,59 +59,56 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 }
             }
 
-            // 执行参数校验
             foreach (var job in execJobBos)
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
                 if (service == null) continue;
 
+                // 执行参数校验
                 await service.VerifyParamAsync(param);
-            }
 
-            // 执行数据组装
-            foreach (var job in execJobBos)
-            {
-                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
-                if (service == null) continue;
-
-                /*
-                var dataAssembling = await service.DataAssemblingAsync(param);
-                if (dataAssembling == null) continue;
-
-                param.Proxy.SetValue(job.Name, dataAssembling);
-                */
-
-                await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
-                //await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
-                //param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
+                // 执行数据组装
+                await param.Proxy.SetDataBaseValueAsync(service.DataAssemblingAsync<T>, param);
             }
 
             // 执行入库
             var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = new TransactionScope();
-            foreach (var job in execJobBos)
+
+            try
             {
-                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
-                if (service == null) continue;
+                foreach (var job in execJobBos)
+                {
+                    var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
+                    if (service == null) continue;
 
-                //var obj = param.Proxy.GetValueOnly(job.Name);
-                //var obj = param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
-                var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
-                if (obj == null) continue;
+                    //var obj = param.Proxy.GetValueOnly(job.Name);
+                    //var obj = param.Proxy?.GetValue(job.Name, await service.DataAssemblingAsync(param));
+                    var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
+                    if (obj == null) continue;
 
-                var responseDto = await service.ExecuteAsync(obj);
-                responseDtos.Add(job.Name, responseDto);
+                    var responseDto = await service.ExecuteAsync(obj);
+                    responseDtos.Add(job.Name, responseDto);
 
-                if (responseDto.Rows < 0) break;
+                    if (responseDto.Rows < 0) break;
+                }
+
+                if (responseDtos.Any(a => a.Value.Rows < 0))
+                {
+                    trans.Dispose();
+                }
+                else
+                {
+                    trans.Complete();
+                }
             }
-
-            if (responseDtos.Any(a => a.Value.Rows < 0))
+            catch
+            {
+                throw;
+            }
+            finally
             {
                 trans.Dispose();
-            }
-            else
-            {
-                trans.Complete();
             }
 
             return responseDtos;

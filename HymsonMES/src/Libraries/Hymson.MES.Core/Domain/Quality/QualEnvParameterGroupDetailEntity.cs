@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Quality
 {
@@ -13,17 +14,17 @@ namespace Hymson.MES.Core.Domain.Quality
         /// <summary>
         /// 环境检验参数id
         /// </summary>
-        public long ParameterVerifyEnvId { get; set; }
+        public long ParameterGroupId { get; set; }
 
        /// <summary>
-        /// 参数id
+        /// 参数id（环境参数）
         /// </summary>
         public long ParameterId { get; set; }
 
        /// <summary>
         /// 规格上限
         /// </summary>
-        public decimal UpperLimit { get; set; }
+        public decimal? UpperLimit { get; set; }
 
        /// <summary>
         /// 中心值（均值）
@@ -33,12 +34,12 @@ namespace Hymson.MES.Core.Domain.Quality
        /// <summary>
         /// 规格下限
         /// </summary>
-        public decimal LowerLimit { get; set; }
+        public decimal? LowerLimit { get; set; }
 
        /// <summary>
         /// 频率
         /// </summary>
-        public bool Frequency { get; set; }
+        public FrequencyEnum? Frequency { get; set; }
 
        /// <summary>
         /// 录入次数

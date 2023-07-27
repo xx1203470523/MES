@@ -46,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [Route("create")]
         [PermissionDescription("quality:qualEnvParameterGroup:insert")]
-        public async Task AddQualEnvParameterGroupAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
+        public async Task AddAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
-             await _qualEnvParameterGroupService.CreateQualEnvParameterGroupAsync(saveDto);
+            await _qualEnvParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPut]
         [Route("update")]
         [PermissionDescription("quality:qualEnvParameterGroup:update")]
-        public async Task UpdateQualEnvParameterGroupAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
+        public async Task UpdateAsync([FromBody] QualEnvParameterGroupSaveDto saveDto)
         {
-             await _qualEnvParameterGroupService.ModifyQualEnvParameterGroupAsync(saveDto);
+            await _qualEnvParameterGroupService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpDelete]
         [Route("delete")]
         [PermissionDescription("quality:qualEnvParameterGroup:delete")]
-        public async Task DeleteQualEnvParameterGroupAsync([FromBody] long[] ids)
+        public async Task DeleteAsync([FromBody] long[] ids)
         {
-            await _qualEnvParameterGroupService.DeletesQualEnvParameterGroupAsync(ids);
+            await _qualEnvParameterGroupService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -83,9 +83,20 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
+        public async Task<QualEnvParameterGroupInfoDto?> QueryByIdAsync(long id)
         {
-            return await _qualEnvParameterGroupService.QueryQualEnvParameterGroupByIdAsync(id);
+            return await _qualEnvParameterGroupService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（环境检验参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("details/{id}")]
+        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>?> QueryDetailsByParameterVerifyEnvIdAsync(long id)
+        {
+            return await _qualEnvParameterGroupService.QueryDetailsByParameterGroupIdAsync(id);
         }
 
         /// <summary>
@@ -95,7 +106,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<QualEnvParameterGroupDto>> QueryPagedQualEnvParameterGroupAsync([FromQuery] QualEnvParameterGroupPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<QualEnvParameterGroupDto>> QueryPagedListAsync([FromQuery] QualEnvParameterGroupPagedQueryDto pagedQueryDto)
         {
             return await _qualEnvParameterGroupService.GetPagedListAsync(pagedQueryDto);
         }

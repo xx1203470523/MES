@@ -1,13 +1,18 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Quality;
@@ -47,6 +52,28 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualEnvParameterGroupDetailRepository _qualEnvParameterGroupDetailRepository;
 
         /// <summary>
+        /// 仓储接口（工作中心）
+        /// </summary>
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
+        /// 仓储接口（工序）
+        /// </summary>
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 仓储接口（标准参数）
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
+        /// <summary>
+        /// 国际化服务
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -54,15 +81,27 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="validationSaveRules"></param>
         /// <param name="qualEnvParameterGroupRepository"></param>
         /// <param name="qualEnvParameterGroupDetailRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="procParameterRepository"></param>
+        /// <param name="localizationService"></param>
         public QualEnvParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<QualEnvParameterGroupSaveDto> validationSaveRules,
             IQualEnvParameterGroupRepository qualEnvParameterGroupRepository,
-            IQualEnvParameterGroupDetailRepository qualEnvParameterGroupDetailRepository)
+            IQualEnvParameterGroupDetailRepository qualEnvParameterGroupDetailRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcParameterRepository procParameterRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualEnvParameterGroupRepository = qualEnvParameterGroupRepository;
             _qualEnvParameterGroupDetailRepository = qualEnvParameterGroupDetailRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _procParameterRepository = procParameterRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -71,7 +110,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto)
+        public async Task<int> CreateAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -93,13 +132,44 @@ namespace Hymson.MES.Services.Services.Quality
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
-            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.Code);
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit >= item.LowerLimit) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                    ErrorCode = nameof(ErrorCode.MES10516)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
 
             var details = saveDto.Details.Select(s =>
             {
                 var detailEntity = s.ToEntity<QualEnvParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.ParameterGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
@@ -124,7 +194,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto)
+        public async Task<int> ModifyAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -140,11 +210,50 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = saveDto.ToEntity<QualEnvParameterGroupEntity>();
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.SiteId = _currentSite.SiteId ?? 0;
+
+            // 编码唯一性验证
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
+            }
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit >= item.LowerLimit) continue;
+
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                    ErrorCode = nameof(ErrorCode.MES10516)
+                });
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
 
             var details = saveDto.Details.Select(s =>
             {
                 var detailEntity = s.ToEntity<QualEnvParameterGroupDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.ParameterGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
@@ -177,7 +286,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteQualEnvParameterGroupAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             return await _qualEnvParameterGroupRepository.DeleteAsync(id);
         }
@@ -187,7 +296,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesQualEnvParameterGroupAsync(long[] ids)
+        public async Task<int> DeletesAsync(long[] ids)
         {
             return await _qualEnvParameterGroupRepository.DeletesAsync(new DeleteCommand
             {
@@ -202,12 +311,63 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
+        public async Task<QualEnvParameterGroupInfoDto?> QueryByIdAsync(long id)
         {
             var qualEnvParameterGroupEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(id);
             if (qualEnvParameterGroupEntity == null) return null;
 
-            return qualEnvParameterGroupEntity.ToModel<QualEnvParameterGroupInfoDto>();
+            var dto = qualEnvParameterGroupEntity.ToModel<QualEnvParameterGroupInfoDto>();
+            if (dto == null) return dto;
+
+            var workCenterTask = _inteWorkCenterRepository.GetByIdAsync(dto.WorkCenterId);
+            var procedureTask = _procProcedureRepository.GetByIdAsync(dto.ProcedureId);
+
+            var workCenterEntity = await workCenterTask;
+            var procedureEntity = await procedureTask;
+
+            if (workCenterEntity != null) dto.WorkCenterCode = workCenterEntity.Code;
+            if (procedureEntity != null) dto.ProcedureCode = procedureEntity.Code;
+
+            return dto;
+        }
+
+        /// <summary>
+        /// 根据ID获取项目明细列表
+        /// </summary>
+        /// <param name="parameterGroupId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId)
+        {
+            var details = await _qualEnvParameterGroupDetailRepository.GetEntitiesAsync(new QualEnvParameterGroupDetailQuery
+            {
+                ParameterGroupId = parameterGroupId
+            });
+
+            // 查询已经缓存的参数实体
+            var parameterEntities = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            List<QualEnvParameterGroupDetailDto> dtos = new();
+            foreach (var item in details)
+            {
+                var dto = item.ToModel<QualEnvParameterGroupDetailDto>();
+                var parameterEntity = parameterEntities.FirstOrDefault(f => f.Id == item.ParameterId);
+                if (dto == null) continue;
+
+                if (parameterEntity != null)
+                {
+                    dto.Code = parameterEntity.ParameterCode;
+                    dto.Name = parameterEntity.ParameterName;
+                    dto.Unit = parameterEntity.ParameterUnit;
+                    dto.DataType = parameterEntity.DataType;
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
         }
 
         /// <summary>

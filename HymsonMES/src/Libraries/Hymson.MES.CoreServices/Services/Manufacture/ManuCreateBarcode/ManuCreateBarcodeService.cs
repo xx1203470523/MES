@@ -124,7 +124,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             //    StartNumber = inteCodeRulesEntity.StartNumber,
             //    CodeMode = inteCodeRulesEntity.CodeMode,
             //});
-            var barcodeList = (await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
+            var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = false,
                 IsSimulation = false,
@@ -145,7 +145,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 ResetType = inteCodeRulesEntity.ResetType,
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
-            })).Select(x => x.BarCode);
+            });
 
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
@@ -157,71 +157,74 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             var issQty = param.Qty;
             foreach (var item in barcodeList)
             {
-                var qty = issQty > procMaterialEntity.Batch ? procMaterialEntity.Batch : issQty;
-                issQty -= procMaterialEntity.Batch;
+                var qty = issQty > procMaterialEntity.Batch * item.BarCodes.Count() ? procMaterialEntity.Batch : issQty/ item.BarCodes.Count();
+                foreach (var sfc in item.BarCodes) {
+          
+                    issQty -= procMaterialEntity.Batch;
 
-                var manuSfcEntity = new ManuSfcEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = param.SiteId,
-                    SFC = item,
-                    Qty = qty,
-                    IsUsed = YesOrNoEnum.No,
-                    Status = SfcStatusEnum.InProcess,
-                    CreatedBy = param.UserName,
-                    UpdatedBy = param.UserName
-                };
-                manuSfcList.Add(manuSfcEntity);
+                    var manuSfcEntity = new ManuSfcEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = param.SiteId,
+                        SFC = sfc,
+                        Qty = qty,
+                        IsUsed = YesOrNoEnum.No,
+                        Status = SfcStatusEnum.InProcess,
+                        CreatedBy = param.UserName,
+                        UpdatedBy = param.UserName
+                    };
+                    manuSfcList.Add(manuSfcEntity);
 
-                manuSfcInfoList.Add(new ManuSfcInfoEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = param.SiteId,
-                    SfcId = manuSfcEntity.Id,
-                    WorkOrderId = planWorkOrderEntity.Id,
-                    ProductId = planWorkOrderEntity.ProductId,
-                    IsUsed = true,
-                    CreatedBy = param.UserName,
-                    UpdatedBy = param.UserName
-                });
+                    manuSfcInfoList.Add(new ManuSfcInfoEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = param.SiteId,
+                        SfcId = manuSfcEntity.Id,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                        ProductId = planWorkOrderEntity.ProductId,
+                        IsUsed = true,
+                        CreatedBy = param.UserName,
+                        UpdatedBy = param.UserName
+                    });
 
-                manuSfcProduceList.Add(new ManuSfcProduceEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = param.SiteId,
-                    SFC = item,
-                    SFCId = manuSfcEntity.Id,
-                    ProductId = planWorkOrderEntity.ProductId,
-                    WorkOrderId = planWorkOrderEntity.Id,
-                    BarCodeInfoId = manuSfcEntity.Id,
-                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
-                    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                    Qty = qty,
-                    ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Status = SfcProduceStatusEnum.lineUp,
-                    RepeatedCount = 0,
-                    IsScrap = TrueOrFalseEnum.No,
-                    CreatedBy = param.UserName,
-                    UpdatedBy = param.UserName
-                });
+                    manuSfcProduceList.Add(new ManuSfcProduceEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = param.SiteId,
+                        SFC = sfc,
+                        SFCId = manuSfcEntity.Id,
+                        ProductId = planWorkOrderEntity.ProductId,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                        BarCodeInfoId = manuSfcEntity.Id,
+                        ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                        WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                        ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                        Qty = qty,
+                        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        Status = SfcProduceStatusEnum.lineUp,
+                        RepeatedCount = 0,
+                        IsScrap = TrueOrFalseEnum.No,
+                        CreatedBy = param.UserName,
+                        UpdatedBy = param.UserName
+                    });
 
-                manuSfcStepList.Add(new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = param.SiteId,
-                    SFC = item,
-                    ProductId = planWorkOrderEntity.ProductId,
-                    WorkOrderId = planWorkOrderEntity.Id,
-                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                    Qty = qty,
-                    ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Create,
-                    CurrentStatus = SfcProduceStatusEnum.lineUp,
-                    CreatedBy = param.UserName,
-                    UpdatedBy = param.UserName
-                });
+                    manuSfcStepList.Add(new ManuSfcStepEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = param.SiteId,
+                        SFC = sfc,
+                        ProductId = planWorkOrderEntity.ProductId,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                        ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                        WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                        Qty = qty,
+                        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        Operatetype = ManuSfcStepTypeEnum.Create,
+                        CurrentStatus = SfcProduceStatusEnum.lineUp,
+                        CreatedBy = param.UserName,
+                        UpdatedBy = param.UserName
+                    });
+                }
             }
 
             var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand

@@ -1,12 +1,5 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -46,6 +39,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 参数单位
         /// </summary>
         public ParameterUnitEnum ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum DataType { get; set; }
 
         /// <summary>
         /// 备注

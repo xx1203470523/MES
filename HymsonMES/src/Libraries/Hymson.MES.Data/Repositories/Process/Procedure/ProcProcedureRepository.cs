@@ -17,6 +17,11 @@ namespace Hymson.MES.Data.Repositories.Process
         private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
         public ProcProcedureRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;

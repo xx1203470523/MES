@@ -13,35 +13,42 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto);
+        Task<int> CreateAsync(QualEnvParameterGroupSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto);
+        Task<int> ModifyAsync(QualEnvParameterGroupSaveDto saveDto);
 
         /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> DeleteQualEnvParameterGroupAsync(long id);
+        Task<int> DeleteAsync(long id);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesQualEnvParameterGroupAsync(long[] ids);
+        Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id);
+        Task<QualEnvParameterGroupInfoDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID获取项目明细列表
+        /// </summary>
+        /// <param name="parameterGroupId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId);
 
         /// <summary>
         /// 获取分页List

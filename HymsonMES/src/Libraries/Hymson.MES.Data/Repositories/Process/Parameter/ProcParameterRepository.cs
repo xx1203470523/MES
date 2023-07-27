@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -14,10 +15,17 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcParameterRepository : IProcParameterRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
-        public ProcParameterRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public ProcParameterRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -52,6 +60,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcParameterEntity>(GetByIdSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcParameterEntity>(GetByIdsSql, new { ids });
         }
 
         /// <summary>
@@ -108,25 +127,24 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcParameterEntity>> GetProcParameterEntitiesAsync(ProcParameterQuery procParameterQuery)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetProcParameterEntitiesSqlTemplate);
-
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
-
-            //if (procParameterQuery.SiteId != 0)
-            //{
-            sqlBuilder.Where(" SiteId=@SiteId ");
-            //}
-            if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
+            var key = $"proc_parameter&{procParameterQuery.SiteId}&{procParameterQuery.ParameterCode}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                //procParameterQuery.ParameterCode = $"%{procParameterQuery.ParameterCode}%";
-                sqlBuilder.Where(" ParameterCode = @ParameterCode ");
-            }
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetProcParameterEntitiesSqlTemplate);
+                sqlBuilder.Where("IsDeleted = 0");
+                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.Select("*");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procParameterEntities = await conn.QueryAsync<ProcParameterEntity>(template.RawSql, procParameterQuery);
-            return procParameterEntities;
+                if (string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode) == false)
+                {
+                    sqlBuilder.Where("ParameterCode = @ParameterCode");
+                }
+
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var procParameterEntities = await conn.QueryAsync<ProcParameterEntity>(template.RawSql, procParameterQuery);
+                return procParameterEntities;
+            });
         }
 
         /// <summary>
@@ -170,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `proc_parameter` WHERE Id = @Id ";
-
+        const string GetByIdsSql = @"SELECT * FROM `proc_parameter` WHERE Id IN @ids and IsDeleted=0 ";
     }
 
 }

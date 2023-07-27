@@ -22,28 +22,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteVehiceFreightStackEntity inteVehiceFreightStackEntity);
+        Task<int> InsertAsync(InteVehicleFreightStackEntity inteVehiceFreightStackEntity);
         
         /// <summary>
         /// 批量新增
         /// </summary>
         /// <param name="inteVehiceFreightStackEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<InteVehiceFreightStackEntity> inteVehiceFreightStackEntitys);
+        Task<int> InsertsAsync(List<InteVehicleFreightStackEntity> inteVehiceFreightStackEntitys);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="inteVehiceFreightStackEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteVehiceFreightStackEntity inteVehiceFreightStackEntity);
+        Task<int> UpdateAsync(InteVehicleFreightStackEntity inteVehiceFreightStackEntity);
         
         /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="inteVehiceFreightStackEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<InteVehiceFreightStackEntity> inteVehiceFreightStackEntitys);
+        Task<int> UpdatesAsync(List<InteVehicleFreightStackEntity> inteVehiceFreightStackEntitys);
 
         /// <summary>
         /// 删除  
@@ -65,28 +65,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteVehiceFreightStackEntity> GetByIdAsync(long id);
-        Task<InteVehiceFreightStackEntity> GetBySFCAsync(string sfc);
+        Task<InteVehicleFreightStackEntity> GetByIdAsync(long id);
+        Task<InteVehicleFreightStackEntity> GetBySFCAsync(string sfc);
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteVehiceFreightStackEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteVehicleFreightStackEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="inteVehiceFreightStackQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteVehiceFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQuery inteVehiceFreightStackQuery);
+        Task<IEnumerable<InteVehicleFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQuery inteVehiceFreightStackQuery);
         
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="inteVehiceFreightStackPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteVehiceFreightStackEntity>> GetPagedInfoAsync(InteVehiceFreightStackPagedQuery inteVehiceFreightStackPagedQuery);
+        Task<PagedInfo<InteVehicleFreightStackEntity>> GetPagedInfoAsync(InteVehiceFreightStackPagedQuery inteVehiceFreightStackPagedQuery);
         #endregion
     }
 }

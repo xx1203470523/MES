@@ -60,7 +60,6 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
-        
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -96,10 +95,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
 
-            #region FaultReason
+            // FaultReason
             services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
-
-            #endregion
             #endregion
 
             #region Integrated
@@ -112,57 +109,54 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCustomService, InteCustomService>();
 
             services.AddSingleton<IInteVehicleTypeService, InteVehicleTypeService>();
-
             services.AddSingleton<IInteVehicleService, InteVehicleService>();
 
-            #region CodeRule
+            // CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
             services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
-            #endregion
             #endregion
 
             #region Process
             services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
+            services.AddSingleton<IProcProductParameterGroupService, ProcProductParameterGroupService>();
 
-            #region Material
+            // Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
             services.AddSingleton<IProcMaterialGroupService, ProcMaterialGroupService>();
-            #endregion
 
-            #region Parameter
+            // Parameter
             services.AddSingleton<IProcParameterService, ProcParameterService>();
-            #endregion
 
-            #region ParameterLinkType
+            // ParameterLinkType 
             services.AddSingleton<IProcParameterLinkTypeService, ProcParameterLinkTypeService>();
-            #endregion
 
-            #region Bom
+            // Bom
             services.AddSingleton<IProcBomService, ProcBomService>();
             services.AddSingleton<IProcBomDetailService, ProcBomDetailService>();
-            #endregion
 
-            #region LoadPoint
+            // LoadPoint 
             services.AddSingleton<IProcLoadPointService, ProcLoadPointService>();
-            #endregion
 
-            #region Resource
+            // Resource
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
             services.AddSingleton<IProcResourceService, ProcResourceService>();
-            #endregion
 
-            //工序
+            // 工序
             services.AddSingleton<IProcProcedureService, ProcProcedureService>();
-            //工艺路线
+
+            // 工艺路线
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
 
             services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
-            //标签模板
+            // 标签模板
             services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
+
+            services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
             #endregion
 
             #region Quality
             services.AddSingleton<IQualEnvParameterGroupService, QualEnvParameterGroupService>();
+            services.AddSingleton<IQualInspectionParameterGroupService, QualInspectionParameterGroupService>();
             services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
             services.AddSingleton<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
             #endregion
@@ -291,6 +285,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Process
+            services.AddSingleton<AbstractValidator<ProcProductParameterGroupSaveDto>, ProcProductParameterGroupValidator>();
+
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -357,6 +353,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcMaskCodeSaveDto>, ProcMaskCodeValidator>();
             #endregion
 
+            #region ProcSortingRule
+            services.AddSingleton<AbstractValidator<ProcSortingRuleCreateDto>, ProcSortingRuleCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcSortingRuleModifyDto>, ProcSortingRuleModifyValidator>();
+            #endregion
             #endregion
 
             #region Integrated
@@ -390,7 +390,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Quality
-            services.AddSingleton<AbstractValidator<QualEnvParameterGroupSaveDto>, QualEnvParameterGroupSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualEnvParameterGroupSaveDto>, QualEnvParameterGroupValidator>();
+            services.AddSingleton<AbstractValidator<QualInspectionParameterGroupSaveDto>, QualInspectionParameterGroupValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeCreateDto>, QualUnqualifiedCodeCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
@@ -481,6 +482,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-       
+
     }
 }

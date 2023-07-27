@@ -28,9 +28,11 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
+using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -54,7 +56,7 @@ namespace Hymson.MES.Services.Mapper
     public class MapperConfiguration : Profile, IOrderedMapperProfile
     {
         /// <summary>
-        /// 
+        /// 映射
         /// </summary>
         public MapperConfiguration()
         {
@@ -69,7 +71,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 设备模块
         /// </summary>
         protected virtual void CreateEquipmentMaps()
         {
@@ -156,7 +158,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 综合模块
         /// </summary>
         protected virtual void CreateIntegratedMaps()
         {
@@ -260,7 +262,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 工艺模块
         /// </summary>
         protected virtual void CreateProcessMaps()
         {
@@ -411,7 +413,22 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLabelTemplatePagedQueryDto, ProcLabelTemplatePagedQuery>();
             #endregion
 
+            #region ProcSortingRule
 
+            CreateMap<ProcSortingRuleEntity, ProcSortingRuleDto>();
+            CreateMap<ProcSortingRuleCreateDto, ProcLabelTemplateEntity>();
+            CreateMap<ProcSortingRuleModifyDto, ProcLabelTemplateEntity>();
+            CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
+            #endregion
+
+            #region ProcProductParameterGroup
+            CreateMap<ProcProductParameterGroupSaveDto, ProcProductParameterGroupEntity>();
+            CreateMap<ProcProductParameterGroupPagedQueryDto, ProcProductParameterGroupPagedQuery>();
+            CreateMap<ProcProductParameterGroupView, ProcProductParameterGroupDto>();
+            CreateMap<ProcProductParameterGroupEntity, ProcProductParameterGroupInfoDto>();
+            CreateMap<ProcProductParameterGroupDetailSaveDto, ProcProductParameterGroupDetailEntity>();
+            CreateMap<ProcProductParameterGroupDetailEntity, ProcProductParameterGroupDetailDto>();
+            #endregion
         }
 
         /// <summary>
@@ -446,7 +463,7 @@ namespace Hymson.MES.Services.Mapper
         }
 
         /// <summary>
-        /// 
+        /// 质量模块
         /// </summary>
         protected virtual void CreateQualityMaps()
         {
@@ -454,7 +471,18 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualEnvParameterGroupSaveDto, QualEnvParameterGroupEntity>();
             CreateMap<QualEnvParameterGroupPagedQueryDto, QualEnvParameterGroupPagedQuery>();
             CreateMap<QualEnvParameterGroupView, QualEnvParameterGroupDto>();
+            CreateMap<QualEnvParameterGroupEntity, QualEnvParameterGroupInfoDto>();
             CreateMap<QualEnvParameterGroupDetailSaveDto, QualEnvParameterGroupDetailEntity>();
+            CreateMap<QualEnvParameterGroupDetailEntity, QualEnvParameterGroupDetailDto>();
+            #endregion
+
+            #region QualInspectionParameterGroup
+            CreateMap<QualInspectionParameterGroupSaveDto, QualInspectionParameterGroupEntity>();
+            CreateMap<QualInspectionParameterGroupPagedQueryDto, QualInspectionParameterGroupPagedQuery>();
+            CreateMap<QualInspectionParameterGroupView, QualInspectionParameterGroupDto>();
+            CreateMap<QualInspectionParameterGroupEntity, QualInspectionParameterGroupInfoDto>();
+            CreateMap<QualInspectionParameterGroupDetailSaveDto, QualInspectionParameterGroupDetailEntity>();
+            CreateMap<QualInspectionParameterGroupDetailEntity, QualInspectionParameterGroupDetailDto>();
             #endregion
 
             #region QualUnqualifiedCode

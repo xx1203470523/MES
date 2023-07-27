@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -21,14 +22,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
     public partial class InteWorkCenterRepository : IInteWorkCenterRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteWorkCenterRepository(IOptions<ConnectionOptions> connectionOptions)
+        /// <param name="memoryCache"></param>
+        public InteWorkCenterRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
         {
             _connectionOptions = connectionOptions.Value;
+            _memoryCache = memoryCache;
         }
 
 
@@ -93,8 +97,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<InteWorkCenterEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByIdSql, new { Id = id });
+            var key = $"inte_work_center&{id}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByIdSql, new { Id = id });
+            });
         }
 
         /// <summary>
@@ -333,7 +341,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string UpdateRangSql = "UPDATE `inte_work_center` SET Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
-        const string GetByIdSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Id = @Id AND IsDeleted=0  ";
+        const string GetByIdSql = @"SELECT * FROM `inte_work_center` WHERE Id = @Id AND IsDeleted = 0  ";
         const string GetByIdsSql = @"SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Id IN @ids ";
         const string GetByTypeAndParentIdSql = "SELECT /**select**/ FROM inte_work_center IWC /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";

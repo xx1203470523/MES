@@ -11,11 +11,16 @@
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.49" />
-		<PackageReference Include="Hymson.Snowflake" Version="2.1.49" />
-		<PackageReference Include="Hymson.Web.Framework" Version="2.1.49" />
+		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.61" />
+		<PackageReference Include="Hymson.Snowflake" Version="2.1.61" />
+		<PackageReference Include="Hymson.Web.Framework" Version="2.1.61" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Dtos\Bootup\" />
+	  <Folder Include="Services\Bootup\" />
+	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>
 
 </Project>
