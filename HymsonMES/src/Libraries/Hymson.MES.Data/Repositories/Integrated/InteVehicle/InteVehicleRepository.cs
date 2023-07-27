@@ -203,7 +203,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
-                        v.*,vt.Code AS VehicleTypeCode,vt.Name AS VehicleTypeType  
+                        v.*,vt.Code AS VehicleTypeCode,vt.Name AS VehicleTypeName  
                      FROM `inte_vehicle` v 
                      LEFT JOIN `inte_vehicle_type` vt ON vt.Id=v.VehicleTypeId
                     /**where**/ ORDER BY v.UpdatedOn DESC LIMIT @Offset,@Rows ";
