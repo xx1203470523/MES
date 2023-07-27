@@ -222,8 +222,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
             var entities = sfcProduceEntities.AsList();
 
-            responseBo.FirstSFCProduceEntity = entities.FirstOrDefault();
-            if (responseBo.FirstSFCProduceEntity == null) return default;
+            var firstSFCProduceEntity = entities.FirstOrDefault();
+            if (firstSFCProduceEntity == null) return default;
 
             // 更新时间
             var updatedBy = bo.UserName;
@@ -235,17 +235,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var processRouteId = (long)parameters[0];
                 var procedureId = (long)parameters[1];
                 return await _masterDataService.IsFirstProcedureAsync(processRouteId, procedureId);
-            }, new object[] { responseBo.FirstSFCProduceEntity.ProcessRouteId, responseBo.FirstSFCProduceEntity.ProcedureId });
+            }, new object[] { firstSFCProduceEntity.ProcessRouteId, firstSFCProduceEntity.ProcedureId });
 
             // 获取当前工序信息
-            var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheck(responseBo.FirstSFCProduceEntity.ProcedureId);
+            var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheck(firstSFCProduceEntity.ProcedureId);
 
             // 更新工单信息
             var updateQtyCommand = new UpdateQtyCommand
             {
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn,
-                WorkOrderId = responseBo.FirstSFCProduceEntity.WorkOrderId
+                WorkOrderId = firstSFCProduceEntity.WorkOrderId
             };
 
             // 组装（进站数据）
@@ -257,11 +257,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (procedureEntity.Type == ProcedureTypeEnum.Test)
                 {
                     // 超过复投次数，标识为NG
-                    if (responseBo.FirstSFCProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
-                    responseBo.FirstSFCProduceEntity.RepeatedCount++;
+                    if (firstSFCProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
+                    firstSFCProduceEntity.RepeatedCount++;
                 }
 
-                /*
                 sfcProduceEntity.ProcedureId = bo.ProcedureId;
                 sfcProduceEntity.ResourceId = bo.ResourceId;
 
@@ -269,7 +268,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
                 sfcProduceEntity.UpdatedBy = bo.UserName;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-                */
 
                 // 初始化步骤
                 sfcStepEntities.Add(new ManuSfcStepEntity
@@ -316,7 +314,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
                 Status = SfcProduceStatusEnum.Activity,
-                RepeatedCount = responseBo.FirstSFCProduceEntity.RepeatedCount,
+                RepeatedCount = firstSFCProduceEntity.RepeatedCount,
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             };
@@ -324,6 +322,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return new InStationResponseBo
             {
                 IsFirstProcedure = isFirstProcedure,
+                FirstSFC = firstSFCProduceEntity.SFC,
+                ManuSfcProduceEntities = entities,
                 MultiUpdateProduceSFCCommand = multiUpdateProduceSFCCommand,
                 UpdateQtyCommand = updateQtyCommand,
                 SFCStepEntities = sfcStepEntities,
@@ -352,7 +352,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.Rows = -1;
 
                 //throw new CustomerValidationException(nameof(ErrorCode.MES18217)).WithData("SFC", data.FirstSFCProduceEntity.SFC);
-                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFCProduceEntity.SFC);
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFC);
                 return responseBo;
             }
 
@@ -385,7 +385,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 { "BadEntryCom", "False" },
             };
 
-            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), data.FirstSFCProduceEntity.SFC);
+            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), data.FirstSFC);
             return responseBo;
         }
 
