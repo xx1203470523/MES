@@ -36,16 +36,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public bool IsFirstProcedure { get; set; }
 
         /// <summary>
-        /// 
+        /// 条码（首个）
         /// </summary>
-        public ManuSfcProduceEntity FirstSFCProduceEntity { get; set; } = new();
+        public string FirstSFC { get; set; } = "";
 
-        /*
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<UpdateWorkOrderRealTimeCommand> UpdateWorkOrderRealTimeCommands = new List<UpdateWorkOrderRealTimeCommand>();
-        */
+        public IEnumerable<ManuSfcProduceEntity> ManuSfcProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
 
         /// <summary>
         /// 
