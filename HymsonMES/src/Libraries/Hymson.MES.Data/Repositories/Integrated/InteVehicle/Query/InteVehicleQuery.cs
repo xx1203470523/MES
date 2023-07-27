@@ -15,9 +15,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
     {
     }
 
-    public class InteVehicleCodeQuery 
+    public class InteVehicleCodeQuery
     {
         public string Code { get; set; }
+
+        public long SiteId { get; set; }
+    }
+
+    public class InteVehicleVehicleTypeIdsQuery
+    {
+        public long[] VehicleTypeIds { get; set; }
 
         public long SiteId { get; set; }
     }

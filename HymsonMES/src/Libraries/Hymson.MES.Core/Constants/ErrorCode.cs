@@ -1003,6 +1003,8 @@
         public const string MES18515 = "载具类型验证物料或物料组不合法";
 
         public const string MES18516 = "载具类型编码不允许有空格";
+
+        public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
         #endregion
 
         #region 载具注册 18600

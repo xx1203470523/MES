@@ -186,6 +186,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteVehicleEntity>(GetByCodeSql, query);
         }
+
+        /// <summary>
+        /// 根据VehicleTypeId获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteVehicleEntity>> GetByVehicleTypeIdsAsync(InteVehicleVehicleTypeIdsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteVehicleEntity>(GetByVehicleTypeIdsSql, query);
+        }
     }
 
     public partial class InteVehicleRepository
@@ -223,5 +234,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetByCodeSql = @"SELECT * 
                             FROM `inte_vehicle`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+
+        const string GetByVehicleTypeIdsSql = @"SELECT * FROM `inte_vehicle` WHERE IsDeleted=0 AND SiteId=@SiteId AND VehicleTypeId in @VehicleTypeIds";
     }
 }

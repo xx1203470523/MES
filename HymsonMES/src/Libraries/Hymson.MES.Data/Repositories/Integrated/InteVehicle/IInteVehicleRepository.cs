@@ -95,5 +95,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="query"></param>
         /// <returns></returns>
         Task<InteVehicleEntity> GetByCodeAsync(InteVehicleCodeQuery query);
+
+        /// <summary>
+        /// 根据VehicleTypeId获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteVehicleEntity>> GetByVehicleTypeIdsAsync(InteVehicleVehicleTypeIdsQuery query);
     }
 }
