@@ -326,7 +326,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 UnqualifiedRate = unqualifiedRate,
                 WorkLineName = inteWorkCenterEntity?.Name,
                 WorkOrderCode = planWorkOrderEntity?.OrderCode,
-                WorkOrderDownTime = planWorkOrderEntity?.CreatedOn,
+                WorkOrderDownTime = planWorkOrderEntity?.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty,
                 WorkOrderQty = planWorkOrderEntity?.Qty
             };
             return managePanelReportDto;

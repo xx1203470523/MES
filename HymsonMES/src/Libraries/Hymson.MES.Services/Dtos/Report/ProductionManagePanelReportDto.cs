@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 工单下达时间
         /// </summary>
-        public DateTime? WorkOrderDownTime { get; set; }
+        public string WorkOrderDownTime { get; set; }
         /// <summary>
         /// 工单号
         /// </summary>
