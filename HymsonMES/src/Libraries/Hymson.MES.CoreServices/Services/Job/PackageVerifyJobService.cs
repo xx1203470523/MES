@@ -99,7 +99,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            return await Task.FromResult(new JobResponseBo { });
+            // 面板需要的数据
+            return await Task.FromResult(new JobResponseBo
+            {
+                Content = new Dictionary<string, string> {
+                { "PackageCom", "True" },
+                { "BadEntryCom", "False" },
+            },
+                Message = ""
+            });
         }
 
 
