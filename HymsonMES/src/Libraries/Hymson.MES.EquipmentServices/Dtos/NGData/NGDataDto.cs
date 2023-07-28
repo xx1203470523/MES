@@ -11,7 +11,6 @@ namespace Hymson.MES.EquipmentServices.Dtos.NGData
     /// </summary>
     public class NGDataQueryDto
     {
-        public long SiteId { get; set; }
         public string SFC { get; set; }
         public string? ProcedureCode { get; set; }
     }

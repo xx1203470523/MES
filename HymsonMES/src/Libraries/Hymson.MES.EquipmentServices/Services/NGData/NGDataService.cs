@@ -51,7 +51,7 @@ namespace Hymson.MES.EquipmentServices.Services
             long? procedureId = null;
             if (!string.IsNullOrEmpty(param.ProcedureCode))
             {
-                var procProcedureEntitie = await _procProcedureRepository.GetByCodeAsync(param.ProcedureCode, param.SiteId);
+                var procProcedureEntitie = await _procProcedureRepository.GetByCodeAsync(param.ProcedureCode, _currentEquipment.SiteId);
                 if (procProcedureEntitie == null)
                 {
                     return nGDataDto;
