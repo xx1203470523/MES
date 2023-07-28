@@ -92,5 +92,25 @@ namespace Hymson.MES.Api.Controllers
             { return NotFound(); }
 
         }
+
+        [Route("remove-cache")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Remove(string key)
+        {
+             _memoryCache.Remove(key);
+           return Ok();
+
+        }
+
+        [Route("clear")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Clear()
+        {
+            _memoryCache.RemoveCacheRegex("&");
+            return Ok();
+
+        }
     }
 }
