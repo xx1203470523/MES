@@ -413,7 +413,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //虚拟条码绑定流转信息处理
             var manuSfcCirculationUpdateEntities = await BindVirtualSFCCirculationAsync(outBoundMoreDto);
             //虚拟条码更新为实际模组条码
-            var manuProductParameterUpdateEntities = await BindBirtualProductParameter(outBoundMoreDto);
+            var manuProductParameterUpdateEntities = await BindBirtualProductParameterAsync(outBoundMoreDto);
 
             //SFC关联绑定流转信息处理
             var manuSfcCirculationBarCodeQuery = new ManuSfcCirculationBarCodeQuery
@@ -450,8 +450,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 }
             }
 
-            //标准参数
-            List<ManuProductParameterEntity> manuProductParameterEntities = await PrepareProductParameterEntityAsync(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
+            //产品参数&标准参数
+            var (manuProductParameterEntities, procParameterEntities) = await PrepareProductParameterEntityAsync(outBoundMoreDto, manuSfcStepEntities, procResource.Id);
             //NG
             List<ManuSfcStepNgEntity> manuProductNGEntities = await PrepareProductNgEntityAsync(outBoundMoreDto, manuSfcStepEntities);
             //批次码信息
@@ -493,6 +493,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             if (manuSfcProduceEntities.Any())
             {
                 rows += await _manuSfcProduceRepository.UpdateRangeAsync(manuSfcProduceEntities);
+            }
+            //标准参数
+            if (procParameterEntities.Any())
+            {
+                rows += await _procParameterRepository.InsertsAsync(procParameterEntities);
             }
             //产品参数信息
             if (manuProductParameterEntities.Any())
@@ -592,7 +597,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// </summary>
         /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ManuProductParameterEntity>> BindBirtualProductParameter(OutBoundMoreDto outBoundMoreDto)
+        private async Task<IEnumerable<ManuProductParameterEntity>> BindBirtualProductParameterAsync(OutBoundMoreDto outBoundMoreDto)
         {
             //虚拟码绑定处理
             var manuProductParameterEntities = new List<ManuProductParameterEntity>();
@@ -706,9 +711,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// <param name="manuSfcStepEntities"></param>
         /// <param name="procResourceId"></param>
         /// <returns></returns>
-        private async Task<List<ManuProductParameterEntity>> PrepareProductParameterEntityAsync(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities, long procResourceId)
+        private async Task<(List<ManuProductParameterEntity>, List<ProcParameterEntity>)> PrepareProductParameterEntityAsync(OutBoundMoreDto outBoundMoreDto, List<ManuSfcStepEntity> manuSfcStepEntities, long procResourceId)
         {
             List<ManuProductParameterEntity> manuProductParameterEntities = new();
+            List<ProcParameterEntity> procParameterEntities = new();
             //所有参数
             List<string> paramCodeList = new();
             foreach (var item in outBoundMoreDto.SFCs)
@@ -723,7 +729,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //如果所有参数都为空
             if (paramCodeList.Count <= 0)
             {
-                return manuProductParameterEntities;
+                return (manuProductParameterEntities, procParameterEntities);
             }
             var codesQuery = new EntityByCodesQuery
             {
@@ -733,8 +739,33 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);
             //如果有不存在的参数编码就提示
             var noIncludeCodes = paramCodeList.Where(w => procParameter.Select(s => s.ParameterCode.ToUpper()).Contains(w.ToUpper()) == false);
-            if (noIncludeCodes.Any() == true)
-                throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
+            //if (noIncludeCodes.Any() == true)
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19108)).WithData("Code", string.Join(',', noIncludeCodes));
+
+            // 找出不在数据库里面的Code，自动新增标准参数，应对设备不合理需求
+            if (noIncludeCodes.Any())
+            {
+                foreach (var item in noIncludeCodes)
+                {
+                    if (!procParameterEntities.Where(c => c.ParameterCode == item).Any())
+                    {
+                        procParameterEntities.Add(new ProcParameterEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            CreatedBy = _currentEquipment.Code,
+                            UpdatedBy = _currentEquipment.Code,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            ParameterCode = item,
+                            ParameterName = item,
+                            Remark = "自动创建"
+                        });
+                    }
+                }
+                //将要新增的参数也添加到查询列表中
+                procParameter = procParameter.Concat(procParameterEntities);
+            }
 
             foreach (var outBoundDto in outBoundMoreDto.SFCs)
             {
@@ -769,7 +800,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     manuProductParameterEntities.AddRange(paramList);
                 }
             }
-            return manuProductParameterEntities;
+            return (manuProductParameterEntities, procParameterEntities);
         }
 
         /// <summary>
