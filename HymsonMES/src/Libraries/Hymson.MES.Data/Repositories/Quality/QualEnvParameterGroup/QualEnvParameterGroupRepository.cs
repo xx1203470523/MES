@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualEnvParameterGroupView>> GetPagedInfoAsync(QualEnvParameterGroupPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualEnvParameterGroupView>> GetPagedListAsync(QualEnvParameterGroupPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -180,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.WorkCenterName = $"%{pagedQuery.WorkCenterName}%";
                 sqlBuilder.Where("IWC.Name LIKE @WorkCenterName");
             }
-
+         
             if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode) == false)
             {
                 pagedQuery.ProcedureCode = $"%{pagedQuery.ProcedureCode}%";
@@ -192,7 +192,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.ProcedureName = $"%{pagedQuery.ProcedureName}%";
                 sqlBuilder.Where("PP.Name LIKE @ProcedureName");
             }
-
+          
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -215,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     public partial class QualEnvParameterGroupRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_env_parameter_group T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM qual_env_parameter_group T /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM qual_env_parameter_group T /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_env_parameter_group /**where**/  ";

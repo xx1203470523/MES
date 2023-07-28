@@ -541,7 +541,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 批次
         /// </summary>
-        public string Batch { get; set; }
+        public string? Batch { get; set; }
 
         /// <summary>
         /// 供应商ID

@@ -17,6 +17,11 @@ namespace Hymson.MES.Core.Domain.Equipment
         public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>

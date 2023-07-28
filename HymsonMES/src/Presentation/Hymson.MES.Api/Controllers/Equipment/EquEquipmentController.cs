@@ -142,5 +142,18 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         {
             return await _equEquipmentService.GetEquEquipmentTokenAsync(EquEquipmentId);
         }
+
+        /// <summary>
+        /// 根据设备ID查询对应的验证
+        /// </summary>
+        /// <param name="equEquipmentId"></param>
+        /// <returns></returns>
+        [Route("getEquipmentVerifyByEquipmentId/{equEquipmentId}")]
+        [HttpGet]
+        public async Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equEquipmentId)
+        {
+            return await _equEquipmentService.GetEquipmentVerifyByEquipmentIdAsync(equEquipmentId);
+        }
+
     }
 }

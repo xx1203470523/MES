@@ -282,6 +282,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
             services.AddSingleton<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
             services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
+
+            services.AddSingleton<AbstractValidator<EquEquipmentVerifyCreateDto>, EquEquipmentVerifyCreateValidator>();
             #endregion
 
             #region Process
