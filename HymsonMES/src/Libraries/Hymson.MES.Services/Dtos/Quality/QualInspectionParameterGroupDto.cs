@@ -202,22 +202,22 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 物料编码
         /// </summary>
-        public long? MaterialCode { get; set; }
+        public string? MaterialCode { get; set; }
 
         /// <summary>
         /// 物料名称
         /// </summary>
-        public long? MaterialName { get; set; }
+        public string? MaterialName { get; set; }
 
         /// <summary>
         /// 工序编码
         /// </summary>
-        public long? ProcedureCode { get; set; }
+        public string? ProcedureCode { get; set; }
 
         /// <summary>
         /// 工序名称
         /// </summary>
-        public long? ProcedureName { get; set; }
+        public string? ProcedureName { get; set; }
     }
 
 }

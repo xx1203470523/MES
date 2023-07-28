@@ -215,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     public partial class QualInspectionParameterGroupRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_inspection_parameter_group` /**where**/  ";
