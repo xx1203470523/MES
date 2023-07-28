@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Options;
 using Hymson.Snowflake;
@@ -69,6 +70,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
         private readonly JwtOptions _jwtOptions;
 
+        private readonly IEquEquipmentVerifyRepository _equEquipmentVerifyRepository;
+
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
+        /// 验证器
+        /// </summary>
+        private readonly AbstractValidator<EquEquipmentVerifyCreateDto> _verifyValidationRules;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -85,7 +95,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions)
+            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules,IProcResourceRepository procResourceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -95,6 +105,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             _equEquipmentLinkHardwareRepository = equEquipmentLinkHardwareRepository;
             _equEquipmentTokenRepository = equEquipmentTokenRepository;
             _jwtOptions = jwtOptions.Value;
+            _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
+            _verifyValidationRules = verifyValidationRules;
+            _procResourceRepository = procResourceRepository;
         }
 
 
@@ -149,6 +162,36 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     linkHardwareList.Add(linkHardware);
                 }
             }
+
+
+
+            //绑定验证
+            List<EquEquipmentVerifyEntity> verifyList = new();
+            if (createDto.Verifys != null && createDto.Verifys.Any() == true)
+            {
+                //验证验证参数
+                foreach (var item in createDto.Verifys)
+                {
+                    await _verifyValidationRules.ValidateAndThrowAsync(item);
+                }
+
+                foreach (var item in createDto.Verifys)
+                {
+                    EquEquipmentVerifyEntity verify = new EquEquipmentVerifyEntity();
+                    verify.EquipmentId = entity.Id;
+                    verify.Account = item.Account;
+                    verify.Password = item.Password;
+
+                    verify.Id = IdGenProvider.Instance.CreateId();
+                    verify.SiteId = _currentSite.SiteId ?? 0;
+                    verify.CreatedBy = _currentUser.UserName;
+                    verify.CreatedOn = HymsonClock.Now();
+                    verify.UpdatedBy = _currentUser.UserName;
+                    verify.UpdatedOn = HymsonClock.Now();
+                    verifyList.Add(verify);
+                }
+            }
+
             #endregion
 
             #region 参数校验
@@ -163,6 +206,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 rows += await _equEquipmentRepository.InsertAsync(entity);
                 rows += await _equEquipmentLinkApiRepository.InsertRangeAsync(linkApiList);
                 rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+                rows += await _equEquipmentVerifyRepository.InsertsAsync(verifyList);
                 trans.Complete();
             }
             return rows;
@@ -212,6 +256,33 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     linkHardwareList.Add(linkHardware);
                 }
             }
+
+            //绑定验证
+            List<EquEquipmentVerifyEntity> verifyList = new();
+            if (modifyDto.Verifys != null && modifyDto.Verifys.Any() == true)
+            {
+                //验证验证参数
+                foreach (var item in modifyDto.Verifys)
+                {
+                    await _verifyValidationRules.ValidateAndThrowAsync(item);
+                }
+
+                foreach (var item in modifyDto.Verifys)
+                {
+                    EquEquipmentVerifyEntity verify = new EquEquipmentVerifyEntity();
+                    verify.EquipmentId = entity.Id;
+                    verify.Account = item.Account;
+                    verify.Password = item.Password;
+
+                    verify.Id = IdGenProvider.Instance.CreateId();
+                    verify.SiteId = _currentSite.SiteId ?? 0;
+                    verify.CreatedBy = _currentUser.UserName;
+                    verify.CreatedOn = HymsonClock.Now();
+                    verify.UpdatedBy = _currentUser.UserName;
+                    verify.UpdatedOn = HymsonClock.Now();
+                    verifyList.Add(verify);
+                }
+            }
             #endregion
 
             #region 参数校验
@@ -232,6 +303,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 // 绑定硬件数据
                 rows += await _equEquipmentLinkHardwareRepository.DeletesAsync(entity.Id);
                 rows += await _equEquipmentLinkHardwareRepository.InsertRangeAsync(linkHardwareList);
+
+                rows += await _equEquipmentVerifyRepository.DeletesByEquipmentIdsAsync(new long[] { entity.Id });
+                rows += await _equEquipmentVerifyRepository.InsertsAsync(verifyList);
                 trans.Complete();
             }
             return rows;
@@ -249,6 +323,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             {
                 rows += await _equEquipmentLinkApiRepository.DeletesAsync(idsArr);
                 rows += await _equEquipmentLinkHardwareRepository.DeletesAsync(idsArr);
+                rows += await _equEquipmentVerifyRepository.DeletesByEquipmentIdsAsync(idsArr);
                 rows += await _equEquipmentRepository.DeletesAsync(new DeleteCommand
                 {
                     Ids = idsArr,
@@ -270,9 +345,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equEquipmentRepository.GetPagedListAsync(pagedQuery);
-
+            
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentListDto>());
+
+            //查询所有的资源
+            //var resources= await _procResourceRepository.GetByIdsAsync(dtos.Select(x => x.ResourceId).ToArray());
+
             return new PagedInfo<EquEquipmentListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -517,6 +596,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             return token;
         }
 
+
+        /// <summary>
+        /// 根据设备ID查询对应的验证
+        /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equipmentId)
+        {
+            var verifyEntitys= await _equEquipmentVerifyRepository.GetEquipmentVerifyByEquipmentIdAsync(equipmentId);
+
+            var verifyDtos=new List<EquEquipmentVerifyDto>();
+            foreach (var item in verifyEntitys)
+            {
+                verifyDtos.Add(item.ToModel<EquEquipmentVerifyDto>());
+            }
+            return verifyDtos;
+        }
 
 
         #region 这里是供其他业务层调用的方法，个人觉得应该直接在其他业务层调用各业务仓储层

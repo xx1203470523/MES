@@ -86,6 +86,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string? Supplier { get; set; }
 
         /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; } 
+
+        /// <summary>
         /// 功率
         /// </summary>
         public string? Power { get; set; }
@@ -115,6 +120,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备关联Api
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
+
+        /// <summary>
+        /// 设备验证
+        /// </summary>
+        public List<EquEquipmentVerifyCreateDto> Verifys { get; set; }
         #endregion
     }
 
@@ -169,6 +179,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 空值 : false  
         /// </summary>
         public EquipmentUseStatusEnum UseStatus { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源Code
+        /// </summary>
+        public long ResourceCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public long ResourceName { get; set; }
 
         /// <summary>
         /// 描述 :功率 

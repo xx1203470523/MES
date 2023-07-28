@@ -414,6 +414,12 @@
         public const string MES12604 = "设备信息不存在！";
         public const string MES12605 = "状态不合法，请检查！";
         public const string MES12606 = "存放位置不能为空";
+
+        public const string MES12610 = "设备验证账号不能为空";
+        public const string MES12611 = "设备验证密码不能为空";
+        public const string MES12612 = "设备验证账号不允许有空格";
+        public const string MES12613 = "设备验证账号最大长度为50";
+        public const string MES12614 = "设备验证密码最大长度为50";
         #endregion
 
         #region 设备组 12700

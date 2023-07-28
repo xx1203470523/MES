@@ -104,5 +104,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         Task<string> GetEquEquipmentTokenAsync(long EquipmentId);
 
+        /// <summary>
+        /// 根据设备ID查询对应的验证
+        /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equipmentId);
     }
 }

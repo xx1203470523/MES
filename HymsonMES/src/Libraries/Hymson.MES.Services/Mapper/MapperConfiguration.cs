@@ -155,6 +155,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
             #endregion
+
+            #region EquEquipmentVerify
+            CreateMap<EquEquipmentVerifyCreateDto, EquEquipmentVerifyEntity>();
+            CreateMap<EquEquipmentVerifyPagedQueryDto, EquEquipmentVerifyPagedQuery>();
+
+            CreateMap<EquEquipmentVerifyEntity, EquEquipmentVerifyDto>();
+
+            #endregion
         }
 
         /// <summary>
