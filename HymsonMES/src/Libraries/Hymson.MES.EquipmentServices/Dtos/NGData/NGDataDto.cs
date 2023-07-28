@@ -22,7 +22,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.NGData
         /// <summary>
         /// 是否合格，true合格，false不合格
         /// </summary>
-        public bool Passed { get; set; }
+        public bool? Passed { get; set; }
         /// <summary>
         /// 不合格代码信息
         /// </summary>

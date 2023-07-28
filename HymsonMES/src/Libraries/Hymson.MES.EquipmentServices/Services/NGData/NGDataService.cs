@@ -47,7 +47,7 @@ namespace Hymson.MES.EquipmentServices.Services
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));
             }
-            NGDataDto nGDataDto = new NGDataDto { Passed = true };
+            NGDataDto nGDataDto = new NGDataDto { Passed = null };
             long? procedureId = null;
             if (!string.IsNullOrEmpty(param.ProcedureCode))
             {
