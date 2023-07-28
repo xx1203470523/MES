@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -104,6 +105,34 @@ namespace Hymson.MES.Data.Repositories.Process
             var procProcedureEntities = await procProcedureEntitiesTask;
             var totalCount = await totalCountTask;
             return new PagedInfo<ProcProcedureView>(procProcedureEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureEntity> GetByCodeAsync(string code, long siteId)
+        {
+            var key = $"proc_procedure&{siteId}&{code}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetByCodeSql, new { Code = code, SiteId = siteId });
+            });
+        }
+
+        /// <summary>
+        /// 根据Codes批量获取数据
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>> GetByCodesAsync(string[] codes, long siteId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcedureEntity>(GetByCodesSql, new { Codes = codes, SiteId = siteId });
         }
 
         /// <summary>
@@ -218,6 +247,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeletesSql = "UPDATE `proc_procedure` SET IsDeleted =Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT * FROM `proc_procedure`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_procedure`  WHERE Id IN @ids and IsDeleted=0  ";
+        const string GetByCodeSql = @"SELECT * FROM `proc_procedure`  WHERE Code = @Code and SiteId=@SiteId LIMIT 1";
+        const string GetByCodesSql = @"SELECT * FROM `proc_procedure`  WHERE Code in @Codes and SiteId=@SiteId ";
 
         const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId  WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";
     }

@@ -99,6 +99,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("SFC=@SFC");
             }
+            if (manuSfcStepQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(template.RawSql, manuSfcStepQuery);
             return manuSfcStepEntities;

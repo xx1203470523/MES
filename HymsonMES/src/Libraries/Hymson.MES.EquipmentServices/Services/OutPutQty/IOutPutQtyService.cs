@@ -1,4 +1,5 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using System;
 using System.Collections.Generic;
 using System.Linq;

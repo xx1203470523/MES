@@ -42,18 +42,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// 日志
         /// </summary>
         private readonly ILogger<EquipmentController> _logger;
-
         /// <summary>
         /// 进站
         /// </summary>
         private readonly IInStationService _InStationService;
-
         /// <summary>
         /// 条码绑定
         /// </summary>
         private readonly ISfcBindingService _sfcBindingService;
-
-
         /// <summary>
         /// 业务接口（设备监控服务）
         /// </summary>
@@ -73,8 +69,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IOutBoundService _outBoundService;
         private readonly INGDataService _ngDataService;
         private readonly ISfcCirculationService _sfcCirculationService;
-
-
 
         /// <summary>
         /// 构造函数
@@ -99,7 +93,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="ngDataService"></param>
         /// <param name="sfcCirculationService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
-            IInStationService manuInStationService, 
+            IInStationService manuInStationService,
             ISfcBindingService sfcBindingService,
             IEquipmentCollectService equipmentService,
             IBindSFCService bindSFCService,
@@ -119,11 +113,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
             ISfcCirculationService sfcCirculationService)
         {
             _logger = logger;
-
             _InStationService = manuInStationService;
             _sfcBindingService = sfcBindingService;
-
-
             _equipmentService = equipmentService;
             _bindSFCService = bindSFCService;
             _bindContainerService = bindContainerService;
@@ -140,13 +131,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _outBoundService = outBoundService;
             _ngDataService = ngDataService;
             _sfcCirculationService = sfcCirculationService;
-
-
-
         }
-
-
-
 
         /// <summary>
         ///进站
@@ -171,8 +156,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcBindingService.SfcBindingAsync(sfcBindingDto);
         }
-
-
 
         /// <summary>
         /// 设备心跳
@@ -222,7 +205,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _equipmentService.EquipmentDownReasonAsync(request);
         }
 
-
         /// <summary>
         /// 设备过程参数采集（无在制品条码）
         /// HY-MES-EQU-010
@@ -259,7 +241,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _equipmentService.EquipmentProductProcessParamAsync(request);
         }
 
-
         /// <summary>
         /// 上料-原材料上料
         /// HY-MES-EQU-013
@@ -284,16 +265,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _feedingService.FeedingUnloadingAsync(request);
         }
 
-
         /// <summary>
         /// 进站 HY-MES-EQU-015
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InBound")]
-        public async Task InBound(InBoundDto request)
+        public async Task InBoundAsync(InBoundDto request)
         {
-            await _inBoundService.InBound(request);
+            await _inBoundService.InBoundAsync(request);
         }
 
         /// <summary>
@@ -302,9 +282,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("InBoundMore")]
-        public async Task InBoundMore(InBoundMoreDto request)
+        public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
-            await _inBoundService.InBoundMore(request);
+            await _inBoundService.InBoundMoreAsync(request);
         }
 
         /// <summary>
@@ -313,9 +293,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBound")]
-        public async Task OutBound(OutBoundDto request)
+        public async Task OutBoundAsync(OutBoundDto request)
         {
-            await _outBoundService.OutBound(request);
+            await _outBoundService.OutBoundAsync(request);
         }
 
         /// <summary>
@@ -324,11 +304,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBoundMore")]
-        public async Task OutBoundMore(OutBoundMoreDto request)
+        public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
-            await _outBoundService.OutBoundMore(request);
+            await _outBoundService.OutBoundMoreAsync(request);
         }
-
 
         ///// <summary>
         ///// 容器绑定
@@ -405,10 +384,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GenerateModuleSFC")]
-        public async Task GenerateModuleSFCAsync(GenerateModuleSFCDto request)
+        public async Task<GenerateModuleSFCModelDto> GenerateModuleSFCAsync(GenerateModuleSFCDto request)
         {
-            _logger.LogInformation("请求生成模组码-电芯堆叠：GenerateModuleSFC,msg:{request}", request);
-            await _generateModuleSFCService.GenerateModuleSFCAsync(request);
+            return await _generateModuleSFCService.GenerateModuleSFCAsync(request);
         }
 
         ///// <summary>
@@ -423,7 +401,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         //{
         //    await _inboundInSFCContainerService.InboundInSFCContainerAsync(request);
         //}
-
 
         /// <summary>
         /// CCD文件上传完成
@@ -452,7 +429,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         //    await _feedingConsumptionService.FeedingConsumptionAsync(request);
         //}
 
-
         /// <summary>
         /// 单体条码上料校验
         /// HY-MES-EQU-028
@@ -467,7 +443,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _singleBarCodeLoadingVerificationService.SingleBarCodeLoadingVerificationAsync(request);
         }
 
-
         /// <summary>
         ///产出上报数量
         ///HY-MES-EQU-029   
@@ -481,7 +456,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _logger.LogInformation("产出上报数量：OutPutQty,msg:{request}", request);
             await _outPutQtyService.OutPutQtyAsync(request);
         }
-
 
         ///// <summary>
         /////容器内条码查询
@@ -500,14 +474,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 获取NG数据
         /// </summary>
-        /// <param name="sfc">产品条码</param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetNGData")]
-        [ProducesResponseType(typeof(NGDataDto),200)]
-        public async Task<NGDataDto> GetNGDataAsync(string sfc)
+        [ProducesResponseType(typeof(NGDataDto), 200)]
+        public async Task<NGDataDto> GetNGDataAsync([FromQuery] NGDataQueryDto param)
         {
-            return await _ngDataService.GetNGData(sfc);
+            return await _ngDataService.GetNGDataAsync(param);
         }
 
         /// <summary>
@@ -517,7 +491,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationBind")]
-        public async Task SfcCirculationBind(SfcCirculationBindDto request)
+        public async Task SfcCirculationBindAsync(SfcCirculationBindDto request)
         {
             await _sfcCirculationService.SfcCirculationBindAsync(request);
         }
@@ -529,9 +503,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationUnBind")]
-        public async Task SfcCirculationUnBind(SfcCirculationUnBindDto request)
+        public async Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationUnBindAsync(request,SfcCirculationTypeEnum.Merge);
+            await _sfcCirculationService.SfcCirculationUnBindAsync(request, SfcCirculationTypeEnum.Merge);
         }
 
         /// <summary>
@@ -541,9 +515,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationModuleAdd")]
-        public async Task SfcCirculationModuleAdd(SfcCirculationBindDto request)
+        public async Task SfcCirculationModuleAddAsync(SfcCirculationBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationModuleAdd(request);
+            await _sfcCirculationService.SfcCirculationModuleAddAsync(request);
         }
 
         /// <summary>
@@ -553,13 +527,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SfcCirculationModuleRemove")]
-        public async Task SfcCirculationModuleRemove(SfcCirculationUnBindDto request)
+        public async Task SfcCirculationModuleRemoveAsync(SfcCirculationUnBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationModuleRemove(request);
+            await _sfcCirculationService.SfcCirculationModuleRemoveAsync(request);
         }
-
-
-
-
     }
 }

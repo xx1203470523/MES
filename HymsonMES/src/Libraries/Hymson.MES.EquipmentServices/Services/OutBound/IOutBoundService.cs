@@ -12,13 +12,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
         /// </summary>
         /// <param name="outBoundDto"></param>
         /// <returns></returns>
-        Task OutBound(OutBoundDto outBoundDto);
+        Task OutBoundAsync(OutBoundDto outBoundDto);
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
         /// <param name="outBoundMoreDto"></param>
         /// <returns></returns>
-        Task OutBoundMore(OutBoundMoreDto outBoundMoreDto);
+        Task OutBoundMoreAsync(OutBoundMoreDto outBoundMoreDto);
     }
 }

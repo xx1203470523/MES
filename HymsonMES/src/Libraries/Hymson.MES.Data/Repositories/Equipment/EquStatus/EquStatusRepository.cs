@@ -83,6 +83,35 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryFirstOrDefaultAsync<EquStatusEntity>(GetLastEntityByEquipmentIdSql, new { equipmentId });
         }
 
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="equStatusQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquStatusStatisticsEntity>> GetEquStatusStatisticsEntitiesAsync(EquStatusStatisticsQuery equStatusQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEquStatusStatisticsEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+            if (equStatusQuery.EquipmentIds != null && equStatusQuery.EquipmentIds.Length > 0)
+            {
+                sqlBuilder.Where("EquipmentId IN @EquipmentIds");
+            }
+            if (equStatusQuery.StartTime.HasValue)
+            {
+                sqlBuilder.Where(" CreatedOn >= @StartTime");
+            }
+            if (equStatusQuery.EndTime.HasValue)
+            {
+                sqlBuilder.Where(" CreatedOn < @EndTime");
+            }
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquStatusStatisticsEntity>(template.RawSql, equStatusQuery);
+        }
+
     }
 
     /// <summary>
@@ -90,6 +119,9 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquStatusRepository
     {
+        const string GetEquStatusStatisticsEntitiesSqlTemplate = @"SELECT 
+                                            /**select**/
+                                           FROM `equ_status_statistics` /**where**/  ";
         const string InsertSql = "REPLACE INTO `equ_status`(  `Id`, `SiteId`, `EquipmentId`, `EquipmentStatus`, `LossRemark`, `BeginTime`, `EndTime`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @EquipmentStatus, @LossRemark, @BeginTime, @EndTime, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_status`(  `Id`, `SiteId`, `EquipmentId`, `EquipmentStatus`, `LossRemark`, `BeginTime`, `EndTime`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @EquipmentStatus, @LossRemark, @BeginTime, @EndTime, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertStatisticsSql = "INSERT INTO `equ_status_statistics`(  `Id`, `SiteId`, `EquipmentId`, `EquipmentStatus`, `SwitchEquipmentStatus`, `BeginTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EquipmentId, @EquipmentStatus, @SwitchEquipmentStatus, @BeginTime, @EndTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

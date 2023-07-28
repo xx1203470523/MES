@@ -49,5 +49,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<EquStatusEntity> GetLastEntityByEquipmentIdAsync(long equipmentId);
 
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name="equStatusQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquStatusStatisticsEntity>> GetEquStatusStatisticsEntitiesAsync(EquStatusStatisticsQuery equStatusQuery);
+
     }
 }

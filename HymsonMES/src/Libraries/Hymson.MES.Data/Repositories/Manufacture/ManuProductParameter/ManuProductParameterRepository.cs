@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var i = 0;
             foreach (var item in entities)
             {
-                stringBuilder.AppendFormat(InsertTailSql,i);
+                stringBuilder.AppendFormat(InsertTailSql, i);
                 insertsParams.Add($"{nameof(item.Id)}{i}", item.Id);
                 insertsParams.Add($"{nameof(item.SiteId)}{i}", item.SiteId);
                 insertsParams.Add($"{nameof(item.ProcedureId)}{i}", item.ProcedureId);
@@ -153,7 +153,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 .Where("T1.SFC=@SFC ");//条码必须传递
             if (queryParam.ParameterType.HasValue)
             {
-                sqlBuilder.Where("T3.ParameterType = @ParameterType ");
+                //如果为产品参数，把未关联参数类型的上报参数也展示出来
+                if (queryParam.ParameterType == ParameterTypeEnum.Product)
+                {
+                    sqlBuilder.Where(" (T3.ParameterType = @ParameterType or  T3.ParameterType  IS NULL )");
+                }
+                else
+                {
+                    sqlBuilder.Where("T3.ParameterType = @ParameterType ");
+                }
             }
             if (queryParam.StartTime.HasValue)
             {

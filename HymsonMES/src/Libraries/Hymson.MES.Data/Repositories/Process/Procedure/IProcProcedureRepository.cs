@@ -22,7 +22,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procProcedurePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcProcedureView>> GetPagedInfoAsync(ProcProcedurePagedQuery procProcedurePagedQuery);
-
+        /// <summary>
+        /// 根据Code获取工序信息
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetByCodeAsync(string code, long siteId);
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -36,6 +42,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param);
+
+        /// <summary>
+        /// 根据Codes批量获取工序信息
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetByCodesAsync(string[] codes, long siteId);
 
         /// <summary>
         /// 判断工序是否存在

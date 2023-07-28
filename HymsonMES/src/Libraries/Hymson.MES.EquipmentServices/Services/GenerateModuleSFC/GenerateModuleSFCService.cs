@@ -54,7 +54,8 @@ namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
             var inteCodeRulesResult = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery
             {
                 ProductId = materialEntit.Id,
-                CodeType = CodeRuleCodeTypeEnum.PackagingSeqCode,
+                CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode,
+                SiteId = _currentEquipment.SiteId
             });
             var inteCodeRulesEntit = inteCodeRulesResult.FirstOrDefault();
             if (inteCodeRulesResult == null || inteCodeRulesEntit == null)

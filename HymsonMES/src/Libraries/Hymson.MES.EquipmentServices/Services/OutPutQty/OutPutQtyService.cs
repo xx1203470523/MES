@@ -117,7 +117,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
             }
 
             //绑定物料
-            bindMaterialList = await BindMaterialListAsync(outPutQtyDto, procResource.Id);
+            bindMaterialList = BindMaterialList(outPutQtyDto, procResource.Id);
 
             using var trans = TransactionHelper.GetTransactionScope();
             if (ngList != null && ngList.Any())
@@ -246,7 +246,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
         /// <param name="outPutQtyDto"></param>
         /// <param name="resourceId"></param>
         /// <returns></returns> 
-        private async Task<List<ManuOutputBindMaterialEntity>> BindMaterialListAsync(OutPutQtyDto outPutQtyDto, long resourceId)
+        private List<ManuOutputBindMaterialEntity> BindMaterialList(OutPutQtyDto outPutQtyDto, long resourceId)
         {
             var bindMaterialList = new List<ManuOutputBindMaterialEntity>();
             if (outPutQtyDto.BindFeedingCodes != null && outPutQtyDto.BindFeedingCodes.Any())
@@ -292,7 +292,6 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
                     });
                 }
             }
-
             return bindMaterialList;
         }
     }

@@ -372,7 +372,46 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             }
 
             var paramCodes = paramList.Select(s => s.ParamCode);
-            var (parameterEntities, resourceEntity) = await GetEntitiesWithCheckAsync(paramCodes, request.ResourceCode);
+            // var (parameterEntities, resourceEntity) = await GetEntitiesWithCheckAsync(paramCodes, request.ResourceCode);
+
+            // 找出不在数据库里面的Code，自动新增标准参数，应对设备不合理需求
+            List<ProcParameterEntity> procParameterEntities = new List<ProcParameterEntity>();
+            var codesQuery = new EntityByCodesQuery
+            {
+                Site = _currentEquipment.SiteId,
+                Codes = paramCodes.ToArray()
+            };
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(codesQuery);
+            var noIncludeCodes = paramCodes.Where(w => parameterEntities.Select(s => s.ParameterCode).Contains(w) == false);
+            if (noIncludeCodes.Any())
+            {
+                foreach (var item in noIncludeCodes)
+                {
+                    if (!procParameterEntities.Where(c => c.ParameterCode == item).Any())
+                    {
+                        procParameterEntities.Add(new ProcParameterEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            CreatedBy = _currentEquipment.Code,
+                            UpdatedBy = _currentEquipment.Code,
+                            CreatedOn = nowTime,
+                            UpdatedOn = nowTime,
+                            ParameterCode = item,
+                            ParameterName = item,
+                            Remark = "自动创建"
+                        });
+                    }
+                }
+                //将要新增的参数也添加到查询列表中
+                parameterEntities = parameterEntities.Concat(procParameterEntities);
+            }
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = _currentEquipment.SiteId,
+                Code = request.ResourceCode,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", request.ResourceCode);
 
             var entities = paramList.Select(s => new ManuProductParameterEntity
             {
@@ -399,8 +438,11 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 TestResult = s.TestResult,
                 Timestamp = s.Timestamp
             });
-
+            // 开启事务
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _procParameterRepository.InsertsAsync(procParameterEntities);
             await _manuProductParameterRepository.InsertsAsync(entities);
+            trans.Complete();
         }
 
 

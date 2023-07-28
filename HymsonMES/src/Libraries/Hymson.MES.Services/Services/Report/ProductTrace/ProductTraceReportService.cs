@@ -1,7 +1,6 @@
 ﻿using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -9,7 +8,6 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -19,8 +17,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.Utils;
-using IdGen;
-using System.Drawing.Printing;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -191,11 +187,6 @@ namespace Hymson.MES.Services.Services.Report
             manuProductParameterPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             //参数分页查询
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterPagedInfoAsync(manuProductParameterPagedQuery);
-            //如果查询为产品参数
-            if (manuProductParameterPagedQuery.ParameterType == ParameterTypeEnum.Product)
-            {
-                pagedInfo.Data = pagedInfo.Data.Where(c => c.ParameterType == null || c.ParameterType == ParameterTypeEnum.Product);
-            }
             //资源信息
             IEnumerable<ProcResourceEntity> procResources = new List<ProcResourceEntity>();
             var procResourcesIds = pagedInfo.Data.Select(c => c.ResourceId).ToArray();
