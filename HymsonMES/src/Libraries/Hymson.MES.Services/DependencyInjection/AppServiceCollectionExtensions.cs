@@ -184,6 +184,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
 
             services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+            services.AddSingleton<IManuBakingRecordService, ManuBakingRecordService>();
+            services.AddSingleton<IManuBakingService, ManuBakingService>();
 
             #endregion
 
@@ -435,6 +437,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuBakingCreateDto>, ManuBakingCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuBakingModifyDto>, ManuBakingModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuBakingRecordCreateDto>, ManuBakingRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuBakingRecordModifyDto>, ManuBakingRecordModifyValidator>();
+
             #endregion
 
             #region Warehouse 

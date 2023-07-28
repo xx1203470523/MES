@@ -583,6 +583,18 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuContainerPackRecordPagedQueryDto, ManuContainerPackRecordPagedQuery>();
             CreateMap<ManuContainerPackRecordEntity, ManuContainerPackRecordDto>();
             #endregion
+            #region Baking
+            CreateMap<ManuBakingCreateDto, ManuBakingEntity>();
+            CreateMap<ManuBakingPagedQueryDto, ManuBakingPagedQuery>();
+            CreateMap<ManuBakingModifyDto, ManuBakingEntity>();
+          
+            CreateMap<ManuBakingEntity, ManuBakingDto>();
+
+            CreateMap<ManuBakingRecordCreateDto, ManuBakingRecordEntity>();
+            CreateMap<ManuBakingRecordEntity, ManuBakingRecordDto>();
+            CreateMap<ManuBakingRecordModifyDto, ManuBakingRecordEntity>();
+            CreateMap<ManuBakingRecordPagedQueryDto, ManuBakingRecordPagedQuery>();
+            #endregion
         }
 
         /// <summary>
