@@ -284,6 +284,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcessRouteId = item.ProcessRouteId,
                     ProductBOMId = item.ProductBOMId,
                     ProcedureId = item.ProcedureId,
+                    ProductId=item.ProductId,
                     Status = item.Status,
                     OrderCode = item.OrderCode,
                     Code = item.Code,
