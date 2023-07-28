@@ -376,7 +376,7 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
     {
         var pagedQuery = pagedQueryDto.ToQuery<ProcProductParameterGroupPagedQuery>();
         pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-        var pagedInfo = await _procProductParameterGroupRepository.GetPagedInfoAsync(pagedQuery);
+        var pagedInfo = await _procProductParameterGroupRepository.GetPagedListAsync(pagedQuery);
 
         // 实体到DTO转换 装载数据
         var dtos = pagedInfo.Data.Select(s => s.ToModel<ProcProductParameterGroupDto>());

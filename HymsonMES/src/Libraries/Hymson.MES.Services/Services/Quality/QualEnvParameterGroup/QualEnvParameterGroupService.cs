@@ -379,7 +379,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualEnvParameterGroupPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _qualEnvParameterGroupRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _qualEnvParameterGroupRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<QualEnvParameterGroupDto>());

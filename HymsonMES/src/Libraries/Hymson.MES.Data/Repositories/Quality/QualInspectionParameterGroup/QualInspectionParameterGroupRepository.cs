@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualInspectionParameterGroupView>> GetPagedInfoAsync(QualInspectionParameterGroupPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualInspectionParameterGroupView>> GetPagedListAsync(QualInspectionParameterGroupPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
