@@ -350,7 +350,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentListDto>());
 
             //查询所有的资源
-            //var resources= await _procResourceRepository.GetByIdsAsync(dtos.Select(x => x.ResourceId).ToArray());
+            //var resources = await _procResourceRepository.GetListByIdsAsync(dtos.Select(x => x.ResourceId).ToArray());
+            //foreach (var item in dtos)
+            //{
+            //    if (item.ResourceId > 0) 
+            //    {
+            //        var resource = resources.Where(x => x.Id == item.ResourceId).FirstOrDefault();
+            //        item.ResourceCode = resource!=null? resource.ResCode:"";
+            //        item.ResourceName = resource != null ? resource.ResName : "";
+            //    }
+            //}
 
             return new PagedInfo<EquEquipmentListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
@@ -391,7 +400,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
-            return (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
+            var equipmentDto = (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
+            if (equipmentDto.ResourceId > 0) 
+            {
+                var resource = await _procResourceRepository.GetByIdAsync(equipmentDto.ResourceId);
+                equipmentDto.ResourceCode = resource.ResCode;
+                equipmentDto.ResourceName = resource.ResName;
+            }
+
+            return equipmentDto;
         }
 
         /// <summary>

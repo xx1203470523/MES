@@ -186,16 +186,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long ResourceId { get; set; }
 
         /// <summary>
-        /// 资源Code
-        /// </summary>
-        public long ResourceCode { get; set; }
-
-        /// <summary>
-        /// 资源名称
-        /// </summary>
-        public long ResourceName { get; set; }
-
-        /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>
@@ -347,6 +337,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 空值 : false  
         /// </summary>
         public EquipmentUseStatusEnum UseStatus { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源Code
+        /// </summary>
+        public string ResourceCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
 
         /// <summary>
         /// 描述 :功率 
