@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 检查数据之前的状态是否允许修改
             var dbEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(entity.Id);
-            if (dbEntity.Status != SysDataStatusEnum.Build && dbEntity.Status == SysDataStatusEnum.Build)
+            if (dbEntity.Status != SysDataStatusEnum.Build && saveDto.Status == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12510));
             }
