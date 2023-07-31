@@ -48,7 +48,8 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteVehicleRepository _inteVehicleRepository;
         private readonly AbstractValidator<InteVehicleCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteVehicleModifyDto> _validationModifyRules;
-
+        private readonly AbstractValidator<InteVehicleUnbindOperationDto> _validationUnbindOperationRules;
+        private readonly AbstractValidator<InteVehicleBindOperationDto> _validateBindOperationRules;
         private readonly IInteVehicleTypeRepository _inteVehicleTypeRepository;
         private readonly IInteVehicleVerifyRepository _inteVehicleVerifyRepository;
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
@@ -61,6 +62,8 @@ namespace Hymson.MES.Services.Services.Integrated
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             IInteVehicleFreightRecordRepository inteVehicleFreightRecordRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            AbstractValidator<InteVehicleBindOperationDto> validateBindOperationRules,
+            AbstractValidator<InteVehicleUnbindOperationDto> validationUnbindOperationRules,
             IInteVehicleFreightRepository inteVehicleFreightRepository)
         {
             _currentUser = currentUser;
@@ -74,6 +77,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _inteVehicleFreightRecordRepository = inteVehicleFreightRecordRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _validateBindOperationRules = validateBindOperationRules;
+            _validationUnbindOperationRules = validationUnbindOperationRules;
         }
 
         /// <summary>
@@ -514,12 +519,13 @@ namespace Hymson.MES.Services.Services.Integrated
           
             var  dto = ivo as InteVehicleBindOperationDto;
             //验证DTO
-          //  await _validationCreateRules.ValidateAndThrowAsync(dto);
+            await _validateBindOperationRules.ValidateAndThrowAsync(dto);
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
                 Sfc = dto.SFC,
                 SiteId = _currentSite.SiteId??123456
             });
+
             if (manuSfcProduceEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19918)).WithData("SFC", dto.SFC);
@@ -599,6 +605,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private async Task VehicleUnBindOperationAsync(InteVehicleOperationDto ivo)
         {
             var dto = ivo as InteVehicleUnbindOperationDto;
+            await _validationUnbindOperationRules.ValidateAndThrowAsync(dto);
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
                 Code = dto.PalletNo,

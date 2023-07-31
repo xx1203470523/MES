@@ -29,6 +29,7 @@
         public const string MES10120 = "状态不合法";
         public const string MES10121 = "描述最大长度为255";
         public const string MES10122 = "版本不允许有空格";
+        public const string MES10123 = "启用状态不允许修改";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -1034,8 +1035,10 @@
         public const string MES18616 = "载具：重复装载该条码:{sfc},托盘码:{palletNo}";
         public const string MES18617 = "载具不存在或者载具未激活";
         public const string MES18618 = "载具编码不允许有空格";
-        public const string MES18619 = "托盘信息不存在或未启用！";
-
+        public const string MES18619 = "载具信息不存在或未启用！";
+        public const string MES18620 = "载具位置Id不能为0！";
+        public const string MES18621 = "载具SFC信息不能为空！";
+        public const string MES18622 = "载具待解盘条码不能为空！";
         #endregion
 
         #region 设备对接错误

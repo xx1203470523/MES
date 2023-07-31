@@ -212,10 +212,18 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         entity.SiteId = _currentSite.SiteId ?? 0;
 
         // 检查数据之前的状态是否允许修改
-        var dbEntity = await _procProductParameterGroupRepository.GetByIdAsync(entity.Id);
-        if (dbEntity.Status != SysDataStatusEnum.Build && dbEntity.Status == SysDataStatusEnum.Build)
+        var dbEntity = await _procProductParameterGroupRepository.GetByIdAsync(entity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+        switch (dbEntity.Status)
         {
-            throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+            case SysDataStatusEnum.Enable:
+            case SysDataStatusEnum.Retain:
+            case SysDataStatusEnum.Abolish:
+                if (saveDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+                if (dbEntity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
+                break;
+            case SysDataStatusEnum.Build:
+            default:
+                break;
         }
 
         // 编码唯一性验证
