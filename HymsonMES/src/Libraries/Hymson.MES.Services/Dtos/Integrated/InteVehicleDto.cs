@@ -331,6 +331,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 载具实体
         /// </summary>
         public InteVehicleEntity Vehicle { get; set; }
+        /// <summary>
+        /// 载具类型信息
+        /// </summary>
+        public InteVehicleTypeEntity VehicleType { get; set; }
 
         /// <summary>
         /// 条码信息集合

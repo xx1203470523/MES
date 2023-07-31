@@ -405,6 +405,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new ValidationException(nameof(ErrorCode.MES18619));
             }
             var baseobj = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicle.VehicleTypeId);
+            view.VehicleType = baseobj;
             view.Capacity = baseobj.CellQty;
             view.Vehicle = inteVehicle;
             var inteVehicleFreights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicle.Id });
@@ -510,7 +511,10 @@ namespace Hymson.MES.Services.Services.Integrated
              * 条码存放在inte_vehice_freight_stack表中
              */
             // 条码 是否在制品校验
+          
             var  dto = ivo as InteVehicleBindOperationDto;
+            //验证DTO
+          //  await _validationCreateRules.ValidateAndThrowAsync(dto);
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
                 Sfc = dto.SFC,
