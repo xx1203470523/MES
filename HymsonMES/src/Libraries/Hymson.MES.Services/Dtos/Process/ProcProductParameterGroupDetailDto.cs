@@ -48,6 +48,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public decimal? LowerLimit { get; set; }
 
+        /// <summary>
+        /// 是否必填
+        /// </summary>
+        public bool IsRequired { get; set; } = false;
+
+        /// <summary>
+        /// 顺序（正整数，最大值10000）
+        /// </summary>
+        public int Sort { get; set; }
     }
 
     /// <summary>
@@ -95,6 +104,16 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 规格下限
         /// </summary>
         public decimal? LowerLimit { get; set; }
+
+        /// <summary>
+        /// 是否必填
+        /// </summary>
+        public bool IsRequired { get; set; } = false;
+
+        /// <summary>
+        /// 顺序（正整数，最大值10000）
+        /// </summary>
+        public int Sort { get; set; }
 
     }
 

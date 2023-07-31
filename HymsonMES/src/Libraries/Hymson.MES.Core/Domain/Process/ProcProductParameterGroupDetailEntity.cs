@@ -36,6 +36,16 @@ namespace Hymson.MES.Core.Domain.Process
         public decimal? LowerLimit { get; set; }
 
         /// <summary>
+        /// 是否必填
+        /// </summary>
+        public bool IsRequired { get; set; } = false;
+
+        /// <summary>
+        /// 顺序（正整数，最大值10000）
+        /// </summary>
+        public int Sort { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
