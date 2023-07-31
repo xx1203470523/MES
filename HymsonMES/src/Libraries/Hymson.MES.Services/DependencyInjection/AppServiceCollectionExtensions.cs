@@ -383,6 +383,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<InteVehicleCreateDto>, InteVehicleCreateValidator>();
             services.AddSingleton<AbstractValidator<InteVehicleModifyDto>, InteVehicleModifyValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleBindOperationDto>, InteVehicleBindoptValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleUnbindOperationDto>, InteVehicleUnBindoptValidator>();
+
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
