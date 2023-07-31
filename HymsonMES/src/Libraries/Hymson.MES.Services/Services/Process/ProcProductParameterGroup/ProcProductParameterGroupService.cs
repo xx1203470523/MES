@@ -18,6 +18,7 @@ using Hymson.MES.Services.Services.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Org.BouncyCastle.Crypto;
 
 /// <summary>
 /// 服务（产品检验参数组） 
@@ -210,6 +211,13 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         entity.UpdatedOn = updatedOn;
         entity.SiteId = _currentSite.SiteId ?? 0;
 
+        // 检查数据之前的状态是否允许修改
+        var dbEntity = await _procProductParameterGroupRepository.GetByIdAsync(entity.Id);
+        if (dbEntity.Status != SysDataStatusEnum.Build && dbEntity.Status == SysDataStatusEnum.Build)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+        }
+
         // 编码唯一性验证
         var checkEntity = await _procProductParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
         {
@@ -297,6 +305,12 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
     /// <returns></returns>
     public async Task<int> DeletesAsync(long[] ids)
     {
+        var list = await _procProductParameterGroupRepository.GetByIdsAsync(ids);
+        if (list != null && list.Any(x => x.Status != SysDataStatusEnum.Build))
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES12509));
+        }
+
         return await _procProductParameterGroupRepository.DeletesAsync(new DeleteCommand
         {
             Ids = ids,

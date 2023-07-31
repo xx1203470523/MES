@@ -212,6 +212,13 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
+            // 检查数据之前的状态是否允许修改
+            var dbEntity = await _qualInspectionParameterGroupRepository.GetByIdAsync(entity.Id);
+            if (dbEntity.Status != SysDataStatusEnum.Build && dbEntity.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+            }
+
             // 编码唯一性验证
             var checkEntity = await _qualInspectionParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
             {
@@ -299,6 +306,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var list = await _qualInspectionParameterGroupRepository.GetByIdsAsync(ids);
+            if (list != null && list.Any(x => x.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12509));
+            }
+
             return await _qualInspectionParameterGroupRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
