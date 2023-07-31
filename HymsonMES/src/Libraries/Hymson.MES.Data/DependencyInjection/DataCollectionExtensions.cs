@@ -83,6 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
             services.AddSingleton<IInteContainerRepository, InteContainerRepository>();
             services.AddSingleton<IInteJobClassRepository, InteJobClassRepository>();
+            services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
 
             //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
