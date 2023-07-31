@@ -1035,6 +1035,7 @@
         public const string MES18617 = "载具不存在或者载具未激活";
         public const string MES18618 = "载具编码不允许有空格";
         public const string MES18619 = "托盘信息不存在或未启用！";
+        public const string MES18620 = "托盘位置Id不能为0！";
 
         #endregion
 

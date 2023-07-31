@@ -402,7 +402,7 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             if (inteVehicle == null || inteVehicle.Status != DisableOrEnableEnum.Enable)
             {
-                throw new ValidationException(nameof(ErrorCode.MES18619));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18619));
             }
             var baseobj = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicle.VehicleTypeId);
             view.VehicleType = baseobj;
@@ -520,6 +520,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 Sfc = dto.SFC,
                 SiteId = _currentSite.SiteId??123456
             });
+
             if (manuSfcProduceEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19918)).WithData("SFC", dto.SFC);
