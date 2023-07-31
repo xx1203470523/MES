@@ -145,16 +145,17 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 // 如果参数类型为数值，则判断规格上限和规格下限
                 if (item.DataType != DataTypeEnum.Numeric) continue;
-                if (item.UpperLimit >= item.LowerLimit) continue;
-
-                validationFailures.Add(new ValidationFailure
+                if (item.UpperLimit < item.LowerLimit)
                 {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    validationFailures.Add(new ValidationFailure
+                    {
+                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
                         { "CollectionIndex", item.Code },
                         { "Code", item.Code }
                     },
-                    ErrorCode = nameof(ErrorCode.MES10516)
-                });
+                        ErrorCode = nameof(ErrorCode.MES10516)
+                    });
+                }
             }
 
             // 是否存在错误
@@ -229,16 +230,17 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 // 如果参数类型为数值，则判断规格上限和规格下限
                 if (item.DataType != DataTypeEnum.Numeric) continue;
-                if (item.UpperLimit >= item.LowerLimit) continue;
-
-                validationFailures.Add(new ValidationFailure
+                if (item.UpperLimit < item.LowerLimit)
                 {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    validationFailures.Add(new ValidationFailure
+                    {
+                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
                         { "CollectionIndex", item.Code },
                         { "Code", item.Code }
                     },
-                    ErrorCode = nameof(ErrorCode.MES10516)
-                });
+                        ErrorCode = nameof(ErrorCode.MES10516)
+                    });
+                }
             }
 
             // 是否存在错误
