@@ -29,6 +29,7 @@
         public const string MES10120 = "状态不合法";
         public const string MES10121 = "描述最大长度为255";
         public const string MES10122 = "版本不允许有空格";
+        public const string MES10123 = "启用状态不允许修改";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
