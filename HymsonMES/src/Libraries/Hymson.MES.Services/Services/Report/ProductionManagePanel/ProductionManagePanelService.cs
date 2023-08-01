@@ -362,6 +362,10 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 QualityStatus = 1,
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            if (!manuSfcSummaryEntities.Any())
+            {
+                return processCompletedDataDto;
+            }
             processCompletedDataDto = manuSfcSummaryEntities
                 .Where(s => s.IsDeleted == 0)
                 .GroupBy(s => new { s.WorkOrderId })
