@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用部门
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 入厂日期
@@ -156,7 +156,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用部门
         /// </summary>
-        public int? UseDepartment { get; set; }
+        public long[]? UseDepartments { get; set; }
 
         /// <summary>
         /// 车间
@@ -273,7 +273,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -441,7 +441,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 

@@ -187,9 +187,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EE.UseStatus = @UseStatus");
             }
 
-            if (pagedQuery.UseDepartment.HasValue)
+            if (pagedQuery.UseDepartments!=null && pagedQuery.UseDepartments.Any())
             {
-                sqlBuilder.Where("EE.UseDepartment = @UseDepartment");
+                sqlBuilder.Where("EE.UseDepartment in @UseDepartments");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentCode))
