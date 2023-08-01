@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
+using System;
 using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -205,6 +206,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, equHeartbeatEntitys);
         }
+        /// <summary>
+        /// 删除之前的心跳数据
+        /// </summary>
+        /// <param name="months"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteMonthsBeforeAsync(int months)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteMonthsBeforeSql);
+        }
     }
 
     /// <summary>
@@ -238,7 +249,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
 									left join equ_equipment ee on eh.EquipmentId=ee.Id and ee.SiteId=eh.SiteId and ee.IsDeleted=0
 									left join proc_resource_equipment_bind preb on preb.EquipmentId=ee.Id and preb.SiteId=ee.SiteId and preb.IsDeleted=0
 									left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=0
-									left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  ";
+									left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  "
+        ;
+        //删除之前的心跳记录
+        const string DeleteMonthsBeforeSql = "Delete FROM equ_heartbeat_record WHERE CreatedOn<SUBDATE(CURDATE(), INTERVAL @months month);";
 
     }
 }

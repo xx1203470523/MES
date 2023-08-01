@@ -49,6 +49,7 @@ Host.CreateDefaultBuilder(args)
            //q.AddJobAndTrigger<HelloWorld1Job>(hostContext.Configuration);
            //q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
            q.AddJobAndTrigger<EquHeartbeatJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<EquHeartBeatRecordJob>(hostContext.Configuration);
 
            #endregion
            q.UsePersistentStore((persistentStoreOptions) =>

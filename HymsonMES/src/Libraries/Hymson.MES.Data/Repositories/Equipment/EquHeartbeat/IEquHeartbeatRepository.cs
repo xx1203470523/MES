@@ -64,6 +64,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="equHeartbeatEntitys"></param>
         /// <returns></returns>
         Task<int> UpdatesAsync(IEnumerable<EquHeartbeatEntity> equHeartbeatEntitys);
+        /// <summary>
+        /// 删除之前的心跳数据
+        /// </summary>
+        /// <param name="months"></param>
+        /// <returns></returns>
+        Task<int> DeleteMonthsBeforeAsync(int months);
 
     }
 }

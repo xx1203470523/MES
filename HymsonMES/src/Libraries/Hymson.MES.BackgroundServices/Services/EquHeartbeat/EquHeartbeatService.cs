@@ -60,5 +60,15 @@ namespace Hymson.MES.BackgroundServices.Services.EquHeartbeat
                 trans.Complete();
             }
         }
+
+        /// <summary>
+        /// 删除之前的心跳数据
+        /// </summary>
+        /// <param name="months"></param>
+        /// <returns></returns>
+        public async Task DeleteMonthsBeforeAsync(int months)
+        {
+            await _equHeartbeatRepository.DeleteMonthsBeforeAsync(months);
+        }
     }
 }

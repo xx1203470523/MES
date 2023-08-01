@@ -10,5 +10,12 @@ namespace Hymson.MES.BackgroundServices.Services.EquHeartbeat
         /// <param name="request"></param>
         /// <returns></returns>
         Task EquipmentHeartbeatUpdateAsync(EquipmentHeartbeatUpdateDto request);
+
+        /// <summary>
+        /// 删除之前的心跳数据
+        /// </summary>
+        /// <param name="months"></param>
+        /// <returns></returns>
+        Task DeleteMonthsBeforeAsync(int months);
     }
 }
