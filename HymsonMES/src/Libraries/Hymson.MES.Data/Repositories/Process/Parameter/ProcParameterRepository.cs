@@ -76,9 +76,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="procParameterPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcParameterEntity>> GetPagedInfoAsync(ProcParameterPagedQuery procParameterPagedQuery)
+        public async Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -91,33 +91,44 @@ namespace Hymson.MES.Data.Repositories.Process
             //{
             sqlBuilder.Where(" SiteId = @SiteId ");
             //}
-            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
+
+            if (pagedQuery.ParameterUnit.HasValue)
             {
-                procParameterPagedQuery.ParameterCode = $"%{procParameterPagedQuery.ParameterCode}%";
-                sqlBuilder.Where(" ParameterCode like @ParameterCode ");
-            }
-            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterName))
-            {
-                procParameterPagedQuery.ParameterName = $"%{procParameterPagedQuery.ParameterName}%";
-                sqlBuilder.Where(" ParameterName like @ParameterName ");
-            }
-            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.Remark))
-            {
-                procParameterPagedQuery.Remark = $"%{procParameterPagedQuery.Remark}%";
-                sqlBuilder.Where(" Remark like @Remark ");
+                sqlBuilder.Where("ParameterUnit = @ParameterUnit");
             }
 
-            var offSet = (procParameterPagedQuery.PageIndex - 1) * procParameterPagedQuery.PageSize;
+            if (pagedQuery.DataType.HasValue)
+            {
+                sqlBuilder.Where("DataType = @DataType");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ParameterCode))
+            {
+                pagedQuery.ParameterCode = $"%{pagedQuery.ParameterCode}%";
+                sqlBuilder.Where(" ParameterCode LIKE @ParameterCode ");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ParameterName))
+            {
+                pagedQuery.ParameterName = $"%{pagedQuery.ParameterName}%";
+                sqlBuilder.Where(" ParameterName LIKE @ParameterName ");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Remark))
+            {
+                pagedQuery.Remark = $"%{pagedQuery.Remark}%";
+                sqlBuilder.Where(" Remark LIKE @Remark ");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procParameterPagedQuery.PageSize });
-            sqlBuilder.AddParameters(procParameterPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procParameterEntitiesTask = conn.QueryAsync<ProcParameterEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procParameterEntities = await procParameterEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcParameterEntity>(procParameterEntities, procParameterPagedQuery.PageIndex, procParameterPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcParameterEntity>(procParameterEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
