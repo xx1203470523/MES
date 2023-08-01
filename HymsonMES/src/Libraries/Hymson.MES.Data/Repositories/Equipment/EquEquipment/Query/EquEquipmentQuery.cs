@@ -3,5 +3,11 @@
     /// <summary>
     /// 
     /// </summary>
-    public class EquEquipmentQuery { }
+    public class EquEquipmentQuery
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long SiteId { get; set; }
+    }
 }

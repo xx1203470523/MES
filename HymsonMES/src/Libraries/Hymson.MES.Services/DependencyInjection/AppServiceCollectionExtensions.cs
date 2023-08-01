@@ -90,7 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
-            services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
+            services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
             services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
@@ -153,6 +153,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
 
             services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
+
+            //工艺设备组
+            services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
+            services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
             #endregion
 
             #region Quality
@@ -355,6 +359,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ProcSortingRule
             services.AddSingleton<AbstractValidator<ProcSortingRuleCreateDto>, ProcSortingRuleCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcSortingRuleModifyDto>, ProcSortingRuleModifyValidator>();
+            #endregion
+
+            #region ProcProcessEquipmentGroup
+            services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupSaveDto>, ProcProcessEquipmentGroupSaveValidator>();
+            services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
+
             #endregion
             #endregion
 

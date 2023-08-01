@@ -28,6 +28,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
@@ -95,12 +96,21 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             #endregion
 
-            #region EquEquipmentGroup
-            CreateMap<EquEquipmentGroupSaveDto, EquEquipmentGroupEntity>();
-            CreateMap<EquEquipmentGroupPagedQueryDto, EquEquipmentGroupPagedQuery>();
+            #region  ProcProcessEquipment
+            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
+            CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
 
-            CreateMap<EquEquipmentGroupEntity, EquEquipmentGroupListDto>();
-            CreateMap<EquEquipmentEntity, EquEquipmentBaseDto>();
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupDto>();
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupListDto>();
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentBaseDto>();
+            #endregion
+
+            #region ProcProcessEquipmentGroup
+            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
+            CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
+
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupListDto>();
+            CreateMap<ProcProcessEquipmentGroupRelationEntity, EquEquipmentBaseDto>();
             #endregion
 
             #region EquEquipmentLinkApi
@@ -264,6 +274,18 @@ namespace Hymson.MES.Services.Mapper
         /// </summary>
         protected virtual void CreateProcessMaps()
         {
+            #region ProcProcessEquipmentGroup
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupDto>();
+            CreateMap<ProcProcessEquipmentGroupRelationEntity, ProcProcessEquipmentGroupRelationDto>();
+
+            //CreateMap<ProcProcessEquipmentGroupRuleDto, ProcProcessEquipmentGroupRuleEntity>();
+            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
+            CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
+            //CreateMap<ProcProcessEquipmentGroupRelationRuleDto, ProcProcessEquipmentGroupRelationRuleEntity>();
+            CreateMap<ProcProcessEquipmentGroupRelationSaveDto, ProcProcessEquipmentGroupRelationEntity>();
+            CreateMap<ProcProcessEquipmentGroupRelationPagedQueryDto, ProcProcessEquipmentGroupRelationPagedQuery>();
+            #endregion
+
             #region MaskCode
             CreateMap<ProcMaskCodeRuleDto, ProcMaskCodeRuleEntity>();
             CreateMap<ProcMaskCodeSaveDto, ProcMaskCodeEntity>();
