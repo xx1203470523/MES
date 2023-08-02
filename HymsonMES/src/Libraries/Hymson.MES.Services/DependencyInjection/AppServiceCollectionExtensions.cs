@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -19,7 +18,6 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
-using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
@@ -218,19 +216,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrderBind
             services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
             #endregion
-            #endregion
-
-            #region Job
-            services.AddSingleton<IJobManufactureService, JobManuBadRecordService>();
-            services.AddSingleton<IJobManufactureService, JobManuCompleteService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageService>();
-            services.AddSingleton<IJobManufactureService, JobManuRepairEndService>();
-            services.AddSingleton<IJobManufactureService, JobManuRepairStartService>();
-            services.AddSingleton<IJobManufactureService, JobManuStartService>();
-            services.AddSingleton<IJobManufactureService, JobManuStopService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageCloseService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageOpenService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageIngService>();
             #endregion
 
             #region Report
