@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("integrated:inteMessageGroup:insert")]
         public async Task AddAsync([FromBody] InteMessageGroupSaveDto saveDto)
         {
              await _inteMessageGroupService.CreateAsync(saveDto);
@@ -56,11 +58,12 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("integrated:inteMessageGroup:update")]
         public async Task UpdateAsync([FromBody] InteMessageGroupSaveDto saveDto)
         {
              await _inteMessageGroupService.ModifyAsync(saveDto);
         }
-
+        
         /// <summary>
         /// 删除（消息组）
         /// </summary>
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [PermissionDescription("integrated:inteMessageGroup:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _inteMessageGroupService.DeletesAsync(ids);
