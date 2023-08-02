@@ -740,6 +740,7 @@
         public const string MES17252 = "按钮序列号必须大于0！";
         public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
         public const string MES17254 = "按钮中存在，作业为空，请检查！";
+        public const string MES17255 = "未读取到有效作业，请检查！";
         #endregion
 
         #region 在制维修

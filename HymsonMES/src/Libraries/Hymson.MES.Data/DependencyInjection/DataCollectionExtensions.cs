@@ -102,6 +102,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteVehicleFreightRepository, InteVehicleFreightRepository>();
             services.AddSingleton<IInteVehiceFreightStackRepository, InteVehiceFreightStackRepository>();
             services.AddSingleton<IInteVehicleFreightRecordRepository, InteVehicleFreightRecordRepository>();
+
+            services.AddSingleton<IInteMessageGroupRepository, InteMessageGroupRepository>();
+            services.AddSingleton<IInteMessageGroupPushMethodRepository, InteMessageGroupPushMethodRepository>();
+
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();

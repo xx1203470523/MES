@@ -267,6 +267,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteVehicleFreightEntity, InteVehicleFreightDto>();
 
             #endregion
+
+            #region InteMessageGroup
+
+            #endregion
         }
 
         /// <summary>
