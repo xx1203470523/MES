@@ -1,8 +1,10 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
@@ -83,6 +85,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<InteMessageGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteMessageGroupEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -171,6 +184,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeleteSql = "UPDATE inte_message_group SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE inte_message_group SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
+        const string GetByCodeSql = "SELECT * FROM inte_message_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM inte_message_group WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_message_group WHERE Id IN @Ids ";
 

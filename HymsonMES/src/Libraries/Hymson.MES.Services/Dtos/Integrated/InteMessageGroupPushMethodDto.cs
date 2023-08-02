@@ -20,7 +20,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 消息组Id
         /// </summary>
-        public string MessageGroupId { get; set; }
+        public long MessageGroupId { get; set; }
 
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 消息组Id
         /// </summary>
-        public string MessageGroupId { get; set; }
+        public long MessageGroupId { get; set; }
 
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱

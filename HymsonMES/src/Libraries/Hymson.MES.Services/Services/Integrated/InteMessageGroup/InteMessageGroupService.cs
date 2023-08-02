@@ -1,16 +1,20 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -89,8 +93,50 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 保存
-            return await _inteMessageGroupRepository.InsertAsync(entity);
+            // 编码唯一性验证
+            var checkEntity = await _inteMessageGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // TODO
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
+
+            var details = saveDto.Details.Select(s =>
+            {
+                var detailEntity = s.ToEntity<InteMessageGroupPushMethodEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.MessageGroupId = entity.Id;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                detailEntity.SiteId = entity.SiteId;
+
+                return detailEntity;
+            });
+
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteMessageGroupRepository.InsertAsync(entity);
+                rows += await _inteMessageGroupPushMethodRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
@@ -106,12 +152,71 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
             // DTO转换实体
             var entity = saveDto.ToEntity<InteMessageGroupEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+            entity.SiteId = _currentSite.SiteId ?? 0;
 
-            return await _inteMessageGroupRepository.UpdateAsync(entity);
+            // 编码唯一性验证
+            var checkEntity = await _inteMessageGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+            }
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // TODO
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
+
+            var details = saveDto.Details.Select(s =>
+            {
+                var detailEntity = s.ToEntity<InteMessageGroupPushMethodEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.MessageGroupId = entity.Id;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                detailEntity.SiteId = entity.SiteId;
+
+                return detailEntity;
+            });
+
+            var command = new DeleteByParentIdCommand
+            {
+                ParentId = entity.Id,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            };
+
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteMessageGroupRepository.UpdateAsync(entity);
+                rows += await _inteMessageGroupPushMethodRepository.DeleteByParentIdAsync(command);
+                rows += await _inteMessageGroupPushMethodRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
