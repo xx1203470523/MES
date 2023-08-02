@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
 {
@@ -145,6 +146,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<InteWorkCenterEntity>(templateData.RawSql, templateData.Parameters);
+        }
+
+        /// <summary>
+        /// 获取当前站点下面的所有车间
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteWorkCenterEntity>> GetWorkShopListAsync(EntityBySiteIdQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteWorkCenterEntity>(GetBySiteIdSql, query);
         }
 
         /// <summary>
@@ -344,6 +356,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string GetByIdSql = @"SELECT * FROM `inte_work_center` WHERE Id = @Id AND IsDeleted = 0  ";
         const string GetByIdsSql = @"SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Id IN @ids ";
         const string GetByTypeAndParentIdSql = "SELECT /**select**/ FROM inte_work_center IWC /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetBySiteIdSql = "SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND SiteId = @SiteId ";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
         const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 

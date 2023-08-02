@@ -31,8 +31,8 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long WorkShopId { get; set; }
 
-       /// <summary>
-        /// 状态;1、启用 2、禁用
+        /// <summary>
+        /// 状态;0、禁用 1、启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
