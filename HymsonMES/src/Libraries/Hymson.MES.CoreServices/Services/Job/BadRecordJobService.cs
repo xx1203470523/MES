@@ -137,7 +137,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 面板需要的数据
             responseBo.Content = new Dictionary<string, string> {
                 { "PackageCom", "False" },
-                { "BadEntryCom", "True" },
+                { "BadEntryCom", $"{data.IsShow}" },
                 { "IsShow", $"{data.IsShow}" },
             };
 
