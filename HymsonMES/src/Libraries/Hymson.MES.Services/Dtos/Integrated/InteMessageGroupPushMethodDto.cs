@@ -13,11 +13,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long Id { get; set; }
 
         /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
         /// 消息组Id
         /// </summary>
         public long MessageGroupId { get; set; }
@@ -53,11 +48,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 主键
         /// </summary>
         public long Id { get; set; }
-
-        /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
 
         /// <summary>
         /// 消息组Id
