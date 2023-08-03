@@ -115,6 +115,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
 
             services.AddSingleton<IInteMessageGroupService, InteMessageGroupService>();
+            services.AddSingleton<IInteEventTypeService, InteEventTypeService>();
             #endregion
 
             #region Process
@@ -390,6 +391,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteVehicleUnbindOperationDto>, InteVehicleUnBindoptValidator>();
 
             services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteEventTypeSaveDto>, InteEventTypeSaveValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
