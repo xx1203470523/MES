@@ -9,16 +9,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public record InteMessageGroupPushMethodSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 消息组Id
-        /// </summary>
-        public long MessageGroupId { get; set; }
-
-        /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
         public PushTypeEnum Type { get; set; }
@@ -31,12 +21,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 秘钥
         /// </summary>
-        public string SecretKey { get; set; }
+        public string? SecretKey { get; set; }
 
         /// <summary>
         /// 关键词
         /// </summary>
-        public string KeyWord { get; set; }
+        public string? KeyWord { get; set; }
 
     }
 
@@ -49,11 +39,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 主键
         /// </summary>
         public long Id { get; set; }
-
-        /// <summary>
-        /// 消息组Id
-        /// </summary>
-        public long MessageGroupId { get; set; }
 
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
