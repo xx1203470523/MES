@@ -437,6 +437,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProductParameterGroupDetailSaveDto, ProcProductParameterGroupDetailEntity>();
             CreateMap<ProcProductParameterGroupDetailEntity, ProcProductParameterGroupDetailDto>();
             #endregion
+
+            #region EquipmentGroupParam
+            CreateMap<ProcEquipmentGroupParamEntity, ProcEquipmentGroupParamDto>();
+            CreateMap<ProcEquipmentGroupParamDto, ProcEquipmentGroupParamEntity>();
+            CreateMap<ProcEquipmentGroupParamModifyDto, ProcEquipmentGroupParamEntity>();
+            CreateMap<ProcEquipmentGroupParamCreateDto, ProcEquipmentGroupParamEntity>();
+
+            CreateMap<ProcEquipmentGroupParamPagedQueryDto, ProcEquipmentGroupParamPagedQuery>();
+            #endregion
         }
 
         /// <summary>

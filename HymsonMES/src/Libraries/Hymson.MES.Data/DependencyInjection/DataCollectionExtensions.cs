@@ -195,6 +195,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcSortingRuleGradeRepository, ProcSortingRuleGradeRepository>();
             services.AddSingleton<IProcSortingRuleGradeDetailsRepository, ProcSortingRuleGradeDetailsRepository>();
             #endregion
+
+            #region EquipmentGroupParam
+            services.AddSingleton<IProcEquipmentGroupParamRepository, ProcEquipmentGroupParamRepository>();
+            services.AddSingleton<IProcEquipmentGroupParamDetailRepository, ProcEquipmentGroupParamDetailRepository>();
+            #endregion
+
             #endregion
 
             #region Quality

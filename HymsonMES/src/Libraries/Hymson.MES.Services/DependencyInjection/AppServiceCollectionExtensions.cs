@@ -152,6 +152,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
 
             services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
+
+            // EquipmentGroupParam
+            services.AddSingleton<IProcEquipmentGroupParamService, ProcEquipmentGroupParamService>();
+
             #endregion
 
             #region Quality
@@ -361,6 +365,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcSortingRuleCreateDto>, ProcSortingRuleCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcSortingRuleModifyDto>, ProcSortingRuleModifyValidator>();
             #endregion
+
+            #region EquipmentGroupParam
+            services.AddSingleton<AbstractValidator<ProcEquipmentGroupParamCreateDto>, ProcEquipmentGroupParamCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcEquipmentGroupParamModifyDto>, ProcEquipmentGroupParamModifyValidator>();
+            #endregion
+
             #endregion
 
             #region Integrated
