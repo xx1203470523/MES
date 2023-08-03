@@ -11,7 +11,10 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -255,6 +258,21 @@ namespace Hymson.MES.Services.Services.Integrated
             if (inteMessageGroupEntity == null) return null;
 
             return inteMessageGroupEntity.ToModel<InteMessageGroupDto>();
+        }
+
+        /// <summary>
+        /// 根据ID获取关联明细列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteMessageGroupPushMethodDto>> QueryDetailsByMainIdAsync(long id)
+        {
+            var details = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new InteMessageGroupPushMethodQuery
+            {
+                MessageGroupId = id
+            });
+
+            return details.Select(s => s.ToModel<InteMessageGroupPushMethodDto>());
         }
 
         /// <summary>

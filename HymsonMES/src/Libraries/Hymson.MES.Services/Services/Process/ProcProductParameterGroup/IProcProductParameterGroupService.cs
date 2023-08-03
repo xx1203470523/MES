@@ -44,11 +44,11 @@ namespace Hymson.MES.Services.Services.Process
         Task<ProcProductParameterGroupInfoDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 根据ID获取项目明细列表
+        /// 根据ID获取关联明细列表
         /// </summary>
-        /// <param name="parameterGroupId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProductParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId);
+        Task<IEnumerable<ProcProductParameterGroupDetailDto>> QueryDetailsByMainIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
