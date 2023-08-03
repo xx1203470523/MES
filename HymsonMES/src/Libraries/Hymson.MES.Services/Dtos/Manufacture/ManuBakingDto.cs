@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -49,8 +50,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 烘烤预计总时长
         /// </summary>
         public int? BakingPlan { get; set; }
+        /// <summary>
+        /// 烘烤总时长
+        /// </summary>
+        public int BakingTotalTimeSpan { get; set; }
+        /// <summary>
+        /// 烘烤状态
+        /// </summary>
+        public BakingStatusEnum BakingStatus { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
@@ -108,42 +117,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 进站时间
         /// </summary>
         public DateTime BakingOn { get; set; }
-
-       /// <summary>
-        /// 出站时间
-        /// </summary>
-        public DateTime? BakingEnd { get; set; }
-
-       /// <summary>
-        /// 烘烤预计总时长
-        /// </summary>
-        public int? BakingPlan { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
        
     }
 
