@@ -48,6 +48,12 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         Task<IEnumerable<SelectOptionDto>> QueryListByTypeAndParentIdAsync(QueryInteWorkCenterByTypeAndParentIdDto queryDto);
 
         /// <summary>
+        /// 获取当前站点下面的所有车间
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> GetWorkShopListAsync();
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param">新增参数</param>

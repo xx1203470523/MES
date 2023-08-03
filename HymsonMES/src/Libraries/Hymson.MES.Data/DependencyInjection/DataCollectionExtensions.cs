@@ -84,6 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
             services.AddSingleton<IInteContainerRepository, InteContainerRepository>();
             services.AddSingleton<IInteJobClassRepository, InteJobClassRepository>();
+            services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
 
             //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
@@ -102,6 +103,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteVehicleFreightRepository, InteVehicleFreightRepository>();
             services.AddSingleton<IInteVehiceFreightStackRepository, InteVehiceFreightStackRepository>();
             services.AddSingleton<IInteVehicleFreightRecordRepository, InteVehicleFreightRecordRepository>();
+
+            services.AddSingleton<IInteMessageGroupRepository, InteMessageGroupRepository>();
+            services.AddSingleton<IInteMessageGroupPushMethodRepository, InteMessageGroupPushMethodRepository>();
+
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
@@ -119,8 +124,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcMaskCodeRuleRepository, ProcMaskCodeRuleRepository>();
             services.AddSingleton<IProcMaskCodeRepository, ProcMaskCodeRepository>();
             services.AddSingleton<IProcProductSetRepository, ProcProductSetRepository>();
+
             services.AddSingleton<IProcProductParameterGroupRepository, ProcProductParameterGroupRepository>();
             services.AddSingleton<IProcProductParameterGroupDetailRepository, ProcProductParameterGroupDetailRepository>();
+
+            services.AddSingleton<IProcProcessEquipmentGroupRepository, ProcProcessEquipmentGroupRepository>();
+            services.AddSingleton<IProcProcessEquipmentGroupRelationRepository, ProcProcessEquipmentGroupRelationRepository>();
 
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
@@ -195,6 +204,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcSortingRuleGradeRepository, ProcSortingRuleGradeRepository>();
             services.AddSingleton<IProcSortingRuleGradeDetailsRepository, ProcSortingRuleGradeDetailsRepository>();
             #endregion
+
+            #region EquipmentGroupParam
+            services.AddSingleton<IProcEquipmentGroupParamRepository, ProcEquipmentGroupParamRepository>();
+            services.AddSingleton<IProcEquipmentGroupParamDetailRepository, ProcEquipmentGroupParamDetailRepository>();
+            #endregion
+
             #endregion
 
             #region Quality

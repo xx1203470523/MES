@@ -209,6 +209,7 @@
         public const string MES10518 = "产品不能为空";
         public const string MES10519 = "工序不能为空";
         public const string MES10520 = "此编码{Code}版本{Version}已存在，请重新输入！";
+        public const string MES10521 = "此编码{Code}已存在，请重新输入！";
         #endregion
 
         #region Bom 10600
@@ -741,6 +742,7 @@
         public const string MES17252 = "按钮序列号必须大于0！";
         public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
         public const string MES17254 = "按钮中存在，作业为空，请检查！";
+        public const string MES17255 = "未读取到有效作业，请检查！";
         #endregion
 
         #region 在制维修
