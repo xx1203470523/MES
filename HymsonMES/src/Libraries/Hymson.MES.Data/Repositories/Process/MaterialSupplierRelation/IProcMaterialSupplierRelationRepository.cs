@@ -27,7 +27,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialSupplierRelationEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcMaterialSupplierRelationEntity procMaterialSupplierRelationEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialSupplierRelationEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcMaterialSupplierRelationEntity procMaterialSupplierRelationEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -55,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -85,6 +85,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcMaterialSupplierView>> GetByMaterialIdAsync(long materialId);
 
         /// <summary>
+        /// 通过供应商Id查询
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns> 
+        Task<IEnumerable<ProcMaterialSupplierView>> GetBySupplierIdsAsync(long[] supplierIds);
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
@@ -97,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialSupplierRelationQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcMaterialSupplierRelationEntity>> GetProcMaterialSupplierRelationEntitiesAsync(ProcMaterialSupplierRelationQuery procMaterialSupplierRelationQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

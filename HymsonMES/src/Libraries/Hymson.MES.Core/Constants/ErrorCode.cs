@@ -470,6 +470,7 @@
         public const string MES15008 = "此供应商编码{Code}不符合规则，字母/数字！";
         public const string MES15009 = "供应商编码最大长度50";
         public const string MES15010 = "供应商名称最大长度50";
+        public const string MES15011 = "供应商已关联物料，不允许删除！";
 
 
         #endregion
