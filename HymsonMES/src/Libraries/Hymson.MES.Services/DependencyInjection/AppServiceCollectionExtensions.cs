@@ -87,7 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
             services.AddSingleton<IEquEquipmentService, EquEquipmentService>();
-            services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
+            services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
             services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
@@ -155,7 +155,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
 
             services.AddSingleton<IProcEquipmentGroupParamService, ProcEquipmentGroupParamService>();
-//工艺设备组
+
+            // 工艺设备组
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
             #endregion
@@ -363,7 +364,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
 
             #endregion
-
 
             #region Integrated
             services.AddSingleton<AbstractValidator<InteContainerSaveDto>, InteContainerValidator>();

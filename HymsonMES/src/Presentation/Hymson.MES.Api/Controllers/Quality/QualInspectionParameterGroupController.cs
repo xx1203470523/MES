@@ -89,14 +89,14 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
-        /// 查询详情（环境检验参数表）
+        /// 根据ID获取关联明细列表（环境检验参数表）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("details/{id}")]
-        public async Task<IEnumerable<QualInspectionParameterGroupDetailDto>?> QueryDetailsByParameterGroupIdAsync(long id)
+        public async Task<IEnumerable<QualInspectionParameterGroupDetailDto>?> QueryDetailsByMainIdAsync(long id)
         {
-            return await _qualInspectionParameterGroupService.QueryDetailsByParameterGroupIdAsync(id);
+            return await _qualInspectionParameterGroupService.QueryDetailsByMainIdAsync(id);
         }
 
         /// <summary>

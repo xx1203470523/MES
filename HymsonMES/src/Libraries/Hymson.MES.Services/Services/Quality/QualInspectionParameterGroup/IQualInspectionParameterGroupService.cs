@@ -44,11 +44,11 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualInspectionParameterGroupInfoDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 根据ID获取项目明细列表
+        /// 根据ID获取关联明细列表
         /// </summary>
-        /// <param name="parameterGroupId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualInspectionParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId);
+        Task<IEnumerable<QualInspectionParameterGroupDetailDto>> QueryDetailsByMainIdAsync(long id);
 
         /// <summary>
         /// 获取分页List

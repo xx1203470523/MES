@@ -89,14 +89,14 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
-        /// 查询详情（产品检验参数表）
+        /// 根据ID获取关联明细列表（产品检验参数表）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("details/{id}")]
-        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>?> QueryDetailsByParameterGroupIdAsync(long id)
+        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>?> QueryDetailsByMainIdAsync(long id)
         {
-            return await _procProductParameterGroupService.QueryDetailsByParameterGroupIdAsync(id);
+            return await _procProductParameterGroupService.QueryDetailsByMainIdAsync(id);
         }
 
         /// <summary>

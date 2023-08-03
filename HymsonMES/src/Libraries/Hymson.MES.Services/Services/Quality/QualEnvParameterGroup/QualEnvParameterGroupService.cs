@@ -355,15 +355,15 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 根据ID获取项目明细列表
+        /// 根据ID获取关联明细列表
         /// </summary>
-        /// <param name="parameterGroupId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId)
+        public async Task<IEnumerable<QualEnvParameterGroupDetailDto>> QueryDetailsByMainIdAsync(long id)
         {
             var details = await _qualEnvParameterGroupDetailRepository.GetEntitiesAsync(new QualEnvParameterGroupDetailQuery
             {
-                ParameterGroupId = parameterGroupId
+                ParameterGroupId = id
             });
 
             // 查询已经缓存的参数实体
