@@ -128,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         public async Task<IEnumerable<QualInspectionParameterGroupEntity>> GetEntitiesAsync(QualInspectionParameterGroupQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetQualInspectionParameterGroupEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualInspectionParameterGroupEntity>(template.RawSql, query);
         }
@@ -138,18 +138,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualInspectionParameterGroupView>> GetPagedInfoAsync(QualInspectionParameterGroupPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualInspectionParameterGroupView>> GetPagedListAsync(QualInspectionParameterGroupPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = T.MaterialId");
             sqlBuilder.LeftJoin("proc_procedure PP ON PP.Id = T.ProcedureId");
-            sqlBuilder.Where("T.IsDeleted = 0");
-            sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.Select("T.*");
             sqlBuilder.Select("PM.MaterialCode, PM.MaterialName");
             sqlBuilder.Select("PP.Code AS ProcedureCode, PP.Name AS ProcedureName");
+            sqlBuilder.OrderBy("T.UpdatedOn DESC");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
 
             if (pagedQuery.Status.HasValue)
             {
@@ -213,9 +214,9 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualInspectionParameterGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**where**/ ";
-        const string GetQualInspectionParameterGroupEntitiesSqlTemplate = @"SELECT 
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `qual_inspection_parameter_group` T /**innerjoin**/ /**leftjoin**/ /**where**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `qual_inspection_parameter_group` /**where**/  ";
 
@@ -228,7 +229,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeleteSql = "UPDATE `qual_inspection_parameter_group` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `qual_inspection_parameter_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByCodeSql = "SELECT * FROM qual_inspection_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM qual_inspection_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code AND Version = @Version LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM `qual_inspection_parameter_group`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `qual_inspection_parameter_group`  WHERE Id IN @Ids ";
 

@@ -31,7 +31,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -59,7 +58,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
 
             var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
@@ -88,8 +87,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult(new PackageResponseBo { });
         }
 
         /// <summary>
@@ -99,9 +97,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
-            return await Task.FromResult(new JobResponseBo { });
+            // 面板需要的数据
+            return await Task.FromResult(new JobResponseBo
+            {
+                Content = new Dictionary<string, string> {
+                { "PackageCom", "True" },
+                { "BadEntryCom", "False" },
+            },
+                Message = ""
+            });
         }
-
 
         /// <summary>
         /// 执行后节点
@@ -113,5 +118,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
+
     }
 }

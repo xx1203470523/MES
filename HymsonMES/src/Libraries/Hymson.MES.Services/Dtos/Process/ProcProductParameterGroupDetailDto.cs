@@ -1,9 +1,10 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
     /// <summary>
-    /// 产品工序参数项目表新增/更新Dto
+    /// 产品检验参数项目表新增/更新Dto
     /// </summary>
     public record ProcProductParameterGroupDetailSaveDto : BaseEntityDto
     {
@@ -12,135 +13,108 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 产品检验参数id
+        /// <summary>
+        /// 全检检验参数id
         /// </summary>
-        public long parameterGroupId { get; set; }
+        public long ParameterGroupId { get; set; }
 
-       /// <summary>
-        /// 参数组id
+        /// <summary>
+        /// 参数id（产品参数）
         /// </summary>
-        public long ProductParameterId { get; set; }
+        public long ParameterId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum DataType { get; set; } = DataTypeEnum.Text;
+
+        /// <summary>
         /// 规格上限
         /// </summary>
-        public decimal UpperLimit { get; set; }
+        public decimal? UpperLimit { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 中心值（均值）
         /// </summary>
         public decimal? CenterValue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 规格下限
         /// </summary>
-        public decimal LowerLimit { get; set; }
+        public decimal? LowerLimit { get; set; }
 
-       /// <summary>
-        /// 创建人
+        /// <summary>
+        /// 是否必填
         /// </summary>
-        public string CreatedBy { get; set; }
+        public bool IsRequired { get; set; } = false;
 
-       /// <summary>
-        /// 创建时间
+        /// <summary>
+        /// 顺序（正整数，最大值10000）
         /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
+        public int Sort { get; set; }
     }
 
     /// <summary>
-    /// 产品工序参数项目表Dto
+    /// 产品检验参数项目表Dto
     /// </summary>
     public record ProcProductParameterGroupDetailDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键id
+        /// 参数id（产品参数）
         /// </summary>
-        public long Id { get; set; }
+        public long ParameterId { get; set; }
 
-       /// <summary>
-        /// 产品检验参数id
+        /// <summary>
+        /// 参数编码
         /// </summary>
-        public long parameterGroupId { get; set; }
+        public string Code { get; set; }
 
-       /// <summary>
-        /// 参数组id
+        /// <summary>
+        /// 参数名称
         /// </summary>
-        public long ProductParameterId { get; set; }
+        public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 描述 :参数单位（字典定义） 
+        /// 空值 : false  
+        /// </summary>
+        public ParameterUnitEnum Unit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum DataType { get; set; } = DataTypeEnum.Text;
+
+        /// <summary>
         /// 规格上限
         /// </summary>
-        public decimal UpperLimit { get; set; }
+        public decimal? UpperLimit { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 中心值（均值）
         /// </summary>
         public decimal? CenterValue { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 规格下限
         /// </summary>
-        public decimal LowerLimit { get; set; }
+        public decimal? LowerLimit { get; set; }
 
-       /// <summary>
-        /// 创建人
+        /// <summary>
+        /// 是否必填
         /// </summary>
-        public string CreatedBy { get; set; }
+        public bool IsRequired { get; set; } = false;
 
-       /// <summary>
-        /// 创建时间
+        /// <summary>
+        /// 顺序（正整数，最大值10000）
         /// </summary>
-        public DateTime CreatedOn { get; set; }
+        public int Sort { get; set; }
 
-       /// <summary>
-        /// 最后修改人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 修改时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
     }
-
-    /// <summary>
-    /// 产品工序参数项目表分页Dto
-    /// </summary>
-    public class ProcProductParameterGroupDetailPagedQueryDto : PagerInfo { }
 
 }

@@ -44,6 +44,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 当前工序
         /// </summary>
         public long? ProcedureId { get; set; }
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long ProductId { get; set; }
 
         /// <summary>
         /// 状态;1：排队；2：活动；

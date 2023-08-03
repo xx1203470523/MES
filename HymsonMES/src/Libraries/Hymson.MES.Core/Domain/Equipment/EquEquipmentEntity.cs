@@ -17,6 +17,11 @@ namespace Hymson.MES.Core.Domain.Equipment
         public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>
@@ -109,7 +114,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -165,7 +170,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public int UseDepartment { get; set; }
+        public long UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :功率 

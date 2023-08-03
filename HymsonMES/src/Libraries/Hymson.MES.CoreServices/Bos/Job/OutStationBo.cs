@@ -38,9 +38,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public bool IsCompleted { get; set; } = true;
 
         /// <summary>
-        /// 
+        /// 条码（首个）
         /// </summary>
-        public ManuSfcProduceEntity FirstSFCProduceEntity { get; set; } = new();
+        public string FirstSFC { get; set; } = "";
 
         /// <summary>
         /// 

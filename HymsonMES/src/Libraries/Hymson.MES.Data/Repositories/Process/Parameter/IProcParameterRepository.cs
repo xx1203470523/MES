@@ -15,14 +15,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcParameterEntity procParameterEntity);
-        
+
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procParameterEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcParameterEntity procParameterEntity);
-        
+
         /// <summary>
         /// 删除
         /// </summary>
@@ -43,19 +43,26 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcParameterEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procParameterQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcParameterEntity>> GetProcParameterEntitiesAsync(ProcParameterQuery procParameterQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procParameterPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcParameterEntity>> GetPagedInfoAsync(ProcParameterPagedQuery procParameterPagedQuery);
+        Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery procParameterPagedQuery);
     }
 }

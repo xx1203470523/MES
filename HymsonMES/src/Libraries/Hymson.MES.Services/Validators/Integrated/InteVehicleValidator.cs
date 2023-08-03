@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18608));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
             RuleFor(x => x.Position).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18610));
-            RuleFor(x => x.VehicleTypeId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18611));
+            //RuleFor(x => x.VehicleTypeId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18611));
         }
     }
 
@@ -49,7 +49,41 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18608));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18609));
             RuleFor(x => x.Position).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18610));
-            RuleFor(x => x.VehicleTypeId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18611));
+            //RuleFor(x => x.VehicleTypeId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18611));
+
+        }
+    }
+    /// <summary>
+    /// 解盘校验
+    /// </summary>
+    internal class InteVehicleUnBindoptValidator : AbstractValidator<InteVehicleUnbindOperationDto>
+    {
+        public InteVehicleUnBindoptValidator()
+        {
+            RuleFor(x => x.LocationId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18620));
+
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.PalletNo).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18604));
+            RuleFor(x => x.StackIds).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18622));
+            //RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18606));
+            
+
+        }
+    }
+    /// <summary>
+    /// 绑盘校验
+    /// </summary>
+    internal class InteVehicleBindoptValidator : AbstractValidator<InteVehicleBindOperationDto>
+    {
+        public InteVehicleBindoptValidator()
+        {
+            RuleFor(x => x.LocationId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18620));
+
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.PalletNo).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18604));
+            RuleFor(x => x.SFC).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18621));
+            //RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18606));
+            //RuleFor(x => x.VehicleTypeId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18611));
 
         }
     }

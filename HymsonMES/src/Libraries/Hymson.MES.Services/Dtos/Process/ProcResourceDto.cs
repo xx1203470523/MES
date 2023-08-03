@@ -112,6 +112,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? ProcedureId { get; set; }
 
         /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
+
+        /// <summary>
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>

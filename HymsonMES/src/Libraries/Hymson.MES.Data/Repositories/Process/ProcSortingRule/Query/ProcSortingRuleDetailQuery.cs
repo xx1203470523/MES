@@ -21,6 +21,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分选规则id
         /// </summary>
-        public long SortingRuleId { get; set; }
+        public long? SortingRuleId { get; set; }
     }
 }

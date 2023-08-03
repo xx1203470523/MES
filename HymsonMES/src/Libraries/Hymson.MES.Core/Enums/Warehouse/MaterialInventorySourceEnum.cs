@@ -26,6 +26,12 @@ namespace Hymson.MES.Core.Enums
         /// 生产完成
         /// </summary>
         [Description("生产完成")]
-        ManuComplete = 4
+        ManuComplete = 4,
+
+        /// <summary>
+        /// 库存维护   (仅仅做记录使用)
+        /// </summary>
+        [Description("库存维护")]
+        InventoryModify = 6
     }
 }

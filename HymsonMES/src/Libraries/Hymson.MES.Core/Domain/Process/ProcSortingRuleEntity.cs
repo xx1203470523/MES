@@ -6,6 +6,7 @@
  *build datetime: 2023-07-25 03:24:54
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -45,13 +46,12 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
        
     }
 }

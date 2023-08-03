@@ -31,6 +31,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
 
     public record WhMaterialInventoryPageListViewDto : BaseEntityDto
     {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
         ///// <summary>
         ///// 供应商ID
         ///// </summary>
@@ -166,6 +171,11 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 数量（剩余）
         /// </summary>
         public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 接收数量 (一开始的数量)
+        /// </summary>
+        public decimal ReceivedQty { get; set; }
 
         /// <summary>
         /// 状态;待使用/使用中/锁定
@@ -473,5 +483,69 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public WhMaterialInventoryStatusEnum? Status { get; set; }
 
+
+        #region 添加 库存修改功能时添加 karl
+        /// <summary>
+        /// 接收时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? CreatedOnRange { get; set; }
+
+        #endregion
+    }
+
+    public record WhMaterialInventoryDetailDto : WhMaterialInventoryDto
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string SupplierCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string SupplierName { get; set; }
+    }
+
+    /// <summary>
+    /// 修改外部来源的库存
+    /// </summary>
+    public class OutsideWhMaterialInventoryModifyDto 
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 现有剩余的数量
+        /// </summary>
+        public decimal QuantityResidue { get; set; }
+
+        /// <summary>
+        /// 批次
+        /// </summary>
+        public string? Batch { get; set; }
+
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
     }
 }

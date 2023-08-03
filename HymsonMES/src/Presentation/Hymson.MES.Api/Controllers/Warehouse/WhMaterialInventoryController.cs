@@ -140,5 +140,54 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         {
             return await _whMaterialInventoryService.GetMaterialAndSupplierByMateialCodeIdAsync(id);
         }
+
+
+        /// <summary>
+        /// 来源外部的数据分页查询列表（物料库存）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("outsidePagelist")]
+        public async Task<PagedInfo<WhMaterialInventoryPageListViewDto>> QueryOutsidePagedWhMaterialInventoryAsync([FromQuery] WhMaterialInventoryPagedQueryDto parm)
+        {
+            return await _whMaterialInventoryService.GetOutsidePageListAsync(parm);
+        }
+
+        /// <summary>
+        /// 根据物料条码查询外部的
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        [HttpGet("outsideBarCode/{barCode}")]
+        public async Task<WhMaterialInventoryDetailDto?> QueryOutsideWhMaterialInventoryByBarCodeAsync(string barCode)
+        {
+            return await _whMaterialInventoryService.QueryOutsideWhMaterialInventoryByBarCodeAsync(barCode);
+        }
+
+        /// <summary>
+        /// 查询库存物料信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("queryWhMaterialInventoryById/{id}")]
+        public async Task<WhMaterialInventoryDetailDto> QueryWhMaterialInventoryByIdAsync(long id)
+        {
+            return await _whMaterialInventoryService.QueryWhMaterialInventoryDetailByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 修改外部来源库存
+        /// </summary>
+        /// <param name="modifyDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("updateOutsideWhMaterialInventory")]
+        [LogDescription("修改外部来源库存", BusinessType.UPDATE)]
+        //[PermissionDescription("wh:materialInventory:updateOutsideWhMaterialInventory")]
+        public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto) 
+        {
+            await _whMaterialInventoryService.UpdateOutsideWhMaterialInventoryAsync(modifyDto);
+        }
     }
 }

@@ -18,6 +18,6 @@ namespace Hymson.MES.Core.Enums
         /// 否
         /// </summary>
         [Description("否")]
-        No= 0,
+        No = 0,
     }
 }

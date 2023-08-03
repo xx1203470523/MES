@@ -81,6 +81,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
@@ -110,6 +111,19 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcSortingRuleEntity>> GetProcSortingRuleEntitiesAsync(ProcSortingRuleQuery procSortingRuleQuery)
         {
             var sqlBuilder = new SqlBuilder();
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+
+            if (procSortingRuleQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("MaterialId=@MaterialId");
+            }
+            if (procSortingRuleQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status=@Status");
+            }
+
             var template = sqlBuilder.AddTemplate(GetProcSortingRuleEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
             var procSortingRuleEntities = await conn.QueryAsync<ProcSortingRuleEntity>(template.RawSql, procSortingRuleQuery);

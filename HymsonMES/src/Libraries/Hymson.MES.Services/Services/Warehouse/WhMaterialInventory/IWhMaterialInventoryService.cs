@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Warehouse;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -80,5 +81,34 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         Task<ProcMaterialInfoViewDto> GetMaterialAndSupplierByMateialCodeIdAsync(long materialId);
 
+
+        /// <summary>
+        /// 根据查询条件获取分页数据 来源外部的
+        /// </summary>
+        /// <param name="whMaterialInventoryPagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<WhMaterialInventoryPageListViewDto>> GetOutsidePageListAsync(WhMaterialInventoryPagedQueryDto whMaterialInventoryPagedQueryDto);
+
+        /// <summary>
+        /// 根据物料条码查询 来源外部的数据
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <returns></returns>
+        Task<WhMaterialInventoryDetailDto?> QueryOutsideWhMaterialInventoryByBarCodeAsync(string barCode);
+
+        /// <summary>
+        /// 获取物料库存相关的信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<WhMaterialInventoryDetailDto> QueryWhMaterialInventoryDetailByIdAsync(long id);
+
+        /// <summary>
+        /// 修改外部来源库存
+        /// </summary>
+        /// <param name="modifyDto"></param>
+        /// <returns></returns>
+        Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto);
     }
 }

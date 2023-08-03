@@ -28,6 +28,8 @@
         public const string MES10119 = "版本最大长度为100";
         public const string MES10120 = "状态不合法";
         public const string MES10121 = "描述最大长度为255";
+        public const string MES10122 = "版本不允许有空格";
+        public const string MES10123 = "启用状态不允许修改";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -206,6 +208,8 @@
         public const string MES10517 = "工作中心不能为空";
         public const string MES10518 = "产品不能为空";
         public const string MES10519 = "工序不能为空";
+        public const string MES10520 = "此编码{Code}版本{Version}已存在，请重新输入！";
+        public const string MES10521 = "此编码{Code}已存在，请重新输入！";
         #endregion
 
         #region Bom 10600
@@ -413,6 +417,12 @@
         public const string MES12604 = "设备信息不存在！";
         public const string MES12605 = "状态不合法，请检查！";
         public const string MES12606 = "存放位置不能为空";
+
+        public const string MES12610 = "设备验证账号不能为空";
+        public const string MES12611 = "设备验证密码不能为空";
+        public const string MES12612 = "设备验证账号不允许有空格";
+        public const string MES12613 = "设备验证账号最大长度为50";
+        public const string MES12614 = "设备验证密码最大长度为50";
         #endregion
 
         #region 设备组 12700
@@ -476,6 +486,11 @@
         public const string MES15107 = " 重复扫描！";
         public const string MES15108 = " 供应商不能为空";
 
+        public const string MES15120 = " 没有查询到对应原材料库存数据";
+        public const string MES15121 = " 维护库存剩余数量要不大于接收数量且不小于0";
+        public const string MES15122 = " 物料条码{materialBarCode}状态{status},不允许执行该操作！";
+        public const string MES15123 = " 不允许操作非原材料库存！";
+        public const string MES15124 = " 没有查询到对应库存数据";
         #endregion
 
         #region 物料台账 15200
@@ -726,6 +741,7 @@
         public const string MES17252 = "按钮序列号必须大于0！";
         public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
         public const string MES17254 = "按钮中存在，作业为空，请检查！";
+        public const string MES17255 = "未读取到有效作业，请检查！";
         #endregion
 
         #region 在制维修
@@ -954,6 +970,7 @@
         public const string MES18215 = "条码{0}设置为活动状态成功！";
         public const string MES18216 = "条码{0}状态修改失败，请联系管理员！";
         public const string MES18217 = "条码{SFC}状态不合法！";
+        public const string MES18218 = "条码{0}库存修改失败，请联系管理员！";
         #endregion
 
 
@@ -996,6 +1013,8 @@
         public const string MES18515 = "载具类型验证物料或物料组不合法";
 
         public const string MES18516 = "载具类型编码不允许有空格";
+
+        public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
         #endregion
 
         #region 载具注册 18600
@@ -1018,8 +1037,10 @@
         public const string MES18616 = "载具：重复装载该条码:{sfc},托盘码:{palletNo}";
         public const string MES18617 = "载具不存在或者载具未激活";
         public const string MES18618 = "载具编码不允许有空格";
-        public const string MES18619 = "托盘信息不存在或未启用！";
-
+        public const string MES18619 = "载具信息不存在或未启用！";
+        public const string MES18620 = "载具位置Id不能为0！";
+        public const string MES18621 = "载具SFC信息不能为空！";
+        public const string MES18622 = "载具待解盘条码不能为空！";
         #endregion
 
         #region 设备对接错误

@@ -20,6 +20,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.AspNetCore.Components;
+using System.Security.Cryptography.Xml;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -39,6 +40,14 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcSortingRuleDetailRepository _sortingRuleDetailRepository;
         private readonly IProcSortingRuleGradeRepository _sortingRuleGradeRepository;
         private readonly IProcSortingRuleGradeDetailsRepository _ruleGradeDetailsRepository;
+        /// <summary>
+        /// 标准参数表 仓储
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+        /// <summary>
+        /// 工序表 仓储
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
 
         private readonly AbstractValidator<ProcSortingRuleCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcSortingRuleModifyDto> _validationModifyRules;
@@ -48,6 +57,8 @@ namespace Hymson.MES.Services.Services.Process
             IProcSortingRuleDetailRepository sortingRuleDetailRepository,
             IProcSortingRuleGradeRepository sortingRuleGradeRepository,
             IProcSortingRuleGradeDetailsRepository ruleGradeDetailsRepository,
+            IProcParameterRepository procParameterRepository,
+            IProcProcedureRepository procProcedureRepository,
             AbstractValidator<ProcSortingRuleCreateDto> validationCreateRules,
             AbstractValidator<ProcSortingRuleModifyDto> validationModifyRules)
         {
@@ -57,6 +68,8 @@ namespace Hymson.MES.Services.Services.Process
             _sortingRuleDetailRepository = sortingRuleDetailRepository;
             _sortingRuleGradeRepository = sortingRuleGradeRepository;
             _ruleGradeDetailsRepository = ruleGradeDetailsRepository;
+            _procParameterRepository = procParameterRepository;
+            _procProcedureRepository = procProcedureRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -181,8 +194,18 @@ namespace Hymson.MES.Services.Services.Process
             return null;
         }
 
+        /// <summary>
+        /// 读取分选规则列表信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListAsync(ProcSortingRuleDetailQueryDto queryDto)
         {
+            if (!queryDto.SortingRuleId.HasValue)
+            {
+                return new List<ProcSortingRuleDetailViewDto>();
+            }
+
             var query = new ProcSortingRuleDetailQuery()
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -192,26 +215,78 @@ namespace Hymson.MES.Services.Services.Process
             var sortingRuleDetailEntities = await _sortingRuleDetailRepository.GetProcSortingRuleDetailEntitiesAsync(query);
 
             //实体到DTO转换 装载数据
-            List<ProcSortingRuleDetailViewDto>  ruleDetailViewDtos= new List<ProcSortingRuleDetailViewDto>();
+            List<ProcSortingRuleDetailViewDto> ruleDetailViewDtos = new List<ProcSortingRuleDetailViewDto>();
             if (sortingRuleDetailEntities != null && sortingRuleDetailEntities.Any())
             {
+                var parameterIds = new List<long> { };
+                IEnumerable<ProcParameterEntity> procParameterEntities = new List<ProcParameterEntity>();
+                parameterIds.AddRange(sortingRuleDetailEntities.Select(a => a.ParameterId).ToArray());
+                var parameterIdList = parameterIds.Distinct().ToArray();
+                if (parameterIdList.Any())
+                {
+                    procParameterEntities = await _procParameterRepository.GetByIdsAsync(parameterIdList);
+                }
+
+                var procedureIds = new List<long> { };
+                IEnumerable<ProcProcedureEntity> procProcedureEntities = new List<ProcProcedureEntity>();
+                procedureIds.AddRange(sortingRuleDetailEntities.Select(a => a.ProcedureId).ToArray());
+                var procedureIdList = parameterIds.Distinct().ToArray();
+                if (procedureIdList.Any())
+                {
+                    procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIdList);
+                }
                 foreach (var entity in sortingRuleDetailEntities)
                 {
+                    var procParameter = procParameterEntities.FirstOrDefault(x => x.Id == entity.ParameterId);
+                    var procedureEntity = procProcedureEntities.FirstOrDefault(x => x.Id == entity.ProcedureId);
                     ruleDetailViewDtos.Add(new ProcSortingRuleDetailViewDto()
                     {
                         Id = entity.Id,
-                        ProcedureId=entity.ProcedureId,
-                        ParameterId=entity.ParameterId,
-                        MinValue=entity.MinValue,
+                        ProcedureId = entity.ProcedureId,
+                        Code = procedureEntity?.Code ?? "",
+                        ParameterId = entity.ParameterId,
+                        ParameterCode = procParameter?.ParameterCode ?? "",
+                        ParameterName = procParameter?.ParameterName ?? "",
+                        ParameterUnit = procParameter?.ParameterUnit,
+                        MinValue = entity.MinValue,
                         MinContainingType = entity.MinContainingType,
                         MaxValue = entity.MaxValue,
                         MaxContainingType = entity.MaxContainingType,
-                        ParameterValue=entity.ParameterValue,
-                        Rating=entity.Rating,
-                    }); ;
+                        ParameterValue = entity.ParameterValue,
+                        Rating = entity.Rating,
+                    }); ; ;
                 }
             }
             return ruleDetailViewDtos;
+        }
+
+        /// <summary>
+        /// 根据物料读取分选规则列表信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListByMaterialIdAsync(ProcSortingRuleDetailQueryDto queryDto)
+        {
+            if (!queryDto.MaterialId.HasValue)
+            {
+                return new List<ProcSortingRuleDetailViewDto>();
+            }
+
+            //根据物料找到分选规则
+            var query = new ProcSortingRuleQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialId = queryDto.MaterialId.Value,
+                Status = Core.Enums.SysDataStatusEnum.Enable
+            };
+            var procSortingRules = await _procSortingRuleRepository.GetProcSortingRuleEntitiesAsync(query);
+
+            var ruleId = procSortingRules.FirstOrDefault()?.Id ?? 0;
+            var detailQueryDto = new ProcSortingRuleDetailQueryDto
+            {
+                SortingRuleId= ruleId
+            };
+            return await GetSortingRuleDetailListAsync(detailQueryDto);
         }
     }
 }
