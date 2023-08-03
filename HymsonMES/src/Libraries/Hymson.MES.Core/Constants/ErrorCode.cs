@@ -1043,6 +1043,25 @@
         public const string MES18622 = "载具待解盘条码不能为空！";
         #endregion
 
+        #region Recipe参数 18700
+        public const string MES18700 = "Recipe参数错误";
+        public const string MES18701 = "对应Recipe参数不存在";
+        public const string MES18702 = "Recipe参数编码已存在";
+        //public const string MES18603 = "载具编码[{codes}]有关联的产品序列码,请先解绑该载具所关联的产品序列码！";
+        public const string MES18704 = "Recipe参数编码不能为空";
+        public const string MES18703 = "Recipe参数编码不允许空格";
+        public const string MES18705 = "Recipe参数名称不能为空";
+        public const string MES18706 = "Recipe参数编码最大长度为100";
+        public const string MES18707 = "Recipe参数名称最大长度为100";
+        //public const string MES18708 = "Recipe参数描述最大长度为255";
+        public const string MES18709 = "Recipe参数状态不合法";
+        public const string MES18710 = "Recipe参数功能类型不合法";
+
+        public const string MES18712 = "Recipe参数Id不能为空";
+        public const string MES18713 = "无法将其他状态修改成新建状态!";
+
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用
