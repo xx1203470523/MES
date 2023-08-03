@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
@@ -35,15 +33,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// 
     /// </summary>
 
-    [JobProxy(typeof(IEnumerable<ManuSfcProduceEntity>))]
+    //[JobProxy(typeof(IEnumerable<ManuSfcProduceEntity>))]
     public class MultiUpdateProduceSFCCommand : UpdateCommand
     {
         /// <summary>
         ///Id
         /// </summary>
-        [Condition]
-        [Ignore]
-        [Field("Id")]
+        //[Condition]
+        //[Ignore]
+        //[Field("Id")]
         public IEnumerable<long> Ids { get; set; }
 
         /// <summary>

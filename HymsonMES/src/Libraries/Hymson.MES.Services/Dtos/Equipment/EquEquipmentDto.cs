@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用部门
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 入厂日期
@@ -84,6 +84,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 供应商
         /// </summary>
         public string? Supplier { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; } 
 
         /// <summary>
         /// 功率
@@ -115,6 +120,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备关联Api
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
+
+        /// <summary>
+        /// 设备验证
+        /// </summary>
+        public List<EquEquipmentVerifyCreateDto> Verifys { get; set; }
         #endregion
     }
 
@@ -146,7 +156,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 使用部门
         /// </summary>
-        public int? UseDepartment { get; set; }
+        public long[]? UseDepartments { get; set; }
 
         /// <summary>
         /// 车间
@@ -169,6 +179,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 空值 : false  
         /// </summary>
         public EquipmentUseStatusEnum UseStatus { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
 
         /// <summary>
         /// 描述 :功率 
@@ -258,7 +273,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -324,6 +339,21 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源Code
+        /// </summary>
+        public string ResourceCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
+
+        /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>
@@ -411,7 +441,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public DepartmentTypeEnum? UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 

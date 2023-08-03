@@ -89,6 +89,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
+        /// 获取当前站点下面的所有车间
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("shops")]
+        public async Task<IEnumerable<SelectOptionDto>> GetWorkShopListAsync()
+        {
+            return await _inteWorkCenterService.GetWorkShopListAsync();
+        }
+
+        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="param"></param>

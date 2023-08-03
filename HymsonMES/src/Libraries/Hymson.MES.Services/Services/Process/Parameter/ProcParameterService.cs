@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var procParameterPagedQuery = procParameterPagedQueryDto.ToQuery<ProcParameterPagedQuery>();
             procParameterPagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _procParameterRepository.GetPagedInfoAsync(procParameterPagedQuery);
+            var pagedInfo = await _procParameterRepository.GetPagedListAsync(procParameterPagedQuery);
 
             // 实体到DTO转换 装载数据
             List<ProcParameterDto> procParameterDtos = PrepareProcParameterDtos(pagedInfo);

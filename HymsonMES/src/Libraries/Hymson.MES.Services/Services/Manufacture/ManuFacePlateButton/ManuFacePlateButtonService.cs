@@ -338,6 +338,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             var isClear = false;
             if (buttonJobs.Any(a => a.IsClear) == true) isClear = true;
 
+            // 如果没有读取到有效作业，就提示错误
+            if (jobs.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
+
             // 执行Job
             var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
             {

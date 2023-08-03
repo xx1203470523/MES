@@ -73,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query)
+        public async Task<IEnumerable<ProcResourceEntity>> GetByIdsAndStatusAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceEntity>(GetByIdsAndStatusSql, new { Ids = query.IdsArr, Status = query.Status });
@@ -214,12 +214,16 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("r.SiteId = @SiteId");
             sqlBuilder.OrderBy("r.UpdatedOn DESC");
             sqlBuilder.Select("r.*");
-            sqlBuilder.LeftJoin("proc_resource_type t on r.ResTypeId = t.Id");
-            sqlBuilder.LeftJoin("proc_procedure p on p.ResourceTypeId =t.Id");
+            sqlBuilder.LeftJoin("proc_resource_type t on r.ResTypeId = t.Id and t.IsDeleted=0");
+            sqlBuilder.LeftJoin("proc_procedure p on p.ResourceTypeId =t.Id and p.IsDeleted=0");
 
             if (query.ProcedureId.HasValue)
             {
                 sqlBuilder.Where("p.Id = @ProcedureId");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ProcedureCode))
+            {
+                sqlBuilder.Where("p.code = @ProcedureCode");
             }
             if (query.Status.HasValue)
             {

@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto)
+        public async Task<int> CreateAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -132,8 +132,13 @@ namespace Hymson.MES.Services.Services.Quality
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
-            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12600)).WithData("Code", entity.Code);
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
 
             // 判断规格上限和规格下限（数据类型为数值）
             List<ValidationFailure> validationFailures = new();
@@ -141,16 +146,17 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 // 如果参数类型为数值，则判断规格上限和规格下限
                 if (item.DataType != DataTypeEnum.Numeric) continue;
-                if (item.UpperLimit >= item.LowerLimit) continue;
-
-                validationFailures.Add(new ValidationFailure
+                if (item.UpperLimit < item.LowerLimit)
                 {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    validationFailures.Add(new ValidationFailure
+                    {
+                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
                         { "CollectionIndex", item.Code },
                         { "Code", item.Code }
                     },
-                    ErrorCode = nameof(ErrorCode.MES10516)
-                });
+                        ErrorCode = nameof(ErrorCode.MES10516)
+                    });
+                }
             }
 
             // 是否存在错误
@@ -189,7 +195,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyQualEnvParameterGroupAsync(QualEnvParameterGroupSaveDto saveDto)
+        public async Task<int> ModifyAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
@@ -205,6 +211,60 @@ namespace Hymson.MES.Services.Services.Quality
             var entity = saveDto.ToEntity<QualEnvParameterGroupEntity>();
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.SiteId = _currentSite.SiteId ?? 0;
+
+            // 检查数据之前的状态是否允许修改
+            var dbEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(entity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            switch (dbEntity.Status)
+            {
+                case SysDataStatusEnum.Enable:
+                case SysDataStatusEnum.Retain:
+                case SysDataStatusEnum.Abolish:
+                    if (saveDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+                    if (dbEntity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
+                    break;
+                case SysDataStatusEnum.Build:
+                default:
+                    break;
+            }
+
+            // 编码唯一性验证
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
+            }
+
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in saveDto.Details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit < item.LowerLimit)
+                {
+                    validationFailures.Add(new ValidationFailure
+                    {
+                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                        ErrorCode = nameof(ErrorCode.MES10516)
+                    });
+                }
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
 
             var details = saveDto.Details.Select(s =>
             {
@@ -243,7 +303,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteQualEnvParameterGroupAsync(long id)
+        public async Task<int> DeleteAsync(long id)
         {
             return await _qualEnvParameterGroupRepository.DeleteAsync(id);
         }
@@ -253,8 +313,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesQualEnvParameterGroupAsync(long[] ids)
+        public async Task<int> DeletesAsync(long[] ids)
         {
+            var list = await _qualEnvParameterGroupRepository.GetByIdsAsync(ids);
+            if (list != null && list.Any(x => x.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12509));
+            }
+
             return await _qualEnvParameterGroupRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -268,7 +334,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualEnvParameterGroupInfoDto?> QueryQualEnvParameterGroupByIdAsync(long id)
+        public async Task<QualEnvParameterGroupInfoDto?> QueryByIdAsync(long id)
         {
             var qualEnvParameterGroupEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(id);
             if (qualEnvParameterGroupEntity == null) return null;
@@ -336,7 +402,7 @@ namespace Hymson.MES.Services.Services.Quality
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualEnvParameterGroupPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _qualEnvParameterGroupRepository.GetPagedInfoAsync(pagedQuery);
+            var pagedInfo = await _qualEnvParameterGroupRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<QualEnvParameterGroupDto>());

@@ -45,5 +45,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }
+
+        #region 添加 库存修改功能时添加 karl
+        /// <summary>
+        /// 接收时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? CreatedOnRange { get; set; }
+
+        /// <summary>
+        /// 来源
+        /// </summary>
+        public MaterialInventorySourceEnum[]? Sources { get; set; }
+        #endregion
+
     }
 }

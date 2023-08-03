@@ -134,15 +134,15 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 载具操作
+        /// 载具绑盘
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("bindVehicle")]
-        public async Task VehicleFreightOperationAsync(InteVehicleOperationDto dto)
+        public async Task VehicleFreightOperationAsync(InteVehicleBindOperationDto dto)
         {
-            dto.OperationType = 0;
+            dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Bind;
             await _inteVehicleService.VehicleOperationAsync(dto);
         }
 
@@ -153,9 +153,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("unbindVehicle")]
-        public async Task UnbindVehicleAsync(InteVehicleOperationDto dto)
+        public async Task UnbindVehicleAsync(InteVehicleUnbindOperationDto dto)
         {
-            dto.OperationType = 1;
+            
+            dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Unbind;
             await _inteVehicleService.VehicleOperationAsync(dto);
         }
 
@@ -166,12 +167,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("clearVehicle")]
-        public async Task ClearVehicleAsync(InteVehicleOperationDto dto)
+        public async Task ClearVehicleAsync(InteVehicleClearOperationDto dto)
         {
-            dto.OperationType = 2;
+            dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Clear;
             await _inteVehicleService.VehicleOperationAsync(dto);
         }
-
+        /// <summary>
+        /// 通过托盘码获取托盘视图信息
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("getVehicleFreightByPalletNo/{palletNo}")]
         public async Task<InteVehicleStackView> QueryVehicleFreightByVehicleIdAsync(string palletNo)

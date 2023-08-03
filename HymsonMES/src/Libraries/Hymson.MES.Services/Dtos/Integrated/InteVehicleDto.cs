@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -108,7 +109,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 载具类型id
         /// </summary>
-        public long VehicleTypeId { get; set; }
+        public long? VehicleTypeId { get; set; }
 
        /// <summary>
         /// 存放位置
@@ -148,7 +149,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 载具类型id
         /// </summary>
-        public long VehicleTypeId { get; set; }
+        public long? VehicleTypeId { get; set; }
 
        /// <summary>
         /// 存放位置
@@ -321,7 +322,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 扩展条码集合，用于一个位置多个条码的情况
         /// </summary>
-        public List<InteVehiceFreightStackEntity> Stacks { get; set; } = new List<InteVehiceFreightStackEntity>();
+        public List<InteVehicleFreightStackEntity> Stacks { get; set; } = new List<InteVehicleFreightStackEntity>();
 
     }
     public class InteVehicleStackView
@@ -330,6 +331,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 载具实体
         /// </summary>
         public InteVehicleEntity Vehicle { get; set; }
+        /// <summary>
+        /// 载具类型信息
+        /// </summary>
+        public InteVehicleTypeEntity VehicleType { get; set; }
 
         /// <summary>
         /// 条码信息集合
@@ -379,22 +384,52 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 托盘码
         /// </summary>
         public string PalletNo { get; set; }
+        /// <summary>
+        /// 操作方式 0 绑定，1解绑，2清盘
+        /// </summary>
+        public VehicleOperationEnum OperationType;
 
+    }
+    /// <summary>
+    /// 绑盘
+    /// </summary>
+    public class InteVehicleBindOperationDto:InteVehicleOperationDto
+    {
         /// <summary>
         /// 位置ID
         /// </summary>
-        public long? LocationId { get; set; }
+        public long LocationId { get; set; }
 
         /// <summary>
         /// 条码
         /// </summary>
-        public string? SFC { get; set; }
+        public string SFC { get; set; }
 
-        /// <summary>
-        /// 操作方式 0 绑定，1解绑，2清盘
-        /// </summary>
-        public int? OperationType { get; set; }
+        
+
     }
-    
+    /// <summary>
+    /// 载具解绑操作
+    /// </summary>
+    public class InteVehicleUnbindOperationDto:InteVehicleOperationDto
+    {
+        /// <summary>
+        /// 位置ID
+        /// </summary>
+        public long LocationId { get; set; }
+        /// <summary>
+        /// 待解绑条码Id集合
+        /// </summary>
+        public List<long> StackIds { get; set; } = new List<long>();
+       
+    }
+    /// <summary>
+    /// 清盘
+    /// </summary>
+    public class InteVehicleClearOperationDto : InteVehicleOperationDto
+    {
+        
+    }
+
     #endregion
 }

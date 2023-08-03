@@ -15,7 +15,7 @@ namespace Hymson.MES.Core.Domain.Integrated
     /// @author wxk
     /// @date 2023-07-19 08:14:38
     /// </summary>
-    public class InteVehiceFreightStackEntity : BaseEntity
+    public class InteVehicleFreightStackEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id

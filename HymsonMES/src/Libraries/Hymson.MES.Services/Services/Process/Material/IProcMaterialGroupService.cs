@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task CreateProcMaterialGroupAsync(ProcMaterialGroupCreateDto procMaterialGroupCreateDto);
 
-        /// <summary>
+        /// <summary>   
         /// 修改
         /// </summary>
         /// <param name="procMaterialGroupDto"></param>

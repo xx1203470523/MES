@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query
         /// <summary>
         /// 使用部门
         /// </summary>
-        public int? UseDepartment { get; set; }
+        public long[]? UseDepartments { get; set; }
 
         /// <summary>
         /// 车间

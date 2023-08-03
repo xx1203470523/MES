@@ -115,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("IsDeleted = 0");
 
-            if (procSortingRuleDetailQuery.SortingRuleId > 0)
+            if (procSortingRuleDetailQuery.SortingRuleId.HasValue)
             {
                 sqlBuilder.Where("SortingRuleId=@SortingRuleId");
             }

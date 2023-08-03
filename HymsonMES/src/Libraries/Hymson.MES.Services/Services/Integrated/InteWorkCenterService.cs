@@ -177,6 +177,26 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
+        /// 获取当前站点下面的所有车间
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetWorkShopListAsync()
+        {
+            var workShops = await _inteWorkCenterRepository.GetWorkShopListAsync(new EntityBySiteIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            return workShops.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = s.Code,
+                Value = $"{s.Id}"
+            });
+        }
+
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="param">新增参数</param>

@@ -48,7 +48,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -82,7 +81,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
 
             var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
@@ -92,7 +91,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }
-
 
         /// <summary>
         /// 执行前节点
@@ -197,7 +195,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             return responseBo;
         }
 
-
         /// <summary>
         /// 执行后节点
         /// </summary>
@@ -208,5 +205,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
+
     }
 }

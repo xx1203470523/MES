@@ -55,10 +55,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteVehiceFreightStackEntity> GetByIdAsync(long id)
+        public async Task<InteVehicleFreightStackEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehiceFreightStackEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightStackEntity>(GetByIdSql, new { Id=id});
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteVehiceFreightStackEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteVehicleFreightStackEntity>> GetByIdsAsync(long[] ids) 
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteVehiceFreightStackEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<InteVehicleFreightStackEntity>(GetByIdsSql, new { Ids = ids});
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteVehiceFreightStackEntity>> GetPagedInfoAsync(InteVehiceFreightStackPagedQuery inteVehiceFreightStackPagedQuery)
+        public async Task<PagedInfo<InteVehicleFreightStackEntity>> GetPagedInfoAsync(InteVehiceFreightStackPagedQuery inteVehiceFreightStackPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -96,11 +96,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(inteVehiceFreightStackPagedQuery);
 
             using var conn = GetMESDbConnection();
-            var inteVehiceFreightStackEntitiesTask = conn.QueryAsync<InteVehiceFreightStackEntity>(templateData.RawSql, templateData.Parameters);
+            var inteVehiceFreightStackEntitiesTask = conn.QueryAsync<InteVehicleFreightStackEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteVehiceFreightStackEntities = await inteVehiceFreightStackEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteVehiceFreightStackEntity>(inteVehiceFreightStackEntities, inteVehiceFreightStackPagedQuery.PageIndex, inteVehiceFreightStackPagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteVehicleFreightStackEntity>(inteVehiceFreightStackEntities, inteVehiceFreightStackPagedQuery.PageIndex, inteVehiceFreightStackPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteVehiceFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQuery inteVehiceFreightStackQuery)
+        public async Task<IEnumerable<InteVehicleFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQuery inteVehiceFreightStackQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteVehiceFreightStackEntitiesSqlTemplate);
@@ -127,7 +127,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("BarCode IN @Sfcs");
             }
             using var conn = GetMESDbConnection();
-            var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehiceFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
+            var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehicleFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
             return inteVehiceFreightStackEntities;
         }
 
@@ -136,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(InteVehiceFreightStackEntity inteVehiceFreightStackEntity)
+        public async Task<int> InsertAsync(InteVehicleFreightStackEntity inteVehiceFreightStackEntity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, inteVehiceFreightStackEntity);
@@ -147,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<InteVehiceFreightStackEntity> inteVehiceFreightStackEntitys)
+        public async Task<int> InsertsAsync(List<InteVehicleFreightStackEntity> inteVehiceFreightStackEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, inteVehiceFreightStackEntitys);
@@ -158,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(InteVehiceFreightStackEntity inteVehiceFreightStackEntity)
+        public async Task<int> UpdateAsync(InteVehicleFreightStackEntity inteVehiceFreightStackEntity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteVehiceFreightStackEntity);
@@ -169,25 +169,25 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="inteVehiceFreightStackEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<InteVehiceFreightStackEntity> inteVehiceFreightStackEntitys)
+        public async Task<int> UpdatesAsync(List<InteVehicleFreightStackEntity> inteVehiceFreightStackEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, inteVehiceFreightStackEntitys);
         }
 
-        public async Task<IEnumerable<InteVehiceFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQueryByLocation inteVehiceFreightStackQuery)
+        public async Task<IEnumerable<InteVehicleFreightStackEntity>> GetInteVehiceFreightStackEntitiesAsync(InteVehiceFreightStackQueryByLocation inteVehiceFreightStackQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteVehiceFreightStackEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
-            var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehiceFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
+            var inteVehiceFreightStackEntities = await conn.QueryAsync<InteVehicleFreightStackEntity>(template.RawSql, inteVehiceFreightStackQuery);
             return inteVehiceFreightStackEntities;
         }
 
-        public async Task<InteVehiceFreightStackEntity> GetBySFCAsync(string sfc)
+        public async Task<InteVehicleFreightStackEntity> GetBySFCAsync(string sfc)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehiceFreightStackEntity>(GetBySFCSql, new { BarCode = sfc });
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightStackEntity>(GetBySFCSql, new { BarCode = sfc });
         }
         #endregion
 
@@ -196,30 +196,30 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteVehiceFreightStackRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehice_freight_stack` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_vehice_freight_stack` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_vehicle_freight_stack` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_vehicle_freight_stack` /**where**/ ";
         const string GetInteVehiceFreightStackEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `inte_vehice_freight_stack` /**where**/  ";
+                                           FROM `inte_vehicle_freight_stack` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_vehice_freight_stack`(  `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @LocationId, @BarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
-        const string InsertsSql = "INSERT INTO `inte_vehice_freight_stack`(  `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @LocationId, @BarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
+        const string InsertSql = "INSERT INTO `inte_vehicle_freight_stack`(  `Id`, `SiteId`, `LocationId`,`VehicleId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @LocationId,@VehicleId, @BarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
+        const string InsertsSql = "INSERT INTO `inte_vehicle_freight_stack`(  `Id`, `SiteId`, `LocationId`,`VehicleId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`) VALUES (   @Id, @SiteId, @LocationId,@VehicleId, @BarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn )  ";
 
-        const string UpdateSql = "UPDATE `inte_vehice_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `inte_vehice_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_vehicle_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `inte_vehicle_freight_stack` SET   SiteId = @SiteId, LocationId = @LocationId, BarCode = @BarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
-        const string DeleteSql = "DELETE `inte_vehice_freight_stack`  WHERE Id = @Id ";
-        const string DeletesSql = "DELETE `inte_vehice_freight_stack`  WHERE Id IN @Ids";
+        const string DeleteSql = "DELETE from `inte_vehicle_freight_stack`  WHERE Id = @Id ";
+        const string DeletesSql = "DELETE from `inte_vehicle_freight_stack`  WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
-                            FROM `inte_vehice_freight_stack`  WHERE Id = @Id ";
+                               `Id`, `SiteId`, `LocationId`,`VehicleId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
+                            FROM `inte_vehicle_freight_stack`  WHERE Id = @Id ";
         const string GetBySFCSql = @"SELECT 
-                               `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
-                            FROM `inte_vehice_freight_stack`  WHERE BarCode = @BarCode ";
+                               `Id`, `SiteId`, `LocationId`,`VehicleId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
+                            FROM `inte_vehicle_freight_stack`  WHERE BarCode = @BarCode ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `LocationId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
-                            FROM `inte_vehice_freight_stack`  WHERE Id IN @Ids ";
+                                          `Id`, `SiteId`, `LocationId`,`VehicleId`, `BarCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`
+                            FROM `inte_vehicle_freight_stack`  WHERE Id IN @Ids ";
         #endregion
     }
 }

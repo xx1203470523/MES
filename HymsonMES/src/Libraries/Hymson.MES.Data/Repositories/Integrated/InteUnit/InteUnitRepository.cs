@@ -1,35 +1,70 @@
-/*
- *creator: Karl
- *
- *describe: 单位表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-06-29 02:13:40
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 单位表仓储
+    /// 仓储（单位维护）
     /// </summary>
-    public partial class InteUnitRepository :BaseRepository, IInteUnitRepository
+    public partial class InteUnitRepository : BaseRepository, IInteUnitRepository
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        public InteUnitRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
-        public InteUnitRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertAsync(InteUnitEntity entity)
         {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
-        #region 方法
         /// <summary>
-        /// 删除（软删除）
+        /// 新增（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRangeAsync(IEnumerable<InteUnitEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsSql, entities);
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(InteUnitEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, entity);
+        }
+
+        /// <summary>
+        /// 更新（批量）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateRangeAsync(IEnumerable<InteUnitEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesSql, entities);
+        }
+
+        /// <summary>
+        /// 软删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -40,14 +75,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
-        /// 批量删除（软删除）
+        /// 软删除（批量）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand command) 
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, param);
+            return await conn.ExecuteAsync(DeletesSql, command);
         }
 
         /// <summary>
@@ -58,135 +93,82 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteUnitEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteUnitEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteUnitEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
-        /// 根据IDs批量获取数据
+        /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         public async Task<IEnumerable<InteUnitEntity>> GetByIdsAsync(long[] ids) 
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteUnitEntity>(GetByIdsSql, new { Ids = ids});
-        }
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="inteUnitPagedQuery"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<InteUnitEntity>> GetPagedInfoAsync(InteUnitPagedQuery inteUnitPagedQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (inteUnitPagedQuery.PageIndex - 1) * inteUnitPagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = inteUnitPagedQuery.PageSize });
-            sqlBuilder.AddParameters(inteUnitPagedQuery);
-
-            using var conn = GetMESDbConnection();
-            var inteUnitEntitiesTask = conn.QueryAsync<InteUnitEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var inteUnitEntities = await inteUnitEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<InteUnitEntity>(inteUnitEntities, inteUnitPagedQuery.PageIndex, inteUnitPagedQuery.PageSize, totalCount);
+            return await conn.QueryAsync<InteUnitEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="inteUnitQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteUnitEntity>> GetInteUnitEntitiesAsync(InteUnitQuery inteUnitQuery)
+        public async Task<IEnumerable<InteUnitEntity>> GetEntitiesAsync(InteUnitQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteUnitEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted =0");
-            sqlBuilder.Select("*");
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteUnitEntity>(template.RawSql, query);
+        }
 
-            if (inteUnitQuery.Codes != null && inteUnitQuery.Codes.Any())
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<InteUnitEntity>> GetPagedInfoAsync(InteUnitPagedQuery pagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Select("*");
+           
+            
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
-                sqlBuilder.Where(" Code  in @Codes ");
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
             }
 
-            using var conn = GetMESDbConnection();
-            var inteUnitEntities = await conn.QueryAsync<InteUnitEntity>(template.RawSql, inteUnitQuery);
-            return inteUnitEntities;
-        }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
+            }
 
-        /// <summary>
-        /// 根据编码获取数据
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<InteUnitEntity> GetByCodeAsync(EntityByCodeQuery param)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteUnitEntity>(GetByCodeSql, param);
-        }
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
-        /// <summary>
-        /// 新增
-        /// </summary>
-        /// <param name="inteUnitEntity"></param>
-        /// <returns></returns>
-        public async Task<int> InsertAsync(InteUnitEntity inteUnitEntity)
-        {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, inteUnitEntity);
+            var entitiesTask = conn.QueryAsync<InteUnitEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var entities = await entitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<InteUnitEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
-        /// <summary>
-        /// 批量新增
-        /// </summary>
-        /// <param name="inteUnitEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> InsertsAsync(List<InteUnitEntity> inteUnitEntitys)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, inteUnitEntitys);
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="inteUnitEntity"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateAsync(InteUnitEntity inteUnitEntity)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, inteUnitEntity);
-        }
-
-        /// <summary>
-        /// 批量更新
-        /// </summary>
-        /// <param name="inteUnitEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<InteUnitEntity> inteUnitEntitys)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, inteUnitEntitys);
-        }
-        #endregion
 
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class InteUnitRepository
     {
-        #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_unit` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_unit` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_unit` /**where**/ ";
         const string GetInteUnitEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -201,16 +183,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeleteSql = "UPDATE `inte_unit` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `inte_unit` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_unit`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_unit`  WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM `inte_unit`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `inte_unit`  WHERE Id IN @Ids ";
+        const string GetByCodeSql = @"SELECT Id,Code,Name,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted
+                                                           FROM inte_inte  WHERE Code=@Code  AND Id=@Ids AND IsDeleted=0 ";
 
-        const string GetByCodeSql = @"SELECT 
-                               `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_unit`    WHERE Code = @Code  AND IsDeleted=0 ";
-        #endregion
     }
 }

@@ -33,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetByIdsAsync(ProcResourceQuery query);
+        Task<IEnumerable<ProcResourceEntity>> GetByIdsAndStatusAsync(ProcResourceQuery query);
 
         /// <summary>
         /// 批量查询

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -19,7 +18,6 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
-using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
@@ -60,7 +58,6 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
-
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -111,15 +108,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInteVehicleTypeService, InteVehicleTypeService>();
             services.AddSingleton<IInteVehicleService, InteVehicleService>();
+            services.AddSingleton<IInteUnitService, InteUnitService>();
 
             // CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
             services.AddSingleton<IInteCodeRulesMakeService, InteCodeRulesMakeService>();
+
+            services.AddSingleton<IInteMessageGroupService, InteMessageGroupService>();
             #endregion
 
             #region Process
             services.AddSingleton<IProcMaskCodeService, ProcMaskCodeService>();
-            //services.AddSingleton<IProcProductParameterGroupService, ProcProductParameterGroupService>();
+            services.AddSingleton<IProcProductParameterGroupService, ProcProductParameterGroupService>();
 
             // Material
             services.AddSingleton<IProcMaterialService, ProcMaterialService>();
@@ -142,19 +142,20 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcResourceTypeService, ProcResourceTypeService>();
             services.AddSingleton<IProcResourceService, ProcResourceService>();
 
-            //工序
+            // 工序
             services.AddSingleton<IProcProcedureService, ProcProcedureService>();
 
-            //工艺路线
+            // 工艺路线
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
 
             services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
-            //标签模板
+            // 标签模板
             services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
 
             services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
 
-            //工艺设备组
+            services.AddSingleton<IProcEquipmentGroupParamService, ProcEquipmentGroupParamService>();
+//工艺设备组
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
             #endregion
@@ -189,6 +190,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerPackRecordService, ManuContainerPackRecordService>();
 
             services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
+            services.AddSingleton<IManuBakingRecordService, ManuBakingRecordService>();
+            services.AddSingleton<IManuBakingService, ManuBakingService>();
 
             #endregion
 
@@ -219,19 +222,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrderBind
             services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
             #endregion
-            #endregion
-
-            #region Job
-            services.AddSingleton<IJobManufactureService, JobManuBadRecordService>();
-            services.AddSingleton<IJobManufactureService, JobManuCompleteService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageService>();
-            services.AddSingleton<IJobManufactureService, JobManuRepairEndService>();
-            services.AddSingleton<IJobManufactureService, JobManuRepairStartService>();
-            services.AddSingleton<IJobManufactureService, JobManuStartService>();
-            services.AddSingleton<IJobManufactureService, JobManuStopService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageCloseService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageOpenService>();
-            services.AddSingleton<IJobManufactureService, JobManuPackageIngService>();
             #endregion
 
             #region Report
@@ -287,9 +277,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
             services.AddSingleton<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
             services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
+
+            services.AddSingleton<AbstractValidator<EquEquipmentVerifyCreateDto>, EquEquipmentVerifyCreateValidator>();
             #endregion
 
             #region Process
+            services.AddSingleton<AbstractValidator<ProcProductParameterGroupSaveDto>, ProcProductParameterGroupValidator>();
+
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
@@ -361,12 +355,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcSortingRuleModifyDto>, ProcSortingRuleModifyValidator>();
             #endregion
 
-            #region ProcProcessEquipmentGroup
+
+            services.AddSingleton<AbstractValidator<ProcEquipmentGroupParamCreateDto>, ProcEquipmentGroupParamCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcEquipmentGroupParamModifyDto>, ProcEquipmentGroupParamModifyValidator>();
+
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupSaveDto>, ProcProcessEquipmentGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
 
             #endregion
-            #endregion
+
 
             #region Integrated
             services.AddSingleton<AbstractValidator<InteContainerSaveDto>, InteContainerValidator>();
@@ -380,6 +377,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<InteCustomCreateDto>, InteCustomCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCustomModifyDto>, InteCustomModifyValidator>();
+            services.AddSingleton<AbstractValidator<InteUnitSaveDto>, InteUnitSaveValidator>();
 
             services.AddSingleton<AbstractValidator<InteVehicleTypeCreateDto>, InteVehicleTypeCreateValidator>();
             services.AddSingleton<AbstractValidator<InteVehicleTypeModifyDto>, InteVehicleTypeModifyValidator>();
@@ -388,6 +386,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<InteVehicleCreateDto>, InteVehicleCreateValidator>();
             services.AddSingleton<AbstractValidator<InteVehicleModifyDto>, InteVehicleModifyValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleBindOperationDto>, InteVehicleBindoptValidator>();
+            services.AddSingleton<AbstractValidator<InteVehicleUnbindOperationDto>, InteVehicleUnBindoptValidator>();
+
+            services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
@@ -399,8 +401,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Quality
-            services.AddSingleton<AbstractValidator<QualEnvParameterGroupSaveDto>, QualEnvParameterGroupSaveValidator>();
-            services.AddSingleton<AbstractValidator<QualInspectionParameterGroupSaveDto>, QualInspectionParameterGroupSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualEnvParameterGroupSaveDto>, QualEnvParameterGroupValidator>();
+            services.AddSingleton<AbstractValidator<QualInspectionParameterGroupSaveDto>, QualInspectionParameterGroupValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeCreateDto>, QualUnqualifiedCodeCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
@@ -442,6 +444,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ManuContainerPackRecordModifyDto>, ManuContainerPackRecordModifyValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerPackCreateDto>, ManuContainerPackCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuContainerPackModifyDto>, ManuContainerPackModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuBakingCreateDto>, ManuBakingCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuBakingModifyDto>, ManuBakingModifyValidator>();
+            services.AddSingleton<AbstractValidator<ManuBakingRecordCreateDto>, ManuBakingRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuBakingRecordModifyDto>, ManuBakingRecordModifyValidator>();
+
             #endregion
 
             #region Warehouse 

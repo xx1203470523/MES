@@ -44,8 +44,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
+        private readonly IInteVehicleRepository _inteVehicleRepository;
 
-        public InteVehicleTypeService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleTypeRepository inteVehicleTypeRepository, AbstractValidator<InteVehicleTypeCreateDto> validationCreateRules, AbstractValidator<InteVehicleTypeModifyDto> validationModifyRules, IInteVehicleTypeVerifyRepository inteVehicleTypeVerifyRepository, AbstractValidator<InteVehicleTypeVerifyCreateDto> validationInteVehicleTypeVerifyCreateRules, IProcMaterialRepository procMaterialRepository, IProcMaterialGroupRepository procMaterialGroupRepository)
+        public InteVehicleTypeService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleTypeRepository inteVehicleTypeRepository, AbstractValidator<InteVehicleTypeCreateDto> validationCreateRules, AbstractValidator<InteVehicleTypeModifyDto> validationModifyRules, IInteVehicleTypeVerifyRepository inteVehicleTypeVerifyRepository, AbstractValidator<InteVehicleTypeVerifyCreateDto> validationInteVehicleTypeVerifyCreateRules, IProcMaterialRepository procMaterialRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IInteVehicleRepository inteVehicleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -56,6 +57,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _validationInteVehicleTypeVerifyCreateRules = validationInteVehicleTypeVerifyCreateRules;
             _procMaterialRepository = procMaterialRepository;
             _procMaterialGroupRepository = procMaterialGroupRepository;
+            _inteVehicleRepository = inteVehicleRepository;
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
-
+            
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteVehicleTypeCreateDto);
 
@@ -149,6 +151,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesInteVehicleTypeAsync(long[] ids)
         {
+            //校验数据 ：判断哪个载具使用了载具类型
+            var vehicleEntitys= await _inteVehicleRepository.GetByVehicleTypeIdsAsync(new InteVehicleVehicleTypeIdsQuery() { SiteId = _currentSite.SiteId ?? 0, VehicleTypeIds = ids });
+            if (vehicleEntitys.Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18517));
+            }
+
             return await _inteVehicleTypeRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

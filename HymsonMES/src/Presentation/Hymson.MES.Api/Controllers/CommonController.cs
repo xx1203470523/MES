@@ -80,6 +80,11 @@ namespace Hymson.MES.Api.Controllers
             return Ok(new { caches, ips, hostName });
         }
 
+        /// <summary>
+        /// 获取某个缓存值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [Route("cache")]
         [HttpGet]
         [AllowAnonymous]
@@ -90,6 +95,34 @@ namespace Hymson.MES.Api.Controllers
             { return Ok(cache); }
             else
             { return NotFound(); }
+
+        }
+        /// <summary>
+        /// 根据缓存key删除缓存
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        [Route("remove-cache")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Remove(string key)
+        {
+            _memoryCache.Remove(key);
+            return Ok();
+
+        }
+
+        /// <summary>
+        /// 清理所有缓存
+        /// </summary>
+        /// <returns></returns>
+        [Route("clear")]
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Clear()
+        {
+            _memoryCache.RemoveCacheRegex("&");
+            return Ok();
 
         }
     }
