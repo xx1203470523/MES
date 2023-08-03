@@ -3,7 +3,7 @@
  *
  *describe: 烘烤工序仓储类 | 代码由框架生成
  *builder:  wxk
- *build datetime: 2023-07-28 05:41:12
+ *build datetime: 2023-08-02 07:32:20
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;

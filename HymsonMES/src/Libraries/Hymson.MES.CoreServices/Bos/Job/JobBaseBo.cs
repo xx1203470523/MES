@@ -11,7 +11,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IJobContextProxy Proxy { get; set; }
+        public IJobContextProxy? Proxy { get; set; }
     }
 
     /// <summary>

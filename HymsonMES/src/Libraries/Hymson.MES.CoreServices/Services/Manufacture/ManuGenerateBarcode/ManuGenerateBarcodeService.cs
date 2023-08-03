@@ -104,7 +104,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             var list = new List<string>();
             foreach (var barcode in barcodes)
             {
-                list.Concat(barcode.BarCodes);
+                list.AddRange(barcode.BarCodes);
             }
             return list;
         }
@@ -161,7 +161,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             var list = new List<string>();
             foreach (var barcode in barcodes)
             {
-                list.Concat(barcode.BarCodes);
+                list.AddRange(barcode.BarCodes);
             }
             return list;
         }

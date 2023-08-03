@@ -1,42 +1,44 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Integrated.View;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储接口（单位维护）
+    /// 仓储接口（消息组）
     /// </summary>
-    public interface IInteUnitRepository
+    public interface IInteMessageGroupRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteUnitEntity entity);
-        
+        Task<int> InsertAsync(InteMessageGroupEntity entity);
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<InteUnitEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<InteMessageGroupEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(InteUnitEntity entity);
-        
+        Task<int> UpdateAsync(InteMessageGroupEntity entity);
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<InteUnitEntity> entities);
+        Task<int> UpdateRangeAsync(IEnumerable<InteMessageGroupEntity> entities);
 
         /// <summary>
         /// 软删除  
@@ -44,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -53,32 +55,39 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<InteMessageGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteUnitEntity> GetByIdAsync(long id);
-    
+        Task<InteMessageGroupEntity> GetByIdAsync(long id);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteUnitEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteMessageGroupEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteUnitEntity>> GetEntitiesAsync(InteUnitQuery query);
-        
+        Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(InteMessageGroupQuery query);
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteUnitEntity>> GetPagedInfoAsync(InteUnitPagedQuery pagedQuery);
+        Task<PagedInfo<InteMessageGroupView>> GetPagedListAsync(InteMessageGroupPagedQuery pagedQuery);
 
     }
 }

@@ -3,7 +3,7 @@
  *
  *describe: 烘烤执行表 仓储类 | 代码由框架生成
  *builder:  wxk
- *build datetime: 2023-07-28 05:42:41
+ *build datetime: 2023-08-02 07:32:33
  */
 
 using Dapper;
@@ -172,20 +172,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_baking_record` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_baking_record`(  `Id`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @BakingId, @Location, @BakingStart, @BakingEnd, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_baking_record`(  `Id`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @BakingId, @Location, @BakingStart, @BakingEnd, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_baking_record`(  `Id`, `SiteId`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `BakingPlan`, `BakingExecution`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @BakingId, @Location, @BakingStart, @BakingEnd, @BakingPlan, @BakingExecution, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_baking_record`(  `Id`, `SiteId`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `BakingPlan`, `BakingExecution`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @BakingId, @Location, @BakingStart, @BakingEnd, @BakingPlan, @BakingExecution, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `manu_baking_record` SET   BakingId = @BakingId, Location = @Location, BakingStart = @BakingStart, BakingEnd = @BakingEnd, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_baking_record` SET   BakingId = @BakingId, Location = @Location, BakingStart = @BakingStart, BakingEnd = @BakingEnd, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_baking_record` SET   SiteId = @SiteId, BakingId = @BakingId, Location = @Location, BakingStart = @BakingStart, BakingEnd = @BakingEnd, BakingPlan = @BakingPlan, BakingExecution = @BakingExecution, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_baking_record` SET   SiteId = @SiteId, BakingId = @BakingId, Location = @Location, BakingStart = @BakingStart, BakingEnd = @BakingEnd, BakingPlan = @BakingPlan, BakingExecution = @BakingExecution, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_baking_record` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_baking_record` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `BakingPlan`, `BakingExecution`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_baking_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `BakingId`, `Location`, `BakingStart`, `BakingEnd`, `BakingPlan`, `BakingExecution`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_baking_record`  WHERE Id IN @Ids ";
         #endregion
     }

@@ -1,19 +1,25 @@
-/*
- *creator: Karl
- *
- *describe: 单位表 分页查询类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-06-29 02:13:40
- */
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Integrated
+namespace Hymson.MES.Data.Repositories.Integrated.Query
 {
     /// <summary>
-    /// 单位表 分页参数
+    /// 单位维护 分页参数
     /// </summary>
     public class InteUnitPagedQuery : PagerInfo
     {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long? Id { get; set; }
 
+        /// <summary>
+        /// 单位编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 单位名称
+        /// </summary>
+        public string Name { get; set; }
     }
 }

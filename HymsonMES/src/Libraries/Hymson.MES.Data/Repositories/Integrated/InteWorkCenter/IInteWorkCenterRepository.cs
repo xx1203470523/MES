@@ -42,6 +42,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<IEnumerable<InteWorkCenterEntity>> GetByTypeAndParentIdAsync(InteWorkCenterByTypeQuery query);
 
         /// <summary>
+        /// 获取当前站点下面的所有车间
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteWorkCenterEntity>> GetWorkShopListAsync(EntityBySiteIdQuery query);
+
+        /// <summary>
         /// 根据编码获取数据
         /// </summary>
         /// <param name="param"></param>
