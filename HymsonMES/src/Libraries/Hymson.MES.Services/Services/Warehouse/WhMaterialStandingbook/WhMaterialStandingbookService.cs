@@ -39,13 +39,16 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly AbstractValidator<WhMaterialStandingbookCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialStandingbookModifyDto> _validationModifyRules;
 
-        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules, AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules)
+        private readonly IWhSupplierRepository _whSupplierRepository;
+
+        public WhMaterialStandingbookService(ICurrentUser currentUser, ICurrentSite currentSite, IWhMaterialStandingbookRepository whMaterialStandingbookRepository, AbstractValidator<WhMaterialStandingbookCreateDto> validationCreateRules, AbstractValidator<WhMaterialStandingbookModifyDto> validationModifyRules, IWhSupplierRepository whSupplierRepository)
         {
             _currentUser = currentUser;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
+            _whSupplierRepository = whSupplierRepository;
         }
 
         /// <summary>
@@ -102,8 +105,20 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialStandingbookPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whMaterialStandingbookRepository.GetPagedInfoAsync(whMaterialStandingbookPagedQuery);
 
+            //查询供应商
+            var suppliers= await _whSupplierRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.SupplierId).ToArray());
+
             //实体到DTO转换 装载数据
             List<WhMaterialStandingbookDto> whMaterialStandingbookDtos = PrepareWhMaterialStandingbookDtos(pagedInfo);
+
+            foreach (var item in whMaterialStandingbookDtos)
+            {
+                if (item.SupplierId > 0) 
+                {
+                    item.SupplierCode = suppliers.FirstOrDefault(x => x.Id == item.SupplierId)?.Code??"";
+                }
+            }
+            
             return new PagedInfo<WhMaterialStandingbookDto>(whMaterialStandingbookDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

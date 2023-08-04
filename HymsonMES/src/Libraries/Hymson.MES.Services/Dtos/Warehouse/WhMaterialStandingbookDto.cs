@@ -96,7 +96,15 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
 
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string SupplierCode { get; set; }
     }
 
 
