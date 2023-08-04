@@ -214,7 +214,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public async Task<int> DeleteMonthsBeforeAsync(int months)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteMonthsBeforeSql);
+            return await conn.ExecuteAsync(DeleteMonthsBeforeSql, new { Months = months });
         }
     }
 
@@ -252,7 +252,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 									left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  "
         ;
         //删除之前的心跳记录
-        const string DeleteMonthsBeforeSql = "Delete FROM equ_heartbeat_record WHERE CreatedOn<SUBDATE(CURDATE(), INTERVAL @months month);";
+        const string DeleteMonthsBeforeSql = "Delete FROM equ_heartbeat_record WHERE CreatedOn<SUBDATE(CURDATE(), INTERVAL @Months month);";
 
     }
 }

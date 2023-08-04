@@ -1,24 +1,24 @@
 ﻿using FluentValidation;
-using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.Web.Framework.WorkContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hymson.MES.Core.Constants;
 
 namespace Hymson.MES.EquipmentServices.Validators.InBound
 {
     /// <summary>
     /// 进站验证(多个)
     /// </summary>
-    internal class InBoundMoreValidator : AbstractValidator<InBoundMoreDto>
+    public class InBoundMoreValidator : AbstractValidator<InBoundMoreDto>
     {
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly ICurrentEquipment _currentEquipment;
+        /// <summary>
+        /// 多个进站必要校验
+        /// </summary>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="currentEquipment"></param>
         public InBoundMoreValidator(IProcResourceRepository procResourceRepository, ICurrentEquipment currentEquipment)
         {
             _procResourceRepository = procResourceRepository;

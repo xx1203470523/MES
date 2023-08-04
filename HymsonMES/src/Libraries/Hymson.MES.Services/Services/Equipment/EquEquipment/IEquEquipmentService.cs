@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipment
@@ -65,6 +66,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquimentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm);
 
+        /// <summary>
+        /// 查询设备信息
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        Task<EquEquipmentEntity> GetByEquipmentEntityCodeAsync(string equipmentCode);
 
         /// <summary>
         /// 查询设备（单个）

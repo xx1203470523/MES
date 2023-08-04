@@ -16,6 +16,6 @@ namespace Hymson.MES.BackgroundServices.Services.EquHeartbeat
         /// </summary>
         /// <param name="months"></param>
         /// <returns></returns>
-        Task DeleteMonthsBeforeAsync(int months);
+        Task<int> DeleteMonthsBeforeAsync(int months);
     }
 }

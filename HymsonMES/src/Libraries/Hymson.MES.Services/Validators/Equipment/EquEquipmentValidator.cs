@@ -8,7 +8,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 验证（设备注册）
     /// </summary>
-    internal class EquEquipmentValidator : AbstractValidator<EquEquipmentSaveDto>
+    public class EquEquipmentValidator : AbstractValidator<EquEquipmentSaveDto>
     {
         /// <summary>
         /// 

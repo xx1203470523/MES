@@ -1,25 +1,24 @@
 ﻿using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.Web.Framework.WorkContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.EquipmentServices.Validators.InBound
 {
     /// <summary>
     /// 进站验证
     /// </summary>
-    internal class InBoundValidator : AbstractValidator<InBoundDto>
+    public class InBoundValidator : AbstractValidator<InBoundDto>
     {
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly ICurrentEquipment _currentEquipment;
+        /// <summary>
+        /// 进站必要校验
+        /// </summary>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="currentEquipment"></param>
         public InBoundValidator(IProcResourceRepository procResourceRepository, ICurrentEquipment currentEquipment)
         {
             _procResourceRepository = procResourceRepository;

@@ -31,6 +31,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetByResourceIdAsync(ProcResourceEquipmentBindQuery query);
 
         /// <summary>
+        /// 批量根据资源Id查询绑定信息
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetByResourceIdsAsync(long[] ids);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procResourceEquipmentBinds"></param>

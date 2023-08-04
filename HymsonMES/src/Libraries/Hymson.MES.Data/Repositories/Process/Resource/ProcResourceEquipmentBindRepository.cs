@@ -86,6 +86,21 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);
         }
 
+        /// <summary>
+        /// 批量根据资源Id查询绑定信息
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetByResourceIdsAsync(long[] ids)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetByResourceIdSqllTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("ResourceId in @ResourceIds");
+            sqlBuilder.AddParameters(new { ResourceIds = ids });
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);
+        }
 
         /// <summary>
         /// 新增

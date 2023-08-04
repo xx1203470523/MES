@@ -137,6 +137,13 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcessRouteEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (!string.IsNullOrWhiteSpace(procProcessRouteQuery.Code))
+            {
+                sqlBuilder.Where("Code = @Code");
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteEntities = await conn.QueryAsync<ProcProcessRouteEntity>(template.RawSql, procProcessRouteQuery);
             return procProcessRouteEntities;

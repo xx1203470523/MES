@@ -91,6 +91,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// <returns></returns>
         public async Task InBoundAsync(InBoundDto inBoundDto)
         {
+            var equName = _currentEquipment.Name;
             await _validationInBoundDtoRules.ValidateAndThrowAsync(inBoundDto);
             if (inBoundDto == null)
             {

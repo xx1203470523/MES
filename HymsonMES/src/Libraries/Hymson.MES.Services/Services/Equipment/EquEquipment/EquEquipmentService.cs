@@ -520,6 +520,21 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 
 
         #region 这里是供其他业务层调用的方法，个人觉得应该直接在其他业务层调用各业务仓储层
+
+        /// <summary>
+        /// 查询设备（单个）
+        /// </summary>
+        /// <param name="equipmentCode">设备编码</param>
+        /// <returns></returns>
+        public async Task<EquEquipmentEntity> GetByEquipmentEntityCodeAsync(string equipmentCode)
+        {
+            return await _equEquipmentRepository.GetByEquipmentCodeAsync(new EntityByCodeQuery
+            {
+                Site = _currentSite.SiteId ?? 0,
+                Code = equipmentCode.ToUpper()
+            });
+        }
+
         /// <summary>
         /// 查询设备（单个）
         /// </summary>

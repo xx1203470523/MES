@@ -41,6 +41,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 批量查询资源类型
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceTypeEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceTypeEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
         /// 查询资源类型是否存在
         /// </summary>
         /// <param name="param"></param>
@@ -182,6 +193,7 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcResourceTypeRepository
     {
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
+        const string GetByIdsSql = "select * from proc_resource_type where Id IN @Ids and IsDeleted =0 ";
         const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType =@ResType and IsDeleted =0 ";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId and b.IsDeleted=0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";

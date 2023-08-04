@@ -10,10 +10,15 @@ namespace Hymson.MES.EquipmentServices.Validators.OutBound
     /// <summary>
     /// 出站验证
     /// </summary>
-    internal class OutBoundValidator : AbstractValidator<OutBoundDto>
+    public class OutBoundValidator : AbstractValidator<OutBoundDto>
     {
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly ICurrentEquipment _currentEquipment;
+        /// <summary>
+        /// 出站必要校验
+        /// </summary>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="currentEquipment"></param>
         public OutBoundValidator(IProcResourceRepository procResourceRepository, ICurrentEquipment currentEquipment)
         {
             _procResourceRepository = procResourceRepository;
