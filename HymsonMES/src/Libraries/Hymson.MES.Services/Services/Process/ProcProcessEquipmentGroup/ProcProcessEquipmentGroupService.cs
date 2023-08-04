@@ -2,10 +2,12 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -79,11 +81,15 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<int> CreateProcProcessEquipmentGroupAsync(ProcProcessEquipmentGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
+            //saveDto.Code = saveDto.Code.ToTrimSpace();
+            var name = saveDto.Name.ToTrimSpace();
+            //saveDto.Code = saveDto.Code.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-
+            if (saveDto.Code.Contains(" ")) throw new CustomerValidationException(nameof(ErrorCode.MES18901));
+            if (name == "") throw new CustomerValidationException(nameof(ErrorCode.MES18902));
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
@@ -96,6 +102,10 @@ namespace Hymson.MES.Services.Services.Process
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
+
+            // 编码唯一性验证
+            var checkEntity = await _procProcessEquipmentGroupRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES18900)).WithData("Code", entity.Code);
 
             //Insert Relation
             var procProcessEquipmentGroupRelations = saveDto.ToEntity<ProcProcessEquipmentGroupRelations>();
@@ -136,10 +146,14 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<int> ModifyProcProcessEquipmentGroupAsync(ProcProcessEquipmentGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
+            //saveDto.Code = saveDto.Code.ToTrimSpace();
+            var name = saveDto.Name.ToTrimSpace();
+            //saveDto.Code = saveDto.Code.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            if (name == "") throw new CustomerValidationException(nameof(ErrorCode.MES18902));
 
             // DTO转换实体
             var entity = saveDto.ToEntity<ProcProcessEquipmentGroupEntity>();
@@ -169,10 +183,10 @@ namespace Hymson.MES.Services.Services.Process
                 //添加
                 procProcessEquipmentGroupRelationEntities.Add(procProcessEquipmentGroupRelationEntity);
             }
-            IEnumerable<long> Ids=new List<long>() { saveDto.Id??0 };
+            IEnumerable<long> Ids = new List<long>() { saveDto.Id ?? 0 };
             DeleteCommand deleteCommand = new DeleteCommand()
             {
-                Ids=Ids,
+                Ids = Ids,
                 DeleteOn = updatedOn,
                 UserId = updatedBy
             };

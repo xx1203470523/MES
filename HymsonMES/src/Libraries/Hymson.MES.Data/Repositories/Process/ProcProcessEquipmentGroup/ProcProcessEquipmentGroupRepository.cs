@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -164,6 +165,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return new PagedInfo<ProcProcessEquipmentGroupEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcProcessEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessEquipmentGroupEntity>(GetByCodeSql, query);
+        }
+
     }
 
 
@@ -172,7 +184,8 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcProcessEquipmentGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        //const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT * FROM `proc_process_equipment_group` WHERE IsDeleted=0 ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_equipment_group` /**where**/ ";
         const string GetProcProcessEquipmentGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
@@ -189,6 +202,8 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetByIdSql = @"SELECT * FROM `proc_process_equipment_group`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_equipment_group`  WHERE Id IN @Ids ";
+
+        const string GetByCodeSql = "SELECT * FROM proc_process_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
     }
 }
