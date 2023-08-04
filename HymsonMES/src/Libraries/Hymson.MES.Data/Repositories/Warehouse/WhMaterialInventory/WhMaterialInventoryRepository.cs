@@ -74,12 +74,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query)
         {
-            var key = $"wh_material_inventory&{query.SiteId}&{query.BarCode}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCodeSql, query);
-            });
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCodeSql, query);
         }
 
         /// <summary>
@@ -167,7 +163,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 sqlBuilder.AddParameters(new { CreatedOnStart = whMaterialInventoryPagedQuery.CreatedOnRange[0], CreatedOnEnd = whMaterialInventoryPagedQuery.CreatedOnRange[1].AddDays(1) });
                 sqlBuilder.Where("wmi.CreatedOn >= @CreatedOnStart AND wmi.CreatedOn < @CreatedOnEnd");
             }
-            if (whMaterialInventoryPagedQuery.Sources!=null&& whMaterialInventoryPagedQuery.Sources.Length>0) 
+            if (whMaterialInventoryPagedQuery.Sources != null && whMaterialInventoryPagedQuery.Sources.Length > 0)
             {
                 sqlBuilder.Where("wmi.Source in @Sources");
             }
