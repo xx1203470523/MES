@@ -210,6 +210,7 @@
         public const string MES10519 = "工序不能为空";
         public const string MES10520 = "此编码{Code}版本{Version}已存在，请重新输入！";
         public const string MES10521 = "此编码{Code}已存在，请重新输入！";
+        public const string MES10522 = "车间不能为空";
         #endregion
 
         #region Bom 10600

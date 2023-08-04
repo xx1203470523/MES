@@ -13,11 +13,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long Id { get; set; }
 
        /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
         /// 编码
         /// </summary>
         public string Code { get; set; }
@@ -35,34 +30,9 @@ namespace Hymson.MES.Services.Dtos.Integrated
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
     }
 
     /// <summary>
