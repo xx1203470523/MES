@@ -489,6 +489,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcEquipmentGroupParamPagedQueryDto, ProcEquipmentGroupParamPagedQuery>();
             CreateMap<ProcEquipmentGroupParamEntity, ProcEquipmentGroupParamViewDto>();
             CreateMap<ProcEquipmentGroupParamView, ProcEquipmentGroupParamViewDto>();
+
+            CreateMap<ProcEquipmentGroupParamDetailEntity, ProcEquipmentGroupParamDetailDto>();
+            CreateMap<ProcEquipmentGroupParamDetailCreateDto, ProcEquipmentGroupParamDetailEntity>();
             #endregion
         }
 
