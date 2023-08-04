@@ -50,7 +50,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="inteCodeRulesMakeDto"></param>
+        /// <param name="inteCodeRulesMakeCreateDto"></param>
         /// <returns></returns>
         public async Task CreateInteCodeRulesMakeAsync(InteCodeRulesMakeCreateDto inteCodeRulesMakeCreateDto)
         {
@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteCodeRulesMakeDto"></param>
+        /// <param name="inteCodeRulesMakeModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyInteCodeRulesMakeAsync(InteCodeRulesMakeModifyDto inteCodeRulesMakeModifyDto)
         {

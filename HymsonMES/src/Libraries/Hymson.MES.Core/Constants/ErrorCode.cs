@@ -210,6 +210,7 @@
         public const string MES10519 = "工序不能为空";
         public const string MES10520 = "此编码{Code}版本{Version}已存在，请重新输入！";
         public const string MES10521 = "此编码{Code}已存在，请重新输入！";
+        public const string MES10522 = "车间不能为空";
         #endregion
 
         #region Bom 10600
@@ -1042,6 +1043,11 @@
         public const string MES18620 = "载具位置Id不能为0！";
         public const string MES18621 = "载具SFC信息不能为空！";
         public const string MES18622 = "载具待解盘条码不能为空！";
+        #endregion
+
+        #region 单位维护 18800
+        public const string MES18800 = "单位编码不能含有空格";
+        public const string MES18801 = "单位名称不能为空";
         #endregion
 
         #region Recipe参数 18700

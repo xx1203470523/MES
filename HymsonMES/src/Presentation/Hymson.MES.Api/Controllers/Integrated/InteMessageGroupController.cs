@@ -57,7 +57,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPut]       
         [Route("update")]
         [PermissionDescription("integrated:inteMessageGroup:update")]
         public async Task UpdateAsync([FromBody] InteMessageGroupSaveDto saveDto)

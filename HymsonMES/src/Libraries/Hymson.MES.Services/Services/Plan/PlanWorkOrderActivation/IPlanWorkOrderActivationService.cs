@@ -37,14 +37,14 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="planWorkOrderActivationDto"></param>
+        /// <param name="planWorkOrderActivationCreateDto"></param>
         /// <returns></returns>
         Task CreatePlanWorkOrderActivationAsync(PlanWorkOrderActivationCreateDto planWorkOrderActivationCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="planWorkOrderActivationDto"></param>
+        /// <param name="planWorkOrderActivationModifyDto"></param>
         /// <returns></returns>
         Task ModifyPlanWorkOrderActivationAsync(PlanWorkOrderActivationModifyDto planWorkOrderActivationModifyDto);
 

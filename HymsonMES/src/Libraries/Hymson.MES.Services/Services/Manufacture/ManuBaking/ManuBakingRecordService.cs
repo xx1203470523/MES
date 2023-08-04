@@ -69,7 +69,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuBakingRecordEntity.UpdatedBy = _currentUser.UserName;
             manuBakingRecordEntity.CreatedOn = HymsonClock.Now();
             manuBakingRecordEntity.UpdatedOn = HymsonClock.Now();
-          //  manuBakingRecordEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //入库
             await _manuBakingRecordRepository.InsertAsync(manuBakingRecordEntity);
@@ -130,7 +129,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuBakingRecordDto"></param>
+        /// <param name="manuBakingRecordModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuBakingRecordAsync(ManuBakingRecordModifyDto manuBakingRecordModifyDto)
         {

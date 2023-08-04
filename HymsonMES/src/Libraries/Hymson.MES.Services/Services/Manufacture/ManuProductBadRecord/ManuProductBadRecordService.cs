@@ -128,7 +128,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 验证DTO
-            //await _validationCreateRules.ValidateAndThrowAsync(manuProductBadRecordCreateDto);
             if (createDto.Sfcs == null || createDto.Sfcs.Length < 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
@@ -254,7 +253,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SfcProduceId = manuSfc.Id,
+                        SfcProduceId = manuSfc!.Id,
                         BusinessType = ManuSfcProduceBusinessType.Repair,
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
@@ -433,7 +432,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
             var manuSfc = manuSfcs.ToList()[0];
-            //var sfcInfoId = manuSfc.SfcInfoId;
 
             //验证是否报废
             if (manuSfc.IsScrap == TrueOrFalseEnum.Yes)
@@ -441,9 +439,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15411)).WithData("sfcs", sfc);
             }
 
-            // IEnumerable<long> sfcInfoIds = new[] { manuSfc.Id };
             // 判断是否已存在返修信息,是否锁定
-            //  var sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(sfcInfoIds);
+
             await VerifyLockOrRepairAsync(sfc, manuSfc.ProcedureId, manuSfc.Id);
 
             //判断是否关闭所有不合格信息
@@ -512,28 +509,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             else
             {
-
-                //var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySFCQuery
-                //{
-                //    Status = ProductBadRecordStatusEnum.Open,
-                //    SFC = badReJudgmentDto.Sfc,
-                //    SiteId = _currentSite.SiteId ?? 0
-                //});
-                //foreach (var item in productBadRecordList)
-                //{
-                //    var unqualified = badReJudgmentDto.UnqualifiedLists.FirstOrDefault(x => x.UnqualifiedId == item.UnqualifiedId);
-                //    if (unqualified == null)
-                //    {
-                //        item.DisposalResult = ProductBadDisposalResultEnum.ReJudgmentRepair;
-                //    }
-                //    else
-                //    {
-                //        item.Status = ProductBadRecordStatusEnum.Close;
-                //        item.Remark = unqualified.Remark ?? "";
-                //    }
-                //    item.UpdatedBy = _currentUser.UserName;
-                //    item.UpdatedOn = HymsonClock.Now();
-                //}
 
                 //放到不合格工艺路线指定工序排队
                 //判断是否关闭所有不合格代码
@@ -661,7 +636,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 //1.修改状态为关闭
                 rows += await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
-                if (rows < updateCommandList.Count())
+                if (rows < updateCommandList.Count)
                 {
                     //报错
                     throw new CustomerValidationException(nameof(ErrorCode.MES15414)).WithData("sfcs", string.Join("','", sfcs));
@@ -801,7 +776,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
             if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
             {
-                //var sfcInfoIds = sfcProduceBusinesss.Select(it => it.SfcProduceId).ToArray();
                 var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
                 var instantLockSfcs = new List<string>();
                 foreach (var business in sfcProduceBusinesssList)

@@ -124,6 +124,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// /// <param name="manuCreateBarcodeService"></param>
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
             AbstractValidator<PlanSfcPrintCreatePrintDto> validationCreatePrintRules,
@@ -313,16 +314,6 @@ namespace Hymson.MES.Services.Services.Plan
                     UpdatedBy = _currentUser.UserName
                 }));
 
-                /*
-                 * 禅道 1159 反映不能删除
-                rows += await _planWorkOrderRepository.DeletesAsync(new DeleteCommand
-                {
-                    Ids = sfcInfoEntities.Select(s => s.WorkOrderId).ToArray(),
-                    UserId = _currentUser.UserName,
-                    DeleteOn = HymsonClock.Now()
-                });
-                */
-
                 trans.Complete();
             }
             return rows;
@@ -373,7 +364,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 工单下达及打印
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
         {

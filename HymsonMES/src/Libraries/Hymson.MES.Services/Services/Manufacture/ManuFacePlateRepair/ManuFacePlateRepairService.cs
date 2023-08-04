@@ -185,20 +185,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 调用作业
-            //manuFacePlateRepairExJobDto.SFC = manuFacePlateRepairExJobDto.SFC.Trim();
             var jobDto = new ButtonRequestDto
             {
                 FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
                 FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
             };
 
-            //Dictionary<string, string> dic = new Dictionary<string, string>
-            //{
-            //    { "SFC", manuFacePlateRepairExJobDto.SFC },
-            //    { "ProcedureId", $"{manuFacePlateRepairExJobDto.ProcedureId}" },
-            //    { "ResourceId", $"{manuFacePlateRepairExJobDto.ResourceId}" }
-            //};
-            //jobDto.Param = dic;
             var sfcs = new List<string>() { manuFacePlateRepairExJobDto.SFC };
             JobRequestBo bo = new()
             {
@@ -208,8 +200,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName
             };
-            // 调用作业
-            //var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
 
             var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
             if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
@@ -373,7 +363,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Status = ProductBadRecordStatusEnum.Open,
                 SiteId = _currentSite.SiteId ?? 0
             });
-            //if (manuProductBads == null || !manuProductBads.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17316));
             if (manuProductBads != null && manuProductBads.Any())
             {
                 var manuSfcRepairDetailList = await _manuFacePlateRepairRepository.ManuSfcRepairDetailByProductBadIdAsync(new ManuSfcRepairDetailByProductBadIdQuery
@@ -417,7 +406,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId
             });
 
-            // var procProcessRouteNodeList = await _procProcessRouteNodeRepository.GetListAsync(new ProcProcessRouteDetailNodeQuery { ProcessRouteId = manuSfcProduceEntit.ProcessRouteId });
             List<ManuFacePlateRepairReturnProcedureDto> manuFacePlateRepairReturnProcedureList = new();
             var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(procProcessRouteNodeList.Select(s => s.ProcedureId).ToArray());
             foreach (var itemNode in procProcessRouteNodeList)
@@ -432,11 +420,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureCode = procProcedureEntity.Code
                 });
             }
-            //manuFacePlateRepairReturnProcedureList.Add(new ManuFacePlateRepairReturnProcedureDto
-            //{
-            //    ProcedureId = ProcessRoute.LastProcedureId,
-            //    ProcedureCode = "END"
-            //});
+
             manuFacePlateRepairOpenInfoDto.returnProcedureInfo = manuFacePlateRepairReturnProcedureList;
 
             //尾工序
@@ -548,10 +532,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProductBadId = BadRecordIds,
                 SiteId = _currentSite.SiteId ?? 0
             });
-            //if (badRecordList == null || !badRecordList.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES17331));
-            //}
+
             var updateCommandList = new List<ManuProductBadRecordUpdateCommand>();
 
             if (badRecordList != null && badRecordList.Any())
@@ -694,16 +675,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new ValidationException(_localizationService.GetResource(nameof(ErrorCode.MES17328)), validationFailures);
                 }
             }
-            //var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(new ProcResourceListByProcedureIdQuery
-            //{
-            //    SiteId = _currentSite.SiteId ?? 0,
-            //    ProcedureId = confirmSubmitDto.ReturnProcedureId
-            //});
-            //if (resources == null || !resources.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES17327));
-            //}
-            //long resourcesId = resources.FirstOrDefault().Id;
 
             // 返回工序 
             var updateProcedureCommand = new UpdateProcedureCommand
@@ -765,7 +736,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (updateCommandList != null && updateCommandList.Any())
                 {
                     //不良录入
-                    //rows += await _manuProductBadRecordRepository.UpdateRangeAsync(badRecordsList);
                     rows += await _manuProductBadRecordRepository.UpdateStatusByIdRangeAsync(updateCommandList);
                 }
                 //出站 
@@ -780,7 +750,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     //返回工序
                     rows += await _manuSfcProduceRepository.UpdateProcedureIdAsync(updateProcedureCommand);
-                    // 删除 manu_sfc_produce_business
                     rows += await _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdAsync(new DeleteSfcProduceBusinesssBySfcInfoIdCommand
                     {
                         SiteId = manuSfcProduceEntit.SiteId,
@@ -792,10 +761,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 trans.Complete();
             }
-            //if (rows == 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES17310));
-            //}
             #endregion
         }
 
@@ -916,7 +881,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuFacePlateRepairDto"></param>
+        /// <param name="manuFacePlateRepairModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuFacePlateRepairAsync(ManuFacePlateRepairModifyDto manuFacePlateRepairModifyDto)
         {
