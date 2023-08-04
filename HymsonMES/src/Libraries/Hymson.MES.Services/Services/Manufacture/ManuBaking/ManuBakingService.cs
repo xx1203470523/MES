@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuBakingDto"></param>
+        /// <param name="manuBakingModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuBakingAsync(ManuBakingModifyDto manuBakingModifyDto)
         {

@@ -68,7 +68,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="inteCodeRulesDto"></param>
+        /// <param name="inteCodeRulesCreateDto"></param>
         /// <returns></returns>
         public async Task CreateInteCodeRulesAsync(InteCodeRulesCreateDto inteCodeRulesCreateDto)
         {

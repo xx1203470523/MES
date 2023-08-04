@@ -475,7 +475,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
 
             // 随机工序Key
-            //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
             var cacheKey = $"{workOrderId}-{processRouteId}-{procedureId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
 
@@ -583,10 +582,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             long processRouteId, long procedureId)
         {
             processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
-            if (processRouteDetailLinks.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+            if (processRouteDetailLinks.Any() == false) return false;
 
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
-            if (processRouteDetailNodes.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+            if (processRouteDetailNodes.Any() == false) return false; 
 
             // 有多工序分叉的情况（取第一个当默认值）
             ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();

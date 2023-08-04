@@ -2,10 +2,12 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -31,7 +33,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 参数验证器
         /// </summary>
-        //private readonly AbstractValidator<InteUnitSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<InteUnitSaveDto> _validationSaveRules;
 
         /// <summary>
         /// 仓储接口（单位维护）
@@ -67,6 +69,13 @@ namespace Hymson.MES.Services.Services.Integrated
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
+            if(saveDto.Code.Contains(" "))
+                throw new CustomerValidationException(nameof(ErrorCode.MES18800));
+            
+            saveDto.Name = saveDto.Name.ToTrimSpace();
+            if (saveDto.Name == "")
+                throw new CustomerValidationException(nameof(ErrorCode.MES18801));
+
             //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // 更新时间
@@ -81,6 +90,14 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
+
+            // 编码唯一性验证
+            var checkEntity = await _inteUnitRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
 
             // 保存
             return await _inteUnitRepository.InsertAsync(entity);
@@ -97,13 +114,14 @@ namespace Hymson.MES.Services.Services.Integrated
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
              // 验证DTO
-            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+             saveDto.Name = saveDto.Name.ToTrimSpace();
+             if (saveDto.Name == "")   throw new CustomerValidationException(nameof(ErrorCode.MES18801));
+             // await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
             var entity = saveDto.ToEntity<InteUnitEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-
             return await _inteUnitRepository.UpdateAsync(entity);
         }
 

@@ -1043,6 +1043,11 @@
         public const string MES18622 = "载具待解盘条码不能为空！";
         #endregion
 
+        #region 单位维护 18800
+        public const string MES18800 = "单位编码不能含有空格";
+        public const string MES18801 = "单位名称不能为空";
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用
