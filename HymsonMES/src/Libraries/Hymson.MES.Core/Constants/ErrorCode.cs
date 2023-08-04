@@ -1069,6 +1069,13 @@
 
         #endregion
 
+        #region 工艺设备组 18900
+        public const string MES18900 = "此编码{Code}在系统已经存在!";
+        public const string MES18901 = "工艺设备组编码不允许有空格";
+        public const string MES18902 = "工艺设备组名称不能为空";
+        public const string MES18903 = "请求实体不能为空！";
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用
