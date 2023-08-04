@@ -95,6 +95,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
+        /// <summary>
+        /// 支持的推送方式
+        /// </summary>
+        public IEnumerable<PushTypeEnum> PushTypes { get; set; }
+
     }
 
     /// <summary>
