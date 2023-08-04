@@ -184,6 +184,7 @@
         public const string MES10474 = $"工序节点手动排序号不能为空";
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
+        public const string MES10476 = $"工序不存在";
         #endregion
 
         #region 参数 10500
@@ -458,6 +459,10 @@
         public const string MES13011 = "此故障原因编码{Code}在系统已经存在！";
         public const string MES13012 = "状态不合法，请检查!";
         public const string MES13013 = "设备故障原因不存在！";
+        #endregion
+
+        #region  14000段项目使用 平台请勿使用
+
         #endregion
 
         #region 供应商  15000
@@ -1043,7 +1048,7 @@
         public const string MES18622 = "载具待解盘条码不能为空！";
         #endregion
 
-        #region 设备对接错误
+        #region 设备对接错误19900
 
         #region 设备对接公用
         public const string MES19001 = "设备编码不能为空";
