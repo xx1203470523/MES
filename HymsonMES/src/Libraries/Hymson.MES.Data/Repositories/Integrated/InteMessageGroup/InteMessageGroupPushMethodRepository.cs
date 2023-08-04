@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("MessageGroupId = @MessageGroupId");
+            sqlBuilder.Where("MessageGroupId IN @MessageGroupIds");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
