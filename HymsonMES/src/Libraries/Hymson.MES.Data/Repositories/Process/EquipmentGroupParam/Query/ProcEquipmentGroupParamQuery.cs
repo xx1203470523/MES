@@ -14,4 +14,11 @@ namespace Hymson.MES.Data.Repositories.Process
     public class ProcEquipmentGroupParamQuery
     {
     }
+
+    public class ProcEquipmentGroupParamCodeQuery 
+    {
+        public string Code { get; set; }
+
+        public long SiteId { get; set; }
+    }
 }

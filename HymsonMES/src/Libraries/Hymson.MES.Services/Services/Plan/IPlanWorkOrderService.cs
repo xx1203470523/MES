@@ -30,14 +30,14 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="planWorkOrderDto"></param>
+        /// <param name="planWorkOrderCreateDto"></param>
         /// <returns></returns>
         Task CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="planWorkOrderDto"></param>
+        /// <param name="planWorkOrderModifyDto"></param>
         /// <returns></returns>
         Task ModifyPlanWorkOrderAsync(PlanWorkOrderModifyDto planWorkOrderModifyDto);
 
@@ -72,14 +72,14 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 修改工单状态
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
         Task ModifyWorkOrderStatusAsync(List<PlanWorkOrderChangeStatusDto> parms);
 
         /// <summary>
         /// 修改工单是否锁定
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
         Task ModifyWorkOrderLockedAsync(List<PlanWorkOrderLockedDto> parms);
 

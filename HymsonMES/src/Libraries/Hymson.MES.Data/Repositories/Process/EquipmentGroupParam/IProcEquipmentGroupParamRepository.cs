@@ -80,13 +80,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procEquipmentGroupParamQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetProcEquipmentGroupParamEntitiesAsync(ProcEquipmentGroupParamQuery procEquipmentGroupParamQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="procEquipmentGroupParamPagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcEquipmentGroupParamEntity>> GetPagedInfoAsync(ProcEquipmentGroupParamPagedQuery procEquipmentGroupParamPagedQuery);
+        Task<PagedInfo<ProcEquipmentGroupParamView>> GetPagedInfoAsync(ProcEquipmentGroupParamPagedQuery query);
         #endregion
+
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(ProcEquipmentGroupParamCodeQuery query);
     }
 }

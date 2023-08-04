@@ -248,27 +248,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 读取资源绑定的产线
             var workCenterLineEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(queryDto.ResourceId);
 
-            /*
-            if (workCenterLineEntity == null)
-            {
-                materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
-            }
-            // 混线
-            else if (workCenterLineEntity.IsMixLine == true)
-            {
-                materialIds = await GetMaterialIdsByResourceIdAsync(queryDto.ResourceId);
-            }
-            // 不混线
-            else if (workCenterLineEntity.IsMixLine == false)
-            {
-                materialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
-            }
-            else
-            {
-                return Array.Empty<ManuFeedingMaterialDto>();
-            }
-            */
-
             if (workCenterLineEntity == null) return Array.Empty<ManuFeedingMaterialDto>();
 
             // 全部需展示的物料ID
@@ -578,12 +557,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 通过产线查询工单
             var workOrdersOfLine = await _planWorkOrderRepository.GetByWorkLineIdAsync(workCenterId);
 
-            /*
-            // 合并结果
-            var workOrders = workOrdersOfFarm.Union(workOrdersOfLine);
-            return workOrders;
-            */
-
             return workOrdersOfLine;
         }
 
@@ -607,7 +580,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15501));
             }
-
             // 通过工单查询BOM
             return workOrders.Select(s => s.ProductBOMId);
         }

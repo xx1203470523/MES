@@ -8,9 +8,11 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -74,32 +76,45 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="procEquipmentGroupParamPagedQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcEquipmentGroupParamEntity>> GetPagedInfoAsync(ProcEquipmentGroupParamPagedQuery procEquipmentGroupParamPagedQuery)
+        public async Task<PagedInfo<ProcEquipmentGroupParamView>> GetPagedInfoAsync(ProcEquipmentGroupParamPagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("egp.IsDeleted=0");
+            sqlBuilder.Where("egp.SiteId=@SiteId");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (procEquipmentGroupParamPagedQuery.PageIndex - 1) * procEquipmentGroupParamPagedQuery.PageSize;
+            if (!string.IsNullOrWhiteSpace(query.Code))
+            {
+                query.Code = $"%{query.Code}%";
+                sqlBuilder.Where("egp.Code LIKE @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                query.Name = $"%{query.Name}%";
+                sqlBuilder.Where("egp.Name LIKE @Name");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.MaterialCode))
+            {
+                query.MaterialCode = $"%{query.MaterialCode}%";
+                sqlBuilder.Where("m.MaterialCode LIKE @MaterialCode");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procEquipmentGroupParamPagedQuery.PageSize });
-            sqlBuilder.AddParameters(procEquipmentGroupParamPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
-            var procEquipmentGroupParamEntitiesTask = conn.QueryAsync<ProcEquipmentGroupParamEntity>(templateData.RawSql, templateData.Parameters);
+            var procEquipmentGroupParamEntitiesTask = conn.QueryAsync<ProcEquipmentGroupParamView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procEquipmentGroupParamEntities = await procEquipmentGroupParamEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcEquipmentGroupParamEntity>(procEquipmentGroupParamEntities, procEquipmentGroupParamPagedQuery.PageIndex, procEquipmentGroupParamPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcEquipmentGroupParamView>(procEquipmentGroupParamEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -161,32 +176,51 @@ namespace Hymson.MES.Data.Repositories.Process
         }
         #endregion
 
+        /// <summary>
+        /// 根据Code获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(ProcEquipmentGroupParamCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetByCodeSql, query);
+        }
     }
 
     public partial class ProcEquipmentGroupParamRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_equipment_group_param` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_equipment_group_param` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT 
+                                                        egp.* ,m.materialCode as materialCode,m.materialName as materialName
+                                                     FROM `proc_equipment_group_param` egp 
+                                                     LEFT JOIN proc_material  m ON  m.id=egp.ProductId
+                                                    /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(*) FROM `proc_equipment_group_param` egp   
+                                                      LEFT JOIN proc_material  m ON  m.id=egp.ProductId 
+                                                     /**where**/ ";
         const string GetProcEquipmentGroupParamEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_equipment_group_param` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `Procedure`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @Procedure, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
-        const string InsertsSql = "INSERT INTO `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `Procedure`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @Procedure, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
+        const string InsertSql = "INSERT INTO `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @ProcedureId, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
+        const string InsertsSql = "INSERT INTO `proc_equipment_group_param`(  `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`) VALUES (   @Id, @SiteId, @Code, @Name, @Type, @ProductId, @ProcedureId, @EquipmentGroupId, @Version, @Status, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsUsed )  ";
 
-        const string UpdateSql = "UPDATE `proc_equipment_group_param` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Type = @Type, ProductId = @ProductId, Procedure = @Procedure, EquipmentGroupId = @EquipmentGroupId, Version = @Version, Status = @Status, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, IsUsed = @IsUsed  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_equipment_group_param` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Type = @Type, ProductId = @ProductId, Procedure = @Procedure, EquipmentGroupId = @EquipmentGroupId, Version = @Version, Status = @Status, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, IsUsed = @IsUsed  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_equipment_group_param` SET  Name = @Name, Type = @Type, ProductId = @ProductId, ProcedureId = @ProcedureId, EquipmentGroupId = @EquipmentGroupId, Version = @Version, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_equipment_group_param` SET Name = @Name, Type = @Type, ProductId = @ProductId, ProcedureId = @ProcedureId, EquipmentGroupId = @EquipmentGroupId, Version = @Version, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_equipment_group_param` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_equipment_group_param` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `Procedure`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`
+                               `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`
                             FROM `proc_equipment_group_param`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `Procedure`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`
+                                          `Id`, `SiteId`, `Code`, `Name`, `Type`, `ProductId`, `ProcedureId`, `EquipmentGroupId`, `Version`, `Status`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `IsUsed`
                             FROM `proc_equipment_group_param`  WHERE Id IN @Ids ";
         #endregion
+
+        const string GetByCodeSql = @"SELECT * 
+                            FROM `proc_equipment_group_param`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
     }
 }

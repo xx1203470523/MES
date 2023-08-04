@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
@@ -80,5 +82,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<PagedInfo<ProcProcessEquipmentGroupEntity>> GetPagedInfoAsync(ProcProcessEquipmentGroupPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcProcessEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
     }
 }

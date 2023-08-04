@@ -18,7 +18,6 @@ using Hymson.MES.Services.Services.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Org.BouncyCastle.Crypto;
 
 /// <summary>
 /// 服务（产品检验参数组） 
@@ -353,15 +352,15 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
     }
 
     /// <summary>
-    /// 根据ID获取项目明细列表
+    /// 根据ID获取关联明细列表
     /// </summary>
-    /// <param name="parameterGroupId"></param>
+    /// <param name="id"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> QueryDetailsByParameterGroupIdAsync(long parameterGroupId)
+    public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> QueryDetailsByMainIdAsync(long id)
     {
         var details = await _procProductParameterGroupDetailRepository.GetEntitiesAsync(new ProcProductParameterGroupDetailQuery
         {
-            ParameterGroupId = parameterGroupId
+            ParameterGroupId = id
         });
 
         // 查询已经缓存的参数实体

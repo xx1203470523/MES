@@ -30,14 +30,14 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteCodeRulesMakeDto"></param>
+        /// <param name="inteCodeRulesMakeCreateDto"></param>
         /// <returns></returns>
         Task CreateInteCodeRulesMakeAsync(InteCodeRulesMakeCreateDto inteCodeRulesMakeCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteCodeRulesMakeDto"></param>
+        /// <param name="inteCodeRulesMakeModifyDto"></param>
         /// <returns></returns>
         Task ModifyInteCodeRulesMakeAsync(InteCodeRulesMakeModifyDto inteCodeRulesMakeModifyDto);
 

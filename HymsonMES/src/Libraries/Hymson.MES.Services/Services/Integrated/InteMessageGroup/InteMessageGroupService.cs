@@ -1,3 +1,4 @@
+using Dapper;
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
@@ -258,6 +259,21 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
+        /// 根据ID获取关联明细列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteMessageGroupPushMethodDto>> QueryDetailsByMainIdAsync(long id)
+        {
+            var details = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new InteMessageGroupPushMethodQuery
+            {
+                MessageGroupIds = new[] { id }
+            });
+
+            return details.Select(s => s.ToModel<InteMessageGroupPushMethodDto>());
+        }
+
+        /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
         /// <param name="pagedQueryDto"></param>
@@ -268,8 +284,23 @@ namespace Hymson.MES.Services.Services.Integrated
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _inteMessageGroupRepository.GetPagedListAsync(pagedQuery);
 
-            // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteMessageGroupDto>());
+            // 实体到DTO转换 装载数据（因为后面还需要更改属性的值，因此转为List）
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteMessageGroupDto>()).AsList();
+
+            // 填充数据
+            var allMessageGroupPushMethods = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new InteMessageGroupPushMethodQuery
+            {
+                MessageGroupIds = dtos.Select(s => s.Id).ToArray()
+            });
+
+            // 将推送方式按照消息组ID分组
+            var pushMethodsByMessageGroupIdDic = allMessageGroupPushMethods.ToLookup(w => w.MessageGroupId).ToDictionary(d => d.Key, d => d);
+            foreach (var dto in dtos)
+            {
+                if (pushMethodsByMessageGroupIdDic.TryGetValue(dto.Id, out var pushMethods) == false) continue;
+                dto.PushTypes = pushMethods.Select(s => s.Type).Distinct();
+            }
+
             return new PagedInfo<InteMessageGroupDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

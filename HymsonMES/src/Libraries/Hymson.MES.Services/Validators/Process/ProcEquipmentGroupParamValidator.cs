@@ -6,6 +6,8 @@
  *build datetime: 2023-08-02 01:48:35
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Validators.Process
@@ -17,8 +19,14 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcEquipmentGroupParamCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18704));
+            RuleFor(x => x.Code).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18703));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18705));
+            RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18706));
+            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18707));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES18709));
+            RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(EquipmentGroupParamTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES18710));
         }
     }
 
@@ -29,8 +37,13 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcEquipmentGroupParamModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+
+            RuleFor(x => x.Id).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18712));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18705));
+            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18707));
+            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES18709));
+            RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(EquipmentGroupParamTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES18710));
         }
     }
 }

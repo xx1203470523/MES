@@ -65,7 +65,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="planWorkOrderActivationDto"></param>
+        /// <param name="planWorkOrderActivationCreateDto"></param>
         /// <returns></returns>
         public async Task CreatePlanWorkOrderActivationAsync(PlanWorkOrderActivationCreateDto planWorkOrderActivationCreateDto)
         {
@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Plan
             var workCenter = await _inteWorkCenterRepository.GetHigherInteWorkCenterAsync(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
 
             var planWorkOrderActivationPagedQuery = planWorkOrderActivationPagedQueryDto.ToQuery<PlanWorkOrderActivationPagedQuery>();
-            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId.Value;
+            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId!.Value;
 
             //将对应的工作中心ID放置查询条件中
             planWorkOrderActivationPagedQuery.WorkCenterIds.Add(planWorkOrderActivationPagedQueryDto.LineId ?? 0);
@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 using (TransactionScope ts = new TransactionScope())
                 {
-                    await _planWorkOrderActivationRepository.DeleteTrueAsync(workOrderActivation.Id);//真删除
+                    await _planWorkOrderActivationRepository.DeleteTrueAsync(workOrderActivation!.Id);//真删除
 
                     //记录下激活状态变化
                     await _planWorkOrderActivationRecordRepository.InsertAsync(new PlanWorkOrderActivationRecordEntity
@@ -403,8 +403,7 @@ namespace Hymson.MES.Services.Services.Plan
                         });
 
                         break;
-                    //case Core.Enums.PlanWorkOrderStatusEnum.Closed:
-                    //    break;
+
                     default:
                         break;
                 }

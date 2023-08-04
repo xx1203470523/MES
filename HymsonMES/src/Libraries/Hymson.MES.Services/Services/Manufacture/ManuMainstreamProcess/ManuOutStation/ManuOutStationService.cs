@@ -141,6 +141,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
+        /// /// <param name="localizationService"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
             IMasterDataService masterDataService,
@@ -220,7 +221,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var nextProcedure = await _manuCommonOldService.GetNextProcedureAsync(sfcProduceEntity);
 
             // 扣料
-            //await func(sfcProduceEntity.ProductBOMId, sfcProduceEntity.ProcedureId);
             var initialMaterials = await _masterDataService.GetInitialMaterialsAsync(sfcProduceEntity);
 
             // 物料ID集合
@@ -348,13 +348,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
                     //// 2023.05.29 克明说不在这里更新完成时间
                     //// 更新工单统计表的 RealEnd
-                    //rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
-                    //{
-                    //    UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    //    UpdatedBy = sfcProduceEntity.UpdatedBy,
-                    //    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
-                    //});
-
+             
                     // 入库
                     SaveToWarehouseAsync(ref tasks, sfcProduceEntity, procMaterialEntity);
                 }

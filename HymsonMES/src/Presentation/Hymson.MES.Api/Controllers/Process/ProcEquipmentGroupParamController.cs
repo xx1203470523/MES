@@ -6,6 +6,7 @@
  *build datetime: 2023-08-02 01:48:35
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Microsoft.AspNetCore.Authorization;
@@ -48,7 +49,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<ProcEquipmentGroupParamDto>> QueryPagedProcEquipmentGroupParamAsync([FromQuery] ProcEquipmentGroupParamPagedQueryDto parm)
+        public async Task<PagedInfo<ProcEquipmentGroupParamViewDto>> QueryPagedProcEquipmentGroupParamAsync([FromQuery] ProcEquipmentGroupParamPagedQueryDto parm)
         {
             return await _procEquipmentGroupParamService.GetPagedListAsync(parm);
         }
@@ -59,7 +60,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcEquipmentGroupParamDto> QueryProcEquipmentGroupParamByIdAsync(long id)
+        public async Task<ProcEquipmentGroupParamViewDto> QueryProcEquipmentGroupParamByIdAsync(long id)
         {
             return await _procEquipmentGroupParamService.QueryProcEquipmentGroupParamByIdAsync(id);
         }
@@ -101,5 +102,18 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         #endregion
+
+
+
+        /// <summary>
+        /// 查询详情（设备组参数详情维护）
+        /// </summary>
+        /// <param name="recipeId"></param>
+        /// <returns></returns>
+        [HttpGet("getProcEquGroupParamDetail/{recipeId}")]
+        public async Task<IEnumerable<ProcEquipmentGroupParamDetailDto>> QueryProcEquipmentGroupParamDetailByRecipeIdAsync(long recipeId)
+        {
+            return await _procEquipmentGroupParamService.QueryProcEquipmentGroupParamDetailByRecipeIdAsync(recipeId);
+        }
     }
 }

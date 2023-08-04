@@ -37,18 +37,20 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 供应商 仓储
         /// </summary>
         private readonly IWhSupplierRepository _whSupplierRepository;
+        private readonly IProcMaterialSupplierRelationRepository _procMaterialSupplierRelationRepository;
         private readonly AbstractValidator<WhSupplierCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhSupplierModifyDto> _validationModifyRules;
         private readonly ICurrentSite _currentSite;
 
 
-        public WhSupplierService(ICurrentUser currentUser, IWhSupplierRepository whSupplierRepository, AbstractValidator<WhSupplierCreateDto> validationCreateRules, AbstractValidator<WhSupplierModifyDto> validationModifyRules, ICurrentSite currentSite)
+        public WhSupplierService(ICurrentUser currentUser, IWhSupplierRepository whSupplierRepository, AbstractValidator<WhSupplierCreateDto> validationCreateRules, AbstractValidator<WhSupplierModifyDto> validationModifyRules, ICurrentSite currentSite, IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository)
         {
             _currentUser = currentUser;
             _whSupplierRepository = whSupplierRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
+            _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
         }
 
         /// <summary>
@@ -104,6 +106,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task DeleteWhSupplierAsync(long id)
         {
+            VerifySupplier(new long[] { id });
             await _whSupplierRepository.DeleteAsync(id);
         }
 
@@ -118,12 +121,24 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 throw new ValidationException(nameof(ErrorCode.MES13005));
             }
+            VerifySupplier(ids);
             return await _whSupplierRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now()
             });
+        }
+        /// <summary>
+        /// 验证
+        /// </summary>
+        private async void VerifySupplier(long[] ids)
+        {
+            var data = await _procMaterialSupplierRelationRepository.GetBySupplierIdsAsync(ids);
+            if (data != null && ids.Any())
+            {
+                throw new ValidationException(nameof(ErrorCode.MES15011));
+            }
         }
 
         /// <summary>

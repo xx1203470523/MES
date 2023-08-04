@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -42,6 +43,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteMessageGroupDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID获取关联明细列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteMessageGroupPushMethodDto>> QueryDetailsByMainIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
