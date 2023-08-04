@@ -8,11 +8,13 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Collections;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -161,6 +163,30 @@ namespace Hymson.MES.Data.Repositories.Process
         }
         #endregion
 
+        /// <summary>
+        /// 批量删除 (硬删除) 根据 RecipeId
+        /// </summary>
+        /// <param name="vehicleTypeIds"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueByRecipeIdsAsync(long[] recipeIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteTrueByRecipeIdsSql, new { RecipeIds = recipeIds });
+        }
+
+        /// <summary>
+        /// 根据参数ID查询List
+        /// </summary>
+        /// <param name="recipeIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcEquipmentGroupParamDetailEntity>> GetEntitiesByRecipeIdsAsync(long[] recipeIds) 
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesByRecipeIdsSql);
+            using var conn = GetMESDbConnection();
+            var entitys = await conn.QueryAsync<ProcEquipmentGroupParamDetailEntity>(template.RawSql, new { RecipeIds = recipeIds });
+            return entitys;
+        }
     }
 
     public partial class ProcEquipmentGroupParamDetailRepository
@@ -188,5 +214,8 @@ namespace Hymson.MES.Data.Repositories.Process
                                           `Id`, `SiteId`, `RecipeId`, `ParamId`, `ParamValue`, `CenterValue`, `MaxValue`, `MinValue`, `DecimalPlaces`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_equipment_group_param_detail`  WHERE Id IN @Ids ";
         #endregion
+                
+        const string DeleteTrueByRecipeIdsSql = "DELETE From `proc_equipment_group_param_detail` WHERE  RecipeId in @RecipeIds";
+        const string GetEntitiesByRecipeIdsSql= @"SELECT *   FROM `proc_equipment_group_param_detail` WHERE  RecipeId in @RecipeIds   ";
     }
 }

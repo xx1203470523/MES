@@ -170,6 +170,8 @@ namespace Hymson.MES.Services.Dtos.Process
        // /// 备注
        // /// </summary>
        // public string? Remark { get; set; }
+
+        public List<ProcEquipmentGroupParamDetailCreateDto> ParamList { get; set; }
     }
 
     /// <summary>
@@ -216,6 +218,9 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
+
+
+        public List<ProcEquipmentGroupParamDetailCreateDto> ParamList { get; set; }
     }
 
     /// <summary>

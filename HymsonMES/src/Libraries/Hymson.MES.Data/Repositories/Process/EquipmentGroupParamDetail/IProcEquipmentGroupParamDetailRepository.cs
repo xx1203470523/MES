@@ -87,6 +87,21 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procEquipmentGroupParamDetailPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcEquipmentGroupParamDetailEntity>> GetPagedInfoAsync(ProcEquipmentGroupParamDetailPagedQuery procEquipmentGroupParamDetailPagedQuery);
+
         #endregion
+
+        /// <summary>
+        /// 批量删除 (硬删除) 根据 RecipeId
+        /// </summary>
+        /// <param name="vehicleTypeIds"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueByRecipeIdsAsync(long[] recipeIds);
+
+        /// <summary>
+        /// 根据参数ID查询List
+        /// </summary>
+        /// <param name="recipeIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcEquipmentGroupParamDetailEntity>> GetEntitiesByRecipeIdsAsync(long[] recipeIds);
     }
 }

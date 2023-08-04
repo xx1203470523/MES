@@ -56,5 +56,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcEquipmentGroupParamViewDto> QueryProcEquipmentGroupParamByIdAsync(long id);
+
+        /// <summary>
+        /// 获取载具类型验证根据vehicleTypeId查询
+        /// </summary>
+        /// <param name="recipeId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcEquipmentGroupParamDetailDto>> QueryProcEquipmentGroupParamDetailByRecipeIdAsync(long recipeId);
     }
 }
