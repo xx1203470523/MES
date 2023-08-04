@@ -1,8 +1,10 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 {
@@ -45,6 +47,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquEquipmentGroupEntity> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentGroupEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 根据Code查询对象

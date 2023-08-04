@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -38,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 参数组类型;1、开机参数 2、设备过程参数
         /// </summary>
-        public bool Type { get; set; }
+        public EquipmentGroupParamTypeEnum Type { get; set; }
 
        /// <summary>
         /// 产品ID
@@ -48,7 +49,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 工序Id
         /// </summary>
-        public long Procedure { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 设备组ID
@@ -63,7 +64,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 备注
@@ -103,22 +104,28 @@ namespace Hymson.MES.Services.Dtos.Process
        
     }
 
+    public record ProcEquipmentGroupParamViewDto: ProcEquipmentGroupParamDto 
+    {
+        public string MaterialCode { get; set; }
+
+        public string MaterialName { get; set; }
+
+        public string MaterialNameVersion { get; set; }
+
+        public string ProcedureCode { get; set; }
+
+        public string ProcedureName { get; set; }
+
+        public string EquipmentGroupCode { get; set; }
+
+        public string EquipmentGroupName { get; set; }
+    }
 
     /// <summary>
     /// 设备参数组新增Dto
     /// </summary>
     public record ProcEquipmentGroupParamCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
        /// <summary>
         /// 配编码
         /// </summary>
@@ -132,7 +139,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 参数组类型;1、开机参数 2、设备过程参数
         /// </summary>
-        public bool Type { get; set; }
+        public EquipmentGroupParamTypeEnum Type { get; set; }
 
        /// <summary>
         /// 产品ID
@@ -142,7 +149,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 工序Id
         /// </summary>
-        public long Procedure { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 设备组ID
@@ -157,44 +164,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 是否使用0 未使用，1使用
-        /// </summary>
-        public bool? IsUsed { get; set; }
-
-       
+       ///// <summary>
+       // /// 备注
+       // /// </summary>
+       // public string? Remark { get; set; }
     }
 
     /// <summary>
@@ -208,16 +183,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public long Id { get; set; }
 
        /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
-        /// 配编码
-        /// </summary>
-        public string Code { get; set; }
-
-       /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
@@ -225,7 +190,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 参数组类型;1、开机参数 2、设备过程参数
         /// </summary>
-        public bool Type { get; set; }
+        public EquipmentGroupParamTypeEnum Type { get; set; }
 
        /// <summary>
         /// 产品ID
@@ -235,7 +200,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 工序Id
         /// </summary>
-        public long Procedure { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 设备组ID
@@ -250,45 +215,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
-
-       /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 是否使用0 未使用，1使用
-        /// </summary>
-        public bool? IsUsed { get; set; }
-
-       
-
+        public SysDataStatusEnum Status { get; set; }
     }
 
     /// <summary>
@@ -296,5 +223,19 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcEquipmentGroupParamPagedQueryDto : PagerInfo
     {
+        /// <summary>
+        /// 参数集编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 参数集名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
     }
 }

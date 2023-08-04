@@ -195,6 +195,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialSupplierView>(GetByMaterialIdSql, new { materialId = materialIds });
         }
+
+        /// <summary>
+        /// 通过供应商Id查询
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns> 
+        public async Task<IEnumerable<ProcMaterialSupplierView>> GetBySupplierIdsAsync(long[] supplierIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialSupplierView>(GetBySupplierIdsSql, new { supplierIds });
+        }
     }
 
     public partial class ProcMaterialSupplierRelationRepository
@@ -234,5 +245,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                 LEFT join wh_supplier s on msr.SupplierId=s.Id
                                 where msr.MaterialId in @materialIds
             ";
+
+        const string GetBySupplierIdsSql = @"Select *  from proc_material_supplier_relation  where SupplierId in @supplierIds";
     }
 }

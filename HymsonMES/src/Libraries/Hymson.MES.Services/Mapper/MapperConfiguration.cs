@@ -99,23 +99,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
             #endregion
 
-            #region  ProcProcessEquipment
-            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
-            CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
+            #region EquEquipmentGroup
+            CreateMap<EquEquipmentGroupSaveDto, EquEquipmentGroupEntity>();
+            CreateMap<EquEquipmentGroupPagedQueryDto, EquEquipmentGroupPagedQuery>();
 
-            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupDto>();
-            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupListDto>();
-            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentBaseDto>();
+            CreateMap<EquEquipmentGroupEntity, EquEquipmentGroupListDto>();
+            CreateMap<EquEquipmentEntity, EquEquipmentBaseDto>();
             #endregion
 
-            #region ProcProcessEquipmentGroup
-            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
-            CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
-
-            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupListDto>();
-            CreateMap<ProcProcessEquipmentGroupRelationEntity, EquEquipmentBaseDto>();
-            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupRelations>();
-            #endregion
 
             #region EquEquipmentLinkApi
             CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
@@ -275,7 +266,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteVehicleView, InteVehicleViewDto>();
 
             CreateMap<InteVehicleVerifyEntity, InteVehicleVerifyDto>();
-
             CreateMap<InteVehicleFreightEntity, InteVehicleFreightDto>();
 
             #endregion
@@ -291,8 +281,16 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageGroupEntity, InteMessageGroupDto>();
             CreateMap<InteMessageGroupPagedQueryDto, InteMessageGroupPagedQuery>();
             CreateMap<InteMessageGroupView, InteMessageGroupDto>();
+
+            CreateMap<InteMessageGroupPushMethodSaveDto, InteMessageGroupPushMethodEntity>();
+            CreateMap<InteMessageGroupPushMethodEntity, InteMessageGroupPushMethodDto>();
             #endregion
 
+
+            #region InteEventType
+            CreateMap<InteEventTypePagedQueryDto, InteEventTypePagedQuery>();
+            CreateMap<InteEventTypeDto, InteEventTypeEntity>();
+            #endregion
         }
 
         /// <summary>
@@ -485,6 +483,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcEquipmentGroupParamCreateDto, ProcEquipmentGroupParamEntity>();
 
             CreateMap<ProcEquipmentGroupParamPagedQueryDto, ProcEquipmentGroupParamPagedQuery>();
+            CreateMap<ProcEquipmentGroupParamEntity, ProcEquipmentGroupParamViewDto>();
+            CreateMap<ProcEquipmentGroupParamView, ProcEquipmentGroupParamViewDto>();
             #endregion
         }
 

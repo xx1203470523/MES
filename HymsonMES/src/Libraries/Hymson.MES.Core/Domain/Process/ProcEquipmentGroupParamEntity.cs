@@ -36,7 +36,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 参数组类型;1、开机参数 2、设备过程参数
         /// </summary>
-        public bool Type { get; set; }
+        public EquipmentGroupParamTypeEnum Type { get; set; }
 
        /// <summary>
         /// 产品ID
@@ -46,7 +46,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 工序Id
         /// </summary>
-        public long Procedure { get; set; }
+        public long ProcedureId { get; set; }
 
        /// <summary>
         /// 设备组ID

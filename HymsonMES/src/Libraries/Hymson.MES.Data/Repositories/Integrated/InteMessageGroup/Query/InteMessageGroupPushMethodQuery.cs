@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     /// </summary>
     public class InteMessageGroupPushMethodQuery
     {
-    
+        /// <summary>
+        /// 消息组Id
+        /// </summary>
+        public long MessageGroupId { get; set; }
     }
 }

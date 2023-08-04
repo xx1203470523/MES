@@ -20,7 +20,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procEquipmentGroupParamPagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcEquipmentGroupParamDto>> GetPagedListAsync(ProcEquipmentGroupParamPagedQueryDto procEquipmentGroupParamPagedQueryDto);
+        Task<PagedInfo<ProcEquipmentGroupParamViewDto>> GetPagedListAsync(ProcEquipmentGroupParamPagedQueryDto procEquipmentGroupParamPagedQueryDto);
 
         /// <summary>
         /// 新增
@@ -55,6 +55,6 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcEquipmentGroupParamDto> QueryProcEquipmentGroupParamByIdAsync(long id);
+        Task<ProcEquipmentGroupParamViewDto> QueryProcEquipmentGroupParamByIdAsync(long id);
     }
 }
