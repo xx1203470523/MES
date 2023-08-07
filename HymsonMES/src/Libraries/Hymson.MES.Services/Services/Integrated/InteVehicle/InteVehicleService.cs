@@ -465,6 +465,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             ThreadPool.QueueUserWorkItem(async o =>
             {
+                Thread.Sleep(100000);
                 var foo = new InteVehicleFreightRecordEntity()
                 {
                     CreatedBy = _currentUser.UserName,
