@@ -225,6 +225,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
                     ResourceCode = resourceCode,
                     SFCs = sfcs
                 });
+                Thread.Sleep(TimeSpan.FromSeconds(2));//等待2秒避免进出站时间一样
                 //出站
                 List<OutBoundSFCDto> sfcList = new();
                 foreach (var sfcItem in routeSfcs)
