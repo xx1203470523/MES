@@ -308,19 +308,24 @@ namespace Hymson.MES.Services.Services.Report
         {
             var procProcessRouteDetailNodeQuery = procSfcProcessRoutePagedQueryDto.ToQuery<ProcProcessRouteDetailNodePagedQuery>();
             IEnumerable<ProcSfcProcessRouteViewDto> procSfcProcessRouteViewDtos = new List<ProcSfcProcessRouteViewDto>();
+            var emptyResult = new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, procSfcProcessRoutePagedQueryDto.PageIndex, procSfcProcessRoutePagedQueryDto.PageSize, 0);
             //查询条码信息
             var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = procSfcProcessRoutePagedQueryDto.SFC, SiteId = _currentSite.SiteId });
             if (manuSfcEntity == null)
             {
-                return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, procSfcProcessRoutePagedQueryDto.PageIndex, procSfcProcessRoutePagedQueryDto.PageSize, 0);
+                return emptyResult;
             }
             var sfcinfo = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity?.Id ?? 0);
             if (sfcinfo == null)
             {
-                return new PagedInfo<ProcSfcProcessRouteViewDto>(procSfcProcessRouteViewDtos, procSfcProcessRoutePagedQueryDto.PageIndex, procSfcProcessRoutePagedQueryDto.PageSize, 0);
+                return emptyResult;
             }
             //条码对应工单信息
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcinfo.WorkOrderId);
+            if (planWorkOrderEntity == null)
+            {
+                return emptyResult;
+            }
             //工艺路线明细
             procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
             var pagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);

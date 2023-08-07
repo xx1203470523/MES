@@ -5,13 +5,16 @@ using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.MES.Data.Options;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
+using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Validators.InBound;
 using Hymson.MES.EquipmentServices.Validators.OutBound;
+using Hymson.MES.EquipmentServicesTests.Dtos;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Validators.Process;
+using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,6 +59,7 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSingleton<ICurrentSite, TestCurrentSite>()//测试所用CurrentSite服务，修改CurrentEquipmentInfo总SiteId和SiteName模拟信息
                 .AddSingleton<IInBoundService, InBoundService>()//进站
                 .AddSingleton<IOutBoundService, OutBoundService>()//出站
+                .AddSingleton<IEquipmentCollectService, EquipmentCollectService>()//设备信息收集服务
                 .AddSingleton<AbstractValidator<InBoundDto>, InBoundValidator>()//进站
                 .AddSingleton<AbstractValidator<InBoundMoreDto>, InBoundMoreValidator>()//进站（多个） 便于测试需要将InBoundMoreValidator访问修饰符修改为public
                 .AddSingleton<AbstractValidator<OutBoundDto>, OutBoundValidator>()//出站
@@ -65,6 +69,24 @@ namespace Hymson.MES.EquipmentServicesTests
                 .BuildServiceProvider();
 
             ConnectionOptions = ServiceProvider.GetRequiredService<IOptions<ConnectionOptions>>().Value;
+        }
+
+        /// <summary>
+        /// 设置当前测试设备信息
+        /// </summary>
+        /// <param name="equipmentInfoDto"></param>
+        public static void SetEquInfoAsync(EquipmentInfoDto  equipmentInfoDto)
+        {
+            //所以必须先设置站点Id
+            var siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
+            Dictionary<string, object> equDic = new()
+            {
+                { "Id", equipmentInfoDto.Id },
+                { "FactoryId", equipmentInfoDto.FactoryId },
+                { "Code", equipmentInfoDto.Code },
+                { "Name", equipmentInfoDto.Name }
+            };
+            CurrentEquipmentInfo.AddUpdate(equDic);
         }
     }
 }
