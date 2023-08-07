@@ -551,11 +551,11 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 //直通数
                 var firstPassQty = manuSfcSummaries.Where(c => c.FirstQualityStatus == 1).Count();
                 //直通率
-                var firstPassRate = decimal.Parse((firstPassQty.ParseToDecimal() / (inputQty == 0 ? 1 : inputQty.ParseToDecimal())).ToString("0.00"));
+                var firstPassRate = decimal.Parse((firstPassQty.ParseToDecimal() / (inputQty == 0 ? 1 : inputQty.ParseToDecimal())).ToString("0.00")) * 100;
                 //工序良品总数
                 var passQty = manuSfcSummaries.Where(c => c.QualityStatus == 1).Count();
                 //良率
-                var passRate = decimal.Parse((passQty.ParseToDecimal() / (inputQty == 0 ? 1 : inputQty.ParseToDecimal())).ToString("0.00"));
+                var passRate = decimal.Parse((passQty.ParseToDecimal() / (inputQty == 0 ? 1 : inputQty.ParseToDecimal())).ToString("0.00")) * 100;
                 var processQualityRateDto = new ProcessQualityRateDto
                 {
                     FirstPassYieldRate = firstPassRate,
