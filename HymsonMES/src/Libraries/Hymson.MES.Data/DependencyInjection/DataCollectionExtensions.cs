@@ -244,6 +244,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
             services.AddSingleton<IManuBakingRecordRepository, ManuBakingRecordRepository>();
             services.AddSingleton<IManuBakingRepository, ManuBakingRepository>();
+
+            services.AddSingleton<IManuDowngradingRuleRepository, ManuDowngradingRuleRepository>();
             #endregion
 
             #region Warehouse 

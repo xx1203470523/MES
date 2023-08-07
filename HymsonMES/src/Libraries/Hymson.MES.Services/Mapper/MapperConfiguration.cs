@@ -648,6 +648,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuBakingRecordModifyDto, ManuBakingRecordEntity>();
             CreateMap<ManuBakingRecordPagedQueryDto, ManuBakingRecordPagedQuery>();
             #endregion
+
+            #region ManuDowngradingRule
+            CreateMap<ManuDowngradingRuleCreateDto, ManuDowngradingRuleEntity>();
+            CreateMap<ManuDowngradingRulePagedQueryDto, ManuDowngradingRulePagedQuery>();
+            CreateMap<ManuDowngradingRuleModifyDto, ManuDowngradingRuleEntity>();
+            CreateMap<ManuDowngradingRuleEntity, ManuDowngradingRuleDto>();
+            #endregion
         }
 
         /// <summary>
