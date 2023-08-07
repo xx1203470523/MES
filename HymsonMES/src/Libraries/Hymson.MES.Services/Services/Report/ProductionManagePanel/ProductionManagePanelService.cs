@@ -613,7 +613,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                         Day = x.Day.Date.Day.ToString().PadLeft(2, '0'),
                         YieldQty = x.PassQty,
                         Total = x.Total,
-                        YieldRate = decimal.Parse((x.PassQty / x.Total == 0 ? 1 : x.Total).ToString("0.00"))
+                        YieldRate = decimal.Parse((x.PassQty.ParseToDecimal() / (x.Total == 0 ? 1 : x.Total.ParseToDecimal())).ToString("0.00"))
                     };
                 })
                 .OrderBy(x => x.Day)
