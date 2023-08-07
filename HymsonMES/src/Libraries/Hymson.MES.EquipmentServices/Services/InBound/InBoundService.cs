@@ -232,8 +232,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             List<ManuSfcEntity> updateManuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcSummaryEntity> updateManuSfcSummaryList = new List<ManuSfcSummaryEntity>();
 
-            //过滤复投的数量
-            int sfcQty = 0;
+            decimal firstProcedureQty = 0;//首工序进站数量
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
                 //汇总信息
@@ -247,11 +246,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     sfcProduce.Status = SfcProduceStatusEnum.Activity;
                     //当前SFC的工序信息
                     var sfcprocedureEntity = procedureEntityList.Where(c => c.Id == sfcProduce.ProcedureId).First();
-                    //第一次进站
-                    if (sfcProduce.RepeatedCount == 0)
-                    {
-                        sfcQty++;
-                    }
                     // 检查是否测试工序
                     if (sfcprocedureEntity.Type == ProcedureTypeEnum.Test)
                     {
@@ -269,6 +263,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     }
                     //是否首工序
                     var isFirstProcedure = await IsFirstProcedureAsync(sfcProduce.ProcessRouteId, sfcProduce.ProcedureId);
+                    if (isFirstProcedure)
+                    {
+                        firstProcedureQty++;
+                    }
                     // 初始化步骤
                     var sfcStep = new ManuSfcStepEntity
                     {
@@ -352,7 +350,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     }
                     continue;
                 }
-                sfcQty++;
                 //条码表
                 var manuSfcEntity = new ManuSfcEntity
                 {
@@ -456,7 +453,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             {
                 WorkOrderId = planWorkOrderEntity.Id,
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
-                PassDownQuantity = sfcQty,
+                PassDownQuantity = firstProcedureQty,
                 UserName = _currentEquipment.Name,
                 UpdateDate = HymsonClock.Now()
             });
@@ -466,7 +463,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 UpdatedBy = _currentEquipment.Name,
                 UpdatedOn = HymsonClock.Now(),
                 WorkOrderId = planWorkOrderEntity.Id,
-                Qty = sfcQty,
+                Qty = firstProcedureQty,
             });
 
             // 更新工单统计表的 RealStart
