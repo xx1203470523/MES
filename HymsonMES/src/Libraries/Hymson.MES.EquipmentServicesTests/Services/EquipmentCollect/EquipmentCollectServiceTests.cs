@@ -65,5 +65,30 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
             }
             Assert.IsTrue(true);
         }
+
+        /// <summary>
+        /// 模拟设备心跳
+        /// </summary>
+        [TestMethod()]
+        public async Task EquipmentHeartbeatAsyncTest()
+        {
+            long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
+            var equEquipmentEntities = await _equEquipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
+            {
+                SiteId = siteId
+            });
+            foreach (var item in equEquipmentEntities)
+            {
+                //设置当前模拟设备名称
+                SetEquInfoAsync(new EquipmentInfoDto { Id = item.Id, FactoryId = item.WorkCenterFactoryId, Code = item.EquipmentCode, Name = item.EquipmentName });
+                await _equipmentCollectService.EquipmentHeartbeatAsync(new EquipmentHeartbeatDto
+                {
+                    IsOnline = Random.Shared.Next(0, 2) == 1,
+                    LocalTime = HymsonClock.Now(),
+                    ResourceCode = item.EquipmentCode
+                });
+            }
+            Assert.IsTrue(true);
+        }
     }
 }

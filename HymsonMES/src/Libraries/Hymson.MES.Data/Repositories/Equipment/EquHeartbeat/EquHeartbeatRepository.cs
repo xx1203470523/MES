@@ -242,7 +242,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 								    left join equ_equipment ee on eh.EquipmentId=ee.Id and ee.SiteId=eh.SiteId and ee.IsDeleted=0
 								    left join proc_resource_equipment_bind preb on preb.EquipmentId=ee.Id and preb.SiteId=ee.SiteId and preb.IsDeleted=0
 								    left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=0
-								    left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  ";
+								    left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  LIMIT @Offset,@Rows ";
 
         const string GetPagedInfoEquHeartbeatReportCountSqlTemplate = @"select COUNT(1) 
                                     FROM equ_heartbeat eh 
