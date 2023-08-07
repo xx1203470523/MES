@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -39,19 +40,36 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteEventTypeRepository _inteEventTypeRepository;
 
         /// <summary>
+        /// 仓储接口（事件类型关联群组）
+        /// </summary>
+        private readonly IInteEventTypeMessageGroupRelationRepository _inteEventTypeMessageGroupRelationRepository;
+
+        /// <summary>
+        /// 仓储接口（事件类型推送规则）
+        /// </summary>
+        private readonly IInteEventTypePushRuleRepository _inteEventTypePushRuleRepository;
+
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteEventTypeRepository"></param>
-        public InteEventTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventTypeSaveDto> validationSaveRules, 
-            IInteEventTypeRepository inteEventTypeRepository)
+        /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
+        /// <param name="inteEventTypePushRuleRepository"></param>
+        public InteEventTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventTypeSaveDto> validationSaveRules,
+            IInteEventTypeRepository inteEventTypeRepository,
+            IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
+            IInteEventTypePushRuleRepository inteEventTypePushRuleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteEventTypeRepository = inteEventTypeRepository;
+            _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
+            _inteEventTypePushRuleRepository = inteEventTypePushRuleRepository;
         }
 
 
@@ -95,7 +113,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -136,12 +154,46 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteEventTypeDto?> QueryByIdAsync(long id) 
+        public async Task<InteEventTypeDto?> QueryByIdAsync(long id)
         {
-           var inteEventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(id);
-           if (inteEventTypeEntity == null) return null;
-           
-           return inteEventTypeEntity.ToModel<InteEventTypeDto>();
+            var inteEventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(id);
+            if (inteEventTypeEntity == null) return null;
+
+            return inteEventTypeEntity.ToModel<InteEventTypeDto>();
+        }
+
+        /// <summary>
+        /// 根据ID获取关联群组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventTypeMessageGroupRelationDto>> QueryMessageGroupsByMainIdAsync(long id)
+        {
+            var details = await _inteEventTypeMessageGroupRelationRepository.GetEntitiesAsync(new EntityByParentIdQuery
+            {
+                ParentId = id
+            });
+
+            return details.Select(s => s.ToModel<InteEventTypeMessageGroupRelationDto>());
+        }
+
+        // TODO 读取接收升级数据
+
+        // TODO 读取处理升级数据
+
+        /// <summary>
+        /// 根据ID获取推送规则
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventTypePushRuleDto>> QueryRulesByMainIdAsync(long id)
+        {
+            var details = await _inteEventTypePushRuleRepository.GetEntitiesAsync(new EntityByParentIdQuery
+            {
+                ParentId = id
+            });
+
+            return details.Select(s => s.ToModel<InteEventTypePushRuleDto>());
         }
 
         /// <summary>

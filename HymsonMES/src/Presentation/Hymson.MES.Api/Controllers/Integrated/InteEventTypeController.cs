@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("integrated:inteEventType:insert")]
         public async Task AddAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
-             await _inteEventTypeService.CreateAsync(saveDto);
+            await _inteEventTypeService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("integrated:inteEventType:update")]
         public async Task UpdateAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
-             await _inteEventTypeService.ModifyAsync(saveDto);
+            await _inteEventTypeService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -86,6 +86,32 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<InteEventTypeDto?> QueryByIdAsync(long id)
         {
             return await _inteEventTypeService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（关联群组）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("messageGroups/{id}")]
+        public async Task<IEnumerable<InteEventTypeMessageGroupRelationDto>?> QueryMessageGroupsByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryMessageGroupsByMainIdAsync(id);
+        }
+
+        // TODO 读取接收升级数据
+
+        // TODO 读取处理升级数据
+
+        /// <summary>
+        /// 查询详情（推送规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("rules/{id}")]
+        public async Task<IEnumerable<InteEventTypePushRuleDto>> QueryRulesByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryRulesByMainIdAsync(id);
         }
 
         /// <summary>
