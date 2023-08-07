@@ -59,7 +59,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
                 int stateValue = random.Next(0, 5);
                 await _equipmentCollectService.EquipmentStateAsync(new EquipmentStateDto
                 {
-                    LocalTime = HymsonClock.Now(),
+                    LocalTime = HymsonClock.Now().AddMinutes(Random.Shared.Next(-50, 10)),
                     StateCode = (EquipmentStateEnum)stateValue
                 });
             }
