@@ -5,6 +5,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -35,6 +36,11 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteEventTypeSaveDto> _validationSaveRules;
 
         /// <summary>
+        /// 仓储接口（消息组）
+        /// </summary>
+        private readonly IInteMessageGroupRepository _inteMessageGroupRepository;
+
+        /// <summary>
         /// 仓储接口（事件维护）
         /// </summary>
         private readonly IInteEventTypeRepository _inteEventTypeRepository;
@@ -43,6 +49,16 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 仓储接口（事件类型关联群组）
         /// </summary>
         private readonly IInteEventTypeMessageGroupRelationRepository _inteEventTypeMessageGroupRelationRepository;
+
+        /// <summary>
+        /// 仓储接口（事件升级）
+        /// </summary>
+        private readonly IInteEventTypeUpgradeRepository _inteEventTypeUpgradeRepository;
+
+        /// <summary>
+        /// 仓储接口（事件升级消息组关联表）
+        /// </summary>
+        private readonly IInteEventTypeUpgradeMessageGroupRelationRepository _inteEventTypeUpgradeMessageGroupRelationRepository;
 
         /// <summary>
         /// 仓储接口（事件类型推送规则）
@@ -56,19 +72,28 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
+        /// <param name="inteMessageGroupRepository"></param>
         /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
+        /// <param name="inteEventTypeUpgradeRepository"></param>
+        /// <param name="inteEventTypeUpgradeMessageGroupRelationRepository"></param>
         /// <param name="inteEventTypePushRuleRepository"></param>
         public InteEventTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventTypeSaveDto> validationSaveRules,
+            IInteMessageGroupRepository inteMessageGroupRepository,
             IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
+            IInteEventTypeUpgradeRepository inteEventTypeUpgradeRepository,
+            IInteEventTypeUpgradeMessageGroupRelationRepository inteEventTypeUpgradeMessageGroupRelationRepository,
             IInteEventTypePushRuleRepository inteEventTypePushRuleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
+            _inteMessageGroupRepository = inteMessageGroupRepository;
             _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
+            _inteEventTypeUpgradeRepository = inteEventTypeUpgradeRepository;
+            _inteEventTypeUpgradeMessageGroupRelationRepository = inteEventTypeUpgradeMessageGroupRelationRepository;
             _inteEventTypePushRuleRepository = inteEventTypePushRuleRepository;
         }
 
@@ -169,17 +194,33 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteEventTypeMessageGroupRelationDto>> QueryMessageGroupsByMainIdAsync(long id)
         {
-            var details = await _inteEventTypeMessageGroupRelationRepository.GetEntitiesAsync(new EntityByParentIdQuery
+            var entities = await _inteEventTypeMessageGroupRelationRepository.GetEntitiesAsync(new EntityByParentIdQuery
             {
                 ParentId = id
             });
 
-            return details.Select(s => s.ToModel<InteEventTypeMessageGroupRelationDto>());
+            return entities.Select(s => s.ToModel<InteEventTypeMessageGroupRelationDto>());
         }
 
-        // TODO 读取接收升级数据
+        /// <summary>
+        /// 根据ID获取升级数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id)
+        {
+            return await GetUpgradeByMainIdAsync(id, PushSceneEnum.ReceiveUpgrade);
+        }
 
-        // TODO 读取处理升级数据
+        /// <summary>
+        /// 根据ID获取处理升级数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id)
+        {
+            return await GetUpgradeByMainIdAsync(id, PushSceneEnum.HandleUpgrade);
+        }
 
         /// <summary>
         /// 根据ID获取推送规则
@@ -188,12 +229,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteEventTypePushRuleDto>> QueryRulesByMainIdAsync(long id)
         {
-            var details = await _inteEventTypePushRuleRepository.GetEntitiesAsync(new EntityByParentIdQuery
+            var entities = await _inteEventTypePushRuleRepository.GetEntitiesAsync(new EntityByParentIdQuery
             {
                 ParentId = id
             });
 
-            return details.Select(s => s.ToModel<InteEventTypePushRuleDto>());
+            return entities.Select(s => s.ToModel<InteEventTypePushRuleDto>());
         }
 
         /// <summary>
@@ -211,6 +252,65 @@ namespace Hymson.MES.Services.Services.Integrated
             var dtos = pagedInfo.Data.Select(s => s.ToModel<InteEventTypeDto>());
             return new PagedInfo<InteEventTypeDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+
+
+        #region 内部方法
+        /// <summary>
+        /// 根据ID获取升级数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="pushScene"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<InteEventTypeUpgradeDto>> GetUpgradeByMainIdAsync(long id, PushSceneEnum pushScene)
+        {
+            // 升级信息
+            var entities = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
+            {
+                EventTypeId = id,
+                PushScene = pushScene
+            });
+
+            // 升级消息组关联信息
+            var messageGroupRelationEntities = await _inteEventTypeUpgradeMessageGroupRelationRepository.GetEntitiesAsync(new InteEventTypeUpgradeMessageGroupRelationQuery
+            {
+                EventTypeId = id,
+                PushScene = pushScene
+            });
+            var messageGroupRelationDic = messageGroupRelationEntities.ToLookup(w => w.EventTypeUpgradeId).ToDictionary(d => d.Key, d => d);
+
+            // 消息组基础信息（已缓存）
+            var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            // 组装数据
+            List<InteEventTypeUpgradeDto> dtos = new();
+            foreach (var entity in entities)
+            {
+                var dto = entity.ToModel<InteEventTypeUpgradeDto>();
+                if (messageGroupRelationDic.TryGetValue(entity.Id, out var messageGroupRelations) == false) continue;
+
+                List<InteEventTypeUpgradeMessageGroupRelationDto> messageGroups = new();
+                foreach (var item in messageGroupRelations)
+                {
+                    var messageGroupEntity = messageGroupEntities.FirstOrDefault(f => f.Id == item.MessageGroupId);
+                    if (messageGroupEntity == null) continue;
+
+                    messageGroups.Add(new InteEventTypeUpgradeMessageGroupRelationDto
+                    {
+                        Id = item.Id,
+                        MessageGroupId = item.MessageGroupId,
+                        PushTypes = item.PushTypes,
+                        Code = messageGroupEntity.Code,
+                        Name = messageGroupEntity.Name
+                    });
+                }
+                dto.MessageGroups = messageGroups;
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+        #endregion
 
     }
 }

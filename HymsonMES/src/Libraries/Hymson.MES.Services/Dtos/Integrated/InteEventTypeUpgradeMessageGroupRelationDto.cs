@@ -4,17 +4,22 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 事件类型关联群组新增/更新Dto
+    /// 事件升级消息组关联表新增/更新Dto
     /// </summary>
-    public record InteEventTypeMessageGroupRelationSaveDto : BaseEntityDto
+    public record InteEventTypeUpgradeMessageGroupRelationSaveDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 消息组id
+        /// <summary>
+        /// 升级场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
+        /// </summary>
+        public PushSceneEnum PushScene { get; set; }
+
+        /// <summary>
+        /// 消息组
         /// </summary>
         public long MessageGroupId { get; set; }
 
@@ -26,17 +31,27 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 事件类型关联群组Dto
+    /// 事件升级消息组关联表Dto
     /// </summary>
-    public record InteEventTypeMessageGroupRelationDto : BaseEntityDto
+    public record InteEventTypeUpgradeMessageGroupRelationDto : BaseEntityDto
     {
         /// <summary>
         /// 主键
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 消息组id
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 消息组
         /// </summary>
         public long MessageGroupId { get; set; }
 
@@ -48,8 +63,8 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 事件类型关联群组分页Dto
+    /// 事件升级消息组关联表分页Dto
     /// </summary>
-    public class InteEventTypeMessageGroupRelationPagedQueryDto : PagerInfo { }
+    public class InteEventTypeUpgradeMessageGroupRelationPagedQueryDto : PagerInfo { }
 
 }

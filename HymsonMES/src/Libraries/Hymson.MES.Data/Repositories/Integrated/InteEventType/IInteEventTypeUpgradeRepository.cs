@@ -1,20 +1,21 @@
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储接口（事件类型推送规则）
+    /// 仓储接口（事件升级）
     /// </summary>
-    public interface IInteEventTypePushRuleRepository
+    public interface IInteEventTypeUpgradeRepository
     {
         /// <summary>
-        /// 新增
+        /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<InteEventTypePushRuleEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<InteEventTypeUpgradeEntity> entities);
 
         /// <summary>
         /// 删除（批量）
@@ -28,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteEventTypePushRuleEntity>> GetEntitiesAsync(EntityByParentIdQuery query);
+        Task<IEnumerable<InteEventTypeUpgradeEntity>> GetEntitiesAsync(InteEventTypeUpgradeQuery query);
 
     }
 }

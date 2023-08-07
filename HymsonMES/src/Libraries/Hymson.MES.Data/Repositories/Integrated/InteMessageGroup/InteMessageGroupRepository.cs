@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Integrated.View;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -18,8 +19,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 
         /// </summary>
+        private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteMessageGroupRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public InteMessageGroupRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        {
+            _memoryCache = memoryCache;
+        }
 
         /// <summary>
         /// 新增
@@ -125,12 +134,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(InteMessageGroupQuery query)
+        public async Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteMessageGroupEntity>(template.RawSql, query);
+            var key = $"inte_message_group&SiteId-{query.SiteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+                sqlBuilder.Where("IsDeleted = 0");
+                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.Select("*");
+
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<InteMessageGroupEntity>(template.RawSql, query);
+            });
         }
 
         /// <summary>

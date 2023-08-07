@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -18,12 +19,12 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 事件类型id
         /// </summary>
-        public long? EventTypeId { get; set; }
+        public long EventTypeId { get; set; }
 
        /// <summary>
         /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
         /// </summary>
-        public bool PushScene { get; set; }
+        public PushSceneEnum PushScene { get; set; }
 
        
     }
