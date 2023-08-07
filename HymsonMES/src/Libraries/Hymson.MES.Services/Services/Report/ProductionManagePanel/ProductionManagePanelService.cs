@@ -595,7 +595,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
             var dailyPassList = manuSfcSummaryEntities
                 .Where(s => s.IsDeleted == 0)
-                .GroupBy(s => new { s.CreatedOn.Date, s.ProductId })
+                .GroupBy(s => new { s.CreatedOn.Date, s.ProcedureId })
                 .Select(g => new
                 {
                     ProcedureId = g.Max(c => c.ProcedureId),
