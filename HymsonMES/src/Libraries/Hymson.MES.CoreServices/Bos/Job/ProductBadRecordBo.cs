@@ -30,7 +30,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 不合格代码Id
         /// </summary>
-        public long[]? UnqualifiedIds { get; set; }
+        public long[] UnqualifiedIds { get; set; }
 
         /// <summary>
         /// 不合格工艺路线id

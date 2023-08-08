@@ -41,11 +41,6 @@ namespace Hymson.MES.CoreServices.Services.Job
     public class ProductBadRecordJobService : IJobService
     {
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
@@ -54,11 +49,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 多语言服务
-        /// </summary>
-        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 产品不良录入 仓储
@@ -82,21 +72,17 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="localizationService"></param>
-        public ProductBadRecordJobService(IManuCommonService manuCommonService,
-            IMasterDataService masterDataService,
+        public ProductBadRecordJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuSfcRepository manuSfcRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
-            ILocalizationService localizationService)
+            IManuSfcStepRepository manuSfcStepRepository)
         {
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
-            _localizationService = localizationService;
         }
 
         /// <summary>
