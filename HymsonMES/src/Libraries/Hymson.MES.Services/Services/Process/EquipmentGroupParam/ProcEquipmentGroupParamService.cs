@@ -179,7 +179,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 //查询相关的信息
                 //var products = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId).ToArray());
-                var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId).ToArray());
+                //var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId).ToArray());
                 var procEquipmentGroups = await _procProcessEquipmentGroupRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.EquipmentGroupId).ToArray());
 
                 foreach (var item in pagedInfo.Data)
@@ -187,8 +187,8 @@ namespace Hymson.MES.Services.Services.Process
                     var procEquipmentGroupParamViewDto = item.ToModel<ProcEquipmentGroupParamViewDto>();
                     //procEquipmentGroupParamViewDto.MaterialCode = products.FirstOrDefault(x => x.Id == item.ProductId)?.MaterialCode??"";
                     //procEquipmentGroupParamViewDto.MaterialName = products.FirstOrDefault(x => x.Id == item.ProductId)?.MaterialName ?? "";
-                    procEquipmentGroupParamViewDto.ProcedureCode = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code ?? "";
-                    procEquipmentGroupParamViewDto.ProcedureName = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Name ?? "";
+                    //procEquipmentGroupParamViewDto.ProcedureCode = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code ?? "";
+                    //procEquipmentGroupParamViewDto.ProcedureName = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Name ?? "";
                     procEquipmentGroupParamViewDto.EquipmentGroupCode = procEquipmentGroups.FirstOrDefault(x => x.Id == item.EquipmentGroupId)?.Code ?? "";
                     procEquipmentGroupParamViewDto.EquipmentGroupName = procEquipmentGroups.FirstOrDefault(x => x.Id == item.EquipmentGroupId)?.Name ?? "";
 
