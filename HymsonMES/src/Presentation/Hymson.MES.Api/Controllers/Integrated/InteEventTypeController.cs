@@ -102,23 +102,13 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 查询详情（接收升级）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        [HttpGet("receive/{id}")]
-        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id)
+        [HttpGet]
+        [Route("upgrade")]
+        public async Task<PagedInfo<InteEventTypeUpgradeDto>> GetUpgradeByMainIdAsync([FromQuery] InteEventTypeUpgradePagedQueryDto query)
         {
-            return await _inteEventTypeService.QueryReceivesByMainIdAsync(id);
-        }
-
-        /// <summary>
-        /// 查询详情（处理升级）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("handle/{id}")]
-        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id)
-        {
-            return await _inteEventTypeService.QueryHandlesByMainIdAsync(id);
+            return await _inteEventTypeService.GetUpgradeByMainIdAsync(query);
         }
 
         /// <summary>

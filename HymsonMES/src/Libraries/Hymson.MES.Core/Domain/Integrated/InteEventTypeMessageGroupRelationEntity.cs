@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public IEnumerable<PushTypeEnum> PushTypes { get; set; }
+        public string PushTypes { get; set; }
 
 
     }

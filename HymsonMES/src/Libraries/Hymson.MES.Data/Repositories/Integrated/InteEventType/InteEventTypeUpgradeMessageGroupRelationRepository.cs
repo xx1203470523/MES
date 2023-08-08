@@ -2,7 +2,6 @@ using Dapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
@@ -52,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("PushScene = @PushScene");
-            sqlBuilder.Where("EventTypeId IN @EventTypeId");
+            sqlBuilder.Where("EventTypeId = @EventTypeId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();

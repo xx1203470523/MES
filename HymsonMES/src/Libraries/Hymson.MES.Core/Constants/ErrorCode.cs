@@ -281,6 +281,10 @@
 
         #endregion
 
+        #region 异常消息 10900
+        public const string MES10901 = "";
+        #endregion
+
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码维护错误";
         public const string MES11101 = "不合格代码编码不能为空";
