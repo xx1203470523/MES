@@ -6,8 +6,10 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.OutBound;
+using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServicesTests.Dtos;
 using Hymson.MES.EquipmentServicesTests.Extensions;
 using Hymson.Utils;
@@ -28,6 +30,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
         private readonly IProcResourceTypeRepository _procResourceTypeRepository;//资源类型
         private readonly IProcResourceRepository _procResourceRepository;//资源
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;//资源对应设备绑定
+        private readonly ISfcCirculationService _sfcCirculationService;
         public ProcessRouteInOutBoundTests()
         {
             _inBoundService = ServiceProvider.GetRequiredService<IInBoundService>();
@@ -39,6 +42,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
             _procResourceTypeRepository = ServiceProvider.GetRequiredService<IProcResourceTypeRepository>();
             _procResourceRepository = ServiceProvider.GetRequiredService<IProcResourceRepository>();
             _procResourceEquipmentBindRepository = ServiceProvider.GetRequiredService<IProcResourceEquipmentBindRepository>();
+            _sfcCirculationService = ServiceProvider.GetRequiredService<ISfcCirculationService>();
         }
 
         [TestCleanup]
@@ -62,7 +66,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
         /// 获取工艺路线对应工序，设备，资源相关信息
         /// </summary>
         /// <returns></returns>
-        private async Task<IEnumerable<ProcessRouteInOutBoundDto>> GetTestProcessInfoAsnync(string processRouteCode)
+        private async Task<IEnumerable<ProcessRouteInOutBoundDto>> GetTestProcessInfoAsync(string processRouteCode)
         {
             long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
             var procProcessRouteEntities = await _procProcessRouteRepository.GetProcProcessRouteEntitiesAsync(new ProcProcessRouteQuery
@@ -120,6 +124,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
                 {
                     SiteId = siteId,
                     ProcedureId = procProcedure.Id,
+                    ProcedureCode = procProcedure.Code,
                     Id = equEquipment.Id,
                     Code = equEquipment.EquipmentCode,
                     FactoryId = equEquipment.WorkCenterFactoryId,
@@ -175,14 +180,14 @@ namespace Hymson.MES.EquipmentServicesTests.Services
         /// </summary>
         /// <returns></returns>
         [TestMethod]
-        public async Task ProcessRouteInOutBoundTestAsnync()
+        public async Task ProcessRouteInOutBoundTestAsync()
         {
             string processRouteCode = "QAPR001";//执行工艺路线
             string prefix = "AAA230807" + DateTime.Now.ToString("HHmm");//生成条码前缀
             int sfcCount = 30;//需要进出站多少条码数量
             int sfcSuffixLength = 3;//条码追加后缀0长度
             //或许工艺路线设备工序等信息
-            var processRouteInOutBounds = await GetTestProcessInfoAsnync(processRouteCode);
+            var processRouteInOutBounds = await GetTestProcessInfoAsync(processRouteCode);
             processRouteInOutBounds = processRouteInOutBounds.OrderBy(x => x.Sort).ToList();
             //生成模拟条码
             ProcessRouteSfcDto[] routeSfcDtos = new ProcessRouteSfcDto[sfcCount];
@@ -251,6 +256,136 @@ namespace Hymson.MES.EquipmentServicesTests.Services
                     LocalTime = HymsonClock.Now(),
                     SFCs = sfcList.ToArray()
                 });
+            }
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        ///  模组绑定测试
+        ///  13个电芯进站》电芯堆叠（OP040）》模组绑定电芯》模组出站
+        ///  模组固化（OP050）》模组极性检测等直到》箱体涂胶
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task ProcessRouteModuleBindTestAsync()
+        {
+            string processRouteCode = "QAPR001";//执行工艺路线
+            string prefix = "AAA230807" + DateTime.Now.ToString("HHmm");//生成条码前缀
+            int sfcCount = 13;//需要进出站多少条码数量
+            int sfcSuffixLength = 3;//条码追加后缀0长度
+            //或许工艺路线设备工序等信息
+            var processRouteInOutBounds = await GetTestProcessInfoAsync(processRouteCode);
+            processRouteInOutBounds = processRouteInOutBounds.OrderBy(x => x.Sort).ToList();
+            //生成模拟条码
+            ProcessRouteSfcDto[] routeSfcDtos = new ProcessRouteSfcDto[sfcCount];
+            for (int i = 1; i <= sfcCount; i++)
+            {
+                Random random = new Random();
+                var sfcSuffix = i.ToString().PadLeft(sfcSuffixLength, '0');
+                var sfc = prefix + sfcSuffix;
+                //出站参数
+                var parameterCount = random.Next(0, 50);
+                var outParameters = GetOutBoundParameters().GetListRandomElements(parameterCount);
+                routeSfcDtos[i - 1] = new ProcessRouteSfcDto
+                {
+                    IsNg = false,
+                    OutBoundParam = outParameters,
+                    SFC = sfc
+                };
+            }
+            string moduleSfc = "M230807" + DateTime.Now.ToString("HHmmss");//一个模组条码
+
+            //电芯段
+            string[] cellOp = new string[] { "OP010", "OP020", "OP030" };
+            //模组段
+            string[] moduleOp = new string[] { "OP040", "OP050", "OP060", "OP070", "OP080", "OP090", "OP100", "OP110" };
+            //Pack段
+            string[] packOp = new string[] { "OP120", "OP130", "OP140", "OP150", "OP160", "OP170", "OP180", "OP190", "OP200" };
+
+            //按工艺路线做简单循环进出站
+            foreach (var item in processRouteInOutBounds)
+            {
+                if (packOp.Contains(item.ProcedureCode)) {//Pack段
+                    break;
+                }
+                var resourceCode = item.ResourceCode;
+                //获取需要进站的数据
+                var routeSfcs = routeSfcDtos.Where(c => c.IsNg != true);
+                var sfcs = routeSfcs.Select(c => c.SFC).ToArray();
+                if (!sfcs.Any()) { break; }
+                //设置当前模拟设备名称
+                SetEquInfoAsync(new EquipmentInfoDto { Id = item.Id, FactoryId = item.FactoryId, Code = item.Code, Name = item.Name });
+
+                if (item.ProcedureCode.ToUpper() != "OP040")//进出站
+                {
+                    //模组段
+                    if (moduleOp.Contains(item.ProcedureCode))
+                    {
+                        routeSfcs = new ProcessRouteSfcDto[] { new ProcessRouteSfcDto {
+                            SFC=moduleSfc
+                        } };
+                        sfcs = new string[] { moduleSfc };
+                    }
+                    //进站
+                    await _inBoundService.InBoundMoreAsync(new InBoundMoreDto
+                    {
+                        LocalTime = HymsonClock.Now().AddMilliseconds(-1),
+                        ResourceCode = resourceCode,
+                        SFCs = sfcs
+                    });
+                    Thread.Sleep(TimeSpan.FromSeconds(2));//等待2秒避免进出站时间一样
+                                                          //出站
+                    List<OutBoundSFCDto> sfcList = new();
+                    foreach (var sfcItem in routeSfcs)
+                    {
+                        sfcList.Add(new OutBoundSFCDto
+                        {
+                            SFC = sfcItem.SFC,
+                            Passed = 1,
+                            ParamList = sfcItem.OutBoundParam?.ToArray()
+                        });
+                    }
+                    await _outBoundService.OutBoundMoreAsync(new OutBoundMoreDto
+                    {
+                        ResourceCode = resourceCode,
+                        LocalTime = HymsonClock.Now(),
+                        SFCs = sfcList.ToArray()
+                    });
+                }
+                else if (item.ProcedureCode.ToUpper() == "OP040")//模组绑定电芯
+                {
+                    //电芯进站
+                    await _inBoundService.InBoundMoreAsync(new InBoundMoreDto
+                    {
+                        LocalTime = HymsonClock.Now().AddMilliseconds(-1),
+                        ResourceCode = resourceCode,
+                        SFCs = sfcs
+                    });
+                    //绑定模组
+                    await _sfcCirculationService.SfcCirculationBindAsync(new SfcCirculationBindDto
+                    {
+                        ResourceCode = resourceCode,
+                        SFC = moduleSfc,
+                        BindSFCs = sfcs.Select(c =>
+                        {
+                            return new CirculationBindDto
+                            {
+                                SFC = c,
+                                Location = 0,
+                                Name = string.Empty
+                            };
+                        }
+                        ).ToArray()
+                    });
+                    Thread.Sleep(TimeSpan.FromSeconds(2));//等待2秒避免进出站时间一样
+                    //模组出站
+                    await _outBoundService.OutBoundAsync(new OutBoundDto
+                    {
+                        ResourceCode = resourceCode,
+                        LocalTime = HymsonClock.Now(),
+                        SFC = moduleSfc
+                    });
+                }
             }
             Assert.IsTrue(true);
         }

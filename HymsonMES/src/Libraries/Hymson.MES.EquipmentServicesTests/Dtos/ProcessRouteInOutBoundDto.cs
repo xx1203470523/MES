@@ -12,6 +12,10 @@
         /// </summary>
         public long ProcedureId { get; set; }
         /// <summary>
+        /// 当前工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+        /// <summary>
         /// 设备Id
         /// </summary>
         public long Id { get; set; }

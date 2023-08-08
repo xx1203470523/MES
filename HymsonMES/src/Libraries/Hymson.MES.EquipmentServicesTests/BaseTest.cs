@@ -5,11 +5,14 @@ using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.MES.Data.Options;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.EquipmentCollect;
 using Hymson.MES.EquipmentServices.Services.InBound;
 using Hymson.MES.EquipmentServices.Services.OutBound;
+using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Validators.InBound;
 using Hymson.MES.EquipmentServices.Validators.OutBound;
+using Hymson.MES.EquipmentServices.Validators.SfcCirculation;
 using Hymson.MES.EquipmentServicesTests.Dtos;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
@@ -66,6 +69,9 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSingleton<AbstractValidator<OutBoundMoreDto>, OutBoundMoreValidator>()//出站（多个）
                 .AddSingleton<IEquEquipmentService, EquEquipmentService>()//注入使用到的其他服务
                 .AddSingleton<AbstractValidator<EquEquipmentSaveDto>, EquEquipmentValidator>()
+                .AddSingleton<ISfcCirculationService, SfcCirculationService>()
+                .AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>()//条码流转绑定
+                .AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>()//条码流转解绑
                 .BuildServiceProvider();
 
             ConnectionOptions = ServiceProvider.GetRequiredService<IOptions<ConnectionOptions>>().Value;

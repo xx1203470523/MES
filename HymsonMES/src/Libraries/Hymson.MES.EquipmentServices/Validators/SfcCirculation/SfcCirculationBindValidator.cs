@@ -7,7 +7,10 @@ using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Validators.SfcCirculation
 {
-    internal class SfcCirculationBindValidator : AbstractValidator<SfcCirculationBindDto>
+    /// <summary>
+    /// 条码绑定验证类
+    /// </summary>
+    public class SfcCirculationBindValidator : AbstractValidator<SfcCirculationBindDto>
     {
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly ICurrentEquipment _currentEquipment;
