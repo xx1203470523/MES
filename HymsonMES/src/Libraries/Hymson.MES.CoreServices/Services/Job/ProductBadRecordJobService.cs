@@ -99,7 +99,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 验证DTO
-            if (bo.Sfcs == null || bo.Sfcs.Length < 1)
+            if (bo.SFCs == null || !bo.SFCs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
@@ -141,7 +141,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             //已经存在的不合格信息不允许重复录入
             var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
-                Sfcs = bo.Sfcs,
+                Sfcs = bo.SFCs.ToArray(),
                 Status = ProductBadRecordStatusEnum.Open,
                 SiteId = bo.SiteId
             });

@@ -23,14 +23,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public long ResourceId { get; set; }
 
         /// <summary>
-        /// 产品条码列表
-        /// </summary>
-        public string[]? Sfcs { get; set; }
-
-        /// <summary>
         /// 不合格代码Id
         /// </summary>
-        public long[] UnqualifiedIds { get; set; }
+        public long[]? UnqualifiedIds { get; set; }
 
         /// <summary>
         /// 不合格工艺路线id
