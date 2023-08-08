@@ -16,16 +16,20 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 事件类型id
         /// </summary>
         public long EventTypeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
         /// </summary>
         public PushSceneEnum PushScene { get; set; }
 
-       
+        /// <summary>
+        /// 启用状态（0:已禁用;1:已启用）
+        /// </summary>
+        public DisableOrEnableEnum IsEnabled { get; set; }
+
     }
 }

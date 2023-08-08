@@ -48,12 +48,23 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 关联消息组
         /// </summary>
-        public IEnumerable<InteEventTypeUpgradeMessageGroupRelationDto> MessageGroups { get; set; }
+        public IEnumerable<InteEventTypeMessageGroupRelationDto>? MessageGroups { get; set; }
     }
 
     /// <summary>
     /// 事件升级分页Dto
     /// </summary>
-    public class InteEventTypeUpgradePagedQueryDto : PagerInfo { }
+    public class InteEventTypeUpgradePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 时间类型ID
+        /// </summary>
+        public long EventTypeId { get; set; }
+
+        /// <summary>
+        /// 推送场景
+        /// </summary>
+        public PushSceneEnum PushScene { get; set; }
+    }
 
 }

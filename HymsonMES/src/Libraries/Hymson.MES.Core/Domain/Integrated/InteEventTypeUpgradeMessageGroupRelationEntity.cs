@@ -16,17 +16,17 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long EventTypeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 升级场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
         /// </summary>
         public PushSceneEnum PushScene { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 事件类型id
         /// </summary>
         public long EventTypeUpgradeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 消息组
         /// </summary>
         public long MessageGroupId { get; set; }
@@ -34,13 +34,13 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public IEnumerable<PushTypeEnum> PushTypes { get; set; }
+        public string PushTypes { get; set; }
 
         /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }

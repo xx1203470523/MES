@@ -53,16 +53,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 根据ID获取升级数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id);
-
-        /// <summary>
-        /// 根据ID获取处理升级数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id);
+        Task<PagedInfo<InteEventTypeUpgradeDto>> GetUpgradeByMainIdAsync(InteEventTypeUpgradePagedQueryDto query);
 
         /// <summary>
         /// 根据ID获取推送规则
