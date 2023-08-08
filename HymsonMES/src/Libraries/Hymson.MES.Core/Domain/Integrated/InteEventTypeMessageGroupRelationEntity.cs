@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -25,11 +26,11 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long MessageGroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public string PushType { get; set; }
+        public IEnumerable<PushTypeEnum> PushTypes { get; set; }
 
-       
+
     }
 }

@@ -51,6 +51,20 @@ namespace Hymson.MES.Services.Services.Integrated
         Task<IEnumerable<InteEventTypeMessageGroupRelationDto>> QueryMessageGroupsByMainIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取升级数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID获取处理升级数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id);
+
+        /// <summary>
         /// 根据ID获取推送规则
         /// </summary>
         /// <param name="id"></param>

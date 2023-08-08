@@ -19,14 +19,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public InteEventTypePushRuleRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
-        /// 新增
+        /// 新增（批量）
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(InteEventTypePushRuleEntity entity)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteEventTypePushRuleEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
         /// <summary>
@@ -57,7 +57,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return await conn.QueryAsync<InteEventTypePushRuleEntity>(template.RawSql, query);
         }
 
-
     }
 
 
@@ -68,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_push_rule /**where**/  ";
 
-        const string InsertSql = "INSERT INTO inte_event_type_push_rule(`Id`, `SiteId`, `EventTypeId`, `PushScene`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id, @SiteId, @EventTypeId, @PushScene, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO inte_event_type_push_rule(`Id`, `SiteId`, `EventTypeId`, `PushScene`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id, @SiteId, @EventTypeId, @PushScene, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
         const string DeleteByParentId = "DELETE FROM inte_event_type_push_rule WHERE EventTypeId = @ParentId";
 

@@ -135,21 +135,22 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("proc_process_equipment_group.IsDeleted = 0");
+            sqlBuilder.Where("proc_process_equipment_group.SiteId = @SiteId");
+            sqlBuilder.OrderBy("proc_process_equipment_group.UpdatedOn DESC");
+            sqlBuilder.Select("proc_process_equipment_group.*");
+            sqlBuilder.InnerJoin("proc_procedure PP ON proc_process_equipment_group.ProcedureId = PP.Id ");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
-                sqlBuilder.Where("Code LIKE @Code");
+                sqlBuilder.Where("proc_process_equipment_group.Code LIKE @Code");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode))
             {
-                pagedQuery.Name = $"%{pagedQuery.Name}%";
-                sqlBuilder.Where("Name LIKE @Name");
+                pagedQuery.ProcedureCode = $"%{pagedQuery.ProcedureCode}%";
+                sqlBuilder.Where("PP.Code LIKE @ProcedureCode");
             }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
@@ -184,18 +185,17 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcProcessEquipmentGroupRepository
     {
-        //const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoDataSqlTemplate = @"SELECT * FROM `proc_process_equipment_group` WHERE IsDeleted=0 ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_equipment_group` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_equipment_group` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetProcProcessEquipmentGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_process_equipment_group` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_process_equipment_group`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string InsertsSql = "INSERT INTO `proc_process_equipment_group`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `proc_process_equipment_group`(  `Id`, `Code`, `Name`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertsSql = "INSERT INTO `proc_process_equipment_group`(  `Id`, `Code`, `Name`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `proc_process_equipment_group` SET   Code = @Code, Name = @Name, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_process_equipment_group` SET   Code = @Code, Name = @Name, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_process_equipment_group` SET   Code = @Code, Name = @Name, ProcedureId = @ProcedureId, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_process_equipment_group` SET   Code = @Code, Name = @Name, ProcedureId = @ProcedureId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_process_equipment_group` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_equipment_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

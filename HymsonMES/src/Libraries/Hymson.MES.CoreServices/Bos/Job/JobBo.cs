@@ -35,6 +35,20 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public long ContainerId { get; set; }
 
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long[]? UnqualifiedIds { get; set; }
+
+        /// <summary>
+        /// 不合格工艺路线id
+        /// </summary>
+        public long? BadProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 说明
+        /// </summary>
+        public string? Remark { get; set; }
     }
 
     /// <summary>

@@ -93,22 +93,40 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("messageGroups/{id}")]
+        [HttpGet("messageGroup/{id}")]
         public async Task<IEnumerable<InteEventTypeMessageGroupRelationDto>?> QueryMessageGroupsByMainIdAsync(long id)
         {
             return await _inteEventTypeService.QueryMessageGroupsByMainIdAsync(id);
         }
 
-        // TODO 读取接收升级数据
+        /// <summary>
+        /// 查询详情（接收升级）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("receive/{id}")]
+        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryReceivesByMainIdAsync(id);
+        }
 
-        // TODO 读取处理升级数据
+        /// <summary>
+        /// 查询详情（处理升级）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("handle/{id}")]
+        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryHandlesByMainIdAsync(id);
+        }
 
         /// <summary>
         /// 查询详情（推送规则）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("rules/{id}")]
+        [HttpGet("rule/{id}")]
         public async Task<IEnumerable<InteEventTypePushRuleDto>> QueryRulesByMainIdAsync(long id)
         {
             return await _inteEventTypeService.QueryRulesByMainIdAsync(id);

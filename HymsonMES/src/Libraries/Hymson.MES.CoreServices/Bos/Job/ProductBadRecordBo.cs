@@ -1,4 +1,8 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Job
+﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+
+namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// Job请求实体
@@ -17,11 +21,6 @@
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
-
-        /// <summary>
-        /// 产品条码列表
-        /// </summary>
-        public string[]? Sfcs { get; set; }
 
         /// <summary>
         /// 不合格代码Id
@@ -45,5 +44,12 @@
     public class ProductBadRecordResponseBo: JobResultBo
     {
 
+        public bool IsScrapCode { get; set; }
+        public List<ManuProductBadRecordEntity> ManuProductBadRecords { get; set; }
+        public List<ManuSfcStepEntity> SfcStepList { get; set; }
+        public List<ManuSfcProduceBusinessEntity> ManuSfcProduceList { get; set; }
+        public  ManuSfcUpdateRouteCommand UpdateRouteCommand { get; set; }
+        public ManuSfcUpdateCommand UpdateCommand { get; set; }
+        public UpdateIsScrapCommand IsScrapCommand { get; set; }
     }
 }

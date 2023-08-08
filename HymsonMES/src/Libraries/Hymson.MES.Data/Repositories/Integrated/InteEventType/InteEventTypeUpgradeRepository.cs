@@ -1,4 +1,5 @@
 using Dapper;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -9,22 +10,22 @@ using Microsoft.Extensions.Options;
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储（事件类型关联群组）
+    /// 仓储（事件升级）
     /// </summary>
-    public partial class InteEventTypeMessageGroupRelationRepository : BaseRepository, IInteEventTypeMessageGroupRelationRepository
+    public partial class InteEventTypeUpgradeRepository : BaseRepository, IInteEventTypeUpgradeRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteEventTypeMessageGroupRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public InteEventTypeUpgradeRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<InteEventTypeMessageGroupRelationEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteEventTypeUpgradeEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -46,16 +47,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteEventTypeMessageGroupRelationEntity>> GetEntitiesAsync(EntityByParentIdQuery query)
+        public async Task<IEnumerable<InteEventTypeUpgradeEntity>> GetEntitiesAsync(InteEventTypeUpgradeQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("EventTypeId IN @ParentId");
+            sqlBuilder.Where("PushScene = @PushScene");
+            sqlBuilder.Where("EventTypeId IN @EventTypeId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteEventTypeMessageGroupRelationEntity>(template.RawSql, query);
+            return await conn.QueryAsync<InteEventTypeUpgradeEntity>(template.RawSql, query);
         }
 
     }
@@ -64,13 +66,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// <summary>
     /// 
     /// </summary>
-    public partial class InteEventTypeMessageGroupRelationRepository
+    public partial class InteEventTypeUpgradeRepository
     {
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_message_group_relation /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_upgrade /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO inte_event_type_message_group_relation(  `Id`, `SiteId`, `EventTypeId`, `MessageGroupId`, `PushTypes`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @EventTypeId, @MessageGroupId, @PushTypes, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO inte_event_type_upgrade(  `Id`, `EventTypeId`, `PushScene`, `Level`, `Duration`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @EventTypeId, @PushScene, @Level, @Duration, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
-        const string DeleteByParentId = "DELETE FROM inte_event_type_message_group_relation WHERE EventTypeId = @ParentId";
-
+        const string DeleteByParentId = "DELETE FROM inte_event_type_upgrade WHERE EventTypeId = @ParentId";
     }
 }

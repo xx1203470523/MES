@@ -17,6 +17,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -52,6 +53,11 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IEquEquipmentRepository _equipmentRepository;
 
         /// <summary>
+        /// 仓储接口（工序）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -60,10 +66,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procProcessEquipmentGroupRelationRepository"></param>
         /// <param name="equipmentRepository"></param>
+        /// <param name="procProcedureRepository"></param>
         public ProcProcessEquipmentGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcProcessEquipmentGroupSaveDto> validationSaveRules,
             IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository,
             IProcProcessEquipmentGroupRelationRepository procProcessEquipmentGroupRelationRepository,
-            IEquEquipmentRepository equipmentRepository)
+            IEquEquipmentRepository equipmentRepository,
+            IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -71,6 +79,7 @@ namespace Hymson.MES.Services.Services.Process
             _procProcessEquipmentGroupRepository = procProcessEquipmentGroupRepository;
             _procProcessEquipmentGroupRelationRepository = procProcessEquipmentGroupRelationRepository;
             _equipmentRepository = equipmentRepository;
+            _procProcedureRepository= procProcedureRepository;
         }
 
         /// <summary>
@@ -254,13 +263,21 @@ namespace Hymson.MES.Services.Services.Process
             }
             else
             {
-                dto.Info = (await _procProcessEquipmentGroupRepository.GetByIdAsync(id)).ToModel<ProcProcessEquipmentGroupListDto>();
+                var a = await _procProcessEquipmentGroupRepository.GetByIdAsync(id);
+                dto.Info = a.ToModel<ProcProcessEquipmentGroupListDto>();
+
+                //读取工序数据
+                var procedureId = dto.Info.ProcedureId;
+                var procedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId);
+                dto.Info.ProcedureCode = procedureEntity.Code;
+                dto.Info.ProcedureName = procedureEntity.Name;
+
                 processEquipmentEntitys = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, ProcessEquipmentGroupId = id });
 
             }
 
             var equipmentIds = processEquipmentEntitys.Select(s => s.EquipmentId);
-            var equipmentEntities = await _equipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
+            var equipmentEntities = await _equipmentRepository.GetEntitiesAsync(new EquEquipmentQuery   
             {
                 SiteId = _currentSite.SiteId ?? 0,
             });
@@ -295,8 +312,24 @@ namespace Hymson.MES.Services.Services.Process
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _procProcessEquipmentGroupRepository.GetPagedInfoAsync(pagedQuery);
 
+
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<ProcProcessEquipmentGroupListDto>());
+            var procedureIds = dtos.Select(s => s.ProcedureId);
+            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
+
+            List<ProcProcessEquipmentGroupListDto> newDtos = new();
+            foreach (var item in dtos)
+            {
+                var procedure = procedureEntities.Where(p => p.Id == item.ProcedureId).FirstOrDefault();
+                if (procedure == null) continue;
+
+                item.ProcedureCode = procedure.Code;
+                item.ProcedureName = procedure.Name;
+                newDtos.Add(item);
+            }
+            dtos= newDtos;
+
             return new PagedInfo<ProcProcessEquipmentGroupListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

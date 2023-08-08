@@ -1,11 +1,14 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
@@ -72,6 +75,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="sfcBos"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsWithCheckAsync(MultiSFCBo sfcBos);
+
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceInfoView>> GetManuSfcProduceInfoEntitiesAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 获取生产条码信息
@@ -180,6 +190,22 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
         Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+
+        /// <summary>
+        /// 获取不合格代码列表
+        /// </summary>
+        /// <param name="unqualifiedIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds);
+
+        /// <summary>
+        /// 创建条码步骤数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="type"></param>
+        /// <param name="remark"></param>
+        /// <returns></returns>
+        ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId, string remark = "");
 
         /// <summary>
         /// 进行扣料（单一物料，包含物料的替代料）

@@ -18,8 +18,8 @@ namespace Hymson.MES.Data.Repositories.Process.Query
         public string Code { get; set; } = "";
 
         /// <summary>
-        /// 名称（设备组）
+        /// 工序编码（工序）
         /// </summary>
-        public string Name { get; set; } = "";
+        public string ProcedureCode { get; set; } = "";
     }
 }
