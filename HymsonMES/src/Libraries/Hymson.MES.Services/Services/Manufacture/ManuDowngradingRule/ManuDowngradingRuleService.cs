@@ -183,5 +183,49 @@ namespace Hymson.MES.Services.Services.Manufacture
            }
             return null;
         }
+
+        /// <summary>
+        /// 获取所有降级规则数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuDowngradingRuleEntity>> GetAllManuDowngradingRuleEntitiesAsync() 
+        {
+            var allRuleList= await _manuDowngradingRuleRepository.GetManuDowngradingRuleEntitiesAsync(new ManuDowngradingRuleQuery() 
+            {
+                SiteId=_currentSite.SiteId??0
+            });
+
+            allRuleList = allRuleList.OrderBy(x => x.SerialNumber);
+
+            return allRuleList;
+        }
+
+        /// <summary>
+        /// 修改降级规则的排序号
+        /// </summary>
+        /// <param name="manuDowngradingRuleChangeSerialNumberDtos"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task UpdateSerialNumbersAsync(List<ManuDowngradingRuleChangeSerialNumberDto> manuDowngradingRuleChangeSerialNumberDtos) 
+        {
+            if (!manuDowngradingRuleChangeSerialNumberDtos.Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES21110));
+            }
+
+            List<ManuDowngradingRuleEntity> entitys=new List<ManuDowngradingRuleEntity>();
+            foreach (var item in manuDowngradingRuleChangeSerialNumberDtos)
+            {
+                entitys.Add(new ManuDowngradingRuleEntity()
+                {
+                    Id = item.Id,
+                    SerialNumber = item.SerialNumber,
+
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+            await _manuDowngradingRuleRepository.UpdateSerialNumbersAsync(entitys);
+        }
     }
 }

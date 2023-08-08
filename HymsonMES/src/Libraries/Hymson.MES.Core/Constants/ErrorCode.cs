@@ -1092,6 +1092,7 @@
         public const string MES21107 = "描述最大长度为255";
         public const string MES21108 = "降级规则编码不允许有空格";
         public const string MES21109 = "Id不合法";
+        public const string MES21110 = "参数为空";
         #endregion
 
         #region 设备对接错误
