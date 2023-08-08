@@ -25,6 +25,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Name { get; set; } = "";
 
         /// <summary>
+        /// 工序Id（工序）
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
@@ -56,6 +61,21 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Name { get; set; } = "";
 
         /// <summary>
+        /// 工序Id（工序）
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序编码（工序）
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称（工序）
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
@@ -82,9 +102,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? Code { get; set; }
 
         /// <summary>
-        /// 名称（工艺设备组）
+        /// 工序编码（工序）
         /// </summary>
-        public string? Name { get; set; }
+        public string? ProcedureCode { get; set; }
     }
 
     /// <summary>
@@ -101,6 +121,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 集合（设备）
         /// </summary>
         public IEnumerable<ProcProcessEquipmentBaseDto> Equipments { get; set; }
+
     }
 
     /// <summary>
@@ -118,8 +139,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
     }
-
-
 
     /// <summary>
     /// 自定义实体列表（设备注册）
@@ -146,4 +165,5 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long EquipmentGroupId { get; set; }
     }
+
 }
