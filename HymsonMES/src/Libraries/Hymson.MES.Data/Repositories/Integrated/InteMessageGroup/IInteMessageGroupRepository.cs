@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(InteMessageGroupQuery query);
+        Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(EntityBySiteIdQuery query);
 
         /// <summary>
         /// 分页查询

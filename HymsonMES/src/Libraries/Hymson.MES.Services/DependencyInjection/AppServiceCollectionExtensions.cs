@@ -195,6 +195,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuBakingRecordService, ManuBakingRecordService>();
             services.AddSingleton<IManuBakingService, ManuBakingService>();
 
+            services.AddSingleton<IManuDowngradingRuleService, ManuDowngradingRuleService>();
+
             #endregion
 
             #region Warehouse 
@@ -452,6 +454,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ManuBakingModifyDto>, ManuBakingModifyValidator>();
             services.AddSingleton<AbstractValidator<ManuBakingRecordCreateDto>, ManuBakingRecordCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuBakingRecordModifyDto>, ManuBakingRecordModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuDowngradingRuleCreateDto>, ManuDowngradingRuleCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuDowngradingRuleModifyDto>, ManuDowngradingRuleModifyValidator>();
 
             #endregion
 

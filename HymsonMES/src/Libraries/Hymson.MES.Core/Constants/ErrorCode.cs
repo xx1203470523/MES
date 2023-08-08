@@ -1081,6 +1081,19 @@
         public const string MES18903 = "请求实体不能为空！";
         #endregion
 
+        #region 降级规则 21100
+        public const string MES21100 = "降级规则错误";
+        public const string MES21101 = "对应降级规则不存在";
+        public const string MES21102 = "降级规则编码已存在";
+        public const string MES21103 = "降级规则编码不能为空";
+        public const string MES21104 = "降级规则名称不能为空";
+        public const string MES21105 = "降级规则编码最大长度为100";
+        public const string MES21106 = "降级规则名称最大长度为100";
+        public const string MES21107 = "描述最大长度为255";
+        public const string MES21108 = "降级规则编码不允许有空格";
+        public const string MES21109 = "Id不合法";
+        #endregion
+
         #region 设备对接错误
 
         #region 设备对接公用
