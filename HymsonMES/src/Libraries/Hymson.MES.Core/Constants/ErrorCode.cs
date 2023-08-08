@@ -632,9 +632,7 @@
         public const string MES16110 = "扫描条码失败";
         public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         public const string MES16112 = "扫描SN与关联工单号不符，请重新扫描！";
-        //public const string MES16113 = "请配置当前工单产品的编码规则！";
-        //public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
-        //public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
+
         public const string MES16116 = "已使用的条码，不允许删除";
 
         public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
@@ -1140,7 +1138,6 @@
         #endregion
 
         #region 系统执行出错 业务逻辑出错
-        //public const string MES20001 = "MES20001";
 
         #endregion
 
