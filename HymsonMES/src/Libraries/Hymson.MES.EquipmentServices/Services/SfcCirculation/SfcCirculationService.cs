@@ -20,6 +20,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 {
@@ -41,19 +42,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
-        /// 当前使用工单
-        /// </summary>
-        private PlanWorkOrderEntity planWorkOrder;
-        /// <summary>
-        /// 当前资源
-        /// </summary>
-        private ProcResourceEntity procResource;
-        /// <summary>
-        /// 工作中心（产线）
-        /// </summary>
-        private InteWorkCenterEntity inteWorkCenter;
 
         public SfcCirculationService(
             ICurrentEquipment currentEquipment,
@@ -85,6 +73,46 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         #endregion
 
         /// <summary>
+        /// 获取公用信息
+        /// </summary>
+        /// <param name="resourceCode"></param>
+        /// <returns></returns>
+        private async Task<(ProcResourceEntity, InteWorkCenterEntity, PlanWorkOrderEntity)> GetPubInfoByResourceCodeAsync(string resourceCode)
+        {
+            //已经验证过资源是否存在直接使用
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = resourceCode });
+            //查询资源和设备是否绑定
+            var resourceEquipmentBindQuery = new ProcResourceEquipmentBindQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                Ids = new long[] { _currentEquipment.Id ?? 0 },
+                ResourceId = procResource.Id
+            };
+            var resEquipentBinds = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
+            if (resEquipentBinds.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19131)).WithData("ResCode", procResource.ResCode).WithData("EquCode", _currentEquipment.Code);
+            }
+            //查找当前工作中心（产线）
+            var inteWorkCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(procResource.Id);
+            if (inteWorkCenter == null)
+            {
+                //通过资源未找到关联产线
+                throw new CustomerValidationException(nameof(ErrorCode.MES19123)).WithData("ResourceCode", procResource.ResCode);
+            }
+            //查找激活工单
+            var planWorkOrders = await _planWorkOrderRepository.GetByWorkLineIdAsync(inteWorkCenter.Id);
+            if (!planWorkOrders.Any())
+            {
+                //产线未激活工单
+                throw new CustomerValidationException(nameof(ErrorCode.MES19124)).WithData("WorkCenterCode", inteWorkCenter.Code);
+            }
+            //不考虑混线
+            var planWorkOrder = planWorkOrders.First();
+            return (procResource, inteWorkCenter, planWorkOrder);
+        }
+
+        /// <summary>
         /// 流转表绑定
         /// </summary>
         /// <param name="sfcCirculationBindDto"></param>
@@ -105,8 +133,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 sfcCirculationBindDto.SFC = ManuProductParameter.DefaultSFC;
             }
-
-            await GetPubInfoByResourceCodeAsync(sfcCirculationBindDto.ResourceCode);
+            //获取公共信息
+            var (procResource, inteWorkCenter, planWorkOrder) = await GetPubInfoByResourceCodeAsync(sfcCirculationBindDto.ResourceCode);
 
             var sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray();
             //条码信息
@@ -169,7 +197,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CirculationBarCode = sfcCirculationBindDto.SFC,
                     CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
                     CirculationMainProductId = sfcProduceEntity.ProductId,
-                    Location = circulationBindSFC.Location,
+                    Location = circulationBindSFC.Location.ToString(),
                     CirculationQty = 1,
                     //使用虚拟码记录为转换
                     CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
@@ -352,11 +380,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// 组件添加
         /// </summary>
         /// <param name="sfcCirculationBindDto"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task SfcCirculationModuleAddAsync(SfcCirculationBindDto sfcCirculationBindDto)
+        public async Task SfcCirculationModuleAddAsync(SfcCirculationBindDto sfcCirculationBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum)
         {
-            await GetPubInfoByResourceCodeAsync(sfcCirculationBindDto.ResourceCode);
             if (sfcCirculationBindDto.IsVirtualSFC == true && !string.IsNullOrEmpty(sfcCirculationBindDto.SFC))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19133));
@@ -392,7 +420,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     Location = circulationBindSFC.Location,
                     CirculationQty = 1,
-                    CirculationType = SfcCirculationTypeEnum.ModuleAdd,
+                    CirculationType = sfcCirculationTypeEnum,
                     CreatedBy = _currentEquipment.Name,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentEquipment.Name,
@@ -400,7 +428,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 });
             }
             await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntities);
-
         }
 
         /// <summary>
@@ -415,42 +442,48 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         }
 
         /// <summary>
-        /// 获取公用信息
+        /// 绑定CCS
         /// </summary>
-        /// <param name="resourceCode"></param>
+        /// <param name="sfcCirculationCCSBindDto"></param>
         /// <returns></returns>
-        private async Task GetPubInfoByResourceCodeAsync(string resourceCode)
+        public async Task SfcCirculationCCSBindAsync(SfcCirculationCCSBindDto sfcCirculationCCSBindDto)
         {
-            //已经验证过资源是否存在直接使用
-            procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = resourceCode });
-            //查询资源和设备是否绑定
-            var resourceEquipmentBindQuery = new ProcResourceEquipmentBindQuery
+            var sfcCirculationBindDto = new SfcCirculationBindDto()
             {
-                SiteId = _currentEquipment.SiteId,
-                Ids = new long[] { _currentEquipment.Id ?? 0 },
-                ResourceId = procResource.Id
+                SFC = sfcCirculationCCSBindDto.SFC,
+                LocalTime = sfcCirculationCCSBindDto.LocalTime,
+                ResourceCode = sfcCirculationCCSBindDto.ResourceCode,
+                EquipmentCode = sfcCirculationCCSBindDto.EquipmentCode,
+                BindSFCs = sfcCirculationCCSBindDto.BindSFCs.Select(c =>
+                {
+                    return new CirculationBindDto
+                    {
+                        SFC = c.SFC,
+                        Location = c.Location,
+                        Name = c.Name
+                    };
+                }).ToArray()
             };
-            var resEquipentBinds = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
-            if (resEquipentBinds.Any() == false)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19131)).WithData("ResCode", procResource.ResCode).WithData("EquCode", _currentEquipment.Code);
-            }
-            //查找当前工作中心（产线）
-            inteWorkCenter = await _inteWorkCenterRepository.GetByResourceIdAsync(procResource.Id);
-            if (inteWorkCenter == null)
-            {
-                //通过资源未找到关联产线
-                throw new CustomerValidationException(nameof(ErrorCode.MES19123)).WithData("ResourceCode", procResource.ResCode);
-            }
-            //查找激活工单
-            var planWorkOrders = await _planWorkOrderRepository.GetByWorkLineIdAsync(inteWorkCenter.Id);
-            if (!planWorkOrders.Any())
-            {
-                //产线未激活工单
-                throw new CustomerValidationException(nameof(ErrorCode.MES19124)).WithData("WorkCenterCode", inteWorkCenter.Code);
-            }
-            //不考虑混线
-            planWorkOrder = planWorkOrders.First();
+            await SfcCirculationModuleAddAsync(sfcCirculationBindDto, SfcCirculationTypeEnum.BindCCS);
         }
+
+        /// <summary>
+        /// 解绑CSS
+        /// </summary>
+        /// <param name="sfcCirculationCCSUnBindDto"></param>
+        /// <returns></returns>
+        public async Task SfcCirculationCCSUnBindAsync(SfcCirculationCCSUnBindDto sfcCirculationCCSUnBindDto)
+        {
+            var sfcCirculationUnBindDto = new SfcCirculationUnBindDto
+            {
+                SFC = sfcCirculationCCSUnBindDto.SFC,
+                LocalTime = sfcCirculationCCSUnBindDto.LocalTime,
+                ResourceCode = sfcCirculationCCSUnBindDto.ResourceCode,
+                EquipmentCode = sfcCirculationCCSUnBindDto.EquipmentCode,
+                UnBindSFCs = sfcCirculationCCSUnBindDto.UnBindSFCs
+            };
+            await SfcCirculationUnBindAsync(sfcCirculationUnBindDto, SfcCirculationTypeEnum.BindCCS);
+        }
+
     }
 }

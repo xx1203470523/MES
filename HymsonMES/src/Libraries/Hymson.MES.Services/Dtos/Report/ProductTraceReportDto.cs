@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 合并时绑定位置
         /// </summary>
-        public int? Location { get; set; }
+        public string? Location { get; set; }
         /// <summary>
         /// 创建人
         /// </summary>

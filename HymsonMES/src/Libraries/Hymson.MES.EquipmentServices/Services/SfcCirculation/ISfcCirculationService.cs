@@ -27,8 +27,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// 组件添加
         /// </summary>
         /// <param name="sfcCirculationBindDto"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
         /// <returns></returns>
-        Task SfcCirculationModuleAddAsync(SfcCirculationBindDto sfcCirculationBindDto);
+        Task SfcCirculationModuleAddAsync(SfcCirculationBindDto sfcCirculationBindDto,SfcCirculationTypeEnum sfcCirculationTypeEnum);
 
         /// <summary>
         /// 组件移除
@@ -36,5 +37,19 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcCirculationUnBindDto"></param>
         /// <returns></returns>
         Task SfcCirculationModuleRemoveAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto);
+
+        /// <summary>
+        /// CCS绑定
+        /// </summary>
+        /// <param name="sfcCirculationCCSBindDto"></param>
+        /// <returns></returns>
+        Task SfcCirculationCCSBindAsync(SfcCirculationCCSBindDto sfcCirculationCCSBindDto);
+
+        /// <summary>
+        /// CCS解绑
+        /// </summary>
+        /// <param name="sfcCirculationCCSUnBindDto"></param>
+        /// <returns></returns>
+        Task SfcCirculationCCSUnBindAsync(SfcCirculationCCSUnBindDto sfcCirculationCCSUnBindDto);
     }
 }

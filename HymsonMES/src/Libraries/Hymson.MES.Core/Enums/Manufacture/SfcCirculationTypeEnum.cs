@@ -42,6 +42,16 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 换件
         /// </summary>
         [Description("换件")]
-        ModuleReplace = 7
+        ModuleReplace = 7,
+        /// <summary>
+        /// 绑定
+        /// </summary>
+        [Description("绑定")]
+        Bind = 8,
+        /// <summary>
+        /// 绑定CCS
+        /// </summary>
+        [Description("绑定CCS")]
+        BindCCS = 9,
     }
 }

@@ -517,7 +517,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [Route("SfcCirculationModuleAdd")]
         public async Task SfcCirculationModuleAddAsync(SfcCirculationBindDto request)
         {
-            await _sfcCirculationService.SfcCirculationModuleAddAsync(request);
+            await _sfcCirculationService.SfcCirculationModuleAddAsync(request, SfcCirculationTypeEnum.ModuleAdd);
         }
 
         /// <summary>

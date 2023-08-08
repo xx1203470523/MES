@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,34 +8,28 @@ using System.Threading.Tasks;
 namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
 {
     /// <summary>
-    /// 绑定条码流转表
+    /// 条码组件CCS添加Dto
     /// </summary>
-    public record SfcCirculationBindDto : BaseDto
+    public record SfcCirculationCCSBindDto : BaseDto
     {
         /// <summary>
-        /// 模组/Pack条码
+        /// 模组
         /// </summary>
         public string SFC { get; set; } = string.Empty;
         /// <summary>
-        /// 模组绑电芯条码/Pack绑模组条码
+        /// 绑定CCS条码信息
         /// </summary>
-        public CirculationBindDto[] BindSFCs { get; set; }
-
-        /// <summary>
-        /// 是否为模组虚拟条码参数
-        /// 为兼容永泰虚拟条码场景
-        /// </summary>
-        public bool IsVirtualSFC { get; set; } = false;
+        public CirculationCCSDto[] BindSFCs { get; set; }
     }
-
-    public class CirculationBindDto
+    public class CirculationCCSDto
     {
         /// <summary>
         /// 绑定位置
+        /// CCS中为A,B,C,D
         /// </summary>
         public string Location { get; set; }
         /// <summary>
-        /// 绑定的条码
+        /// CCS条码
         /// </summary>
         public string SFC { get; set; }
 

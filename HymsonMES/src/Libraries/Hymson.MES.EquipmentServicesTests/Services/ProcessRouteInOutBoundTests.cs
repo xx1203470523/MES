@@ -305,7 +305,8 @@ namespace Hymson.MES.EquipmentServicesTests.Services
             //按工艺路线做简单循环进出站
             foreach (var item in processRouteInOutBounds)
             {
-                if (packOp.Contains(item.ProcedureCode)) {//Pack段
+                if (packOp.Contains(item.ProcedureCode))
+                {//Pack段
                     break;
                 }
                 var resourceCode = item.ResourceCode;
@@ -361,6 +362,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
                         ResourceCode = resourceCode,
                         SFCs = sfcs
                     });
+                    Thread.Sleep(TimeSpan.FromSeconds(2));//等待2秒避免进出站时间一样
                     //绑定模组
                     await _sfcCirculationService.SfcCirculationBindAsync(new SfcCirculationBindDto
                     {
@@ -371,7 +373,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
                             return new CirculationBindDto
                             {
                                 SFC = c,
-                                Location = 0,
+                                Location = string.Empty,
                                 Name = string.Empty
                             };
                         }

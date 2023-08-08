@@ -247,6 +247,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
+            //保存条码当前所在工序,出站条码去一个即可
+            var currentProcedureId = sfcProduceList.First().ProcedureId;
+
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
@@ -290,7 +293,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     ResourceId = procResource.Id,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ProcedureId = currentProcedureId,
                     CreatedBy = _currentEquipment.Name,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentEquipment.Name,
@@ -372,7 +375,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentEquipment.SiteId,
-                        ProcedureId = sfcProduceEntity.ProcedureId,
+                        ProcedureId = currentProcedureId,
                         EquipmentId = _currentEquipment.Id ?? 0,
                         ProductId = planWorkOrderEntity.ProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
@@ -505,7 +508,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 foreach (var entity in manuProductParameterEntities)
                 {
                     var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == entity.SFC).First();
-                    entity.ProcedureId = sfcProduceEntity.ProcedureId;
+                    entity.ProcedureId = currentProcedureId;
                     entity.ProductId = sfcProduceEntity.ProductId;
                     entity.WorkOrderId = sfcProduceEntity.WorkOrderId;
                 }
@@ -517,7 +520,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 foreach (var entity in manuProductParameterUpdateEntities)
                 {
                     var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == entity.SFC).First();
-                    entity.ProcedureId = sfcProduceEntity.ProcedureId;
+                    entity.ProcedureId = currentProcedureId;
                     entity.ProductId = sfcProduceEntity.ProductId;
                     entity.WorkOrderId = sfcProduceEntity.WorkOrderId;
                 }
