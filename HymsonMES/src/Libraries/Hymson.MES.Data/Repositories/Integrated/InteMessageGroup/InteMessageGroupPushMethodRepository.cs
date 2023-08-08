@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("MessageGroupId = @MessageGroupId");
+            sqlBuilder.Where("MessageGroupId IN @MessageGroupIds");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
@@ -67,9 +67,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteMessageGroupPushMethodRepository
     {
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM inte_message_group_push_method /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_message_group_push_method /**where**/  ";
 
         const string InsertsSql = "INSERT INTO inte_message_group_push_method(  `Id`, `SiteId`, `MessageGroupId`, `Type`, `Address`, `SecretKey`, `KeyWord`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @MessageGroupId, @Type, @Address, @SecretKey, @KeyWord, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 

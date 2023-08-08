@@ -408,6 +408,18 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
+
+        /// <summary>
+        /// 根据设备Id查询关联的资源数据
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetByEquipmentIdsAsync(ProcResourceByEquipmentIdsQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentIdsSql, new { EquipmentIds = query.EquipmentIds, SiteId = query.SiteId });
+        }
+
     }
 
     /// <summary>
@@ -451,5 +463,11 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetResourceByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND Status=@Status AND ResCode = @ResCode and SiteId =@SiteId ";
 
+        const string GetByEquipmentIdsSql = @"SELECT R.* 
+            FROM proc_resource_equipment_bind REB 
+            LEFT JOIN proc_resource R ON REB.ResourceId = R.Id
+            WHERE R.IsDeleted = 0 
+            AND REB.EquipmentId IN @EquipmentIds 
+            AND REB.SiteId = @SiteId ";
     }
 }

@@ -68,6 +68,16 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         public string EquipmentCode { get; set; }
     }
 
+    public class ProcResourceByEquipmentIdsQuery
+    {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        public long[] EquipmentIds { get; set; }
+    }
+
 
     /// <summary>
     /// 资源维护表：根据工序查询资源列表

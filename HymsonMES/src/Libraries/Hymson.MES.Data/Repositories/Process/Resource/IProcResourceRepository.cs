@@ -147,5 +147,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 根据设备Id查询关联的资源数据
+        /// </summary>
+        /// <param name="equipmentCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetByEquipmentIdsAsync(ProcResourceByEquipmentIdsQuery query);
     }
 }

@@ -184,6 +184,7 @@
         public const string MES10474 = $"工序节点手动排序号不能为空";
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
+        public const string MES10476 = $"工序不存在";
         #endregion
 
         #region 参数 10500
@@ -459,6 +460,10 @@
         public const string MES13011 = "此故障原因编码{Code}在系统已经存在！";
         public const string MES13012 = "状态不合法，请检查!";
         public const string MES13013 = "设备故障原因不存在！";
+        #endregion
+
+        #region  14000段项目使用 平台请勿使用
+
         #endregion
 
         #region 供应商  15000
@@ -1074,6 +1079,19 @@
         public const string MES18901 = "工艺设备组编码不允许有空格";
         public const string MES18902 = "工艺设备组名称不能为空";
         public const string MES18903 = "请求实体不能为空！";
+        #endregion
+
+        #region 降级规则 21100
+        public const string MES21100 = "降级规则错误";
+        public const string MES21101 = "对应降级规则不存在";
+        public const string MES21102 = "降级规则编码已存在";
+        public const string MES21103 = "降级规则编码不能为空";
+        public const string MES21104 = "降级规则名称不能为空";
+        public const string MES21105 = "降级规则编码最大长度为100";
+        public const string MES21106 = "降级规则名称最大长度为100";
+        public const string MES21107 = "描述最大长度为255";
+        public const string MES21108 = "降级规则编码不允许有空格";
+        public const string MES21109 = "Id不合法";
         #endregion
 
         #region 设备对接错误

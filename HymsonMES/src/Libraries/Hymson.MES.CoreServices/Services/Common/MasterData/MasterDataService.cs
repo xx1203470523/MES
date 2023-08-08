@@ -5,6 +5,7 @@ using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
@@ -18,11 +19,14 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
+using Hymson.MES.Data.Repositories.Quality;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Sequences;
@@ -122,6 +126,16 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IInteJobRepository _inteJobRepository;
 
         /// <summary>
+        /// 不合格代码仓储
+        /// </summary>
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+        /// <summary>
+        /// 产品不良录入 仓储
+        /// </summary>
+        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="sequenceService"></param>
@@ -156,7 +170,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcProductSetRepository procProductSetRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
-            IInteJobRepository inteJobRepository)
+            IInteJobRepository inteJobRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
@@ -176,6 +192,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProductSetRepository = procProductSetRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _inteJobRepository = inteJobRepository;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -361,6 +379,38 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             // 条码在制表
             var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            {
+                SiteId = sfcBos.SiteId,
+                Sfcs = sfcBos.SFCs
+            });
+
+            // 不存在在制表的话，就去库存查找
+            if (sfcProduceEntities.Any() == false)
+            {
+                //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
+                //{
+                //    SiteId = sfcBos.SiteId,
+                //    BarCodes = sfcBos.SFCs
+                //});
+                //if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
+            }
+
+            return sfcProduceEntities;
+        }
+
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceInfoView>> GetManuSfcProduceInfoEntitiesAsync(MultiSFCBo sfcBos)
+        {
+            if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
+
+            // 条码在制表
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(new ManuSfcProduceQuery
             {
                 SiteId = sfcBos.SiteId,
                 Sfcs = sfcBos.SFCs
@@ -954,6 +1004,48 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 获取不合格代码列表
+        /// </summary>
+        /// <param name="unqualifiedIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds)
+        {
+           return await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
+        }
+
+
+        /// <summary>
+        /// 创建条码步骤数据
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="type"></param>
+        /// <param name="remark"></param>
+        /// <returns></returns>
+        public ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId,string remark = "")
+        {
+            return new ManuSfcStepEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SFC = sfc.SFC,
+                ProductId = sfc.ProductId,
+                WorkOrderId = sfc.WorkOrderId,
+                WorkCenterId = sfc.WorkCenterId,
+                ProductBOMId = sfc.ProductBOMId,
+                Qty = sfc.Qty,
+                EquipmentId = sfc.EquipmentId,
+                ResourceId = sfc.ResourceId,
+                ProcedureId = sfc.ProcedureId,
+                Operatetype = type,
+                CurrentStatus = sfc.Status,
+                //Lock = sfc.Lock,
+                Remark = remark,
+                SiteId = siteId,
+                CreatedBy = sfc.CreatedBy,
+                UpdatedBy = sfc.UpdatedBy
+            };
+        }
+
+        /// <summary>
         /// 取得消耗系数
         /// </summary>
         /// <param name="materialEntities"></param>
@@ -1103,5 +1195,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (originQty == 0) return originValue;
             return targetQty * originValue / originQty;
         }
+
     }
 }
