@@ -154,6 +154,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteVehicleFreightEntity);
         }
+        public async Task<int> UpdateQtyAsync(InteVehicleFreightEntity inteVehicleFreightEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateQtySql, inteVehicleFreightEntity);
+        }
 
         /// <summary>
         /// 批量更新
@@ -202,8 +207,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string InsertSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location,  @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `inte_vehicle_freight`(  `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @VehicleId, @Qty, @Row, @Column, @Location, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-
-        const string UpdateSql = "UPDATE `inte_vehicle_freight` SET   Qty =@Qty, VehicleId = @VehicleId, `Row`=@Row, `Column`=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateQtySql = "UPDATE `inte_vehicle_freight` SET   Qty =@Qty+1, VehicleId = @VehicleId, `Row`=@Row, `Column`=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_vehicle_freight` SET   Qty =@Qty+1, VehicleId = @VehicleId, `Row`=@Row, `Column`=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `inte_vehicle_freight` SET   Qty =@Qty, VehicleId = @VehicleId, `Row`=@Row, `Column`=@Column, Location = @Location, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_vehicle_freight` SET IsDeleted = Id WHERE Id = @Id ";

@@ -37,7 +37,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleFreightEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteVehicleFreightEntity inteVehicleFreightEntity);
-        
+        Task<int> UpdateQtyAsync(InteVehicleFreightEntity inteVehicleFreightEntity);
+
         /// <summary>
         /// 批量更新 
         /// </summary>
