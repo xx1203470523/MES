@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("integrated:inteEventType:insert")]
         public async Task AddAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
-             await _inteEventTypeService.CreateAsync(saveDto);
+            await _inteEventTypeService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("integrated:inteEventType:update")]
         public async Task UpdateAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
-             await _inteEventTypeService.ModifyAsync(saveDto);
+            await _inteEventTypeService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -86,6 +86,50 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<InteEventTypeDto?> QueryByIdAsync(long id)
         {
             return await _inteEventTypeService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（关联群组）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("messageGroup/{id}")]
+        public async Task<IEnumerable<InteEventTypeMessageGroupRelationDto>?> QueryMessageGroupsByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryMessageGroupsByMainIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（接收升级）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("receive/{id}")]
+        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryReceivesByMainIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（处理升级）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("handle/{id}")]
+        public async Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryHandlesByMainIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（推送规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("rule/{id}")]
+        public async Task<IEnumerable<InteEventTypePushRuleDto>> QueryRulesByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryRulesByMainIdAsync(id);
         }
 
         /// <summary>

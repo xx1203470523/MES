@@ -107,7 +107,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentEntity, EquEquipmentBaseDto>();
             #endregion
 
-
             #region EquEquipmentLinkApi
             CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
             CreateMap<EquEquipmentLinkApiModifyDto, EquEquipmentLinkApiEntity>();
@@ -286,10 +285,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageGroupPushMethodEntity, InteMessageGroupPushMethodDto>();
             #endregion
 
-
             #region InteEventType
             CreateMap<InteEventTypePagedQueryDto, InteEventTypePagedQuery>();
             CreateMap<InteEventTypeDto, InteEventTypeEntity>();
+            CreateMap<InteEventTypeMessageGroupRelationEntity, InteEventTypeMessageGroupRelationDto>();
+            CreateMap<InteEventTypePushRuleEntity, InteEventTypePushRuleDto>();
             #endregion
         }
 
@@ -647,6 +647,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuBakingRecordEntity, ManuBakingRecordDto>();
             CreateMap<ManuBakingRecordModifyDto, ManuBakingRecordEntity>();
             CreateMap<ManuBakingRecordPagedQueryDto, ManuBakingRecordPagedQuery>();
+            #endregion
+
+            #region ManuDowngradingRule
+            CreateMap<ManuDowngradingRuleCreateDto, ManuDowngradingRuleEntity>();
+            CreateMap<ManuDowngradingRulePagedQueryDto, ManuDowngradingRulePagedQuery>();
+            CreateMap<ManuDowngradingRuleModifyDto, ManuDowngradingRuleEntity>();
+            CreateMap<ManuDowngradingRuleEntity, ManuDowngradingRuleDto>();
             #endregion
         }
 

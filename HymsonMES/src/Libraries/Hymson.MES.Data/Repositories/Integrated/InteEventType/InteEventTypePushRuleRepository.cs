@@ -1,31 +1,29 @@
 using Dapper;
-using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储（消息组推送方式）
+    /// 仓储（事件类型推送规则）
     /// </summary>
-    public partial class InteMessageGroupPushMethodRepository : BaseRepository, IInteMessageGroupPushMethodRepository
+    public partial class InteEventTypePushRuleRepository : BaseRepository, IInteEventTypePushRuleRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteMessageGroupPushMethodRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public InteEventTypePushRuleRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<InteMessageGroupPushMethodEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteEventTypePushRuleEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -47,16 +45,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteMessageGroupPushMethodEntity>> GetEntitiesAsync(InteMessageGroupPushMethodQuery query)
+        public async Task<IEnumerable<InteEventTypePushRuleEntity>> GetEntitiesAsync(EntityByParentIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("MessageGroupId IN @MessageGroupIds");
+            sqlBuilder.Where("EventTypeId IN @ParentId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteMessageGroupPushMethodEntity>(template.RawSql, query);
+            return await conn.QueryAsync<InteEventTypePushRuleEntity>(template.RawSql, query);
         }
 
     }
@@ -65,12 +63,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// <summary>
     /// 
     /// </summary>
-    public partial class InteMessageGroupPushMethodRepository
+    public partial class InteEventTypePushRuleRepository
     {
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_message_group_push_method /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_push_rule /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO inte_message_group_push_method(  `Id`, `SiteId`, `MessageGroupId`, `Type`, `Address`, `SecretKey`, `KeyWord`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @MessageGroupId, @Type, @Address, @SecretKey, @KeyWord, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO inte_event_type_push_rule(`Id`, `SiteId`, `EventTypeId`, `PushScene`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id, @SiteId, @EventTypeId, @PushScene, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string DeleteByParentId = "DELETE FROM inte_message_group_push_method WHERE MessageGroupId = @ParentId";
+        const string DeleteByParentId = "DELETE FROM inte_event_type_push_rule WHERE EventTypeId = @ParentId";
+
     }
 }

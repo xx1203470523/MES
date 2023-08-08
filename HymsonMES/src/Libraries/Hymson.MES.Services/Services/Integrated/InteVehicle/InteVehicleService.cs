@@ -463,8 +463,10 @@ namespace Hymson.MES.Services.Services.Integrated
                 case Core.Enums.Integrated.VehicleOperationEnum.Unbind : { await VehicleUnBindOperationAsync(dto); } break;
                 case Core.Enums.Integrated.VehicleOperationEnum.Clear: { await VehicleClearAsync(dto); } break;
             }
+
             ThreadPool.QueueUserWorkItem(async o =>
             {
+               
                 var foo = new InteVehicleFreightRecordEntity()
                 {
                     CreatedBy = _currentUser.UserName,
@@ -590,11 +592,10 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             var loc = await _inteVehicleFreightRepository.GetByIdAsync(dto.LocationId);
-
-            loc.Qty += 1;
+           
             loc.UpdatedBy = _currentUser.UserName;
             loc.UpdatedOn = HymsonClock.Now();
-            await _inteVehicleFreightRepository.UpdateAsync(loc);
+            await _inteVehicleFreightRepository.UpdateQtyAsync(loc);
         }
 
         /// <summary>
