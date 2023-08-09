@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
 using Hymson.MES.Data.Repositories.Integrated.InteEventType.View;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
@@ -289,7 +290,8 @@ namespace Hymson.MES.Services.Mapper
 
             #region InteEvent
             CreateMap<InteEventPagedQueryDto, InteEventPagedQuery>();
-            CreateMap<InteEventEntity, InteEventDto>();
+            CreateMap<InteEventEntity, InteEventInfoDto>();
+             CreateMap<InteEventView, InteEventDto>();
             CreateMap<InteEventSaveDto, InteEventEntity>();
             #endregion
 

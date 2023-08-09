@@ -20,7 +20,7 @@ using Hymson.Utils.Tools;
 namespace Hymson.MES.Services.Services.Integrated
 {
     /// <summary>
-    /// 服务（事件维护） 
+    /// 服务（事件类型维护） 
     /// </summary>
     public class InteEventTypeService : IInteEventTypeService
     {
@@ -44,7 +44,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteMessageGroupRepository _inteMessageGroupRepository;
 
         /// <summary>
-        /// 仓储接口（事件维护）
+        /// 仓储接口（事件类型维护）
         /// </summary>
         private readonly IInteEventTypeRepository _inteEventTypeRepository;
 

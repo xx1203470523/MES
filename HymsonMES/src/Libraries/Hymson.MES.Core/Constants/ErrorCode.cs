@@ -282,7 +282,7 @@
         #endregion
 
         #region 异常消息 10900
-        public const string MES10901 = "";
+        public const string MES10901 = "事件类型不能为空";
         #endregion
 
         #region 不合格代码 11100
@@ -1120,6 +1120,12 @@
         public const string MES19006 = "资源编码不存在";
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
+        #endregion
+
+        #region  产品参数采集
+        public const string MES19100 = "产品参数采集异常";
+        public const string MES19101 = "未找到资源{ResCode}对应工序";
+        public const string MES19102 = "参数{ResCode}不存在";
         #endregion
 
 

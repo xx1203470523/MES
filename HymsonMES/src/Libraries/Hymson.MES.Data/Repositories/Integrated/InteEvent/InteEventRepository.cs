@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
@@ -137,12 +138,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteEventEntity>> GetPagedListAsync(InteEventPagedQuery pagedQuery)
+        public async Task<PagedInfo<InteEventView>> GetPagedListAsync(InteEventPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("inte_event_type IET IE ON IET.Id = T.EventTypeId");
+            sqlBuilder.LeftJoin("inte_event_type IET ON IET.Id = T.EventTypeId");
             sqlBuilder.Select("T.*, IET.Name AS EventTypeName");
             sqlBuilder.OrderBy("T.UpdatedOn DESC");
             sqlBuilder.Where("T.IsDeleted = 0");
@@ -177,11 +178,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<InteEventEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<InteEventView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteEventEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteEventView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }

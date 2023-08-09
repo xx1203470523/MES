@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -86,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteEventEntity>> GetPagedListAsync(InteEventPagedQuery pagedQuery);
+        Task<PagedInfo<InteEventView>> GetPagedListAsync(InteEventPagedQuery pagedQuery);
 
     }
 }

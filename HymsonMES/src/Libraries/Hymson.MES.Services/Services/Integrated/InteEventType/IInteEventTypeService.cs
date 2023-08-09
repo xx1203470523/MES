@@ -4,7 +4,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Services.Integrated
 {
     /// <summary>
-    /// 服务接口（事件维护）
+    /// 服务接口（事件类型维护）
     /// </summary>
     public interface IInteEventTypeService
     {

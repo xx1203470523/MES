@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteEventDto?> QueryByIdAsync(long id);
+        Task<InteEventInfoDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List

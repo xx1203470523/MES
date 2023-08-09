@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     break;
                 default:
                 case FeedingSourceEnum.Resource:
-                    resources.AddRange(await _procResourceRepository.GetByResourceCodeAsync(new ProcResourceQuery
+                    resources.Add(await _procResourceRepository.GetByResourceCodeAsync(new ProcResourceQuery
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         ResCode = queryDto.Code

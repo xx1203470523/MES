@@ -5,6 +5,7 @@ using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
 using Hymson.MES.EquipmentServices.Services.Job.Implementing;
 using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
+using Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.InStation;
 using Hymson.MES.EquipmentServices.Validators.SfcBinding;
@@ -43,7 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInStationService, InStationService>();
             services.AddSingleton<IJobManufactureService, JobManuSfcConvertService>();
             services.AddSingleton<ISfcBindingService, SfcBindingService>();
-
+            services.AddSingleton<IProductProcessCollectionService, ProductProcessCollectionService>();
         }
 
         /// <summary>

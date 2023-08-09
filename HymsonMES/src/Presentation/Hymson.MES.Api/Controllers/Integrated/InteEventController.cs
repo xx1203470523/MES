@@ -83,7 +83,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<InteEventDto?> QueryByIdAsync(long id)
+        public async Task<InteEventInfoDto?> QueryByIdAsync(long id)
         {
             return await _inteEventService.QueryByIdAsync(id);
         }
