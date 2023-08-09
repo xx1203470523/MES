@@ -536,14 +536,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 根据模组条码获取绑定CCS的位置
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="sfc"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetModuleCCSLocation")]
         [ProducesResponseType(typeof(CirculationBindCCSLocationDto), 200)]
-        public async Task<CirculationBindCCSLocationDto> GetBindCCSLocationAsync(string request)
+        public async Task<CirculationBindCCSLocationDto> GetBindCCSLocationAsync(string sfc)
         {
-            return await _sfcCirculationService.GetBindCCSLocationAsync(request);
+            return await _sfcCirculationService.GetBindCCSLocationAsync(sfc);
         }
 
         /// <summary>
