@@ -8,6 +8,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -20,7 +21,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using Org.BouncyCastle.Asn1.Ocsp;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 {
@@ -70,6 +71,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
         }
+        /// <summary>
+        /// CCS绑定的Location
+        /// </summary>
+        private readonly string[] locationArray = new string[] { "A", "B", "C", "D" };
+
         #endregion
 
         /// <summary>
@@ -113,6 +119,28 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         }
 
         /// <summary>
+        /// 验证绑定是否重复并触发异常提醒
+        /// </summary>
+        /// <param name="sfcCirculationBindDto"></param>
+        /// <returns></returns>
+        private async Task VerifyDuplicate(SfcCirculationBindDto sfcCirculationBindDto)
+        {
+            //查找当前已有的绑定记录
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                Sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray(),
+                CirculationBarCode = sfcCirculationBindDto.SFC,
+                IsDisassemble = TrueOrFalseEnum.No
+            });
+            if (manuSfcCirculationEntities.Any())
+            {
+                //条码：{SFCS}已经存在绑定记录
+                throw new CustomerValidationException(nameof(ErrorCode.MES19138)).WithData("SFCS", string.Join(",", manuSfcCirculationEntities.Select(c => c.SFC)));
+            }
+        }
+
+        /// <summary>
         /// 流转表绑定
         /// </summary>
         /// <param name="sfcCirculationBindDto"></param>
@@ -128,6 +156,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19133));
             }
+            //验证是否已经存在绑定关系
+            await VerifyDuplicate(sfcCirculationBindDto);
             //如果为虚拟条码绑定
             if (sfcCirculationBindDto.IsVirtualSFC == true)
             {
@@ -389,13 +419,16 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19133));
             }
+            //验证是否已经存在绑定关系
+            await VerifyDuplicate(sfcCirculationBindDto);
             //如果为虚拟条码
             if (sfcCirculationBindDto.IsVirtualSFC == true)
             {
                 sfcCirculationBindDto.SFC = ManuProductParameter.DefaultSFC;
             }
             //获取主条码信息
-            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
+            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", sfcCirculationBindDto.SFC); ;
             //查询已经存在条码的生产信息
             var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = sfcEntity.SFC, SiteId = _currentEquipment.SiteId })
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", sfcEntity.SFC);
@@ -411,11 +444,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     SiteId = _currentEquipment.SiteId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
-                    SFC = sfcProduceEntity.SFC,
+                    SFC = circulationBindSFC.SFC,
                     WorkOrderId = sfcProduceEntity.WorkOrderId,
                     ProductId = sfcProduceEntity.ProductId,
                     EquipmentId = _currentEquipment.Id,
-                    CirculationBarCode = circulationBindSFC.SFC,
+                    CirculationBarCode = sfcProduceEntity.SFC,
                     CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     Location = circulationBindSFC.Location,
@@ -442,12 +475,52 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         }
 
         /// <summary>
+        /// 验证CSS绑定是否重复并触发异常提醒
+        /// </summary>
+        /// <param name="sfcCirculationBindDto"></param>
+        /// <returns></returns>
+        private async Task VerifyCSSLocationAsync(SfcCirculationBindDto sfcCirculationBindDto)
+        {
+            var sfcLocations = sfcCirculationBindDto.BindSFCs.Select(c => c.Location ?? string.Empty).ToArray();
+            var exceptLocations = sfcLocations.Except(locationArray).ToArray();
+            if (exceptLocations.Any())
+            {
+                //错误的Location  1,2，只能为：A,B,C,D
+                throw new CustomerValidationException(nameof(ErrorCode.MES19140)).WithData("SFCLocation", string.Join(",", exceptLocations))
+                    .WithData("Location", string.Join(",", locationArray));
+            }
+            //查找当前已有的绑定记录
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCode = sfcCirculationBindDto.SFC,
+                IsDisassemble = TrueOrFalseEnum.No
+            });
+            //
+            var locations = sfcCirculationBindDto.BindSFCs.Select(c => c.Location).ToArray();
+            var sfcCirculationEntities = manuSfcCirculationEntities.Where(c => locations.Contains(c.Location));
+            if (sfcCirculationEntities.Any())
+            {
+                //条码：{SFCS}已经存在绑定记录
+                throw new CustomerValidationException(nameof(ErrorCode.MES19139)).WithData("SFCS", string.Join(",", sfcCirculationEntities.Select(c => c.SFC)))
+                    .WithData("Location", string.Join(",", sfcCirculationEntities.Select(c => c.Location)));
+            }
+        }
+        /// <summary>
         /// 绑定CCS
         /// </summary>
         /// <param name="sfcCirculationCCSBindDto"></param>
         /// <returns></returns>
         public async Task SfcCirculationCCSBindAsync(SfcCirculationCCSBindDto sfcCirculationCCSBindDto)
         {
+            if (string.IsNullOrEmpty(sfcCirculationCCSBindDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
+            }
+            if (sfcCirculationCCSBindDto.BindSFCs == null || sfcCirculationCCSBindDto.BindSFCs.Length == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19119));//绑定条码列表不能为空
+            }
             var sfcCirculationBindDto = new SfcCirculationBindDto()
             {
                 SFC = sfcCirculationCCSBindDto.SFC,
@@ -464,6 +537,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     };
                 }).ToArray()
             };
+            //验证Location是否已经存在绑定数据
+            await VerifyCSSLocationAsync(sfcCirculationBindDto);
             await SfcCirculationModuleAddAsync(sfcCirculationBindDto, SfcCirculationTypeEnum.BindCCS);
         }
 
@@ -474,6 +549,14 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <returns></returns>
         public async Task SfcCirculationCCSUnBindAsync(SfcCirculationCCSUnBindDto sfcCirculationCCSUnBindDto)
         {
+            if (string.IsNullOrEmpty(sfcCirculationCCSUnBindDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
+            }
+            if (sfcCirculationCCSUnBindDto.UnBindSFCs == null || sfcCirculationCCSUnBindDto.UnBindSFCs.Length == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19120));//解绑条码列表不能为空
+            }
             var sfcCirculationUnBindDto = new SfcCirculationUnBindDto
             {
                 SFC = sfcCirculationCCSUnBindDto.SFC,
@@ -483,6 +566,84 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 UnBindSFCs = sfcCirculationCCSUnBindDto.UnBindSFCs
             };
             await SfcCirculationUnBindAsync(sfcCirculationUnBindDto, SfcCirculationTypeEnum.BindCCS);
+        }
+
+        /// <summary>
+        /// 获取绑定CCS的位置
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<CirculationBindCCSLocationDto> GetBindCCSLocationAsync(string sfc)
+        {
+            if (string.IsNullOrEmpty(sfc))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
+            }
+            CirculationBindCCSLocationDto circulationBindCCSLocation = new() { CurrentLocation = string.Empty, Locations = Array.Empty<string>() };
+            //查找当前已有的绑定记录
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCode = sfc,
+                IsDisassemble = TrueOrFalseEnum.No
+            });
+            //找出缺失位置
+            var locations = manuSfcCirculationEntities.Select(c => c.Location ?? string.Empty).ToArray();
+            var exceptLocations = locationArray.Except(locations).OrderBy(c => c).ToArray();
+            if (exceptLocations.Any())
+            {
+                var currentLocation = exceptLocations.Take(1).First();
+                circulationBindCCSLocation.CurrentLocation = currentLocation;
+                circulationBindCCSLocation.Locations = exceptLocations;
+            }
+            return circulationBindCCSLocation;
+        }
+
+        /// <summary>
+        /// CCS NG设定
+        /// </summary>
+        /// <param name="sfcCirculationCCSNgSetDto"></param>
+        /// <returns></returns>
+        public async Task SfcCirculationCCSNgSetAsync(SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto)
+        {
+            if (string.IsNullOrEmpty(sfcCirculationCCSNgSetDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
+            }
+            //按Location NG或按绑定CCS编码NG必须任选其一
+            if ((sfcCirculationCCSNgSetDto.Locations == null || sfcCirculationCCSNgSetDto.Locations.Length <= 0)
+                && (sfcCirculationCCSNgSetDto.BindSFCs == null || sfcCirculationCCSNgSetDto.BindSFCs.Length <= 0))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19141));//CCS设定NG时Location和BindSfc方式必须任选其一
+            }
+            //查找当前已有的绑定记录
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCode = sfcCirculationCCSNgSetDto.SFC,
+                IsDisassemble = TrueOrFalseEnum.No
+            });
+            if (!manuSfcCirculationEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19142)).WithData("SFC", sfcCirculationCCSNgSetDto.SFC);//条码：{SFC}没找到关联CCS码绑定关系
+            }
+            //根据传入条件找出已经NG的CSS绑定记录
+            var delEntities = manuSfcCirculationEntities.Where(c =>
+            {
+                return sfcCirculationCCSNgSetDto.BindSFCs != null && sfcCirculationCCSNgSetDto.BindSFCs.Contains(c.SFC)
+                    || sfcCirculationCCSNgSetDto.Locations != null && sfcCirculationCCSNgSetDto.Locations.Contains(c.Location);
+            });
+            if (!delEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19143));//条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系
+            }
+            //NG设定的CSS直接软删除
+            await _manuSfcCirculationRepository.DeleteRangeAsync(new DeleteCommand
+            {
+                UserId = _currentEquipment.Name,
+                DeleteOn = HymsonClock.Now(),
+                Ids = delEntities.Select(c => c.Id)
+            });
         }
 
     }

@@ -580,7 +580,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     CirculationType = SfcCirculationTypeEnum.Change,//虚拟条码绑定关系为转换
                     IsDisassemble = TrueOrFalseEnum.No,
                     SiteId = _currentEquipment.SiteId,
-                    CirculationBarCodes = new string[] { ManuProductParameter.DefaultSFC }
+                    CirculationBarCode = ManuProductParameter.DefaultSFC
                 };
                 var manuSfcCirculationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(bindVirtualSFCCirculationBarCodeQuery);
                 foreach (var item in manuSfcCirculationBarCodeEntities)

@@ -29,9 +29,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 流转后条码
         /// </summary>
         public string[]? CirculationBarCodes { get; set; }
+        /// <summary>
+        /// 单个流转后条码
+        /// </summary>
+        public string? CirculationBarCode { get; set; }
 
         /// <summary>
-        /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
+        /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件 8 绑定，9 CCS绑定
         /// </summary>
         public SfcCirculationTypeEnum? CirculationType { get; set; }
 

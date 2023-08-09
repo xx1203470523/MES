@@ -18,6 +18,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
 
         /// <summary>
         /// 解绑的条码列表
+        /// 为空解绑所有
         /// </summary>
         public string[] UnBindSFCs { get; set; } = Array.Empty<string>();
     }

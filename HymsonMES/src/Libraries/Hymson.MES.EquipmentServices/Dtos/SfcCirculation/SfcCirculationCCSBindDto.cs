@@ -38,4 +38,18 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// </summary>
         public string? Name { get; set; }
     }
+    /// <summary>
+    /// 绑定CSS位置
+    /// </summary>
+    public class CirculationBindCCSLocationDto
+    {
+        /// <summary>
+        /// 当前需要绑定CSS位置
+        /// </summary>
+        public string CurrentLocation { get; set; } = string.Empty;
+        /// <summary>
+        /// 所有待绑定位置
+        /// </summary>
+        public string[] Locations { get; set; } = Array.Empty<string>();
+    }
 }

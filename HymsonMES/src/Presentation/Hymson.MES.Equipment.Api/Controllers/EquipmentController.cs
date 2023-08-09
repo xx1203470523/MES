@@ -531,5 +531,55 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcCirculationService.SfcCirculationModuleRemoveAsync(request);
         }
+
+
+        /// <summary>
+        /// 根据模组条码获取绑定CCS的位置
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetModuleCCSLocation")]
+        [ProducesResponseType(typeof(CirculationBindCCSLocationDto), 200)]
+        public async Task<CirculationBindCCSLocationDto> GetBindCCSLocationAsync(string request)
+        {
+            return await _sfcCirculationService.GetBindCCSLocationAsync(request);
+        }
+
+        /// <summary>
+        /// CCS盖板NG设定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SetModuleCCSNG")]
+        public async Task SfcCirculationCCSNgSetAsync(SfcCirculationCCSNgSetDto request)
+        {
+            await _sfcCirculationService.SfcCirculationCCSNgSetAsync(request);
+        }
+
+        /// <summary>
+        /// 模组CCS绑定
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ModuleCCSBind")]
+        public async Task SfcCirculationCCSBindAsync(SfcCirculationCCSBindDto request)
+        {
+            await _sfcCirculationService.SfcCirculationCCSBindAsync(request);
+        }
+
+        /// <summary>
+        /// 模组CCS解绑
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ModuleCCSUnBind")]
+        public async Task SfcCirculationCCSUnBindAsync(SfcCirculationCCSUnBindDto request)
+        {
+            await _sfcCirculationService.SfcCirculationCCSUnBindAsync(request);
+        }
     }
 }
