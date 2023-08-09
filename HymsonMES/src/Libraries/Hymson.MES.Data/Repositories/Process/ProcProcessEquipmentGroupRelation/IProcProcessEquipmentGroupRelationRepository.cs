@@ -88,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcessEquipmentGroupRelationEntity>> GetEntitiesAsync(ProcProcessEquipmentGroupRelationQuery query);
+        Task<IEnumerable<ProcProcessEquipmentGroupRelationEntity>> GetEntitiesAsync(long SiteId);
         
         /// <summary>
         /// 分页查询

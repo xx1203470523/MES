@@ -6,6 +6,8 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ProcProcessEquipmentGroupRelation.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Crypto;
+using System.Security.Policy;
 using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Data.Repositories.Process
@@ -141,12 +143,15 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessEquipmentGroupRelationEntity>> GetEntitiesAsync(ProcProcessEquipmentGroupRelationQuery query)
+        public async Task<IEnumerable<ProcProcessEquipmentGroupRelationEntity>> GetEntitiesAsync(long SiteId)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcessEquipmentGroupRelationEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcProcessEquipmentGroupRelationEntity>(template.RawSql, query);
+            return await conn.QueryAsync<ProcProcessEquipmentGroupRelationEntity>(template.RawSql, new { SiteId = SiteId });
         }
 
         /// <summary>
@@ -184,9 +189,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_equipment_group_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_equipment_group_relation` /**where**/ ";
-        const string GetProcProcessEquipmentGroupRelationEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_process_equipment_group_relation` /**where**/  ";
+        const string GetProcProcessEquipmentGroupRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM `proc_process_equipment_group_relation` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_process_equipment_group_relation`(  `Id`, `EquipmentGroupId`, `EquipmentId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @EquipmentGroupId, @EquipmentId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `proc_process_equipment_group_relation`(  `Id`, `EquipmentGroupId`, `EquipmentId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @EquipmentGroupId, @EquipmentId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
@@ -205,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByGroupIdSql = "SELECT EE.Id AS EquipmentId, PPEG.EquipmentGroupId FROM equ_equipment EE " +
             "LEFT JOIN proc_process_equipment_group_relation PPEG ON PPEG.EquipmentId = EE.Id AND PPEG.SiteId = @SiteId AND PPEG.IsDeleted = 0 " +
             "WHERE EE.IsDeleted = 0 AND EE.SiteId = @SiteId " +
-            "AND (PPEG.EquipmentGroupId IS NULL OR PPEG.EquipmentGroupId = @ProcessEquipmentGroupId);";
+            "AND  PPEG.EquipmentGroupId = @ProcessEquipmentGroupId;";
 
     }
 }

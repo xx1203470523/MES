@@ -1077,6 +1077,7 @@
         public const string MES18901 = "工艺设备组编码不允许有空格";
         public const string MES18902 = "工艺设备组名称不能为空";
         public const string MES18903 = "请求实体不能为空！";
+        public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
 
         #region 降级规则 21100
