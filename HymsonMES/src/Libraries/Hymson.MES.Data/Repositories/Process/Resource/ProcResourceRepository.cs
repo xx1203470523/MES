@@ -106,10 +106,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="resourceCode"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(ProcResourceQuery query)
+        public async Task<ProcResourceEntity> GetByResourceCodeAsync(ProcResourceQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcResourceEntity>(GetByResourceCode, new { ResCode = query.ResCode, SiteId = query.SiteId });
+            return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByResourceCode, new { ResCode = query.ResCode, SiteId = query.SiteId });
         }
 
         /// <summary>
@@ -372,7 +372,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 UpdatedBy = entity.UpdatedBy,
                 UpdatedOn = entity.UpdatedOn,
                 Ids = entity.IdsArr
-            }); ;
+            });
         }
 
         /// <summary>

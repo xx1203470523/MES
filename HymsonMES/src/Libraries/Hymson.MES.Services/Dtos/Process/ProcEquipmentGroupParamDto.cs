@@ -233,14 +233,19 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? Code { get; set; }
 
-        /// <summary>
-        /// 参数集名称
-        /// </summary>
-        public string? Name { get; set; }
+        ///// <summary>
+        ///// 参数集名称
+        ///// </summary>
+        //public string? Name { get; set; }
 
         /// <summary>
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
     }
 }

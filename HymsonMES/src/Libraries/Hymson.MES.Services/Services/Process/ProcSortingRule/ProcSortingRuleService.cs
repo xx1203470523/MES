@@ -9,19 +9,14 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Microsoft.AspNetCore.Components;
-using System.Security.Cryptography.Xml;
-using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -254,7 +249,7 @@ namespace Hymson.MES.Services.Services.Process
                         MaxContainingType = entity.MaxContainingType,
                         ParameterValue = entity.ParameterValue,
                         Rating = entity.Rating,
-                    }); ; ;
+                    });
                 }
             }
             return ruleDetailViewDtos;
@@ -284,7 +279,7 @@ namespace Hymson.MES.Services.Services.Process
             var ruleId = procSortingRules.FirstOrDefault()?.Id ?? 0;
             var detailQueryDto = new ProcSortingRuleDetailQueryDto
             {
-                SortingRuleId= ruleId
+                SortingRuleId = ruleId
             };
             return await GetSortingRuleDetailListAsync(detailQueryDto);
         }

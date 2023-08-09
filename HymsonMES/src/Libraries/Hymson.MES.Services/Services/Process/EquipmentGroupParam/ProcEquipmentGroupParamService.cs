@@ -12,15 +12,10 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -99,9 +94,21 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18702));
             }
+            //验证是否 逻辑 产品、工序、工艺组唯一性
+            var entityOne = await _procEquipmentGroupParamRepository.GetByRelatesInformationAsync(new ProcEquipmentGroupParamRelatesInformationQuery
+            {
+                SiteId=_currentSite.SiteId ?? 0,
+                ProductId= procEquipmentGroupParamEntity.ProductId,
+                ProcedureId= procEquipmentGroupParamEntity.ProcedureId,
+                EquipmentGroupId= procEquipmentGroupParamEntity.EquipmentGroupId
+            });
+            if (entityOne != null) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18724));
+            }
 
             #region 处理 参数数据
-            var procEquipmentGroupParamDetailEntitys = new List<ProcEquipmentGroupParamDetailEntity>();
+                        var procEquipmentGroupParamDetailEntitys = new List<ProcEquipmentGroupParamDetailEntity>();
             if (procEquipmentGroupParamCreateDto.ParamList.Any())
             {
                 foreach (var item in procEquipmentGroupParamCreateDto.ParamList)
@@ -160,6 +167,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcEquipmentGroupParamAsync(long[] ids)
         {
+            //查询是否不是新建
+            var entitys= await _procEquipmentGroupParamRepository.GetByIdsAsync(ids);
+            if (entitys.Any() && entitys.Where(x => x.Status != SysDataStatusEnum.Build).Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18714));
+            }
+
             return await _procEquipmentGroupParamRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
@@ -179,7 +193,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 //查询相关的信息
                 //var products = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId).ToArray());
-                var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId).ToArray());
+                //var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId).ToArray());
                 var procEquipmentGroups = await _procProcessEquipmentGroupRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.EquipmentGroupId).ToArray());
 
                 foreach (var item in pagedInfo.Data)
@@ -187,8 +201,9 @@ namespace Hymson.MES.Services.Services.Process
                     var procEquipmentGroupParamViewDto = item.ToModel<ProcEquipmentGroupParamViewDto>();
                     //procEquipmentGroupParamViewDto.MaterialCode = products.FirstOrDefault(x => x.Id == item.ProductId)?.MaterialCode??"";
                     //procEquipmentGroupParamViewDto.MaterialName = products.FirstOrDefault(x => x.Id == item.ProductId)?.MaterialName ?? "";
-                    procEquipmentGroupParamViewDto.ProcedureCode = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code ?? "";
-                    procEquipmentGroupParamViewDto.ProcedureName = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Name ?? "";
+                    //procEquipmentGroupParamViewDto.ProcedureCode = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Code ?? "";
+                    //procEquipmentGroupParamViewDto.ProcedureName = procedures.FirstOrDefault(x => x.Id == item.ProcedureId)?.Name ?? "";
+                    procEquipmentGroupParamViewDto.MaterialNameVersion = item.MaterialName + "/" + item.MaterialVersion;
                     procEquipmentGroupParamViewDto.EquipmentGroupCode = procEquipmentGroups.FirstOrDefault(x => x.Id == item.EquipmentGroupId)?.Code ?? "";
                     procEquipmentGroupParamViewDto.EquipmentGroupName = procEquipmentGroups.FirstOrDefault(x => x.Id == item.EquipmentGroupId)?.Name ?? "";
 
@@ -240,11 +255,36 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 验证状态
             var entity = await _procEquipmentGroupParamRepository.GetByIdAsync(procEquipmentGroupParamModifyDto.Id) ?? throw new BusinessException(nameof(ErrorCode.MES18701)); ;
-            if (entity.Status != SysDataStatusEnum.Build && procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build)
+            //if (entity.Status != SysDataStatusEnum.Build && procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES18713));
+            //}
+            switch (entity.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18713));
+                case SysDataStatusEnum.Enable:
+                case SysDataStatusEnum.Retain:
+                case SysDataStatusEnum.Abolish:
+                    if (procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+                    if (entity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
+                    break;
+                case SysDataStatusEnum.Build:
+                default:
+                    break;
             }
             #endregion
+
+            //验证是否 逻辑 产品、工序、工艺组唯一性
+            var entityOne = await _procEquipmentGroupParamRepository.GetByRelatesInformationAsync(new ProcEquipmentGroupParamRelatesInformationQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProductId = procEquipmentGroupParamEntity.ProductId,
+                ProcedureId = procEquipmentGroupParamEntity.ProcedureId,
+                EquipmentGroupId = procEquipmentGroupParamEntity.EquipmentGroupId
+            });
+            if (entityOne != null && entityOne.Id!= procEquipmentGroupParamModifyDto.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18724));
+            }
 
             #region 处理 参数数据
             var procEquipmentGroupParamDetailEntitys = new List<ProcEquipmentGroupParamDetailEntity>();

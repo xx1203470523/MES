@@ -95,5 +95,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(ProcEquipmentGroupParamCodeQuery query);
+
+
+        /// <summary>
+        /// 根据关联信息（产品，工序，工艺组）获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcEquipmentGroupParamEntity> GetByRelatesInformationAsync(ProcEquipmentGroupParamRelatesInformationQuery query);
     }
 }

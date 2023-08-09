@@ -17,6 +17,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJobClass;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
@@ -105,6 +106,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInteMessageGroupRepository, InteMessageGroupRepository>();
             services.AddSingleton<IInteMessageGroupPushMethodRepository, InteMessageGroupPushMethodRepository>();
+            services.AddSingleton<IInteEventRepository, InteEventRepository>();
             services.AddSingleton<IInteEventTypeRepository, InteEventTypeRepository>();
             services.AddSingleton<IInteEventTypeMessageGroupRelationRepository, InteEventTypeMessageGroupRelationRepository>();
             services.AddSingleton<IInteEventTypePushRuleRepository, InteEventTypePushRuleRepository>();
@@ -280,6 +282,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
             services.AddSingleton<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
             #endregion
+            #endregion
+
+            #region Parameter
+            services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>(); 
             #endregion
 
             return services;

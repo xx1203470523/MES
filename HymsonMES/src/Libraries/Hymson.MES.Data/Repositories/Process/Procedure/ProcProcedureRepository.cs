@@ -199,7 +199,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(IEnumerable<long>  ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcProcedureEntity>(GetByIdsSql, new { ids = ids });
@@ -214,6 +214,8 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcedureEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("1=1");
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedureEntities = await conn.QueryAsync<ProcProcedureEntity>(template.RawSql, procProcedureQuery);
             return procProcedureEntities;

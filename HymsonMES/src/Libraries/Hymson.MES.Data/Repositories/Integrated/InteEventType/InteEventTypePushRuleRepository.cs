@@ -50,7 +50,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("EventTypeId IN @ParentId");
+            sqlBuilder.Where("EventTypeId = @ParentId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
@@ -67,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_push_rule /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO inte_event_type_push_rule(`Id`, `SiteId`, `EventTypeId`, `PushScene`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id, @SiteId, @EventTypeId, @PushScene, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO inte_event_type_push_rule(`Id`, `SiteId`, `EventTypeId`, `PushScene`, IsEnabled, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES ( @Id, @SiteId, @EventTypeId, @PushScene, @IsEnabled, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
         const string DeleteByParentId = "DELETE FROM inte_event_type_push_rule WHERE EventTypeId = @ParentId";
 

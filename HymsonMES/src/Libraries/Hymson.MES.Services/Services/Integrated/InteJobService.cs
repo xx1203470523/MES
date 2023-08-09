@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Integrated
             inteJobEntity.UpdatedBy = userId;
             inteJobEntity.UpdatedOn = HymsonClock.Now();
 
-            await _inteJobRepository.UpdateAsync(inteJobEntity); ;
+            await _inteJobRepository.UpdateAsync(inteJobEntity);
         }
 
         /// <summary>

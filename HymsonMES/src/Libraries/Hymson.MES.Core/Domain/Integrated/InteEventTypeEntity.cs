@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 namespace Hymson.MES.Core.Domain.Integrated
 {
     /// <summary>
-    /// 数据实体（事件维护）   
+    /// 数据实体（事件类型维护）   
     /// inte_event_type
     /// @author Czhipu
     /// @date 2023-08-03 02:42:52

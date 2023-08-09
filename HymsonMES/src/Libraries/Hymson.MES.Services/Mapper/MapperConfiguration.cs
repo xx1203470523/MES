@@ -7,6 +7,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
@@ -18,6 +19,8 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
+using Hymson.MES.Data.Repositories.Integrated.InteEventType.View;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
@@ -285,11 +288,28 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageGroupPushMethodEntity, InteMessageGroupPushMethodDto>();
             #endregion
 
+            #region InteEvent
+            CreateMap<InteEventPagedQueryDto, InteEventPagedQuery>();
+            CreateMap<InteEventEntity, InteEventInfoDto>();
+            CreateMap<InteEventEntity, InteEventBaseDto>();
+            CreateMap<InteEventView, InteEventDto>();
+            CreateMap<InteEventSaveDto, InteEventEntity>();
+            #endregion
+
             #region InteEventType
             CreateMap<InteEventTypePagedQueryDto, InteEventTypePagedQuery>();
+            CreateMap<InteEventTypeEntity, InteEventTypeDto>();
+            CreateMap<InteEventTypeView, InteEventTypeDto>();
             CreateMap<InteEventTypeDto, InteEventTypeEntity>();
-            CreateMap<InteEventTypeMessageGroupRelationEntity, InteEventTypeMessageGroupRelationDto>();
+            CreateMap<InteEventTypeSaveDto, InteEventTypeEntity>();
+            CreateMap<InteEventTypeMessageGroupRelationDto, InteEventTypeMessageGroupRelationEntity>();
+            CreateMap<InteEventTypeUpgradeDto, InteEventTypeUpgradeEntity>();
+            CreateMap<InteEventTypeMessageGroupRelationDto, InteEventTypeUpgradeMessageGroupRelationEntity>();
+            CreateMap<InteEventTypePushRuleDto, InteEventTypePushRuleEntity>();
             CreateMap<InteEventTypePushRuleEntity, InteEventTypePushRuleDto>();
+            CreateMap<InteEventTypeUpgradeEntity, InteEventTypeUpgradeDto>();
+            CreateMap<InteEventTypeMessageGroupRelationEntity, MessageGroupBo>();
+            CreateMap<InteEventTypeUpgradeMessageGroupRelationEntity, MessageGroupBo>();
             #endregion
         }
 

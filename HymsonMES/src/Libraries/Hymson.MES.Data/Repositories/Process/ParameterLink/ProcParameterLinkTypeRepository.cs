@@ -119,6 +119,15 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" o.ParameterName like @ParameterName ");
             }
 
+            if (procParameterLinkTypePagedQuery.ParameterUnit.HasValue) 
+            {
+                sqlBuilder.Where(" o.ParameterUnit = @ParameterUnit ");
+            }
+            if (procParameterLinkTypePagedQuery.DataType.HasValue)
+            {
+                sqlBuilder.Where(" o.DataType = @DataType ");
+            }
+
             var offSet = (procParameterLinkTypePagedQuery.PageIndex - 1) * procParameterLinkTypePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procParameterLinkTypePagedQuery.PageSize });

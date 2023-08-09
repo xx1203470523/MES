@@ -29,6 +29,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string? MaterialCode { get; set; }
 
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
+
         public long SiteId { get; set; }
     }
 }

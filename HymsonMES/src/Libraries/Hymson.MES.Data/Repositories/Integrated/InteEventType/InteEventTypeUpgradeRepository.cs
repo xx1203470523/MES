@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("PushScene = @PushScene");
-            sqlBuilder.Where("EventTypeId IN @EventTypeId");
+            sqlBuilder.Where("EventTypeId = @EventTypeId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();

@@ -120,6 +120,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuDowngradingRuleEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Select("*");
+
             using var conn = GetMESDbConnection();
             var manuDowngradingRuleEntities = await conn.QueryAsync<ManuDowngradingRuleEntity>(template.RawSql, manuDowngradingRuleQuery);
             return manuDowngradingRuleEntities;
@@ -191,16 +195,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuDowngradingRuleEntity>(GetByCodeSql, query);
         }
+
+        /// <summary>
+        /// 批量更新序号
+        /// </summary>
+        /// <param name="manuDowngradingRuleEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSerialNumbersAsync(List<ManuDowngradingRuleEntity> manuDowngradingRuleEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSerialNumbersSql, manuDowngradingRuleEntitys);
+        }
     }
 
     public partial class ManuDowngradingRuleRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_downgrading_rule` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_downgrading_rule` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY SerialNumber LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_downgrading_rule` /**where**/ ";
         const string GetManuDowngradingRuleEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `manu_downgrading_rule` /**where**/  ";
+                                           FROM `manu_downgrading_rule` /**where**/ 
+                                            ORDER BY SerialNumber ";
 
         const string InsertSql = "INSERT INTO `manu_downgrading_rule`(  `Id`, `SiteId`, `SerialNumber`, `Code`, `Name`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SerialNumber, @Code, @Name, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `manu_downgrading_rule`(  `Id`, `SiteId`, `SerialNumber`, `Code`, `Name`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SerialNumber, @Code, @Name, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -222,5 +238,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetMaxSerialNumberSql = @"SELECT * FROM `manu_downgrading_rule`  WHERE SiteId =@SiteId AND IsDeleted=0 ORDER BY SerialNumber DESC ";
         const string GetByCodeSql = @"SELECT * 
                             FROM `manu_downgrading_rule`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+        const string UpdateSerialNumbersSql = @"UPDATE `manu_downgrading_rule` SET  SerialNumber = @SerialNumber, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
     }
 }

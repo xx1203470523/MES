@@ -134,4 +134,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string? Name { get; set; }
 
     }
+
+    public class ManuDowngradingRuleChangeSerialNumberDto 
+    {
+        public long Id { set; get; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int SerialNumber { get; set; }
+    }
 }

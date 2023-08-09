@@ -13,6 +13,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuDowngradingRuleQuery
     {
+        public long SiteId { get; set; }
+
     }
 
     public class ManuDowngradingRuleCodeQuery 

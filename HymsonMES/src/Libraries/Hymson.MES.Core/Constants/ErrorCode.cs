@@ -281,6 +281,10 @@
 
         #endregion
 
+        #region 异常消息 10900
+        public const string MES10901 = "事件类型不能为空";
+        #endregion
+
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码维护错误";
         public const string MES11101 = "不合格代码编码不能为空";
@@ -1069,7 +1073,19 @@
 
         public const string MES18712 = "Recipe参数Id不能为空";
         public const string MES18713 = "无法将其他状态修改成新建状态!";
+        public const string MES18714= "无法删除非新建状态数据";
+        public const string MES18715 = "Recipe参数版本不能为空";
+        public const string MES18716 = "Recipe参数版本最大长度为100";
+        public const string MES18717 = "Recipe参数版本不允许有空格";
+        public const string MES18718 = "Recipe参数产品不能为空";
+        public const string MES18719 = "Recipe参数工序不能为空";
+        public const string MES18720 = "Recipe参数工艺组不能为空";
 
+        public const string MES18721 = "Recipe参数项目参数不能为空";
+        public const string MES18722 = "Recipe参数项目小数位应该为不小于0且小于10的整数";
+        public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
+
+        public const string MES18724 = "Recipe参数已存在同一的产品、工序、工艺组数据";
         #endregion
 
         #region 工艺设备组 18900
@@ -1091,6 +1107,7 @@
         public const string MES21107 = "描述最大长度为255";
         public const string MES21108 = "降级规则编码不允许有空格";
         public const string MES21109 = "Id不合法";
+        public const string MES21110 = "参数为空";
         #endregion
 
         #region 设备对接错误
@@ -1104,6 +1121,12 @@
         public const string MES19006 = "资源编码不存在";
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
+        #endregion
+
+        #region  产品参数采集
+        public const string MES19100 = "产品参数采集异常";
+        public const string MES19101 = "未找到资源{ResCode}对应工序";
+        public const string MES19102 = "参数{ResCode}不存在";
         #endregion
 
 

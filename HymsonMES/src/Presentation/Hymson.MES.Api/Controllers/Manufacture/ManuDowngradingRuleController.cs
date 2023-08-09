@@ -6,8 +6,10 @@
  *build datetime: 2023-08-07 02:00:57
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,6 +73,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("降级规则", BusinessType.INSERT)]
+        [PermissionDescription("manu:manuDowngradingRule:insert")]
         public async Task AddManuDowngradingRuleAsync([FromBody] ManuDowngradingRuleCreateDto parm)
         {
              await _manuDowngradingRuleService.CreateManuDowngradingRuleAsync(parm);
@@ -83,6 +87,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [LogDescription("降级规则", BusinessType.UPDATE)]
+        [PermissionDescription("manu:manuDowngradingRule:update")]
         public async Task UpdateManuDowngradingRuleAsync([FromBody] ManuDowngradingRuleModifyDto parm)
         {
              await _manuDowngradingRuleService.ModifyManuDowngradingRuleAsync(parm);
@@ -95,11 +101,38 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [LogDescription("降级规则", BusinessType.DELETE)]
+        [PermissionDescription("manu:manuDowngradingRule:delete")]
         public async Task DeleteManuDowngradingRuleAsync([FromBody] long[] ids)
         {
             await _manuDowngradingRuleService.DeletesManuDowngradingRuleAsync(ids);
         }
 
         #endregion
+
+        /// <summary>
+        /// 查询所有（降级规则）
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("allList")]
+        public async Task<IEnumerable<ManuDowngradingRuleEntity>> GetAllManuDowngradingRuleEntitiesAsync() 
+        {
+            return await _manuDowngradingRuleService.GetAllManuDowngradingRuleEntitiesAsync();
+        }
+
+        /// <summary>
+        /// 更新排序号（降级规则）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateSerialNumber")]
+        [LogDescription("降级规则", BusinessType.UPDATE)]
+        [PermissionDescription("manu:manuDowngradingRule:sort")]
+        public async Task UpdateSerialNumbersAsync([FromBody] List<ManuDowngradingRuleChangeSerialNumberDto> parm)
+        {
+            await _manuDowngradingRuleService.UpdateSerialNumbersAsync(parm);
+        }
     }
 }

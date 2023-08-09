@@ -4,7 +4,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Services.Integrated
 {
     /// <summary>
-    /// 服务接口（事件维护）
+    /// 服务接口（事件类型维护）
     /// </summary>
     public interface IInteEventTypeService
     {
@@ -44,6 +44,13 @@ namespace Hymson.MES.Services.Services.Integrated
         Task<InteEventTypeDto?> QueryByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取关联事件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteEventBaseDto>> QueryEventsByMainIdAsync(long id);
+
+        /// <summary>
         /// 根据ID获取关联群组
         /// </summary>
         /// <param name="id"></param>
@@ -53,16 +60,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 根据ID获取升级数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteEventTypeUpgradeDto>> QueryReceivesByMainIdAsync(long id);
-
-        /// <summary>
-        /// 根据ID获取处理升级数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<IEnumerable<InteEventTypeUpgradeDto>> QueryHandlesByMainIdAsync(long id);
+        Task<PagedInfo<InteEventTypeUpgradeDto>> GetUpgradeByMainIdAsync(InteEventTypeUpgradePagedQueryDto query);
 
         /// <summary>
         /// 根据ID获取推送规则

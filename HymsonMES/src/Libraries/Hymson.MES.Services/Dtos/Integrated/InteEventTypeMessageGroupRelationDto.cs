@@ -13,29 +13,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 消息组id
-        /// </summary>
-        public long MessageGroupId { get; set; }
-
         /// <summary>
-        /// 推送类型;1、企微2、钉钉3、邮箱
-        /// </summary>
-        public IEnumerable<PushTypeEnum> PushTypes { get; set; }
-
-    }
-
-    /// <summary>
-    /// 事件类型关联群组Dto
-    /// </summary>
-    public record InteEventTypeMessageGroupRelationDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
         /// 消息组id
         /// </summary>
         public long MessageGroupId { get; set; }

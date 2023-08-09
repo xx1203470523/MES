@@ -6,6 +6,8 @@
  *build datetime: 2023-08-07 02:00:57
  */
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -56,5 +58,19 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuDowngradingRuleDto> QueryManuDowngradingRuleByIdAsync(long id);
+
+        /// <summary>
+        /// 获取所有降级规则数据
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ManuDowngradingRuleEntity>> GetAllManuDowngradingRuleEntitiesAsync();
+
+        /// <summary>
+        /// 修改降级规则的排序号
+        /// </summary>
+        /// <param name="manuDowngradingRuleChangeSerialNumberDtos"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task UpdateSerialNumbersAsync(List<ManuDowngradingRuleChangeSerialNumberDto> manuDowngradingRuleChangeSerialNumberDtos);
     }
 }

@@ -5,7 +5,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Validators.Integrated
 {
     /// <summary>
-    /// 事件维护 验证
+    /// 事件类型维护 验证
     /// </summary>
     internal class InteEventTypeSaveValidator : AbstractValidator<InteEventTypeSaveDto>
     {

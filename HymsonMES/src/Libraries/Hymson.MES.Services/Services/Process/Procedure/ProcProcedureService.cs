@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -22,7 +23,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -78,6 +78,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
+        private readonly IManuProductParameterService _manuProductParameterService;
+
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
 
@@ -94,6 +96,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
+            IManuProductParameterService manuProductParameterService,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
@@ -107,6 +110,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _inteJobRepository = inteJobRepository;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _procProductSetRepository = procProductSetRepository;
+            _manuProductParameterService = manuProductParameterService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
@@ -328,7 +332,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         SemiMaterialCode = semiProduct?.MaterialCode ?? "",
                         SemiMaterialName = semiProduct?.MaterialName ?? "",
                         SemiVersion = semiProduct?.Version ?? "",
-                    }); ;
+                    });
                 }
             }
 
@@ -408,7 +412,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         continue;
                     }
 
-                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
+                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>();
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.MaterialId = item.MaterialId;
@@ -496,7 +500,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 foreach (var item in parm.ProductSetList)
                 {
-                    var relationEntity = new ProcProductSetEntity(); ;
+                    var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = procProcedureEntity.Id;
@@ -508,9 +512,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-
-
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
             {
                 //入库
                 await _procProcedureRepository.InsertAsync(procProcedureEntity);
@@ -530,6 +532,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
 
+                await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, parm.Procedure.Code);
                 //提交
                 ts.Complete();
             }
@@ -594,7 +597,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
+                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>();
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.MaterialId = item.MaterialId;
@@ -681,7 +684,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 foreach (var item in parm.ProductSetList)
                 {
-                    var relationEntity = new ProcProductSetEntity(); ;
+                    var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = procProcedureEntity.Id;
