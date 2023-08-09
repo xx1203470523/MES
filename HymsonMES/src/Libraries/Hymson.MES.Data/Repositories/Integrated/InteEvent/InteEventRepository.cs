@@ -4,8 +4,10 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -18,8 +20,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 
         /// </summary>
+        private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteEventRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        /// <param name="memoryCache"></param>
+        public InteEventRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        {
+            _memoryCache = memoryCache;
+        }
 
         /// <summary>
         /// 新增
@@ -63,6 +74,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
+        }
+
+        /// <summary>
+        /// 批量修改事件的事件类型
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateEventTypeIdAsync(UpdateEventTypeIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateEventTypeIdSql, command);
+        }
+
+        /// <summary>
+        /// 清空事件的事件类型
+        /// </summary>
+        /// <param name="eventTypeId"></param>
+        /// <returns></returns>
+        public async Task<int> ClearEventTypeIdAsync(long eventTypeId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(ClearEventTypeIdSql, new { EventTypeId = eventTypeId });
         }
 
         /// <summary>
@@ -125,12 +158,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteEventEntity>> GetEntitiesAsync(InteEventQuery query)
+        public async Task<IEnumerable<InteEventEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
+            //var key = $"inte_event&SiteId-{query.SiteId}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteEventEntity>(template.RawSql, query);
+            //});
         }
 
         /// <summary>
@@ -202,6 +243,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string UpdateSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateEventTypeIdSql = "UPDATE inte_event SET EventTypeId = @EventTypeId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id IN @Ids ";
+        const string ClearEventTypeIdSql = "UPDATE inte_event SET EventTypeId = 0 WHERE EventTypeId = @EventTypeId ";
 
         const string DeleteSql = "UPDATE inte_event SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE inte_event SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

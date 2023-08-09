@@ -37,7 +37,7 @@ namespace Hymson.MES.Equipment.Api
             }).AddJsonOptions((jsonOptions) =>
             {
                 jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
-            }); ;
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();

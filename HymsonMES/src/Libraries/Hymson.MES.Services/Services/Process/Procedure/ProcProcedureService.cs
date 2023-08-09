@@ -23,7 +23,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -333,7 +332,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         SemiMaterialCode = semiProduct?.MaterialCode ?? "",
                         SemiMaterialName = semiProduct?.MaterialName ?? "",
                         SemiVersion = semiProduct?.Version ?? "",
-                    }); ;
+                    });
                 }
             }
 
@@ -413,7 +412,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         continue;
                     }
 
-                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
+                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>();
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.MaterialId = item.MaterialId;
@@ -501,7 +500,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 foreach (var item in parm.ProductSetList)
                 {
-                    var relationEntity = new ProcProductSetEntity(); ;
+                    var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = procProcedureEntity.Id;
@@ -598,7 +597,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>(); ;
+                    var releationEntity = item.ToEntity<ProcProcedurePrintRelationEntity>();
                     releationEntity.Id = IdGenProvider.Instance.CreateId();
                     releationEntity.ProcedureId = procProcedureEntity.Id;
                     releationEntity.MaterialId = item.MaterialId;
@@ -685,7 +684,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 foreach (var item in parm.ProductSetList)
                 {
-                    var relationEntity = new ProcProductSetEntity(); ;
+                    var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = procProcedureEntity.Id;

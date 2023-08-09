@@ -44,6 +44,13 @@ namespace Hymson.MES.Services.Services.Integrated
         Task<InteEventTypeDto?> QueryByIdAsync(long id);
 
         /// <summary>
+        /// 根据ID获取关联事件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteEventBaseDto>> QueryEventsByMainIdAsync(long id);
+
+        /// <summary>
         /// 根据ID获取关联群组
         /// </summary>
         /// <param name="id"></param>

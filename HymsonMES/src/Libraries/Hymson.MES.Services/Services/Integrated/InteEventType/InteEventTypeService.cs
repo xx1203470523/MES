@@ -11,6 +11,7 @@ using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
@@ -42,6 +43,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 仓储接口（消息组）
         /// </summary>
         private readonly IInteMessageGroupRepository _inteMessageGroupRepository;
+
+        /// <summary>
+        /// 仓储接口（事件维护）
+        /// </summary>
+        private readonly IInteEventRepository _inteEventRepository;
 
         /// <summary>
         /// 仓储接口（事件类型维护）
@@ -76,6 +82,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteMessageGroupRepository"></param>
+        /// <param name="inteEventRepository"></param>
         /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
         /// <param name="inteEventTypeUpgradeRepository"></param>
@@ -83,6 +90,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteEventTypePushRuleRepository"></param>
         public InteEventTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventTypeSaveDto> validationSaveRules,
             IInteMessageGroupRepository inteMessageGroupRepository,
+            IInteEventRepository inteEventRepository,
             IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
             IInteEventTypeUpgradeRepository inteEventTypeUpgradeRepository,
@@ -93,6 +101,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteMessageGroupRepository = inteMessageGroupRepository;
+            _inteEventRepository = inteEventRepository;
             _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
             _inteEventTypeUpgradeRepository = inteEventTypeUpgradeRepository;
@@ -134,6 +143,16 @@ namespace Hymson.MES.Services.Services.Integrated
                 Code = entity.Code
             });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+
+            // 关联事件
+            saveDto.EventIds ??= new List<long>();
+            var eventCommand = new UpdateEventTypeIdCommand
+            {
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                EventTypeId = entity.Id,
+                Ids = saveDto.EventIds
+            };
 
             // 关联消息组
             saveDto.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
@@ -239,6 +258,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 var rowArray = await Task.WhenAll(new List<Task<int>>()
                 {
+                    _inteEventRepository.UpdateEventTypeIdAsync(eventCommand),
                     _inteEventTypeRepository.InsertAsync(entity),
                     _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
                     _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
@@ -284,6 +304,16 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
             }
+
+            // 关联事件
+            saveDto.EventIds ??= new List<long>();
+            var eventCommand = new UpdateEventTypeIdCommand
+            {
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                EventTypeId = entity.Id,
+                Ids = saveDto.EventIds
+            };
 
             // 关联消息组
             saveDto.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
@@ -394,20 +424,19 @@ namespace Hymson.MES.Services.Services.Integrated
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                await _inteEventRepository.ClearEventTypeIdAsync(entity.Id);
+                await _inteEventTypeMessageGroupRelationRepository.DeleteByParentIdAsync(command);
+                await _inteEventTypeUpgradeRepository.DeleteByParentIdAsync(command);
+                await _inteEventTypeUpgradeMessageGroupRelationRepository.DeleteByParentIdAsync(command);
+                await _inteEventTypePushRuleRepository.DeleteByParentIdAsync(command);
+
                 var rowArray = await Task.WhenAll(new List<Task<int>>()
                 {
+                    _inteEventRepository.UpdateEventTypeIdAsync(eventCommand),
                     _inteEventTypeRepository.UpdateAsync(entity),
-
-                    _inteEventTypeMessageGroupRelationRepository.DeleteByParentIdAsync(command),
                     _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
-
-                    _inteEventTypeUpgradeRepository.DeleteByParentIdAsync(command),
                     _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
-
-                    _inteEventTypeUpgradeMessageGroupRelationRepository.DeleteByParentIdAsync(command),
                     _inteEventTypeUpgradeMessageGroupRelationRepository.InsertRangeAsync(upgradeMessageGroupRelations),
-
-                    _inteEventTypePushRuleRepository.DeleteByParentIdAsync(command),
                     _inteEventTypePushRuleRepository.InsertRangeAsync(ruleEntities)
                 });
                 rows += rowArray.Sum();
@@ -455,6 +484,19 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
+        /// 根据ID获取关联事件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventBaseDto>> QueryEventsByMainIdAsync(long id)
+        {
+            var eventEntities = await _inteEventRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            return eventEntities.Where(w => w.EventTypeId == id || w.EventTypeId == 0)
+                .Select(s => s.ToModel<InteEventBaseDto>());
+        }
+
+        /// <summary>
         /// 根据ID获取关联群组
         /// </summary>
         /// <param name="id"></param>
@@ -469,7 +511,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 消息组基础信息（已缓存）
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
-            return GetMessageGroupRelations(messageGroupEntities, messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>())); ;
+            return GetMessageGroupRelations(messageGroupEntities, messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>()));
         }
 
         /// <summary>

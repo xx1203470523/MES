@@ -150,6 +150,32 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
+    /// 自定义实体列表（事件）
+    /// </summary>
+    public record InteEventBaseDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 编码（设备注册）
+        /// </summary>
+        public string Code { get; set; } = "";
+
+        /// <summary>
+        /// 名称（设备注册）
+        /// </summary>
+        public string Name { get; set; } = "";
+
+        /// <summary>
+        /// 事件类型ID
+        /// </summary>
+        public long? EventTypeId { get; set; }
+    }
+
+    /// <summary>
     /// 事件维护分页Dto
     /// </summary>
     public class InteEventPagedQueryDto : PagerInfo

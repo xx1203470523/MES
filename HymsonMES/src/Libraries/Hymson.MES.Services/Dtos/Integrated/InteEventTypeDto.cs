@@ -34,6 +34,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Remark { get; set; }
 
         /// <summary>
+        /// 关联事件
+        /// </summary>
+        public IEnumerable<long>? EventIds { get; set; }
+
+        /// <summary>
         /// 关联消息组
         /// </summary>
         public IEnumerable<InteEventTypeMessageGroupRelationDto>? MessageGroups { get; set; }

@@ -22,7 +22,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10117));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES10121));
 
-            RuleFor(x => x.EventTypeId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10901));
+            //RuleFor(x => x.EventTypeId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10901));
         }
     }
 
