@@ -1080,6 +1080,10 @@
         public const string MES18718 = "Recipe参数产品不能为空";
         public const string MES18719 = "Recipe参数工序不能为空";
         public const string MES18720 = "Recipe参数工艺组不能为空";
+
+        public const string MES18721 = "Recipe参数项目参数不能为空";
+        public const string MES18722 = "Recipe参数项目小数位应该为不小于0且小于10的整数";
+        public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
         #endregion
 
         #region 工艺设备组 18900
