@@ -4,7 +4,7 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 事件维护新增/更新Dto
+    /// 事件类型维护新增/更新Dto
     /// </summary>
     public record InteEventTypeSaveDto : BaseEntityDto
     {
@@ -56,7 +56,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 事件维护Dto
+    /// 事件类型维护Dto
     /// </summary>
     public record InteEventTypeDto : BaseEntityDto
     {
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 事件维护分页Dto
+    /// 事件类型维护分页Dto
     /// </summary>
     public class InteEventTypePagedQueryDto : PagerInfo
     {

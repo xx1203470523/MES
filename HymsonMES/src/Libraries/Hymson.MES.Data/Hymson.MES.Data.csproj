@@ -38,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Integrated\InteEvent\" />
     <Folder Include="Repositories\Manufacture\ManuFacePlateButtonJobRelation\View\" />
     <Folder Include="Repositories\Manufacture\ManuFacePlateButton\View\" />
     <Folder Include="Repositories\Manufacture\ManuFacePlateProduction\View\" />

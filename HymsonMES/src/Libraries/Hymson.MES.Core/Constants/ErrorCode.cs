@@ -282,7 +282,7 @@
         #endregion
 
         #region 异常消息 10900
-        public const string MES10901 = "";
+        public const string MES10901 = "事件类型不能为空";
         #endregion
 
         #region 不合格代码 11100
