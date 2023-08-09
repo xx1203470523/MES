@@ -160,6 +160,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcEquipmentGroupParamAsync(long[] ids)
         {
+            //查询是否不是新建
+            var entitys= await _procEquipmentGroupParamRepository.GetByIdsAsync(ids);
+            if (entitys.Any() && entitys.Where(x => x.Status != SysDataStatusEnum.Build).Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18714));
+            }
+
             return await _procEquipmentGroupParamRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

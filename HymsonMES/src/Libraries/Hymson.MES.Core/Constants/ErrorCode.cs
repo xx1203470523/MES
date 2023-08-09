@@ -1073,7 +1073,7 @@
 
         public const string MES18712 = "Recipe参数Id不能为空";
         public const string MES18713 = "无法将其他状态修改成新建状态!";
-
+        public const string MES18714= "无法删除非新建状态数据";
         #endregion
 
         #region 工艺设备组 18900
