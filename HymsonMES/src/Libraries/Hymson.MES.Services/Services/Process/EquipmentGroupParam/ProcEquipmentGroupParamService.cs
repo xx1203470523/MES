@@ -260,21 +260,9 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 验证状态
             var entity = await _procEquipmentGroupParamRepository.GetByIdAsync(procEquipmentGroupParamModifyDto.Id) ?? throw new BusinessException(nameof(ErrorCode.MES18701)); ;
-            //if (entity.Status != SysDataStatusEnum.Build && procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18713));
-            //}
-            switch (entity.Status)
+            if (entity.Status != SysDataStatusEnum.Build && procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build)
             {
-                case SysDataStatusEnum.Enable:
-                case SysDataStatusEnum.Retain:
-                case SysDataStatusEnum.Abolish:
-                    if (procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
-                    if (entity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
-                    break;
-                case SysDataStatusEnum.Build:
-                default:
-                    break;
+                throw new CustomerValidationException(nameof(ErrorCode.MES18713));
             }
             #endregion
 
