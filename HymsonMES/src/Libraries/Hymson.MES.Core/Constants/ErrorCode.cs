@@ -281,6 +281,10 @@
 
         #endregion
 
+        #region 异常消息 10900
+        public const string MES10901 = "";
+        #endregion
+
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码维护错误";
         public const string MES11101 = "不合格代码编码不能为空";
@@ -632,9 +636,7 @@
         public const string MES16110 = "扫描条码失败";
         public const string MES16111 = "条码:{SFC}已使用，不允许删除";
         public const string MES16112 = "扫描SN与关联工单号不符，请重新扫描！";
-        //public const string MES16113 = "请配置当前工单产品的编码规则！";
-        //public const string MES16114 = "扫描SN与工单产品编码规则不符！基数为:{Base}位";
-        //public const string MES16115 = "扫描SN与工单产品编码规则不符！需包含{ValuesType}值:{SegmentedValue}";
+
         public const string MES16116 = "已使用的条码，不允许删除";
 
         public const string MES16117 = "工单{OrderCode}已经被锁定，无法继续生产";
@@ -1071,7 +1073,17 @@
 
         public const string MES18712 = "Recipe参数Id不能为空";
         public const string MES18713 = "无法将其他状态修改成新建状态!";
+        public const string MES18714= "无法删除非新建状态数据";
+        public const string MES18715 = "Recipe参数版本不能为空";
+        public const string MES18716 = "Recipe参数版本最大长度为100";
+        public const string MES18717 = "Recipe参数版本不允许有空格";
+        public const string MES18718 = "Recipe参数产品不能为空";
+        public const string MES18719 = "Recipe参数工序不能为空";
+        public const string MES18720 = "Recipe参数工艺组不能为空";
 
+        public const string MES18721 = "Recipe参数项目参数不能为空";
+        public const string MES18722 = "Recipe参数项目小数位应该为不小于0且小于10的整数";
+        public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
         #endregion
 
         #region 工艺设备组 18900
@@ -1079,6 +1091,20 @@
         public const string MES18901 = "工艺设备组编码不允许有空格";
         public const string MES18902 = "工艺设备组名称不能为空";
         public const string MES18903 = "请求实体不能为空！";
+        #endregion
+
+        #region 降级规则 21100
+        public const string MES21100 = "降级规则错误";
+        public const string MES21101 = "对应降级规则不存在";
+        public const string MES21102 = "降级规则编码已存在";
+        public const string MES21103 = "降级规则编码不能为空";
+        public const string MES21104 = "降级规则名称不能为空";
+        public const string MES21105 = "降级规则编码最大长度为100";
+        public const string MES21106 = "降级规则名称最大长度为100";
+        public const string MES21107 = "描述最大长度为255";
+        public const string MES21108 = "降级规则编码不允许有空格";
+        public const string MES21109 = "Id不合法";
+        public const string MES21110 = "参数为空";
         #endregion
 
         #region 设备对接错误
@@ -1133,7 +1159,6 @@
         #endregion
 
         #region 系统执行出错 业务逻辑出错
-        //public const string MES20001 = "MES20001";
 
         #endregion
 

@@ -9,7 +9,7 @@ namespace Hymson.MES.Core.Constants.Manufacture
     /// <summary>
     /// 生成条码通配符
     /// </summary>
-    public   static class GenerateBarcodeWildcard
+    public static class GenerateBarcodeWildcard
     {
        /// <summary>
        /// 流水

@@ -45,6 +45,17 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 名称（设备/产品参数）
         /// </summary>
         public string ParameterName { get; set; }
+
+
+        /// <summary>
+        /// 参数单位（字典定义）
+        /// </summary>
+        public ParameterUnitEnum? ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum? DataType { get; set; }
     }
 
     /// <summary>

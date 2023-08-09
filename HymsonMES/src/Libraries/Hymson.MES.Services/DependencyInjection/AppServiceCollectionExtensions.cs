@@ -116,6 +116,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInteMessageGroupService, InteMessageGroupService>();
             services.AddSingleton<IInteEventTypeService, InteEventTypeService>();
+            services.AddSingleton<IInteEventService, InteEventService>();
             #endregion
 
             #region Process
@@ -194,6 +195,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFacePlateProductionService, ManuFacePlateProductionService>();
             services.AddSingleton<IManuBakingRecordService, ManuBakingRecordService>();
             services.AddSingleton<IManuBakingService, ManuBakingService>();
+
+            services.AddSingleton<IManuDowngradingRuleService, ManuDowngradingRuleService>();
 
             #endregion
 
@@ -393,6 +396,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventTypeSaveDto>, InteEventTypeSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteEventSaveDto>, InteEventSaveValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
@@ -452,6 +456,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ManuBakingModifyDto>, ManuBakingModifyValidator>();
             services.AddSingleton<AbstractValidator<ManuBakingRecordCreateDto>, ManuBakingRecordCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuBakingRecordModifyDto>, ManuBakingRecordModifyValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuDowngradingRuleCreateDto>, ManuDowngradingRuleCreateValidator>();
+            services.AddSingleton<AbstractValidator<ManuDowngradingRuleModifyDto>, ManuDowngradingRuleModifyValidator>();
 
             #endregion
 

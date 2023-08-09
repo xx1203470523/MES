@@ -67,9 +67,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteMessageGroupPushMethodRepository
     {
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM inte_message_group_push_method /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_message_group_push_method /**where**/  ";
 
         const string InsertsSql = "INSERT INTO inte_message_group_push_method(  `Id`, `SiteId`, `MessageGroupId`, `Type`, `Address`, `SecretKey`, `KeyWord`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @MessageGroupId, @Type, @Address, @SecretKey, @KeyWord, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 

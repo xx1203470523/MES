@@ -138,16 +138,15 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
 
-            //报废的不能操作
-            //即时锁不能操作
-            //将来锁定当前工序不能操作
             var scrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.Yes).Select(x => x.SFC).ToArray();
-            //类型为报废时判断条码是否已经报废,若已经报废提示:存在已报废的条码，不可再次报废
+            //判断条码报废状态，报废的不能操作
             if (scrapSfcs.Any())
             {
                 var strs = string.Join("','", scrapSfcs);
                 throw new CustomerValidationException(nameof(ErrorCode.MES15411)).WithData("sfcs", strs);
             }
+
+            //即时锁不能操作,将来锁定当前工序不能操作
             await VerifySfcsLockAsync(manuSfcs.ToArray());
 
             //已经存在的不合格信息不允许重复录入
@@ -195,7 +194,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var strs = string.Join(",", sfcRepairs.Select(x => x.Sfc));
                     throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
                 }
-                processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
+               processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(createDto.BadProcessRouteId ?? 0);
             }
             var sfcStepList = new List<ManuSfcStepEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceBusinessEntity>();

@@ -20,7 +20,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }

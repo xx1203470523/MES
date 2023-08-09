@@ -104,6 +104,12 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("m.MaterialCode LIKE @MaterialCode");
             }
 
+            if (!string.IsNullOrWhiteSpace(query.ProcedureCode))
+            {
+                query.ProcedureCode = $"%{query.ProcedureCode}%";
+                sqlBuilder.Where("p.Code LIKE @ProcedureCode");
+            }
+
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
@@ -192,12 +198,16 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
-                                                        egp.* ,m.materialCode as materialCode,m.materialName as materialName
+                                                        egp.* ,m.materialCode as materialCode,m.materialName as materialName, p.Code as ProcedureCode , p.Name as ProcedureName 
                                                      FROM `proc_equipment_group_param` egp 
                                                      LEFT JOIN proc_material  m ON  m.id=egp.ProductId
-                                                    /**where**/ LIMIT @Offset,@Rows ";
+                                                     LEFT JOIN proc_procedure p ON  p.id=egp.ProcedureId
+                                                    /**where**/ 
+                                                    ORDER BY egp.UpdatedOn DESC
+                                                    LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(*) FROM `proc_equipment_group_param` egp   
                                                       LEFT JOIN proc_material  m ON  m.id=egp.ProductId 
+                                                      LEFT JOIN proc_procedure p ON  p.id=egp.ProcedureId
                                                      /**where**/ ";
         const string GetProcEquipmentGroupParamEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

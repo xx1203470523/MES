@@ -7,6 +7,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
@@ -18,6 +19,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEventType.View;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
@@ -106,7 +108,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentGroupEntity, EquEquipmentGroupListDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentBaseDto>();
             #endregion
-
 
             #region EquEquipmentLinkApi
             CreateMap<EquEquipmentLinkApiCreateDto, EquEquipmentLinkApiEntity>();
@@ -286,10 +287,26 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageGroupPushMethodEntity, InteMessageGroupPushMethodDto>();
             #endregion
 
+            #region InteEvent
+            CreateMap<InteEventPagedQueryDto, InteEventPagedQuery>();
+            CreateMap<InteEventEntity, InteEventDto>();
+            CreateMap<InteEventSaveDto, InteEventEntity>();
+            #endregion
 
             #region InteEventType
             CreateMap<InteEventTypePagedQueryDto, InteEventTypePagedQuery>();
+            CreateMap<InteEventTypeEntity, InteEventTypeDto>();
+            CreateMap<InteEventTypeView, InteEventTypeDto>();
             CreateMap<InteEventTypeDto, InteEventTypeEntity>();
+            CreateMap<InteEventTypeSaveDto, InteEventTypeEntity>();
+            CreateMap<InteEventTypeMessageGroupRelationDto, InteEventTypeMessageGroupRelationEntity>();
+            CreateMap<InteEventTypeUpgradeDto, InteEventTypeUpgradeEntity>();
+            CreateMap<InteEventTypeMessageGroupRelationDto, InteEventTypeUpgradeMessageGroupRelationEntity>();
+            CreateMap<InteEventTypePushRuleDto, InteEventTypePushRuleEntity>();
+            CreateMap<InteEventTypePushRuleEntity, InteEventTypePushRuleDto>();
+            CreateMap<InteEventTypeUpgradeEntity, InteEventTypeUpgradeDto>();
+            CreateMap<InteEventTypeMessageGroupRelationEntity, MessageGroupBo>();
+            CreateMap<InteEventTypeUpgradeMessageGroupRelationEntity, MessageGroupBo>();
             #endregion
         }
 
@@ -647,6 +664,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuBakingRecordEntity, ManuBakingRecordDto>();
             CreateMap<ManuBakingRecordModifyDto, ManuBakingRecordEntity>();
             CreateMap<ManuBakingRecordPagedQueryDto, ManuBakingRecordPagedQuery>();
+            #endregion
+
+            #region ManuDowngradingRule
+            CreateMap<ManuDowngradingRuleCreateDto, ManuDowngradingRuleEntity>();
+            CreateMap<ManuDowngradingRulePagedQueryDto, ManuDowngradingRulePagedQuery>();
+            CreateMap<ManuDowngradingRuleModifyDto, ManuDowngradingRuleEntity>();
+            CreateMap<ManuDowngradingRuleEntity, ManuDowngradingRuleDto>();
             #endregion
         }
 

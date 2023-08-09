@@ -98,7 +98,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteVehicleTypeVerifyRepository, InteVehicleTypeVerifyRepository>();
 
             services.AddSingleton<IInteVehicleRepository, InteVehicleRepository>();
-
             services.AddSingleton<IInteVehicleVerifyRepository, InteVehicleVerifyRepository>();
 
             services.AddSingleton<IInteVehicleFreightRepository, InteVehicleFreightRepository>();
@@ -107,7 +106,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInteMessageGroupRepository, InteMessageGroupRepository>();
             services.AddSingleton<IInteMessageGroupPushMethodRepository, InteMessageGroupPushMethodRepository>();
+            services.AddSingleton<IInteEventRepository, InteEventRepository>();
             services.AddSingleton<IInteEventTypeRepository, InteEventTypeRepository>();
+            services.AddSingleton<IInteEventTypeMessageGroupRelationRepository, InteEventTypeMessageGroupRelationRepository>();
+            services.AddSingleton<IInteEventTypePushRuleRepository, InteEventTypePushRuleRepository>();
+            services.AddSingleton<IInteEventTypeUpgradeRepository, InteEventTypeUpgradeRepository>();
+            services.AddSingleton<IInteEventTypeUpgradeMessageGroupRelationRepository, InteEventTypeUpgradeMessageGroupRelationRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
@@ -245,6 +249,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuContainerBarcodeRepository, ManuContainerBarcodeRepository>();
             services.AddSingleton<IManuBakingRecordRepository, ManuBakingRecordRepository>();
             services.AddSingleton<IManuBakingRepository, ManuBakingRepository>();
+
+            services.AddSingleton<IManuDowngradingRuleRepository, ManuDowngradingRuleRepository>();
             #endregion
 
             #region Warehouse 
