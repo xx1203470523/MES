@@ -287,6 +287,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageGroupPushMethodEntity, InteMessageGroupPushMethodDto>();
             #endregion
 
+            #region InteEvent
+            CreateMap<InteEventPagedQueryDto, InteEventPagedQuery>();
+            CreateMap<InteEventEntity, InteEventDto>();
+            CreateMap<InteEventSaveDto, InteEventEntity>();
+            #endregion
+
             #region InteEventType
             CreateMap<InteEventTypePagedQueryDto, InteEventTypePagedQuery>();
             CreateMap<InteEventTypeEntity, InteEventTypeDto>();

@@ -105,6 +105,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IInteMessageGroupRepository, InteMessageGroupRepository>();
             services.AddSingleton<IInteMessageGroupPushMethodRepository, InteMessageGroupPushMethodRepository>();
+            services.AddSingleton<IInteEventRepository, InteEventRepository>();
             services.AddSingleton<IInteEventTypeRepository, InteEventTypeRepository>();
             services.AddSingleton<IInteEventTypeMessageGroupRelationRepository, InteEventTypeMessageGroupRelationRepository>();
             services.AddSingleton<IInteEventTypePushRuleRepository, InteEventTypePushRuleRepository>();

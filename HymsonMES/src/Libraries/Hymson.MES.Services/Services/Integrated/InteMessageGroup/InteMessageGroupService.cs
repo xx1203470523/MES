@@ -88,11 +88,11 @@ namespace Hymson.MES.Services.Services.Integrated
             // DTO转换实体
             var entity = saveDto.ToEntity<InteMessageGroupEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
             var checkEntity = await _inteMessageGroupRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -120,12 +120,12 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 var detailEntity = s.ToEntity<InteMessageGroupPushMethodEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.SiteId = entity.SiteId;
                 detailEntity.MessageGroupId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
-                detailEntity.SiteId = entity.SiteId;
 
                 return detailEntity;
             });
@@ -159,9 +159,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = saveDto.ToEntity<InteMessageGroupEntity>();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
             var checkEntity = await _inteMessageGroupRepository.GetByCodeAsync(new EntityByCodeQuery
