@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Dtos.Parameter;
 
 namespace Hymson.MES.CoreServices.Mapper
 {
@@ -15,6 +18,7 @@ namespace Hymson.MES.CoreServices.Mapper
         public MapperConfiguration()
         {
             CreateRequestBoMaps();
+            CreateParameterBoMaps();
         }
 
         /// <summary>
@@ -33,6 +37,15 @@ namespace Hymson.MES.CoreServices.Mapper
             CreateMap<JobRequestBo, PackageOpenRequestBo>();
             CreateMap<JobRequestBo, PackageCloseRequestBo>();
             CreateMap<JobRequestBo, BarcodeSfcReceiveBo>();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void CreateParameterBoMaps()
+        {
+            CreateMap<ParameterDto,ManuProductParameterEntity> ();
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -78,6 +79,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
+        private readonly IManuProductParameterService _manuProductParameterService;
+
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
 
@@ -94,6 +97,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
+            IManuProductParameterService manuProductParameterService,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
@@ -107,6 +111,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _inteJobRepository = inteJobRepository;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _procProductSetRepository = procProductSetRepository;
+            _manuProductParameterService = manuProductParameterService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
@@ -508,9 +513,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-
-
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
             {
                 //入库
                 await _procProcedureRepository.InsertAsync(procProcedureEntity);
@@ -530,6 +533,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
 
+                await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, parm.Procedure.Code);
                 //提交
                 ts.Complete();
             }

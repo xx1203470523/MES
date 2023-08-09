@@ -1094,6 +1094,12 @@
         public const string MES19008 = "资源不匹配";
         #endregion
 
+        #region  产品参数采集
+        public const string MES19100 = "产品参数采集异常";
+        public const string MES19101 = "未找到资源{ResCode}对应工序";
+        public const string MES19102 = "参数{ResCode}不存在";
+        #endregion
+
 
         public const string MES19910 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
         public const string MES19911 = "资源：{ResourceCode}未找到关联的产线信息";

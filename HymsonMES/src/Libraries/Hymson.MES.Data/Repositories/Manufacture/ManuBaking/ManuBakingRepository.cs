@@ -180,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string DeleteSql = "UPDATE `manu_baking` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_baking` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-
+            
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `EquipmentId`, `SFC`, `BakingOn`, `BakingEnd`, `BakingPlan`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_baking`  WHERE Id = @Id ";

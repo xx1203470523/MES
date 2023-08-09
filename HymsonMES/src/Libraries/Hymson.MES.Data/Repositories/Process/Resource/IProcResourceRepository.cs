@@ -55,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="resourceCode"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetByResourceCodeAsync(ProcResourceQuery query);
+        Task<ProcResourceEntity> GetByResourceCodeAsync(ProcResourceQuery query);
 
         /// <summary>
         /// 根据设备Code查询数据
