@@ -17,6 +17,8 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -43,6 +45,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 仓储接口（消息组）
         /// </summary>
         private readonly IInteMessageGroupRepository _inteMessageGroupRepository;
+
+        /// <summary>
+        /// 仓储接口（消息组推送方式）
+        /// </summary>
+        private readonly IInteMessageGroupPushMethodRepository _inteMessageGroupPushMethodRepository;
 
         /// <summary>
         /// 仓储接口（事件维护）
@@ -82,6 +89,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteMessageGroupRepository"></param>
+        /// <param name="inteMessageGroupPushMethodRepository"></param>
         /// <param name="inteEventRepository"></param>
         /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
@@ -90,6 +98,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteEventTypePushRuleRepository"></param>
         public InteEventTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventTypeSaveDto> validationSaveRules,
             IInteMessageGroupRepository inteMessageGroupRepository,
+            IInteMessageGroupPushMethodRepository inteMessageGroupPushMethodRepository,
             IInteEventRepository inteEventRepository,
             IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
@@ -101,6 +110,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteMessageGroupRepository = inteMessageGroupRepository;
+            _inteMessageGroupPushMethodRepository = inteMessageGroupPushMethodRepository;
             _inteEventRepository = inteEventRepository;
             _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
@@ -511,7 +521,10 @@ namespace Hymson.MES.Services.Services.Integrated
             // 消息组基础信息（已缓存）
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
-            return GetMessageGroupRelations(messageGroupEntities, messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>()));
+            // 消息组关联推送方式（已缓存）
+            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            return GetMessageGroupRelations(messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>()), messageGroupEntities, messageGroupPushMethodEntities);
         }
 
         /// <summary>
@@ -539,6 +552,9 @@ namespace Hymson.MES.Services.Services.Integrated
             // 消息组基础信息（已缓存）
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
+            // 消息组关联推送方式（已缓存）
+            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
             // 组装数据
             List<InteEventTypeUpgradeDto> dtos = new();
             foreach (var entity in entities)
@@ -546,7 +562,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 var dto = entity.ToModel<InteEventTypeUpgradeDto>();
                 if (messageGroupRelationDic.TryGetValue(entity.Id, out var messageGroupRelations) == false) continue;
 
-                dto.MessageGroups = GetMessageGroupRelations(messageGroupEntities, messageGroupRelations.Select(s => s.ToModel<MessageGroupBo>()));
+                dto.MessageGroups = GetMessageGroupRelations(messageGroupRelations.Select(s => s.ToModel<MessageGroupBo>()), messageGroupEntities, messageGroupPushMethodEntities);
                 dtos.Add(dto);
             }
 
@@ -589,25 +605,35 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 获取消息组关联信息
         /// </summary>
-        /// <param name="messageGroupEntities"></param>
         /// <param name="messageGroupBos"></param>
+        /// <param name="messageGroupEntities"></param>
+        /// <param name="messageGroupPushMethodEntities"></param>
         /// <returns></returns>
-        private static IEnumerable<InteEventTypeMessageGroupRelationDto> GetMessageGroupRelations(IEnumerable<InteMessageGroupEntity> messageGroupEntities, IEnumerable<MessageGroupBo> messageGroupBos)
+        private static IEnumerable<InteEventTypeMessageGroupRelationDto> GetMessageGroupRelations(IEnumerable<MessageGroupBo> messageGroupBos,
+            IEnumerable<InteMessageGroupEntity> messageGroupEntities,
+            IEnumerable<InteMessageGroupPushMethodEntity> messageGroupPushMethodEntities)
         {
+            var messageGroupPushMethodDic = messageGroupPushMethodEntities.ToLookup(w => w.MessageGroupId).ToDictionary(d => d.Key, d => d);
+
             List<InteEventTypeMessageGroupRelationDto> dtos = new();
             foreach (var item in messageGroupBos)
             {
                 var pushTypeArray = item.PushTypes.ToDeserialize<IEnumerable<PushTypeEnum>>();
                 if (pushTypeArray == null) continue;
 
+                // 消息组基础信息
                 var messageGroupEntity = messageGroupEntities.FirstOrDefault(f => f.Id == item.MessageGroupId);
                 if (messageGroupEntity == null) continue;
+
+                // 消息组推送方式
+                if (messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods) == false) continue;
 
                 dtos.Add(new InteEventTypeMessageGroupRelationDto
                 {
                     Id = item.Id,
                     MessageGroupId = item.MessageGroupId,
                     PushTypeArray = pushTypeArray ?? new List<PushTypeEnum>(),
+                    EnabledPushType = messageGroupPushMethods.Select(s => s.Type).Distinct(),
                     Code = messageGroupEntity.Code,
                     Name = messageGroupEntity.Name
                 });

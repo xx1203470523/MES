@@ -158,6 +158,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public IEnumerable<PushTypeEnum> PushTypeArray { get; set; }
 
+        /// <summary>
+        /// 推送类型;1、企微2、钉钉3、邮箱
+        /// </summary>
+        public IEnumerable<PushTypeEnum> EnabledPushType { get; set; }
+
     }
 
 }
