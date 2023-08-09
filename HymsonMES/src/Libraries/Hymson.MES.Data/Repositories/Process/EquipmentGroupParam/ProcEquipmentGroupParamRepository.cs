@@ -192,13 +192,25 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetByCodeSql, query);
         }
+
+        /// <summary>
+        /// 根据关联信息（产品，工序，工艺组）获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcEquipmentGroupParamEntity> GetByRelatesInformationAsync(ProcEquipmentGroupParamRelatesInformationQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetByRelatesInformationSql, query);
+        }
     }
 
     public partial class ProcEquipmentGroupParamRepository
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT 
-                                                        egp.* ,m.materialCode as materialCode,m.materialName as materialName, p.Code as ProcedureCode , p.Name as ProcedureName 
+                                                        egp.* ,m.materialCode as materialCode,m.materialName as materialName, m.Version as  MaterialVersion, 
+                                                        p.Code as ProcedureCode , p.Name as ProcedureName 
                                                      FROM `proc_equipment_group_param` egp 
                                                      LEFT JOIN proc_material  m ON  m.id=egp.ProductId
                                                      LEFT JOIN proc_procedure p ON  p.id=egp.ProcedureId
@@ -232,5 +244,11 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetByCodeSql = @"SELECT * 
                             FROM `proc_equipment_group_param`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+        const string GetByRelatesInformationSql = @"SELECT * 
+                            FROM `proc_equipment_group_param`  
+                            WHERE ProductId = @ProductId 
+                            AND ProcedureId = @ProcedureId 
+                            AND EquipmentGroupId = @EquipmentGroupId 
+                            AND IsDeleted=0 AND SiteId=@SiteId ";
     }
 }

@@ -13,6 +13,8 @@ namespace Hymson.MES.Data.Repositories.Process
 
         public string MaterialName { get; set; }
 
+        public string MaterialVersion { get; set; }
+
         public string ProcedureCode { get; set; }
 
         public string ProcedureName { get; set; }
