@@ -202,6 +202,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                                      FROM `proc_equipment_group_param` egp 
                                                      LEFT JOIN proc_material  m ON  m.id=egp.ProductId
                                                      LEFT JOIN proc_procedure p ON  p.id=egp.ProcedureId
+                                                     ORDERY BY egp.UpdatedOn DESC
                                                     /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(*) FROM `proc_equipment_group_param` egp   
                                                       LEFT JOIN proc_material  m ON  m.id=egp.ProductId 
