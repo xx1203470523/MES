@@ -264,12 +264,156 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
             // DTO转换实体
             var entity = saveDto.ToEntity<InteEventTypeEntity>();
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
+            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
 
-            return await _inteEventTypeRepository.UpdateAsync(entity);
+            // 编码唯一性验证
+            var checkEntity = await _inteEventTypeRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+            }
+
+            // 关联消息组
+            saveDto.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
+            var messageGroupEntities = saveDto.MessageGroups.Select(s =>
+            {
+                var detailEntity = s.ToEntity<InteEventTypeMessageGroupRelationEntity>();
+                detailEntity.PushTypes = s.PushTypeArray.ToSerialize();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.EventTypeId = entity.Id;
+                detailEntity.SiteId = entity.SiteId;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                return detailEntity;
+            });
+
+            // 升级
+            //List<ValidationFailure> validationFailures = new();
+            List<InteEventTypeUpgradeEntity> upgrades = new();
+            List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
+
+            // 接收升级
+            foreach (var item in saveDto.ReceiveUpgrades)
+            {
+                var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.PushScene = PushSceneEnum.ReceiveUpgrade;
+                detailEntity.EventTypeId = entity.Id;
+                detailEntity.SiteId = entity.SiteId;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                upgrades.Add(detailEntity);
+
+                item.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
+                upgradeMessageGroupRelations.AddRange(item.MessageGroups.Select(s =>
+                {
+                    var relationEntity = s.ToEntity<InteEventTypeUpgradeMessageGroupRelationEntity>();
+                    relationEntity.PushTypes = s.PushTypeArray.ToSerialize();
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.EventTypeId = detailEntity.EventTypeId;
+                    relationEntity.PushScene = detailEntity.PushScene;
+                    relationEntity.EventTypeUpgradeId = detailEntity.Id;
+                    relationEntity.SiteId = entity.SiteId;
+                    relationEntity.CreatedBy = updatedBy;
+                    relationEntity.CreatedOn = updatedOn;
+                    relationEntity.UpdatedBy = updatedBy;
+                    relationEntity.UpdatedOn = updatedOn;
+                    return relationEntity;
+                }));
+            }
+
+            // 处理升级
+            foreach (var item in saveDto.HandleUpgrades)
+            {
+                var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.PushScene = PushSceneEnum.HandleUpgrade;
+                detailEntity.EventTypeId = entity.Id;
+                detailEntity.SiteId = entity.SiteId;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                upgrades.Add(detailEntity);
+
+                item.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
+                upgradeMessageGroupRelations.AddRange(item.MessageGroups.Select(s =>
+                {
+                    var relationEntity = s.ToEntity<InteEventTypeUpgradeMessageGroupRelationEntity>();
+                    relationEntity.PushTypes = s.PushTypeArray.ToSerialize();
+                    relationEntity.Id = IdGenProvider.Instance.CreateId();
+                    relationEntity.EventTypeId = detailEntity.EventTypeId;
+                    relationEntity.PushScene = detailEntity.PushScene;
+                    relationEntity.EventTypeUpgradeId = detailEntity.Id;
+                    relationEntity.SiteId = entity.SiteId;
+                    relationEntity.CreatedBy = updatedBy;
+                    relationEntity.CreatedOn = updatedOn;
+                    relationEntity.UpdatedBy = updatedBy;
+                    relationEntity.UpdatedOn = updatedOn;
+                    return relationEntity;
+                }));
+            }
+
+            // 推送规则
+            var ruleEntities = saveDto.Rules.Select(s =>
+            {
+                var detailEntity = s.ToEntity<InteEventTypePushRuleEntity>();
+                detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.EventTypeId = entity.Id;
+                detailEntity.SiteId = entity.SiteId;
+                detailEntity.CreatedBy = updatedBy;
+                detailEntity.CreatedOn = updatedOn;
+                detailEntity.UpdatedBy = updatedBy;
+                detailEntity.UpdatedOn = updatedOn;
+                return detailEntity;
+            });
+
+            var command = new DeleteByParentIdCommand
+            {
+                ParentId = entity.Id,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            };
+
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                var rowArray = await Task.WhenAll(new List<Task<int>>()
+                {
+                    _inteEventTypeRepository.UpdateAsync(entity),
+
+                    _inteEventTypeMessageGroupRelationRepository.DeleteByParentIdAsync(command),
+                    _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
+
+                    _inteEventTypeUpgradeRepository.DeleteByParentIdAsync(command),
+                    _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
+
+                    _inteEventTypeUpgradeMessageGroupRelationRepository.DeleteByParentIdAsync(command),
+                    _inteEventTypeUpgradeMessageGroupRelationRepository.InsertRangeAsync(upgradeMessageGroupRelations),
+
+                    _inteEventTypePushRuleRepository.DeleteByParentIdAsync(command),
+                    _inteEventTypePushRuleRepository.InsertRangeAsync(ruleEntities)
+                });
+                rows += rowArray.Sum();
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
