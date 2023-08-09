@@ -372,7 +372,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 UpdatedBy = entity.UpdatedBy,
                 UpdatedOn = entity.UpdatedOn,
                 Ids = entity.IdsArr
-            }); ;
+            });
         }
 
         /// <summary>

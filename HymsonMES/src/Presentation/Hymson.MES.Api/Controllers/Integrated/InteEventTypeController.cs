@@ -89,6 +89,17 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
+        /// 查询详情（关联事件）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("event/{id}")]
+        public async Task<IEnumerable<InteEventBaseDto>?> QueryEventsByMainIdAsync(long id)
+        {
+            return await _inteEventTypeService.QueryEventsByMainIdAsync(id);
+        }
+
+        /// <summary>
         /// 查询详情（关联群组）
         /// </summary>
         /// <param name="id"></param>

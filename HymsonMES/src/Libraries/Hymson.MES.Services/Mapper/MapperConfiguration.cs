@@ -291,7 +291,8 @@ namespace Hymson.MES.Services.Mapper
             #region InteEvent
             CreateMap<InteEventPagedQueryDto, InteEventPagedQuery>();
             CreateMap<InteEventEntity, InteEventInfoDto>();
-             CreateMap<InteEventView, InteEventDto>();
+            CreateMap<InteEventEntity, InteEventBaseDto>();
+            CreateMap<InteEventView, InteEventDto>();
             CreateMap<InteEventSaveDto, InteEventEntity>();
             #endregion
 
