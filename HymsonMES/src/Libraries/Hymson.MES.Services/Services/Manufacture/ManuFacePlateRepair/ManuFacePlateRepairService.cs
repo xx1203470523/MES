@@ -424,7 +424,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateRepairOpenInfoDto.returnProcedureInfo = manuFacePlateRepairReturnProcedureList;
 
             //尾工序
-            var endProcessRouteDetailId = await GetEndProcessRouteDetailId(manuSfcProduceEntit.ProcessRouteId);
+            var endProcessRouteDetailId = await GetEndProcessRouteDetailIdAsync(manuSfcProduceEntit.ProcessRouteId);
             manuFacePlateRepairOpenInfoDto.IsReturnProcedure = manuSfcProduceEntit.ProcedureId == endProcessRouteDetailId;
 
             return manuFacePlateRepairOpenInfoDto;
@@ -485,7 +485,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
 
             #region 工序判断
-            var endProcessRouteDetailId = await GetEndProcessRouteDetailId(manuSfcProduceEntit.ProcessRouteId);
+            var endProcessRouteDetailId = await GetEndProcessRouteDetailIdAsync(manuSfcProduceEntit.ProcessRouteId);
             if (confirmSubmitDto.ProcedureId == endProcessRouteDetailId && confirmSubmitDto.ReturnProcedureId <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17318));
@@ -525,7 +525,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var BadRecordIds = confirmSubmitDto.confirmSubmitDetail.Select(it => it.BadRecordId).ToArray();
             var badRecordList = await _manuProductBadRecordRepository.GetByIdsAsync(BadRecordIds);
 
-            var sfcProduceRepairBo = await GetSfcProduceRepairBo(manuSfcProduceEntit.SFC);
+            var sfcProduceRepairBo = await GetSfcProduceRepairBoAsync(manuSfcProduceEntit.SFC);
 
             var GetManuSfcRepairDetails = await _manuFacePlateRepairRepository.ManuSfcRepairDetailByProductBadIdAsync(new ManuSfcRepairDetailByProductBadIdQuery
             {
@@ -804,12 +804,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuFacePlateRepairAsync(ManuFacePlateRepairCreateDto manuFacePlateRepairCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(manuFacePlateRepairCreateDto);
 
@@ -885,12 +879,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task ModifyManuFacePlateRepairAsync(ManuFacePlateRepairModifyDto manuFacePlateRepairModifyDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuFacePlateRepairModifyDto);
 
@@ -925,7 +913,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="sfc"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        private async Task<SfcProduceRepairBo> GetSfcProduceRepairBo(string sfc)
+        private async Task<SfcProduceRepairBo> GetSfcProduceRepairBoAsync(string sfc)
         {
             // 获取维修业务
             var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
@@ -942,7 +930,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             return sfcProduceRepairBo;
         }
 
-        private async Task<long> GetEndProcessRouteDetailId(long ProcessRouteId)
+        private async Task<long> GetEndProcessRouteDetailIdAsync(long ProcessRouteId)
         {
             //获取尾工序
             // 因为可能有分叉，所以返回的下一步工序是集合

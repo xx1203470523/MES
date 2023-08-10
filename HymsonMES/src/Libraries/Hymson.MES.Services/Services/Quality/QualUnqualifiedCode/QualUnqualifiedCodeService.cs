@@ -190,15 +190,8 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
-        /// <exception cref="BusinessException">编码复用</exception>
         public async Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
-
             param.UnqualifiedCode = param.UnqualifiedCode.ToTrimSpace().ToUpperInvariant();
             param.UnqualifiedCodeName = param.UnqualifiedCodeName.Trim();
 
@@ -208,7 +201,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             var qualUnqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByCodeAsync(new QualUnqualifiedCodeByCodeQuery { Code = param.UnqualifiedCode, Site = _currentSite.SiteId });
             if (qualUnqualifiedCodeEntity != null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES11108)).WithData("code", param.UnqualifiedCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11108)).WithData("code", param.UnqualifiedCode);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -254,7 +247,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             var qualUnqualifiedList = await _qualUnqualifiedCodeRepository.GetByIdsAsync(ids);
             if (qualUnqualifiedList != null && qualUnqualifiedList.Any(x => x.Status != SysDataStatusEnum.Build))
             {
-                throw new BusinessException(nameof(ErrorCode.MES10106));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
             var userId = _currentUser.UserName;
             return await _qualUnqualifiedCodeRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
@@ -265,20 +258,15 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
         public async Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
             param.UnqualifiedCodeName = param.UnqualifiedCodeName.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var qualUnqualifiedEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(param.Id);
             if (qualUnqualifiedEntity != null && qualUnqualifiedEntity.Status != SysDataStatusEnum.Build && param.Status == SysDataStatusEnum.Build)
             {
-                throw new BusinessException(nameof(ErrorCode.MES11111));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11111));
             }
             var userId = _currentUser.UserName;
             //DTO转换实体

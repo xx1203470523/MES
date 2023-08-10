@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -23,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcSortingRuleEntity procSortingRuleEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcSortingRuleEntity procSortingRuleEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcSortingRuleEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,13 +81,27 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcSortingRuleEntity>> GetProcSortingRuleEntitiesAsync(ProcSortingRuleQuery procSortingRuleQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procSortingRulePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcSortingRuleEntity>> GetPagedInfoAsync(ProcSortingRulePagedQuery procSortingRulePagedQuery);
+
+        /// <summary>
+        ///根据编码和版本获取分选规则
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        Task<ProcSortingRuleEntity> GetByCodeAndVersion(ProcSortingRuleByCodeAndVersionQuery param);
+
+        /// <summary>
+        /// 根据编码和物料获取分选规则
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        Task<ProcSortingRuleEntity> GetByCodeAndMaterialId(ProcSortingRuleCodeAndMaterialIdQuery param);
         #endregion
     }
 }

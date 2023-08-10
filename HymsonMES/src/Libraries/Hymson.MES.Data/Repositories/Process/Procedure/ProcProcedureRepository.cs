@@ -214,8 +214,20 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcedureEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("1=1");
+
+            if (!string.IsNullOrWhiteSpace(procProcedureQuery.Code))
+            {
+                sqlBuilder.Where(" Code= @Code ");
+            }
+            if (procProcedureQuery.Codes != null && procProcedureQuery.Codes.Any())
+            {
+                sqlBuilder.Where(" Code in @Codes ");
+            }
+            sqlBuilder.AddParameters(procProcedureQuery);
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedureEntities = await conn.QueryAsync<ProcProcedureEntity>(template.RawSql, procProcedureQuery);
             return procProcedureEntities;

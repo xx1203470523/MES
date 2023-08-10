@@ -313,6 +313,19 @@
         public const string MES11206 = "不合格组编码{code}已经存在";
         #endregion
 
+        #region 分选规则  11300
+        public const string MES11300 = "分选规则错误";
+        public const string MES11301 = "分选规则编码不能为空";
+        public const string MES11302 = "分选规则名称不能为空";
+        public const string MES11303 = "分选规则版本不能为空";
+        public const string MES11304 = "分选规则物料不能为空";
+        public const string MES11305 = "分选规则状态不能为空";
+        public const string MES11306 = "参数的最大值不能小于最小值";
+        public const string MES11307 = "当前编码和版本已存在";
+        public const string MES11308 = "当前物料已存在的分选规则编码与当前编码不一致";
+        public const string MES11309 = "分选规则不存在";
+        #endregion
+
         #region 作业12000
         public const string MES12000 = "作业维护错误";
         public const string MES12001 = "作业{code}已经存在";
@@ -726,71 +739,6 @@
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
         #endregion
 
-        #region 生产
-        public const string MES17101 = "物料条码:{barCode}不存在！";
-        public const string MES17102 = "获取条码{SFC}信息失败！";
-        public const string MES17103 = "获取出站产品信息失败！";
-        public const string MES17104 = "获取条码信息失败！";
-
-        #region 面板维护
-        public const string MES17201 = "面板类型不能为空";
-        public const string MES17202 = "面板编码不能为空";
-        public const string MES17203 = "面板名称不能为空";
-        public const string MES17204 = "面板状态不能为空";
-        public const string MES17205 = "面板编码已经存在";
-        public const string MES17206 = "面板编码最大长度为255";
-        public const string MES17207 = "面板名称最大长度为255";
-        public const string MES17208 = "面板有更新，请刷新页面！";
-        public const string MES17209 = "面板不存在！";
-        public const string MES17210 = "面板类型不合法！";
-        public const string MES17211 = "状态不合法！";
-        public const string MES17212 = "会话超时时间不能为空！";
-
-        public const string MES17251 = "按钮名称不能为空！";
-        public const string MES17252 = "按钮序列号必须大于0！";
-        public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
-        public const string MES17254 = "按钮中存在，作业为空，请检查！";
-        public const string MES17255 = "未读取到有效作业，请检查！";
-        #endregion
-
-        #region 在制维修
-        public const string MES17301 = "工序不能为空";
-        public const string MES17302 = "资源不能为空";
-        public const string MES17303 = "产品条码不能为空";
-        public const string MES17304 = "更改产品条码生产状态失败";
-        public const string MES17305 = "获取维修信息失败";
-        public const string MES17306 = "获取条码生产信息失败";
-        public const string MES17307 = "存在未关闭的缺陷，请检查！";
-        public const string MES17308 = "返回工序失败！";
-        public const string MES17309 = "当前面板不存在！";
-        public const string MES17310 = "结束维修，保存数据失败！";
-        public const string MES17311 = "未获取到工序信息";
-        public const string MES17312 = "未获取到资源信息";
-        public const string MES17313 = "未获取到工单信息";
-        public const string MES17314 = "未获取到产品信息";
-        public const string MES17315 = "未获取到在制维修信息";
-        public const string MES17316 = "未获取到不良录入信息";
-        public const string MES17317 = "更新条码生产状态失败";
-        public const string MES17318 = "返回工序不能为空";
-        public const string MES17319 = "作业:{key}执行失败";
-        public const string MES17320 = "作业返回空，请检查作业是否正确配置";
-        public const string MES17321 = "不识别的类型：{key}";
-        public const string MES17322 = "请先开始维修";
-        public const string MES17323 = "排队中";
-        public const string MES17324 = "活动中";
-        public const string MES17325 = "未获取到维修业务表的数据";
-        public const string MES17326 = "未获取到维修业务内容";
-        public const string MES17327 = "工序未关联到资源";
-        public const string MES17328 = "不合格代码:{0}";
-        public const string MES17329 = "分析原因不能为空！";
-        public const string MES17330 = "维修方法不能为空！";
-        public const string MES17331 = "未找到不良录入信息！";
-
-
-        #endregion
-
-        #endregion
-
         #region 工单激活 MES16400
         public const string MES16400 = "工单激活错误";
         public const string MES16401 = "查询工单激活必须选择线体！";
@@ -915,6 +863,71 @@
         public const string MES17005 = "条码打印，模板数据格式错误";
         #endregion
 
+        #region 生产MES17100
+        public const string MES17101 = "物料条码:{barCode}不存在！";
+        public const string MES17102 = "获取条码{SFC}信息失败！";
+        public const string MES17103 = "获取出站产品信息失败！";
+        public const string MES17104 = "获取条码信息失败！";
+
+        #endregion
+
+        #region 面板维护 MES17201
+        public const string MES17201 = "面板类型不能为空";
+        public const string MES17202 = "面板编码不能为空";
+        public const string MES17203 = "面板名称不能为空";
+        public const string MES17204 = "面板状态不能为空";
+        public const string MES17205 = "面板编码已经存在";
+        public const string MES17206 = "面板编码最大长度为255";
+        public const string MES17207 = "面板名称最大长度为255";
+        public const string MES17208 = "面板有更新，请刷新页面！";
+        public const string MES17209 = "面板不存在！";
+        public const string MES17210 = "面板类型不合法！";
+        public const string MES17211 = "状态不合法！";
+        public const string MES17212 = "会话超时时间不能为空！";
+
+        public const string MES17251 = "按钮名称不能为空！";
+        public const string MES17252 = "按钮序列号必须大于0！";
+        public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
+        public const string MES17254 = "按钮中存在，作业为空，请检查！";
+        public const string MES17255 = "未读取到有效作业，请检查！";
+        #endregion
+
+        #region 在制维修 MES17301
+        public const string MES17301 = "工序不能为空";
+        public const string MES17302 = "资源不能为空";
+        public const string MES17303 = "产品条码不能为空";
+        public const string MES17304 = "更改产品条码生产状态失败";
+        public const string MES17305 = "获取维修信息失败";
+        public const string MES17306 = "获取条码生产信息失败";
+        public const string MES17307 = "存在未关闭的缺陷，请检查！";
+        public const string MES17308 = "返回工序失败！";
+        public const string MES17309 = "当前面板不存在！";
+        public const string MES17310 = "结束维修，保存数据失败！";
+        public const string MES17311 = "未获取到工序信息";
+        public const string MES17312 = "未获取到资源信息";
+        public const string MES17313 = "未获取到工单信息";
+        public const string MES17314 = "未获取到产品信息";
+        public const string MES17315 = "未获取到在制维修信息";
+        public const string MES17316 = "未获取到不良录入信息";
+        public const string MES17317 = "更新条码生产状态失败";
+        public const string MES17318 = "返回工序不能为空";
+        public const string MES17319 = "作业:{key}执行失败";
+        public const string MES17320 = "作业返回空，请检查作业是否正确配置";
+        public const string MES17321 = "不识别的类型：{key}";
+        public const string MES17322 = "请先开始维修";
+        public const string MES17323 = "排队中";
+        public const string MES17324 = "活动中";
+        public const string MES17325 = "未获取到维修业务表的数据";
+        public const string MES17326 = "未获取到维修业务内容";
+        public const string MES17327 = "工序未关联到资源";
+        public const string MES17328 = "不合格代码:{0}";
+        public const string MES17329 = "分析原因不能为空！";
+        public const string MES17330 = "维修方法不能为空！";
+        public const string MES17331 = "未找到不良录入信息！";
+
+
+        #endregion
+
         #region 在制品步骤控制 MES18000
 
         public const string MES18001 = "条码信息不存在";
@@ -981,7 +994,6 @@
         public const string MES18217 = "条码{SFC}状态不合法！";
         public const string MES18218 = "条码{0}库存修改失败，请联系管理员！";
         #endregion
-
 
         #region 系统Token MES18300
         public const string MES18300 = "系统编码{code}已经存在";

@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -19,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Process
     /// <summary>
     /// 分选规则仓储
     /// </summary>
-    public partial class ProcSortingRuleRepository :BaseRepository, IProcSortingRuleRepository
+    public partial class ProcSortingRuleRepository : BaseRepository, IProcSortingRuleRepository
     {
 
-        public ProcSortingRuleRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ProcSortingRuleRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcSortingRuleEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcSortingRuleEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcSortingRuleEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcSortingRuleEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ProcSortingRuleEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Process
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (procSortingRulePagedQuery.PageIndex - 1) * procSortingRulePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procSortingRulePagedQuery.PageSize });
@@ -173,6 +174,30 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procSortingRuleEntitys);
         }
+
+        /// <summary>
+        ///根据编码和版本获取分选规则
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<ProcSortingRuleEntity> GetByCodeAndVersion(ProcSortingRuleByCodeAndVersionQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByCodeAndVersionSql, param);
+        }
+
+        /// <summary>
+        /// 根据编码和物料获取分选规则
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<ProcSortingRuleEntity> GetByCodeAndMaterialId(ProcSortingRuleCodeAndMaterialIdQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByCodeAndMaterialIdSql, param);
+        }
+
+
         #endregion
 
     }
@@ -201,6 +226,12 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`  WHERE Id IN @Ids ";
+        public string GetByCodeAndVersionSql = @"SELECT 
+                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule`  WHERE Code = @Code AND  Version=@Version AND SiteId=@SiteId AND  IsDeleted = 0";
+        public string GetByCodeAndMaterialIdSql = @"SELECT 
+                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule`   WHERE Code = @Code AND  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
         #endregion
     }
 }

@@ -9,6 +9,6 @@
         /// <summary>
         /// 工艺路线索引
         /// </summary>
-        public IList<long> ProcedureIds { get; set; }
+        public IList<long> ProcedureIds { get; set; }= new List<long>();
     }
 }

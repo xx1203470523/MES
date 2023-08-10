@@ -6,6 +6,7 @@
  *build datetime: 2023-07-25 03:25:19
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -45,7 +46,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 包含最小值类型;1< 2.≤
         /// </summary>
-        public int MinContainingType { get; set; }
+        public ContainingTypeEnum? MinContainingType { get; set; }
 
        /// <summary>
         /// 最大值
@@ -55,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 包含最大值类型;1< 2.≥
         /// </summary>
-        public int MaxContainingType { get; set; }
+        public ContainingTypeEnum? MaxContainingType { get; set; }
 
        /// <summary>
         /// 参数值

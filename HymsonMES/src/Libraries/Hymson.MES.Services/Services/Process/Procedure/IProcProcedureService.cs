@@ -71,5 +71,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <param name="idsAr"></param>
         /// <returns></returns>
         Task<int> DeleteProcProcedureAsync(long[] idsAr);
+
+        /// <summary>
+        /// 根据工序编码获取工序信息
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        Task<ProcProcedureCodeDto> GetByCodeAsync(string code);
     }
 }

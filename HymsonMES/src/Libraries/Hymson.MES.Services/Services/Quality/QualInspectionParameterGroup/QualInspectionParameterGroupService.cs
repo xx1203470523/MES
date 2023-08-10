@@ -111,8 +111,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> CreateAsync(QualInspectionParameterGroupSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -196,8 +194,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> ModifyAsync(QualInspectionParameterGroupSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
