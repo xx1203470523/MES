@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> CreateAsync(InteMessageGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> ModifyAsync(InteMessageGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
