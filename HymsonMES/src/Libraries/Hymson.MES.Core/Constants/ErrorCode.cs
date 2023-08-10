@@ -313,6 +313,16 @@
         public const string MES11206 = "不合格组编码{code}已经存在";
         #endregion
 
+        #region 分选规则  11300
+        public const string MES11300 = "分选规则错误";
+        public const string MES11301 = "分选规则编码不能为空";
+        public const string MES11302 = "分选规则名称不能为空";
+        public const string MES11303 = "分选规则版本不能为空";
+        public const string MES11304 = "分选规则物料不能为空";
+        public const string MES11305 = "分选规则状态不能为空";
+        public const string MES11306 = "参数的最大值不能小于最小值";
+        #endregion
+
         #region 作业12000
         public const string MES12000 = "作业维护错误";
         public const string MES12001 = "作业{code}已经存在";

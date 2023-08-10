@@ -21,7 +21,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcSortingRuleGradeRepository :BaseRepository, IProcSortingRuleGradeRepository
     {
-
         public ProcSortingRuleGradeRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
         {
         }
@@ -159,8 +158,18 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procSortingRuleGradeEntitys);
         }
-        #endregion
 
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteSortingRuleGradeByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByDeleteSortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = id });
+        }
+        #endregion
     }
 
     public partial class ProcSortingRuleGradeRepository
@@ -187,6 +196,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_grade`  WHERE Id IN @Ids ";
+        const string DeleteByDeleteSortingRuleGradeByIdAsyncIdSql = "DELETE FROM`proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
 }

@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES10218));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10218));
                 }
 
                 foreach (var item in procMaterialList)
@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response < procMaterialList.Count())
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES10218));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10218));
                 }
 
                 ts.Complete();
@@ -137,13 +137,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto dto)
         {
-            if (dto == null) throw new ValidationException(nameof(ErrorCode.MES10213));
-
             dto.Remark ??= "".Trim();
 
             // 物料组是否存在
             var entity = await _procMaterialGroupRepository.GetByIdAsync(dto.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES10219));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10219));
 
             entity.Remark = dto.Remark;
             entity.UpdatedBy = _currentUser.UserName;
@@ -164,7 +162,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var rows = 0;
                 rows = await _procMaterialGroupRepository.UpdateAsync(entity);
-                if (rows == 0) throw new BusinessException(nameof(ErrorCode.MES10220));
+                if (rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10220));
 
                 // 将之前所有该物料组的物料改为未绑定 
                 await _procMaterialRepository.UpdateProcMaterialUnboundAsync(entity.Id);
@@ -197,7 +195,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10213));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10213));
             }
 
             //判断物料中是否有当前物料组

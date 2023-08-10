@@ -84,13 +84,11 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto modifyDto)
         {
-            if (modifyDto == null) throw new ValidationException(ErrorCode.MES13003);
-
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
 
             var entityOld = await _equFaultReasonRepository.GetByIdAsync(modifyDto.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES13013));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13013));
             if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10108));
@@ -123,11 +121,6 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesEquFaultReasonAsync(long[] ids)
         {
-            if (ids == null || ids.Any() == false)
-            {
-                throw new ValidationException(ErrorCode.MES13005);
-            }
-
             var entities = await _equFaultReasonRepository.GetByIdsAsync(ids);
             if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
             {

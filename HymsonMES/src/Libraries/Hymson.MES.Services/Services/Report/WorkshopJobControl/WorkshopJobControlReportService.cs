@@ -86,14 +86,14 @@ namespace Hymson.MES.Services.Services.Report
             var sfcInfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(sfc);
             if (sfcInfo == null) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
             }
 
             var sfcSteps= await _manuSfcStepRepository.GetSFCInOutStepAsync(new SfcInOutStepQuery() { SiteId=_currentSite.SiteId??0,Sfc=sfc});
 
             if (sfcSteps==null|| !sfcSteps.Any()) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
             }
             #region 查询基础数据
             //var oneSfcStep = sfcSteps.Where(x=>x.WorkOrderId == sfcInfo.WorkOrderId).FirstOrDefault();
@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Services.Report
             var workOrder= await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId);
             if (workOrder == null) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
             }
             workshopJobControlStepReportDto.OrderCode=workOrder.OrderCode;
 
@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Services.Report
             var material = await _procMaterialRepository.GetByIdAsync(sfcInfo.ProductId);
             if (material == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
             }
             workshopJobControlStepReportDto.MaterialCodrNameVersion = material.MaterialCode + "/" + material.MaterialName + "/" + material.Version;
 
@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Services.Report
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(workOrder.ProcessRouteId);
             if (processRoute == null) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES18104)).WithData("sfc", sfc);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfc);
             }
             workshopJobControlStepReportDto.ProcessRouteCodeNameVersion = processRoute.Code + "/" + processRoute.Name + "/" + processRoute.Version;
 
@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Report
             var bom = await _procBomRepository.GetByIdAsync(workOrder.ProductBOMId);
             if (bom == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES18105)).WithData("sfc", sfc);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18105)).WithData("sfc", sfc);
             }
             workshopJobControlStepReportDto.ProcBomCodeNameVersion = bom.BomCode + "/" + bom.BomName + "/" + bom.Version;
 
@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.Report
 
             if (string.IsNullOrEmpty(pagedQuery.SFC)) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES18110));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18110));
             }
 
             var pagedInfo = await _manuSfcStepRepository.GetPagedInfoBySFCAsync(pagedQuery);

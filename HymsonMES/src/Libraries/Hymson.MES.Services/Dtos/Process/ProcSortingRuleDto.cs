@@ -7,6 +7,8 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -79,16 +81,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
-
-        /// <summary>
-        /// 参数详情
-        /// </summary>
-        IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
-
-        /// <summary>
-        /// 档次
-        /// </summary>
-        IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
     }
 
     /// <summary>
@@ -119,22 +111,22 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 参数详情
         /// </summary>
-        IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
+        public IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
 
         /// <summary>
         /// 档次
         /// </summary>
-        IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
+        public IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
     }
 
     /// <summary>
@@ -170,17 +162,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 参数详情
         /// </summary>
-        IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
+        public IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
 
         /// <summary>
         /// 档次
         /// </summary>
-        IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
+        public IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
     }
 
     /// <summary>
@@ -227,7 +219,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 包含最小值类型;1< 2.≤
         /// </summary>
-        public bool? MinContainingType { get; set; }
+        public ContainingTypeEnum? MinContainingType { get; set; }
 
         /// <summary>
         /// 最大值
@@ -235,9 +227,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MaxValue { get; set; }
 
         /// <summary>
-        /// 包含最大值类型;1< 2.≥
+        /// 包含最大值类型;1< 2.≤
         /// </summary>
-        public bool? MaxContainingType { get; set; }
+        public ContainingTypeEnum? MaxContainingType { get; set; }
 
         /// <summary>
         /// 参数值
@@ -258,5 +250,10 @@ namespace Hymson.MES.Services.Dtos.Process
         public IEnumerable<string> Ratings { get; set; }
 
         public string Grade { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }

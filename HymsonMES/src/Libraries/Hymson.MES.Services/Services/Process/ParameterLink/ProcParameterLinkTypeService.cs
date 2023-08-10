@@ -56,9 +56,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto)
         {
-            // 检查SiteId
-            if (_currentSite.SiteId == 0 || _currentSite.SiteId == null) throw new BusinessException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procParameterLinkTypeCreateDto);
 
@@ -92,17 +89,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcParameterLinkTypeAsync(ProcParameterLinkTypeModifyDto procParameterLinkTypeModifyDto)
         {
-            if (procParameterLinkTypeModifyDto == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
-
-            //检查SiteId
-            if (_currentSite.SiteId == 0)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procParameterLinkTypeModifyDto);
 
@@ -147,7 +133,7 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procParameterLinkTypeRepository.InsertsAsync(adds);
                     if (response == 0)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES10507));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10507));
                     }
                 }
 
@@ -156,14 +142,14 @@ namespace Hymson.MES.Services.Services.Process
                     response = await _procParameterLinkTypeRepository.DeletesTrueAsync(deletes.Select(x => x.Id).ToArray());
                     if (response == 0)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES10507));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10507));
                     }
                 }
 
                 response = await _procParameterLinkTypeRepository.UpdatesAsync(links);
                 if (response == 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES10507));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10507));
                 }
 
                 ts.Complete();
@@ -190,7 +176,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             return await _procParameterLinkTypeRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });

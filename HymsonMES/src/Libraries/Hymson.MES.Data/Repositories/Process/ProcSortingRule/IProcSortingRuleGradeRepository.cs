@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleGradeEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcSortingRuleGradeEntity procSortingRuleGradeEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleGradeEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcSortingRuleGradeEntity procSortingRuleGradeEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcSortingRuleGradeEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,13 +80,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleGradeQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcSortingRuleGradeEntity>> GetProcSortingRuleGradeEntitiesAsync(ProcSortingRuleGradeQuery procSortingRuleGradeQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="procSortingRuleGradePagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcSortingRuleGradeEntity>> GetPagedInfoAsync(ProcSortingRuleGradePagedQuery procSortingRuleGradePagedQuery);
+
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteSortingRuleGradeByIdAsync(long id);
         #endregion
     }
 }

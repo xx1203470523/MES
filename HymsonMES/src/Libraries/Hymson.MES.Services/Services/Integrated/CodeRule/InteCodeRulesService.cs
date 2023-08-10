@@ -75,7 +75,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             //// 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
@@ -86,28 +86,28 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             }
             if (!inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%")) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES12438));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12438));
             }
             if (inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%").Count()!=1)
             {
-                throw new BusinessException(nameof(ErrorCode.MES12444));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12444));
             }
             if (inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%")) 
             {
                 if (inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%").Count() != 1)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12445));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12445));
                 }
                 if (inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && string.IsNullOrEmpty(x.CustomValue))) 
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12446));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12446));
                 }
 
                 foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
                 {
                     if (item!.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1)) 
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES12447));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12447));
                     }
                 }
                 
@@ -141,9 +141,9 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 if (repeats != null && repeats.Any())
                 {
                     if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
-                        throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId);
                     else
-                        throw new BusinessException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesCreateDto.ProductId);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesCreateDto.ProductId);
                 }
             }
 
@@ -171,7 +171,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 response = await _inteCodeRulesRepository.InsertAsync(inteCodeRulesEntity);
                 if (response <= 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12402));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12402));
                 }
 
                 if (inteCodeRulesMakeEntitys.Count > 0)
@@ -180,7 +180,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                     response = await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
                     if (response < inteCodeRulesMakeEntitys.Count)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES12402));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12402));
                     }
                 }
 
@@ -256,28 +256,28 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             }
             if (!inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%"))
             {
-                throw new BusinessException(nameof(ErrorCode.MES12438));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12438));
             }
             if (inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%").Count() != 1)
             {
-                throw new BusinessException(nameof(ErrorCode.MES12444));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12444));
             }
             if (inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%"))
             {
                 if (inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%").Count() != 1)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12445));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12445));
                 }
                 if (inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && string.IsNullOrEmpty(x.CustomValue)))
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12446));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12446));
                 }
 
                 foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
                 {
                     if (item!.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1))
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES12447));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12447));
                     }
                 }
             }
@@ -309,9 +309,9 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                     if (!(repeats.Count() == 1 && repeats.First().Id == inteCodeRulesModifyDto.Id)) //去掉当前修改的数据的
                     {
                         if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
-                            throw new BusinessException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesModifyDto.ProductId);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesModifyDto.ProductId);
                         else
-                            throw new BusinessException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesModifyDto.ProductId);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesModifyDto.ProductId);
                     }
                 }
             }
@@ -340,7 +340,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
 
                 if (response <= 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12402));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12402));
                 }
 
                 await _inteCodeRulesMakeRepository.DeleteByCodeRulesIdAsync(inteCodeRulesEntity.Id);
@@ -351,7 +351,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                     response = await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
                     if (response < inteCodeRulesMakeEntitys.Count)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES12402));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12402));
                     }
                 }
 

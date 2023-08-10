@@ -128,8 +128,6 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task AddProcPrintConfigAsync(ProcPrinterDto param)
         {
-            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
-
             param.PrintName = param.PrintName.ToTrimSpace();
             param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
@@ -150,7 +148,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             };
 
             var nameEntity = await _printConfigRepository.GetByPrintNameAsync(new EntityByCodeQuery { Site=_currentSite.SiteId??0,Code= param.PrintName });
-            if (nameEntity != null) throw new BusinessException(nameof(ErrorCode.MES10341));
+            if (nameEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10341));
 
             // 检查IP是否重复
             var ipEntity = await _printConfigRepository.GetByPrintIpAsync(new EntityByCodeQuery
@@ -158,7 +156,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
                 Site = entity.SiteId,
                 Code = entity.PrintIp
             });
-            if (ipEntity != null) throw new BusinessException(nameof(ErrorCode.MES10348));
+            if (ipEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10348));
 
             // 新增
             await _printConfigRepository.InsertAsync(entity);
@@ -171,8 +169,6 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <returns></returns>
         public async Task UpdateProcPrintConfigAsync(ProcPrinterUpdateDto param)
         {
-            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
-
             param.PrintName = param.PrintName.ToTrimSpace();
             //param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
@@ -202,7 +198,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10102));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
             //查询资源类型是否关联资源

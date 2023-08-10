@@ -22,7 +22,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// proc_sorting_rules 分选规则id
+        /// </summary>
+        public long SortingRuleId { get; set; }
+
+        /// <summary>
         /// proc_sorting_rule_grade分选规则档位id
         /// </summary>
         public long SortingRuleGradeId { get; set; }

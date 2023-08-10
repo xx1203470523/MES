@@ -125,7 +125,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             if (planWorkOrderBindEntity == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16306));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
 
             var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
