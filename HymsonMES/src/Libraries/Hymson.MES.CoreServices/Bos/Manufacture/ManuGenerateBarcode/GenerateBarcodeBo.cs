@@ -96,7 +96,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode
         /// </summary>
         public int StartNumber { get; set; }
 
-        public IEnumerable<CodeRulesMakeDto> CodeRulesMakeList { get; set; }
+        public IEnumerable<CodeRulesMakeDto> CodeRulesMakeList { get; set; } = new List<CodeRulesMakeDto>();
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode
         /// <summary>
         /// 分段值
         /// </summary>
-        public string SegmentedValue { get; set; }
+        public string SegmentedValue { get; set; } = "";
 
         /// <summary>
         /// 自定义值
