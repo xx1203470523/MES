@@ -242,7 +242,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.QualifiedColour);
                         facePlateQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.UnqualifiedColour);
                         //填充Job数据
-                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodes(manuFacePlateProductionEntity.ScanJobId);
+                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateProductionEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -275,7 +275,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateContainerPack.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateContainerPack.QualifiedColour);
                         facePlateQueryDto.FacePlateContainerPack.IsShowErrorsColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateContainerPack.ErrorsColour);
                         //填充Job数据
-                        facePlateQueryDto.FacePlateContainerPack.ScanJobCode = await QueryInteJobCodes(manuFacePlateContainerPackEntity.ScanJobId);
+                        facePlateQueryDto.FacePlateContainerPack.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateContainerPackEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -387,7 +387,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="scanJobIdStr"></param>
         /// <returns>返回使用,逗号分割的Code</returns>
-        private async Task<string> QueryInteJobCodes(string scanJobIdStr)
+        private async Task<string> QueryInteJobCodesAsync(string scanJobIdStr)
         {
             string jobCodeStr = string.Empty;
             if (!string.IsNullOrEmpty(scanJobIdStr))
@@ -445,7 +445,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.QualifiedColour);
                         facePlateQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.UnqualifiedColour);
                         //填充Job数据
-                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodes(manuFacePlateProductionEntity.ScanJobId);
+                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateProductionEntity.ScanJobId);
                     }
                 }
                 #endregion
