@@ -399,4 +399,22 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Remark { get; set; }
     }
+
+    public class ProcProcedureCodeDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 工序BOM代码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序BOM名称
+        /// </summary>
+        public string Name { get; set; }
+    }
 }
