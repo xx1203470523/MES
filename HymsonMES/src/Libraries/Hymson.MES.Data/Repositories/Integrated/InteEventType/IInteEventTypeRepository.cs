@@ -8,7 +8,7 @@ using Hymson.MES.Data.Repositories.Integrated.Query;
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储接口（事件维护）
+    /// 仓储接口（事件类型维护）
     /// </summary>
     public interface IInteEventTypeRepository
     {

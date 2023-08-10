@@ -4,7 +4,7 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 事件维护新增/更新Dto
+    /// 事件类型维护新增/更新Dto
     /// </summary>
     public record InteEventTypeSaveDto : BaseEntityDto
     {
@@ -34,6 +34,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Remark { get; set; }
 
         /// <summary>
+        /// 关联事件
+        /// </summary>
+        public IEnumerable<long>? EventIds { get; set; }
+
+        /// <summary>
         /// 关联消息组
         /// </summary>
         public IEnumerable<InteEventTypeMessageGroupRelationDto>? MessageGroups { get; set; }
@@ -56,7 +61,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 事件维护Dto
+    /// 事件类型维护Dto
     /// </summary>
     public record InteEventTypeDto : BaseEntityDto
     {
@@ -103,7 +108,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 事件维护分页Dto
+    /// 事件类型维护分页Dto
     /// </summary>
     public class InteEventTypePagedQueryDto : PagerInfo
     {
@@ -152,6 +157,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
         public IEnumerable<PushTypeEnum> PushTypeArray { get; set; }
+
+        /// <summary>
+        /// 推送类型;1、企微2、钉钉3、邮箱
+        /// </summary>
+        public IEnumerable<PushTypeEnum> EnabledPushType { get; set; }
 
     }
 

@@ -21,4 +21,27 @@ namespace Hymson.MES.Data.Repositories.Process
 
         public long SiteId { get; set; }
     }
+
+    public class ProcEquipmentGroupParamRelatesInformationQuery
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 产品ID
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 设备组ID
+        /// </summary>
+        public long EquipmentGroupId { get; set; }
+    }
 }

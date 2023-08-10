@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储（事件维护）
+    /// 仓储（事件类型维护）
     /// </summary>
     public partial class InteEventTypeRepository : BaseRepository, IInteEventTypeRepository
     {

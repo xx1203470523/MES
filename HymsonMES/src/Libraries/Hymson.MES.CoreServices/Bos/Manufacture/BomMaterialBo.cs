@@ -30,12 +30,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 替代料集合（来自BOM）
         /// </summary>
-        public IEnumerable<BomMaterialReplaceBo> BomMaterials { get; set; }
+        public IEnumerable<BomMaterialReplaceBo> BomMaterials { get; set; } = new List<BomMaterialReplaceBo>();
 
         /// <summary>
         /// 替代料集合（来自物料维护）
         /// </summary>
-        public IEnumerable<BomMaterialReplaceBo> ProcMaterials { get; set; }
+        public IEnumerable<BomMaterialReplaceBo> ProcMaterials { get; set; } = new List<BomMaterialReplaceBo>();
 
     }
 

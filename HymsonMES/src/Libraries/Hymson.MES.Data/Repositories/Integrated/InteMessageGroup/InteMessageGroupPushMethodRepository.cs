@@ -4,7 +4,9 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -17,8 +19,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 
         /// </summary>
+        private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteMessageGroupPushMethodRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        /// <param name="memoryCache"></param>
+        public InteMessageGroupPushMethodRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        {
+            _memoryCache = memoryCache;
+        }
 
         /// <summary>
         /// 新增（批量）
@@ -40,6 +51,27 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByParentId, command);
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteMessageGroupPushMethodEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
+        {
+            var key = $"inte_message_group_push_method&SiteId-{query.SiteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+                sqlBuilder.Where("IsDeleted = 0");
+                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.Select("*");
+
+                using var conn = GetMESDbConnection();
+                return await conn.QueryAsync<InteMessageGroupPushMethodEntity>(template.RawSql, query);
+            });
         }
 
         /// <summary>

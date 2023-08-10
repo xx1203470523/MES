@@ -6,11 +6,13 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -41,19 +43,27 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteEventRepository _inteEventRepository;
 
         /// <summary>
+        /// 仓储接口（事件类型维护）
+        /// </summary>
+        private readonly IInteEventTypeRepository _inteEventTypeRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteEventRepository"></param>
+        /// <param name="inteEventTypeRepository"></param>
         public InteEventService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventSaveDto> validationSaveRules,
-            IInteEventRepository inteEventRepository)
+            IInteEventRepository inteEventRepository,
+            IInteEventTypeRepository inteEventTypeRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteEventRepository = inteEventRepository;
+            _inteEventTypeRepository = inteEventTypeRepository;
         }
 
 
@@ -104,6 +114,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = saveDto.ToEntity<InteEventEntity>();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
@@ -151,12 +162,18 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteEventDto?> QueryByIdAsync(long id)
+        public async Task<InteEventInfoDto?> QueryByIdAsync(long id)
         {
             var inteEventEntity = await _inteEventRepository.GetByIdAsync(id);
             if (inteEventEntity == null) return null;
 
-            return inteEventEntity.ToModel<InteEventDto>();
+            var dto = inteEventEntity.ToModel<InteEventInfoDto>();
+            if (dto == null) return dto;
+
+            var inteEventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(dto.EventTypeId);
+            if (inteEventTypeEntity != null) dto.EventTypeCode = inteEventTypeEntity.Code;
+
+            return dto;
         }
 
         /// <summary>

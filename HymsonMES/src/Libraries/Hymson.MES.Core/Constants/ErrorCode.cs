@@ -282,7 +282,7 @@
         #endregion
 
         #region 异常消息 10900
-        public const string MES10901 = "";
+        public const string MES10901 = "事件类型不能为空";
         #endregion
 
         #region 不合格代码 11100
@@ -1092,8 +1092,10 @@
         public const string MES18720 = "Recipe参数工艺组不能为空";
 
         public const string MES18721 = "Recipe参数项目参数不能为空";
-        public const string MES18722 = "Recipe参数项目小数位应该为不小于0且小于10的整数";
+        public const string MES18722 = "Recipe参数项目小数位应该为0到9的整数";
         public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
+
+        public const string MES18724 = "Recipe参数已存在同一的产品、工序、工艺组数据";
         #endregion
 
         #region 工艺设备组 18900
@@ -1101,6 +1103,7 @@
         public const string MES18901 = "工艺设备组编码不允许有空格";
         public const string MES18902 = "工艺设备组名称不能为空";
         public const string MES18903 = "请求实体不能为空！";
+        public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
 
         #region 降级规则 21100

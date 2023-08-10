@@ -11,6 +11,7 @@ using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
@@ -20,7 +21,7 @@ using Hymson.Utils.Tools;
 namespace Hymson.MES.Services.Services.Integrated
 {
     /// <summary>
-    /// 服务（事件维护） 
+    /// 服务（事件类型维护） 
     /// </summary>
     public class InteEventTypeService : IInteEventTypeService
     {
@@ -44,7 +45,17 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteMessageGroupRepository _inteMessageGroupRepository;
 
         /// <summary>
+        /// 仓储接口（消息组推送方式）
+        /// </summary>
+        private readonly IInteMessageGroupPushMethodRepository _inteMessageGroupPushMethodRepository;
+
+        /// <summary>
         /// 仓储接口（事件维护）
+        /// </summary>
+        private readonly IInteEventRepository _inteEventRepository;
+
+        /// <summary>
+        /// 仓储接口（事件类型维护）
         /// </summary>
         private readonly IInteEventTypeRepository _inteEventTypeRepository;
 
@@ -76,6 +87,8 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteMessageGroupRepository"></param>
+        /// <param name="inteMessageGroupPushMethodRepository"></param>
+        /// <param name="inteEventRepository"></param>
         /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
         /// <param name="inteEventTypeUpgradeRepository"></param>
@@ -83,6 +96,8 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteEventTypePushRuleRepository"></param>
         public InteEventTypeService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteEventTypeSaveDto> validationSaveRules,
             IInteMessageGroupRepository inteMessageGroupRepository,
+            IInteMessageGroupPushMethodRepository inteMessageGroupPushMethodRepository,
+            IInteEventRepository inteEventRepository,
             IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
             IInteEventTypeUpgradeRepository inteEventTypeUpgradeRepository,
@@ -93,6 +108,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteMessageGroupRepository = inteMessageGroupRepository;
+            _inteMessageGroupPushMethodRepository = inteMessageGroupPushMethodRepository;
+            _inteEventRepository = inteEventRepository;
             _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
             _inteEventTypeUpgradeRepository = inteEventTypeUpgradeRepository;
@@ -131,6 +148,16 @@ namespace Hymson.MES.Services.Services.Integrated
                 Code = entity.Code
             });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+
+            // 关联事件
+            saveDto.EventIds ??= new List<long>();
+            var eventCommand = new UpdateEventTypeIdCommand
+            {
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                EventTypeId = entity.Id,
+                Ids = saveDto.EventIds
+            };
 
             // 关联消息组
             saveDto.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
@@ -236,6 +263,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 var rowArray = await Task.WhenAll(new List<Task<int>>()
                 {
+                    _inteEventRepository.UpdateEventTypeIdAsync(eventCommand),
                     _inteEventTypeRepository.InsertAsync(entity),
                     _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
                     _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
@@ -278,6 +306,16 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
             }
+
+            // 关联事件
+            saveDto.EventIds ??= new List<long>();
+            var eventCommand = new UpdateEventTypeIdCommand
+            {
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn,
+                EventTypeId = entity.Id,
+                Ids = saveDto.EventIds
+            };
 
             // 关联消息组
             saveDto.MessageGroups ??= new List<InteEventTypeMessageGroupRelationDto>();
@@ -388,20 +426,19 @@ namespace Hymson.MES.Services.Services.Integrated
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                await _inteEventRepository.ClearEventTypeIdAsync(entity.Id);
+                await _inteEventTypeMessageGroupRelationRepository.DeleteByParentIdAsync(command);
+                await _inteEventTypeUpgradeRepository.DeleteByParentIdAsync(command);
+                await _inteEventTypeUpgradeMessageGroupRelationRepository.DeleteByParentIdAsync(command);
+                await _inteEventTypePushRuleRepository.DeleteByParentIdAsync(command);
+
                 var rowArray = await Task.WhenAll(new List<Task<int>>()
                 {
+                    _inteEventRepository.UpdateEventTypeIdAsync(eventCommand),
                     _inteEventTypeRepository.UpdateAsync(entity),
-
-                    _inteEventTypeMessageGroupRelationRepository.DeleteByParentIdAsync(command),
                     _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
-
-                    _inteEventTypeUpgradeRepository.DeleteByParentIdAsync(command),
                     _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
-
-                    _inteEventTypeUpgradeMessageGroupRelationRepository.DeleteByParentIdAsync(command),
                     _inteEventTypeUpgradeMessageGroupRelationRepository.InsertRangeAsync(upgradeMessageGroupRelations),
-
-                    _inteEventTypePushRuleRepository.DeleteByParentIdAsync(command),
                     _inteEventTypePushRuleRepository.InsertRangeAsync(ruleEntities)
                 });
                 rows += rowArray.Sum();
@@ -449,6 +486,19 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
+        /// 根据ID获取关联事件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventBaseDto>> QueryEventsByMainIdAsync(long id)
+        {
+            var eventEntities = await _inteEventRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            return eventEntities.Where(w => w.EventTypeId == id || w.EventTypeId == 0)
+                .Select(s => s.ToModel<InteEventBaseDto>());
+        }
+
+        /// <summary>
         /// 根据ID获取关联群组
         /// </summary>
         /// <param name="id"></param>
@@ -463,7 +513,10 @@ namespace Hymson.MES.Services.Services.Integrated
             // 消息组基础信息（已缓存）
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
-            return GetMessageGroupRelations(messageGroupEntities, messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>())); ;
+            // 消息组关联推送方式（已缓存）
+            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
+            return GetMessageGroupRelations(messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>()), messageGroupEntities, messageGroupPushMethodEntities);
         }
 
         /// <summary>
@@ -491,6 +544,9 @@ namespace Hymson.MES.Services.Services.Integrated
             // 消息组基础信息（已缓存）
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
+            // 消息组关联推送方式（已缓存）
+            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+
             // 组装数据
             List<InteEventTypeUpgradeDto> dtos = new();
             foreach (var entity in entities)
@@ -498,7 +554,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 var dto = entity.ToModel<InteEventTypeUpgradeDto>();
                 if (messageGroupRelationDic.TryGetValue(entity.Id, out var messageGroupRelations) == false) continue;
 
-                dto.MessageGroups = GetMessageGroupRelations(messageGroupEntities, messageGroupRelations.Select(s => s.ToModel<MessageGroupBo>()));
+                dto.MessageGroups = GetMessageGroupRelations(messageGroupRelations.Select(s => s.ToModel<MessageGroupBo>()), messageGroupEntities, messageGroupPushMethodEntities);
                 dtos.Add(dto);
             }
 
@@ -541,25 +597,35 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 获取消息组关联信息
         /// </summary>
-        /// <param name="messageGroupEntities"></param>
         /// <param name="messageGroupBos"></param>
+        /// <param name="messageGroupEntities"></param>
+        /// <param name="messageGroupPushMethodEntities"></param>
         /// <returns></returns>
-        private static IEnumerable<InteEventTypeMessageGroupRelationDto> GetMessageGroupRelations(IEnumerable<InteMessageGroupEntity> messageGroupEntities, IEnumerable<MessageGroupBo> messageGroupBos)
+        private static IEnumerable<InteEventTypeMessageGroupRelationDto> GetMessageGroupRelations(IEnumerable<MessageGroupBo> messageGroupBos,
+            IEnumerable<InteMessageGroupEntity> messageGroupEntities,
+            IEnumerable<InteMessageGroupPushMethodEntity> messageGroupPushMethodEntities)
         {
+            var messageGroupPushMethodDic = messageGroupPushMethodEntities.ToLookup(w => w.MessageGroupId).ToDictionary(d => d.Key, d => d);
+
             List<InteEventTypeMessageGroupRelationDto> dtos = new();
             foreach (var item in messageGroupBos)
             {
                 var pushTypeArray = item.PushTypes.ToDeserialize<IEnumerable<PushTypeEnum>>();
                 if (pushTypeArray == null) continue;
 
+                // 消息组基础信息
                 var messageGroupEntity = messageGroupEntities.FirstOrDefault(f => f.Id == item.MessageGroupId);
                 if (messageGroupEntity == null) continue;
+
+                // 消息组推送方式
+                if (messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods) == false) continue;
 
                 dtos.Add(new InteEventTypeMessageGroupRelationDto
                 {
                     Id = item.Id,
                     MessageGroupId = item.MessageGroupId,
                     PushTypeArray = pushTypeArray ?? new List<PushTypeEnum>(),
+                    EnabledPushType = messageGroupPushMethods.Select(s => s.Type).Distinct(),
                     Code = messageGroupEntity.Code,
                     Name = messageGroupEntity.Name
                 });

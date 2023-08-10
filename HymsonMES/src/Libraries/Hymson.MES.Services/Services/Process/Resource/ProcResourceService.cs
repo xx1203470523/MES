@@ -15,7 +15,6 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
@@ -27,8 +26,6 @@ using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
-using System.Security.Policy;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -413,7 +410,7 @@ namespace Hymson.MES.Services.Services.Process
                         SemiMaterialCode = semiProduct?.MaterialCode ?? "",
                         SemiMaterialName = semiProduct?.MaterialName ?? "",
                         SemiVersion = semiProduct?.Version ?? "",
-                    }); ;
+                    });
                 }
             }
 
@@ -739,7 +736,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 foreach (var item in parm.ProductSetList)
                 {
-                    var relationEntity = new ProcProductSetEntity(); ;
+                    var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = entity.Id;
@@ -1113,7 +1110,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 foreach (var item in param.ProductSetList)
                 {
-                    var relationEntity = new ProcProductSetEntity(); ;
+                    var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
                     relationEntity.ProductId = item.ProductId;
                     relationEntity.SetPointId = param.Id;

@@ -21,12 +21,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 分段值
         /// </summary>
-        public string SegmentedValue { get; set; }
+        public string SegmentedValue { get; set; }= "";
 
         /// <summary>
         /// 自定义值
         /// </summary>
-        public string CustomValue { get; set; }
+        public string CustomValue { get; set; } = "";
     }
 
     /// <summary>
@@ -47,13 +47,13 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 集合（编码规则）
         /// </summary>
-        public IEnumerable<CodeRulesMakeBo> CodeRulesMakeBos { get; set; }
+        public IEnumerable<CodeRulesMakeBo> CodeRulesMakeBos { get; set; } = new List<CodeRulesMakeBo>();
 
 
         /// <summary>
         /// 
         /// </summary>
-        public string CodeRuleKey { get; set; }
+        public string CodeRuleKey { get; set; } = "";
 
         /// <summary>
         /// 起始
@@ -73,7 +73,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 忽略字符
         /// </summary>
-        public string IgnoreChar { get; set; }
+        public string IgnoreChar { get; set; } = "";
 
         /// <summary>
         /// 增量
@@ -105,12 +105,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 条码
         /// </summary>
-        public IEnumerable<string> BarCodes { get; set; }
+        public IEnumerable<string> BarCodes { get; set; } = new List<string>();
 
         /// <summary>
         /// 条码流水号
         /// </summary>
-        public string SerialNumber { get; set; }
+        public string SerialNumber { get; set; } = "";
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 参数key
         /// </summary>
-        public string CodeRuleKey { get; set; }
+        public string CodeRuleKey { get; set; } = "";
 
         /// <summary>
         /// 是否测试

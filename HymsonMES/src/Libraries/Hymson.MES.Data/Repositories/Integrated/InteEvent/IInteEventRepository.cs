@@ -2,6 +2,8 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
+using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -38,6 +40,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="entities"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<InteEventEntity> entities);
+
+        /// <summary>
+        /// 批量修改事件的事件类型
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateEventTypeIdAsync(UpdateEventTypeIdCommand command);
+
+        /// <summary>
+        /// 清空事件的事件类型
+        /// </summary>
+        /// <param name="eventTypeId"></param>
+        /// <returns></returns>
+        Task<int> ClearEventTypeIdAsync(long eventTypeId);
 
         /// <summary>
         /// 软删除  
@@ -79,14 +95,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteEventEntity>> GetEntitiesAsync(InteEventQuery query);
+        Task<IEnumerable<InteEventEntity>> GetEntitiesAsync(EntityBySiteIdQuery query);
 
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteEventEntity>> GetPagedListAsync(InteEventPagedQuery pagedQuery);
+        Task<PagedInfo<InteEventView>> GetPagedListAsync(InteEventPagedQuery pagedQuery);
 
     }
 }
