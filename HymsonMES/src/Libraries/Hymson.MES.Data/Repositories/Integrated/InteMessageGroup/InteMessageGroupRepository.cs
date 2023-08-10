@@ -25,6 +25,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
         public InteMessageGroupRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _memoryCache = memoryCache;
