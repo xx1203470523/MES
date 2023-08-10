@@ -65,9 +65,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> CreateInteUnitAsync(InteUnitSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             if(saveDto.Code.Contains(" "))
                 throw new CustomerValidationException(nameof(ErrorCode.MES18800));
@@ -110,9 +107,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> ModifyInteUnitAsync(InteUnitSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
              // 验证DTO
              saveDto.Name = saveDto.Name.ToTrimSpace();
              if (saveDto.Name == "")   throw new CustomerValidationException(nameof(ErrorCode.MES18801));

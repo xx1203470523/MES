@@ -21,7 +21,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcSortingRuleGradeDetailsRepository :BaseRepository, IProcSortingRuleGradeDetailsRepository
     {
-
         public ProcSortingRuleGradeDetailsRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
         {
         }
@@ -159,8 +158,18 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procSortingRuleGradeDetailsEntitys);
         }
-        #endregion
 
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteSortingRuleGradeByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByDeleteSortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = id });
+        }
+        #endregion
     }
 
     public partial class ProcSortingRuleGradeDetailsRepository
@@ -172,8 +181,8 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_sorting_rule_grade_details` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_sorting_rule_grade_details`(  `Id`, `SiteId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleGradeId, @SortingRuleDetailId, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_sorting_rule_grade_details`(  `Id`, `SiteId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleGradeId, @SortingRuleDetailId, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_sorting_rule_grade_details`(  `Id`, `SiteId`,`SortingRuleId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@SortingRuleId, @SortingRuleGradeId, @SortingRuleDetailId, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_sorting_rule_grade_details`(  `Id`, `SiteId`,`SortingRuleId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@SortingRuleId, @SortingRuleGradeId, @SortingRuleDetailId, @remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `proc_sorting_rule_grade_details` SET   SiteId = @SiteId, SortingRuleGradeId = @SortingRuleGradeId, SortingRuleDetailId = @SortingRuleDetailId, remark = @remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_sorting_rule_grade_details` SET   SiteId = @SiteId, SortingRuleGradeId = @SortingRuleGradeId, SortingRuleDetailId = @SortingRuleDetailId, remark = @remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
@@ -187,6 +196,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_grade_details`  WHERE Id IN @Ids ";
+        const string DeleteByDeleteSortingRuleGradeByIdAsyncIdSql = "DELETE FROM `proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
 }

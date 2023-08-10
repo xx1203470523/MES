@@ -107,12 +107,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuFacePlateAsync(ManuFacePlateCreateDto manuFacePlateCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(manuFacePlateCreateDto);
 
@@ -201,12 +195,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task ModifyManuFacePlateAsync(ManuFacePlateModifyDto manuFacePlateModifyDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuFacePlateModifyDto);
 
@@ -216,7 +204,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
 
             var entity = await _manuFacePlateRepository.GetByIdAsync(manuFacePlateModifyDto.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES17209));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17209));
 
             if (entity.Status != SysDataStatusEnum.Build && manuFacePlateModifyDto.Status == SysDataStatusEnum.Build)
             {
@@ -795,17 +783,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <exception cref="ValidationException"></exception>
         public async Task UpdateManuFacePlateAsync(UpdateManuFacePlateDto updateManuFacePlateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(updateManuFacePlateDto.FacePlate);
 
             var entity = await _manuFacePlateRepository.GetByIdAsync(updateManuFacePlateDto.FacePlate.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES17209));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17209));
 
             if (entity.Status != SysDataStatusEnum.Build && updateManuFacePlateDto.FacePlate.Status == SysDataStatusEnum.Build)
             {

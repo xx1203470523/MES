@@ -53,12 +53,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task CreateInteCustomAsync(InteCustomCreateDto inteCustomCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteCustomCreateDto);
 
@@ -142,12 +136,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task ModifyInteCustomAsync(InteCustomModifyDto inteCustomModifyDto)
         {
-             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
              //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(inteCustomModifyDto);
 

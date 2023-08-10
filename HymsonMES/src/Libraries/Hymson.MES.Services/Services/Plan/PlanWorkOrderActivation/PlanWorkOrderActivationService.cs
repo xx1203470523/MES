@@ -69,12 +69,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task CreatePlanWorkOrderActivationAsync(PlanWorkOrderActivationCreateDto planWorkOrderActivationCreateDto)
         {
-            //// 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(planWorkOrderActivationCreateDto);
 
@@ -120,18 +114,18 @@ namespace Hymson.MES.Services.Services.Plan
         {
             if (!planWorkOrderActivationPagedQueryDto.LineId.HasValue)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16401));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16401));
             }
 
             //查询当前线体
             var line = await _inteWorkCenterRepository.GetByIdAsync(planWorkOrderActivationPagedQueryDto.LineId.Value);
             if (line == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16402));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16402));
             }
             if (line.Type != WorkCenterTypeEnum.Line)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16403));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16403));
             }
 
             //查询线体上级车间
@@ -163,19 +157,19 @@ namespace Hymson.MES.Services.Services.Plan
         {
             if (!param.ResourceId.HasValue)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16412));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16412));
             }
 
             //检查当前资源对应的线体
             var workCenterEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(param.ResourceId.Value);
             if (workCenterEntity == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16413));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16413));
             }
 
             if (workCenterEntity.Type != WorkCenterTypeEnum.Line)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16414));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16414));
             }
 
             var planWorkOrderActivationPagedQuery = param.ToQuery<PlanWorkOrderActivationPagedQuery>();
@@ -220,24 +214,24 @@ namespace Hymson.MES.Services.Services.Plan
             var line = await _inteWorkCenterRepository.GetByIdAsync(activationWorkOrderDto.LineId);
             if (line == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16402));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16402));
             }
             if (line.Type != WorkCenterTypeEnum.Line)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16403));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16403));
             }
 
             //查询当前工单信息
             var workOrder = await _planWorkOrderRepository.GetByIdAsync(activationWorkOrderDto.Id);
             if (workOrder == null || workOrder.Id <= 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16404));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16404));
             }
 
             //查询是否被暂停
             if (workOrder.Status == PlanWorkOrderStatusEnum.Pending) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16415)).WithData("orderCode", workOrder.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16415)).WithData("orderCode", workOrder.OrderCode);
             }
 
             //查询当前工单是否已经被激活
@@ -250,11 +244,11 @@ namespace Hymson.MES.Services.Services.Plan
             var isActivationed = workOrderActivation != null;//是否已经激活
             if (isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16406)).WithData("orderCode", workOrder.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16406)).WithData("orderCode", workOrder.OrderCode);
             }
             else if (!isActivationed && isActivationed == activationWorkOrderDto.IsNeedActivation)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16407)).WithData("orderCode", workOrder.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16407)).WithData("orderCode", workOrder.OrderCode);
             }
 
             //取消激活
@@ -296,7 +290,7 @@ namespace Hymson.MES.Services.Services.Plan
                 if (hasActivation != null)
                 {
                     var activationWorkOrder = await _planWorkOrderRepository.GetByIdAsync(hasActivation.WorkOrderId);
-                    throw new BusinessException(nameof(ErrorCode.MES16409)).WithData("orderCode", activationWorkOrder.OrderCode);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16409)).WithData("orderCode", activationWorkOrder.OrderCode);
                 }
 
                 await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
@@ -313,7 +307,7 @@ namespace Hymson.MES.Services.Services.Plan
         {
             if (workOrder.Status == PlanWorkOrderStatusEnum.Pending)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16408)).WithData("orderCode", workOrder.OrderCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16408)).WithData("orderCode", workOrder.OrderCode);
             }
 
             var planWorkOrderActivationEntity = new PlanWorkOrderActivationEntity()
@@ -344,8 +338,7 @@ namespace Hymson.MES.Services.Services.Plan
                 switch (workOrder.Status)
                 {
                     case Core.Enums.PlanWorkOrderStatusEnum.NotStarted:
-                        throw new BusinessException(nameof(ErrorCode.MES16405)).WithData("orderCode", workOrder.OrderCode);
-                        break;
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16405)).WithData("orderCode", workOrder.OrderCode);
                     case Core.Enums.PlanWorkOrderStatusEnum.SendDown:
                         await _planWorkOrderActivationRepository.InsertAsync(planWorkOrderActivationEntity);
 

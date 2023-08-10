@@ -73,12 +73,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuContainerPackRecordAsync(ManuContainerPackRecordCreateDto manuContainerPackRecordCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(manuContainerPackRecordCreateDto);
 
@@ -206,12 +200,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task ModifyManuContainerPackRecordAsync(ManuContainerPackRecordModifyDto manuContainerPackRecordModifyDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuContainerPackRecordModifyDto);
 
@@ -242,11 +230,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             if (manuContainerPackRecordCreateDtos != null && manuContainerPackRecordCreateDtos.Any())
             {
-                // 判断是否有获取到站点码 
-                if (_currentSite.SiteId == 0)
-                {
-                    throw new ValidationException(nameof(ErrorCode.MES10101));
-                }
                 var lst = new List<ManuContainerPackRecordEntity>();
                 foreach (var manuContainerPackRecordCreateDto in manuContainerPackRecordCreateDtos)
                 {

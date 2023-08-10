@@ -95,10 +95,6 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// <returns></returns>
         public async Task CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
             param.UnqualifiedGroup = param.UnqualifiedGroup.ToTrimSpace().ToUpperInvariant();
             param.UnqualifiedGroupName = param.UnqualifiedGroupName.Trim();
 
@@ -107,7 +103,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
             var qualUnqualifiedGroupEntity = await _qualUnqualifiedGroupRepository.GetByCodeAsync(new QualUnqualifiedGroupByCodeQuery { Code = param.UnqualifiedGroup, Site = _currentSite.SiteId ?? 0 });
             if (qualUnqualifiedGroupEntity != null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES11206)).WithData("code", param.UnqualifiedGroup);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11206)).WithData("code", param.UnqualifiedGroup);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -201,10 +197,6 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// <returns></returns>
         public async Task ModifyQualUnqualifiedGroupAsync(QualUnqualifiedGroupModifyDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
             param.UnqualifiedGroupName = param.UnqualifiedGroupName.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);

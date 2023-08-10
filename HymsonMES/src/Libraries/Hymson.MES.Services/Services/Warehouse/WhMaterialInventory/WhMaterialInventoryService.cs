@@ -289,7 +289,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             }
             if (rows == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES15105));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15105));
             }
             #endregion
         }

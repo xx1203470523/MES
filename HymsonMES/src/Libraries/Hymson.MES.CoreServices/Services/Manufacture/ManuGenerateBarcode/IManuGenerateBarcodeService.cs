@@ -21,7 +21,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="BusinessException">未找到生成规则</exception>
         Task<IEnumerable<string>> GenerateBarcodeListByIdAsync(GenerateBarcodeBo param);
 
         /// <summary>
@@ -29,7 +28,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="BusinessException">未找到生成规则</exception>
         Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleBo param);
     }
 }

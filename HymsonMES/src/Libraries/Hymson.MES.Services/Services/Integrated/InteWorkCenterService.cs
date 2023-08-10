@@ -159,8 +159,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<SelectOptionDto>> QueryListByTypeAndParentIdAsync(QueryInteWorkCenterByTypeAndParentIdDto queryDto)
         {
-            if (queryDto == null) throw new ValidationException(nameof(ErrorCode.MES10100));
-
             var workCenters = await _inteWorkCenterRepository.GetByTypeAndParentIdAsync(new InteWorkCenterByTypeQuery
             {
                 SiteId = _currentSite.SiteId,
@@ -201,17 +199,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
-        /// <exception cref="BusinessException">编码复用</exception>
         public async Task CreateInteWorkCenterAsync(InteWorkCenterCreateDto param)
         {
-            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
-
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
             var entity = await _inteWorkCenterRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId });
-            if (entity != null) throw new BusinessException(nameof(ErrorCode.MES12101)).WithData("code", param.Code);
+            if (entity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12101)).WithData("code", param.Code);
 
             // DTO转换实体
             entity = param.ToEntity<InteWorkCenterEntity>();
@@ -294,16 +288,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
         public async Task ModifyInteWorkCenterAsync(InteWorkCenterModifyDto param)
         {
-            if (param == null) throw new ValidationException(nameof(ErrorCode.MES10100));
-
             // 验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
 
             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES12111));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12111));
 
             if (entity.Status != SysDataStatusEnum.Build && param.Status == SysDataStatusEnum.Build)
             {
@@ -398,7 +389,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 if ((inteWorkCenterRelationList != null && inteWorkCenterRelationList.Any())
                     || (inteWorkCenterResourceRelationList != null && inteWorkCenterResourceRelationList.Any()))
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12112));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12112));
                 }
             }
 

@@ -111,16 +111,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task CreateInteSystemTokenAsync(InteSystemTokenCreateDto inteSystemTokenCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-            if (inteSystemTokenCreateDto == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteSystemTokenCreateDto);
 
@@ -133,7 +123,7 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             if (inteSystemTokenEntity != null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES18300)).WithData("code", systemCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18300)).WithData("code", systemCode);
             }
 
             //DTO转换实体
@@ -174,12 +164,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<string> RefreshSystemTokenAsync(long systemId)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             var inteSystemTokenEntity = await _inteSystemTokenRepository.GetByIdAsync(systemId);
             if (inteSystemTokenEntity == null)
             {
@@ -212,12 +196,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task ModifyInteSystemTokenAsync(InteSystemTokenModifyDto inteSystemTokenModifyDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(inteSystemTokenModifyDto);
 

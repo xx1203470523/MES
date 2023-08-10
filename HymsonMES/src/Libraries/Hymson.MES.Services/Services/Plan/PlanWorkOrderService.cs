@@ -93,9 +93,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(planWorkOrderCreateDto);
 

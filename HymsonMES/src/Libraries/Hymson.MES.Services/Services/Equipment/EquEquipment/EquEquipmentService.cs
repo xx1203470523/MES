@@ -533,11 +533,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<string> CreateEquEquipmentTokenAsync(long EquipmentId)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
             var equEquipmentEntity = await _equEquipmentRepository.GetByIdAsync(EquipmentId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12604));
             var equipmentModel = new EquipmentModel

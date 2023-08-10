@@ -190,12 +190,12 @@ namespace Hymson.MES.Services.Services.Plan
             var workCenterEntity = await _inteWorkCenterRepository.GetByResourceIdAsync(bindActivationWorkOrder.ResourceId);
             if (workCenterEntity == null) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16803));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16803));
             }
 
             if (workCenterEntity.Type != WorkCenterTypeEnum.Line) 
             {
-                throw new BusinessException(nameof(ErrorCode.MES16801));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16801));
             }
 
             if (bindActivationWorkOrder.WorkOrderIds != null && bindActivationWorkOrder.WorkOrderIds.Any())
@@ -203,7 +203,7 @@ namespace Hymson.MES.Services.Services.Plan
                 //检查当前工单是否重复
                 if (bindActivationWorkOrder.WorkOrderIds.Distinct().Count() != bindActivationWorkOrder.WorkOrderIds.Count())
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16804));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16804));
                 }
 
                 //检查当前这些工单是否是激活
@@ -216,7 +216,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 if (hasActivationWorkOrders.Count() != bindActivationWorkOrder.WorkOrderIds.Count)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16802));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16802));
                 }
             }
             else 

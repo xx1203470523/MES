@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (exists != null && exists.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
             }
 
             //入库
@@ -99,10 +99,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto)
         {
-            if (procParameterModifyDto == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10503));
-            }
             procParameterModifyDto.ParameterName = procParameterModifyDto.ParameterName.Trim();
             procParameterModifyDto.Remark = procParameterModifyDto.Remark ?? "".Trim();
 
@@ -116,7 +112,7 @@ namespace Hymson.MES.Services.Services.Process
             await _validationModifyRules.ValidateAndThrowAsync(procParameterModifyDto);
 
             var modelOrigin = await _procParameterRepository.GetByIdAsync(procParameterEntity.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES10504));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10504));
 
             /*
             //判断编号是否已经存在
@@ -154,14 +150,14 @@ namespace Hymson.MES.Services.Services.Process
         {
             if (idsArr.Length < 1)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10505));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10505));
             }
 
             //查询参数是否关联产品参数和设备参数
             var lists = await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
             if (lists != null && lists.Count() > 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10506));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10506));
             }
 
             return await _procParameterRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });

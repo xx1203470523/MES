@@ -73,7 +73,6 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
         Task ModifyInteWorkCenterAsync(InteWorkCenterModifyDto param);
     }
 }

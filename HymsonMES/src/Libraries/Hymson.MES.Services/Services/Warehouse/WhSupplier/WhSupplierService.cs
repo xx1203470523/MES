@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             Regex reg = new Regex(@"^[A-Za-z0-9]+$");
             if (!reg.Match(whSupplierCreateDto.Code).Success)
             {
-                throw new BusinessException(nameof(ErrorCode.MES15008)).WithData("Code", whSupplierCreateDto.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15008)).WithData("Code", whSupplierCreateDto.Code);
             }
             whSupplierCreateDto.Code = whSupplierCreateDto.Code.ToUpper();
             //判断编号是否已经存在
@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             });
             if (exists != null && exists.Count() > 0)
             {
-                throw new BusinessException(nameof(ErrorCode.MES15002)).WithData("Code", whSupplierCreateDto.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES15002)).WithData("Code", whSupplierCreateDto.Code);
             }
 
             //DTO转换实体
@@ -117,10 +117,6 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesWhSupplierAsync(long[] ids)
         {
-            if (ids == null || ids.Count() <= 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES13005));
-            }
             VerifySupplier(ids);
             return await _whSupplierRepository.DeletesAsync(new DeleteCommand
             {
@@ -137,7 +133,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var data = await _procMaterialSupplierRelationRepository.GetBySupplierIdsAsync(ids);
             if (data != null && ids.Any())
             {
-                throw new ValidationException(nameof(ErrorCode.MES15011));
+                throw new(nameof(ErrorCode.MES15011));
             }
         }
 

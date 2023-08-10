@@ -35,8 +35,6 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 备注
         /// </summary>
-        public string remark { get; set; }
-
-       
+        public string? remark { get; set; }
     }
 }

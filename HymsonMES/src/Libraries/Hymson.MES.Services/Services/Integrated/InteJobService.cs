@@ -111,14 +111,8 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
-        /// <exception cref="BusinessException">编码复用</exception>
         public async Task CreateInteJobAsync(InteJobCreateDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
@@ -132,7 +126,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteJobEntity = await _inteJobRepository.GetByCodeAsync(new EntityByCodeQuery { Code = param.Code, Site = _currentSite.SiteId });
             if (inteJobEntity != null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES12001)).WithData("code", param.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12001)).WithData("code", param.Code);
             }
             var userId = _currentUser.UserName;
             //DTO转换实体
@@ -157,7 +151,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var list = await _jobBusinessRelationRepository.GetByJobIdsAsync(ids);
             if (list != null && list.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES12009));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12009));
             }
             var row = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -165,7 +159,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 row = await _inteJobRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
                 if (row != ids.Length)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES12010));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12010));
                 }
                 trans.Complete();
             }
@@ -177,20 +171,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="ValidationException">参数为空</exception>
         public async Task ModifyInteJobAsync(InteJobModifyDto param)
         {
-            if (param == null)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10100));
-            }
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobService>();
             if (!services.Any(it => it.GetType().Name == param.ClassProgram))
             {
-                throw new ValidationException(nameof(ErrorCode.MES12011));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12011));
             }
             var userId = _currentUser.UserName;
             //DTO转换实体

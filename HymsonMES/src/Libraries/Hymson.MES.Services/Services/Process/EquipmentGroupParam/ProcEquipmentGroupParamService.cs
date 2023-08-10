@@ -72,12 +72,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcEquipmentGroupParamAsync(ProcEquipmentGroupParamCreateDto procEquipmentGroupParamCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procEquipmentGroupParamCreateDto);
 
@@ -231,12 +225,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcEquipmentGroupParamAsync(ProcEquipmentGroupParamModifyDto procEquipmentGroupParamModifyDto)
         {
-             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
              //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procEquipmentGroupParamModifyDto);
 
@@ -246,7 +234,7 @@ namespace Hymson.MES.Services.Services.Process
             procEquipmentGroupParamEntity.UpdatedOn = HymsonClock.Now();
 
             #region 验证状态
-            var entity = await _procEquipmentGroupParamRepository.GetByIdAsync(procEquipmentGroupParamModifyDto.Id) ?? throw new BusinessException(nameof(ErrorCode.MES18701)); ;
+            var entity = await _procEquipmentGroupParamRepository.GetByIdAsync(procEquipmentGroupParamModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES18701)); ;
             if (entity.Status != SysDataStatusEnum.Build && procEquipmentGroupParamModifyDto.Status == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18713));

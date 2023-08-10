@@ -87,6 +87,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleGradeDetailsPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcSortingRuleGradeDetailsEntity>> GetPagedInfoAsync(ProcSortingRuleGradeDetailsPagedQuery procSortingRuleGradeDetailsPagedQuery);
+
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteSortingRuleGradeByIdAsync(long id);
         #endregion
     }
 }
