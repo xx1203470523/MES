@@ -95,7 +95,7 @@ namespace Hymson.MES.Services.Dtos.Process
 
         public string ParameterCode { get; set; }
         public string ParameterName { get; set; }
-        public ParameterUnitEnum? ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
         public DataTypeEnum? DataType { get; set; } = DataTypeEnum.Text;
     }
 
