@@ -761,5 +761,31 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
             return rows;
         }
+
+        /// <summary>
+        /// 根据工序编码获取工序信息
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public async Task<ProcProcedureCodeDto> GetByCodeAsync(string code)
+        {
+            var entitys = await _procProcedureRepository.GetProcProcedureEntitiesAsync(new ProcProcedureQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Code = code
+            });
+            if (entitys == null || !entitys.Any())
+            {
+                return new ProcProcedureCodeDto();
+            }
+
+            var model = entitys.ToList()[0];
+            return new ProcProcedureCodeDto
+            {
+                Id = model.Id,
+                Code = model.Code,
+                Name = model.Name
+            };
+        }
     }
 }
