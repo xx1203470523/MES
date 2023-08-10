@@ -180,15 +180,16 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<SelectOptionDto>> GetWorkShopListAsync()
         {
-            var workShops = await _inteWorkCenterRepository.GetWorkShopListAsync(new EntityBySiteIdQuery
+            var workShops = await _inteWorkCenterRepository.GetWorkCenterListByTypeAsync(new EntityByTypeQuery
             {
-                SiteId = _currentSite.SiteId ?? 0
+                SiteId = _currentSite.SiteId ?? 0,
+                Type = WorkCenterTypeEnum.Farm
             });
 
             return workShops.Select(s => new SelectOptionDto
             {
                 Key = $"{s.Id}",
-                Label = s.Code,
+                Label = $"【{s.Code}】 {s.Name}",
                 Value = $"{s.Id}"
             });
         }
