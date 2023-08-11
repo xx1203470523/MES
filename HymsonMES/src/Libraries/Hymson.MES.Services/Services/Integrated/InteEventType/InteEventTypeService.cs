@@ -181,6 +181,7 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
 
             // 接收升级
+            saveDto.ReceiveUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.ReceiveUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -213,6 +214,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             // 处理升级
+            saveDto.HandleUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.HandleUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -339,6 +341,7 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
 
             // 接收升级
+            saveDto.ReceiveUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.ReceiveUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -371,6 +374,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             // 处理升级
+            saveDto.HandleUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.HandleUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();

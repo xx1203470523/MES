@@ -46,12 +46,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 接收升级
         /// </summary>
-        public IEnumerable<InteEventTypeUpgradeDto> ReceiveUpgrades { get; set; }
+        public IEnumerable<InteEventTypeUpgradeDto>? ReceiveUpgrades { get; set; }
 
         /// <summary>
         /// 处理升级
         /// </summary>
-        public IEnumerable<InteEventTypeUpgradeDto> HandleUpgrades { get; set; }
+        public IEnumerable<InteEventTypeUpgradeDto>? HandleUpgrades { get; set; }
 
         /// <summary>
         /// 推送规则
