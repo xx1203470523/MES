@@ -292,5 +292,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfcInfoIds"></param>
         /// <returns></returns>
         Task<int> DeleteSfcProduceBusinesssAsync(DeleteSfcProduceBusinesssCommand command);
+
+        /// <summary>
+        /// 根据SFCs 获取数据
+        /// </summary>
+        /// <param name="sfcsQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetListBySfcsAsync(ManuSfcProduceBySfcsQuery sfcsQuery);
     }
 }

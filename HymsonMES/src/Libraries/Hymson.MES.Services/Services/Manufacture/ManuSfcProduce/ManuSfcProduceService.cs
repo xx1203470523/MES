@@ -9,6 +9,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -160,6 +161,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteNodeRepository;
 
+        private readonly IManuDowngradingRepository _manuDowngradingRepository;
+
         private readonly AbstractValidator<ManuSfcProduceLockDto> _validationLockRules;
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
         private readonly ILogger<ManuSfcProduceService> _logger;
@@ -193,6 +196,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="validationModifyRules"></param>
         /// <param name="logger"></param>
         /// /// <param name="procProcessRouteNodeRepository"></param>
+        /// <param name="manuDowngradingRepository"></param>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -216,7 +220,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IProcBomRepository procBomRepository,
             AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules,
-            ILogger<ManuSfcProduceService> logger, IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository)
+            ILogger<ManuSfcProduceService> logger, IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,IManuDowngradingRepository manuDowngradingRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -244,6 +248,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
             this._logger = logger;
             _procProcessRouteNodeRepository = procProcessRouteNodeRepository;
+            _manuDowngradingRepository= manuDowngradingRepository;
         }
 
 
@@ -2250,6 +2255,89 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(lockProductionId);
                 throw new CustomerValidationException(nameof(ErrorCode.MES15317)).WithData("lockproduction", procProcedureEntity.Code);
             }
+        }
+
+
+        /// <summary>
+        /// 根据sfcs查询条码信息关联降级等级 
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetManuSfcAboutManuDowngradingBySfcsAsync(string[] sfcs)
+        {
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = sfcs });
+
+            //实体到DTO转换 装载数据
+            List<ManuSfcProduceAboutDowngradingViewDto> manuSfcProduceAboutDowngradingDtos = new List<ManuSfcProduceAboutDowngradingViewDto>();
+
+            if (sfcList != null && sfcList.Any())
+            {
+                //查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(sfcList.Where(x => x.WorkOrderId > 0).Select(x => x.WorkOrderId).ToArray());
+
+                //查询物料
+                var materials = await _procMaterialRepository.GetByIdsAsync(sfcList.Where(x => x.ProductId > 0).Select(x => x.ProductId).ToArray());
+
+                //查找降级
+                var manuDowngradings = await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery 
+                { 
+                    Sfcs = sfcList.Select(x => x.SFC).ToArray(), 
+                    SiteId = _currentSite.SiteId ?? 0 
+                });
+
+                //查询sfc对应的过程
+                var sfcProduces = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Sfcs = sfcList.Select(x => x.SFC).ToArray(),
+                });
+                //查找对应的工序
+                var procedures = await _procProcedureRepository.GetByIdsAsync(sfcProduces.Where(x => x.ProcedureId > 0).Select(x => x.ProcedureId).ToArray());
+
+                foreach (var item in sfcList)
+                {
+                    var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;                    
+                    var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
+
+                    var manuDowngrading = manuDowngradings.FirstOrDefault(x => x.SFC == item.SFC);
+
+                    //条码在制
+                    var sfcProduce = sfcProduces != null && sfcProduces.Any()?sfcProduces.FirstOrDefault(x => x.SFC == item.SFC):null;
+
+                    //工序
+                    var procedure = procedures != null && procedures.Any() && sfcProduce!=null ? procedures.FirstOrDefault(x => x.Id == sfcProduce.ProcedureId) : null;
+
+                    
+                    var viewDto = new ManuSfcProduceAboutDowngradingViewDto
+                    {
+                        Id = item.Id,
+                        Sfc = item.SFC,
+                        OrderCode = workOrder != null ? workOrder.OrderCode : "",
+                        MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                        ProcedureCode = procedure?.Code ?? "",
+                        ManuDowngradingCode = manuDowngrading?.Grade ?? ""
+                    };
+
+                    //找到对应的状态
+                    if (item.Status.HasValue)
+                    {
+                        switch (item.Status)
+                        {
+                            case SfcStatusEnum.InProcess:
+                                viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (int)item.Status;
+                                break;
+                            default:
+                                viewDto.Status = (int)item.Status;
+                                break;
+                        }
+                    }
+
+                    manuSfcProduceAboutDowngradingDtos.Add(viewDto); 
+                }
+
+            }
+
+            return manuSfcProduceAboutDowngradingDtos;
         }
 
     }

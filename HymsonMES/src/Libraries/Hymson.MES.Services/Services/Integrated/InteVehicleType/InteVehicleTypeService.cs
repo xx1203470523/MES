@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -241,7 +242,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             #endregion
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 await _inteVehicleTypeRepository.UpdateAsync(inteVehicleTypeEntity);
 

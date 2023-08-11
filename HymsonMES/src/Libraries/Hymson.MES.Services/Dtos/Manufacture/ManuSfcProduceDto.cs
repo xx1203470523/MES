@@ -920,4 +920,47 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string Remark { get; set; }
     }
+
+
+    /// <summary>
+    /// 条码信息关于降级等级信息
+    /// </summary>
+    public class ManuSfcProduceAboutDowngradingViewDto
+    {
+        /// <summary>
+        ///  唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 状态;1：排队；2：活动；
+        /// </summary>
+        public int? Status { get; set; }
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 产品名称/版本
+        /// </summary>
+        public string MaterialCodeVersion { get; set; }
+
+        /// <summary>
+        /// 降级编码
+        /// </summary>
+        public string ManuDowngradingCode { get; set; }
+    }
+
 }

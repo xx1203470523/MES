@@ -546,6 +546,8 @@
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         public const string MES15317 = "将来锁工序{lockproduction}不在条码所在工序之后";
         public const string MES15318 = "条码已经被锁定";
+
+        public const string MES15320 = "条码【{sfcs}】已不存在";
         #endregion
 
         #region 质量录入 15400
@@ -1108,6 +1110,14 @@
         public const string MES21108 = "降级规则编码不允许有空格";
         public const string MES21109 = "Id不合法";
         public const string MES21110 = "参数为空";
+        #endregion
+
+        #region 降级录入/移除 21200
+        public const string MES21200 = "降级录入/移除错误";
+        public const string MES21201 = "缺少降级编码参数";
+        public const string MES21202 = "缺少产品序列码参数";
+
+
         #endregion
 
         #region 设备对接错误

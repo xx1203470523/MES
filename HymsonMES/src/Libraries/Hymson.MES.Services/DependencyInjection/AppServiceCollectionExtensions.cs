@@ -198,6 +198,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuDowngradingRuleService, ManuDowngradingRuleService>();
 
+            services.AddSingleton<IManuDowngradingService, ManuDowngradingService>();
+
             #endregion
 
             #region Warehouse 

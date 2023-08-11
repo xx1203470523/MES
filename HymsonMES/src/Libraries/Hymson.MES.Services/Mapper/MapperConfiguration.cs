@@ -675,6 +675,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuDowngradingRuleModifyDto, ManuDowngradingRuleEntity>();
             CreateMap<ManuDowngradingRuleEntity, ManuDowngradingRuleDto>();
             #endregion
+
+            #region ManuDowngrading
+            CreateMap<ManuDowngradingEntity, ManuDowngradingDto>();
+            #endregion
         }
 
         /// <summary>
