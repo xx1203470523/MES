@@ -14,6 +14,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 所属站点id
         /// </summary>
         public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 工序编码列表
+        /// </summary>
+        public string[]? Codes { get; set; }
     }
 
 

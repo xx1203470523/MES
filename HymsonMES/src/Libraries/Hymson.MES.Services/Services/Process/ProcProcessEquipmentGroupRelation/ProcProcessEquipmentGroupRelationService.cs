@@ -2,6 +2,7 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
@@ -62,9 +63,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> CreateProcProcessEquipmentGroupRelationAsync(ProcProcessEquipmentGroupRelationSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
@@ -92,9 +90,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> ModifyProcProcessEquipmentGroupRelationAsync(ProcProcessEquipmentGroupRelationSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
              // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 

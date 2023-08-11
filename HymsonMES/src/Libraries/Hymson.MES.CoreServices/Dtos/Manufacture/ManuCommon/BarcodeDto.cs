@@ -11,7 +11,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon
         /// <summary>
         /// 条码
         /// </summary>
-        public string SFC { set; get; }
+        public string SFC { set; get; } = "";
 
         /// <summary>
         /// 数量

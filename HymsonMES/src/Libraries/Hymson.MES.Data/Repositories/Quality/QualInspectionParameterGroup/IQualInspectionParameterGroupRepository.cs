@@ -62,6 +62,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<QualInspectionParameterGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
+        /// 查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualInspectionParameterGroupEntity>> GetByProductProcedureListAsync(EntityByProductProcedureQuery query);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

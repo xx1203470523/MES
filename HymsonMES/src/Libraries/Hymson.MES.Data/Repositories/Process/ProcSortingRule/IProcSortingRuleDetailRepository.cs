@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procSortingRuleDetailEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys);
+        Task<int> InsertsAsync(IEnumerable <ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys);
 
         /// <summary>
         /// 更新
@@ -43,7 +43,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procSortingRuleDetailEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys);
+        Task<int> UpdatesAsync(IEnumerable<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys);
+
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteSortingRuleDetailByIdAsync(long id);
 
         /// <summary>
         /// 删除  

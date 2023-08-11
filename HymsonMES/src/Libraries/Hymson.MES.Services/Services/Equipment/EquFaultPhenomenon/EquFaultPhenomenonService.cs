@@ -75,11 +75,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
 
             if (createDto.EquipmentGroupId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES12904));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12904));
             }
             if (!Enum.IsDefined(typeof(SysDataStatusEnum), createDto.UseStatus))
             {
-                throw new ValidationException(nameof(ErrorCode.MES12906));
+                throw new CustomerValidationException(nameof(ErrorCode.MES12906));
             }
 
             // DTO转换实体
@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
 
             // 验证DTO
             var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(modifyDto.Id.Value)
-                ?? throw new BusinessException(nameof(ErrorCode.MES12905));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12905));
 
             if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
             {

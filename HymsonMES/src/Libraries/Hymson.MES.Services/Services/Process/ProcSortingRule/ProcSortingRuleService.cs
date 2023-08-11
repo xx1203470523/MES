@@ -9,14 +9,21 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Components;
+using Minio.DataModel;
+using System.Security.Cryptography.Xml;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -76,12 +83,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procSortingRuleCreateDto);
 
@@ -94,8 +95,75 @@ namespace Hymson.MES.Services.Services.Process
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
             procSortingRuleEntity.SiteId = _currentSite.SiteId ?? 0;
 
+            List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntities = new();
+            List<ProcSortingRuleGradeEntity> procSortingRuleGradeEntities = new();
+            List<ProcSortingRuleGradeDetailsEntity> procSortingRuleGradeDetailsEntities = new();
+
+            foreach (var item in procSortingRuleCreateDto.SortingParamDtos)
+            {
+                procSortingRuleDetailEntities.Add(new ProcSortingRuleDetailEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SortingRuleId = procSortingRuleEntity.Id,
+                    ProcedureId = item.ProcedureId,
+                    ParameterId = item.ParameterId,
+                    MinValue = item.MinValue,
+                    MinContainingType = item.MinContainingType,
+                    MaxValue = item.MaxValue,
+                    MaxContainingType = item.MaxContainingType,
+                    ParameterValue = item.ParameterValue,
+                    Rating = item.Rating,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+
+            foreach (var item in procSortingRuleCreateDto.SortingRuleGradeDtos)
+            {
+                var procSortingRuleGradeEntity = new ProcSortingRuleGradeEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SortingRuleId = procSortingRuleEntity.Id,
+                    Grade = item.Grade,
+                    remark = item.Remark,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                };
+                procSortingRuleGradeEntities.Add(procSortingRuleGradeEntity);
+
+                var procSortingRuleDetails = procSortingRuleDetailEntities.Where(x => item.Ratings.Contains(x.Rating));
+
+                foreach (var SortingRule in procSortingRuleDetails)
+                {
+                    procSortingRuleGradeDetailsEntities.Add(new ProcSortingRuleGradeDetailsEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SortingRuleId = procSortingRuleEntity.Id,
+                        SiteId = _currentSite.SiteId ?? 0,
+                        SortingRuleGradeId = procSortingRuleGradeEntity.Id,
+                        SortingRuleDetailId = SortingRule.Id,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
+            using TransactionScope trans = TransactionHelper.GetTransactionScope();
             //入库
             await _procSortingRuleRepository.InsertAsync(procSortingRuleEntity);
+            await _sortingRuleDetailRepository.InsertsAsync(procSortingRuleDetailEntities);
+            await _sortingRuleGradeRepository.InsertsAsync(procSortingRuleGradeEntities);
+            await _ruleGradeDetailsRepository.InsertsAsync(procSortingRuleGradeDetailsEntities);
+
+            trans.Complete();
         }
 
         /// <summary>
@@ -157,12 +225,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcSortingRuleAsync(ProcSortingRuleModifyDto procSortingRuleModifyDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procSortingRuleModifyDto);
 
@@ -171,7 +233,81 @@ namespace Hymson.MES.Services.Services.Process
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
 
+
+            List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntities = new();
+            List<ProcSortingRuleGradeEntity> procSortingRuleGradeEntities = new();
+            List<ProcSortingRuleGradeDetailsEntity> procSortingRuleGradeDetailsEntities = new();
+
+            foreach (var item in procSortingRuleModifyDto.SortingParamDtos)
+            {
+                procSortingRuleDetailEntities.Add(new ProcSortingRuleDetailEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SortingRuleId = procSortingRuleEntity.Id,
+                    ProcedureId = item.ProcedureId,
+                    ParameterId = item.ParameterId,
+                    MinValue = item.MinValue,
+                    MinContainingType = item.MinContainingType,
+                    MaxValue = item.MaxValue,
+                    MaxContainingType = item.MaxContainingType,
+                    ParameterValue = item.ParameterValue,
+                    Rating = item.Rating,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                });
+            }
+
+            foreach (var item in procSortingRuleModifyDto.SortingRuleGradeDtos)
+            {
+                var procSortingRuleGradeEntity = new ProcSortingRuleGradeEntity()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SortingRuleId = procSortingRuleEntity.Id,
+                    Grade = item.Grade,
+                    remark = item.Remark,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                };
+                procSortingRuleGradeEntities.Add(procSortingRuleGradeEntity);
+
+                var procSortingRuleDetails = procSortingRuleDetailEntities.Where(x => item.Ratings.Contains(x.Rating));
+
+                foreach (var SortingRule in procSortingRuleDetails)
+                {
+                    procSortingRuleGradeDetailsEntities.Add(new ProcSortingRuleGradeDetailsEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SortingRuleId = procSortingRuleEntity.Id,
+                        SiteId = _currentSite.SiteId ?? 0,
+                        SortingRuleGradeId = procSortingRuleGradeEntity.Id,
+                        SortingRuleDetailId = SortingRule.Id,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now()
+                    });
+                }
+            }
+
+            using TransactionScope trans = TransactionHelper.GetTransactionScope();
+
+            await _sortingRuleDetailRepository.DeleteSortingRuleDetailByIdAsync(procSortingRuleModifyDto.Id);
+            await _sortingRuleGradeRepository.DeleteSortingRuleGradeByIdAsync(procSortingRuleModifyDto.Id);
+            await _ruleGradeDetailsRepository.DeleteSortingRuleGradeByIdAsync(procSortingRuleModifyDto.Id);
+
+            //入库
             await _procSortingRuleRepository.UpdateAsync(procSortingRuleEntity);
+            await _sortingRuleDetailRepository.InsertsAsync(procSortingRuleDetailEntities);
+            await _sortingRuleGradeRepository.InsertsAsync(procSortingRuleGradeEntities);
+            await _ruleGradeDetailsRepository.InsertsAsync(procSortingRuleGradeDetailsEntities);
+
+            trans.Complete();
         }
 
         /// <summary>
@@ -242,14 +378,14 @@ namespace Hymson.MES.Services.Services.Process
                         ParameterId = entity.ParameterId,
                         ParameterCode = procParameter?.ParameterCode ?? "",
                         ParameterName = procParameter?.ParameterName ?? "",
-                        ParameterUnit = procParameter?.ParameterUnit,
+                        ParameterUnit = procParameter?.ParameterUnit ?? "",
                         MinValue = entity.MinValue,
                         MinContainingType = entity.MinContainingType,
                         MaxValue = entity.MaxValue,
                         MaxContainingType = entity.MaxContainingType,
                         ParameterValue = entity.ParameterValue,
                         Rating = entity.Rating,
-                    });
+                    }); ; ;
                 }
             }
             return ruleDetailViewDtos;

@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public ParameterUnitEnum ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 
@@ -78,9 +78,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ParameterName { get; set; } = "";
 
         /// <summary>
-        /// 参数单位（字典定义）
+        /// 参数单位
         /// </summary>
-        public ParameterUnitEnum ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 
@@ -117,9 +117,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ParameterName { get; set; } = "";
 
         /// <summary>
-        /// 参数单位（字典定义）
+        /// 参数单位
         /// </summary>
-        public ParameterUnitEnum ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 
@@ -151,7 +151,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public ParameterUnitEnum? ParameterUnit { get; set; }
+        public string? ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 

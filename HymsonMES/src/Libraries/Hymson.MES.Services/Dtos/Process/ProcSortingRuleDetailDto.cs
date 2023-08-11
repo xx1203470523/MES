@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -52,7 +53,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :参数单位（字典定义） 
         /// 空值 : false  
         /// </summary>
-        public ParameterUnitEnum? ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
 
         /// <summary>
         /// 最小值
@@ -62,7 +63,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 包含最小值类型;1< 2.≤
         /// </summary>
-        public int MinContainingType { get; set; }
+        public ContainingTypeEnum? MinContainingType { get; set; }
 
        /// <summary>
         /// 最大值
@@ -72,7 +73,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 包含最大值类型;1< 2.≥
         /// </summary>
-        public int MaxContainingType { get; set; }
+        public ContainingTypeEnum? MaxContainingType { get; set; }
 
        /// <summary>
         /// 参数值

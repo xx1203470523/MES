@@ -922,11 +922,18 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
+            // 获取初始扣料数据
+            List<MaterialDeductBo> initialMaterials = new();
+
             // 获取BOM绑定的物料
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
-            // 未设置物料
-            if (mainMaterials == null || mainMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+            // 未设置物料（克明说化成和返工的是没有投料的）
+            if (mainMaterials == null || mainMaterials.Any() == false)
+            {
+                return initialMaterials;
+                // throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+            }
 
             // 取得特定工序的物料
             mainMaterials = mainMaterials.Where(w => w.ProcedureId == sfcProduceEntity.ProcedureId);
@@ -948,8 +955,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(sfcProduceEntity.SiteId);
             materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
 
-            // 获取初始扣料数据
-            List<MaterialDeductBo> initialMaterials = new();
             foreach (var item in mainMaterials)
             {
                 var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
@@ -1010,7 +1015,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds)
         {
-           return await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
+            return await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
         }
 
 
@@ -1021,7 +1026,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="type"></param>
         /// <param name="remark"></param>
         /// <returns></returns>
-        public ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId,string remark = "")
+        public ManuSfcStepEntity CreateSFCStepEntity(ManuSfcProduceEntity sfc, ManuSfcStepTypeEnum type, long siteId, string remark = "")
         {
             return new ManuSfcStepEntity
             {

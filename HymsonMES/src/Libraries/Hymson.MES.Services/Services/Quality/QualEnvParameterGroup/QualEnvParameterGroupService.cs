@@ -113,7 +113,7 @@ namespace Hymson.MES.Services.Services.Quality
         public async Task<int> CreateAsync(QualEnvParameterGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -131,40 +131,11 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 编码唯一性验证
-            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = entity.SiteId,
-                Code = entity.Code,
-                Version = entity.Version
-            });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
+            // 验证唯一性
+            await CheckUniqueWorkCenterProcedureAsync(entity);
 
-            // 判断规格上限和规格下限（数据类型为数值）
-            List<ValidationFailure> validationFailures = new();
-            foreach (var item in saveDto.Details)
-            {
-                // 如果参数类型为数值，则判断规格上限和规格下限
-                if (item.DataType != DataTypeEnum.Numeric) continue;
-                if (item.UpperLimit < item.LowerLimit)
-                {
-                    validationFailures.Add(new ValidationFailure
-                    {
-                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                        { "CollectionIndex", item.Code },
-                        { "Code", item.Code }
-                    },
-                        ErrorCode = nameof(ErrorCode.MES10516)
-                    });
-                }
-            }
-
-            // 是否存在错误
-            if (validationFailures.Any())
-            {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-                throw new ValidationException("", validationFailures);
-            }
+            // 验证参数项目
+            CheckGroupDetails(saveDto.Details);
 
             var details = saveDto.Details.Select(s =>
             {
@@ -197,9 +168,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> ModifyAsync(QualEnvParameterGroupSaveDto saveDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
@@ -228,43 +196,11 @@ namespace Hymson.MES.Services.Services.Quality
                     break;
             }
 
-            // 编码唯一性验证
-            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = entity.SiteId,
-                Code = entity.Code,
-                Version = entity.Version
-            });
-            if (checkEntity != null && checkEntity.Id != entity.Id)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
-            }
+            // 验证唯一性
+            await CheckUniqueWorkCenterProcedureAsync(entity);
 
-            // 判断规格上限和规格下限（数据类型为数值）
-            List<ValidationFailure> validationFailures = new();
-            foreach (var item in saveDto.Details)
-            {
-                // 如果参数类型为数值，则判断规格上限和规格下限
-                if (item.DataType != DataTypeEnum.Numeric) continue;
-                if (item.UpperLimit < item.LowerLimit)
-                {
-                    validationFailures.Add(new ValidationFailure
-                    {
-                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                        { "CollectionIndex", item.Code },
-                        { "Code", item.Code }
-                    },
-                        ErrorCode = nameof(ErrorCode.MES10516)
-                    });
-                }
-            }
-
-            // 是否存在错误
-            if (validationFailures.Any())
-            {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-                throw new ValidationException("", validationFailures);
-            }
+            // 验证参数项目
+            CheckGroupDetails(saveDto.Details);
 
             var details = saveDto.Details.Select(s =>
             {
@@ -408,6 +344,97 @@ namespace Hymson.MES.Services.Services.Quality
             var dtos = pagedInfo.Data.Select(s => s.ToModel<QualEnvParameterGroupDto>());
             return new PagedInfo<QualEnvParameterGroupDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+
+
+        #region 内部方法
+        /// <summary>
+        /// 验证工作中心工序唯一性
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task CheckUniqueWorkCenterProcedureAsync(QualEnvParameterGroupEntity entity)
+        {
+            // 编码唯一性验证
+            var checkEntity = await _qualEnvParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code,
+                Version = entity.Version
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id) throw new CustomerValidationException(nameof(ErrorCode.MES10520))
+                    .WithData("Code", entity.Code)
+                    .WithData("Version", entity.Version);
+
+            var workCenterEntity = await _inteWorkCenterRepository.GetByIdAsync(entity.WorkCenterId);
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
+            if (workCenterEntity == null || procedureEntity == null) return;
+
+            var checkUniqueWorkCenterProcedureEntities = await _qualEnvParameterGroupRepository.GetByWorkCenterProcedureListAsync(new EntityByWorkCenterProcedureQuery
+            {
+                SiteId = entity.SiteId,
+                WorkCenterId = entity.WorkCenterId,
+                ProcedureId = entity.ProcedureId
+            });
+            if (checkUniqueWorkCenterProcedureEntities == null || checkUniqueWorkCenterProcedureEntities.Any() == false) return;
+
+            // 校验工作中心编码+工序编码+版本是否唯一
+            if (checkUniqueWorkCenterProcedureEntities.Any(a => a.WorkCenterId == entity.WorkCenterId
+            && a.ProcedureId == entity.ProcedureId
+            && a.Version == entity.Version
+            && a.Id != entity.Id))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10525))
+                    .WithData("WorkCenterCode", workCenterEntity.Code)
+                    .WithData("ProcedureCode", procedureEntity.Code)
+                    .WithData("Version", entity.Version);
+            }
+
+            // 状态为启用时，校验启用状态的 工作中心编码+工序编码 唯一性
+            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueWorkCenterProcedureEntities.Any(a => a.ProcedureId == entity.ProcedureId
+            && a.Status == entity.Status
+            && a.Id != entity.Id))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10524))
+                    .WithData("WorkCenterCode", workCenterEntity.Code)
+                    .WithData("ProcedureCode", procedureEntity.Code);
+            }
+        }
+
+        /// <summary>
+        /// 验证参数项目
+        /// </summary>
+        /// <param name="details"></param>
+        /// <returns></returns>
+        public static void CheckGroupDetails(IEnumerable<QualEnvParameterGroupDetailSaveDto> details)
+        {
+            // 判断规格上限和规格下限（数据类型为数值）
+            List<ValidationFailure> validationFailures = new();
+            foreach (var item in details)
+            {
+                // 如果参数类型为数值，则判断规格上限和规格下限
+                if (item.DataType != DataTypeEnum.Numeric) continue;
+                if (item.UpperLimit < item.LowerLimit)
+                {
+                    validationFailures.Add(new ValidationFailure
+                    {
+                        FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                        ErrorCode = nameof(ErrorCode.MES10516)
+                    });
+                }
+            }
+
+            // 是否存在错误
+            if (validationFailures.Any())
+            {
+                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
+            }
+        }
+        #endregion
 
     }
 }

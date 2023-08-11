@@ -107,12 +107,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuFacePlateAsync(ManuFacePlateCreateDto manuFacePlateCreateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(manuFacePlateCreateDto);
 
@@ -201,12 +195,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task ModifyManuFacePlateAsync(ManuFacePlateModifyDto manuFacePlateModifyDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(manuFacePlateModifyDto);
 
@@ -216,7 +204,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
 
             var entity = await _manuFacePlateRepository.GetByIdAsync(manuFacePlateModifyDto.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES17209));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17209));
 
             if (entity.Status != SysDataStatusEnum.Build && manuFacePlateModifyDto.Status == SysDataStatusEnum.Build)
             {
@@ -254,7 +242,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.QualifiedColour);
                         facePlateQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.UnqualifiedColour);
                         //填充Job数据
-                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodes(manuFacePlateProductionEntity.ScanJobId);
+                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateProductionEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -287,7 +275,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateContainerPack.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateContainerPack.QualifiedColour);
                         facePlateQueryDto.FacePlateContainerPack.IsShowErrorsColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateContainerPack.ErrorsColour);
                         //填充Job数据
-                        facePlateQueryDto.FacePlateContainerPack.ScanJobCode = await QueryInteJobCodes(manuFacePlateContainerPackEntity.ScanJobId);
+                        facePlateQueryDto.FacePlateContainerPack.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateContainerPackEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -399,7 +387,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="scanJobIdStr"></param>
         /// <returns>返回使用,逗号分割的Code</returns>
-        private async Task<string> QueryInteJobCodes(string scanJobIdStr)
+        private async Task<string> QueryInteJobCodesAsync(string scanJobIdStr)
         {
             string jobCodeStr = string.Empty;
             if (!string.IsNullOrEmpty(scanJobIdStr))
@@ -457,7 +445,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateProduction.IsShowQualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.QualifiedColour);
                         facePlateQueryDto.FacePlateProduction.IsShowUnqualifiedColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateProduction.UnqualifiedColour);
                         //填充Job数据
-                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodes(manuFacePlateProductionEntity.ScanJobId);
+                        facePlateQueryDto.FacePlateProduction.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateProductionEntity.ScanJobId);
                     }
                 }
                 #endregion
@@ -795,17 +783,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <exception cref="ValidationException"></exception>
         public async Task UpdateManuFacePlateAsync(UpdateManuFacePlateDto updateManuFacePlateDto)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
-
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(updateManuFacePlateDto.FacePlate);
 
             var entity = await _manuFacePlateRepository.GetByIdAsync(updateManuFacePlateDto.FacePlate.Id)
-                ?? throw new BusinessException(nameof(ErrorCode.MES17209));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17209));
 
             if (entity.Status != SysDataStatusEnum.Build && updateManuFacePlateDto.FacePlate.Status == SysDataStatusEnum.Build)
             {

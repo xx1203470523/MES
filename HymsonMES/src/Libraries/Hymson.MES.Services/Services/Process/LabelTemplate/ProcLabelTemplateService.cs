@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             var foo = await QueryProcLabelTemplateByNameAsync(procLabelTemplateEntity.Name);
             if (foo != null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
             }
             procLabelTemplateEntity.Id = IdGenProvider.Instance.CreateId();
             procLabelTemplateEntity.CreatedBy = _currentUser.UserName;
@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             var foo = await QueryProcLabelTemplateByNameAsync(procLabelTemplateEntity.Name);
             if (foo != null && foo.Id != procLabelTemplateEntity.Id)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10340)).WithData("Name", procLabelTemplateEntity.Name);
             }
 
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;

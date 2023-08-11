@@ -29,16 +29,15 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.WorkOrderId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16102));
             RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16104));
             RuleFor(x => x.SFCs).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16126));
-            RuleFor(x => x).MustAsync(ManuSfcProduceSFCSValidatorAsync).WithErrorCode(nameof(ErrorCode.MES16126));
+            RuleFor(x => x).Must(ManuSfcProduceSFCSValidator).WithErrorCode(nameof(ErrorCode.MES16126));
         }
 
         /// <summary>
         /// 参数验证
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ManuSfcProduceSFCSValidatorAsync(PlanSfcReceiveCreateDto param, CancellationToken cancellationToken)
+        private bool ManuSfcProduceSFCSValidator(PlanSfcReceiveCreateDto param)
         {
             if (param.RelevanceWorkOrderId==param.WorkOrderId)
             {

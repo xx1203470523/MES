@@ -142,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procSortingRuleDetailEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, procSortingRuleDetailEntitys);
@@ -164,10 +164,21 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procSortingRuleDetailEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procSortingRuleDetailEntitys);
+        }
+
+        /// <summary>
+        /// 删除（物理删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteSortingRuleDetailByIdAsync(long id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteBySortingRuleDetailIdSql, new { SortingRuleId = id });
         }
         #endregion
 
@@ -197,6 +208,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_detail`  WHERE Id IN @Ids ";
+
+        const string DeleteBySortingRuleDetailIdSql = "DELETE FROM `proc_sorting_rule_detail` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
 }

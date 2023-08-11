@@ -82,13 +82,6 @@ namespace Hymson.MES.Services.Services.Process
         public async Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto)
         {
             #region 参数校验
-            //// 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0)
-            {
-                //responseDto.Msg = "站点码获取失败，请重新登录！";
-                //return responseDto;
-                throw new ValidationException(nameof(ErrorCode.MES10101));
-            }
             procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToTrimSpace().ToUpperInvariant();
             procMaterialCreateDto.MaterialName = procMaterialCreateDto.MaterialName.Trim();
             procMaterialCreateDto.Version = procMaterialCreateDto.Version.Trim();
@@ -181,7 +174,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES10202));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10202));
                 }
 
                 if (procMaterialCreateDto.DynamicList != null && procMaterialCreateDto.DynamicList.Count > 0)
@@ -190,7 +183,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response != procMaterialCreateDto.DynamicList.Count)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES10202));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10202));
                     }
                 }
 
@@ -200,7 +193,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response != procMaterialCreateDto.MaterialSupplierList.Count)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES10202));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10202));
                     }
                 }
 
@@ -228,13 +221,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcMaterialAsync(long[] idsArr)
         {
-            if (idsArr.Length < 1) throw new ValidationException(nameof(ErrorCode.MES10213));
+            if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
-            //if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
-            //|| a.Status == SysDataStatusEnum.Retain) == true) throw new BusinessException(nameof(ErrorCode.MES10212));
+            
             if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -252,7 +244,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (useMaterilWorkOrders != null && useMaterilWorkOrders.Any())
             {
-                throw new BusinessException(nameof(ErrorCode.MES10225));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10225));
             }
 
             return await _procMaterialRepository.DeletesAsync(new DeleteCommand
@@ -353,7 +345,7 @@ namespace Hymson.MES.Services.Services.Process
             var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList, procMaterialEntity);
             if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id) == true)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10206));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10206));
             }
 
             // 判断编号是否已存在
@@ -365,7 +357,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (exists != null && exists.Id != procMaterialEntity.Id)
             {
-                throw new BusinessException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
             }
 
             #endregion
@@ -447,7 +439,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 if (response == 0)
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES10208));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10208));
                 }
 
                 //先真删除替换物料
@@ -458,7 +450,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList)) <= 0)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES10209));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10209));
                     }
                 }
 
@@ -472,7 +464,7 @@ namespace Hymson.MES.Services.Services.Process
 
                     if (response != procMaterialModifyDto.MaterialSupplierList.Count)
                     {
-                        throw new BusinessException(nameof(ErrorCode.MES10222));
+                        throw new CustomerValidationException(nameof(ErrorCode.MES10222));
                     }
                 }
 

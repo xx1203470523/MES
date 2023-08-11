@@ -77,7 +77,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        /// <exception cref="BusinessException"></exception>
         public async Task<ManuFacePlateProductionPackageDto> GetManuFacePlateProductionPackageInfoAsync(ManuFacePlateProductionPackageQueryDto param)
         {
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
@@ -88,7 +87,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //判断工序是否一致
             if (manuSfcProduceEntity == null)
             {
-                throw new BusinessException(nameof(ErrorCode.MES16901));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16901));
             }
 
             //获取对应bom下所有的物料(包含替代物料)
@@ -120,7 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 long mainMaterialId = 0;
                 if (!long.TryParse(item.MaterialId, out mainMaterialId))
                 {
-                    throw new BusinessException(nameof(ErrorCode.MES16902));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16902));
                 }
 
                 //查找每个主物料是否已经完成组装 --根据装配数量来判断

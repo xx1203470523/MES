@@ -146,5 +146,16 @@ namespace Hymson.MES.Api.Controllers
             await _procProcedureService.DeleteProcProcedureAsync(deleteDto.Ids);
         }
 
+        /// <summary>
+        /// 根据工序读取工序详细信息和资源信息
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("getByCode/{code}")]
+        public async Task<ProcProcedureCodeDto> GetByCodeAsync(string code)
+        {
+            return await _procProcedureService.GetByCodeAsync(code);
+        }
+
     }
 }
