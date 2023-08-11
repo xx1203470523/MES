@@ -125,40 +125,11 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         entity.UpdatedOn = updatedOn;
         entity.SiteId = _currentSite.SiteId ?? 0;
 
-        // 编码唯一性验证
-        var checkEntity = await _procProductParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
-        {
-            Site = entity.SiteId,
-            Code = entity.Code,
-            Version = entity.Version
-        });
-        if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
+        // 验证唯一性
+        await CheckUniqueMaterialProcedureAsync(entity);
 
-        // 判断规格上限和规格下限（数据类型为数值）
-        List<ValidationFailure> validationFailures = new();
-        foreach (var item in saveDto.Details)
-        {
-            // 如果参数类型为数值，则判断规格上限和规格下限
-            if (item.DataType != DataTypeEnum.Numeric) continue;
-            if (item.UpperLimit < item.LowerLimit)
-            {
-                validationFailures.Add(new ValidationFailure
-                {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                        { "CollectionIndex", item.Code },
-                        { "Code", item.Code }
-                    },
-                    ErrorCode = nameof(ErrorCode.MES10516)
-                });
-            }
-        }
-
-        // 是否存在错误
-        if (validationFailures.Any())
-        {
-            //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-            throw new ValidationException("", validationFailures);
-        }
+        // 验证参数项目
+        CheckGroupDetails(saveDto.Details);
 
         var details = saveDto.Details.Select(s =>
         {
@@ -219,43 +190,11 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
                 break;
         }
 
-        // 编码唯一性验证
-        var checkEntity = await _procProductParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
-        {
-            Site = entity.SiteId,
-            Code = entity.Code,
-            Version = entity.Version
-        });
-        if (checkEntity != null && checkEntity.Id != entity.Id)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES10520)).WithData("Code", entity.Code).WithData("Version", entity.Version);
-        }
+        // 验证唯一性
+        await CheckUniqueMaterialProcedureAsync(entity);
 
-        // 判断规格上限和规格下限（数据类型为数值）
-        List<ValidationFailure> validationFailures = new();
-        foreach (var item in saveDto.Details)
-        {
-            // 如果参数类型为数值，则判断规格上限和规格下限
-            if (item.DataType != DataTypeEnum.Numeric) continue;
-            if (item.UpperLimit < item.LowerLimit)
-            {
-                validationFailures.Add(new ValidationFailure
-                {
-                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                        { "CollectionIndex", item.Code },
-                        { "Code", item.Code }
-                    },
-                    ErrorCode = nameof(ErrorCode.MES10516)
-                });
-            }
-        }
-
-        // 是否存在错误
-        if (validationFailures.Any())
-        {
-            //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
-            throw new ValidationException("", validationFailures);
-        }
+        // 验证参数项目
+        CheckGroupDetails(saveDto.Details);
 
         var details = saveDto.Details.Select(s =>
         {
@@ -399,5 +338,96 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         var dtos = pagedInfo.Data.Select(s => s.ToModel<ProcProductParameterGroupDto>());
         return new PagedInfo<ProcProductParameterGroupDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
     }
+
+
+
+    #region 内部方法
+    /// <summary>
+    /// 验证工作中心工序唯一性
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public async Task CheckUniqueMaterialProcedureAsync(ProcProductParameterGroupEntity entity)
+    {
+        // 编码唯一性验证
+        var checkEntity = await _procProductParameterGroupRepository.GetByCodeAsync(new EntityByCodeQuery
+        {
+            Site = entity.SiteId,
+            Code = entity.Code,
+            Version = entity.Version
+        });
+        if (checkEntity != null && checkEntity.Id != entity.Id) throw new CustomerValidationException(nameof(ErrorCode.MES10520))
+                .WithData("Code", entity.Code)
+                .WithData("Version", entity.Version);
+
+        var materialEntity = await _procMaterialRepository.GetByIdAsync(entity.MaterialId);
+        var procedureEntity = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
+        if (materialEntity == null || procedureEntity == null) return;
+
+        var checkUniqueMaterialProcedureEntities = await _procProductParameterGroupRepository.GetByProductProcedureListAsync(new EntityByProductProcedureQuery
+        {
+            SiteId = entity.SiteId,
+            ProductId = entity.MaterialId,
+            ProcedureId = entity.ProcedureId
+        });
+        if (checkUniqueMaterialProcedureEntities == null || checkUniqueMaterialProcedureEntities.Any() == false) return;
+
+        // 校验产品编码+工序编码+版本是否唯一
+        if (checkUniqueMaterialProcedureEntities.Any(a => a.MaterialId == entity.MaterialId
+        && a.ProcedureId == entity.ProcedureId
+        && a.Version == entity.Version
+        && a.Id != entity.Id))
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10526))
+                .WithData("ProductCode", materialEntity.MaterialCode)
+                .WithData("ProcedureCode", procedureEntity.Code)
+                .WithData("Version", entity.Version);
+        }
+
+        // 状态为启用时，校验启用状态的 产品编码+工序编码 唯一性
+        if (entity.Status == SysDataStatusEnum.Enable && checkUniqueMaterialProcedureEntities.Any(a => a.ProcedureId == entity.ProcedureId
+        && a.Status == entity.Status
+        && a.Id != entity.Id))
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10524))
+                .WithData("WorkCenterCode", materialEntity.MaterialCode)
+                .WithData("ProcedureCode", procedureEntity.Code);
+        }
+    }
+
+    /// <summary>
+    /// 验证参数项目
+    /// </summary>
+    /// <param name="details"></param>
+    /// <returns></returns>
+    public static void CheckGroupDetails(IEnumerable<ProcProductParameterGroupDetailSaveDto> details)
+    {
+        // 判断规格上限和规格下限（数据类型为数值）
+        List<ValidationFailure> validationFailures = new();
+        foreach (var item in details)
+        {
+            // 如果参数类型为数值，则判断规格上限和规格下限
+            if (item.DataType != DataTypeEnum.Numeric) continue;
+            if (item.UpperLimit < item.LowerLimit)
+            {
+                validationFailures.Add(new ValidationFailure
+                {
+                    FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        { "CollectionIndex", item.Code },
+                        { "Code", item.Code }
+                    },
+                    ErrorCode = nameof(ErrorCode.MES10516)
+                });
+            }
+        }
+
+        // 是否存在错误
+        if (validationFailures.Any())
+        {
+            //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+            throw new ValidationException("", validationFailures);
+        }
+    }
+    #endregion
 
 }

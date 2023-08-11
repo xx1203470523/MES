@@ -212,6 +212,10 @@
         public const string MES10520 = "此编码{Code}版本{Version}已存在，请重新输入！";
         public const string MES10521 = "此编码{Code}已存在，请重新输入！";
         public const string MES10522 = "车间不能为空";
+        public const string MES10523 = "产品{ProductCode}+工序{ProcedureCode}启用状态的已存在，请重新输入！";
+        public const string MES10524 = "工作中心{WorkCenterCode}+工序{ProcedureCode}启用状态的已存在，请重新输入！";
+        public const string MES10525 = "工作中心{WorkCenterCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
+        public const string MES10526 = "产品{ProductCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         #endregion
 
         #region Bom 10600
