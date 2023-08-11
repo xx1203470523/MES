@@ -76,6 +76,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string EventTypeCode { get; set; }
 
         /// <summary>
+        /// 事件类型名称
+        /// </summary>
+        public string EventTypeName { get; set; } = "";
+
+        /// <summary>
         /// 状态;0、禁用 1、启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }

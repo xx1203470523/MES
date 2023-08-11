@@ -99,6 +99,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 清空事件的事件类型
+        /// </summary>
+        /// <param name="eventTypeId"></param>
+        /// <returns></returns>
+        public async Task<int> ClearEventTypeIdsAsync(long[] eventTypeIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(ClearEventTypeIdsSql, new { EventTypeIds = eventTypeIds });
+        }
+
+        /// <summary>
         /// 软删除
         /// </summary>
         /// <param name="id"></param>
@@ -245,6 +256,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string UpdatesSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateEventTypeIdSql = "UPDATE inte_event SET EventTypeId = @EventTypeId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id IN @Ids ";
         const string ClearEventTypeIdSql = "UPDATE inte_event SET EventTypeId = 0 WHERE EventTypeId = @EventTypeId ";
+        const string ClearEventTypeIdsSql = "UPDATE inte_event SET EventTypeId = 0 WHERE EventTypeId IN @EventTypeIds ";
 
         const string DeleteSql = "UPDATE inte_event SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE inte_event SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
