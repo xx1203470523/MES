@@ -161,7 +161,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public IEnumerable<PushTypeEnum> EnabledPushType { get; set; }
+        public IEnumerable<PushTypeEnum>? EnabledPushType { get; set; }
 
     }
 
