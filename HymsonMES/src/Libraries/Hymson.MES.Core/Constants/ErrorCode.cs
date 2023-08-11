@@ -1132,6 +1132,10 @@
         public const string MES21200 = "降级录入/移除错误";
         public const string MES21201 = "缺少降级编码参数";
         public const string MES21202 = "缺少产品序列码参数";
+        public const string MES21203 = "产品序列码【{sfc}】没有找到相关信息";
+        public const string MES21204 = "产品序列码【{sfc}】状态为报废";
+        public const string MES21205 = "产品序列码【{sfc}】状态为锁定";
+        public const string MES21206 = "不存在降级编码【{code}】的相关信息";
 
 
         #endregion
