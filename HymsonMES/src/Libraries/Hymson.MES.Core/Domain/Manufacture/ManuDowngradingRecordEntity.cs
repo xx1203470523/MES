@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -36,8 +37,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
        /// <summary>
         /// 是否取消;0 否 1是
         /// </summary>
-        public TrueOrFalseEnum? IsCancellation { get; set; }
+        public ManuDowngradingRecordTypeEnum? IsCancellation { get; set; }
 
-       
     }
 }

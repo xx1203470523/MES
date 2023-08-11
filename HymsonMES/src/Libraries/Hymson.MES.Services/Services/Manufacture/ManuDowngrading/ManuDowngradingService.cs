@@ -15,6 +15,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -172,7 +173,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     SFC=item,
                     Grade= manuDowngradingSaveDto.Grade,
-                    IsCancellation= TrueOrFalseEnum.No,
+                    IsCancellation= ManuDowngradingRecordTypeEnum.Entry,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
@@ -244,5 +245,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             var dtos = entitys.Select(s => s.ToModel<ManuDowngradingDto>());
             return dtos;
         }
+
     }
 }

@@ -73,6 +73,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         /// <summary>
         /// 分页查询
+        /// 不是模糊查询
         /// </summary>
         /// <param name="manuDowngradingRecordPagedQuery"></param>
         /// <returns></returns>
@@ -82,13 +83,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            if (!string.IsNullOrWhiteSpace(manuDowngradingRecordPagedQuery.SFC))
+            {
+                sqlBuilder.Where("SFC=@SFC");
+            }
+            if (!string.IsNullOrWhiteSpace(manuDowngradingRecordPagedQuery.Grade))
+            {
+                sqlBuilder.Where("Grade=@Grade");
+            }
+
             var offSet = (manuDowngradingRecordPagedQuery.PageIndex - 1) * manuDowngradingRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuDowngradingRecordPagedQuery.PageSize });

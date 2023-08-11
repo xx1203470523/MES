@@ -14,6 +14,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuDowngradingRecordPagedQuery : PagerInfo
     {
+        public long SiteId { get; set; }
 
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 品级
+        /// </summary>
+        public string? Grade { get; set; }
     }
 }

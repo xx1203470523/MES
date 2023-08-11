@@ -678,6 +678,8 @@ namespace Hymson.MES.Services.Mapper
 
             #region ManuDowngrading
             CreateMap<ManuDowngradingEntity, ManuDowngradingDto>();
+            CreateMap<ManuDowngradingRecordEntity, ManuDowngradingRecordDto>();
+            CreateMap<ManuDowngradingRecordPagedQueryDto, ManuDowngradingRecordPagedQuery>();
             #endregion
         }
 
