@@ -56,6 +56,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> ClearEventTypeIdAsync(long eventTypeId);
 
         /// <summary>
+        /// 清空事件的事件类型
+        /// </summary>
+        /// <param name="eventTypeId"></param>
+        /// <returns></returns>
+        Task<int> ClearEventTypeIdsAsync(long[] eventTypeIds);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>

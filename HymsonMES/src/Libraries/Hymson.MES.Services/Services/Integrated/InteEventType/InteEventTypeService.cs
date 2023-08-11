@@ -17,6 +17,8 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -468,12 +470,23 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _inteEventTypeRepository.DeletesAsync(new DeleteCommand
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
             {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                var rowArray = await Task.WhenAll(new List<Task<int>>()
+                {
+                    _inteEventRepository.ClearEventTypeIdsAsync(ids),
+                    _inteEventTypeRepository.DeletesAsync(new DeleteCommand
+                    {
+                        Ids = ids,
+                        DeleteOn = HymsonClock.Now(),
+                        UserId = _currentUser.UserName
+                    })
+                });
+                rows += rowArray.Sum();
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
