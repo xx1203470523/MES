@@ -180,6 +180,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFC=item,
                     Grade= manuDowngradingSaveDto.Grade,
                     IsCancellation= ManuDowngradingRecordTypeEnum.Entry,
+                    Remark= manuDowngradingSaveDto.Remark,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
@@ -372,6 +373,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFC = item,
                     Grade = "",
                     IsCancellation = ManuDowngradingRecordTypeEnum.Remove,
+                    Remark = manuDowngradingSaveRemoveDto.Remark,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,

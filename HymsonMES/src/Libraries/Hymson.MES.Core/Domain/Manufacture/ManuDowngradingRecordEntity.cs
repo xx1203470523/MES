@@ -39,5 +39,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public ManuDowngradingRecordTypeEnum? IsCancellation { get; set; }
 
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }

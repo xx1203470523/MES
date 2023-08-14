@@ -178,20 +178,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_downgrading_record` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted , @Remark)  ";
+        const string InsertsSql = "INSERT INTO `manu_downgrading_record`(  `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark) VALUES (   @Id, @SiteId, @SFC, @Grade, @IsCancellation, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark )  ";
 
-        const string UpdateSql = "UPDATE `manu_downgrading_record` SET   SiteId = @SiteId, SFC = @SFC, Grade = @Grade, IsCancellation = @IsCancellation, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_downgrading_record` SET   SiteId = @SiteId, SFC = @SFC, Grade = @Grade, IsCancellation = @IsCancellation, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_downgrading_record` SET   SiteId = @SiteId, SFC = @SFC, Grade = @Grade, IsCancellation = @IsCancellation, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark=@Remark  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_downgrading_record` SET   SiteId = @SiteId, SFC = @SFC, Grade = @Grade, IsCancellation = @IsCancellation, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted ,Remark=@Remark  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_downgrading_record` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_downgrading_record` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark
                             FROM `manu_downgrading_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `SFC`, `Grade`, `IsCancellation`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, Remark
                             FROM `manu_downgrading_record`  WHERE Id IN @Ids ";
         #endregion
     }
