@@ -510,7 +510,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="workShopId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId)
+        public async Task<IEnumerable<SelectOptionDto>> QueryByWorkShopIdAsync(long workShopId)
         {
             var inteEventTypeEntities = await _inteEventTypeRepository.GetByWorkShopIdSqlAsync(workShopId);
             return inteEventTypeEntities.Select(s => new SelectOptionDto

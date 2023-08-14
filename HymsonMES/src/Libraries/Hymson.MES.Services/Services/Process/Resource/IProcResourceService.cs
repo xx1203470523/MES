@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using System;
@@ -104,5 +105,13 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// <param name="idsAr"></param>
         /// <returns></returns>
         Task<int> DeleteProcResourceAsync(long[] idsAr);
+
+        /// <summary>
+        /// 查询资源绑定的设备
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> QueryEquipmentsByResourceIdAsync(long resourceId);
+
     }
 }

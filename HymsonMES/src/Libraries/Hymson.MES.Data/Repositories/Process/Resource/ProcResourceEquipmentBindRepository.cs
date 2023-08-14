@@ -8,12 +8,10 @@
 
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -74,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("IsMain=@IsMain");
             }
-            if (query.Ids.Length > 0)
+            if (query.Ids != null && query.Ids.Length > 0)
             {
                 sqlBuilder.Where("EquipmentId in @Ids");
             }

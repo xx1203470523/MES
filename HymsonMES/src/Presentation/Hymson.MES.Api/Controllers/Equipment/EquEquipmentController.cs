@@ -2,7 +2,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
@@ -138,7 +137,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [Route("token/{equEquipmentId}")]
         [PermissionDescription("equ:equipment:token")]
         [HttpGet]
-        public async Task<string> GetEquEquipmentTokenAsync(long EquEquipmentId) 
+        public async Task<string> GetEquEquipmentTokenAsync(long EquEquipmentId)
         {
             return await _equEquipmentService.GetEquEquipmentTokenAsync(EquEquipmentId);
         }

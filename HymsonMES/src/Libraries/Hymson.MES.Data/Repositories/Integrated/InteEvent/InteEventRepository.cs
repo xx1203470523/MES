@@ -206,6 +206,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.Status = @Status");
             }
 
+            if (pagedQuery.EventTypeId.HasValue)
+            {
+                sqlBuilder.Where("T.EventTypeId = @EventTypeId");
+            }
+
             if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";

@@ -16,11 +16,9 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Equipment;
-using Hymson.MES.Services.Options;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
 using Microsoft.Extensions.Options;
 using System.Data.SqlTypes;
 
@@ -95,7 +93,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             IEquEquipmentRepository equEquipmentRepository,
             IEquEquipmentLinkApiRepository equEquipmentLinkApiRepository,
             IEquEquipmentLinkHardwareRepository equEquipmentLinkHardwareRepository,
-            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules,IProcResourceRepository procResourceRepository)
+            IEquEquipmentTokenRepository equEquipmentTokenRepository, IOptions<JwtOptions> jwtOptions, IEquEquipmentVerifyRepository equEquipmentVerifyRepository, AbstractValidator<EquEquipmentVerifyCreateDto> verifyValidationRules, IProcResourceRepository procResourceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -345,7 +343,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equEquipmentRepository.GetPagedListAsync(pagedQuery);
-            
+
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentListDto>());
 
@@ -359,8 +357,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<IEnumerable<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync()
         {
             var dics = new List<EquEquipmentDictionaryDto> { };
-            //TODO SiteId
-            var list = await _equEquipmentRepository.GetBaseListAsync();
+            var list = await _equEquipmentRepository.GetBaseListAsync(new EntityBySiteIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
             var equipmentTypeDic = list.ToLookup(g => g.EquipmentType);
             foreach (var item in equipmentTypeDic)
             {
@@ -390,10 +391,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         {
             var equipmentDto = (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
 
-            if (equipmentDto != null) 
+            if (equipmentDto != null)
             {
                 //查询关联的资源
-                var resources= await _procResourceRepository.GetByEquipmentIdsAsync(new Data.Repositories.Process.Resource.ProcResourceByEquipmentIdsQuery()
+                var resources = await _procResourceRepository.GetByEquipmentIdsAsync(new Data.Repositories.Process.Resource.ProcResourceByEquipmentIdsQuery()
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     EquipmentIds = new long[] { equipmentDto.Id }
@@ -576,7 +577,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             return equEquipmentTokenEntity.Token;
         }
 
-
         /// <summary>
         /// 查找Token
         /// </summary>
@@ -601,7 +601,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             return token;
         }
 
-
         /// <summary>
         /// 根据设备ID查询对应的验证
         /// </summary>
@@ -609,9 +608,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equipmentId)
         {
-            var verifyEntitys= await _equEquipmentVerifyRepository.GetEquipmentVerifyByEquipmentIdAsync(equipmentId);
+            var verifyEntitys = await _equEquipmentVerifyRepository.GetEquipmentVerifyByEquipmentIdAsync(equipmentId);
 
-            var verifyDtos=new List<EquEquipmentVerifyDto>();
+            var verifyDtos = new List<EquEquipmentVerifyDto>();
             foreach (var item in verifyEntitys)
             {
                 verifyDtos.Add(item.ToModel<EquEquipmentVerifyDto>());

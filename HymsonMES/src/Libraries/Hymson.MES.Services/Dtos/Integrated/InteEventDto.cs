@@ -201,6 +201,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
+        /// 事件类型Id
+        /// </summary>
+        public long? EventTypeId { get; set; }
+
+        /// <summary>
         /// 事件类型名称
         /// </summary>
         public string? EventTypeName { get; set; }

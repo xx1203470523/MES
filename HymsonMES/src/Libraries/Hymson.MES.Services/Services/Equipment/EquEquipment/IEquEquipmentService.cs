@@ -110,5 +110,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="equipmentId"></param>
         /// <returns></returns>
         Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equipmentId);
+
+
     }
 }

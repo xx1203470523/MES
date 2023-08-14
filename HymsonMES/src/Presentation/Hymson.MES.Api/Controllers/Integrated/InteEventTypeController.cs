@@ -95,9 +95,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="workShopId"></param>
         /// <returns></returns>
         [HttpGet("optionsByShopId/{workShopId}")]
-        public async Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId)
+        public async Task<IEnumerable<SelectOptionDto>> QueryByWorkShopIdAsync(long workShopId)
         {
-            return await _inteEventTypeService.QueryEventTypesByWorkShopIdAsync(workShopId);
+            return await _inteEventTypeService.QueryByWorkShopIdAsync(workShopId);
         }
 
         /// <summary>
