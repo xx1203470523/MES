@@ -78,11 +78,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         Task<EquEquipmentEntity> GetByEquipmentCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
-        /// 
+        /// 查询所有设备
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentEntity>> GetBaseListAsync();
+        Task<IEnumerable<EquEquipmentEntity>> GetBaseListAsync(EntityBySiteIdQuery query);
 
         /// <summary>
         /// equipmentQuery

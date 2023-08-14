@@ -12,7 +12,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Process;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
@@ -82,9 +84,20 @@ namespace Hymson.MES.Services.Services.Process
         /// 作业表仓储
         /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
@@ -92,6 +105,10 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
 
+        /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
         /// 
@@ -104,6 +121,23 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="resourceRepository"></param>
+        /// <param name="resourceTypeRepository"></param>
+        /// <param name="resourceConfigPrintRepository"></param>
+        /// <param name="procResourceConfigResRepository"></param>
+        /// <param name="resourceEquipmentBindRepository"></param>
+        /// <param name="jobBusinessRelationRepository"></param>
+        /// <param name="inteJobRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procProductSetRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="localizationService"></param>
         public ProcResourceService(ICurrentUser currentUser, ICurrentSite currentSite,
                   IProcResourceRepository resourceRepository,
                   IProcResourceTypeRepository resourceTypeRepository,
@@ -116,6 +150,7 @@ namespace Hymson.MES.Services.Services.Process
                   IPlanWorkOrderRepository planWorkOrderRepository,
                   IProcMaterialRepository procMaterialRepository,
                   IProcProductSetRepository procProductSetRepository,
+                  IEquEquipmentRepository equEquipmentRepository,
                   AbstractValidator<ProcResourceCreateDto> validationCreateRules,
                   AbstractValidator<ProcResourceModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
@@ -132,6 +167,7 @@ namespace Hymson.MES.Services.Services.Process
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
             _procProductSetRepository = procProductSetRepository;
+            _equEquipmentRepository = equEquipmentRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
@@ -1653,5 +1689,35 @@ namespace Hymson.MES.Services.Services.Process
         //        ts.Complete();
         //    }
         //}
+
+
+
+        /// <summary>
+        /// 查询资源绑定的设备
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QueryEquipmentsByResourceIdAsync(long resourceId)
+        {
+            var resourceEquipmentBindEntities = await _resourceEquipmentBindRepository.GetByResourceIdAsync(new ProcResourceEquipmentBindQuery { ResourceId = resourceId });
+
+            List<SelectOptionDto> selectOptionDtos = new();
+            foreach (var item in resourceEquipmentBindEntities)
+            {
+                var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(item.EquipmentId);
+                if (equipmentEntity == null) continue;
+
+                selectOptionDtos.Add(new SelectOptionDto
+                {
+                    Key = $"{item.EquipmentId}",
+                    Label = $"{equipmentEntity.EquipmentName}",
+                    Value = $"{item.EquipmentId}"
+                });
+            }
+
+            return selectOptionDtos;
+        }
+
+
     }
 }

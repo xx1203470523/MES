@@ -175,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("a.Status = @Status");
             }
-            if (query.ResTypeId.HasValue&&query.ResTypeId>0)
+            if (query.ResTypeId.HasValue && query.ResTypeId > 0)
             {
                 //if (query.ResTypeId == 0)
                 //{
@@ -183,8 +183,14 @@ namespace Hymson.MES.Data.Repositories.Process
                 //}
                 //else
                 //{
-                    sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
+                sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
                 //}
+            }
+
+            // 这个是为了查询指定线体下的资源，大部分情况下这个 WorkCenterLineId 是不会有值的
+            if (query.WorkCenterLineId.HasValue)
+            {
+                sqlBuilder.Where("EXISTS (SELECT IWCRR.ResourceId FROM inte_work_center_resource_relation IWCRR WHERE IWCRR.IsDeleted = 0 AND IWCRR.WorkCenterId = @WorkCenterLineId AND IWCRR.ResourceId = a.Id)");
             }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;

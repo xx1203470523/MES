@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
@@ -17,7 +18,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-08
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceController : ControllerBase
@@ -196,5 +197,18 @@ namespace Hymson.MES.Api.Controllers
         {
             await _procResourceService.DeleteProcResourceAsync(deleteDto.Ids);
         }
+
+        /// <summary>
+        /// 查询资源绑定的设备
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        [HttpGet("equipments/{resourceId}")]
+        public async Task<IEnumerable<SelectOptionDto>> QueryEquipmentsByResourceIdAsync(long resourceId)
+        {
+            return await _procResourceService.QueryEquipmentsByResourceIdAsync(resourceId);
+        }
+
+
     }
 }

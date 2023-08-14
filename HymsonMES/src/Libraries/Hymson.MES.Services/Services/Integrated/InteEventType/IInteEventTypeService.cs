@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="workShopId"></param>
         /// <returns></returns>
-        Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId);
+        Task<IEnumerable<SelectOptionDto>> QueryByWorkShopIdAsync(long workShopId);
 
         /// <summary>
         /// 根据ID获取关联事件

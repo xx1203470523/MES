@@ -40,8 +40,16 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 站点id
         /// </summary>
         public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long? WorkCenterLineId { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcResourceQuery
     {
         /// <summary>
@@ -49,6 +57,9 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// </summary>
         public long SiteId { get; set; } = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long[] IdsArr { get; set; }
 
         /// <summary>
@@ -68,6 +79,9 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         public string EquipmentCode { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcResourceByEquipmentIdsQuery
     {
         /// <summary>
@@ -75,9 +89,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// </summary>
         public long SiteId { get; set; } = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long[] EquipmentIds { get; set; }
     }
-
 
     /// <summary>
     /// 资源维护表：根据工序查询资源列表
