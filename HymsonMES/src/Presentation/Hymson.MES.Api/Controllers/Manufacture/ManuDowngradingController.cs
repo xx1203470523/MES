@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,6 +69,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("saveManuDowngrading")]
+        [PermissionDescription("manu:downgrading:save")]
         public async Task SaveManuDowngradingAsync([FromBody] ManuDowngradingSaveDto manuDowngradingSaveDto)
         {
              await _manuDowngradingService.SaveManuDowngradingAsync(manuDowngradingSaveDto);
@@ -80,6 +82,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("saveManuDowngradingRemove")]
+        [PermissionDescription("manu:downgrading:saveRemove")]
         public async Task SaveManuDowngradingRemoveAsync([FromBody] ManuDowngradingSaveRemoveDto manuDowngradingSaveRemoveDto)
         {
             await _manuDowngradingService.SaveManuDowngradingRemoveAsync(manuDowngradingSaveRemoveDto);
