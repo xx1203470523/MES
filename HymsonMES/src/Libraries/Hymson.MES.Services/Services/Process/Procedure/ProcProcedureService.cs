@@ -512,7 +512,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress, IsolationLevel.ReadCommitted))
             {
                 //入库
                 await _procProcedureRepository.InsertAsync(procProcedureEntity);
