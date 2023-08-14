@@ -14,6 +14,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -55,7 +56,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
-        public ManuDowngradingService(ICurrentUser currentUser, ICurrentSite currentSite, IManuDowngradingRepository manuDowngradingRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuSfcRepository manuSfcRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuDowngradingRuleRepository manuDowngradingRuleRepository)
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        public ManuDowngradingService(ICurrentUser currentUser, ICurrentSite currentSite, IManuDowngradingRepository manuDowngradingRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuSfcRepository manuSfcRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuDowngradingRuleRepository manuDowngradingRuleRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -64,6 +67,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuDowngradingRuleRepository = manuDowngradingRuleRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -166,6 +170,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             List< ManuDowngradingEntity > updateEntities = new List< ManuDowngradingEntity >();
 
             List<ManuDowngradingRecordEntity> addRecordEntitys=new List<ManuDowngradingRecordEntity> ();
+            List<ManuSfcStepEntity> manuSfcStepList = new();
 
             foreach (var item in manuDowngradingSaveDto.Sfcs)
             {
@@ -185,12 +190,32 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 addRecordEntitys.Add(rocordEntity);
 
+                var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
+                var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
+                manuSfcStepList.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item,
+                    ProductId = sfcInfo?.ProductId ?? 0,
+                    WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
+                    ProductBOMId = sfcProduce?.ProductBOMId,
+                    WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
+                    Qty = sfcProduce?.Qty ?? 0,
+                    ProcedureId = sfcProduce?.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.EnterDowngrading,
+                    CurrentStatus = sfcProduce?.Status ?? 0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                });
+
+
                 //新增/更改 sfc对应的降级等级
                 var currentDowngrading = downgradings.FirstOrDefault(x => x.SFC == item);
                 if (currentDowngrading != null)
                 {
                     currentDowngrading.Grade = manuDowngradingSaveDto.Grade;
-                    currentDowngrading.Remark = manuDowngradingSaveDto.Remark;
+                    currentDowngrading.Remark = manuDowngradingSaveDto.Remark??"";
 
                     currentDowngrading.UpdatedOn = HymsonClock.Now();
                     currentDowngrading.UpdatedBy = _currentUser.UserName;
@@ -202,7 +227,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         SFC = item,
                         Grade = manuDowngradingSaveDto.Grade,
-                        Remark = manuDowngradingSaveDto.Remark,
+                        Remark = manuDowngradingSaveDto.Remark??"",
 
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -224,6 +249,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //保存记录 
                 if(addRecordEntitys.Any())
                     await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+
+                if (manuSfcStepList.Any()) 
+                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
 
                 ts.Complete();
             }
@@ -334,6 +362,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<long> delIds = new List<long>();
 
             List<ManuDowngradingRecordEntity> addRecordEntitys = new List<ManuDowngradingRecordEntity>();
+            List<ManuSfcStepEntity> manuSfcStepList = new();
 
             foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
             {
@@ -353,6 +382,25 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 addRecordEntitys.Add(rocordEntity);
 
+                var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
+                var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
+                manuSfcStepList.Add(new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId??0,
+                    SFC = item,
+                    ProductId = sfcInfo?.ProductId??0,
+                    WorkOrderId = sfcInfo?.WorkOrderId??0,
+                    ProductBOMId = sfcProduce?.ProductBOMId,
+                    WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
+                    Qty = sfcProduce?.Qty??0,
+                    ProcedureId = sfcProduce?.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.RemoveDowngrading,
+                    CurrentStatus = sfcProduce?.Status??0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName
+                });
+
                 //删除
                 var currentDowngrading = downgradings.FirstOrDefault(x => x.SFC == item);
                 if (currentDowngrading != null)
@@ -369,6 +417,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //保存记录 
                 if (addRecordEntitys.Any())
                     await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+
+                if (manuSfcStepList.Any())
+                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
 
                 ts.Complete();
             }

@@ -156,6 +156,17 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 解包
         /// </summary>
         [Description("解包")]
-        Unpack = 30
+        Unpack = 30,
+
+        /// <summary>
+        /// 录入等级
+        /// </summary>
+        [Description("录入等级")]
+        EnterDowngrading = 31,
+        /// <summary>
+        /// 移除降级
+        /// </summary>
+        [Description("移除降级")]
+        RemoveDowngrading = 32
     }
 }
