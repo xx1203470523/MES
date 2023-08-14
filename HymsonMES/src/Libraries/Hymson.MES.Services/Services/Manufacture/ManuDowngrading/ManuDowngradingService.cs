@@ -24,6 +24,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -244,6 +245,134 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var dtos = entitys.Select(s => s.ToModel<ManuDowngradingDto>());
             return dtos;
+        }
+
+
+        /// <summary>
+        /// 保存-降级移除
+        /// </summary>
+        /// <param name="manuDowngradingSaveRemoveDto"></param>
+        /// <returns></returns>
+        public async Task SaveManuDowngradingRemoveAsync(ManuDowngradingSaveRemoveDto manuDowngradingSaveRemoveDto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10101));
+            }
+
+            if (!manuDowngradingSaveRemoveDto.Sfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES21202));
+            }
+
+            #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
+
+            var noFindSfcs = new List<string>();
+            foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
+            {
+                if (!sfcList.Any(y => y.SFC == item))
+                {
+                    noFindSfcs.Add(item);
+                }
+            }
+
+            if (noFindSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES21203)).WithData("sfcs", string.Join(",", noFindSfcs));
+            }
+
+            //查询已经废弃的
+            var scrappingSfcs = new List<string>();
+            foreach (var item in sfcList)
+            {
+                if (item.Status == SfcStatusEnum.Scrapping)
+                {
+                    scrappingSfcs.Add(item.SFC);
+                }
+            }
+
+            if (scrappingSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES21204)).WithData("sfcs", string.Join(",", scrappingSfcs));
+            }
+
+            //查询sfc对应的过程
+            var sfcProduces = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = sfcList.Select(x => x.SFC).ToArray(),
+            });
+            //找到锁定状态的
+            var lockedSfcs = new List<string>();
+            foreach (var item in sfcProduces)
+            {
+                if (item.Status == SfcProduceStatusEnum.Locked)
+                {
+                    lockedSfcs.Add(item.SFC);
+                }
+            }
+            if (lockedSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES21205)).WithData("sfcs", string.Join(",", lockedSfcs));
+            }
+            #endregion
+
+            ////DTO转换实体
+            //var manuDowngradingEntity = manuDowngradingSaveDto.ToEntity<ManuDowngradingEntity>();
+            var downgradings = await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = manuDowngradingSaveRemoveDto.Sfcs
+            });
+
+            //校验当前降级是否有记录
+            var noDowngradingSfcs = manuDowngradingSaveRemoveDto.Sfcs.Where(x => downgradings.FirstOrDefault(y => y.SFC == x) == null);
+            if (noDowngradingSfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES21207)).WithData("sfc", string.Join(",", noDowngradingSfcs));
+
+            List<long> delIds = new List<long>();
+
+            List<ManuDowngradingRecordEntity> addRecordEntitys = new List<ManuDowngradingRecordEntity>();
+
+            foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
+            {
+                //记录
+                var rocordEntity = new ManuDowngradingRecordEntity()
+                {
+                    SFC = item,
+                    Grade = "",
+                    IsCancellation = ManuDowngradingRecordTypeEnum.Remove,
+
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now(),
+                };
+                addRecordEntitys.Add(rocordEntity);
+
+                //删除
+                var currentDowngrading = downgradings.FirstOrDefault(x => x.SFC == item);
+                if (currentDowngrading != null)
+                {
+                    delIds.Add(currentDowngrading.Id);
+                }
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                if (delIds.Any())
+                    await _manuDowngradingRepository.DeletesTrueByIdsAsync(delIds.ToArray());
+                
+                //保存记录 
+                if (addRecordEntitys.Any())
+                    await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+
+                ts.Complete();
+            }
+
         }
 
     }

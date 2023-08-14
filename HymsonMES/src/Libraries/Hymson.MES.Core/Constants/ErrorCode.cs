@@ -1136,6 +1136,7 @@
         public const string MES21204 = "产品序列码【{sfc}】状态为报废";
         public const string MES21205 = "产品序列码【{sfc}】状态为锁定";
         public const string MES21206 = "不存在降级编码【{code}】的相关信息";
+        public const string MES21207 = "产品序列码[{sfc}]没有录入降级编码，无法移除！";
 
 
         #endregion

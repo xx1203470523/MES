@@ -28,5 +28,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="sfcs"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuDowngradingDto>> GetManuDowngradingBySfcsAsync(string[] sfcs);
+
+        /// <summary>
+        /// 保存-降级移除
+        /// </summary>
+        /// <param name="manuDowngradingSaveRemoveDto"></param>
+        /// <returns></returns>
+        Task SaveManuDowngradingRemoveAsync(ManuDowngradingSaveRemoveDto manuDowngradingSaveRemoveDto);
     }
 }

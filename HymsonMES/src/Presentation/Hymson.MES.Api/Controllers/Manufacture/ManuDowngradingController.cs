@@ -73,5 +73,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
              await _manuDowngradingService.SaveManuDowngradingAsync(manuDowngradingSaveDto);
         }
 
+        /// <summary>
+        /// 保存:进行降级移除
+        /// </summary>
+        /// <param name="manuDowngradingSaveRemoveDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("saveManuDowngradingRemove")]
+        public async Task SaveManuDowngradingRemoveAsync([FromBody] ManuDowngradingSaveRemoveDto manuDowngradingSaveRemoveDto)
+        {
+            await _manuDowngradingService.SaveManuDowngradingRemoveAsync(manuDowngradingSaveRemoveDto);
+        }
     }
 }

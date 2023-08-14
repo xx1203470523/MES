@@ -95,5 +95,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuDowngradingEntity>> GetBySfcsAsync(ManuDowngradingBySfcsQuery query);
+
+        /// <summary>
+        /// 真实删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> DeletesTrueByIdsAsync(long[] ids);
     }
 }

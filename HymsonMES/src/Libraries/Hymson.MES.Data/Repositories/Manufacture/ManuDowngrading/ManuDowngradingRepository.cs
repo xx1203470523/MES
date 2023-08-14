@@ -172,6 +172,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.QueryAsync<ManuDowngradingEntity>(GetBySfcsSql, query);
         }
 
+        /// <summary>
+        /// 真实删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueByIdsAsync(long[] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesTrueByIdsSql, new { Ids=ids });
+        }
     }
 
     public partial class ManuDowngradingRepository
@@ -201,5 +211,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #endregion
 
         const string GetBySfcsSql = @"SELECT * FROM  `manu_downgrading` WHERE IsDeleted=0 AND SFC in @Sfcs AND SiteId=@SiteId ";
+        const string DeletesTrueByIdsSql = @"DELETE FROM `manu_downgrading` WHERE Id in @Ids ";
     }
 }
