@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES21202));
             }
 
-            #region 验证对应的降级编码是否存在
+            #region 验证录入对应的降级编码是否存在
             var manuDowngradingRule= await _manuDowngradingRuleRepository.GetByCodeAsync(new ManuDowngradingRuleCodeQuery 
             { 
                 Code=manuDowngradingSaveDto.Grade,
@@ -166,6 +166,41 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Sfcs= manuDowngradingSaveDto.Sfcs
             });
 
+            #region 校验 当前录入的等级不能高于之前等级 （按照等级编码的顺序，排序靠前等级越高）:表示 录入的等级的排序需要大于之前的等级的排序号
+            //获取全部降级规则
+            var allRuleList = await _manuDowngradingRuleRepository.GetManuDowngradingRuleEntitiesAsync(new ManuDowngradingRuleQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            allRuleList = allRuleList.OrderBy(x => x.SerialNumber);
+
+            //上面有该验证，这块就注释了
+            //var currentEntryGrade= allRuleList.FirstOrDefault(x => x.Code == manuDowngradingSaveDto.Grade);
+            //if (currentEntryGrade == null)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES21206)).WithData("code", manuDowngradingSaveDto.Grade);
+            //}
+
+            //查询sfc的降级等级是否大于当前需要修改的等级 （按照等级编码的顺序，排序靠前等级越高）
+            foreach (var item in downgradings)
+            {
+                var oldRule = allRuleList.FirstOrDefault(x => x.Code == item.Grade);
+                if (oldRule != null) 
+                {
+                    if (manuDowngradingRule.SerialNumber < oldRule.SerialNumber)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES21209)).WithData("sfc",item.SFC);
+                    }
+                }
+                else 
+                    throw new CustomerValidationException(nameof(ErrorCode.MES21208)).WithData("sfc", item.SFC);
+            }
+
+
+            #endregion
+
+
             List< ManuDowngradingEntity > addEntities = new List< ManuDowngradingEntity >();
             List< ManuDowngradingEntity > updateEntities = new List< ManuDowngradingEntity >();
 
@@ -191,6 +226,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 addRecordEntitys.Add(rocordEntity);
 
+                //条码步骤记录
                 var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
                 var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
                 manuSfcStepList.Add(new ManuSfcStepEntity
@@ -384,6 +420,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 addRecordEntitys.Add(rocordEntity);
 
+                //条码步骤记录
                 var sfcInfo = sfcList.FirstOrDefault(x => x.SFC == item);
                 var sfcProduce = sfcProduces.FirstOrDefault(x => x.SFC == item);
                 manuSfcStepList.Add(new ManuSfcStepEntity
