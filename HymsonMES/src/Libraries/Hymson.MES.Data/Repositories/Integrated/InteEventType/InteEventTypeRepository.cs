@@ -121,6 +121,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 查询事件类型
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteEventTypeEntity>> GetByWorkShopIdSqlAsync(long workShopId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteEventTypeEntity>(GetByWorkShopIdSql, new { WorkShopId = workShopId });
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
@@ -204,6 +215,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByCodeSql = "SELECT * FROM inte_event_type WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM inte_event_type WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_event_type WHERE Id IN @Ids ";
+        const string GetByWorkShopIdSql = @"SELECT * FROM inte_event_type WHERE IsDeleted = 0 AND WorkShopId = @WorkShopId ";
 
     }
 }

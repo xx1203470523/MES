@@ -23,13 +23,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleDetailEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcSortingRuleDetailEntity procSortingRuleDetailEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
         /// <param name="procSortingRuleDetailEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable <ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys);
+        Task<int> InsertsAsync(IEnumerable<ProcSortingRuleDetailEntity> procSortingRuleDetailEntitys);
 
         /// <summary>
         /// 更新
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleDetailEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcSortingRuleDetailEntity procSortingRuleDetailEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -50,7 +50,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> DeleteSortingRuleDetailByIdAsync(long id);
+        Task<int> DeleteSortingRuleDetailByIdAsync(long sortingRuleId);
+
+        /// <summary>
+        /// 根据分选规则id获取参数信息
+        /// </summary>
+        /// <param name="sortingRuleId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcSortingRuleDetailEntity>> GetSortingRuleDetailByIdAsync(long sortingRuleId);
 
         /// <summary>
         /// 删除  
@@ -59,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -73,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcSortingRuleDetailEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -87,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procSortingRuleDetailQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcSortingRuleDetailEntity>> GetProcSortingRuleDetailEntitiesAsync(ProcSortingRuleDetailQuery procSortingRuleDetailQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

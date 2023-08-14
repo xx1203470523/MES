@@ -167,7 +167,18 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> DeleteSortingRuleGradeByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteByDeleteSortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = id });
+            return await conn.ExecuteAsync(DeleteBySortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = id });
+        }
+
+        /// <summary>
+        /// 根据分选规则id获取档位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleGradeDetailsEntity>> GetSortingRuleGradeeDetailsByIdAsync(long sortingRuleId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcSortingRuleGradeDetailsEntity>(GetBySortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = sortingRuleId });
         }
         #endregion
     }
@@ -196,7 +207,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_grade_details`  WHERE Id IN @Ids ";
-        const string DeleteByDeleteSortingRuleGradeByIdAsyncIdSql = "DELETE FROM `proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
+        const string GetBySortingRuleGradeByIdAsyncIdSql = @"SELECT 
+                                          `Id`, `SiteId`, `SortingRuleGradeId`, `SortingRuleDetailId`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule_grade_details`   WHERE SortingRuleId = @SortingRuleId AND  IsDeleted=0";
+        const string DeleteBySortingRuleGradeByIdAsyncIdSql = "DELETE FROM `proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
 }

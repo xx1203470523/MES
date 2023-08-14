@@ -877,7 +877,7 @@
 
         #endregion
 
-        #region 面板维护 MES17201
+        #region 面板维护 MES17200
         public const string MES17201 = "面板类型不能为空";
         public const string MES17202 = "面板编码不能为空";
         public const string MES17203 = "面板名称不能为空";
@@ -898,7 +898,7 @@
         public const string MES17255 = "未读取到有效作业，请检查！";
         #endregion
 
-        #region 在制维修 MES17301
+        #region 在制维修 MES17300
         public const string MES17301 = "工序不能为空";
         public const string MES17302 = "资源不能为空";
         public const string MES17303 = "产品条码不能为空";
@@ -1070,11 +1070,6 @@
         public const string MES18622 = "载具待解盘条码不能为空！";
         #endregion
 
-        #region 单位维护 18800
-        public const string MES18800 = "单位编码不能含有空格";
-        public const string MES18801 = "单位名称不能为空";
-        #endregion
-
         #region Recipe参数 18700
         public const string MES18700 = "Recipe参数错误";
         public const string MES18701 = "对应Recipe参数不存在";
@@ -1091,7 +1086,7 @@
 
         public const string MES18712 = "Recipe参数Id不能为空";
         public const string MES18713 = "无法将其他状态修改成新建状态!";
-        public const string MES18714= "无法删除非新建状态数据";
+        public const string MES18714 = "无法删除非新建状态数据";
         public const string MES18715 = "Recipe参数版本不能为空";
         public const string MES18716 = "Recipe参数版本最大长度为100";
         public const string MES18717 = "Recipe参数版本不允许有空格";
@@ -1104,6 +1099,11 @@
         public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
 
         public const string MES18724 = "Recipe参数已存在同一的产品、工序、工艺组数据";
+        #endregion
+
+        #region 单位维护 18800
+        public const string MES18800 = "单位编码不能含有空格";
+        public const string MES18801 = "单位名称不能为空";
         #endregion
 
         #region 工艺设备组 18900

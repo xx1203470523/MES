@@ -162,12 +162,23 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 删除（物理删除）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="sortingRuleId"></param>
         /// <returns></returns>
-        public async Task<int> DeleteSortingRuleGradeByIdAsync(long id)
+        public async Task<int> DeleteSortingRuleGradeByIdAsync(long sortingRuleId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteByDeleteSortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = id });
+            return await conn.ExecuteAsync(DeleteBySortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = sortingRuleId });
+        }
+
+        /// <summary>
+        /// 根据分选规则id获取档位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleGradeEntity>> GetSortingRuleGradesByIdAsync(long sortingRuleId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcSortingRuleGradeEntity>(GetBySortingRuleGradeByIdAsyncIdSql, new { SortingRuleId = sortingRuleId });
         }
         #endregion
     }
@@ -196,7 +207,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_grade`  WHERE Id IN @Ids ";
-        const string DeleteByDeleteSortingRuleGradeByIdAsyncIdSql = "DELETE FROM`proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
+        const string GetBySortingRuleGradeByIdAsyncIdSql = @"SELECT 
+                                          `Id`, `SiteId`, `SortingRuleId`, `Grade`, `remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule_grade`  WHERE SortingRuleId = @SortingRuleId AND  IsDeleted=0";
+        const string DeleteBySortingRuleGradeByIdAsyncIdSql = "DELETE FROM`proc_sorting_rule_grade` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
 }

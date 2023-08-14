@@ -86,10 +86,27 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            if (!string.IsNullOrWhiteSpace(procSortingRulePagedQuery.Code))
+            {
+                procSortingRulePagedQuery.Code = $"%{procSortingRulePagedQuery.Code}%";
+                sqlBuilder.Where("Code like @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(procSortingRulePagedQuery.Name))
+            {
+                procSortingRulePagedQuery.Name = $"%{procSortingRulePagedQuery.Name}%";
+                sqlBuilder.Where("Name like @Name");
+            }
+
+            if (procSortingRulePagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
+
+            if (procSortingRulePagedQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("MaterialId = @MaterialId");
+            }
 
             var offSet = (procSortingRulePagedQuery.PageIndex - 1) * procSortingRulePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -196,10 +213,7 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByCodeAndMaterialIdSql, param);
         }
-
-
         #endregion
-
     }
 
     public partial class ProcSortingRuleRepository
@@ -231,7 +245,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_sorting_rule`  WHERE Code = @Code AND  Version=@Version AND SiteId=@SiteId AND  IsDeleted = 0";
         public string GetByCodeAndMaterialIdSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_sorting_rule`   WHERE Code = @Code AND  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
+                            FROM `proc_sorting_rule`   WHERE  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
         #endregion
     }
 }

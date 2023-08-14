@@ -20,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Process
     /// <summary>
     /// 分选规则详情仓储
     /// </summary>
-    public partial class ProcSortingRuleDetailRepository :BaseRepository, IProcSortingRuleDetailRepository
+    public partial class ProcSortingRuleDetailRepository : BaseRepository, IProcSortingRuleDetailRepository
     {
 
-        public ProcSortingRuleDetailRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ProcSortingRuleDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcSortingRuleDetailEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleDetailEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleDetailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcSortingRuleDetailEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcSortingRuleDetailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcSortingRuleDetailEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ProcSortingRuleDetailEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.Process
             //{
             //    sqlBuilder.Where("SiteCode=@SiteCode");
             //}
-           
+
             var offSet = (procSortingRuleDetailPagedQuery.PageIndex - 1) * procSortingRuleDetailPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procSortingRuleDetailPagedQuery.PageSize });
@@ -175,13 +175,23 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<int> DeleteSortingRuleDetailByIdAsync(long id)
+        public async Task<int> DeleteSortingRuleDetailByIdAsync(long sortingRuleId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteBySortingRuleDetailIdSql, new { SortingRuleId = id });
+            return await conn.ExecuteAsync(DeleteBySortingRuleDetailIdSql, new { SortingRuleId = sortingRuleId });
+        }
+
+        /// <summary>
+        /// 根据分选规则id获取参数信息
+        /// </summary>
+        /// <param name="sortingRuleId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleDetailEntity>> GetSortingRuleDetailByIdAsync(long sortingRuleId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcSortingRuleDetailEntity>(GetBySortingRuleIdSql, new { SortingRuleId = sortingRuleId });
         }
         #endregion
-
     }
 
     public partial class ProcSortingRuleDetailRepository
@@ -208,7 +218,9 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_detail`  WHERE Id IN @Ids ";
-
+        const string GetBySortingRuleIdSql = @"SELECT 
+                                          `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule_detail`  WHERE  SortingRuleId = @SortingRuleId  AND IsDeleted=0";
         const string DeleteBySortingRuleDetailIdSql = "DELETE FROM `proc_sorting_rule_detail` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }

@@ -22,9 +22,5 @@ namespace Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query
         /// </summary>
         public long MaterialId { get; set; }
 
-        /// <summary>
-        /// 编码
-        /// </summary>
-        public string  Code { get; set; }
     }
 }

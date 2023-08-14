@@ -7,11 +7,14 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Integrated;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
@@ -500,6 +503,22 @@ namespace Hymson.MES.Services.Services.Integrated
             if (inteEventTypeEntity == null) return null;
 
             return inteEventTypeEntity.ToModel<InteEventTypeDto>();
+        }
+
+        /// <summary>
+        /// 查询事件类型
+        /// </summary>
+        /// <param name="workShopId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId)
+        {
+            var inteEventTypeEntities = await _inteEventTypeRepository.GetByWorkShopIdSqlAsync(workShopId);
+            return inteEventTypeEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"{s.Name}",
+                Value = $"{s.Id}"
+            });
         }
 
         /// <summary>

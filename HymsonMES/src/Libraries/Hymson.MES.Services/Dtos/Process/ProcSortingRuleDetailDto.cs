@@ -170,8 +170,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
-
-       
     }
 
     /// <summary>
@@ -258,9 +256,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
-
-       
-
     }
 
     /// <summary>

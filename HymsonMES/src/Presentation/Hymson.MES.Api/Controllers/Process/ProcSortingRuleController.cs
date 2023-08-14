@@ -65,6 +65,28 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 获取分选规则参数信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/parameterDetai")]
+        public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailList(long id)
+        {
+            return await _procSortingRuleService.GetProcSortingRuleGradeRuleDetailsAsync(id);
+        }
+
+        /// <summary>
+        /// 获取档位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/grade")]
+        public async Task<IEnumerable<SortingRuleGradeDto>> GetProcSortingRuleGrades(long id)
+        {
+            return await _procSortingRuleService.GetProcSortingRuleGradesAsync(id);
+        }
+
+        /// <summary>
         /// 添加（分选规则）
         /// </summary>
         /// <param name="parm"></param>

@@ -22,8 +22,11 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Components;
 using Minio.DataModel;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Transactions;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -129,7 +132,7 @@ namespace Hymson.MES.Services.Services.Process
                     SiteId = _currentSite.SiteId ?? 0,
                     SortingRuleId = procSortingRuleEntity.Id,
                     Grade = item.Grade,
-                    remark = item.Remark,
+                    Remark = item.Remark,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -229,7 +232,13 @@ namespace Hymson.MES.Services.Services.Process
             await _validationModifyRules.ValidateAndThrowAsync(procSortingRuleModifyDto);
 
             //DTO转换实体
-            var procSortingRuleEntity = procSortingRuleModifyDto.ToEntity<ProcSortingRuleEntity>();
+            var procSortingRuleEntity = await _procSortingRuleRepository.GetByIdAsync(procSortingRuleModifyDto.Id);
+            if (procSortingRuleEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11309));
+            }
+            procSortingRuleEntity.Name = procSortingRuleModifyDto.Name;
+            procSortingRuleEntity.Remark = procSortingRuleModifyDto.Remark;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
 
@@ -268,7 +277,7 @@ namespace Hymson.MES.Services.Services.Process
                     SiteId = _currentSite.SiteId ?? 0,
                     SortingRuleId = procSortingRuleEntity.Id,
                     Grade = item.Grade,
-                    remark = item.Remark,
+                    Remark = item.Remark,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -326,7 +335,7 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 读取分选规则列表信息
+        ///获取分选规则参数信息
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -385,10 +394,83 @@ namespace Hymson.MES.Services.Services.Process
                         MaxContainingType = entity.MaxContainingType,
                         ParameterValue = entity.ParameterValue,
                         Rating = entity.Rating,
-                    }); ; ;
+                    });
                 }
             }
             return ruleDetailViewDtos;
+        }
+
+        /// <summary>
+        /// 获取参数信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetProcSortingRuleGradeRuleDetailsAsync(long id)
+        {
+            List<ProcSortingRuleDetailViewDto> list = new();
+            var sortingRuleDetailEntits = await _sortingRuleDetailRepository.GetSortingRuleDetailByIdAsync(id);
+            if (sortingRuleDetailEntits != null && sortingRuleDetailEntits.Any())
+            {
+                var procParameterEntities = await _procParameterRepository.GetByIdsAsync(sortingRuleDetailEntits.Select(x => x.ProcedureId).Distinct());
+                var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(sortingRuleDetailEntits.Select(x => x.ProcedureId).Distinct());
+                foreach (var entity in sortingRuleDetailEntits)
+                {
+                    var procParameter = procParameterEntities.FirstOrDefault(x => x.Id == entity.ParameterId);
+                    var procedureEntity = procProcedureEntities.FirstOrDefault(x => x.Id == entity.ProcedureId);
+                    list.Add(new ProcSortingRuleDetailViewDto()
+                    {
+                        Id = entity.Id,
+                        ProcedureId = entity.ProcedureId,
+                        Code = procedureEntity?.Code ?? "",
+                        ParameterId = entity.ParameterId,
+                        ParameterCode = procParameter?.ParameterCode ?? "",
+                        ParameterName = procParameter?.ParameterName ?? "",
+                        ParameterUnit = procParameter?.ParameterUnit,
+                        MinValue = entity.MinValue,
+                        MinContainingType = entity.MinContainingType,
+                        MaxValue = entity.MaxValue,
+                        MaxContainingType = entity.MaxContainingType,
+                        ParameterValue = entity.ParameterValue,
+                        Rating = entity.Rating,
+                    });
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 获取档位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SortingRuleGradeDto>> GetProcSortingRuleGradesAsync(long id)
+        {
+            List<SortingRuleGradeDto> list = new();
+            var sortingRuleDetailTask = _sortingRuleDetailRepository.GetSortingRuleDetailByIdAsync(id);
+            var sortingRuleGradesTask = _sortingRuleGradeRepository.GetSortingRuleGradesByIdAsync(id);
+            var sortingRuleGradeeDetailsTask = _ruleGradeDetailsRepository.GetSortingRuleGradeeDetailsByIdAsync(id);
+
+            var sortingRuleDetails = await sortingRuleDetailTask;
+
+            var sortingRuleGrades = await sortingRuleGradesTask;
+
+            var sortingRuleGradeeDetails = await sortingRuleGradeeDetailsTask;
+
+            if (sortingRuleDetails != null && sortingRuleDetails.Any())
+            {
+                foreach (var item in sortingRuleGrades)
+                {
+                    var gradeDetails = sortingRuleGradeeDetails.Where(x => x.SortingRuleGradeId == item.Id);
+                    list.Add(new SortingRuleGradeDto
+                    {
+                        Grade = item.Grade,
+                        Remark = item.Remark,
+                        Ratings = sortingRuleDetails.Where(o => gradeDetails.Select(x => x.SortingRuleDetailId).Contains(o.Id)).Select(k => k.Rating)
+                    });
+                }
+            }
+
+            return list;
         }
 
         /// <summary>
