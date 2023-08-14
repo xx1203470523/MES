@@ -144,15 +144,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 版本
-        /// </summary>
-        public string Version { get; set; }
-
-        /// <summary>
-        /// 物料id
-        /// </summary>
-        public long MaterialId { get; set; }
 
         /// <summary>
         /// 状态
@@ -183,17 +174,17 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 规则编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 规则名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 
     /// <summary>
@@ -247,8 +238,14 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class SortingRuleGradeDto
     {
+       /// <summary>
+       /// 等级
+       /// </summary>
         public IEnumerable<string> Ratings { get; set; }
 
+        /// <summary>
+        /// 档位
+        /// </summary>
         public string Grade { get; set; }
 
         /// <summary>

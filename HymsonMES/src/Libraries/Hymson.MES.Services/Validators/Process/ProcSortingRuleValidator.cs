@@ -6,6 +6,7 @@
  *build datetime: 2023-07-25 03:24:54
  */
 using FluentValidation;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query;
@@ -20,16 +21,20 @@ namespace Hymson.MES.Services.Validators.Process
     internal class ProcSortingRuleCreateValidator : AbstractValidator<ProcSortingRuleCreateDto>
     {
         private readonly IProcSortingRuleRepository _procSortingRuleRepository;
-        public ProcSortingRuleCreateValidator(IProcSortingRuleRepository procSortingRuleRepository)
+        private readonly ICurrentSite _currentSite;
+        private string code = "";
+        public ProcSortingRuleCreateValidator(IProcSortingRuleRepository procSortingRuleRepository, ICurrentSite currentSite)
         {
             _procSortingRuleRepository = procSortingRuleRepository;
+            _currentSite = currentSite;
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11301));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11302));
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11303));
             RuleFor(x => x.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11304));
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11305));
             RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamUpperAndLowerLimitValidator).WithErrorCode(nameof(ErrorCode.MES11306));
-            RuleFor(x => x).MustAsync(ManuSortingParamcodeRepeatValidatorasync).WithErrorCode(nameof(ErrorCode.MES11306));
+            RuleFor(x => x).MustAsync(ManuSortingyCodeAndVersionValidatorasync).WithErrorCode(nameof(ErrorCode.MES11307));
+            RuleFor(x => x).MustAsync(ManuSortingCodeAndMaterialIdValidatorasync).WithErrorCode(nameof(ErrorCode.MES11308));
         }
 
         /// <summary>
@@ -56,15 +61,29 @@ namespace Hymson.MES.Services.Validators.Process
         }
 
         /// <summary>
-        /// 数据
+        /// 编码和版本 唯一验证
         /// </summary>
         /// <param name="param"></param>
         /// <param name="">cancellationToken</param>
         /// <returns></returns>
-        private async Task<bool> ManuSortingParamcodeRepeatValidatorasync(ProcSortingRuleCreateDto param, CancellationToken cancellationtoken)
+        private async Task<bool> ManuSortingyCodeAndVersionValidatorasync(ProcSortingRuleCreateDto param, CancellationToken cancellationtoken)
         {
-          //  await _procSortingRuleRepository.GetByCodeAndVersion(new ProcSortingRuleByCodeAndVersionQuery { SiteId = });
-            return true;
+            var procSortingRuleEntity = await _procSortingRuleRepository.GetByCodeAndVersion(new ProcSortingRuleByCodeAndVersionQuery { SiteId = _currentSite.SiteId ?? 0, Code = param.Code, Version = param.Version });
+            code= procSortingRuleEntity.Code;
+            return !(procSortingRuleEntity==null);
+        }
+
+        /// <summary>
+        /// 编码和物物料唯一验证
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="">cancellationToken</param>
+        /// <returns></returns>
+        private async Task<bool> ManuSortingCodeAndMaterialIdValidatorasync(ProcSortingRuleCreateDto param, CancellationToken cancellationtoken)
+        {
+            var procSortingRuleEntity = await _procSortingRuleRepository.GetByCodeAndMaterialId(new ProcSortingRuleCodeAndMaterialIdQuery { SiteId = _currentSite.SiteId ?? 0, MaterialId= param.MaterialId });
+
+            return !(procSortingRuleEntity == null);
         }
     }
 
@@ -76,8 +95,6 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcSortingRuleModifyValidator()
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11302));
-            RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11303));
-            RuleFor(x => x.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11304));
             RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11305));
             RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamUpperAndLowerLimitValidator).WithErrorCode(nameof(ErrorCode.MES11306));
         }

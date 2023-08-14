@@ -64,6 +64,21 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListAsync(ProcSortingRuleDetailQueryDto queryDto);
 
+
+        /// <summary>
+        /// 获取参数信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetProcSortingRuleGradeRuleDetailsAsync(long id);
+
+        /// <summary>
+        /// 获取档位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SortingRuleGradeDto>> GetProcSortingRuleGradesAsync(long id);
+
         /// <summary>
         /// 根据物料读取分选规则列表信息
         /// </summary>

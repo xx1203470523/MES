@@ -91,9 +91,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 删除（物理删除）
         /// </summary>
+        /// <param name="sortingRuleId"></param>
+        /// <returns></returns>
+        Task<int> DeleteSortingRuleGradeByIdAsync(long sortingRuleId);
+
+        /// <summary>
+        /// 根据分选规则id获取档位信息
+        /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> DeleteSortingRuleGradeByIdAsync(long id);
+        Task<IEnumerable<ProcSortingRuleGradeEntity>> GetSortingRuleGradesByIdAsync(long sortingRuleId);
         #endregion
     }
 }
