@@ -76,6 +76,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<IEnumerable<InteEventTypeEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 查询事件类型
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteEventTypeEntity>> GetByWorkShopIdSqlAsync(long workShopId);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
