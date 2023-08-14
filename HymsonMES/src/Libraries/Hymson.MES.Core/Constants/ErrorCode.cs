@@ -611,7 +611,7 @@
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
-        public const string MES16022 = "数量 不能小于0！";
+        public const string MES16022 = "数量 必须大于0！";
         public const string MES16023 = "产品Bom 不能为空！";
         public const string MES16024 = "工艺路线 不能为空！";
         public const string MES16025 = "工作中心 不能为空！";
