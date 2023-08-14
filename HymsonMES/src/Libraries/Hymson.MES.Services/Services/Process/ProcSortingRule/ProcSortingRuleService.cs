@@ -387,7 +387,7 @@ namespace Hymson.MES.Services.Services.Process
                         ParameterId = entity.ParameterId,
                         ParameterCode = procParameter?.ParameterCode ?? "",
                         ParameterName = procParameter?.ParameterName ?? "",
-                        ParameterUnit = procParameter?.ParameterUnit,
+                        ParameterUnit = procParameter?.ParameterUnit ?? "",
                         MinValue = entity.MinValue,
                         MinContainingType = entity.MinContainingType,
                         MaxValue = entity.MaxValue,

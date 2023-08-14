@@ -46,12 +46,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 接收升级
         /// </summary>
-        public IEnumerable<InteEventTypeUpgradeDto> ReceiveUpgrades { get; set; }
+        public IEnumerable<InteEventTypeUpgradeDto>? ReceiveUpgrades { get; set; }
 
         /// <summary>
         /// 处理升级
         /// </summary>
-        public IEnumerable<InteEventTypeUpgradeDto> HandleUpgrades { get; set; }
+        public IEnumerable<InteEventTypeUpgradeDto>? HandleUpgrades { get; set; }
 
         /// <summary>
         /// 推送规则
@@ -161,7 +161,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public IEnumerable<PushTypeEnum> EnabledPushType { get; set; }
+        public IEnumerable<PushTypeEnum>? EnabledPushType { get; set; }
 
     }
 

@@ -368,9 +368,9 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     var procEquipmentGroupParamDetailDto = item.ToModel<ProcEquipmentGroupParamDetailDto>();
                     var paramEntity = paramEntitys.FirstOrDefault(x => x.Id == item.ParamId);
-                    procEquipmentGroupParamDetailDto.ParameterCode = paramEntity?.ParameterCode??"";
-                    procEquipmentGroupParamDetailDto.ParameterName = paramEntity?.ParameterName??"";
-                    procEquipmentGroupParamDetailDto.ParameterUnit = paramEntity?.ParameterUnit;
+                    procEquipmentGroupParamDetailDto.ParameterCode = paramEntity?.ParameterCode ?? "";
+                    procEquipmentGroupParamDetailDto.ParameterName = paramEntity?.ParameterName ?? "";
+                    procEquipmentGroupParamDetailDto.ParameterUnit = paramEntity?.ParameterUnit ?? "";
                     procEquipmentGroupParamDetailDto.DataType = paramEntity?.DataType;
 
                     procEquipmentGroupParamDetailDtos.Add(procEquipmentGroupParamDetailDto);

@@ -152,5 +152,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="processRouteId"></param>
         /// <returns></returns>
         Task<long> GetLastProcedureAsync(long processRouteId);
+
+        /// <summary>
+        /// 根据sfcs查询条码信息关联降级等级 
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetManuSfcAboutManuDowngradingBySfcsAsync(string[] sfcs);
     }
 }

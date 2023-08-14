@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -42,6 +43,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteEventTypeDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 查询事件类型
+        /// </summary>
+        /// <param name="workShopId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId);
 
         /// <summary>
         /// 根据ID获取关联事件

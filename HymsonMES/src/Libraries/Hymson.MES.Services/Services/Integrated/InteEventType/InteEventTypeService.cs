@@ -7,16 +7,21 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Integrated;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Diagnostics;
+using System.Diagnostics.Tracing;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -181,6 +186,7 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
 
             // 接收升级
+            saveDto.ReceiveUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.ReceiveUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -213,6 +219,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             // 处理升级
+            saveDto.HandleUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.HandleUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -339,6 +346,7 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
 
             // 接收升级
+            saveDto.ReceiveUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.ReceiveUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -371,6 +379,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             // 处理升级
+            saveDto.HandleUpgrades ??= new List<InteEventTypeUpgradeDto>();
             foreach (var item in saveDto.HandleUpgrades)
             {
                 var detailEntity = item.ToEntity<InteEventTypeUpgradeEntity>();
@@ -464,12 +473,23 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _inteEventTypeRepository.DeletesAsync(new DeleteCommand
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
             {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                var rowArray = await Task.WhenAll(new List<Task<int>>()
+                {
+                    _inteEventRepository.ClearEventTypeIdsAsync(ids),
+                    _inteEventTypeRepository.DeletesAsync(new DeleteCommand
+                    {
+                        Ids = ids,
+                        DeleteOn = HymsonClock.Now(),
+                        UserId = _currentUser.UserName
+                    })
+                });
+                rows += rowArray.Sum();
+                trans.Complete();
+            }
+            return rows;
         }
 
         /// <summary>
@@ -483,6 +503,22 @@ namespace Hymson.MES.Services.Services.Integrated
             if (inteEventTypeEntity == null) return null;
 
             return inteEventTypeEntity.ToModel<InteEventTypeDto>();
+        }
+
+        /// <summary>
+        /// 查询事件类型
+        /// </summary>
+        /// <param name="workShopId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId)
+        {
+            var inteEventTypeEntities = await _inteEventTypeRepository.GetByWorkShopIdSqlAsync(workShopId);
+            return inteEventTypeEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"{s.Name}",
+                Value = $"{s.Id}"
+            });
         }
 
         /// <summary>

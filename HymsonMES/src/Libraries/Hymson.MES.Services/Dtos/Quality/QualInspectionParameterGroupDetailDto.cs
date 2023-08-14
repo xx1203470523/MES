@@ -74,7 +74,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 描述 :参数单位（字典定义） 
         /// 空值 : false  
         /// </summary>
-        public ParameterUnitEnum Unit { get; set; }
+        public string Unit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 

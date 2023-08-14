@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
 using Hymson.Web.Framework.Attributes;
@@ -86,6 +87,17 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<InteEventTypeDto?> QueryByIdAsync(long id)
         {
             return await _inteEventTypeService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询事件类型
+        /// </summary>
+        /// <param name="workShopId"></param>
+        /// <returns></returns>
+        [HttpGet("optionsByShopId/{workShopId}")]
+        public async Task<IEnumerable<SelectOptionDto>> QueryEventTypesByWorkShopIdAsync(long workShopId)
+        {
+            return await _inteEventTypeService.QueryEventTypesByWorkShopIdAsync(workShopId);
         }
 
         /// <summary>

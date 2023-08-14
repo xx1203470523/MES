@@ -171,7 +171,11 @@ namespace Hymson.MES.Services.Services.Integrated
             if (dto == null) return dto;
 
             var inteEventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(dto.EventTypeId);
-            if (inteEventTypeEntity != null) dto.EventTypeCode = inteEventTypeEntity.Code;
+            if (inteEventTypeEntity != null)
+            {
+                dto.EventTypeCode = inteEventTypeEntity.Code;
+                dto.EventTypeName = inteEventTypeEntity.Name;
+            }
 
             return dto;
         }

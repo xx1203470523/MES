@@ -586,6 +586,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(RealDeletesSfcProduceBusinessSql, command);
         }
         #endregion
+
+        /// <summary>
+        /// 根据SFCs 获取数据
+        /// </summary>
+        /// <param name="sfcsQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetListBySfcsAsync(ManuSfcProduceBySfcsQuery sfcsQuery) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcProduceEntity>(GetListBySfcsSql, sfcsQuery);
+        }
     }
 
     /// <summary>
@@ -645,5 +656,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateRouteSql = "UPDATE `manu_sfc_produce` SET ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId,Status=@Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id in @Ids ";
         const string LockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET  BeforeLockedStatus=Status,Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
         const string UnLockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET Status = BeforeLockedStatus, BeforeLockedStatus=null,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
+
+        const string GetListBySfcsSql = @"SELECT * FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
     }
 }

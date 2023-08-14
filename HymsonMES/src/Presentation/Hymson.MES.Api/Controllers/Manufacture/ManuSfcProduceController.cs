@@ -243,5 +243,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcProduceService.GetLastProcedureAsync(processRouteId);
         }
+
+        /// <summary>
+        /// 根据条码获取条码相关联降级等级信息
+        /// </summary>
+        /// <param name="sfcs"></param>
+        /// <returns></returns>
+        [HttpPost("getSfcAboutManuDowngrading")]
+        public async Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetLastProcedureAsync(string[] sfcs)
+        {
+            return await _manuSfcProduceService.GetManuSfcAboutManuDowngradingBySfcsAsync(sfcs);
+        }
     }
 }

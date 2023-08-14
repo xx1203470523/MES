@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -99,6 +100,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualEnvParameterGroupEntity>> GetByWorkCenterProcedureListAsync(EntityByWorkCenterProcedureQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualEnvParameterGroupEntity>(GetByWorkCenterProcedureSql, query);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -180,7 +192,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.WorkCenterName = $"%{pagedQuery.WorkCenterName}%";
                 sqlBuilder.Where("IWC.Name LIKE @WorkCenterName");
             }
-         
+
             if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode) == false)
             {
                 pagedQuery.ProcedureCode = $"%{pagedQuery.ProcedureCode}%";
@@ -192,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 pagedQuery.ProcedureName = $"%{pagedQuery.ProcedureName}%";
                 sqlBuilder.Where("PP.Name LIKE @ProcedureName");
             }
-          
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -230,6 +242,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeletesSql = "UPDATE qual_env_parameter_group SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByCodeSql = "SELECT * FROM qual_env_parameter_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code AND Version = @Version LIMIT 1";
+        const string GetByWorkCenterProcedureSql = "SELECT * FROM qual_env_parameter_group WHERE IsDeleted = 0 AND SiteId = @SiteId AND WorkCenterId = @WorkCenterId AND ProcedureId = @ProcedureId";
         const string GetByIdSql = @"SELECT * FROM qual_env_parameter_group WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_env_parameter_group WHERE Id IN @Ids ";
 

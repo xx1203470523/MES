@@ -200,7 +200,7 @@
         public const string MES10509 = "参数编码不能为空";
         public const string MES10510 = "参数名称不能为空";
         public const string MES10511 = "标准参数代码最大长度为50";
-        public const string MES10512 = "参数单位不合法，请检查！";
+        public const string MES10512 = "参数单位最大长度为50";
         public const string MES10513 = "参数类型不合法，请检查！";
         public const string MES10514 = "参数ID不能为空";
         public const string MES10515 = "标准参数名称最大长度为50";
@@ -212,6 +212,10 @@
         public const string MES10520 = "此编码{Code}版本{Version}已存在，请重新输入！";
         public const string MES10521 = "此编码{Code}已存在，请重新输入！";
         public const string MES10522 = "车间不能为空";
+        public const string MES10523 = "产品{ProductCode}+工序{ProcedureCode}启用状态的已存在，请重新输入！";
+        public const string MES10524 = "工作中心{WorkCenterCode}+工序{ProcedureCode}启用状态的已存在，请重新输入！";
+        public const string MES10525 = "工作中心{WorkCenterCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
+        public const string MES10526 = "产品{ProductCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         #endregion
 
         #region Bom 10600
@@ -559,6 +563,8 @@
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         public const string MES15317 = "将来锁工序{lockproduction}不在条码所在工序之后";
         public const string MES15318 = "条码已经被锁定";
+
+        public const string MES15320 = "条码【{sfcs}】已不存在";
         #endregion
 
         #region 质量录入 15400
@@ -1120,6 +1126,18 @@
         public const string MES21108 = "降级规则编码不允许有空格";
         public const string MES21109 = "Id不合法";
         public const string MES21110 = "参数为空";
+        #endregion
+
+        #region 降级录入/移除 21200
+        public const string MES21200 = "降级录入/移除错误";
+        public const string MES21201 = "缺少降级编码参数";
+        public const string MES21202 = "缺少产品序列码参数";
+        public const string MES21203 = "产品序列码【{sfc}】没有找到相关信息";
+        public const string MES21204 = "产品序列码【{sfc}】状态为报废";
+        public const string MES21205 = "产品序列码【{sfc}】状态为锁定";
+        public const string MES21206 = "不存在降级编码【{code}】的相关信息";
+
+
         #endregion
 
         #region 设备对接错误

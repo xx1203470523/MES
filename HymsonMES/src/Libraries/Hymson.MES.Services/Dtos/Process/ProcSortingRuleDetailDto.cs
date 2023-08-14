@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :参数单位（字典定义） 
         /// 空值 : false  
         /// </summary>
-        public ParameterUnitEnum? ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
 
         /// <summary>
         /// 最小值
