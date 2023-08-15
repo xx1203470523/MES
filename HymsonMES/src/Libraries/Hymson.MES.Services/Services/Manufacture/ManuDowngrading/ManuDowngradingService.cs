@@ -85,12 +85,12 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (string.IsNullOrEmpty(manuDowngradingSaveDto.Grade)) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21201));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11401));
             }
 
             if (!manuDowngradingSaveDto.Sfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21202));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11402));
             }
 
             #region 验证录入对应的降级编码是否存在
@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
             if (manuDowngradingRule == null) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21206)).WithData("code", manuDowngradingSaveDto.Grade);
+                throw new CustomerValidationException(nameof(ErrorCode.MES11406)).WithData("code", manuDowngradingSaveDto.Grade);
             }
             #endregion
 
@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (noFindSfcs.Any()) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21203)).WithData("sfcs", string.Join(",", noFindSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11403)).WithData("sfc", string.Join(",", noFindSfcs));
             }
 
             //查询已经废弃的
@@ -134,7 +134,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (scrappingSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21204)).WithData("sfcs", string.Join(",", scrappingSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11404)).WithData("sfc", string.Join(",", scrappingSfcs));
             }
 
             //查询sfc对应的过程
@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             if (lockedSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21205)).WithData("sfcs", string.Join(",", lockedSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
             }
             #endregion
 
@@ -190,11 +190,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     if (manuDowngradingRule.SerialNumber < oldRule.SerialNumber)
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES21209)).WithData("sfc",item.SFC);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11409)).WithData("sfc",item.SFC);
                     }
                 }
-                else 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES21208)).WithData("sfc", item.SFC);
+                //else   //该验证 不需要了，海龙说： 如果移除了，重新录入，不用判断之前的信息，就当成第一次录入就好
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES11408)).WithData("sfc", item.SFC);
             }
 
 
@@ -328,7 +328,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (!manuDowngradingSaveRemoveDto.Sfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21202));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11402));
             }
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
@@ -345,7 +345,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (noFindSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21203)).WithData("sfcs", string.Join(",", noFindSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11403)).WithData("sfc", string.Join(",", noFindSfcs));
             }
 
             //查询已经废弃的
@@ -360,7 +360,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (scrappingSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21204)).WithData("sfcs", string.Join(",", scrappingSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11404)).WithData("sfc", string.Join(",", scrappingSfcs));
             }
 
             //查询sfc对应的过程
@@ -380,7 +380,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             if (lockedSfcs.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21205)).WithData("sfcs", string.Join(",", lockedSfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
             }
             #endregion
 
@@ -394,7 +394,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //校验当前降级是否有记录
             var noDowngradingSfcs = manuDowngradingSaveRemoveDto.Sfcs.Where(x => downgradings.FirstOrDefault(y => y.SFC == x) == null);
-            if (noDowngradingSfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES21207)).WithData("sfc", string.Join(",", noDowngradingSfcs));
+            if (noDowngradingSfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES11407)).WithData("sfc", string.Join(",", noDowngradingSfcs));
 
             List<long> delIds = new List<long>();
 

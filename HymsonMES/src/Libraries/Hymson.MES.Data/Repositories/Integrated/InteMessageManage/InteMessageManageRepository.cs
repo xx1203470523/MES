@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteMessageManageEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteMessageManageEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteMessageManageEntity>(GetByIdsSql, new { Ids = ids });
@@ -125,15 +125,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteMessageManageEntity>> GetPagedListAsync(InteMessageManagePagedQuery pagedQuery)
+        public async Task<PagedInfo<InteMessageManageView>> GetPagedListAsync(InteMessageManagePagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.LeftJoin("inte_event_type IET ON IET.Id = T.EventTypeId");
+            sqlBuilder.LeftJoin("proc_resource PR ON PR.Id = T.ResourceId");
+            sqlBuilder.Select("T.*");
+            sqlBuilder.Select("IET.Name AS EventTypeName, PR.ResName AS ResourceName");
+            sqlBuilder.OrderBy("T.UpdatedOn DESC");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -141,11 +144,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<InteMessageManageEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<InteMessageManageView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteMessageManageEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<InteMessageManageView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -156,11 +159,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteMessageManageRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_message_manage /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_message_manage /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM inte_message_manage /**where**/  ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_message_manage T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_message_manage T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_message_manage /**where**/  ";
 
         const string InsertSql = "INSERT INTO inte_message_manage(  `Id`, `Code`, `WorkShopId`, `LineId`, `ResourceId`, `EquipmentId`, `EventTypeId`, `EventDescription`, `Status`, `UrgencyLevel`, `DepartmentId`, `ResponsibleBy`, `ReasonAnalysis`, `HandleSolution`, `Remark`, `ReceiveDuration`, `HandleDuration`, `EvaluateOn`, `EvaluateBy`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @WorkShopId, @LineId, @ResourceId, @EquipmentId, @EventTypeId, @EventDescription, @Status, @UrgencyLevel, @DepartmentId, @ResponsibleBy, @ReasonAnalysis, @HandleSolution, @Remark, @ReceiveDuration, @HandleDuration, @EvaluateOn, @EvaluateBy, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO inte_message_manage(  `Id`, `Code`, `WorkShopId`, `LineId`, `ResourceId`, `EquipmentId`, `EventTypeId`, `EventDescription`, `Status`, `UrgencyLevel`, `DepartmentId`, `ResponsibleBy`, `ReasonAnalysis`, `HandleSolution`, `Remark`, `ReceiveDuration`, `HandleDuration`, `EvaluateOn`, `EvaluateBy`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @WorkShopId, @LineId, @ResourceId, @EquipmentId, @EventTypeId, @EventDescription, @Status, @UrgencyLevel, @DepartmentId, @ResponsibleBy, @ReasonAnalysis, @HandleSolution, @Remark, @ReceiveDuration, @HandleDuration, @EvaluateOn, @EvaluateBy, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";

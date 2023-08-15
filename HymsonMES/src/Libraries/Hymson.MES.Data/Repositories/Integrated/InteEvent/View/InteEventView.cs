@@ -1,7 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Data.Repositories.Integrated.InteEvent.View
+namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 

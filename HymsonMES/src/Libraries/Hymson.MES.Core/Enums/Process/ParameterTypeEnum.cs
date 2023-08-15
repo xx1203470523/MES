@@ -2,6 +2,7 @@
 
 namespace Hymson.MES.Core.Enums
 {
+    [Flags]
     public enum ParameterTypeEnum : sbyte
     {
         /// <summary>
@@ -25,6 +26,8 @@ namespace Hymson.MES.Core.Enums
         [Description("质量")]
         IQC = 8,
     }
+
+
 
     /// <summary>
     /// 参数类型展示枚举

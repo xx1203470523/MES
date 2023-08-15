@@ -2,13 +2,18 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.Sequences;
+using Hymson.Sequences.Enums;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -27,11 +32,20 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 当前站点
         /// </summary>
         private readonly ICurrentSite _currentSite;
+        /// <summary>
+        /// 生成序列码
+        /// </summary>
+        private readonly ISequenceService _sequenceService;
 
         /// <summary>
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<InteMessageManageSaveDto> _validationSaveRules;
+
+        /// <summary>
+        /// 仓储接口（工作中心）
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
         /// 仓储接口（消息管理）
@@ -54,18 +68,23 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="sequenceService"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="inteMessageManageRepository"></param>
         /// <param name="inteMessageManageAnalysisReportAttachmentRepository"></param>
         /// <param name="inteMessageManageHandleProgrammeAttachmentRepository"></param>
-        public InteMessageManageService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteMessageManageSaveDto> validationSaveRules,
+        public InteMessageManageService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+            AbstractValidator<InteMessageManageSaveDto> validationSaveRules,
+            IInteWorkCenterRepository inteWorkCenterRepository,
             IInteMessageManageRepository inteMessageManageRepository,
             IInteMessageManageAnalysisReportAttachmentRepository inteMessageManageAnalysisReportAttachmentRepository,
             IInteMessageManageHandleProgrammeAttachmentRepository inteMessageManageHandleProgrammeAttachmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _sequenceService = sequenceService;
             _validationSaveRules = validationSaveRules;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteMessageManageAnalysisReportAttachmentRepository = inteMessageManageAnalysisReportAttachmentRepository;
             _inteMessageManageHandleProgrammeAttachmentRepository = inteMessageManageHandleProgrammeAttachmentRepository;
@@ -80,7 +99,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> CreateAsync(InteMessageManageSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -110,7 +129,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> ModifyAsync(InteMessageManageSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -173,9 +192,36 @@ namespace Hymson.MES.Services.Services.Integrated
             var pagedInfo = await _inteMessageManageRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteMessageManageDto>());
+            List<InteMessageManageDto> dtos = new();
+            foreach (var item in pagedInfo.Data)
+            {
+                var dto = item.ToModel<InteMessageManageDto>();
+
+                var workShopEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.WorkShopId);
+                if (workShopEntity != null) dto.WorkShopName = workShopEntity.Name;
+
+                var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.LineId);
+                if (workLineEntity != null) dto.LineName = workLineEntity.Name;
+
+                dtos.Add(dto);
+            }
+
             return new PagedInfo<InteMessageManageDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+        /// <summary>
+        /// 获取消息编号
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetCodeAsync()
+        {
+            const string businessKey = "InteMessageManageCode";
+            var serialNumbers = await _sequenceService.GetSerialNumberAsync(SerialNumberTypeEnum.ByDay, businessKey, 0, 1);
+
+            var padNo = $"{serialNumbers}".PadLeft(4, '0');
+            return $"EVENT{DateTime.Now:yyyyMMdd}{padNo}";
+        }
+
 
     }
 }

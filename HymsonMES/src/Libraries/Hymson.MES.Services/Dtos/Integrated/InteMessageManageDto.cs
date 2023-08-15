@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -12,127 +13,96 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 消息单号
         /// </summary>
-        public long Code { get; set; }
+        public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 车间id
         /// </summary>
         public long WorkShopId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 线体id
         /// </summary>
         public long LineId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long? EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 事件类型id
         /// </summary>
         public long EventTypeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 事件描述
         /// </summary>
-        public string EventDescription { get; set; }
+        public string? EventDescription { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
         /// </summary>
-        public bool Status { get; set; }
+        public PushSceneEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 紧急程度;1、高2、中3、低
         /// </summary>
-        public bool UrgencyLevel { get; set; }
+        public DegreeEnum UrgencyLevel { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 责任部门
         /// </summary>
         public long? DepartmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 责任人
         /// </summary>
-        public string ResponsibleBy { get; set; }
+        public string? ResponsibleBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 原因分析
         /// </summary>
-        public string ReasonAnalysis { get; set; }
+        public string? ReasonAnalysis { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理方案
         /// </summary>
-        public string HandleSolution { get; set; }
+        public string? HandleSolution { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 接收时长
         /// </summary>
         public decimal? ReceiveDuration { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理时长
         /// </summary>
         public decimal? HandleDuration { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 评价时间
         /// </summary>
-        public string EvaluateOn { get; set; }
+        public string? EvaluateOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 评价人
         /// </summary>
-        public string EvaluateBy { get; set; }
+        public string? EvaluateBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime? CreatedOn { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
     }
 
     /// <summary>
@@ -145,127 +115,121 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 消息单号
         /// </summary>
-        public long Code { get; set; }
+        public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 车间id
         /// </summary>
         public long WorkShopId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 车间名称
+        /// </summary>
+        public string WorkShopName { get; set; }
+
+        /// <summary>
         /// 线体id
         /// </summary>
         public long LineId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 线体名称
+        /// </summary>
+        public string LineName { get; set; }
+
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long? EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 事件类型id
         /// </summary>
         public long EventTypeId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 事件类型名称
+        /// </summary>
+        public string EventTypeName { get; set; }
+
+        /// <summary>
         /// 事件描述
         /// </summary>
-        public string EventDescription { get; set; }
+        public string? EventDescription { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
         /// </summary>
-        public bool Status { get; set; }
+        public PushSceneEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 紧急程度;1、高2、中3、低
         /// </summary>
-        public bool UrgencyLevel { get; set; }
+        public DegreeEnum UrgencyLevel { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 责任部门
         /// </summary>
         public long? DepartmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 责任人
         /// </summary>
-        public string ResponsibleBy { get; set; }
+        public string? ResponsibleBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 原因分析
         /// </summary>
-        public string ReasonAnalysis { get; set; }
+        public string? ReasonAnalysis { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理方案
         /// </summary>
-        public string HandleSolution { get; set; }
+        public string? HandleSolution { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 接收时长
         /// </summary>
         public decimal? ReceiveDuration { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理时长
         /// </summary>
         public decimal? HandleDuration { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 评价时间
         /// </summary>
-        public string EvaluateOn { get; set; }
+        public string? EvaluateOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 评价人
         /// </summary>
-        public string EvaluateBy { get; set; }
+        public string? EvaluateBy { get; set; }
 
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime? CreatedOn { get; set; }
-
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-       /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       
     }
 
     /// <summary>

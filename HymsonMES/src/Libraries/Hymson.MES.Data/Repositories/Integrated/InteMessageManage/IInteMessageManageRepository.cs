@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteMessageManageEntity>> GetPagedListAsync(InteMessageManagePagedQuery pagedQuery);
+        Task<PagedInfo<InteMessageManageView>> GetPagedListAsync(InteMessageManagePagedQuery pagedQuery);
 
     }
 }

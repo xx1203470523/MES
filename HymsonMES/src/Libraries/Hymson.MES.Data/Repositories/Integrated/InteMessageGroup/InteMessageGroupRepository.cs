@@ -5,7 +5,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
-using Hymson.MES.Data.Repositories.Integrated.View;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 

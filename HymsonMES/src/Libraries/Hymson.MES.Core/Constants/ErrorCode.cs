@@ -287,6 +287,7 @@
 
         #region 异常消息 10900
         public const string MES10901 = "事件类型不能为空";
+        public const string MES10902 = "编码生成失败";
         #endregion
 
         #region 降级规则 11000
@@ -342,6 +343,20 @@
         public const string MES11307 = "当前编码和版本已存在";
         public const string MES11308 = "当前物料已存在的分选规则编码与当前编码不一致";
         public const string MES11309 = "分选规则不存在";
+        #endregion
+
+        #region 降级录入/移除 11400
+        public const string MES11400 = "降级录入/移除错误";
+        public const string MES11401 = "缺少降级编码参数";
+        public const string MES11402 = "缺少产品序列码参数";
+        public const string MES11403 = "产品序列码【{sfc}】没有找到相关信息";
+        public const string MES11404 = "产品序列码【{sfc}】状态为报废";
+        public const string MES11405 = "产品序列码【{sfc}】状态为锁定";
+        public const string MES11406 = "不存在降级编码【{code}】的相关信息";
+        public const string MES11407 = "产品序列码[{sfc}]没有录入降级编码，无法移除！";
+        public const string MES11408 = "产品序列码【{sfc}】的降级规则不存在";
+        public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
+
         #endregion
 
         #region 作业12000
@@ -1126,23 +1141,6 @@
         public const string MES18902 = "工艺设备组名称不能为空";
         public const string MES18903 = "请求实体不能为空！";
         public const string MES18904 = "工序与设备组对应关系不唯一";
-        #endregion
-
-        
-
-        #region 降级录入/移除 21200
-        public const string MES21200 = "降级录入/移除错误";
-        public const string MES21201 = "缺少降级编码参数";
-        public const string MES21202 = "缺少产品序列码参数";
-        public const string MES21203 = "产品序列码【{sfc}】没有找到相关信息";
-        public const string MES21204 = "产品序列码【{sfc}】状态为报废";
-        public const string MES21205 = "产品序列码【{sfc}】状态为锁定";
-        public const string MES21206 = "不存在降级编码【{code}】的相关信息";
-        public const string MES21207 = "产品序列码[{sfc}]没有录入降级编码，无法移除！";
-        public const string MES21208 = "产品序列码【{sfc}】的降级规则不存在";
-        public const string MES21209 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
-
-
         #endregion
 
         #region 设备对接错误
