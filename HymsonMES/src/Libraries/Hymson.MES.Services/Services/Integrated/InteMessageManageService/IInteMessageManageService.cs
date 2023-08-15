@@ -50,5 +50,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         Task<PagedInfo<InteMessageManageDto>> GetPagedListAsync(InteMessageManagePagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 获取消息编号
+        /// </summary>
+        /// <returns></returns>
+        Task<string> GetCodeAsync();
+
     }
 }

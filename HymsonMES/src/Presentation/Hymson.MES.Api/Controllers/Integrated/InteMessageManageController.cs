@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,9 +45,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("integrated:inteMessageManage:insert")]
         public async Task AddAsync([FromBody] InteMessageManageSaveDto saveDto)
         {
-             await _inteMessageManageService.CreateAsync(saveDto);
+            await _inteMessageManageService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -56,9 +58,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("integrated:inteMessageManage:update")]
         public async Task UpdateAsync([FromBody] InteMessageManageSaveDto saveDto)
         {
-             await _inteMessageManageService.ModifyAsync(saveDto);
+            await _inteMessageManageService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [PermissionDescription("integrated:inteMessageManage:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _inteMessageManageService.DeletesAsync(ids);
@@ -94,6 +98,16 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task<PagedInfo<InteMessageManageDto>> QueryPagedListAsync([FromQuery] InteMessageManagePagedQueryDto pagedQueryDto)
         {
             return await _inteMessageManageService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 获取消息编号
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getCode")]
+        public async Task<string> GetCodeAsync()
+        {
+            return await _inteMessageManageService.GetCodeAsync();
         }
 
     }
