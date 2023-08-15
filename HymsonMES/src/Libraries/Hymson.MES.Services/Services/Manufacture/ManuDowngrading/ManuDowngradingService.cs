@@ -193,8 +193,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES11409)).WithData("sfc",item.SFC);
                     }
                 }
-                else 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES11408)).WithData("sfc", item.SFC);
+                //else   //该验证 不需要了，海龙说： 如果移除了，重新录入，不用判断之前的信息，就当成第一次录入就好
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES11408)).WithData("sfc", item.SFC);
             }
 
 
