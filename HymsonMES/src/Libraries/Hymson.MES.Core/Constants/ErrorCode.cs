@@ -943,7 +943,7 @@
         public const string MES18300 = "系统编码{code}已经存在";
         #endregion
 
-        #region 设备对接错误
+        #region 设备对接错误 MES19101
 
         #region 设备对接公用
         public const string MES19001 = "设备编码不能为空";
@@ -1001,10 +1001,12 @@
         public const string MES19142 = "条码：{SFC}没找到关联CCS码绑定关系";
         public const string MES19143 = "条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系";
 
-
-
         #endregion
 
+        #region 系统对接 MES19201
+        public const string MES19201 = "同步工单时工单号OrderCode不能为空";
+        public const string MES19202 = "同步工单：{OrderCode}已经存在";
+        #endregion
 
         #region 设备对接错误
         public const string MES19910 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";

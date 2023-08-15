@@ -142,6 +142,13 @@ namespace Hymson.MES.Services.Services.Report
             {
                 procProcedures = await _procProcedureRepository.GetByIdsAsync(procProcedureIds);
             }
+            //设备信息
+            IEnumerable<EquEquipmentEntity> equEquipments = new List<EquEquipmentEntity>();
+            var equEquipmentIds = pagedInfo.Data.Select(c => c.EquipmentId ?? -1).ToArray();
+            if (equEquipmentIds.Any())
+            {
+                equEquipments = await _equipmentRepository.GetByIdsAsync(equEquipmentIds);
+            }
             var dtos = pagedInfo.Data.Select(s =>
             {
                 var returnView = s.ToModel<ManuSfcCirculationViewDto>();
@@ -171,6 +178,13 @@ namespace Hymson.MES.Services.Services.Report
                 {
                     returnView.ProcedureCode = procProcedure.Code;
                     returnView.ProcedureName = procProcedure.Name;
+                }
+                //设备信息
+                var equEquipment = equEquipments.Where(c => c.Id == s.EquipmentId).FirstOrDefault();
+                if (equEquipment != null)
+                {
+                    returnView.EquipentCode = equEquipment.EquipmentCode;
+                    returnView.EquipentName = equEquipment.EquipmentName;
                 }
                 return returnView;
             });
