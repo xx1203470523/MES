@@ -4,7 +4,6 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Integrated.InteEventType.View;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 

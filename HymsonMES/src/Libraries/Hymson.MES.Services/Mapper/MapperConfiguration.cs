@@ -19,12 +19,9 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
-using Hymson.MES.Data.Repositories.Integrated.InteEvent.View;
-using Hymson.MES.Data.Repositories.Integrated.InteEventType.View;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
-using Hymson.MES.Data.Repositories.Integrated.View;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -310,6 +307,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteEventTypeUpgradeEntity, InteEventTypeUpgradeDto>();
             CreateMap<InteEventTypeMessageGroupRelationEntity, MessageGroupBo>();
             CreateMap<InteEventTypeUpgradeMessageGroupRelationEntity, MessageGroupBo>();
+            #endregion
+
+            #region InteMessageManage
+            CreateMap<InteMessageManageSaveDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManagePagedQueryDto, InteMessageManagePagedQuery>();
+            CreateMap<InteMessageManageEntity, InteMessageManageDto>();
+            CreateMap<InteMessageManageView, InteMessageManageDto>();
             #endregion
         }
 

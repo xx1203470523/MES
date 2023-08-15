@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> CreateAsync(InteMessageManageSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> ModifyAsync(InteMessageManageSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -183,7 +183,15 @@ namespace Hymson.MES.Services.Services.Integrated
             var pagedInfo = await _inteMessageManageRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteMessageManageDto>());
+            List<InteMessageManageDto> dtos = new();
+            foreach (var item in pagedInfo.Data)
+            {
+                var dto = item.ToModel<InteMessageManageDto>();
+
+                dto.WorkShopName = "";
+                dtos.Add(dto);
+            }
+
             return new PagedInfo<InteMessageManageDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
