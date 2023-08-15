@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -125,7 +126,7 @@ namespace Hymson.MES.Services.Services.Process
 
             links.RemoveAll(w => adds.Any(e => e.ParameterID == w.ParameterID) == true);
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 var response = 0;
                 if (adds.Count > 0)

@@ -18,6 +18,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -294,7 +295,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             }
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //先删除对应资源和工单ids的工单
                 if (needDeletes.Count() > 0) 

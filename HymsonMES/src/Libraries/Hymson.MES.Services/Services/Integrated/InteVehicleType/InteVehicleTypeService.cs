@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             #endregion
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
                 await _inteVehicleTypeRepository.InsertAsync(inteVehicleTypeEntity);

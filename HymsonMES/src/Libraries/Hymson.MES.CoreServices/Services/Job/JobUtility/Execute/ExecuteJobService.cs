@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
+using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using System.Transactions;
 
@@ -73,7 +74,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 
             // 执行入库
             var responseDtos = new Dictionary<string, JobResponseBo>();
-            using var trans = new TransactionScope();
+            using var trans = TransactionHelper.GetTransactionScope();
 
             try
             {

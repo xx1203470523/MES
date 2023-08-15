@@ -22,6 +22,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Security.Policy;
 using System.Transactions;
 
@@ -164,7 +165,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 }
             }
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 int response = 0;
                 //入库
@@ -333,7 +334,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 }
             }
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 int response = 0;
                 response = await _inteCodeRulesRepository.UpdateAsync(inteCodeRulesEntity);

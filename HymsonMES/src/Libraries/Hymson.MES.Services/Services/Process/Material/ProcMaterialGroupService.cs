@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -99,7 +100,7 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             #region 保存到数据库
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 var response = 0;
 
@@ -158,7 +159,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             #region 保存到数据库
-            using (var trans = new TransactionScope())
+            using (var trans = TransactionHelper.GetTransactionScope())
             {
                 var rows = 0;
                 rows = await _procMaterialGroupRepository.UpdateAsync(entity);

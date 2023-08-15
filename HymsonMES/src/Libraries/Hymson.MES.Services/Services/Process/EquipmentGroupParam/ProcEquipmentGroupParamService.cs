@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -132,7 +133,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //入库
                 await _procEquipmentGroupParamRepository.InsertAsync(procEquipmentGroupParamEntity);
@@ -306,7 +307,7 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 await _procEquipmentGroupParamRepository.UpdateAsync(procEquipmentGroupParamEntity);
 

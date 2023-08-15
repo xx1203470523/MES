@@ -24,6 +24,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -254,7 +255,7 @@ namespace Hymson.MES.Services.Services.Plan
             //取消激活
             if (!activationWorkOrderDto.IsNeedActivation)
             {
-                using (TransactionScope ts = new TransactionScope())
+                using (TransactionScope ts = TransactionHelper.GetTransactionScope())
                 {
                     await _planWorkOrderActivationRepository.DeleteTrueAsync(workOrderActivation!.Id);//真删除
 
@@ -333,7 +334,7 @@ namespace Hymson.MES.Services.Services.Plan
             record.SiteId = _currentSite.SiteId ?? 0;
             record.IsDeleted = 0;
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 switch (workOrder.Status)
                 {

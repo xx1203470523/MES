@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -215,7 +216,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             #region 操作数据库
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 int response = 0;
                 if (procBomEntity.IsCurrentVersion)
@@ -486,7 +487,7 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 操作数据库
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 int response = 0;
                 if (procBomEntity.IsCurrentVersion)

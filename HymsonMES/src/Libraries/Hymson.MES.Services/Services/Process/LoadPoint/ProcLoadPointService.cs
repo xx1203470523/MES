@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Minio.DataModel;
 using System.Transactions;
 
@@ -205,7 +206,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            using TransactionScope trans = new TransactionScope();
+            using TransactionScope trans = TransactionHelper.GetTransactionScope();
             int response = 0;
             // 入库
             response = await _procLoadPointRepository.InsertAsync(procLoadPointEntity);
@@ -371,7 +372,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 int response = 0;
                 //入库
@@ -439,7 +440,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             int response = 0;
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
 
                 response = await _procLoadPointRepository.DeletesAsync(new DeleteCommand { Ids = idsArr, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });

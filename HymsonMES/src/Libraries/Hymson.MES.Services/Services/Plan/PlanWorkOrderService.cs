@@ -325,7 +325,7 @@ namespace Hymson.MES.Services.Services.Plan
                 planWorkOrderStatusRecordEntities.Add(record);
             }
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderStatusAsync(planWorkOrderEntities);
                 if (response != planWorkOrderEntities.Count)
@@ -453,7 +453,7 @@ namespace Hymson.MES.Services.Services.Plan
                 planWorkOrderStatusRecordEntities.Add(record);
             }
 
-            using (TransactionScope ts = new TransactionScope())
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 var response = await _planWorkOrderRepository.ModifyWorkOrderLockedAsync(updateLockedCommands);
 
