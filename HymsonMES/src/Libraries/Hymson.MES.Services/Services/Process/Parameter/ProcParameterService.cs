@@ -215,7 +215,8 @@ namespace Hymson.MES.Services.Services.Process
                     ParameterID = dto.Id
                 });
                 //dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
-                dto.Type = (ParameterTypeEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).Sum();
+                //dto.Type = (ParameterTypeEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).Sum();
+                dto.Type = linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToArray();
 
                 return dto;
             }

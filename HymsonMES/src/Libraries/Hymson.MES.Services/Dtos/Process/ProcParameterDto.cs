@@ -58,7 +58,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型   1 设备  2 产品  3 设备+产品  4 环境  等等
         /// </summary>
-        public ParameterTypeEnum Type { get; set; }
+        public ParameterTypeEnum[] Type { get; set; }
     }
 
 
