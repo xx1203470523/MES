@@ -130,7 +130,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.LeftJoin("inte_event_type IET ON IET.Id = T.EventTypeId");
+            sqlBuilder.LeftJoin("proc_resource PR ON PR.Id = T.ResourceId");
             sqlBuilder.Select("T.*");
+            sqlBuilder.Select("IET.Name AS EventTypeName, PR.ResName AS ResourceName");
             sqlBuilder.OrderBy("T.UpdatedOn DESC");
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
