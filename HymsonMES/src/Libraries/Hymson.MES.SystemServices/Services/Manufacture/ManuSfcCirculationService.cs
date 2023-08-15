@@ -1,4 +1,6 @@
-﻿using Hymson.Infrastructure.Mapper;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -121,6 +123,8 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
         /// <returns></returns>
         public async Task<ManuSfcCirculationDto> GetRelationShipByPackAsync(string sfc)
         {
+            if (string.IsNullOrEmpty(sfc)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
+            //追溯条码信息
             var manuSfcCirculationViews = await GetProductTraceListAsync(sfc);
             //递归处理层级数据
             int level = 1;

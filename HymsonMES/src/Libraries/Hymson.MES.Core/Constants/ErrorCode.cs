@@ -1006,6 +1006,7 @@
         #region 系统对接 MES19201
         public const string MES19201 = "同步工单时工单号OrderCode不能为空";
         public const string MES19202 = "同步工单：{OrderCode}已经存在";
+        public const string MES19203 = "SFC不能为空";
         #endregion
 
         #region 设备对接错误
