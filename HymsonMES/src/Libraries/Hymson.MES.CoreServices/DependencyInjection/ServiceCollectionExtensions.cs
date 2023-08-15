@@ -30,6 +30,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddCoreService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddMessagePushService(configuration);  
             AddServices(services);
             AddValidators(services);
             AddConfig(services, configuration);

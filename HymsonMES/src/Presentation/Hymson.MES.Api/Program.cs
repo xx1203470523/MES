@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
+using static K4os.Compression.LZ4.Engine.Pubternal;
 
 namespace Hymson.MES.Api
 {
@@ -52,6 +53,7 @@ namespace Hymson.MES.Api
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddHttpClientService(builder.Configuration);
+            builder.Services.AddEventBusRabbitMQService(builder.Configuration);
             builder.Services.AddLocalization();
             builder.Services.AddHealthChecks();
 

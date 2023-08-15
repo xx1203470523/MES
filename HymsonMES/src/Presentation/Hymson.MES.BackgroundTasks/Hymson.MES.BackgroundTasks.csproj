@@ -48,6 +48,8 @@
   </ItemGroup>
 	<ItemGroup>
 		
+		<PackageReference Include="Hymson.EventBus.RabbitMQ" Version="2.1.73" />
+		
 		<PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.73" />
 		
 		<PackageReference Include="Hymson.NLog.Console" Version="2.1.73" />
