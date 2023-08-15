@@ -19,12 +19,12 @@ namespace Hymson.MES.Services.Validators.Manufacture
         public ManuDowngradingRuleCreateValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
-            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES21103));
-            RuleFor(x => x.Code).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES21108));
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES21104));
-            RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES21105));
-            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES21106));
-            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES21107));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11003));
+            RuleFor(x => x.Code).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES11008));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11004));
+            RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES11005));
+            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES11006));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11007));
         }
     }
 
@@ -36,13 +36,13 @@ namespace Hymson.MES.Services.Validators.Manufacture
         public ManuDowngradingRuleModifyValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
-            RuleFor(x => x.Id).Must(x => x > 0).WithErrorCode(nameof(ErrorCode.MES21109));
+            RuleFor(x => x.Id).Must(x => x > 0).WithErrorCode(nameof(ErrorCode.MES11009));
             //RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES21103));
             //RuleFor(x => x.Code).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES21108));
-            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES21104));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11004));
             //RuleFor(x => x.Code).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES21105));
-            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES21106));
-            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES21107));
+            RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES11006));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11007));
         }
     }
 }

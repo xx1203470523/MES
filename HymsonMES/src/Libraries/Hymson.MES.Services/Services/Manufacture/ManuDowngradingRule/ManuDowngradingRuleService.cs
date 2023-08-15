@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
             if (entity != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21102));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11002));
             }
 
             //DTO转换实体
@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             if (!manuDowngradingRuleChangeSerialNumberDtos.Any()) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES21110));
+                throw new CustomerValidationException(nameof(ErrorCode.MES11010));
             }
 
             List<ManuDowngradingRuleEntity> entitys=new List<ManuDowngradingRuleEntity>();

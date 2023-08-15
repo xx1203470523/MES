@@ -289,6 +289,20 @@
         public const string MES10901 = "事件类型不能为空";
         #endregion
 
+        #region 降级规则 11000
+        public const string MES11000 = "降级规则错误";
+        public const string MES11001 = "对应降级规则不存在";
+        public const string MES11002 = "降级规则编码已存在";
+        public const string MES11003 = "降级规则编码不能为空";
+        public const string MES11004 = "降级规则名称不能为空";
+        public const string MES11005 = "降级规则编码最大长度为100";
+        public const string MES11006 = "降级规则名称最大长度为100";
+        public const string MES11007 = "描述最大长度为255";
+        public const string MES11008 = "降级规则编码不允许有空格";
+        public const string MES11009 = "Id不合法";
+        public const string MES11010 = "参数为空";
+        #endregion
+
         #region 不合格代码 11100
         public const string MES11100 = "不合格代码维护错误";
         public const string MES11101 = "不合格代码编码不能为空";
@@ -1114,19 +1128,7 @@
         public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
 
-        #region 降级规则 21100
-        public const string MES21100 = "降级规则错误";
-        public const string MES21101 = "对应降级规则不存在";
-        public const string MES21102 = "降级规则编码已存在";
-        public const string MES21103 = "降级规则编码不能为空";
-        public const string MES21104 = "降级规则名称不能为空";
-        public const string MES21105 = "降级规则编码最大长度为100";
-        public const string MES21106 = "降级规则名称最大长度为100";
-        public const string MES21107 = "描述最大长度为255";
-        public const string MES21108 = "降级规则编码不允许有空格";
-        public const string MES21109 = "Id不合法";
-        public const string MES21110 = "参数为空";
-        #endregion
+        
 
         #region 降级录入/移除 21200
         public const string MES21200 = "降级录入/移除错误";
