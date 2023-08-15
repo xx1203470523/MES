@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MessagePush.Enum;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -156,12 +157,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public IEnumerable<PushTypeEnum> PushTypeArray { get; set; }
+        public IEnumerable<MessageTypeEnum> PushTypeArray { get; set; }
 
         /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public IEnumerable<PushTypeEnum>? EnabledPushType { get; set; }
+        public IEnumerable<MessageTypeEnum>? EnabledPushType { get; set; }
 
     }
 

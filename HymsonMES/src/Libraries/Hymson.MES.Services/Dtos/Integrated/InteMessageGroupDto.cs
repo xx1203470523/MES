@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MessagePush.Enum;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -95,10 +96,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-        /// <summary>
+        /// <summary>   
         /// 支持的推送方式
         /// </summary>
-        public IEnumerable<PushTypeEnum> PushTypes { get; set; }
+        public IEnumerable<MessageTypeEnum> PushTypes { get; set; }
 
     }
 

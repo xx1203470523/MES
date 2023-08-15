@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MessagePush.Enum;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -16,31 +17,31 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 消息组Id
         /// </summary>
         public long MessageGroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 推送类型;1、企微2、钉钉3、邮箱
         /// </summary>
-        public PushTypeEnum Type { get; set; }
+        public MessageTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 地址
         /// </summary>
         public string Address { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 秘钥
         /// </summary>
         public string SecretKey { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 关键词
         /// </summary>
         public string KeyWord { get; set; }
 
-       
+
     }
 }

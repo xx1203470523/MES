@@ -17,6 +17,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MessagePush.Enum;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -646,7 +647,7 @@ namespace Hymson.MES.Services.Services.Integrated
             List<InteEventTypeMessageGroupRelationDto> dtos = new();
             foreach (var item in messageGroupBos)
             {
-                var pushTypeArray = item.PushTypes.ToDeserialize<IEnumerable<PushTypeEnum>>();
+                var pushTypeArray = item.PushTypes.ToDeserialize<IEnumerable<MessageTypeEnum>>();
                 if (pushTypeArray == null) continue;
 
                 // 消息组基础信息
@@ -660,7 +661,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 {
                     Id = item.Id,
                     MessageGroupId = item.MessageGroupId,
-                    PushTypeArray = pushTypeArray ?? new List<PushTypeEnum>(),
+                    PushTypeArray = pushTypeArray ?? new List<MessageTypeEnum>(),
                     EnabledPushType = messageGroupPushMethods.Select(s => s.Type).Distinct(),
                     Code = messageGroupEntity.Code,
                     Name = messageGroupEntity.Name
