@@ -1,6 +1,6 @@
 ﻿using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Integrated.InteEventType.View
+namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 
