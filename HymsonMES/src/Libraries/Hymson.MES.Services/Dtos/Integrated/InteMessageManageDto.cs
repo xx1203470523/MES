@@ -136,6 +136,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long LineId { get; set; }
 
         /// <summary>
+        /// 线体名称
+        /// </summary>
+        public string LineName { get; set; }
+
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }

@@ -8,6 +8,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
@@ -41,6 +43,11 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteMessageManageSaveDto> _validationSaveRules;
 
         /// <summary>
+        /// 仓储接口（工作中心）
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
         /// 仓储接口（消息管理）
         /// </summary>
         private readonly IInteMessageManageRepository _inteMessageManageRepository;
@@ -68,6 +75,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteMessageManageHandleProgrammeAttachmentRepository"></param>
         public InteMessageManageService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             AbstractValidator<InteMessageManageSaveDto> validationSaveRules,
+            IInteWorkCenterRepository inteWorkCenterRepository,
             IInteMessageManageRepository inteMessageManageRepository,
             IInteMessageManageAnalysisReportAttachmentRepository inteMessageManageAnalysisReportAttachmentRepository,
             IInteMessageManageHandleProgrammeAttachmentRepository inteMessageManageHandleProgrammeAttachmentRepository)
@@ -76,6 +84,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentSite = currentSite;
             _sequenceService = sequenceService;
             _validationSaveRules = validationSaveRules;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteMessageManageAnalysisReportAttachmentRepository = inteMessageManageAnalysisReportAttachmentRepository;
             _inteMessageManageHandleProgrammeAttachmentRepository = inteMessageManageHandleProgrammeAttachmentRepository;
@@ -188,7 +197,12 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 var dto = item.ToModel<InteMessageManageDto>();
 
-                dto.WorkShopName = "";
+                var workShopEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.WorkShopId);
+                if (workShopEntity != null) dto.WorkShopName = workShopEntity.Name;
+
+                var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.LineId);
+                if (workLineEntity != null) dto.LineName = workLineEntity.Name;
+
                 dtos.Add(dto);
             }
 
