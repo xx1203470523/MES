@@ -121,11 +121,12 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcCirculationDto> GetRelationShipByPackAsync(string sfc)
+        public async Task<ManuSfcCirculationDto?> GetRelationShipByPackAsync(string sfc)
         {
             if (string.IsNullOrEmpty(sfc)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             //追溯条码信息
             var manuSfcCirculationViews = await GetProductTraceListAsync(sfc);
+            if (!manuSfcCirculationViews.Any()) { return null; }
             //递归处理层级数据
             int level = 1;
             //第一层Pack信息/第二层模组信息

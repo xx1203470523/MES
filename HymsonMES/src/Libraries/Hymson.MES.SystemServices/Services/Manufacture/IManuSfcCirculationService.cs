@@ -12,6 +12,6 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<ManuSfcCirculationDto> GetRelationShipByPackAsync(string sfc);
+        Task<ManuSfcCirculationDto?> GetRelationShipByPackAsync(string sfc);
     }
 }

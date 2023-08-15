@@ -43,7 +43,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("relationship")]
-        public async Task<ManuSfcCirculationDto> GetRelationShipByPackAsync(ManuSfcCirculationQueryDto manuSfcCirculationQueryDto)
+        public async Task<ManuSfcCirculationDto?> GetRelationShipByPackAsync(ManuSfcCirculationQueryDto manuSfcCirculationQueryDto)
         {
             return await _manuSfcCirculationService.GetRelationShipByPackAsync(manuSfcCirculationQueryDto.SFC);
         }
