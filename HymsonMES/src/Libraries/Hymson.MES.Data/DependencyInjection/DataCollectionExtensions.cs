@@ -113,6 +113,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventTypeUpgradeRepository, InteEventTypeUpgradeRepository>();
             services.AddSingleton<IInteEventTypeUpgradeMessageGroupRelationRepository, InteEventTypeUpgradeMessageGroupRelationRepository>();
 
+            services.AddSingleton<IInteMessageManageRepository, InteMessageManageRepository>();
+            services.AddSingleton<IInteMessageManageAnalysisReportAttachmentRepository, InteMessageManageAnalysisReportAttachmentRepository>();
+            services.AddSingleton<IInteMessageManageHandleProgrammeAttachmentRepository, InteMessageManageHandleProgrammeAttachmentRepository>();
+
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
             services.AddSingleton<IInteCodeRulesMakeRepository, InteCodeRulesMakeRepository>();
@@ -289,7 +293,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Parameter
-            services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>(); 
+            services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>();
             #endregion
 
             return services;
