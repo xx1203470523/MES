@@ -4,15 +4,10 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 消息管理新增/更新Dto
+    /// 消息管理Dto（触发）
     /// </summary>
-    public record InteMessageManageSaveDto : BaseEntityDto
+    public record InteMessageManageTriggerDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
         /// <summary>
         /// 消息单号
         /// </summary>
@@ -59,50 +54,83 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public DegreeEnum UrgencyLevel { get; set; }
 
         /// <summary>
-        /// 责任部门
-        /// </summary>
-        public long? DepartmentId { get; set; }
-
-        /// <summary>
-        /// 责任人
-        /// </summary>
-        public string? ResponsibleBy { get; set; }
-
-        /// <summary>
-        /// 原因分析
-        /// </summary>
-        public string? ReasonAnalysis { get; set; }
-
-        /// <summary>
-        /// 处理方案
-        /// </summary>
-        public string? HandleSolution { get; set; }
-
-        /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
 
+    }
+
+    /// <summary>
+    /// 消息管理Dto（接收）
+    /// </summary>
+    public record InteMessageManageReceiveDto : BaseEntityDto
+    {
         /// <summary>
-        /// 接收时长
+        /// 主键
         /// </summary>
-        public decimal? ReceiveDuration { get; set; }
+        public long Id { get; set; }
+    }
+
+    /// <summary>
+    /// 消息管理Dto（处理）
+    /// </summary>
+    public record InteMessageManageHandleDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
 
         /// <summary>
-        /// 处理时长
+        /// 责任部门
         /// </summary>
-        public decimal? HandleDuration { get; set; }
+        public long DepartmentId { get; set; }
 
         /// <summary>
-        /// 评价时间
+        /// 责任人
         /// </summary>
-        public string? EvaluateOn { get; set; }
+        public string ResponsibleBy { get; set; }
 
         /// <summary>
-        /// 评价人
+        /// 原因分析
         /// </summary>
-        public string? EvaluateBy { get; set; }
+        public string ReasonAnalysis { get; set; }
 
+        /// <summary>
+        /// 处理方案
+        /// </summary>
+        public string HandleSolution { get; set; }
+
+        /// <summary>
+        /// 原因分析（附件）
+        /// </summary>
+        public IEnumerable<string>? ReasonAttachments { get; set; }
+
+        /// <summary>
+        /// 处理方案（附件）
+        /// </summary>
+        public IEnumerable<string>? HandleAttachments { get; set; }
+
+        /// <summary>
+        /// 备注（处理）
+        /// </summary>
+        public string? HandleRemark { get; set; }
+    }
+
+    /// <summary>
+    /// 消息管理Dto（关闭）
+    /// </summary>
+    public record InteMessageManageCloseDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 备注（评价）
+        /// </summary>
+        public string? EvaluateRemark { get; set; }
     }
 
     /// <summary>

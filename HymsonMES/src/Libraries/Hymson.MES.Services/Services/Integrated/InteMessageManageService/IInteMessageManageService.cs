@@ -9,18 +9,32 @@ namespace Hymson.MES.Services.Services.Integrated
     public interface IInteMessageManageService
     {
         /// <summary>
-        /// 新增
+        /// 触发
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(InteMessageManageSaveDto saveDto);
+        Task<int> TriggerAsync(InteMessageManageTriggerDto dto);
 
         /// <summary>
-        /// 修改
+        /// 接收
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(InteMessageManageSaveDto saveDto);
+        Task<int> ReceiveAsync(InteMessageManageReceiveDto dto);
+
+        /// <summary>
+        /// 处理
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> HandleAsync(InteMessageManageHandleDto dto);
+
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> CloseAsync(InteMessageManageCloseDto dto);
 
         /// <summary>
         /// 删除

@@ -42,6 +42,39 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 接收
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> ReceiveAsync(InteMessageManageEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(ReceiveSql, entity);
+        }
+
+        /// <summary>
+        /// 处理
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> HandleAsync(InteMessageManageEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(HandleSql, entity);
+        }
+
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> CloseAsync(InteMessageManageEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(CloseSql, entity);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
@@ -163,11 +196,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_message_manage T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_message_manage /**where**/  ";
 
-        const string InsertSql = "INSERT INTO inte_message_manage(  `Id`, `Code`, `WorkShopId`, `LineId`, `ResourceId`, `EquipmentId`, `EventTypeId`, `EventDescription`, `Status`, `UrgencyLevel`, `DepartmentId`, `ResponsibleBy`, `ReasonAnalysis`, `HandleSolution`, `Remark`, `ReceiveDuration`, `HandleDuration`, `EvaluateOn`, `EvaluateBy`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @WorkShopId, @LineId, @ResourceId, @EquipmentId, @EventTypeId, @EventDescription, @Status, @UrgencyLevel, @DepartmentId, @ResponsibleBy, @ReasonAnalysis, @HandleSolution, @Remark, @ReceiveDuration, @HandleDuration, @EvaluateOn, @EvaluateBy, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO inte_message_manage(  `Id`, `Code`, `WorkShopId`, `LineId`, `ResourceId`, `EquipmentId`, `EventTypeId`, `EventDescription`, `Status`, `UrgencyLevel`, `DepartmentId`, `ResponsibleBy`, `ReasonAnalysis`, `HandleSolution`, `Remark`, `ReceiveDuration`, `HandleDuration`, `EvaluateOn`, `EvaluateBy`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @WorkShopId, @LineId, @ResourceId, @EquipmentId, @EventTypeId, @EventDescription, @Status, @UrgencyLevel, @DepartmentId, @ResponsibleBy, @ReasonAnalysis, @HandleSolution, @Remark, @ReceiveDuration, @HandleDuration, @EvaluateOn, @EvaluateBy, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO inte_message_manage(  `Id`, `Code`, `WorkShopId`, `LineId`, `ResourceId`, `EquipmentId`, `EventTypeId`, `EventDescription`, `Status`, `UrgencyLevel`, `DepartmentId`, `ResponsibleBy`, `ReasonAnalysis`, `HandleSolution`, HandleRemark, `Remark`, `ReceiveDuration`, `HandleDuration`, `EvaluateOn`, `EvaluateBy`, EvaluateRemark, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @WorkShopId, @LineId, @ResourceId, @EquipmentId, @EventTypeId, @EventDescription, @Status, @UrgencyLevel, @DepartmentId, @ResponsibleBy, @ReasonAnalysis, @HandleSolution, @HandleRemark, @Remark, @ReceiveDuration, @HandleDuration, @EvaluateOn, @EvaluateBy, @EvaluateRemark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO inte_message_manage(  `Id`, `Code`, `WorkShopId`, `LineId`, `ResourceId`, `EquipmentId`, `EventTypeId`, `EventDescription`, `Status`, `UrgencyLevel`, `DepartmentId`, `ResponsibleBy`, `ReasonAnalysis`, `HandleSolution`, HandleRemark, `Remark`, `ReceiveDuration`, `HandleDuration`, `EvaluateOn`, `EvaluateBy`, EvaluateRemark, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @WorkShopId, @LineId, @ResourceId, @EquipmentId, @EventTypeId, @EventDescription, @Status, @UrgencyLevel, @DepartmentId, @ResponsibleBy, @ReasonAnalysis, @HandleSolution, @HandleRemark, @Remark, @ReceiveDuration, @HandleDuration, @EvaluateOn, @EvaluateBy, @EvaluateRemark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE inte_message_manage SET   Code = @Code, WorkShopId = @WorkShopId, LineId = @LineId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, EventTypeId = @EventTypeId, EventDescription = @EventDescription, Status = @Status, UrgencyLevel = @UrgencyLevel, DepartmentId = @DepartmentId, ResponsibleBy = @ResponsibleBy, ReasonAnalysis = @ReasonAnalysis, HandleSolution = @HandleSolution, Remark = @Remark, ReceiveDuration = @ReceiveDuration, HandleDuration = @HandleDuration, EvaluateOn = @EvaluateOn, EvaluateBy = @EvaluateBy, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE inte_message_manage SET   Code = @Code, WorkShopId = @WorkShopId, LineId = @LineId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, EventTypeId = @EventTypeId, EventDescription = @EventDescription, Status = @Status, UrgencyLevel = @UrgencyLevel, DepartmentId = @DepartmentId, ResponsibleBy = @ResponsibleBy, ReasonAnalysis = @ReasonAnalysis, HandleSolution = @HandleSolution, Remark = @Remark, ReceiveDuration = @ReceiveDuration, HandleDuration = @HandleDuration, EvaluateOn = @EvaluateOn, EvaluateBy = @EvaluateBy, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string ReceiveSql = "UPDATE inte_message_manage SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
+        const string HandleSql = "UPDATE inte_message_manage SET DepartmentId = @DepartmentId, ResponsibleBy = @ResponsibleBy, ReasonAnalysis = @ReasonAnalysis, HandleSolution = @HandleSolution, HandleRemark = @HandleRemark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
+        const string CloseSql = "UPDATE inte_message_manage SET ReceiveDuration = @ReceiveDuration, HandleDuration = @HandleDuration, EvaluateOn = @EvaluateOn, EvaluateBy = @EvaluateBy, EvaluateRemark = @EvaluateRemark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id";
+
+        const string UpdateSql = "UPDATE inte_message_manage SET Code = @Code, WorkShopId = @WorkShopId, LineId = @LineId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, EventTypeId = @EventTypeId, EventDescription = @EventDescription, Status = @Status, UrgencyLevel = @UrgencyLevel, DepartmentId = @DepartmentId, ResponsibleBy = @ResponsibleBy, ReasonAnalysis = @ReasonAnalysis, HandleSolution = @HandleSolution, Remark = @Remark, ReceiveDuration = @ReceiveDuration, HandleDuration = @HandleDuration, EvaluateOn = @EvaluateOn, EvaluateBy = @EvaluateBy, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE inte_message_manage SET Code = @Code, WorkShopId = @WorkShopId, LineId = @LineId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, EventTypeId = @EventTypeId, EventDescription = @EventDescription, Status = @Status, UrgencyLevel = @UrgencyLevel, DepartmentId = @DepartmentId, ResponsibleBy = @ResponsibleBy, ReasonAnalysis = @ReasonAnalysis, HandleSolution = @HandleSolution, Remark = @Remark, ReceiveDuration = @ReceiveDuration, HandleDuration = @HandleDuration, EvaluateOn = @EvaluateOn, EvaluateBy = @EvaluateBy, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE inte_message_manage SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE inte_message_manage SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

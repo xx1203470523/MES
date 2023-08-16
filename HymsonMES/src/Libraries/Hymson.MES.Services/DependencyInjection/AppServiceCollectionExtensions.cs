@@ -401,7 +401,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventTypeSaveDto>, InteEventTypeSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventSaveDto>, InteEventSaveValidator>();
-            services.AddSingleton<AbstractValidator<InteMessageManageSaveDto>, InteMessageManageSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteMessageManageTriggerDto>, InteMessageManageSaveValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();

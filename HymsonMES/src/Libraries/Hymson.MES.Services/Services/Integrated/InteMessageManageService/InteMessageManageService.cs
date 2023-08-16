@@ -6,16 +6,17 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
 using Hymson.Sequences.Enums;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -40,12 +41,17 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 参数验证器
         /// </summary>
-        private readonly AbstractValidator<InteMessageManageSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<InteMessageManageTriggerDto> _validationSaveRules;
 
         /// <summary>
         /// 仓储接口（工作中心）
         /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
+        /// 仓储接口（附件）
+        /// </summary>
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
 
         /// <summary>
         /// 仓储接口（消息管理）
@@ -70,12 +76,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
         /// <param name="validationSaveRules"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="inteAttachmentRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
         /// <param name="inteMessageManageAnalysisReportAttachmentRepository"></param>
         /// <param name="inteMessageManageHandleProgrammeAttachmentRepository"></param>
         public InteMessageManageService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
-            AbstractValidator<InteMessageManageSaveDto> validationSaveRules,
+            AbstractValidator<InteMessageManageTriggerDto> validationSaveRules,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
             IInteMessageManageAnalysisReportAttachmentRepository inteMessageManageAnalysisReportAttachmentRepository,
             IInteMessageManageHandleProgrammeAttachmentRepository inteMessageManageHandleProgrammeAttachmentRepository)
@@ -85,6 +94,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _sequenceService = sequenceService;
             _validationSaveRules = validationSaveRules;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteMessageManageAnalysisReportAttachmentRepository = inteMessageManageAnalysisReportAttachmentRepository;
             _inteMessageManageHandleProgrammeAttachmentRepository = inteMessageManageHandleProgrammeAttachmentRepository;
@@ -92,25 +102,26 @@ namespace Hymson.MES.Services.Services.Integrated
 
 
         /// <summary>
-        /// 创建
+        /// 触发
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteMessageManageSaveDto saveDto)
+        public async Task<int> TriggerAsync(InteMessageManageTriggerDto dto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            await _validationSaveRules.ValidateAndThrowAsync(dto);
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<InteMessageManageEntity>();
+            var entity = dto.ToEntity<InteMessageManageEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.Status = PushSceneEnum.Trigger;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
@@ -122,24 +133,92 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
-        /// 修改
+        /// 接收
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(InteMessageManageSaveDto saveDto)
+        public async Task<int> ReceiveAsync(InteMessageManageReceiveDto dto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-
             // DTO转换实体
-            var entity = saveDto.ToEntity<InteMessageManageEntity>();
+            var entity = dto.ToEntity<InteMessageManageEntity>();
+            entity.Status = PushSceneEnum.Receive;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _inteMessageManageRepository.UpdateAsync(entity);
+            return await _inteMessageManageRepository.ReceiveAsync(entity);
+        }
+
+        /// <summary>
+        /// 处理
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> HandleAsync(InteMessageManageHandleDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // DTO转换实体
+            var entity = dto.ToEntity<InteMessageManageEntity>();
+            entity.Status = PushSceneEnum.Handle;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+
+            // 附件处理
+            List<InteAttachmentEntity> attachmentEntities = new();
+            List<InteMessageManageAnalysisReportAttachmentEntity> InteMessageManageAnalysisReportAttachmentEntities = new();
+            List<InteMessageManageHandleProgrammeAttachmentEntity> InteMessageManageHandleProgrammeAttachmentEntities = new();
+
+            // 原因分析（附件）
+            //dto.ReasonAttachments ??= new List<string>();
+            // TODO
+
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                var rowArray = await Task.WhenAll(new List<Task<int>>()
+                {
+                    _inteMessageManageRepository.HandleAsync(entity),
+                    _inteAttachmentRepository.InsertRangeAsync(attachmentEntities),
+                    _inteMessageManageAnalysisReportAttachmentRepository.InsertRangeAsync(InteMessageManageAnalysisReportAttachmentEntities),
+                    _inteMessageManageHandleProgrammeAttachmentRepository.InsertRangeAsync(InteMessageManageHandleProgrammeAttachmentEntities)
+                });
+                rows += rowArray.Sum();
+                trans.Complete();
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> CloseAsync(InteMessageManageCloseDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // DTO转换实体
+            var entity = dto.ToEntity<InteMessageManageEntity>();
+            entity.Status = PushSceneEnum.Close;
+            entity.EvaluateBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+
+            return await _inteMessageManageRepository.CloseAsync(entity); ;
         }
 
         /// <summary>

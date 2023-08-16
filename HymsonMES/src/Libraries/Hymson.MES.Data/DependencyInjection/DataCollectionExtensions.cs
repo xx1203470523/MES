@@ -78,6 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+            services.AddSingleton<IInteAttachmentRepository, InteAttachmentRepository>();
             services.AddSingleton<IInteCalendarDateDetailRepository, InteCalendarDateDetailRepository>();
             services.AddSingleton<IInteCalendarDateRepository, InteCalendarDateRepository>();
             services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();

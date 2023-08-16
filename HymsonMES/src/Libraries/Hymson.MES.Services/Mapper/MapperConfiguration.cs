@@ -310,7 +310,10 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteMessageManage
-            CreateMap<InteMessageManageSaveDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageTriggerDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageReceiveDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageHandleDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageCloseDto, InteMessageManageEntity>();
             CreateMap<InteMessageManagePagedQueryDto, InteMessageManagePagedQuery>();
             CreateMap<InteMessageManageEntity, InteMessageManageDto>();
             CreateMap<InteMessageManageView, InteMessageManageDto>();
