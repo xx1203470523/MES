@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -93,6 +94,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("proc:procSortingRule:insert")]
         public async Task AddProcSortingRuleAsync([FromBody] ProcSortingRuleCreateDto parm)
         {
              await _procSortingRuleService.CreateProcSortingRuleAsync(parm);
@@ -105,6 +107,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("proc:procSortingRule:update")]
         public async Task UpdateProcSortingRuleAsync([FromBody] ProcSortingRuleModifyDto parm)
         {
              await _procSortingRuleService.ModifyProcSortingRuleAsync(parm);
@@ -117,6 +120,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [PermissionDescription("proc:procSortingRule:delete")]
         public async Task DeleteProcSortingRuleAsync([FromBody] long[] ids)
         {
             await _procSortingRuleService.DeletesProcSortingRuleAsync(ids);

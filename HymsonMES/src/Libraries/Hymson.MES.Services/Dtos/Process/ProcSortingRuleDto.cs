@@ -48,9 +48,24 @@ namespace Hymson.MES.Services.Dtos.Process
         public long MaterialId { get; set; }
 
         /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注
@@ -121,12 +136,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数详情
         /// </summary>
-        public IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
+        public IEnumerable<SortingParamDto>? SortingParamDtos { get; set; }
 
         /// <summary>
         /// 档次
         /// </summary>
-        public IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
+        public IEnumerable<SortingRuleGradeDto>? SortingRuleGradeDtos { get; set; }
     }
 
     /// <summary>
@@ -148,7 +163,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注
@@ -172,19 +187,40 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcSortingRulePagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 规则编码
+        /// 工序编码
         /// </summary>
         public string? Code { get; set; }
 
         /// <summary>
-        /// 规则名称
+        /// 工序名称
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 版本
+        /// 状态
         /// </summary>
-        public string? Version { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 物料id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
     }
 
     /// <summary>
@@ -238,9 +274,9 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class SortingRuleGradeDto
     {
-       /// <summary>
-       /// 等级
-       /// </summary>
+        /// <summary>
+        /// 等级
+        /// </summary>
         public IEnumerable<string> Ratings { get; set; }
 
         /// <summary>
