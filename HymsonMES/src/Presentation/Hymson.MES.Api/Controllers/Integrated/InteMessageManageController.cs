@@ -39,29 +39,55 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 添加（消息管理）
+        /// 触发（消息管理）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
+        [Route("trigger")]
         [PermissionDescription("integrated:inteMessageManage:insert")]
-        public async Task AddAsync([FromBody] InteMessageManageSaveDto saveDto)
+        public async Task TriggerAsync([FromBody] InteMessageManageTriggerDto dto)
         {
-            await _inteMessageManageService.CreateAsync(saveDto);
+            await _inteMessageManageService.TriggerAsync(dto);
         }
 
         /// <summary>
-        /// 更新（消息管理）
+        /// 接收（消息管理）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("update")]
+        [HttpPost]
+        [Route("receive")]
         [PermissionDescription("integrated:inteMessageManage:update")]
-        public async Task UpdateAsync([FromBody] InteMessageManageSaveDto saveDto)
+        public async Task ReceiveAsync([FromBody] InteMessageManageReceiveDto dto)
         {
-            await _inteMessageManageService.ModifyAsync(saveDto);
+            await _inteMessageManageService.ReceiveAsync(dto);
+        }
+
+        /// <summary>
+        /// 处理（消息管理）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("handle")]
+        [PermissionDescription("integrated:inteMessageManage:update")]
+        public async Task HandleAsync([FromBody] InteMessageManageHandleDto dto)
+        {
+            await _inteMessageManageService.HandleAsync(dto);
+        }
+
+        /// <summary>
+        /// 关闭（消息管理）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("close")]
+        [PermissionDescription("integrated:inteMessageManage:update")]
+        public async Task CloseAsync([FromBody] InteMessageManageCloseDto dto)
+        {
+            await _inteMessageManageService.CloseAsync(dto);
         }
 
         /// <summary>

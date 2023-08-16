@@ -6,58 +6,37 @@ using Hymson.MES.Data.Repositories.Integrated.Query;
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
-    /// 仓储接口（消息管理）
+    /// 仓储接口（附件表）
     /// </summary>
-    public interface IInteMessageManageRepository
+    public interface IInteAttachmentRepository
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(InteMessageManageEntity entity);
-
+        Task<int> InsertAsync(InteAttachmentEntity entity);
+        
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<InteMessageManageEntity> entities);
+        Task<int> InsertRangeAsync(IEnumerable<InteAttachmentEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> ReceiveAsync(InteMessageManageEntity entity);
-
-        /// <summary>
-        /// 处理
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        Task<int> HandleAsync(InteMessageManageEntity entity);
-
-        /// <summary>
-        /// 关闭
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        Task<int> CloseAsync(InteMessageManageEntity entity);
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        Task<int> UpdateAsync(InteMessageManageEntity entity);
-
+        Task<int> UpdateAsync(InteAttachmentEntity entity);
+        
         /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<InteMessageManageEntity> entities);
+        Task<int> UpdateRangeAsync(IEnumerable<InteAttachmentEntity> entities);
 
         /// <summary>
         /// 软删除  
@@ -65,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-
+        
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -78,28 +57,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<InteMessageManageEntity> GetByIdAsync(long id);
-
+        Task<InteAttachmentEntity> GetByIdAsync(long id);
+    
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteMessageManageEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteAttachmentEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteMessageManageEntity>> GetEntitiesAsync(InteMessageManageQuery query);
-
+        Task<IEnumerable<InteAttachmentEntity>> GetEntitiesAsync(InteAttachmentQuery query);
+        
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteMessageManageView>> GetPagedListAsync(InteMessageManagePagedQuery pagedQuery);
+        Task<PagedInfo<InteAttachmentEntity>> GetPagedListAsync(InteAttachmentPagedQuery pagedQuery);
 
     }
 }
