@@ -21,7 +21,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 {
@@ -579,40 +578,18 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         public async Task<CirculationBindCCSLocationDto> GetBindCCSLocationAsync(string sfc)
         {
             CirculationBindCCSLocationDto circulationBindCCSLocation = new() { CurrentLocation = string.Empty, Locations = Array.Empty<string>() };
-            if (!string.IsNullOrEmpty(sfc))
+            var manuSfcCcsNgRecords = await _manuSfcCcsNgRecordRepository.GetManuSfcCcsNgRecordEntitiesAsync(new ManuSfcCcsNgRecordQuery
             {
-                IEnumerable<ManuSfcCirculationEntity> manuSfcCirculations = new List<ManuSfcCirculationEntity>();
-                //查找当前已有的绑定记录
-                manuSfcCirculations = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
-                {
-                    SiteId = _currentEquipment.SiteId,
-                    CirculationBarCode = sfc,
-                    IsDisassemble = TrueOrFalseEnum.No
-                });
-                //找出缺失位置
-                var locations = manuSfcCirculations.Select(c => c.Location ?? string.Empty).ToArray();
-                var exceptLocations = locationArray.Except(locations).OrderBy(c => c).ToArray();
-                if (exceptLocations.Any())
-                {
-                    var currentLocation = exceptLocations.Take(1).First();
-                    circulationBindCCSLocation.CurrentLocation = currentLocation;
-                    circulationBindCCSLocation.Locations = exceptLocations;
-                }
-            }
-            else//查询CCSNG记录
+                SiteId = _currentEquipment.SiteId,
+                Status = ManuSfcCcsNgRecordStatusEnum.NG,
+                SFC = sfc
+            });
+            if (manuSfcCcsNgRecords.Any())
             {
-                var manuSfcCcsNgRecords = await _manuSfcCcsNgRecordRepository.GetManuSfcCcsNgRecordEntitiesAsync(new ManuSfcCcsNgRecordQuery
-                {
-                    SiteId = _currentEquipment.SiteId,
-                    Status = ManuSfcCcsNgRecordStatusEnum.NG
-                });
-                if (manuSfcCcsNgRecords.Any())
-                {
-                    var locations = manuSfcCcsNgRecords.Select(c => c.Location).ToArray();
-                    var currentLocation = locations.Take(1).First();
-                    circulationBindCCSLocation.CurrentLocation = currentLocation;
-                    circulationBindCCSLocation.Locations = locations;
-                }
+                var locations = manuSfcCcsNgRecords.Select(c => c.Location).ToArray();
+                var currentLocation = locations.Take(1).First();
+                circulationBindCCSLocation.CurrentLocation = currentLocation;
+                circulationBindCCSLocation.Locations = locations;
             }
             return circulationBindCCSLocation;
         }
@@ -704,13 +681,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             });
             if (manuSfcCcsNgRecordEntities.Any())
             {
-                foreach (var item in manuSfcCcsNgRecordEntities)
-                {
-                    item.Status = ManuSfcCcsNgRecordStatusEnum.Confirm;
-                    item.UpdatedBy = _currentEquipment.Name;
-                    item.UpdatedOn = HymsonClock.Now();
-                }
-                await _manuSfcCcsNgRecordRepository.UpdatesAsync(manuSfcCcsNgRecordEntities.ToList());
+                var manuSfcCcsNgRecord = manuSfcCcsNgRecordEntities.First();//每次取一个
+                manuSfcCcsNgRecord.Status = ManuSfcCcsNgRecordStatusEnum.Confirm;
+                manuSfcCcsNgRecord.UpdatedBy = _currentEquipment.Name;
+                manuSfcCcsNgRecord.UpdatedOn = HymsonClock.Now();
+                await _manuSfcCcsNgRecordRepository.UpdateAsync(manuSfcCcsNgRecord);
             }
         }
     }
