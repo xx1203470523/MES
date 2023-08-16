@@ -183,7 +183,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
         public async Task ProcessRouteInOutBoundTestAsync()
         {
             string processRouteCode = "QAPR001";//执行工艺路线
-            string prefix = "AAA230807" + DateTime.Now.ToString("HHmm");//生成条码前缀
+            string prefix = "C" + DateTime.Now.ToString("yyyyMMddHHmm");//生成电芯条码前缀
             int sfcCount = 30;//需要进出站多少条码数量
             int sfcSuffixLength = 3;//条码追加后缀0长度
             //或许工艺路线设备工序等信息
@@ -270,7 +270,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
         public async Task ProcessRouteModuleBindTestAsync()
         {
             string processRouteCode = "QAPR001";//执行工艺路线
-            string prefix = "AAA230807" + DateTime.Now.ToString("HHmm");//生成条码前缀
+            string prefix = "C" + DateTime.Now.ToString("yyyyMMddHHmm");//生成电芯条码前缀
             int sfcCount = 13;//需要进出站多少条码数量
             int sfcSuffixLength = 3;//条码追加后缀0长度
             //或许工艺路线设备工序等信息
@@ -293,7 +293,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services
                     SFC = sfc
                 };
             }
-            string moduleSfc = "M230807" + DateTime.Now.ToString("HHmmss");//一个模组条码
+            string moduleSfc = "M" + DateTime.Now.ToString("yyyyMMddHHmmss");//一个模组条码
 
             //电芯段
             string[] cellOp = new string[] { "OP010", "OP020", "OP030" };
