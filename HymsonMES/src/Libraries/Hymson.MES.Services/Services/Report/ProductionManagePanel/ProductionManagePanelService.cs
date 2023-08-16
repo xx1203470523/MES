@@ -807,11 +807,11 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 //计划工作秒
                 var workingSeconds = workingHours * 3600;
                 //操作时间
-                var operateTime = workingSeconds - equipmentStopTime?.StopSeconds ?? 0;
+                var operateTime = workingSeconds - (equipmentStopTime?.StopSeconds ?? 0);
                 //可用率
-                var availability = operateTime / (equipmentStopTime?.StopSeconds ?? 1);
+                var availability = operateTime / workingSeconds;
                 //表现性 实际运行实际取操作时间
-                var expressive = theoryCycle * 3600 * (equipmentYield?.Total ?? 0) / (operateTime == 0 ? 1 : operateTime);
+                var expressive = theoryCycle * (equipmentYield?.Total ?? 0) / (operateTime == 0 ? 1 : operateTime);
                 //质量指数
                 var qualityIndex = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
                 //OEE
