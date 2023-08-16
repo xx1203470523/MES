@@ -278,60 +278,66 @@ namespace Hymson.MES.Services.Services.Process
             List<ProcSortingRuleGradeEntity> procSortingRuleGradeEntities = new();
             List<ProcSortingRuleGradeDetailsEntity> procSortingRuleGradeDetailsEntities = new();
 
-            foreach (var item in procSortingRuleModifyDto.SortingParamDtos)
+            if (procSortingRuleModifyDto.SortingParamDtos != null && procSortingRuleModifyDto.SortingParamDtos.Any())
             {
-                procSortingRuleDetailEntities.Add(new ProcSortingRuleDetailEntity()
+                foreach (var item in procSortingRuleModifyDto.SortingParamDtos)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
-                    SortingRuleId = procSortingRuleEntity.Id,
-                    ProcedureId = item.ProcedureId,
-                    ParameterId = item.ParameterId,
-                    MinValue = item.MinValue,
-                    MinContainingType = item.MinContainingType,
-                    MaxValue = item.MaxValue,
-                    MaxContainingType = item.MaxContainingType,
-                    ParameterValue = item.ParameterValue,
-                    Rating = item.Rating,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
-                });
-            }
-
-            foreach (var item in procSortingRuleModifyDto.SortingRuleGradeDtos)
-            {
-                var procSortingRuleGradeEntity = new ProcSortingRuleGradeEntity()
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId ?? 0,
-                    SortingRuleId = procSortingRuleEntity.Id,
-                    Grade = item.Grade,
-                    Remark = item.Remark,
-                    CreatedBy = _currentUser.UserName,
-                    UpdatedBy = _currentUser.UserName,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedOn = HymsonClock.Now()
-                };
-                procSortingRuleGradeEntities.Add(procSortingRuleGradeEntity);
-
-                var procSortingRuleDetails = procSortingRuleDetailEntities.Where(x => item.Ratings.Contains(x.Rating));
-
-                foreach (var SortingRule in procSortingRuleDetails)
-                {
-                    procSortingRuleGradeDetailsEntities.Add(new ProcSortingRuleGradeDetailsEntity
+                    procSortingRuleDetailEntities.Add(new ProcSortingRuleDetailEntity()
                     {
                         Id = IdGenProvider.Instance.CreateId(),
-                        SortingRuleId = procSortingRuleEntity.Id,
                         SiteId = _currentSite.SiteId ?? 0,
-                        SortingRuleGradeId = procSortingRuleGradeEntity.Id,
-                        SortingRuleDetailId = SortingRule.Id,
+                        SortingRuleId = procSortingRuleEntity.Id,
+                        ProcedureId = item.ProcedureId,
+                        ParameterId = item.ParameterId,
+                        MinValue = item.MinValue,
+                        MinContainingType = item.MinContainingType,
+                        MaxValue = item.MaxValue,
+                        MaxContainingType = item.MaxContainingType,
+                        ParameterValue = item.ParameterValue,
+                        Rating = item.Rating,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now()
                     });
+                }
+            }
+
+            if (procSortingRuleModifyDto.SortingRuleGradeDtos != null && procSortingRuleModifyDto.SortingRuleGradeDtos.Any())
+            {
+                foreach (var item in procSortingRuleModifyDto.SortingRuleGradeDtos)
+                {
+                    var procSortingRuleGradeEntity = new ProcSortingRuleGradeEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        SortingRuleId = procSortingRuleEntity.Id,
+                        Grade = item.Grade,
+                        Remark = item.Remark,
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now()
+                    };
+                    procSortingRuleGradeEntities.Add(procSortingRuleGradeEntity);
+
+                    var procSortingRuleDetails = procSortingRuleDetailEntities.Where(x => item.Ratings.Contains(x.Rating));
+
+                    foreach (var SortingRule in procSortingRuleDetails)
+                    {
+                        procSortingRuleGradeDetailsEntities.Add(new ProcSortingRuleGradeDetailsEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SortingRuleId = procSortingRuleEntity.Id,
+                            SiteId = _currentSite.SiteId ?? 0,
+                            SortingRuleGradeId = procSortingRuleGradeEntity.Id,
+                            SortingRuleDetailId = SortingRule.Id,
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now()
+                        });
+                    }
                 }
             }
 
