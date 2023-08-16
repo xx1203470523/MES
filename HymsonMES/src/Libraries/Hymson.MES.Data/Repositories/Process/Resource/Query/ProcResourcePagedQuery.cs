@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process.Resource
 {
@@ -33,25 +34,91 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
 
-        //站点
-        public string SiteCode { get; set; }
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long? WorkCenterLineId { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcResourceQuery
     {
         /// <summary>
         /// 站点
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long[] IdsArr { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResCode { get; set; }
 
         /// <summary>
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int? Status { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ProcResourceByEquipmentIdsQuery
+    {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long[] EquipmentIds { get; set; }
+    }
+
+    /// <summary>
+    /// 资源维护表：根据工序查询资源列表
+    /// </summary>
+    public class ProcResourceProcedurePagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 描述 :状态 
+        /// 空值 : false  
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 }

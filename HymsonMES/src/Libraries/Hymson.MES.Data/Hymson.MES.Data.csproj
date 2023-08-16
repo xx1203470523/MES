@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,10 +6,22 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Remove="Repositories\新文件夹\**" />
-    <EmbeddedResource Remove="Repositories\新文件夹\**" />
-    <None Remove="Repositories\新文件夹\**" />
+    <Compile Remove="Repositories\Manufacture\ManuFacePlate\View\新文件夹\**" />
+    <EmbeddedResource Remove="Repositories\Manufacture\ManuFacePlate\View\新文件夹\**" />
+    <None Remove="Repositories\Manufacture\ManuFacePlate\View\新文件夹\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Repositories\Manufacture\ManuReturnMaterial\ManuRequistionOrderDetailRepository.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +35,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.Core\Hymson.MES.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Repositories\Manufacture\ManuFacePlateButtonJobRelation\View\" />
+    <Folder Include="Repositories\Manufacture\ManuFacePlateButton\View\" />
+    <Folder Include="Repositories\Manufacture\ManuFacePlateProduction\View\" />
+    <Folder Include="Repositories\Manufacture\ManuFacePlate\View\" />
+    <Folder Include="Repositories\Plan\PlanWorkOrderBind\View\" />
+    <Folder Include="Repositories\Process\PrintConfig\Command\" />
+    <Folder Include="Repositories\Process\Recipe\" />
   </ItemGroup>
 
 </Project>

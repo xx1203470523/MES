@@ -1,6 +1,5 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
@@ -10,7 +9,7 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次明细仓储
+    /// 班制维护明细仓储
     /// </summary>
     public partial class InteClassDetailRepository : IInteClassDetailRepository
     {
@@ -20,7 +19,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         {
             _connectionOptions = connectionOptions.Value;
         }
-
 
         /// <summary>
         /// 新增
@@ -35,11 +33,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         }
 
         /// <summary>
-        /// 
+        /// 批量插入
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<InteClassDetailEntity> entitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<InteClassDetailEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entitys);
@@ -75,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         public async Task<int> DeleteByClassIdAsync(long classId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = new { classId } });
+            return await conn.ExecuteAsync(DeleteByClassId, new { classId });
         }
 
         /// <summary>
@@ -86,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
         /// <summary>
@@ -108,7 +106,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         public async Task<IEnumerable<InteClassDetailEntity>> GetListByClassIdAsync(long classId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<InteClassDetailEntity>(GetByIdSql, new { classId });
+            return await conn.QueryAsync<InteClassDetailEntity>(GetListByClassId, new { classId });
         }
 
         /// <summary>
@@ -116,18 +114,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="inteClassDetailPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteClassDetailEntity>> GetPagedInfoAsync(InteClassDetailPagedQuery inteClassDetailPagedQuery)
+        public async Task<PagedInfo<InteClassDetailEntity>> GetPagedListAsync(InteClassDetailPagedQuery inteClassDetailPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            //sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
 
             var offSet = (inteClassDetailPagedQuery.PageIndex - 1) * inteClassDetailPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -135,11 +129,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             sqlBuilder.AddParameters(inteClassDetailPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var inteClassDetailEntitiesTask = conn.QueryAsync<InteClassDetailEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var inteClassDetailEntities = await inteClassDetailEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<InteClassDetailEntity>(inteClassDetailEntities, inteClassDetailPagedQuery.PageIndex, inteClassDetailPagedQuery.PageSize, totalCount);
+            var entities = await conn.QueryAsync<InteClassDetailEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+            return new PagedInfo<InteClassDetailEntity>(entities, inteClassDetailPagedQuery.PageIndex, inteClassDetailPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -155,7 +148,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             var inteClassDetailEntities = await conn.QueryAsync<InteClassDetailEntity>(template.RawSql, inteClassDetailQuery);
             return inteClassDetailEntities;
         }
-
     }
 
     /// <summary>
@@ -163,17 +155,21 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
     /// </summary>
     public partial class InteClassDetailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `inte_class_detail` /**where**/";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetInteClassDetailEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM `inte_class_detail` /**where**/  ";
+                                           FROM `inte_class_detail` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_class_detail`(  `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @ClassId, @DetailClassType, @ProjectContent, @StartTime, @EndTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
+        const string InsertSql = "INSERT INTO `inte_class_detail`(  `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`) VALUES (   @Id, @ClassId, @DetailClassType, @ProjectContent, @StartTime, @EndTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteId )  ";
         const string UpdateSql = "UPDATE `inte_class_detail` SET   ClassId = @ClassId, DetailClassType = @DetailClassType, ProjectContent = @ProjectContent, StartTime = @StartTime, EndTime = @EndTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `inte_class_detail` SET IsDeleted = '1' WHERE Id = @Id ";
+        const string DeleteByClassId = "DELETE FROM `inte_class_detail` WHERE ClassId = @classId ";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`
+                               `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteId`
                             FROM `inte_class_detail`  WHERE Id = @Id ";
+        const string GetListByClassId = @"SELECT 
+                               `Id`, `ClassId`, `DetailClassType`, `ProjectContent`, `StartTime`, `EndTime`
+                            FROM `inte_class_detail`  WHERE ClassId = @ClassId ";
     }
 }

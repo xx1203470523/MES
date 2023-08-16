@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
 
 namespace Hymson.MES.Core.Domain.Equipment
 {
@@ -10,7 +11,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public string SiteCode { get; set; } = "";
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 单位编码 
@@ -25,12 +26,12 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string Type { get; set; } = "";
+        public int Type { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string Status { get; set; } = "";
+        public int Status { get; set; } = DbDefaultValueConstant.IntDefaultValue;
 
         /// <summary>
         /// 备注

@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("a.IsDeleted=0");
             sqlBuilder.Where("a.ResourceId=@ResourceId");
             //TODO 按更新时间倒序排列
 
@@ -55,62 +55,57 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 查询List
+        /// 根据资源id和设备Id查询数据
         /// </summary>
-        /// <param name="procResourceEquipmentBindQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetProcResourceEquipmentBindEntitiesAsync(ProcResourceEquipmentBindPagedQuery procResourceEquipmentBindQuery)
+        public async Task<IEnumerable<ProcResourceEquipmentBindEntity>> GetByResourceIdAsync(ProcResourceEquipmentBindQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetProcResourceEquipmentBindEntitiesSqlTemplate);
+            var templateData = sqlBuilder.AddTemplate(GetByResourceIdSqllTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            if (query.ResourceId > 0)
+            {
+                sqlBuilder.Where("ResourceId=@ResourceId");
+            }
+            if (query.IsMain)
+            {
+                sqlBuilder.Where("IsMain=@IsMain");
+            }
+            if (query.Ids != null && query.Ids.Length > 0)
+            {
+                sqlBuilder.Where("EquipmentId in @Ids");
+            }
+            if (query.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+            sqlBuilder.AddParameters(query);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procResourceEquipmentBindEntities = await conn.QueryAsync<ProcResourceEquipmentBindEntity>(template.RawSql, procResourceEquipmentBindQuery);
-            return procResourceEquipmentBindEntities;
+            return await conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);
         }
 
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ProcResourceEquipmentBindEntity> GetByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceEquipmentBindEntity>(GetByIdSql, new { Id = id });
-        }
 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceEquipmentBindEntity"></param>
+        /// <param name="bindEntitys"></param>
         /// <returns></returns>
-        public async Task InsertAsync(ProcResourceEquipmentBindEntity procResourceEquipmentBindEntity)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> bindEntitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceEquipmentBindEntity);
-            procResourceEquipmentBindEntity.Id = id;
+            await conn.ExecuteAsync(InsertSql, bindEntitys);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceEquipmentBindEntity"></param>
+        /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcResourceEquipmentBindEntity procResourceEquipmentBindEntity)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procResourceEquipmentBindEntity);
-        }
-
-        /// <summary>
-        /// 删除（软删除）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = id });
+            return await conn.ExecuteAsync(UpdateSql, procResourceEquipmentBinds);
         }
 
         /// <summary>
@@ -118,26 +113,33 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesRangeAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, idsArr);
+            return await conn.ExecuteAsync(DeleteSql, new { Ids = idsArr });
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByResourceIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByResourceIdSql, new { ResourceId = id });
         }
     }
 
     public partial class ProcResourceEquipmentBindRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"select a.*,b.EquipmentCode,b.EquipmentName,b.EquipmentDesc from proc_resource_equipment_bind a left join equ_equipment b on a.EquipmentId=b.Id and b.IsDeleted=0 /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"select a.*,b.EquipmentCode,b.EquipmentName,b.EquipmentDesc from proc_resource_equipment_bind a left join equ_equipment b on a.EquipmentId=b.Id and b.IsDeleted=0 /**where**/ ORDER BY a.UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "select count(*) from proc_resource_equipment_bind a left join equ_equipment b on a.EquipmentId=b.Id and b.IsDeleted=0 /**where**/";
-        const string GetProcResourceEquipmentBindEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_resource_equipment_bind` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_resource_equipment_bind`(  `Id`, `SiteCode`, `ResourceId`, `EquipmentId`, `IsMain`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ResourceId, @EquipmentId, @IsMain, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_resource_equipment_bind` SET   SiteCode = @SiteCode, ResourceId = @ResourceId, EquipmentId = @EquipmentId, IsMain = @IsMain, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_resource_equipment_bind` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ResourceId`, `EquipmentId`, `IsMain`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_resource_equipment_bind`  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_resource_equipment_bind`(  `Id`, `SiteId`, `ResourceId`, `EquipmentId`, `IsMain`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResourceId, @EquipmentId, @IsMain, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_resource_equipment_bind` SET  EquipmentId=@EquipmentId,IsMain=@IsMain,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `proc_resource_equipment_bind` SET IsDeleted = Id WHERE Id in @Ids ";
+        const string DeleteByResourceIdSql = "delete from `proc_resource_equipment_bind` WHERE ResourceId = @ResourceId ";
+        const string GetByResourceIdSqllTemplate = "SELECT * FROM proc_resource_equipment_bind /**where**/  ";
     }
 }

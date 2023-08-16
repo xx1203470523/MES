@@ -10,7 +10,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query
         /// <summary>
         /// 站点编码 
         /// </summary>
-        public string? SiteCode { get; set; }
+        public long? SiteId { get; set; }
 
         /// <summary>
         /// 单位编码 
@@ -25,11 +25,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query
         /// <summary>
         /// 单位类型
         /// </summary>
-        public string? Type { get; set; }
+        public int? Type { get; set; }
 
         /// <summary>
         /// 单位状态 
         /// </summary>
-        public string? Status { get; set; }
+        public int? Status { get; set; }
     }
 }

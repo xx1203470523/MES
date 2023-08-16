@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -13,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         
         /// <summary>
         /// 描述 :所属BomID 
@@ -31,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属BOM替代物料ID（从物料表选择） 
         /// 空值 : true  
         /// </summary>
-        public long? ReplaceMaterialId { get; set; }
+        public long ReplaceMaterialId { get; set; }
         
         /// <summary>
         /// 描述 :参考点 
@@ -56,5 +57,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; }
-        }
+
+
+        /// <summary>
+        /// 数据收集方式 
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+    }
 }

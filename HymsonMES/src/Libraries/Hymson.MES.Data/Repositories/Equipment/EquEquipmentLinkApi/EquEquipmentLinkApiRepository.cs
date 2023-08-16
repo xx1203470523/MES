@@ -10,17 +10,17 @@ using MySql.Data.MySqlClient;
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
 {
     /// <summary>
-    /// 
+    /// 设备链接
     /// </summary>
     public partial class EquEquipmentLinkApiRepository : IEquEquipmentLinkApiRepository
     {
         /// <summary>
-        /// 
+        /// 链接
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         public EquEquipmentLinkApiRepository(IOptions<ConnectionOptions> connectionOptions)
@@ -29,44 +29,44 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         }
 
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquEquipmentLinkApiEntity entity)
+        public async Task<int> InsertAsync(EquEquipmentLinkApiEntity equipmentUnitEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entity);
+            return await conn.ExecuteAsync(InsertSql, equipmentUnitEntity);
         }
 
         /// <summary>
-        /// 
+        /// 插入
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="entitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(List<EquEquipmentLinkApiEntity> entitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<EquEquipmentLinkApiEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entitys);
         }
 
         /// <summary>
-        /// 
+        /// 更新
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquEquipmentLinkApiEntity entity)
+        public async Task<int> UpdateAsync(EquEquipmentLinkApiEntity equipmentUnitEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, entity);
+            return await conn.ExecuteAsync(UpdateSql, equipmentUnitEntity);
         }
 
         /// <summary>
-        /// 
+        /// 批量更新
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(List<EquEquipmentLinkApiEntity> entitys)
+        public async Task<int> UpdateRangeAsync(IEnumerable<EquEquipmentLinkApiEntity> entitys)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSql, entitys);
@@ -80,7 +80,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         public async Task<int> SoftDeleteAsync(IEnumerable<long> idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(SoftDeleteSql, idsArr);
+            return await conn.ExecuteAsync(SoftDeleteSql, new { Id = idsArr });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsync(long equipmentId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByEquipmentIdSql, new { EquipmentId=equipmentId });
         }
 
         /// <summary>
@@ -88,10 +99,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="equipmentIds"></param>
         /// <returns></returns>
-        public async Task<int> SoftDeleteAsync(long[] equipmentIds)
+        public async Task<int> DeletesAsync(long[] equipmentIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(SoftDeleteSql, new { equipmentIds });
+            return await conn.ExecuteAsync(DeletesByEquipmentIdSql, new { EquipmentIds= equipmentIds });
         }
 
         /// <summary>
@@ -147,32 +158,22 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentLinkApiEntity>> GetPagedInfoAsync(EquEquipmentLinkApiPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquEquipmentLinkApiEntity>> GetPagedListAsync(EquEquipmentLinkApiPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(pagedQuery.SiteCode))
-            {
-                sqlBuilder.Where("SiteCode=@SiteCode");
-            }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.UnitCode))
-            {
-                sqlBuilder.Where("UnitCode=@UnitCode");
-            }
-            //if (equipmentUnitPagedQuery.ChangeType.HasValue)
-            //{
-            //    sqlBuilder.Where("ChangeType=@ChangeType");
-            //}
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-
             var entities = await conn.QueryAsync<EquEquipmentLinkApiEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
@@ -188,14 +189,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
-        const string InsertSql = "INSERT INTO `equ_equipment_link_api`(`Id`, `SiteCode`, `UnitCode`, `UnitName`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @UnitCode, @UnitName, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
-        const string UpdateSql = "UPDATE `equ_equipment_link_api` SET UnitName = @UnitName, Type = @Type, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string InsertSql = "INSERT INTO `equ_equipment_link_api`(  `Id`, `EquipmentId`, `ApiUrl`, `ApiType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `Remark`, `SiteCode`) VALUES (   @Id, @EquipmentId, @ApiUrl, @ApiType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @Remark, @SiteCode )  ";
+        const string UpdateSql = "UPDATE `equ_equipment_link_api` SET   EquipmentId = @EquipmentId, ApiUrl = @ApiUrl, ApiType = @ApiType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, Remark = @Remark, SiteCode = @SiteCode  WHERE Id = @Id ";
         const string SoftDeleteSql = "UPDATE `equ_equipment_link_api` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string DeleteByEquipmentIdSql = "DELETE FROM equ_equipment_link_api WHERE EquipmentId=@EquipmentId ;";
+        const string DeletesByEquipmentIdSql = "DELETE FROM equ_equipment_link_api WHERE EquipmentId in @EquipmentIds ;";
         const string GetByIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `Id` = @Id;";
         const string GetByEquipmentIdSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
         const string GetByEquipmentSql = "SELECT * FROM `equ_equipment_link_api` WHERE `EquipmentId` = @EquipmentId;";
-        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_api` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_api` /**where**/";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `equ_equipment_link_api` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_equipment_link_api` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetEntitiesSqlTemplate = "";
     }
 }

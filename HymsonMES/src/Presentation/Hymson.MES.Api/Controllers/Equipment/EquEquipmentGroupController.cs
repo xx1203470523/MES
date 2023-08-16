@@ -1,7 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
-using Hymson.Utils.Extensions;
+using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
@@ -11,6 +12,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// @author 陈志谱
     /// @date 2023-02-08 02:43:18
     /// </summary>
+    //
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentGroupController : ControllerBase
@@ -37,10 +39,11 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task Create([FromBody] EquEquipmentGroupCreateDto createDto)
+        [LogDescription("设备组", BusinessType.INSERT)]
+        [PermissionDescription("equ:equipmentGroup:insert")]
+        public async Task CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
-            await _equEquipmentGroupService.CreateEquEquipmentGroupAsync(createDto);
+            await _equEquipmentGroupService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -48,11 +51,12 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
-        public async Task Modify([FromBody] EquEquipmentGroupModifyDto modifyDto)
+        [HttpPut]
+        [LogDescription("设备组", BusinessType.UPDATE)]
+        [PermissionDescription("equ:equipmentGroup:update")]
+        public async Task ModifyAsync(EquEquipmentGroupSaveDto modifyDto)
         {
-            await _equEquipmentGroupService.ModifyEquEquipmentGroupAsync(modifyDto);
+            await _equEquipmentGroupService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
@@ -60,12 +64,12 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
-        public async Task Delete(string ids)
+        [HttpDelete]
+        [LogDescription("设备组", BusinessType.DELETE)]
+        [PermissionDescription("equ:equipmentGroup:delete")]
+        public async Task DeletesAsync(long[] ids)
         {
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _equEquipmentGroupService.DeletesEquEquipmentGroupAsync(idsArr);
+            await _equEquipmentGroupService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -73,22 +77,23 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("pagelist")]
+        [HttpGet]
+        [Route("page")]
+        //[PermissionDescription("equ:equipmentGroup:list")]
         public async Task<PagedInfo<EquEquipmentGroupListDto>> GetPagedListAsync([FromQuery] EquEquipmentGroupPagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentGroupService.GetPageListAsync(pagedQueryDto);
+            return await _equEquipmentGroupService.GetPagedListAsync(pagedQueryDto);
         }
 
         /// <summary>
         /// 查询详情（设备组）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("detail")]
-        public async Task<EquEquipmentGroupDto> GetEquEquipmentGroupAsync(EquEquipmentGroupQueryDto query)
+        [HttpGet("{id}")]
+        public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
-            return await _equEquipmentGroupService.GetEquEquipmentGroupWithEquipmentsAsync(query);
+            return await _equEquipmentGroupService.GetDetailAsync(id);
         }
     }
 }

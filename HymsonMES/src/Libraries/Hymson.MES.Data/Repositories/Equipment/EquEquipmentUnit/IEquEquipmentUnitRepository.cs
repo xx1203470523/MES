@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
@@ -10,45 +11,39 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit
     public interface IEquEquipmentUnitRepository
     {
         /// <summary>
-        /// 
+        /// 插入
         /// </summary>
-        /// <param name="equipmentUnitEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquEquipmentUnitEntity equipmentUnitEntity);
+        Task<int> InsertAsync(EquEquipmentUnitEntity entity);
 
         /// <summary>
-        /// 
+        /// 更新
         /// </summary>
-        /// <param name="equipmentUnitEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquEquipmentUnitEntity equipmentUnitEntity);
+        Task<int> UpdateAsync(EquEquipmentUnitEntity entity);
 
         /// <summary>
-        /// 
+        /// 删除
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long[] idsArr);
+        Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
-        /// 
+        /// 查询详情
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquEquipmentUnitEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 
+        /// 分页查询
         /// </summary>
-        /// <param name="equipmentUnitQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentUnitEntity>> GetEntitiesAsync(EquEquipmentUnitQuery equipmentUnitQuery);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="equipmentUnitPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedInfoAsync(EquEquipmentUnitPagedQuery equipmentUnitPagedQuery);
+        Task<PagedInfo<EquEquipmentUnitEntity>> GetPagedListAsync(EquEquipmentUnitPagedQuery pagedQuery);
+        
     }
 }

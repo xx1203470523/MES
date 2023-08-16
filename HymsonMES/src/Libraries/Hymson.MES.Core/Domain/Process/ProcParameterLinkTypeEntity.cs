@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -13,8 +14,8 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
-        
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 描述 :标准参数ID 
         /// 空值 : false  
@@ -25,12 +26,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :参数类型 
         /// 空值 : false  
         /// </summary>
-        public int ParameterType { get; set; }
+        public ParameterTypeEnum ParameterType { get; set; }
         
         /// <summary>
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         }
 }

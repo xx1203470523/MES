@@ -1,16 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
-using Hymson.Utils.Extensions;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -19,6 +11,7 @@ namespace Hymson.MES.Api.Controllers.Process
     /// @author Karl
     /// @date 2023-02-08 04:47:44
     /// </summary>
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialController : ControllerBase
@@ -44,7 +37,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpGet]
         [Route("pagelist")]
         public async Task<PagedInfo<ProcMaterialDto>> QueryPagedProcMaterialAsync([FromQuery] ProcMaterialPagedQueryDto parm)
         {
@@ -74,12 +67,25 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 查询物料关联的供应商信息（物料维护）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        [HttpGet("materialSupplier/{materialId}")]
+        public async Task<List<ProcMaterialSupplierViewDto>> QueryProcMaterialSupplierByMaterialIdAsync(long materialId)
+        {
+            return await _procMaterialService.QueryProcMaterialSupplierByMaterialIdAsync(materialId);
+        }
+
+        /// <summary>
         /// 添加（物料维护）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [LogDescription("物料维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:material:insert")]
         public async Task AddProcMaterialAsync([FromBody] ProcMaterialCreateDto parm)
         {
              await _procMaterialService.CreateProcMaterialAsync(parm);
@@ -90,8 +96,10 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("update")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:update")]
         public async Task UpdateProcMaterialAsync([FromBody] ProcMaterialModifyDto parm)
         {
              await _procMaterialService.ModifyProcMaterialAsync(parm);
@@ -102,12 +110,14 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
-        public async Task DeleteProcMaterialAsync(string ids)
+        [LogDescription("物料维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:material:delete")]
+        public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
         {
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
-            await _procMaterialService.DeletesProcMaterialAsync(ids);
+           return await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
     }

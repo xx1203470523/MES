@@ -35,6 +35,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Remark { get; set; }
 
+        public long[] ResourceIds { get; set; }
+
         /// <summary>
         /// 创建人
         /// </summary>
@@ -96,17 +98,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public string? ResName { get; set; }
-
-        /// <summary>
-        /// 站点
-        /// </summary>
-        public string? SiteCode { get; set; }
     }
 
     /// <summary>
     /// 新增实体
     /// </summary>
-    public record ProcResourceTypeAddCommandDto : BaseEntityDto
+    public record ProcResourceTypeAddDto : BaseEntityDto
     {
         /// <summary>
         /// 描述 :资源类型 
@@ -123,7 +120,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 关联的资源Id
@@ -134,7 +131,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// <summary>
     /// 修改实体
     /// </summary>
-    public record ProcResourceTypeUpdateCommandDto : BaseEntityDto
+    public record ProcResourceTypeUpdateDto : BaseEntityDto
     {
         /// <summary>
         /// 唯一Id

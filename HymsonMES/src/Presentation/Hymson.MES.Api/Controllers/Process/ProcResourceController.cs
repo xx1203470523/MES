@@ -1,7 +1,12 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
-using Hymson.Utils.Extensions;
+using Hymson.MES.Services.Services.Process.Resource;
+using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -13,6 +18,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-08
     /// </summary>
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceController : ControllerBase
@@ -41,7 +47,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceViewDto>> QueryProcResource([FromQuery] ProcResourcePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceViewDto>> QueryProcResourceAsync([FromQuery] ProcResourcePagedQueryDto query)
         {
             return await _procResourceService.GetPageListAsync(query);
         }
@@ -53,7 +59,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("querylist")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceDto>> GetProcResourceList([FromQuery] ProcResourcePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceDto>> GetProcResourceListAsync([FromQuery] ProcResourcePagedQueryDto query)
         {
             return await _procResourceService.GetListAsync(query);
         }
@@ -64,7 +70,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcResourceDto> GetProcResource(long id)
+        public async Task<ProcResourceDto> GetProcResourceAsync(long id)
         {
             return await _procResourceService.GetByIdAsync(id);
         }
@@ -76,33 +82,81 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("listforgroup")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceDto>> GetListForGroup([FromQuery] ProcResourcePagedQueryDto query)
+        public async Task<List<ProcResourceDto>> GetListForGroupAsync([FromQuery] ProcResourcePagedQueryDto query)
         {
             return await _procResourceService.GetListForGroupAsync(query);
         }
 
         /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("listByProcedure")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync([FromQuery] ProcResourceProcedurePagedQueryDto query)
+        {
+            return await _procResourceService.GettPageListByProcedureIdAsync(query);
+        }
+
+        /// <summary>
         /// 资源关联打印机数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("print/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetResourceConfigPrint(ProcResourceConfigPrintPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigPrintViewDto>> GetResourceConfigPrintAsync([FromQuery] ProcResourceConfigPrintPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigPrintAsync(parm);
+            return await _procResourceService.GetcResourceConfigPrintAsync(query);
         }
 
         /// <summary>
         /// 获取资源设置数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Route("res/list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigPrint(ProcResourceConfigResPagedQueryDto parm)
+        public async Task<PagedInfo<ProcResourceConfigResDto>> GetResourceConfigPrintAsync([FromQuery] ProcResourceConfigResPagedQueryDto query)
         {
-            return await _procResourceService.GetcResourceConfigResAsync(parm);
+            return await _procResourceService.GetcResourceConfigResAsync(query);
+        }
+
+        /// <summary>
+        /// 获取资源关联设备数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("equ/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcResourceEquipmentBindViewDto>> GetResourceConfigEquAsync([FromQuery] ProcResourceEquipmentBindPagedQueryDto query)
+        {
+            return await _procResourceService.GetcResourceConfigEquAsync(query);
+        }
+
+        /// <summary>
+        /// 获取资源关联作业数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("job/list")]
+        [HttpGet]
+        public async Task<PagedInfo<ProcedureJobReleationDto>> GetProcedureConfigJobLisAsynct([FromQuery] InteJobBusinessRelationPagedQueryDto query)
+        {
+            return await _procResourceService.GetProcedureConfigJobListAsync(query);
+        }
+
+        /// <summary>
+        /// 获取资源关联产出数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Route("product/list")]
+        [HttpGet]
+        public async Task<IEnumerable<ProcProductSetDto>> GetResourceProductSetListAsync(ProcProductSetQueryDto query)
+        {
+            return await _procResourceService.GetResourceProductSetListAsync(query);
         }
 
         /// <summary>
@@ -111,7 +165,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task AddProcResource([FromBody] ProcResourceDto parm)
+        [LogDescription("资源维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:resource:insert")]
+        public async Task AddProcResourceAsync([FromBody] ProcResourceCreateDto parm)
         {
             await _procResourceService.AddProcResourceAsync(parm);
         }
@@ -122,7 +178,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task UpdateProcResource([FromBody] ProcResourceDto parm)
+        [LogDescription("资源维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:resource:update")]
+        public async Task UpdateProcResourceAsync([FromBody] ProcResourceModifyDto parm)
         {
             await _procResourceService.UpdateProcResrouceAsync(parm);
         }
@@ -130,12 +188,27 @@ namespace Hymson.MES.Api.Controllers
         /// <summary>
         /// 删除资源维护表
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task DeleteProcResource(string ids)
+        [HttpDelete]
+        [LogDescription("资源维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:resource:delete")]
+        public async Task DeleteProcResourceAsync(DeleteDto deleteDto)
         {
-            await _procResourceService.DeleteProcResourceAsync(ids);
+            await _procResourceService.DeleteProcResourceAsync(deleteDto.Ids);
         }
+
+        /// <summary>
+        /// 查询资源绑定的设备
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        [HttpGet("equipments/{resourceId}")]
+        public async Task<IEnumerable<SelectOptionDto>> QueryEquipmentsByResourceIdAsync(long resourceId)
+        {
+            return await _procResourceService.QueryEquipmentsByResourceIdAsync(resourceId);
+        }
+
+
     }
 }

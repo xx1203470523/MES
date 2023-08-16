@@ -37,11 +37,11 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("ResourceId = @ResourceId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("a.ResourceId=@ResourceId");
 
-            //TODO 按UpdateOn倒序排列
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
@@ -71,57 +71,54 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr) 
+        public async Task<int> DeletesRangeAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSql, idsArr);
         }
 
         /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ProcResourceConfigResEntity> GetByIdAsync(long id)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcResourceConfigResEntity>(GetByIdSql, new { Id=id});
-        }
-
-        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceConfigResEntity"></param>
+        /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task InsertAsync(ProcResourceConfigResEntity procResourceConfigResEntity)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, procResourceConfigResEntity);
-            procResourceConfigResEntity.Id = id;
+            await conn.ExecuteAsync(InsertSql, procResourceConfigRess);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceConfigResEntity"></param>
+        /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ProcResourceConfigResEntity procResourceConfigResEntity)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procResourceConfigResEntity);
+            return await conn.ExecuteAsync(UpdateSql, procResourceConfigRess);
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByResourceIdAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByResourceIdSql, new { ResourceId = id });
         }
     }
 
     public partial class ProcResourceConfigResRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_resource_config_res` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `proc_resource_config_res` /**where**/";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_resource_config_res` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_resource_config_res` /**where**/";
 
-        const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteCode`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteCode, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_resource_config_res` SET   SiteCode = @SiteCode, ResourceId = @ResourceId, SetType = @SetType, Value = @Value, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `proc_resource_config_res` SET IsDeleted = '1' WHERE Id = @Id ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteCode`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_resource_config_res`  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_resource_config_res`(  `Id`, `SiteId`, `ResourceId`, `SetType`, `Value`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResourceId, @SetType, @Value, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `proc_resource_config_res` SET  SetType = @SetType, Value = @Value,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `proc_resource_config_res` SET IsDeleted =Id WHERE Id = @Id ";
+        const string DeleteByResourceIdSql = "delete from `proc_resource_config_res` WHERE ResourceId = @ResourceId ";
     }
 }

@@ -13,21 +13,21 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquipmentUnitAsync(EquEquipmentUnitCreateDto createDto);
+        Task<int> CreateAsync(EquEquipmentUnitSaveDto createDto);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyEquipmentUnitAsync(EquEquipmentUnitModifyDto modifyDto);
+        Task<int> ModifyAsync(EquEquipmentUnitSaveDto modifyDto);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteEquipmentUnitAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 
@@ -41,6 +41,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipmentUnit
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquEquipmentUnitDto> GetEntityAsync(long id);
+        Task<EquEquipmentUnitDto> GetDetailAsync(long id);
     }
 }

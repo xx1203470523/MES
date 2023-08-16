@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -13,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         
         /// <summary>
         /// 描述 :BOM 
@@ -31,7 +32,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
         
         /// <summary>
         /// 描述 :版本 
@@ -43,12 +44,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否当前版本 
         /// 空值 : true  
         /// </summary>
-        public byte IsCurrentVersion { get; set; }
+        public bool IsCurrentVersion { get; set; }
         
         /// <summary>
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         }
 }

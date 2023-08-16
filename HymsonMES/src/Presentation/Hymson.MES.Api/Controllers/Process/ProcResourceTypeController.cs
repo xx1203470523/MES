@@ -1,7 +1,10 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Process.IProcessService;
-using Hymson.Utils.Extensions;
+using Hymson.MES.Services.Services.Process.ResourceType;
+using Hymson.Utils;
+using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers
@@ -12,6 +15,7 @@ namespace Hymson.MES.Api.Controllers
     /// @author zhaoqing
     /// @date 2023-02-06
     /// </summary>
+    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceTypeController : ControllerBase
@@ -40,7 +44,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("list")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceTypeViewDto>> QueryProcResourceType([FromQuery] ProcResourceTypePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceTypeViewDto>> QueryProcResourceTypeAsync([FromQuery] ProcResourceTypePagedQueryDto query)
         {
             return await _procResourceTypeService.GetPageListAsync(query);
         }
@@ -52,7 +56,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("querylist")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceTypeDto>> GetProcResourceTypeList([FromQuery] ProcResourceTypePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceTypeDto>> GetProcResourceTypeListAsync([FromQuery] ProcResourceTypePagedQueryDto query)
         {
             return await _procResourceTypeService.GetListAsync(query);
         }
@@ -63,8 +67,7 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        //[ActionPermissionFilter(Permission = "business:procResourceType:query")]
-        public async Task<ProcResourceTypeDto> GetProcResourceType(long id)
+        public async Task<ProcResourceTypeDto> GetProcResourceTypeAsync(long id)
         {
             return await _procResourceTypeService.GetListAsync(id);
         }
@@ -75,7 +78,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task AddProcResourceType([FromBody] ProcResourceTypeAddCommandDto parm)
+        [LogDescription("资源类型维护", BusinessType.INSERT)]
+        [PermissionDescription("proc:resourceType:insert")]
+        public async Task AddProcResourceTypeAsync([FromBody] ProcResourceTypeAddDto parm)
         {
             await _procResourceTypeService.AddProcResourceTypeAsync(parm);
         }
@@ -86,7 +91,9 @@ namespace Hymson.MES.Api.Controllers
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        public async Task UpdateProcResourceType([FromBody] ProcResourceTypeUpdateCommandDto parm)
+        [LogDescription("资源类型维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:resourceType:update")]
+        public async Task UpdateProcResourceTypeAsync([FromBody] ProcResourceTypeUpdateDto parm)
         {
             await _procResourceTypeService.UpdateProcResrouceTypeAsync(parm);
         }
@@ -94,12 +101,14 @@ namespace Hymson.MES.Api.Controllers
         /// <summary>
         /// 删除资源类型维护表
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
-        [HttpDelete("{ids}")]
-        public async Task DeleteProcResourceType(string ids)
+        [HttpDelete]
+        [LogDescription("资源类型维护", BusinessType.DELETE)]
+        [PermissionDescription("proc:resourceType:delete")]
+        public async Task DeleteProcResourceTypeAsync(DeleteDto deleteDto)
         {
-            await _procResourceTypeService.DeleteProcResourceTypeAsync(ids);
+            await _procResourceTypeService.DeleteProcResourceTypeAsync(deleteDto.Ids);
         }
     }
 }

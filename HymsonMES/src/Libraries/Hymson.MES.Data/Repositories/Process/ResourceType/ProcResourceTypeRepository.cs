@@ -1,18 +1,12 @@
 ﻿using Dapper;
-using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.OnStock;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.OnStock;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -68,11 +62,17 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            //sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
+            if (string.IsNullOrEmpty(query.Sorting))
             {
-                sqlBuilder.Where("a.SiteCode=@SiteCode");
+                sqlBuilder.OrderBy("a.CreatedOn DESC");
             }
+            else
+            {
+                sqlBuilder.OrderBy(query.Sorting);
+            }
+
+            //sqlBuilder.Select("*");
+            sqlBuilder.Where("a.SiteId = @SiteId");
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
                 query.ResType = $"%{query.ResType}%";
@@ -117,12 +117,11 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-            if (!string.IsNullOrWhiteSpace(query.SiteCode))
-            {
-                sqlBuilder.Where("SiteCode=@SiteCode");
-            }
+
+            sqlBuilder.Where("SiteId = @SiteId");
             if (!string.IsNullOrWhiteSpace(query.ResType))
             {
                 query.ResType = $"%{query.ResType}%";
@@ -171,28 +170,28 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long[] idsArr)
+        public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
     }
 
     public partial class ProcResourceTypeRepository
     {
-        const string GetByIdSql = "select * from proc_resource_type where Id =@Id ";
-        const string GetByCodeSql = "select * from proc_resource_type where SiteCode =@SiteCode and ResType =@ResType and IsDeleted =0 ";
+        const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
+        const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType =@ResType and IsDeleted =0 ";
 
-        const string GetPagedInfoDataSqlTemplate = "SELECT a.Id,a.SiteCode,ResType,ResTypeName,a.Remark,a.CreateBy ,a.CreateOn,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId and b.IsDeleted=0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";
 
-        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
+        const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type /**where**/";
 
-        const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteCode`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteCode, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
+        const string InsertSql = "INSERT INTO `proc_resource_type`(`Id`, `SiteId`, `ResType`, `ResTypeName`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResType, @ResTypeName, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
         const string UpdateSql = "UPDATE `proc_resource_type` SET ResTypeName = @ResTypeName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
-        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = 1 WHERE `Id` = @Id;";
+        const string DeleteSql = "UPDATE `proc_resource_type` SET `IsDeleted` = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids";
     }
 }

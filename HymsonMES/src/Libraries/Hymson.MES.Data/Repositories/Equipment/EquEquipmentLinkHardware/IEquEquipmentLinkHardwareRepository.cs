@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys);
+        Task<int> InsertRangeAsync(IEnumerable<EquEquipmentLinkHardwareEntity> entitys);
 
         /// <summary>
         /// 
@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<EquEquipmentLinkHardwareEntity> entitys);
+        Task<int> UpdateRangeAsync(IEnumerable<EquEquipmentLinkHardwareEntity> entitys);
 
         /// <summary>
         /// 
@@ -48,9 +48,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsync(long equipmentId);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="equipmentIds"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long[] equipmentIds);
+        Task<int> DeletesAsync(long[] equipmentIds);
 
         /// <summary>
         /// 
@@ -86,6 +93,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentLinkHardwareEntity>> GetPagedInfoAsync(EquEquipmentLinkHardwarePagedQuery pagedQuery);
+        Task<PagedInfo<EquEquipmentLinkHardwareEntity>> GetPagedListAsync(EquEquipmentLinkHardwarePagedQuery pagedQuery);
     }
 }

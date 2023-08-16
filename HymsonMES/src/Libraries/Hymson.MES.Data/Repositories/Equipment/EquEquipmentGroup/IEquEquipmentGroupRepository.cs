@@ -1,6 +1,10 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 {
@@ -12,30 +16,30 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equEquipmentGroupEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task InsertAsync(EquEquipmentGroupEntity equEquipmentGroupEntity);
-        
+        Task<int> InsertAsync(EquEquipmentGroupEntity entity);
+
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="equEquipmentGroupEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquEquipmentGroupEntity equEquipmentGroupEntity);
-        
+        Task<int> UpdateAsync(EquEquipmentGroupEntity entity);
+
         /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long id);
-        
+        Task<int> DeleteAsync(long id);
+
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long[] idsArr);
+        Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
         /// 根据ID获取数据
@@ -43,19 +47,26 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquEquipmentGroupEntity> GetByIdAsync(long id);
-        
+
         /// <summary>
-        /// 获取List
+        /// 根据IDs批量获取数据
         /// </summary>
-        /// <param name="equEquipmentGroupQuery"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquEquipmentGroupEntity>> GetEquEquipmentGroupEntitiesAsync(EquEquipmentGroupQuery equEquipmentGroupQuery);
-        
+        Task<IEnumerable<EquEquipmentGroupEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
+
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="equEquipmentGroupPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentGroupEntity>> GetPagedInfoAsync(EquEquipmentGroupPagedQuery equEquipmentGroupPagedQuery);
+        Task<PagedInfo<EquEquipmentGroupEntity>> GetPagedListAsync(EquEquipmentGroupPagedQuery pagedQuery);
     }
 }

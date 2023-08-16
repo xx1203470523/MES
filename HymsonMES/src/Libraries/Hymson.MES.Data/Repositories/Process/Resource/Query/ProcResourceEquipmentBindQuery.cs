@@ -19,5 +19,24 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcResourceEquipmentBindQuery
     {
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// id集合
+        /// </summary>
+        public long[] Ids { get; set; }
+
+        /// <summary>
+        /// 是否主设备
+        /// </summary>
+        public bool IsMain { get; set; } = false;
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
     }
 }

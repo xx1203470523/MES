@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -7,42 +8,41 @@ namespace Hymson.MES.Core.Domain.Integrated
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class InteCalendarEntity: BaseEntity
+    public class InteCalendarEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :日历名称 
         /// 空值 : false  
         /// </summary>
-        public string CalendarName { get; set; }
-        
+        public string CalendarName { get; set; } = "";
+
         /// <summary>
         /// 描述 :日历类型（字典名称：inte_calendar_type） 
         /// 空值 : false  
         /// </summary>
-        public string CalendarType { get; set; }
-        
+        public int CalendarType { get; set; }
+
         /// <summary>
         /// 描述 :设备或者线体id 
         /// 空值 : false  
         /// </summary>
         public long EquOrLineId { get; set; }
-        
+
         /// <summary>
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
-        
+        public string Remark { get; set; } = "";
+
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 站点ID 
         /// </summary>
-        public string SiteCode { get; set; }
-        
+        public long? SiteId { get; set; }
+
         /// <summary>
         /// 描述 :启用状态 
         /// 空值 : true  
         /// </summary>
-        public byte UseStatus { get; set; }
-        }
+        public CalendarUseStatusEnum UseStatus { get; set; }
+    }
 }

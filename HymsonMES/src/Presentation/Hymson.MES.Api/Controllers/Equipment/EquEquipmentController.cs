@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
-using Hymson.Utils.Extensions;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
@@ -12,6 +12,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
     /// @author Czhipu
     /// @date 2022-11-08
     /// </summary>
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentController : ControllerBase
@@ -39,20 +40,11 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
-        public async Task<int> Create([FromBody] EquEquipmentCreateDto createDto)
+        [LogDescription("设备注册", BusinessType.INSERT)]
+        [PermissionDescription("equ:equipment:insert")]
+        public async Task CreateAsync(EquEquipmentSaveDto createDto)
         {
-            /*
-            if (parm == null)
-            {
-                return ToResponse(ResultCode.PARAM_ERROR, "请求参数错误");
-            }
-
-            var responseDto = await _equEquipmentService.AddEquEquipmentAsync(parm);
-            return ToResponse(responseDto);
-            */
-
-            return await _equEquipmentService.CreateEquEquipmentAsync(createDto);
+            await _equEquipmentService.CreateAsync(createDto);
         }
 
         /// <summary>
@@ -60,21 +52,12 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("update")]
-        public async Task<int> Modify([FromBody] EquEquipmentModifyDto modifyDto)
+        [HttpPut]
+        [LogDescription("设备注册", BusinessType.UPDATE)]
+        [PermissionDescription("equ:equipment:update")]
+        public async Task ModifyAsync(EquEquipmentSaveDto modifyDto)
         {
-            /*
-            if (parm == null)
-            {
-                return ToResponse(ResultCode.PARAM_ERROR, "请求实体不能为空！");
-            }
-
-            var responseDto = await _equEquipmentService.UpdateEquEquipmentAsync(parm);
-            return ToResponse(responseDto);
-            */
-
-            return await _equEquipmentService.ModifyEquEquipmentAsync(modifyDto);
+            await _equEquipmentService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
@@ -82,20 +65,12 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("delete")]
-        public async Task<int> Delete(string ids)
+        [HttpDelete]
+        [LogDescription("设备注册", BusinessType.DELETE)]
+        [PermissionDescription("equ:equipment:delete")]
+        public async Task DeletesAsync(long[] ids)
         {
-            /*
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            if (idsArr.Length <= 0) { return ToResponse(ApiResponse.Error($"删除失败Id 不能为空")); }
-
-            var responseDto = await _equEquipmentService.DeleteEquEquipmentAsync(idsArr);
-            return ToResponse(responseDto);
-            */
-
-            long[] idsArr = StringExtension.SpitLongArrary(ids);
-            return await _equEquipmentService.DeleteEquEquipmentAsync(idsArr);
+            await _equEquipmentService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -103,9 +78,10 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [Route("pagelist")]
+        [Route("page")]
         [HttpGet]
-        public async Task<PagedInfo<EquEquipmentListDto>> QueryEquEquipmentAsync([FromQuery] EquEquipmentPagedQueryDto pagedQueryDto)
+        //[PermissionDescription("equ:equipment:list")]
+        public async Task<PagedInfo<EquEquipmentListDto>> GetPageListAsync([FromQuery] EquEquipmentPagedQueryDto pagedQueryDto)
         {
             return await _equEquipmentService.GetPagedListAsync(pagedQueryDto);
         }
@@ -116,9 +92,9 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id)
+        public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
-            return await _equEquipmentService.GetEquEquipmentWithGroupNameAsync(id);
+            return await _equEquipmentService.GetDetailAsync(id);
         }
 
         /// <summary>
@@ -126,7 +102,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// </summary>
         /// <returns></returns>
         [HttpGet("dictionary")]
-        public async Task<List<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync()
+        public async Task<IEnumerable<EquEquipmentDictionaryDto>> QueryEquEquipmentDictionaryAsync()
         {
             return await _equEquipmentService.GetEquEquipmentDictionaryAsync();
         }
@@ -134,23 +110,49 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         /// <summary>
         ///  获取设备关联硬件数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("linkHardware/list")]
-        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkHardwareBaseDto>> GetEquipmentLinkHardwareAsync(EquEquipmentLinkHardwarePagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentService.GetEquimentLinkHardwareAsync(parm);
+            return await _equEquipmentService.GetEquimentLinkHardwareAsync(pagedQueryDto);
         }
 
         /// <summary>
         ///  获取设备关联Api数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet("linkApi/list")]
-        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto parm)
+        public async Task<PagedInfo<EquEquipmentLinkApiBaseDto>> GetEquipmentLinkApiAsync(EquEquipmentLinkApiPagedQueryDto pagedQueryDto)
         {
-            return await _equEquipmentService.GetEquimentLinkApiAsync(parm);
+            return await _equEquipmentService.GetEquimentLinkApiAsync(pagedQueryDto);
         }
+
+        /// <summary>
+        /// 获取设备Token
+        /// </summary>
+        /// <param name="EquEquipmentId"></param>
+        /// <returns></returns>
+        [Route("token/{equEquipmentId}")]
+        [PermissionDescription("equ:equipment:token")]
+        [HttpGet]
+        public async Task<string> GetEquEquipmentTokenAsync(long EquEquipmentId)
+        {
+            return await _equEquipmentService.GetEquEquipmentTokenAsync(EquEquipmentId);
+        }
+
+        /// <summary>
+        /// 根据设备ID查询对应的验证
+        /// </summary>
+        /// <param name="equEquipmentId"></param>
+        /// <returns></returns>
+        [Route("getEquipmentVerifyByEquipmentId/{equEquipmentId}")]
+        [HttpGet]
+        public async Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equEquipmentId)
+        {
+            return await _equEquipmentService.GetEquipmentVerifyByEquipmentIdAsync(equEquipmentId);
+        }
+
     }
 }

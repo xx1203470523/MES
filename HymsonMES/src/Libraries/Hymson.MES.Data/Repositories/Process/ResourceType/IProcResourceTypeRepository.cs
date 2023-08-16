@@ -1,5 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,8 +57,8 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long[] idsArr);
+        Task<int> DeleteRangeAsync(DeleteCommand command);
     }
 }

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Process;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -13,7 +14,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; } = 0;
         
         /// <summary>
         /// 描述 :所属工艺路线ID 
@@ -26,18 +27,23 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string SerialNo { get; set; }
-        
+
+        /// <summary>
+        /// 手动排序号  20230703 海龙说加上这个做排序使用，重复也不管
+        /// </summary>
+        public string ManualSortNumber { get; set; }
+
         /// <summary>
         /// 描述 :所属工序ID 
         /// 空值 : false  
         /// </summary>
-        public long ProcedureBomId { get; set; }
-        
+        public long ProcedureId { get; set; }
+
         /// <summary>
         /// 描述 :抽检类型 
         /// 空值 : true  
         /// </summary>
-        public string CheckType { get; set; }
+        public ProcessRouteInspectTypeEnum? CheckType { get; set; }
         
         /// <summary>
         /// 描述 :抽检比例 
@@ -49,7 +55,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否报工 
         /// 空值 : true  
         /// </summary>
-        public byte IsWorkReport { get; set; }
+        public int IsWorkReport { get; set; }
         
         /// <summary>
         /// 描述 :包装等级 
@@ -61,7 +67,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否首工序 
         /// 空值 : true  
         /// </summary>
-        public byte IsFirstProcess { get; set; }
+        public int IsFirstProcess { get; set; }
         
         /// <summary>
         /// 描述 :状态 

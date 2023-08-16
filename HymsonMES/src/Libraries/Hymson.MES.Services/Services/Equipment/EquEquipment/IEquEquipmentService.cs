@@ -15,21 +15,21 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> CreateEquEquipmentAsync(EquEquipmentCreateDto parm);
+        Task<int> CreateAsync(EquEquipmentSaveDto parm);
 
         /// <summary>
         /// 更新（设备注册）
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<int> ModifyEquEquipmentAsync(EquEquipmentModifyDto parm);
+        Task<int> ModifyAsync(EquEquipmentSaveDto parm);
 
         /// <summary>
         /// 删除（设备注册）
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteEquEquipmentAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
 
         /// <summary>
         /// 分页查询列表（设备注册）
@@ -42,14 +42,14 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// 查询列表（设备注册）
         /// </summary>
         /// <returns></returns>
-        Task<List<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync();
+        Task<IEnumerable<EquEquipmentDictionaryDto>> GetEquEquipmentDictionaryAsync();
 
         /// <summary>
         /// 查询详情（设备注册）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquEquipmentDto> GetEquEquipmentWithGroupNameAsync(long id);
+        Task<EquEquipmentDto> GetDetailAsync(long id);
 
         /// <summary>
         /// 查询设备关联硬件列表
@@ -70,9 +70,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// 查询设备（单个）
         /// </summary>
         /// <param name="equipmentCode">设备编码</param>
-        /// <param name="siteCode">站点</param>
         /// <returns></returns>
-        Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode, string siteCode);
+        Task<EquEquipmentDto> GetByEquipmentCodeAsync(string equipmentCode);
 
         /// <summary>
         /// 根据设备id+接口类型获取接口地址
@@ -89,6 +88,29 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <param name="hardwareType"></param>
         /// <returns></returns>
         Task<EquEquipmentLinkHardwareDto> GetLinkHardwareForCodeAndTypeAsync(string hardwareCode, string hardwareType);
+
+
+        /// <summary>
+        /// 创建Token
+        /// </summary>
+        /// <param name="EquipmentId"></param>
+        /// <returns></returns>
+        Task<string> CreateEquEquipmentTokenAsync(long EquipmentId);
+
+        /// <summary>
+        /// 查找Token
+        /// </summary>
+        /// <param name="EquipmentId"></param>
+        /// <returns></returns>
+        Task<string> GetEquEquipmentTokenAsync(long EquipmentId);
+
+        /// <summary>
+        /// 根据设备ID查询对应的验证
+        /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentVerifyDto>> GetEquipmentVerifyByEquipmentIdAsync(long equipmentId);
+
 
     }
 }

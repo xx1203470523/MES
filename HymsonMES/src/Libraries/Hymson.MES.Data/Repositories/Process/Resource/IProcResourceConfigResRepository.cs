@@ -25,16 +25,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceConfigResEntity"></param>
+        /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        Task InsertAsync(ProcResourceConfigResEntity procResourceConfigResEntity);
+        Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceConfigResEntity"></param>
+        /// <param name="procResourceConfigRes"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcResourceConfigResEntity procResourceConfigResEntity);
+        Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRes);
 
         /// <summary>
         /// 删除
@@ -48,13 +48,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeletesRangeAsync(long[] idsArr);
 
         /// <summary>
-        /// 根据ID获取数据
+        /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcResourceConfigResEntity> GetByIdAsync(long id);
+        Task<int> DeleteByResourceIdAsync(long id);
     }
 }

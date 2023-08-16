@@ -7,15 +7,42 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591;8618</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.4.0" />
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
+    <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="6.2.2" />
+    <PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.73" />
+    <PackageReference Include="Hymson.Excel" Version="2.1.73" />
+    <PackageReference Include="Hymson.Minio" Version="2.1.73" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.73" />
+    <PackageReference Include="Hymson.Web.Framework" Version="2.1.73" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\10100HymsonSharedSDK\HymsonSharedSDK\src\Hymson.Snowflake\Hymson.Snowflake.csproj" />
+    <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
     <ProjectReference Include="..\Hymson.MES.Data\Hymson.MES.Data.csproj" />
+    <ProjectReference Include="..\Hymson.MES.HttpClients\Hymson.MES.HttpClients.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Process\Recipe\" />
   </ItemGroup>
 
 </Project>

@@ -28,7 +28,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         public string Month { get; set; }
         
         /// <summary>
-        /// 描述 :生产班次表Id 
+        /// 描述 :班制维护表Id 
         /// 空值 : false  
         /// </summary>
         public long ClassId { get; set; }
@@ -49,6 +49,6 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         }
 }

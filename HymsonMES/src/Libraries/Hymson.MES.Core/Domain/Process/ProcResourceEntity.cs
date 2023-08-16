@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         
         /// <summary>
         /// 描述 :资源代码 
@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
-        public string Status { get; set; }
+        public int Status { get; set; }
         
         /// <summary>
         /// 描述 :所属资源类型ID 

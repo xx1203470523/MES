@@ -1,0 +1,176 @@
+using Dapper;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
+using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+using System.Text;
+
+namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
+{
+    /// <summary>
+    /// 仓储（物料加载）
+    /// </summary>
+    public partial class ManuFeedingRepository : BaseRepository, IManuFeedingRepository
+    {
+        /// <summary>
+        /// 数据库连接
+        /// </summary>
+        private readonly ConnectionOptions _connectionOptions;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
+        public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        {
+            _connectionOptions = connectionOptions.Value;
+        }
+
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertAsync(ManuFeedingEntity entity)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertSql, entity);
+        }
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyByIdAsync(UpdateQtyByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
+        }
+
+        /// <summary>
+        /// 更新数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
+
+            /*
+            StringBuilder stringBuilder = new();
+            var updatesParams = new DynamicParameters();
+            var i = 0;
+            foreach (var item in commands)
+            {
+                stringBuilder.Append(UpdateQtyHeadSql);
+                stringBuilder.AppendFormat(UpdateQtyTailSql, i);
+
+                updatesParams.Add($"{nameof(item.Id)}{i}", item.Id);
+                updatesParams.Add($"{nameof(item.Qty)}{i}", item.Qty);
+                updatesParams.Add($"{nameof(item.UpdatedBy)}{i}", item.UpdatedBy);
+                updatesParams.Add($"{nameof(item.UpdatedOn)}{i}", item.UpdatedOn);
+                i++;
+            }
+            return await conn.ExecuteAsync(stringBuilder.ToString(), updatesParams);
+            */
+        }
+
+        /// <summary>
+        /// 批量删除（软删除）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsync(DeleteCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteSql, command);
+        }
+
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteByIds, new { ids });
+        }
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByIdsAsync(long[] ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(GetByIds, new { ids });
+        }
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdAsync(GetByResourceIdAndMaterialIdQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(GetByResourceIdAndMaterialId, query);
+        }
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsAsync(GetByResourceIdAndMaterialIdsQuery query)
+        {
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId ");
+
+            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
+        }
+
+        /// <summary>
+        /// 获取加载数据列表（只读取剩余数量大于0的）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsWithOutZeroAsync(GetByResourceIdAndMaterialIdsQuery query)
+        {
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId ");
+
+            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds ");
+
+            sqlBuilder.Append("AND Qty > 0 ");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
+        }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public partial class ManuFeedingRepository
+    {
+        const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = (CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
+        const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
+        const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";
+        const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";
+        const string GetByResourceIdAndMaterialId = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId = @MaterialId; ";
+    }
+}

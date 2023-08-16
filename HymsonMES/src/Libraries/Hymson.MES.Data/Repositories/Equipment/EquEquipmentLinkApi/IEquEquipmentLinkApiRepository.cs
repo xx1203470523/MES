@@ -11,7 +11,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
     public interface IEquEquipmentLinkApiRepository
     {
         /// <summary>
-        /// 
+        /// equipmentUnitEntity
         /// </summary>
         /// <param name="equipmentUnitEntity"></param>
         /// <returns></returns>
@@ -22,7 +22,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<EquEquipmentLinkApiEntity> entitys);
+        Task<int> InsertRangeAsync(IEnumerable<EquEquipmentLinkApiEntity> entitys);
 
         /// <summary>
         /// 
@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(List<EquEquipmentLinkApiEntity> entitys);
+        Task<int> UpdateRangeAsync(IEnumerable<EquEquipmentLinkApiEntity> entitys);
 
         /// <summary>
         /// 
@@ -48,9 +48,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="equipmentId"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsync(long equipmentId);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="equipmentIds"></param>
         /// <returns></returns>
-        Task<int> SoftDeleteAsync(long[] equipmentIds);
+        Task<int> DeletesAsync(long[] equipmentIds);
 
         /// <summary>
         /// 
@@ -86,6 +93,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentLinkApiEntity>> GetPagedInfoAsync(EquEquipmentLinkApiPagedQuery pagedQuery);
+        Task<PagedInfo<EquEquipmentLinkApiEntity>> GetPagedListAsync(EquEquipmentLinkApiPagedQuery pagedQuery);
     }
 }

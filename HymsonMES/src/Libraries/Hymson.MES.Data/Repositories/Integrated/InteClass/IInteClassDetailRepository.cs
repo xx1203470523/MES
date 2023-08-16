@@ -5,7 +5,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
-    /// 生产班次明细仓储接口
+    /// 班制维护明细仓储接口
     /// </summary>
     public interface IInteClassDetailRepository
     {
@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(List<InteClassDetailEntity> entitys);
+        Task<int> InsertRangeAsync(IEnumerable<InteClassDetailEntity> entitys);
 
         /// <summary>
         /// 更新
@@ -77,6 +77,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// </summary>
         /// <param name="inteClassDetailPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<InteClassDetailEntity>> GetPagedInfoAsync(InteClassDetailPagedQuery inteClassDetailPagedQuery);
+        Task<PagedInfo<InteClassDetailEntity>> GetPagedListAsync(InteClassDetailPagedQuery inteClassDetailPagedQuery);
     }
 }

@@ -1,9 +1,18 @@
 using AutoMapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Api.Filters;
+using Hymson.MES.CoreServices.DependencyInjection;
+using Hymson.Web.Framework.Filters;
+using Hymson.WebApi.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Globalization;
 using System.Reflection;
+using static K4os.Compression.LZ4.Engine.Pubternal;
 
 namespace Hymson.MES.Api
 {
@@ -21,33 +30,78 @@ namespace Hymson.MES.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers(options =>
             {
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+                options.Filters.Add(typeof(HttpGlobalActionFilter));
+                options.Filters.Add(new AuthorizeFilter());
+            }).AddJsonOptions((jsonOptions) =>
+            {
+                jsonOptions.JsonSerializerOptions.Converters.Add(new CustomInt64Converter());
             });
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddClearCacheService(builder.Configuration);
+            builder.Services.AddHostedService<WorkService>();
+
             AddSwaggerGen(builder.Services);
+
+            builder.Services.AddJwtBearerService(builder.Configuration);
+            builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
+            builder.Services.AddSqlLocalization(builder.Configuration);
+            builder.Services.AddSequenceService(builder.Configuration);
+            builder.Services.AddHttpClientService(builder.Configuration);
+            builder.Services.AddEventBusRabbitMQService(builder.Configuration);
+            builder.Services.AddLocalization();
+            builder.Services.AddHealthChecks();
+
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();
             var app = builder.Build();
-
+            app.UseHealthChecks("/healthy");
+            //https://learn.microsoft.com/zh-cn/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-6.0&tabs=linux-ubuntu
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            // TODO 龙总说要这么要开放出来
+            //#if DEBUG
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (!app.Environment.IsProduction())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            //#endif
+            #region snippet_ConfigureLocalization
+            var supportedCultures = new List<CultureInfo>
+            {
+                new CultureInfo("en-US"),
+                new CultureInfo("en-AU"),
+                new CultureInfo("en-GB"),
+                new CultureInfo("es-ES"),
+                new CultureInfo("ja-JP"),
+                new CultureInfo("fr-FR"),
+                new CultureInfo("zh"),
+                new CultureInfo("zh-CN"),
+                new CultureInfo("en")
+            };
+            var options = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("zh-CN"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
 
+            app.UseRequestLocalization(options);
+            #endregion
+            app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
-
             app.Run();
         }
 
@@ -57,7 +111,8 @@ namespace Hymson.MES.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-#if DEBUG
+            //#if DEBUG
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
@@ -85,10 +140,38 @@ namespace Hymson.MES.Api
                 var xmlFilename2 = $"Hymson.MES.Services.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2));
 
+                options.OperationFilter<AddResponseHeadersFilter>();
+                //options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+
+                // 在header 中添加token，传递到后台
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+                // JwtBearerDefaults.AuthenticationScheme
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "前置Bearer。示例：Bearer {Token}",
+                    Name = "Authorization",//jwt默认的参数名称,
+                    Type = SecuritySchemeType.ApiKey, //指定ApiKey
+                    BearerFormat = "JWT",//标识承载令牌的格式 该信息主要是出于文档目的
+                    Scheme = JwtBearerDefaults.AuthenticationScheme//授权中要使用的HTTP授权方案的名称
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                        },
+                        new List<string>()
+                    }
+                });
+
+                //options.OperationFilter<SecurityRequirementsOperationFilter>();
+                //options.OperationFilter<AuthorizationOperationFilter>();
             });
-#endif
+            //#endif
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -115,5 +198,6 @@ namespace Hymson.MES.Api
             //register
             AutoMapperConfiguration.Init(config);
         }
+
     }
 }

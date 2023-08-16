@@ -13,7 +13,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :所属站点代码 
         /// 空值 : false  
         /// </summary>
-        public string SiteCode { get; set; }
+        public long SiteId { get; set; }
         
         /// <summary>
         /// 描述 :物料组编号 
@@ -31,12 +31,12 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :物料组版本 
         /// 空值 : true  
         /// </summary>
-        public string GroupVersion { get; set; }
+        public string? GroupVersion { get; set; }
         
         /// <summary>
         /// 描述 :物料组描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         }
 }

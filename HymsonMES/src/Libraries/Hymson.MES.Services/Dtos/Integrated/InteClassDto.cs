@@ -1,10 +1,41 @@
 ﻿using Hymson.Infrastructure;
-using System.ComponentModel.DataAnnotations;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
     /// <summary>
-    /// 生产班次新增输入对象
+    /// 保存Dto（班制维护）
+    /// </summary>
+    public record InteClassSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        ///主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        ///班次名称
+        /// </summary>
+        public string ClassName { get; set; } = "";
+
+        /// <summary>
+        ///班次类型（字典名称：manu_class_type）
+        /// </summary>
+        public ClassTypeEnum ClassType { get; set; }
+
+        /// <summary>
+        ///描述
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InteClassDetailSaveDto> DetailList { get; set; } = new();
+    }
+
+    /// <summary>
+    /// 班制维护新增输入对象
     /// </summary>
     public record InteClassDto : BaseEntityDto
     {
@@ -23,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :班次类型（字典名称：manu_class_type） 
         /// 空值 : false  
         /// </summary>
-        public string ClassType { get; set; }
+        public ClassTypeEnum ClassType { get; set; }
 
         /// <summary>
         /// 描述 :描述 
@@ -32,14 +63,23 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string Remark { get; set; }
 
         /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
+        /// 最后修改人
         /// </summary>
-        public string SiteCode { get; set; }
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InteClassDetailSaveDto> DetailList { get; set; } = new();
     }
 
     /// <summary>
-    /// 生产班次新增输入对象
+    /// 班制维护新增输入对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
@@ -57,71 +97,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
     }
 
     /// <summary>
-    /// 生产班次新增输入对象
-    /// @author wangkeming
-    /// @date 2022-12-26
-    /// </summary>
-    public record AddInteClassDto : BaseEntityDto
-    {
-        /// <summary>
-        ///班次名称
-        /// </summary>
-        [Required(ErrorMessage = "班次名称不能为空")]
-        public string ClassName { get; set; }
-
-        /// <summary>
-        ///班次类型（字典名称：manu_class_type）
-        /// </summary>
-        [Required(ErrorMessage = "班次类型不能为空")]
-        public string ClassType { get; set; }
-
-        /// <summary>
-        ///描述
-        /// </summary>
-        public string Remark { get; set; }
-
-        public List<AddInteClassDetailDto> DetailList { get; set; }
-    }
-
-    /// <summary>
-    /// 生产班次修改输入对象
-    /// @author wangkeming
-    /// @date 2022-12-26
-    /// </summary>
-    public record UpdateInteClassDto : BaseEntityDto
-    {
-        /// <summary>
-        ///主键id
-        /// </summary>
-        [Required(ErrorMessage = "主键id不能为空")]
-        public long Id { get; set; }
-
-        /// <summary>
-        ///班次名称
-        /// </summary>
-        [Required(ErrorMessage = "班次名称不能为空")]
-        public string ClassName { get; set; }
-
-        /// <summary>
-        ///班次类型（字典名称：manu_class_type）
-        /// </summary>
-        [Required(ErrorMessage = "班次类型（字典名称：manu_class_type）不能为空")]
-        public string ClassType { get; set; }
-
-        /// <summary>
-        ///描述
-        /// </summary>
-        public string Remark { get; set; }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<UpdateInteClassDetailDto> DetailList { get; set; }
-    }
-
-    /// <summary>
-    /// 生产班次查询对象
+    /// 班制维护查询对象
     /// @author wangkeming
     /// @date 2022-12-26
     /// </summary>
@@ -130,11 +106,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///班次名称
         /// </summary>
-        public string ClassName { get; set; }
+        public string? ClassName { get; set; }
 
         /// <summary>
         ///班次类型（字典名称：manu_class_type）
         /// </summary>
-        public string ClassType { get; set; }
+        public ClassTypeEnum? ClassType { get; set; }
     }
 }

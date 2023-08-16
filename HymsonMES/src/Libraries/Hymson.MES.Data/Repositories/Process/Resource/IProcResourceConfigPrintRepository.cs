@@ -17,45 +17,51 @@ namespace Hymson.MES.Data.Repositories.Process
     public interface IProcResourceConfigPrintRepository
     {
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceConfigPrintView>> GetPagedInfoAsync(ProcResourceConfigPrintPagedQuery query);
+
+        /// <summary>
+        /// 根据资源id和打印机Id查询数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByResourceIdAsync(ProcResourceConfigPrintQuery query);
+        /// <summary>
+        /// 根据打印机Id查询数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceConfigPrintEntity>> GetByPrintIdAsync(ProcResourceConfigPrintQuery query);
+
+        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceConfigPrintEntity"></param>
+        /// <param name="procResourceConfigPrints"></param>
         /// <returns></returns>
-        Task InsertAsync(ProcResourceConfigPrintEntity procResourceConfigPrintEntity);
+        Task InsertRangeAsync(IEnumerable<ProcResourceConfigPrintEntity> procResourceConfigPrints);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceConfigPrintEntity"></param>
+        /// <param name="procResourceConfigPrints"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcResourceConfigPrintEntity procResourceConfigPrintEntity);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> UpdateRangeAsync(List<ProcResourceConfigPrintEntity> procResourceConfigPrints);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeleteRangeAsync(long[] idsArr);
 
         /// <summary>
-        /// 根据ID获取数据
+        /// 删除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcResourceConfigPrintEntity> GetByIdAsync(long id);
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ProcResourceConfigPrintView>> GetPagedInfoAsync(ProcResourceConfigPrintPagedQuery query);
+        Task<int> DeleteByResourceIdAsync(long id);
     }
 }

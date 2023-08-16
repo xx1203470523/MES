@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Constants;
+using Hymson.MES.Core.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.Services.Dtos.Equipment
@@ -6,24 +8,37 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 新增输入对象（设备注册）
     /// </summary>
-    public record EquEquipmentCreateDto : BaseEntityDto
+    public record EquEquipmentSaveDto : BaseEntityDto
     {
+        /// <summary>
+        /// 唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        [Required(ErrorMessage = "编码不能为空")]
         public string EquipmentCode { get; set; }
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
         public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 存放位置
+        /// </summary>
+        public string Location { get; set; }
+
+        /// <summary>
+        /// 使用状态
+        /// </summary>
+        public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 设备描述
         /// </summary>
-        public string EquipmentDesc { get; set; }
+        public string? EquipmentDesc { get; set; }
 
         /// <summary>
         /// 工作中心工厂id
@@ -41,66 +56,54 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public long? WorkCenterLineId { get; set; }
 
         /// <summary>
-        /// 存放位置
-        /// </summary>
-        [Required(ErrorMessage = "存放位置不能为空")]
-        public string Location { get; set; }
-
-        /// <summary>
         /// 设备类型
         /// </summary>
-        public string EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public string UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 入厂日期
         /// </summary>
-        public string EntryDate { get; set; }
+        public string? EntryDate { get; set; }
 
         /// <summary>
         /// 质保期限（月）
         /// </summary>
-        public int QualTime { get; set; }
+        public int? QualTime { get; set; }
 
         /// <summary>
         /// 厂商
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
         /// <summary>
         /// 供应商
         /// </summary>
-        public string Supplier { get; set; }
-
-        /// <summary>
-        /// 使用状态
-        /// </summary>
-        [Required(ErrorMessage = "使用状态不能为空")]
-        public string UseStatus { get; set; }
+        public string? Supplier { get; set; }
 
         /// <summary>
         /// 功率
         /// </summary>
-        public string Power { get; set; }
+        public string? Power { get; set; }
 
         /// <summary>
         /// 能耗等级
         /// </summary>
-        public string EnergyLevel { get; set; }
+        public string? EnergyLevel { get; set; }
 
         /// <summary>
         /// ip地址
         /// </summary>
-        public string Ip { get; set; }
+        public string? Ip { get; set; }
 
         /// <summary>
         /// 节拍时间(秒)
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         #region 子
         /// <summary>
@@ -113,123 +116,10 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
 
-        #endregion
-    }
-
-    /// <summary>
-    /// 修改输入对象（设备注册）
-    /// </summary>
-    public record EquEquipmentModifyDto : BaseEntityDto
-    {
         /// <summary>
-        /// 唯一标识
+        /// 设备验证
         /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 名称（设备注册）
-        /// </summary>
-        [Required(ErrorMessage = "名称不能为空")]
-        public string EquipmentName { get; set; }
-
-        /// <summary>
-        /// 设备描述
-        /// </summary>
-        public string EquipmentDesc { get; set; }
-
-        /// <summary>
-        /// 工作中心工厂id
-        /// </summary>
-        public long? WorkCenterFactoryId { get; set; }
-
-        /// <summary>
-        /// 工作中心车间id
-        /// </summary>
-        public long? WorkCenterShopId { get; set; }
-
-        /// <summary>
-        /// 工作中心产线id
-        /// </summary>
-        public long? WorkCenterLineId { get; set; }
-
-        /// <summary>
-        /// 存放位置
-        /// </summary>
-        [Required(ErrorMessage = "存放位置不能为空")]
-        public string Location { get; set; }
-
-        /// <summary>
-        /// 设备类型
-        /// </summary>
-        public string EquipmentType { get; set; }
-
-        /// <summary>
-        /// 使用部门
-        /// </summary>
-        public string UseDepartment { get; set; }
-
-        /// <summary>
-        /// 入厂日期
-        /// </summary>
-        public string EntryDate { get; set; }
-
-        /// <summary>
-        /// 质保期限（月）
-        /// </summary>
-        public int QualTime { get; set; }
-
-        /// <summary>
-        /// 厂商
-        /// </summary>
-        public string Manufacturer { get; set; }
-
-        /// <summary>
-        /// 供应商
-        /// </summary>
-        public string Supplier { get; set; }
-
-        /// <summary>
-        /// 使用状态
-        /// </summary>
-        [Required(ErrorMessage = "使用状态不能为空")]
-        public string UseStatus { get; set; }
-
-        /// <summary>
-        /// 功率
-        /// </summary>
-        public string Power { get; set; }
-
-        /// <summary>
-        /// 能耗等级
-        /// </summary>
-        public string EnergyLevel { get; set; }
-
-        /// <summary>
-        /// ip地址
-        /// </summary>
-        public string Ip { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 节拍时间(秒)
-        /// </summary>
-        public int? TaktTime { get; set; }
-
-        #region 子
-        /// <summary>
-        /// 设备关联硬件设备
-        /// </summary>
-        public List<EquEquipmentLinkHardwareModifyDto> HardwareLinks { get; set; }
-
-        /// <summary>
-        /// 设备关联Api
-        /// </summary>
-        public List<EquEquipmentLinkApiModifyDto> ApiLinks { get; set; }
-
+        public List<EquEquipmentVerifyCreateDto> Verifys { get; set; }
         #endregion
     }
 
@@ -241,37 +131,32 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string? EquipmentCode { get; set; }
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string? EquipmentName { get; set; }
 
         /// <summary>
         /// 类型（设备注册）
         /// </summary>
-        public string EquipmentType { get; set; }
+        public int? EquipmentType { get; set; }
 
         /// <summary>
         /// 使用状态（设备注册）
         /// </summary>
-        public string UseStatus { get; set; }
-
-        /// <summary>
-        /// 车间
-        /// </summary>
-        public string WorkCenterShopName { get; set; }
+        public int? UseStatus { get; set; }
 
         /// <summary>
         /// 使用部门
         /// </summary>
-        public string UseDepartment { get; set; }
+        public long[]? UseDepartments { get; set; }
 
         /// <summary>
-        /// 存放位置
+        /// 车间
         /// </summary>
-        public string Location { get; set; }
+        public string? WorkCenterShopName { get; set; }
     }
 
     /// <summary>
@@ -288,55 +173,49 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用状态 
         /// 空值 : false  
         /// </summary>
-        public string UseStatus { get; set; }
+        public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>
-        public string Power { get; set; }
+        public string Power { get; set; } = "";
 
         /// <summary>
         /// 描述 :能耗等级 
         /// 空值 : true  
         /// </summary>
-        public string EnergyLevel { get; set; }
+        public string EnergyLevel { get; set; } = "";
 
         /// <summary>
         /// 描述 :ip地址 
         /// 空值 : true  
         /// </summary>
-        public string Ip { get; set; }
+        public string Ip { get; set; } = "";
 
         /// <summary>
         /// 描述 :备注 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 描述 :节拍时间(秒) 
         /// 空值 : true  
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         /// <summary>
         /// 描述 :设备编码 
         /// 空值 : false  
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备名称 
         /// 空值 : false  
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备组id 
@@ -348,7 +227,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :设备描述 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentDesc { get; set; }
+        public string EquipmentDesc { get; set; } = "";
 
         /// <summary>
         /// 描述 :工作中心工厂id 
@@ -372,19 +251,19 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :位置 
         /// 空值 : false  
         /// </summary>
-        public string Location { get; set; }
+        public string Location { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备类型 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
         /// <summary>
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public string UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -408,13 +287,23 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :厂商 
         /// 空值 : true  
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string Manufacturer { get; set; } = "";
 
         /// <summary>
         /// 描述 :供应商 
         /// 空值 : true  
         /// </summary>
-        public string Supplier { get; set; }
+        public string Supplier { get; set; } = "";
+
+        /// <summary>
+        /// 最后修改人
+        /// </summary>
+        public string UpdatedBy { get; set; } = "";
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
 
 
         /// <summary>
@@ -437,55 +326,49 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :使用状态 
         /// 空值 : false  
         /// </summary>
-        public string UseStatus { get; set; }
+        public EquipmentUseStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 描述 :功率 
         /// 空值 : true  
         /// </summary>
-        public string Power { get; set; }
+        public string Power { get; set; } = "";
 
         /// <summary>
         /// 描述 :能耗等级 
         /// 空值 : true  
         /// </summary>
-        public string EnergyLevel { get; set; }
+        public string EnergyLevel { get; set; } = "";
 
         /// <summary>
         /// 描述 :ip地址 
         /// 空值 : true  
         /// </summary>
-        public string Ip { get; set; }
+        public string Ip { get; set; } = "";
 
         /// <summary>
         /// 描述 :备注 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
-
-        /// <summary>
-        /// 描述 :所属站点代码 
-        /// 空值 : false  
-        /// </summary>
-        public string SiteCode { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 描述 :节拍时间(秒) 
         /// 空值 : true  
         /// </summary>
-        public int? TaktTime { get; set; }
+        public int? TakeTime { get; set; }
 
         /// <summary>
         /// 描述 :设备编码 
         /// 空值 : false  
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备名称 
         /// 空值 : false  
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备组id 
@@ -497,7 +380,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :设备描述 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentDesc { get; set; }
+        public string EquipmentDesc { get; set; } = "";
 
         /// <summary>
         /// 描述 :工作中心工厂id 
@@ -521,19 +404,19 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :位置 
         /// 空值 : false  
         /// </summary>
-        public string Location { get; set; }
+        public string Location { get; set; } = "";
 
         /// <summary>
         /// 描述 :设备类型 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentType { get; set; }
+        public EquipmentTypeEnum? EquipmentType { get; set; }
 
         /// <summary>
         /// 描述 :使用部门 
         /// 空值 : true  
         /// </summary>
-        public string UseDepartment { get; set; }
+        public long? UseDepartment { get; set; }
 
         /// <summary>
         /// 描述 :入场日期 
@@ -557,19 +440,30 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 描述 :厂商 
         /// 空值 : true  
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string Manufacturer { get; set; } = "";
 
         /// <summary>
         /// 描述 :供应商 
         /// 空值 : true  
         /// </summary>
-        public string Supplier { get; set; }
+        public string Supplier { get; set; } = "";
 
+
+        /// <summary>
+        /// 运行状态 
+        /// </summary>
+        public string RunStatus { get; set; } = "";
 
         /// <summary>
         /// 设备组名称
         /// </summary>
         public string EquipmentGroupName { get; set; } = "";
+
+
+        /// <summary>
+        /// 资源编码（多个）
+        /// </summary>
+        public string ResourceCodes { get; set; }
     }
 
     /// <summary>
@@ -585,12 +479,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备注册）
         /// </summary>
-        public string EquipmentCode { get; set; }
+        public string EquipmentCode { get; set; } = "";
 
         /// <summary>
         /// 名称（设备注册）
         /// </summary>
-        public string EquipmentName { get; set; }
+        public string EquipmentName { get; set; } = "";
+
+        /// <summary>
+        /// 设备组ID
+        /// </summary>
+        public long EquipmentGroupId { get; set; }
     }
 
     /// <summary>
@@ -601,7 +500,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 设备类型
         /// </summary>
-        public string EquipmentType { get; set; } = "";
+        public EquipmentTypeEnum EquipmentType { get; set; }
 
         /// <summary>
         /// 集合（设备注册）
