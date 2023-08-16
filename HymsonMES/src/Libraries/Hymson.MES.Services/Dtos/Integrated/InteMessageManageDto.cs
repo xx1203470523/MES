@@ -44,9 +44,9 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? EventDescription { get; set; }
 
         /// <summary>
-        /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
+        /// 消息状态;1、触发2、接收3、处理4、关闭
         /// </summary>
-        public PushSceneEnum Status { get; set; }
+        public MessageStatusEnum Status { get; set; }
 
         /// <summary>
         /// 紧急程度;1、高2、中3、低
@@ -194,9 +194,9 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? EventDescription { get; set; }
 
         /// <summary>
-        /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
+        /// 消息状态;1、触发2、接收3、处理4、关闭
         /// </summary>
-        public PushSceneEnum Status { get; set; }
+        public MessageStatusEnum Status { get; set; }
 
         /// <summary>
         /// 紧急程度;1、高2、中3、低
