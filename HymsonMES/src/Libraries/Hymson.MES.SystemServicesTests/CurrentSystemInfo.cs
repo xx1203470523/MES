@@ -10,12 +10,12 @@ namespace Hymson.MES.SystemServicesTests
     public static class CurrentSystemInfo
     {
         /// <summary>
-        /// 设备信息
+        /// 当前系统信息
         /// </summary>
         private static Lazy<ConcurrentDictionary<string, object>> systemDic = new(() => new());
 
         /// <summary>
-        /// 设备信息
+        /// 当前系统信息
         /// </summary>
         public static Lazy<ConcurrentDictionary<string, object>> SystemDic
         {
