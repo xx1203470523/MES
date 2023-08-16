@@ -10,7 +10,7 @@ namespace Hymson.MES.Core.Enums
         /// <summary>
         /// 物料条码
         /// </summary>
-        [Description("物料条码")]
+        [Description("产品序列码")]
         MaterialSfc = 1,
         /// <summary>
         /// 供应商条码
