@@ -195,7 +195,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string DeleteSql = "UPDATE qual_ipqc_inspection_parameter SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_ipqc_inspection_parameter SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-        const string DeleteByMainIdSql = "UPDATE qual_ipqc_inspection_parameter SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IpqcInspectionId = @ParentId";
+        const string DeleteByMainIdSql = "UPDATE qual_ipqc_inspection_parameter SET IsDeleted = Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IpqcInspectionId = @ParentId";
         const string DeleteReallyByMainIdSql = "DELETE FROM qual_ipqc_inspection_parameter WHERE IpqcInspectionId = @MainId";
 
         const string GetByIdSql = @"SELECT * FROM qual_ipqc_inspection_parameter WHERE Id = @Id ";

@@ -450,5 +450,36 @@ namespace Hymson.MES.Services.Services.Quality
             return dtos;
         }
 
+        /// <summary>
+        /// 根据ID获取检验规则列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualIpqcInspectionRuleDto>?> QueryRulesByMainIdAsync(long id)
+        {
+            var ipqcRules = await _qualIpqcInspectionRuleRepository.GetEntitiesAsync(new QualIpqcInspectionRuleQuery { IpqcInspectionId = id });
+
+            //获取检验规则关联资源
+            var rulesResources = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                IpqcInspectionId = id
+            });
+
+            List<QualIpqcInspectionRuleDto> dtos = new();
+            foreach (var item in ipqcRules)
+            {
+                var dto = item.ToModel<QualIpqcInspectionRuleDto>();
+                if (rulesResources != null && rulesResources.Any())
+                {
+                    dto.Resources = rulesResources.Where(x => x.IpqcInspectionRuleId == dto.Id).Select(x => { return x.ToModel<QualIpqcInspectionRuleResourceRelationDto>(); });
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
+
     }
 }

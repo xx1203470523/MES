@@ -9,16 +9,6 @@ namespace Hymson.MES.Services.Dtos.Quality
     public record QualIpqcInspectionRuleSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
         /// 检验方式;1、停机 2、不停机
         /// </summary>
         public IPQCRuleWayEnum Way { get; set; }
@@ -58,6 +48,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// IPQC检验项目Id qual_ipqc_inspection 的id
+        /// </summary>
+        public long IpqcInspectionId { get; set; }
 
         /// <summary>
         /// 检验方式;1、停机 2、不停机
@@ -105,6 +100,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long IsDeleted { get; set; }
 
 
+        /// <summary>
+        /// 关联资源列表
+        /// </summary>
+        public IEnumerable<QualIpqcInspectionRuleResourceRelationDto> Resources { get; set; }
     }
 
     /// <summary>

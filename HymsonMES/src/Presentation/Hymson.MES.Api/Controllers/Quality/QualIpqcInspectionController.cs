@@ -111,5 +111,16 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIpqcInspectionService.QueryDetailsByMainIdAsync(id);
         }
 
+        /// <summary>
+        /// 根据ID获取检验规则列表（IPQC检验项目检验规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("rules/{id}")]
+        public async Task<IEnumerable<QualIpqcInspectionRuleDto>?> QueryRulesByMainIdAsync(long id)
+        {
+            return await _qualIpqcInspectionService.QueryRulesByMainIdAsync(id);
+        }
+
     }
 }

@@ -44,18 +44,25 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualIpqcInspectionDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 
+        /// 获取分页List
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<QualIpqcInspectionViewDto>> GetPagedListAsync(QualIpqcInspectionPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 根据ID获取关联明细列表
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<IEnumerable<QualIpqcInspectionParameterDto>?> QueryDetailsByMainIdAsync(long id);
 
         /// <summary>
-        /// 获取分页List
+        /// 根据ID获取检验规则列表
         /// </summary>
-        /// <param name="pagedQueryDto"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualIpqcInspectionViewDto>> GetPagedListAsync(QualIpqcInspectionPagedQueryDto pagedQueryDto);
+        Task<IEnumerable<QualIpqcInspectionRuleDto>?> QueryRulesByMainIdAsync(long id);
 
     }
 }

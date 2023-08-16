@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -123,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIpqcInspectionRuleResourceRelationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIpqcInspectionRuleResourceRelationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionRuleResourceRelationEntity>(GetByIdsSql, new { Ids = ids });
@@ -138,6 +138,18 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (query.IpqcInspectionId.HasValue && query.IpqcInspectionId.Value != 0)
+            {
+                sqlBuilder.Where("IpqcInspectionId = @IpqcInspectionId");
+            }
+            if (query.IpqcInspectionRuleId.HasValue && query.IpqcInspectionRuleId.Value != 0)
+            {
+                sqlBuilder.Where("IpqcInspectionRuleId = @IpqcInspectionRuleId");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionRuleResourceRelationEntity>(template.RawSql, query);
         }
@@ -184,15 +196,15 @@ namespace Hymson.MES.Data.Repositories.Quality
                                             /**select**/
                                            FROM qual_ipqc_inspection_rule_resource_relation /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_ipqc_inspection_rule_resource_relation(  `Id`, `SiteId`, `IpqcInspectionRuleId`, `ResourceId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IpqcInspectionRuleId, @ResourceId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_ipqc_inspection_rule_resource_relation(  `Id`, `SiteId`, `IpqcInspectionRuleId`, `ResourceId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IpqcInspectionRuleId, @ResourceId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_ipqc_inspection_rule_resource_relation(  `Id`, `SiteId`, `IpqcInspectionId`, `IpqcInspectionRuleId`, `ResourceId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IpqcInspectionId, @IpqcInspectionRuleId, @ResourceId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_ipqc_inspection_rule_resource_relation(  `Id`, `SiteId`, `IpqcInspectionId`, `IpqcInspectionRuleId`, `ResourceId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IpqcInspectionId, @IpqcInspectionRuleId, @ResourceId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET   SiteId = @SiteId, IpqcInspectionRuleId = @IpqcInspectionRuleId, ResourceId = @ResourceId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET   SiteId = @SiteId, IpqcInspectionRuleId = @IpqcInspectionRuleId, ResourceId = @ResourceId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET   SiteId = @SiteId, IpqcInspectionId = @IpqcInspectionId, IpqcInspectionRuleId = @IpqcInspectionRuleId, ResourceId = @ResourceId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET   SiteId = @SiteId, IpqcInspectionId = @IpqcInspectionId, IpqcInspectionRuleId = @IpqcInspectionRuleId, ResourceId = @ResourceId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-        const string DeleteByMainIdSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IpqcInspectionId = @ParentId";
+        const string DeleteByMainIdSql = "UPDATE qual_ipqc_inspection_rule_resource_relation SET IsDeleted = Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IpqcInspectionId = @ParentId";
         const string DeleteReallyByMainIdSql = "DELETE FROM qual_ipqc_inspection_rule_resource_relation WHERE IpqcInspectionId = @MainId";
 
         const string GetByIdSql = @"SELECT * FROM qual_ipqc_inspection_rule_resource_relation WHERE Id = @Id ";

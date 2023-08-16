@@ -38,12 +38,22 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验规则Id;qual_ipqc_inspection_rule 的id
         /// </summary>
-        public long? IpqcInspectionRuleId { get; set; }
+        public long IpqcInspectionRuleId { get; set; }
 
         /// <summary>
         /// 资源id
         /// </summary>
-        public long? ResourceId { get; set; }
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源代码
+        /// </summary>
+        public string ResCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResName { get; set; }
 
         /// <summary>
         /// 创建人
