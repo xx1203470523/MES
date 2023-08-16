@@ -216,6 +216,7 @@
         public const string MES10524 = "工作中心{WorkCenterCode}+工序{ProcedureCode}启用状态的已存在，请重新输入！";
         public const string MES10525 = "工作中心{WorkCenterCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10526 = "产品{ProductCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
+        public const string MES10527 = "数据类型不合法";
         #endregion
 
         #region Bom 10600
