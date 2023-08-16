@@ -111,10 +111,10 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ParameterCode { get; set; } = "";
         */
 
-        /// <summary>
-        /// 参数名称
-        /// </summary>
-        public string ParameterName { get; set; } = "";
+        ///// <summary>
+        ///// 参数名称
+        ///// </summary>
+        //public string ParameterName { get; set; } = "";
 
         /// <summary>
         /// 参数单位
@@ -157,11 +157,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 数据类型（字典定义） 
         /// </summary>
         public DataTypeEnum? DataType { get; set; }
-
-        /// <summary>
-        /// 描述（标准参数）
-        /// </summary>
-        public string? Remark { get; set; } = "";
 
     }
 }

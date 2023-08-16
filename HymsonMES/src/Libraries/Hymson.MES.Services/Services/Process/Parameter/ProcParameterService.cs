@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto)
         {
-            procParameterModifyDto.ParameterName = procParameterModifyDto.ParameterName.Trim();
+            //procParameterModifyDto.ParameterName = procParameterModifyDto.ParameterName.Trim();
             procParameterModifyDto.Remark = procParameterModifyDto.Remark ?? "".Trim();
 
             //DTO转换实体

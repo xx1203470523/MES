@@ -104,9 +104,10 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where(" SiteId = @SiteId ");
             //}
 
-            if (pagedQuery.ParameterUnit.HasValue)
+            if (!string.IsNullOrEmpty(pagedQuery.ParameterUnit))
             {
-                sqlBuilder.Where("ParameterUnit = @ParameterUnit");
+                pagedQuery.ParameterUnit = $"%{pagedQuery.ParameterUnit}%";
+                sqlBuilder.Where("ParameterUnit LIKE @ParameterUnit");
             }
 
             if (pagedQuery.DataType.HasValue)

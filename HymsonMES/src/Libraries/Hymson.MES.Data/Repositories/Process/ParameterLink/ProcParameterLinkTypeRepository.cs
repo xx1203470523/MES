@@ -119,9 +119,10 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" o.ParameterName like @ParameterName ");
             }
 
-            if (procParameterLinkTypePagedQuery.ParameterUnit.HasValue) 
+            if (!string.IsNullOrEmpty(procParameterLinkTypePagedQuery.ParameterUnit)) 
             {
-                sqlBuilder.Where(" o.ParameterUnit = @ParameterUnit ");
+                procParameterLinkTypePagedQuery.ParameterUnit = $"%{procParameterLinkTypePagedQuery.ParameterUnit}%";
+                sqlBuilder.Where(" o.ParameterUnit LIKE @ParameterUnit ");
             }
             if (procParameterLinkTypePagedQuery.DataType.HasValue)
             {
