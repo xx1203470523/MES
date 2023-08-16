@@ -112,7 +112,7 @@ namespace Hymson.MES.Api
                             await _resourceRepository.InsertIgnoreAsync(localeStringResourceEntity);
                         }
                     }
-
+                        
                 }
             }
         }

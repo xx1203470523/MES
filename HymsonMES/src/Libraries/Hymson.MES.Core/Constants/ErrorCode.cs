@@ -328,6 +328,11 @@
         public const string MES11307 = "当前编码和版本已存在";
         public const string MES11308 = "当前物料已存在的分选规则编码与当前编码不一致";
         public const string MES11309 = "分选规则不存在";
+        public const string MES11310 = "分选规则编码长度为50";
+        public const string MES11311 = "分选规则名称长度为50";
+        public const string MES11312 = "分选规则版本长度为10";
+        public const string MES11313 = "分选规则备注长度为255";
+        public const string MES11314 = "参数集合中有交集";
         #endregion
 
         #region 作业12000

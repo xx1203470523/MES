@@ -510,6 +510,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcEquipmentGroupParamDetailEntity, ProcEquipmentGroupParamDetailDto>();
             CreateMap<ProcEquipmentGroupParamDetailCreateDto, ProcEquipmentGroupParamDetailEntity>();
             #endregion
+
+            #region SortingRule
+            CreateMap< ProcSortingRuleEntity, ProcSortingRuleDto > ();
+            CreateMap<ProcSortingRuleCreateDto, ProcSortingRuleEntity>();
+            CreateMap<ProcSortingRuleModifyDto, ProcSortingRuleEntity>();
+
+
+            CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
+            #endregion
         }
 
         /// <summary>

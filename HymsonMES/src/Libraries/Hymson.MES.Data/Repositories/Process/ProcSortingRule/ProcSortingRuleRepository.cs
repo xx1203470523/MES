@@ -108,6 +108,20 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("MaterialId = @MaterialId");
             }
 
+            if (procSortingRulePagedQuery.MaterialIds!=null&& procSortingRulePagedQuery.MaterialIds.Any())
+            {
+                sqlBuilder.Where("MaterialId IN @MaterialIds");
+            }
+            if (string.IsNullOrEmpty(procSortingRulePagedQuery.Sorting))
+            {
+                sqlBuilder.OrderBy("UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(procSortingRulePagedQuery.Sorting);
+            }
+
+
             var offSet = (procSortingRulePagedQuery.PageIndex - 1) * procSortingRulePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procSortingRulePagedQuery.PageSize });
@@ -219,8 +233,8 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcSortingRuleRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_sorting_rule` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_sorting_rule` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_sorting_rule` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/   LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_sorting_rule` /**where**/  ";
         const string GetProcSortingRuleEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_sorting_rule` /**where**/  ";
