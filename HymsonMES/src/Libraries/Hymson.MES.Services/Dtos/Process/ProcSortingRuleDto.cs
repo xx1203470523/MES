@@ -187,14 +187,19 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcSortingRulePagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 工序编码
+        /// 编码
         /// </summary>
         public string? Code { get; set; }
 
         /// <summary>
-        /// 工序名称
+        /// 名称
         /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
 
         /// <summary>
         /// 状态

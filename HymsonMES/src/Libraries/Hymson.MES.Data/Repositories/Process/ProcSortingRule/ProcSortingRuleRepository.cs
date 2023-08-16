@@ -98,6 +98,12 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("Name like @Name");
             }
 
+            if (!string.IsNullOrWhiteSpace(procSortingRulePagedQuery.Version))
+            {
+                procSortingRulePagedQuery.Version = $"%{procSortingRulePagedQuery.Version}%";
+                sqlBuilder.Where("Version like @Version");
+            }
+
             if (procSortingRulePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
