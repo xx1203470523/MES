@@ -1000,6 +1000,7 @@
         public const string MES19141 = "CCS设定NG时Location和BindSfc方式必须任选其一";
         public const string MES19142 = "条码：{SFC}没找到关联CCS码绑定关系";
         public const string MES19143 = "条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系";
+        public const string MES19144 = "Location不能为空";
 
         #endregion
 

@@ -532,7 +532,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _sfcCirculationService.SfcCirculationModuleRemoveAsync(request);
         }
 
-
         /// <summary>
         /// 根据模组条码获取绑定CCS的位置
         /// </summary>
@@ -580,6 +579,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task SfcCirculationCCSUnBindAsync(SfcCirculationCCSUnBindDto request)
         {
             await _sfcCirculationService.SfcCirculationCCSUnBindAsync(request);
+        }
+
+        /// <summary>
+        /// CCS状态确认
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ModuleCCSConfirm")]
+        public async Task SfcCirculationCCSConfirmAsync(SfcCirculationCCSConfirmDto request)
+        {
+            await _sfcCirculationService.SfcCirculationCCSConfirmAsync(request);
         }
     }
 }

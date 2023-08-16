@@ -137,10 +137,45 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 ResourceCode = "QAEMZY002",
                 SFC = "AAATESTSFC2308091",
-                //Locations = new string[] { "A" }
-                BindSFCs = new string[] { "CCS0003" }
+                Locations = new string[] { "A" }
+                //BindSFCs = new string[] { "CCS0002" }
             };
             await _sfcCirculationService.SfcCirculationCCSNgSetAsync(sfcCirculationCCSNgSetDto);
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// CCS状态确认测试
+        /// </summary>
+        [TestMethod()]
+        public async Task SfcCirculationCCSConfirmAsyncTest()
+        {
+            string equipmentCode = "QAEM002";
+            await SetEquInfoAsync(equipmentCode);
+            SfcCirculationCCSConfirmDto sfcCirculationCCSConfirmDto = new SfcCirculationCCSConfirmDto
+            {
+                ResourceCode = "QAEMZY002",
+                SFC = "AAATESTSFC2308091",
+                Location = "A"
+            };
+            await _sfcCirculationService.SfcCirculationCCSConfirmAsync(sfcCirculationCCSConfirmDto);
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// CCS状态确认测试
+        /// </summary>
+        [TestMethod()]
+        public async Task SfcCirculationCCSConfirmAsyncTest2()
+        {
+            string equipmentCode = "QAEM002";
+            await SetEquInfoAsync(equipmentCode);
+            SfcCirculationCCSConfirmDto sfcCirculationCCSConfirmDto = new SfcCirculationCCSConfirmDto
+            {
+                ResourceCode = "QAEMZY002",
+                Location = "A"
+            };
+            await _sfcCirculationService.SfcCirculationCCSConfirmAsync(sfcCirculationCCSConfirmDto);
             Assert.IsTrue(true);
         }
     }

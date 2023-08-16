@@ -63,5 +63,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcCirculationCCSNgSetDto"></param>
         /// <returns></returns>
         Task SfcCirculationCCSNgSetAsync(SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto);
+
+        /// <summary>
+        /// CCS确认
+        /// </summary>
+        /// <param name="sfcCirculationCCSConfirmDto"></param>
+        /// <returns></returns>
+        Task SfcCirculationCCSConfirmAsync(SfcCirculationCCSConfirmDto sfcCirculationCCSConfirmDto);
     }
 }
