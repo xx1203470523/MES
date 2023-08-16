@@ -124,6 +124,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Name { get; set; }
 
         /// <summary>
+        /// 车间Id
+        /// </summary>
+        public long? WorkShopId { get; set; }
+
+        /// <summary>
         /// 车间名称
         /// </summary>
         public string? WorkShopName { get; set; }

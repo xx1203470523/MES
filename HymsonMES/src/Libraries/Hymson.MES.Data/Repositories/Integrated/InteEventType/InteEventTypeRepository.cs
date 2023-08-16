@@ -171,6 +171,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.Name LIKE @Name");
             }
 
+            if (pagedQuery.WorkShopId.HasValue)
+            {
+                sqlBuilder.Where("T.WorkShopId = @WorkShopId");
+            }
+
             if (string.IsNullOrWhiteSpace(pagedQuery.WorkShopName) == false)
             {
                 pagedQuery.WorkShopName = $"%{pagedQuery.WorkShopName}%";
