@@ -89,6 +89,9 @@ namespace Hymson.MES.Services.Services.Process
 
             //DTO转换实体
             var procSortingRuleEntity = procSortingRuleCreateDto.ToEntity<ProcSortingRuleEntity>();
+            procSortingRuleEntity.Code = procSortingRuleEntity.Code.Trim();
+            procSortingRuleEntity.Name = procSortingRuleEntity.Name.Trim();
+            procSortingRuleEntity.Version = procSortingRuleEntity.Version.Trim();
             procSortingRuleEntity.Id = IdGenProvider.Instance.CreateId();
             procSortingRuleEntity.CreatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
@@ -268,7 +271,7 @@ namespace Hymson.MES.Services.Services.Process
                 default:
                     break;
             }
-            procSortingRuleEntity.Name = procSortingRuleModifyDto.Name;
+            procSortingRuleEntity.Name = procSortingRuleModifyDto.Name.Trim();
             procSortingRuleEntity.Remark = procSortingRuleModifyDto.Remark;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
