@@ -35,6 +35,7 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
+using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -580,6 +581,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualInspectionParameterGroupEntity, QualInspectionParameterGroupInfoDto>();
             CreateMap<QualInspectionParameterGroupDetailSaveDto, QualInspectionParameterGroupDetailEntity>();
             CreateMap<QualInspectionParameterGroupDetailEntity, QualInspectionParameterGroupDetailDto>();
+            CreateMap<QualInspectionParameterGroupDetailPagedQueryDto, QualInspectionParameterGroupDetailPagedQuery>();
+            CreateMap<QualInspectionParameterGroupDetailView, QualInspectionParameterGroupDetailViewDto>();
             #endregion
 
             #region QualUnqualifiedCode
@@ -594,6 +597,17 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualUnqualifiedGroupCreateDto, QualUnqualifiedGroupEntity>();
             CreateMap<QualUnqualifiedGroupModifyDto, QualUnqualifiedGroupEntity>();
             CreateMap<QualUnqualifiedGroupPagedQueryDto, QualUnqualifiedGroupPagedQuery>();
+            #endregion
+
+            #region QualIpqcInspection
+            CreateMap<QualIpqcInspectionView, QualIpqcInspectionViewDto>();
+            CreateMap<QualIpqcInspectionPagedQueryDto, QualIpqcInspectionPagedQuery>();
+            CreateMap<QualIpqcInspectionSaveDto, QualIpqcInspectionEntity>();
+            CreateMap<QualIpqcInspectionEntity, QualIpqcInspectionDto>();
+            CreateMap<QualIpqcInspectionParameterSaveDto, QualIpqcInspectionParameterEntity>();
+            CreateMap<QualIpqcInspectionParameterEntity, QualIpqcInspectionParameterDto>();
+            CreateMap<QualIpqcInspectionRuleSaveDto, QualIpqcInspectionRuleEntity>();
+            CreateMap<QualIpqcInspectionRuleResourceRelationSaveDto, QualIpqcInspectionRuleResourceRelationEntity>();
             #endregion
         }
 

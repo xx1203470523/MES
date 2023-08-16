@@ -111,5 +111,15 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualInspectionParameterGroupService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 获取关联明细列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("details/list")]
+        public async Task<PagedInfo<QualInspectionParameterGroupDetailViewDto>> QueryDetailPagedListAsync([FromQuery] QualInspectionParameterGroupDetailPagedQueryDto pagedQueryDto)
+        {
+            return await _qualInspectionParameterGroupService.QueryDetailPagedListAsync(pagedQueryDto);
+        }
     }
 }

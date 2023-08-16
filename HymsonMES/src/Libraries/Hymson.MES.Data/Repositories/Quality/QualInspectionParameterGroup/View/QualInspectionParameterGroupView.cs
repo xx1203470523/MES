@@ -29,6 +29,11 @@ namespace Hymson.MES.Data.Repositories.Quality.View
         public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 物料id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }
@@ -37,6 +42,11 @@ namespace Hymson.MES.Data.Repositories.Quality.View
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序编码

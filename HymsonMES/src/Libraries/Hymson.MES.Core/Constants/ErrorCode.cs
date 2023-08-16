@@ -518,6 +518,12 @@
         public const string MES13013 = "设备故障原因不存在！";
         #endregion
 
+        #region IPQC检验项目 13100
+
+        public const string MES13101 = "参数集编码{Code}已存在相同生成条件的IPQC检验项目，请重新输入！";
+
+        #endregion
+
         #region  14000段项目使用 平台请勿使用
 
         #endregion

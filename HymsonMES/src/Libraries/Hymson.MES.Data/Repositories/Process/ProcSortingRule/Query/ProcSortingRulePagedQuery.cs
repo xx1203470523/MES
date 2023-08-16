@@ -30,6 +30,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
 
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
         /// <summary>
         /// 站点id
         /// </summary>

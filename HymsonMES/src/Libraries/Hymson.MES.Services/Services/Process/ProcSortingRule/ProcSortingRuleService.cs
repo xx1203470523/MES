@@ -84,11 +84,15 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto)
         {
+            procSortingRuleCreateDto.Code = procSortingRuleCreateDto.Code.Trim();
+            procSortingRuleCreateDto.Name = procSortingRuleCreateDto.Name.Trim();
+            procSortingRuleCreateDto.Version = procSortingRuleCreateDto.Version.Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procSortingRuleCreateDto);
 
             //DTO转换实体
             var procSortingRuleEntity = procSortingRuleCreateDto.ToEntity<ProcSortingRuleEntity>();
+         
             procSortingRuleEntity.Id = IdGenProvider.Instance.CreateId();
             procSortingRuleEntity.CreatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
@@ -247,6 +251,8 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcSortingRuleAsync(ProcSortingRuleModifyDto procSortingRuleModifyDto)
         {
+            procSortingRuleModifyDto.Name = procSortingRuleModifyDto.Name.Trim();
+            procSortingRuleModifyDto.Remark = procSortingRuleModifyDto.Remark?.Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procSortingRuleModifyDto);
 
@@ -268,7 +274,7 @@ namespace Hymson.MES.Services.Services.Process
                 default:
                     break;
             }
-            procSortingRuleEntity.Name = procSortingRuleModifyDto.Name;
+            procSortingRuleEntity.Name = procSortingRuleModifyDto.Name.Trim();
             procSortingRuleEntity.Remark = procSortingRuleModifyDto.Remark;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();

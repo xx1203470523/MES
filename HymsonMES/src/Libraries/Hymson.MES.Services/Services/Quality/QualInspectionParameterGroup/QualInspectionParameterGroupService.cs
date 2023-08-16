@@ -53,12 +53,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 仓储接口（物料）
         /// </summary>
-        /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
         /// 仓储接口（工序）
-        /// </summary>
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
@@ -342,6 +340,20 @@ namespace Hymson.MES.Services.Services.Quality
             return new PagedInfo<QualInspectionParameterGroupDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 获取关联明细列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<QualInspectionParameterGroupDetailViewDto>> QueryDetailPagedListAsync(QualInspectionParameterGroupDetailPagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<QualInspectionParameterGroupDetailPagedQuery>();
+            var pagedInfo = await _qualInspectionParameterGroupDetailRepository.GetPagedListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<QualInspectionParameterGroupDetailViewDto>());
+            return new PagedInfo<QualInspectionParameterGroupDetailViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
 
 
         #region 内部方法
