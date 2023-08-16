@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         public string BarCode { get; set; }
 
         /// <summary>
-        /// 条码
+        /// 剩余数量
         /// </summary>
         public decimal QuantityResidue { get; set; }
 

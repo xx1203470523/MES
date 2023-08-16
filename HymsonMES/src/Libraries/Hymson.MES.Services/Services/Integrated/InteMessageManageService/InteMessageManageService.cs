@@ -121,7 +121,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.Status = PushSceneEnum.Trigger;
+            entity.Status = MessageStatusEnum.Trigger;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
-            entity.Status = PushSceneEnum.Receive;
+            entity.Status = MessageStatusEnum.Receive;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
@@ -167,7 +167,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
-            entity.Status = PushSceneEnum.Handle;
+            entity.Status = MessageStatusEnum.Handle;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
 
@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
-            entity.Status = PushSceneEnum.Close;
+            entity.Status = MessageStatusEnum.Close;
             entity.EvaluateBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
