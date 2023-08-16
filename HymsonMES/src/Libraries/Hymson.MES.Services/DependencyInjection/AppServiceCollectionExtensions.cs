@@ -169,6 +169,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualInspectionParameterGroupService, QualInspectionParameterGroupService>();
             services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
             services.AddSingleton<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
+            services.AddSingleton<IQualIpqcInspectionService, QualIpqcInspectionService>();
             #endregion
 
             #region Manufacture
@@ -419,6 +420,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualUnqualifiedCodeModifyDto>, QualUnqualifiedCodeModifyValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupCreateDto>, QualUnqualifiedGroupCreateValidator>();
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
+            services.AddSingleton<AbstractValidator<QualIpqcInspectionSaveDto>, QualIpqcInspectionSaveValidator>();
             #endregion
 
             #region Manufacture
