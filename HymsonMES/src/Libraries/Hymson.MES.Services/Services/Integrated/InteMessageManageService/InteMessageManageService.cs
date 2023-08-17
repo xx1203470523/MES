@@ -391,6 +391,8 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (ids.Length == 0) return 0;
+
             return await _inteMessageManageRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
