@@ -252,20 +252,20 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceViewDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourceProcedurePagedQuery>();
             resourcePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _resourceRepository.GettPageListByProcedureIdAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据
-            var procResourceDtos = new List<ProcResourceDto>();
+            var procResourceDtos = new List<ProcResourceViewDto>();
             foreach (var entity in pagedInfo.Data)
             {
-                var resourceDto = entity.ToModel<ProcResourceDto>();
+                var resourceDto = entity.ToModel<ProcResourceViewDto>();
                 procResourceDtos.Add(resourceDto);
             }
-            return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<ProcResourceViewDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
 
