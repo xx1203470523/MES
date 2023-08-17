@@ -13,28 +13,49 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> TriggerAsync(InteMessageManageTriggerDto dto);
+        Task<int> TriggerAsync(InteMessageManageTriggerSaveDto dto);
 
         /// <summary>
         /// 接收
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> ReceiveAsync(InteMessageManageReceiveDto dto);
+        Task<int> ReceiveAsync(InteMessageManageReceiveSaveDto dto);
 
         /// <summary>
         /// 处理
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> HandleAsync(InteMessageManageHandleDto dto);
+        Task<int> HandleAsync(InteMessageManageHandleSaveDto dto);
 
         /// <summary>
         /// 关闭
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<int> CloseAsync(InteMessageManageCloseDto dto);
+        Task<int> CloseAsync(InteMessageManageCloseSaveDto dto);
+
+        /// <summary>
+        /// 查询详情（消息管理）（触发）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteMessageManageTriggerDto?> QueryTriggerByIdAsync(long id);
+
+        /// <summary>
+        /// 查询详情（消息管理）（处理）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteMessageManageHandleDto?> QueryHandleByIdAsync(long id);
+
+        /// <summary>
+        /// 查询详情（消息管理）（关闭）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<InteMessageManageCloseDto?> QueryCloseByIdAsync(long id);
 
         /// <summary>
         /// 删除
@@ -49,13 +70,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(long[] ids);
-
-        /// <summary>
-        /// 根据ID查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<InteMessageManageDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List

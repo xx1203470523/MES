@@ -42,9 +42,9 @@ namespace Hymson.MES.Core.Domain.Integrated
         public long EventTypeId { get; set; }
 
        /// <summary>
-        /// 事件描述
+        /// 事件名称
         /// </summary>
-        public string? EventDescription { get; set; }
+        public string? EventName { get; set; }
 
         /// <summary>
         /// 消息状态;1、触发2、接收3、处理4、关闭
@@ -56,7 +56,26 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public DegreeEnum UrgencyLevel { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+
+
+
+        /// <summary>
+        /// 接收时间
+        /// </summary>
+        public DateTime? ReceivedOn { get; set; }
+
+        /// <summary>
+        /// 接收人
+        /// </summary>
+        public string? ReceivedBy { get; set; }
+
+
+
+        /// <summary>
         /// 责任部门
         /// </summary>
         public long? DepartmentId { get; set; }
@@ -76,32 +95,51 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public string? HandleSolution { get; set; }
 
-       /// <summary>
-        /// 备注
+        /// <summary>
+        /// 处理备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? HandleRemark { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 处理时间
+        /// </summary>
+        public DateTime? HandledOn { get; set; }
+
+        /// <summary>
+        /// 处理人
+        /// </summary>
+        public string? HandledBy { get; set; }
+
+
+
+        /// <summary>
         /// 接收时长
         /// </summary>
-        public decimal? ReceiveDuration { get; set; }
+        public double? ReceiveDuration { get; set; }
 
        /// <summary>
         /// 处理时长
         /// </summary>
-        public decimal? HandleDuration { get; set; }
+        public double? HandleDuration { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 评价备注
+        /// </summary>
+        public string? EvaluateRemark { get; set; }
+
+        /// <summary>
         /// 评价时间
         /// </summary>
-        public string? EvaluateOn { get; set; }
+        public DateTime? EvaluateOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 评价人
         /// </summary>
         public string? EvaluateBy { get; set; }
 
-       /// <summary>
+
+
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }

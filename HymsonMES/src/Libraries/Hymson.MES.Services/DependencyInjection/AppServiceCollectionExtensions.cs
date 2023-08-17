@@ -402,7 +402,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventTypeSaveDto>, InteEventTypeSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventSaveDto>, InteEventSaveValidator>();
-            services.AddSingleton<AbstractValidator<InteMessageManageTriggerDto>, InteMessageManageSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteMessageManageTriggerSaveDto>, InteMessageManageSaveValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();

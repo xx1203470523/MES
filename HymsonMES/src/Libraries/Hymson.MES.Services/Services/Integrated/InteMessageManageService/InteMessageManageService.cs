@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 参数验证器
         /// </summary>
-        private readonly AbstractValidator<InteMessageManageTriggerDto> _validationSaveRules;
+        private readonly AbstractValidator<InteMessageManageTriggerSaveDto> _validationSaveRules;
 
         /// <summary>
         /// 仓储接口（工作中心）
@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteMessageManageAnalysisReportAttachmentRepository"></param>
         /// <param name="inteMessageManageHandleProgrammeAttachmentRepository"></param>
         public InteMessageManageService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
-            AbstractValidator<InteMessageManageTriggerDto> validationSaveRules,
+            AbstractValidator<InteMessageManageTriggerSaveDto> validationSaveRules,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<int> TriggerAsync(InteMessageManageTriggerDto dto)
+        public async Task<int> TriggerAsync(InteMessageManageTriggerSaveDto dto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -121,12 +121,12 @@ namespace Hymson.MES.Services.Services.Integrated
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.Status = MessageStatusEnum.Trigger;
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.Status = MessageStatusEnum.Trigger;
 
             // 保存
             return await _inteMessageManageRepository.InsertAsync(entity);
@@ -137,26 +137,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<int> ReceiveAsync(InteMessageManageReceiveDto dto)
-        {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
-
-            // DTO转换实体
-            var entity = dto.ToEntity<InteMessageManageEntity>();
-            entity.Status = MessageStatusEnum.Receive;
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
-
-            return await _inteMessageManageRepository.ReceiveAsync(entity);
-        }
-
-        /// <summary>
-        /// 处理
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        public async Task<int> HandleAsync(InteMessageManageHandleDto dto)
+        public async Task<int> ReceiveAsync(InteMessageManageReceiveSaveDto dto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -167,9 +148,41 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
-            entity.Status = MessageStatusEnum.Handle;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.ReceivedBy = updatedBy;
+            entity.ReceivedOn = updatedOn;
+            entity.Status = MessageStatusEnum.Receive;
+            entity.ReceiveDuration = (updatedOn - entity.CreatedOn).TotalMinutes;
+
+            return await _inteMessageManageRepository.ReceiveAsync(entity);
+        }
+
+        /// <summary>
+        /// 处理
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> HandleAsync(InteMessageManageHandleSaveDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            // DTO转换实体
+            var entity = dto.ToEntity<InteMessageManageEntity>();
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+            entity.HandledBy = updatedBy;
+            entity.HandledOn = updatedOn;
+            entity.Status = MessageStatusEnum.Handle;
+            if (entity.ReceivedOn.HasValue)
+            {
+                entity.HandleDuration = (updatedOn - entity.ReceivedOn.Value).TotalMinutes;
+            }
 
             // 附件处理
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -201,7 +214,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<int> CloseAsync(InteMessageManageCloseDto dto)
+        public async Task<int> CloseAsync(InteMessageManageCloseSaveDto dto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -212,13 +225,52 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // DTO转换实体
             var entity = dto.ToEntity<InteMessageManageEntity>();
-            entity.Status = MessageStatusEnum.Close;
-            entity.EvaluateBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.EvaluateBy = updatedBy;
+            entity.EvaluateOn = updatedOn;
+            entity.Status = MessageStatusEnum.Close;
 
             return await _inteMessageManageRepository.CloseAsync(entity); ;
+        }
+
+        /// <summary>
+        /// 查询详情（消息管理）（触发）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<InteMessageManageTriggerDto?> QueryTriggerByIdAsync(long id)
+        {
+            var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
+            if (inteMessageManageEntity == null) return null;
+
+            return inteMessageManageEntity.ToModel<InteMessageManageTriggerDto>();
+        }
+
+        /// <summary>
+        /// 查询详情（消息管理）（处理）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<InteMessageManageHandleDto?> QueryHandleByIdAsync(long id)
+        {
+            var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
+            if (inteMessageManageEntity == null) return null;
+
+            return inteMessageManageEntity.ToModel<InteMessageManageHandleDto>();
+        }
+
+        /// <summary>
+        /// 查询详情（消息管理）（关闭）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<InteMessageManageCloseDto?> QueryCloseByIdAsync(long id)
+        {
+            var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
+            if (inteMessageManageEntity == null) return null;
+
+            return inteMessageManageEntity.ToModel<InteMessageManageCloseDto>();
         }
 
         /// <summary>
@@ -244,19 +296,6 @@ namespace Hymson.MES.Services.Services.Integrated
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
-        }
-
-        /// <summary>
-        /// 根据ID查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<InteMessageManageDto?> QueryByIdAsync(long id)
-        {
-            var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
-            if (inteMessageManageEntity == null) return null;
-
-            return inteMessageManageEntity.ToModel<InteMessageManageDto>();
         }
 
         /// <summary>

@@ -49,14 +49,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public string EventTypeName { get; set; }
 
         /// <summary>
-        /// 事件描述
+        /// 事件名称
         /// </summary>
-        public string? EventDescription { get; set; }
+        public string? EventName { get; set; }
 
         /// <summary>
-        /// 推送场景;1、触发2、接收3、接收升级4、处理5、处理升级6、关闭
+        /// 消息状态;1、触发2、接收3、处理4、关闭
         /// </summary>
-        public PushSceneEnum Status { get; set; }
+        public MessageStatusEnum Status { get; set; }
 
         /// <summary>
         /// 紧急程度;1、高2、中3、低
@@ -91,12 +91,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 接收时长
         /// </summary>
-        public decimal? ReceiveDuration { get; set; }
+        public double? ReceiveDuration { get; set; }
 
         /// <summary>
         /// 处理时长
         /// </summary>
-        public decimal? HandleDuration { get; set; }
+        public double? HandleDuration { get; set; }
 
         /// <summary>
         /// 评价时间

@@ -46,20 +46,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> CloseAsync(InteMessageManageEntity entity);
 
         /// <summary>
-        /// 更新
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        Task<int> UpdateAsync(InteMessageManageEntity entity);
-
-        /// <summary>
-        /// 更新（批量）
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<InteMessageManageEntity> entities);
-
-        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>

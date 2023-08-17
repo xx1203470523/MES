@@ -311,12 +311,14 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteMessageManage
-            CreateMap<InteMessageManageTriggerDto, InteMessageManageEntity>();
-            CreateMap<InteMessageManageReceiveDto, InteMessageManageEntity>();
-            CreateMap<InteMessageManageHandleDto, InteMessageManageEntity>();
-            CreateMap<InteMessageManageCloseDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageTriggerSaveDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageReceiveSaveDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageHandleSaveDto, InteMessageManageEntity>();
+            CreateMap<InteMessageManageCloseSaveDto, InteMessageManageEntity>();
             CreateMap<InteMessageManagePagedQueryDto, InteMessageManagePagedQuery>();
-            CreateMap<InteMessageManageEntity, InteMessageManageDto>();
+            CreateMap<InteMessageManageEntity, InteMessageManageTriggerDto>();
+            CreateMap<InteMessageManageEntity, InteMessageManageHandleDto>();
+            CreateMap<InteMessageManageEntity, InteMessageManageCloseDto>();
             CreateMap<InteMessageManageView, InteMessageManageDto>();
             #endregion
         }
@@ -607,9 +609,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionParameterSaveDto, QualIpqcInspectionParameterEntity>();
             CreateMap<QualIpqcInspectionParameterEntity, QualIpqcInspectionParameterDto>();
             CreateMap<QualIpqcInspectionRuleSaveDto, QualIpqcInspectionRuleEntity>();
-            CreateMap<QualIpqcInspectionRuleEntity, QualIpqcInspectionRuleDto>();
             CreateMap<QualIpqcInspectionRuleResourceRelationSaveDto, QualIpqcInspectionRuleResourceRelationEntity>();
-            CreateMap<QualIpqcInspectionRuleResourceRelationEntity, QualIpqcInspectionRuleResourceRelationDto>();
             #endregion
         }
 
