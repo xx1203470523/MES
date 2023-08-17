@@ -21,6 +21,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using MimeKit.Cryptography;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -130,7 +131,12 @@ namespace Hymson.MES.Services.Services.Plan
             });
             var manuSfcList = await _manuSfcRepository.GetBySFCsAsync(param.SFCs);
             //TODO  考虑库存中是否存放工单字段 王克明
-            var manuSfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcList.Select(x => x.Id).ToList());
+            IEnumerable<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
+            var sfcids = manuSfcList.Select(x => x.Id).ToList();
+            if (sfcids != null && sfcids.Any())
+            {
+                manuSfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcids);
+            }
 
             foreach (var sfc in param.SFCs)
             {
@@ -314,8 +320,8 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 await _manuCreateBarcodeService.CreateBarcodeByOldMESSFCAsync(new CreateBarcodeByOldMesSFCBo
                 {
-                    SiteId=_currentSite.SiteId??0,
-                    UserName=_currentUser.UserName,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    UserName = _currentUser.UserName,
                     WorkOrderId = param.WorkOrderId,
                     OldSFCs = barcodeList
                 });
@@ -375,7 +381,7 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16127));
                 }
 
-                var manuContainerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(new ManuContainerPackQuery {LadeBarCode= param.SFC ,SiteId=_currentSite.SiteId??0 });
+                var manuContainerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(new ManuContainerPackQuery { LadeBarCode = param.SFC, SiteId = _currentSite.SiteId ?? 0 });
 
                 if (manuContainerPackEntity != null)
                 {
