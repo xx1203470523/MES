@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query);
+        Task<PagedInfo<ProcResourceViewDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query);
 
         /// <summary>
         /// 资源关联打印机数据

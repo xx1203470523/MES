@@ -94,7 +94,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("listByProcedure")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync([FromQuery] ProcResourceProcedurePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceViewDto>> GettPageListByProcedureIdAsync([FromQuery] ProcResourceProcedurePagedQueryDto query)
         {
             return await _procResourceService.GettPageListByProcedureIdAsync(query);
         }

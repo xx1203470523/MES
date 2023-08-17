@@ -121,6 +121,23 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述 :资源代码 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 描述 :资源名称 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResName { get; set; }
+
+        /// <summary>
+        /// 资源类型编码
+        /// </summary>
+        public string? ResType { get; set; }
     }
 
     public record ProcResourceViewDto : ProcResourceDto

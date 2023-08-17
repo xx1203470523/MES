@@ -211,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceEntity>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query)
+        public async Task<PagedInfo<ProcResourceView>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoJoinDataSqlTemplate);
@@ -219,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("r.IsDeleted = 0");
             sqlBuilder.Where("r.SiteId = @SiteId");
             sqlBuilder.OrderBy("r.UpdatedOn DESC");
-            sqlBuilder.Select("r.*");
+            sqlBuilder.Select("r.*,t.ResType,t.ResTypeName");
             sqlBuilder.LeftJoin("proc_resource_type t on r.ResTypeId = t.Id and t.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_procedure p on p.ResourceTypeId =t.Id and p.IsDeleted=0");
 
@@ -235,17 +235,32 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("r.Status = @Status");
             }
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            {
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("r.ResCode like @ResCode");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResName))
+            {
+                query.ResName = $"%{query.ResName}%";
+                sqlBuilder.Where("r.ResName like @ResName");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResType))
+            {
+                query.ResName = $"%{query.ResType}%";
+                sqlBuilder.Where("t.ResType like @ResType");
+            }
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceEntity>(templateData.RawSql, templateData.Parameters);
+            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceEntities = await procResourceEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceEntity>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcResourceView>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
