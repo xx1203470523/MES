@@ -146,14 +146,17 @@ namespace Hymson.MES.Services.Services.Integrated
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // DTO转换实体
-            var entity = dto.ToEntity<InteMessageManageEntity>();
+            // 查询实体
+            var entity = await _inteMessageManageRepository.GetByIdAsync(dto.Id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            // 更新实体
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.ReceivedBy = updatedBy;
             entity.ReceivedOn = updatedOn;
             entity.Status = MessageStatusEnum.Receive;
-            entity.ReceiveDuration = (updatedOn - entity.CreatedOn).TotalMinutes;
+            entity.ReceiveDuration = Math.Ceiling((updatedOn - entity.CreatedOn).TotalMinutes);
 
             return await _inteMessageManageRepository.ReceiveAsync(entity);
         }
@@ -172,38 +175,117 @@ namespace Hymson.MES.Services.Services.Integrated
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // DTO转换实体
-            var entity = dto.ToEntity<InteMessageManageEntity>();
+            // 查询实体
+            var entity = await _inteMessageManageRepository.GetByIdAsync(dto.Id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            // 更新实体
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.HandledBy = updatedBy;
             entity.HandledOn = updatedOn;
             entity.Status = MessageStatusEnum.Handle;
+            entity.DepartmentId = dto.DepartmentId;
+            entity.ResponsibleBy = dto.ResponsibleBy;
+            entity.ReasonAnalysis = dto.ReasonAnalysis;
+            entity.HandleSolution = dto.HandleSolution;
+            entity.HandleRemark = dto.HandleRemark;
             if (entity.ReceivedOn.HasValue)
             {
-                entity.HandleDuration = (updatedOn - entity.ReceivedOn.Value).TotalMinutes;
+                entity.HandleDuration = Math.Ceiling((updatedOn - entity.ReceivedOn.Value).TotalMinutes);
             }
 
             // 附件处理
             List<InteAttachmentEntity> attachmentEntities = new();
-            List<InteMessageManageAnalysisReportAttachmentEntity> InteMessageManageAnalysisReportAttachmentEntities = new();
-            List<InteMessageManageHandleProgrammeAttachmentEntity> InteMessageManageHandleProgrammeAttachmentEntities = new();
+            List<InteMessageManageAnalysisReportAttachmentEntity> messageManageAnalysisReportAttachmentEntities = new();
+            List<InteMessageManageHandleProgrammeAttachmentEntity> messageManageHandleProgrammeAttachmentEntities = new();
 
+            #region 附件
             // 原因分析（附件）
-            //dto.ReasonAttachments ??= new List<string>();
-            // TODO
+            if (dto.ReasonAttachments != null)
+            {
+                foreach (var item in dto.ReasonAttachments)
+                {
+                    var attachmentId = IdGenProvider.Instance.CreateId();
+                    attachmentEntities.Add(new InteAttachmentEntity
+                    {
+                        Id = attachmentId,
+                        Name = item.Name,
+                        Path = item.Path,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = entity.SiteId,
+                    });
+
+                    messageManageAnalysisReportAttachmentEntities.Add(new InteMessageManageAnalysisReportAttachmentEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        MessageManageId = entity.Id,
+                        AttachmentId = attachmentId,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = entity.SiteId,
+                    });
+                }
+            }
+
+            // 处理方案（附件）
+            if (dto.HandleAttachments != null)
+            {
+                foreach (var item in dto.HandleAttachments)
+                {
+                    var attachmentId = IdGenProvider.Instance.CreateId();
+                    attachmentEntities.Add(new InteAttachmentEntity
+                    {
+                        Id = attachmentId,
+                        Name = item.Name,
+                        Path = item.Path,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = entity.SiteId,
+                    });
+
+                    messageManageHandleProgrammeAttachmentEntities.Add(new InteMessageManageHandleProgrammeAttachmentEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        MessageManageId = entity.Id,
+                        AttachmentId = attachmentId,
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn,
+                        SiteId = entity.SiteId,
+                    });
+                }
+            }
+            #endregion
 
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                var rowArray = await Task.WhenAll(new List<Task<int>>()
+                rows += await _inteMessageManageRepository.HandleAsync(entity);
+
+                if (attachmentEntities.Any())
                 {
-                    _inteMessageManageRepository.HandleAsync(entity),
-                    _inteAttachmentRepository.InsertRangeAsync(attachmentEntities),
-                    _inteMessageManageAnalysisReportAttachmentRepository.InsertRangeAsync(InteMessageManageAnalysisReportAttachmentEntities),
-                    _inteMessageManageHandleProgrammeAttachmentRepository.InsertRangeAsync(InteMessageManageHandleProgrammeAttachmentEntities)
-                });
-                rows += rowArray.Sum();
+                    rows += await _inteAttachmentRepository.InsertRangeAsync(attachmentEntities);
+                }
+
+                if (messageManageAnalysisReportAttachmentEntities.Any())
+                {
+                    rows += await _inteMessageManageAnalysisReportAttachmentRepository.InsertRangeAsync(messageManageAnalysisReportAttachmentEntities);
+                }
+
+                if (messageManageHandleProgrammeAttachmentEntities.Any())
+                {
+                    rows += await _inteMessageManageHandleProgrammeAttachmentRepository.InsertRangeAsync(messageManageHandleProgrammeAttachmentEntities);
+                }
+
                 trans.Complete();
             }
             return rows;
@@ -223,13 +305,17 @@ namespace Hymson.MES.Services.Services.Integrated
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // DTO转换实体
-            var entity = dto.ToEntity<InteMessageManageEntity>();
+            // 查询实体
+            var entity = await _inteMessageManageRepository.GetByIdAsync(dto.Id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            // 更新实体
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.EvaluateBy = updatedBy;
             entity.EvaluateOn = updatedOn;
             entity.Status = MessageStatusEnum.Close;
+            entity.EvaluateRemark = dto.EvaluateRemark;
 
             return await _inteMessageManageRepository.CloseAsync(entity); ;
         }
@@ -257,7 +343,22 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
             if (inteMessageManageEntity == null) return null;
 
-            return inteMessageManageEntity.ToModel<InteMessageManageHandleDto>();
+            var dto = inteMessageManageEntity.ToModel<InteMessageManageHandleDto>();
+
+            // 读取附件
+            var messageManageAnalysisReportAttachmentEntities = await _inteMessageManageAnalysisReportAttachmentRepository.GetEntitiesAsync(new InteMessageManageAnalysisReportAttachmentQuery { MessageManageId = inteMessageManageEntity.Id });
+            var messageManageHandleProgrammeAttachmentEntities = await _inteMessageManageHandleProgrammeAttachmentRepository.GetEntitiesAsync(new InteMessageManageHandleProgrammeAttachmentQuery { MessageManageId = inteMessageManageEntity.Id });
+
+            var reasonAttachmentIds = messageManageAnalysisReportAttachmentEntities.Select(x => x.AttachmentId).ToList();
+            var handleAttachmentIds = messageManageHandleProgrammeAttachmentEntities.Select(x => x.AttachmentId).ToList();
+
+            var attachmentIds = reasonAttachmentIds.Union(handleAttachmentIds);
+            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(attachmentIds);
+
+            dto.ReasonAttachments = attachmentEntities.Where(x => reasonAttachmentIds.Contains(x.Id)).Select(x => x.ToModel<InteAttachmentBaseDto>());
+            dto.HandleAttachments = attachmentEntities.Where(x => handleAttachmentIds.Contains(x.Id)).Select(x => x.ToModel<InteAttachmentBaseDto>());
+
+            return dto;
         }
 
         /// <summary>

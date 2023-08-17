@@ -320,6 +320,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageManageEntity, InteMessageManageHandleDto>();
             CreateMap<InteMessageManageEntity, InteMessageManageCloseDto>();
             CreateMap<InteMessageManageView, InteMessageManageDto>();
+            CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
+            CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
             #endregion
         }
 

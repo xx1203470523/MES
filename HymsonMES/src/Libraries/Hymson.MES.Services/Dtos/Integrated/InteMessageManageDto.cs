@@ -102,19 +102,20 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string HandleSolution { get; set; }
 
         /// <summary>
+        /// 备注（处理）
+        /// </summary>
+        public string? HandleRemark { get; set; }
+
+        /// <summary>
         /// 原因分析（附件）
         /// </summary>
-        public IEnumerable<string>? ReasonAttachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto>? ReasonAttachments { get; set; }
 
         /// <summary>
         /// 处理方案（附件）
         /// </summary>
-        public IEnumerable<string>? HandleAttachments { get; set; }
+        public IEnumerable<InteAttachmentBaseDto>? HandleAttachments { get; set; }
 
-        /// <summary>
-        /// 备注（处理）
-        /// </summary>
-        public string? HandleRemark { get; set; }
     }
 
     /// <summary>
@@ -347,6 +348,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string? HandledBy { get; set; }
 
+        /// <summary>
+        /// 原因分析（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? ReasonAttachments { get; set; }
+
+        /// <summary>
+        /// 处理方案（附件）
+        /// </summary>
+        public IEnumerable<InteAttachmentBaseDto>? HandleAttachments { get; set; }
+
     }
 
     /// <summary>
@@ -373,6 +384,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 处理时长
         /// </summary>
         public double? HandleDuration { get; set; }
+
+        /// <summary>
+        /// 备注（评价）
+        /// </summary>
+        public string? EvaluateRemark { get; set; }
 
         /// <summary>
         /// 评价时间

@@ -91,12 +91,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 接收时长
         /// </summary>
-        public double? ReceiveDuration { get; set; }
+        public int? ReceiveDuration { get; set; }
 
         /// <summary>
         /// 处理时长
         /// </summary>
-        public double? HandleDuration { get; set; }
+        public int? HandleDuration { get; set; }
 
         /// <summary>
         /// 评价时间
