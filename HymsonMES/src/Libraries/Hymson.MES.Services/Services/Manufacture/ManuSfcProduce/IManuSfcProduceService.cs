@@ -104,12 +104,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task<PagedInfo<ManuSfcProduceViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
 
         /// <summary>
-        /// 分页查询（查询所有条码信息）
+        /// 分页查询（查询所有条码信息:不包含锁定和报废的）
         /// 优化
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQueryDto queryDto);
+
+        Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProduceSelectPagedQueryDto queryDto);
 
         /// <summary>
         /// 根据SFC查询在制品步骤列表

@@ -1193,7 +1193,27 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 pagedQuery.SfcArray = queryDto.Sfcs;
             }
+            pagedQuery.SfcStatus = SfcStatusEnum.Scrapping;
 
+            return await GetManuSelectPagedInfoAsync(pagedQuery);
+        }
+
+        public async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProduceSelectPagedQueryDto queryDto)
+        {
+            var pagedQuery = queryDto.ToQuery<ManuSfcProduceSelectPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+
+            //查询多个条码
+            if (queryDto.Sfcs != null && queryDto.Sfcs.Any())
+            {
+                pagedQuery.SfcArray = queryDto.Sfcs;
+            }
+
+            return await GetManuSelectPagedInfoAsync(pagedQuery);
+        }
+
+        private async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSelectPagedInfoAsync(ManuSfcProduceSelectPagedQuery pagedQuery)
+        {
             var pagedInfo = await _manuSfcRepository.GetManuSfcSelectPagedInfoAsync(pagedQuery);
             if (pagedInfo == null || !pagedInfo.Data.Any())
             {
@@ -1248,7 +1268,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             return new PagedInfo<ManuSfcProduceSelectViewDto>(manuSfcProduceDtos, pagedInfo!.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-
 
         /// <summary>
         /// 根据SFC查询在制品步骤列表

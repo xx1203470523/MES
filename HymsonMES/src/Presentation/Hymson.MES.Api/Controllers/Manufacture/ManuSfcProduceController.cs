@@ -162,7 +162,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 分页查询列表（条码生产信息（物理删除））
+        /// 分页查询列表（条码生产信息:不包含报废的条码）
         /// 优化
         /// </summary>
         /// <param name="parm"></param>
@@ -171,6 +171,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcSelectPagedInfoAsync([FromQuery] ManuSfcProduceSelectPagedQueryDto parm)
         {
             return await _manuSfcProduceService.GetManuSfcSelectPagedInfoAsync(parm);
+        }
+
+        /// <summary>
+        /// 分页查询列表（条码生产信息（包含报废的条码））
+        /// 优化
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet("getManuSfcAllPageList")]
+        public async Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcPagedInfoAsync([FromQuery] ManuSfcProduceSelectPagedQueryDto parm)
+        {
+            return await _manuSfcProduceService.GetManuSfcPagedInfoAsync(parm);
         }
 
         /// <summary>
