@@ -46,8 +46,9 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
         private readonly IInteVehicleRepository _inteVehicleRepository;
+        private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
 
-        public InteVehicleTypeService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleTypeRepository inteVehicleTypeRepository, AbstractValidator<InteVehicleTypeCreateDto> validationCreateRules, AbstractValidator<InteVehicleTypeModifyDto> validationModifyRules, IInteVehicleTypeVerifyRepository inteVehicleTypeVerifyRepository, AbstractValidator<InteVehicleTypeVerifyCreateDto> validationInteVehicleTypeVerifyCreateRules, IProcMaterialRepository procMaterialRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IInteVehicleRepository inteVehicleRepository)
+        public InteVehicleTypeService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleTypeRepository inteVehicleTypeRepository, AbstractValidator<InteVehicleTypeCreateDto> validationCreateRules, AbstractValidator<InteVehicleTypeModifyDto> validationModifyRules, IInteVehicleTypeVerifyRepository inteVehicleTypeVerifyRepository, AbstractValidator<InteVehicleTypeVerifyCreateDto> validationInteVehicleTypeVerifyCreateRules, IProcMaterialRepository procMaterialRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IInteVehicleRepository inteVehicleRepository, IInteVehicleFreightRepository inteVehicleFreightRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -59,6 +60,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _procMaterialRepository = procMaterialRepository;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _inteVehicleRepository = inteVehicleRepository;
+            _inteVehicleFreightRepository = inteVehicleFreightRepository;
         }
 
         /// <summary>
@@ -229,6 +231,22 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
             }
             #endregion
+
+            //验证 载具（已使用该载具类型）绑定了产品序列码，则无法修改载具类型
+            var useInteVehicleEntities = await _inteVehicleRepository.GetByVehicleTypeIdsAsync(new InteVehicleVehicleTypeIdsQuery
+            {
+                SiteId = _currentSite.SiteId??0,
+                VehicleTypeIds = new long[] { inteVehicleTypeModifyDto.Id }
+            });
+            if (useInteVehicleEntities.Any())
+            {
+                var freights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(useInteVehicleEntities.Select(x => x.Id).ToArray());
+
+                if (freights.Any(x => x.Qty > 0))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18518));
+                }
+            }
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
