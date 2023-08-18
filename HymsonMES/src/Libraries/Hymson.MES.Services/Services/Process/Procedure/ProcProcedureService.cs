@@ -23,6 +23,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
@@ -512,7 +513,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress, IsolationLevel.ReadCommitted))
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
             {
                 //入库
                 await _procProcedureRepository.InsertAsync(procProcedureEntity);
