@@ -277,6 +277,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long? ResourceId { get; set; }
 
         /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
+
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long? EquipmentId { get; set; }
