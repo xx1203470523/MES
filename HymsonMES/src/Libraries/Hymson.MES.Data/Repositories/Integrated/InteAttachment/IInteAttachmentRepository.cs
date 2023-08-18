@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteAttachmentEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteAttachmentEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

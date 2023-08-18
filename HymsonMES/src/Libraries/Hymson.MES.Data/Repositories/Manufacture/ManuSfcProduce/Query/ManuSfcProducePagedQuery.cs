@@ -140,5 +140,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品编码
         /// </summary>
         public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? SfcStatus { get; set; }
     }
 }

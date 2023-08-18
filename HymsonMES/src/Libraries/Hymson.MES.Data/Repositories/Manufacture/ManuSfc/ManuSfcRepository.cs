@@ -223,7 +223,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
             sqlBuilder.Where("ms.SiteId = @SiteId");
-            sqlBuilder.Where("ms.Status <> 4");
+            //sqlBuilder.Where("ms.Status <> 4");
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
@@ -238,6 +238,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id AND pp.IsDeleted =0");
             //sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id AND pr.IsDeleted =0");
 
+            //sfc条码状态
+            if (query.SfcStatus.HasValue)
+            {
+                sqlBuilder.Where("ms.Status<>@SfcStatus");
+            }
             //状态
             if (query.Status.HasValue)
             {

@@ -143,19 +143,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcList.Select(x => x.SFC).ToArray(),
             });
-            //找到锁定状态的
-            var lockedSfcs = new List<string>();
-            foreach (var item in sfcProduces)
-            {
-                if (item.Status == SfcProduceStatusEnum.Locked) 
-                {
-                    lockedSfcs.Add(item.SFC);
-                }
-            }
-            if (lockedSfcs.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
-            }
+            ////找到锁定状态的
+            //var lockedSfcs = new List<string>();
+            //foreach (var item in sfcProduces)
+            //{
+            //    if (item.Status == SfcProduceStatusEnum.Locked) 
+            //    {
+            //        lockedSfcs.Add(item.SFC);
+            //    }
+            //}
+            //if (lockedSfcs.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
+            //}
             #endregion
 
             ////DTO转换实体
@@ -369,19 +369,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcList.Select(x => x.SFC).ToArray(),
             });
-            //找到锁定状态的
-            var lockedSfcs = new List<string>();
-            foreach (var item in sfcProduces)
-            {
-                if (item.Status == SfcProduceStatusEnum.Locked)
-                {
-                    lockedSfcs.Add(item.SFC);
-                }
-            }
-            if (lockedSfcs.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
-            }
+            ////找到锁定状态的
+            //var lockedSfcs = new List<string>();
+            //foreach (var item in sfcProduces)
+            //{
+            //    if (item.Status == SfcProduceStatusEnum.Locked)
+            //    {
+            //        lockedSfcs.Add(item.SFC);
+            //    }
+            //}
+            //if (lockedSfcs.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
+            //}
             #endregion
 
             ////DTO转换实体
