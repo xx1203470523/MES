@@ -52,6 +52,19 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
+        /// 修改（消息管理）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("update")]
+        [PermissionDescription("integrated:inteMessageManage:insert")]
+        public async Task UpdateAsync([FromBody] InteMessageManageTriggerSaveDto dto)
+        {
+            await _inteMessageManageService.UpdateAsync(dto);
+        }
+
+        /// <summary>
         /// 接收（消息管理）
         /// </summary>
         /// <param name="dto"></param>

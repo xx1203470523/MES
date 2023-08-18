@@ -289,6 +289,7 @@
         #region 异常消息 10900
         public const string MES10901 = "事件类型不能为空";
         public const string MES10902 = "编码生成失败";
+        public const string MES10903 = "消息状态不合法";
         #endregion
 
         #region 降级规则 11000

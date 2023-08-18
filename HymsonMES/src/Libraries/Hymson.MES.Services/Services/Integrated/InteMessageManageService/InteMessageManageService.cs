@@ -133,6 +133,28 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateAsync(InteMessageManageTriggerSaveDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+
+            // 验证DTO
+            await _validationSaveRules.ValidateAndThrowAsync(dto);
+
+            // DTO转换实体
+            var entity = dto.ToEntity<InteMessageManageEntity>();
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
+
+            // 保存
+            return await _inteMessageManageRepository.UpdateAsync(entity);
+        }
+
+        /// <summary>
         /// 接收
         /// </summary>
         /// <param name="dto"></param>
@@ -149,6 +171,9 @@ namespace Hymson.MES.Services.Services.Integrated
             // 查询实体
             var entity = await _inteMessageManageRepository.GetByIdAsync(dto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            // 状态校验
+            if (entity.Status != MessageStatusEnum.Trigger) throw new CustomerValidationException(nameof(ErrorCode.MES10903));
 
             // 更新实体
             entity.UpdatedBy = updatedBy;
@@ -178,6 +203,9 @@ namespace Hymson.MES.Services.Services.Integrated
             // 查询实体
             var entity = await _inteMessageManageRepository.GetByIdAsync(dto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            // 状态校验
+            if (entity.Status != MessageStatusEnum.Receive) throw new CustomerValidationException(nameof(ErrorCode.MES10903));
 
             // 更新实体
             entity.UpdatedBy = updatedBy;
@@ -308,6 +336,9 @@ namespace Hymson.MES.Services.Services.Integrated
             // 查询实体
             var entity = await _inteMessageManageRepository.GetByIdAsync(dto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            // 状态校验
+            if (entity.Status != MessageStatusEnum.Handle) throw new CustomerValidationException(nameof(ErrorCode.MES10903));
 
             // 更新实体
             entity.UpdatedBy = updatedBy;

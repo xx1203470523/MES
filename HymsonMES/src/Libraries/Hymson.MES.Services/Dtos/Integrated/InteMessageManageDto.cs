@@ -9,6 +9,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public record InteMessageManageTriggerSaveDto : BaseEntityDto
     {
         /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 消息单号
         /// </summary>
         public string Code { get; set; }
