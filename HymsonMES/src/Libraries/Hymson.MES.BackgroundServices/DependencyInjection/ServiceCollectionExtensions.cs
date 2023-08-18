@@ -1,17 +1,4 @@
-﻿using FluentValidation;
-using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Options;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.CoreServices.Services.NewJob;
-using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.Services.Validators.Equipment;
+﻿using Hymson.MES.CoreServices.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +17,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCoreService(configuration);  
+            services.AddCoreService(configuration);
             AddServices(services);
             AddValidators(services);
             AddConfig(services, configuration);
@@ -44,7 +31,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-           
             //services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             return services;
         }
@@ -56,8 +42,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
-           
-
             return services;
         }
 

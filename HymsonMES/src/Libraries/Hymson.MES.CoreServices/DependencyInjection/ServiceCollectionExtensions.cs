@@ -3,6 +3,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Options;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Integrated;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
@@ -30,8 +31,9 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddCoreService(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddMessagePushService(configuration);  
-            AddServices(services);
+            services.AddMessagePushService(configuration);
+            AddManuServices(services);
+            AddIntegratedServices(services);
             AddValidators(services);
             AddConfig(services, configuration);
             return services;
@@ -42,7 +44,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        private static IServiceCollection AddServices(this IServiceCollection services)
+        private static IServiceCollection AddManuServices(this IServiceCollection services)
         {
             services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
@@ -72,6 +74,17 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         }
 
         /// <summary>
+        /// 添加服务依赖（综合模块）
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        private static IServiceCollection AddIntegratedServices(this IServiceCollection services)
+        {
+            services.AddSingleton<IMessagePushService, MessagePushService>();
+            return services;
+        }
+
+        /// <summary>
         /// 添加验证器相关服务
         /// </summary>
         /// <param name="services"></param>
@@ -82,7 +95,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<AbstractValidator<RepairEndRequestBo>, RepairEndJobValidator>();
             services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
             services.AddSingleton<AbstractValidator<PackageOpenRequestBo>, PackageOpenJobValidator>();
-            services.AddSingleton<AbstractValidator<PackageCloseRequestBo>, PackageCloseJobValidator>(); 
+            services.AddSingleton<AbstractValidator<PackageCloseRequestBo>, PackageCloseJobValidator>();
 
             return services;
         }
