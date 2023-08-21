@@ -605,12 +605,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
             }
-            //按Location NG或按绑定CCS编码NG必须任选其一
-            if ((sfcCirculationCCSNgSetDto.Locations == null || sfcCirculationCCSNgSetDto.Locations.Length <= 0)
-                && (sfcCirculationCCSNgSetDto.BindSFCs == null || sfcCirculationCCSNgSetDto.BindSFCs.Length <= 0))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19141));//CCS设定NG时Location和BindSfc方式必须任选其一
-            }
+            //按Location NG或按绑定CCS编码NG必须任选其一,允许只传入模组码NG
+            //if ((sfcCirculationCCSNgSetDto.Locations == null || sfcCirculationCCSNgSetDto.Locations.Length <= 0)
+            //    && (sfcCirculationCCSNgSetDto.BindSFCs == null || sfcCirculationCCSNgSetDto.BindSFCs.Length <= 0))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19141));//CCS设定NG时Location和BindSfc方式必须任选其一
+            //}
             //查找当前已有的绑定记录
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
             {
