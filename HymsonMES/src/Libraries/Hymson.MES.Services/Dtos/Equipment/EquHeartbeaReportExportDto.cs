@@ -19,12 +19,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 状态;0：离线 1、在线
         /// </summary>
-        [EpplusTableColumn(Header = "设备状态", Order = 3)]
+        [EpplusTableColumn(Header = "心跳状态", Order = 3)]
         public bool Status { get; set; }
         /// <summary>
         /// 设备故障状态
         /// </summary>
-        [EpplusTableColumn(Header = "设备故障状态", Order = 4)]
+        [EpplusTableColumn(Header = "设备状态", Order = 4)]
         public EquipmentStateEnum? EquipmentStatus { get; set; }
         /// <summary>
         /// 资源编码
