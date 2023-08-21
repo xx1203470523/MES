@@ -318,8 +318,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             // 添加升级检查任务
             _eventBus.PublishDelay(new MessageTriggerSucceededIntegrationEvent
             {
-                CreationDate = HymsonClock.Now(),
-                EventId = messageEntity.Id,
                 Status = messageEntity.Status,
                 UpgradeBo = new EventTypeUpgradeBo
                 {

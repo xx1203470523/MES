@@ -1,7 +1,6 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.CoreServices.Services.Integrated;
-using Hymson.Utils;
 
 namespace Hymson.MES.BackgroundServices.EventHandling
 {
@@ -31,9 +30,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// <returns></returns>
         public async Task Handle(MessageTriggerSucceededIntegrationEvent @event)
         {
-            Console.Write($"------{HymsonClock.Now()}-------{@event}--------------");
-            
-            //await _messagePushService.TriggerCallBackAsync(@event);
+            await _messagePushService.TriggerCallBackAsync(@event);
         }
     }
 }
