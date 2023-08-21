@@ -17,6 +17,6 @@ namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
         /// <summary>
         /// 升级对象
         /// </summary>
-        public EventTypeUpgradeBo UpgradeBo { get; set; }
+        public EventTypeUpgradeBo? UpgradeBo { get; set; }
     }
 }
