@@ -161,6 +161,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquHeartbeatReportView, EquHeartbeaReportExportDto>();
             #endregion
 
+            #region EquAlarm
+            CreateMap<EquAlarmReportView, EquAlarmReportExportDto>();
+            #endregion
+
         }
 
         /// <summary>

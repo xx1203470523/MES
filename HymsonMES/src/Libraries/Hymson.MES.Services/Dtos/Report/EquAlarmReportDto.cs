@@ -22,9 +22,9 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public string FaultCode { get; set; }
         /// <summary>
-        /// 告警消息
+        /// 故障信息
         /// </summary>
-        public string AlermMsg { get; set; }
+        public string AlarmMsg { get; set; }
         /// <summary>
         /// 状态;1：触发 2、恢复
         /// </summary>

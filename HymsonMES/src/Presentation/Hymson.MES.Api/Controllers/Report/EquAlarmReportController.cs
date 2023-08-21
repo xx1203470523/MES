@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.Web.Framework.Attributes;
@@ -40,10 +41,11 @@ namespace Hymson.MES.Api.Controllers.Report
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        //[HttpGet("export")]
-        //public async Task<EquAlarmReportViewDto> EquAlarmReportExport([FromQuery] EquAlarmReportPagedQueryDto param)
-        //{
-        //    return await _equAlarmReportService.GetEquAlarmReportPageListAsync(param);
-        //}
+        [HttpGet("export")]
+        public async Task<ExportResultDto> EquAlarmReportExportAsync([FromQuery] EquAlarmReportPagedQueryDto param)
+        {
+            return await _equAlarmReportService.EquAlarmReportExportAsync(param);
+        }
+
     }
 }
