@@ -12,7 +12,6 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Globalization;
 using System.Reflection;
-using static K4os.Compression.LZ4.Engine.Pubternal;
 
 namespace Hymson.MES.Api
 {
