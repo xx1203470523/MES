@@ -91,9 +91,7 @@ namespace Hymson.MES.Data.Repositories.Common
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM message_push /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM message_push /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM message_push /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM message_push /**where**/  ";
 
         const string GetByIdSql = @"SELECT * FROM message_push WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM message_push WHERE Id IN @Ids ";

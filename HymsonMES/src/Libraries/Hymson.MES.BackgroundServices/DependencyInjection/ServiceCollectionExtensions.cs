@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Options;
+using Hymson.MES.CoreServices.Services.Integrated;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,7 +32,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-            //services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
+            //services.AddSingleton<IMessagePushService, MessagePushService>();
             return services;
         }
 

@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteMessageGroupPushMethodEntity>> GetEntitiesAsync(EntityBySiteIdQuery query);
+        Task<IEnumerable<InteMessageGroupPushMethodEntity>> GetEntitiesAsync(EntityByParentIdQuery query);
 
         /// <summary>
         /// 获取List

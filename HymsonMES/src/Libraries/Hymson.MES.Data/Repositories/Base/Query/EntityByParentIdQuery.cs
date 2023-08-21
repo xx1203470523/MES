@@ -13,7 +13,7 @@
         /// <summary>
         /// 父ID
         /// </summary>
-        public long ParentId { get; set; }
+        public long? ParentId { get; set; }
 
     }
 }

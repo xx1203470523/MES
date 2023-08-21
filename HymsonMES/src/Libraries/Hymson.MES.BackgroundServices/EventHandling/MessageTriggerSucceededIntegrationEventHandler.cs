@@ -30,7 +30,9 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// <returns></returns>
         public async Task Handle(MessageTriggerSucceededIntegrationEvent @event)
         {
-            await _messagePushService.TriggerCallBackAsync(@event);
+            Console.Write($"-------------{@event}--------------");
+            
+            //await _messagePushService.TriggerCallBackAsync(@event);
         }
     }
 }

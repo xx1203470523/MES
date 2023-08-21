@@ -1,6 +1,7 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.BackgroundServices.EventHandling;
 using Hymson.MES.BackgroundTasks;
+using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
@@ -37,6 +38,7 @@ Host.CreateDefaultBuilder(args)
        //});
        AddEventBusServices(services);
        services.AddBackgroundServices(hostContext.Configuration);
+
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        // Add the required Quartz.NET services
        services.AddQuartz(q =>
@@ -63,7 +65,7 @@ Host.CreateDefaultBuilder(args)
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
+       services.AddHostedService<SubHostedService>();
 
        services.AddNLog(hostContext.Configuration);
        services.AddEventBusRabbitMQService(hostContext.Configuration);
