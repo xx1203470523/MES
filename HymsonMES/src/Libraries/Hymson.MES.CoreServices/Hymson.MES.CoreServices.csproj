@@ -13,6 +13,7 @@
     <PackageReference Include="Hymson.Localization" Version="2.1.74" />
     <PackageReference Include="Hymson.Sequences" Version="2.1.74" />
     <PackageReference Include="Hymson.Snowflake" Version="2.1.74" />
+    <PackageReference Include="Scriban" Version="5.7.0" />
   </ItemGroup>
 
   <ItemGroup>

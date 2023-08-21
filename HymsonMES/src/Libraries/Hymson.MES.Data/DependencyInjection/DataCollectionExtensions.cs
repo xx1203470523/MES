@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
@@ -56,6 +57,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
+            #region Commonm
+            services.AddSingleton<IMessageTemplateRepository, MessageTemplateRepository>();
+            services.AddSingleton<IMessagePushRepository, MessagePushRepository>();
+            #endregion
+
             #region Equipment
             //services.AddSingleton<IEquConsumableRepository, EquConsumableRepository>();
             //services.AddSingleton<IEquConsumableTypeRepository, EquConsumableTypeRepository>();

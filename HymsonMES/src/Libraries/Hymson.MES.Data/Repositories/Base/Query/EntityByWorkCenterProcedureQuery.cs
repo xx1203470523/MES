@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Enums;
-
-namespace Hymson.MES.Data.Repositories.Common.Query
+﻿namespace Hymson.MES.Data.Repositories.Common.Query
 {
     /// <summary>
     /// 

@@ -3,7 +3,7 @@
     /// <summary>
     /// code查询实体
     /// </summary>
-    public  class EntityBySiteIdQuery
+    public class EntityBySiteIdQuery
     {
         /// <summary>
         /// 工厂

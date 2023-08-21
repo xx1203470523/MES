@@ -607,6 +607,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             var entities = await _inteEventTypePushRuleRepository.GetEntitiesAsync(new EntityByParentIdQuery
             {
+                SiteId = _currentSite.SiteId ?? 0,
                 ParentId = id
             });
 
