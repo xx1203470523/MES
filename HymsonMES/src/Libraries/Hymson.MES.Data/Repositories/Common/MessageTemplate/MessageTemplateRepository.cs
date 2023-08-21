@@ -162,9 +162,7 @@ namespace Hymson.MES.Data.Repositories.Common
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM message_template /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM message_template /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM message_template /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM message_template /**where**/  ";
 
         const string InsertSql = "INSERT INTO message_template(  `Id`, `MessageType`, `BusinessType`, `PushScene`, `Content`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @MessageType, @BusinessType, @PushScene, @Content, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO message_template(  `Id`, `MessageType`, `BusinessType`, `PushScene`, `Content`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @MessageType, @BusinessType, @PushScene, @Content, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";

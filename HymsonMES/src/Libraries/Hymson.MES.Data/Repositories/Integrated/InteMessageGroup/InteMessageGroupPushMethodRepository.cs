@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteMessageGroupPushMethodEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
+        public async Task<IEnumerable<InteMessageGroupPushMethodEntity>> GetEntitiesAsync(EntityByParentIdQuery query)
         {
             var key = $"inte_message_group_push_method&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
@@ -67,6 +67,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
                 sqlBuilder.Where("IsDeleted = 0");
                 sqlBuilder.Where("SiteId = @SiteId");
+                if (query.ParentId.HasValue)
+                {
+                    sqlBuilder.Where("MessageGroupId = @ParentId");
+                }
                 sqlBuilder.Select("*");
 
                 using var conn = GetMESDbConnection();
