@@ -46,6 +46,8 @@ Host.CreateDefaultBuilder(args)
            #region jobs
 
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
+           q.AddJobAndTrigger<HelloWorld1Job>(hostContext.Configuration);
            //q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
 
            #endregion
