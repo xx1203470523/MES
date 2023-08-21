@@ -39,11 +39,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         private readonly IInteMessageGroupPushMethodRepository _inteMessageGroupPushMethodRepository;
 
         /// <summary>
-        /// 仓储接口（事件类型维护）
-        /// </summary>
-        private readonly IInteEventTypeRepository _inteEventTypeRepository;
-
-        /// <summary>
         /// 仓储接口（事件类型关联群组）
         /// </summary>
         private readonly IInteEventTypeMessageGroupRelationRepository _inteEventTypeMessageGroupRelationRepository;
@@ -52,11 +47,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// 仓储接口（事件升级）
         /// </summary>
         private readonly IInteEventTypeUpgradeRepository _inteEventTypeUpgradeRepository;
-
-        /// <summary>
-        /// 仓储接口（事件升级消息组关联表）
-        /// </summary>
-        private readonly IInteEventTypeUpgradeMessageGroupRelationRepository _inteEventTypeUpgradeMessageGroupRelationRepository;
 
         /// <summary>
         /// 仓储接口（事件类型推送规则）
@@ -76,19 +66,15 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <param name="eventBus"></param>
         /// <param name="messageTemplateRepository"></param>
         /// <param name="inteMessageGroupPushMethodRepository"></param>
-        /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
         /// <param name="inteEventTypeUpgradeRepository"></param>
-        /// <param name="inteEventTypeUpgradeMessageGroupRelationRepository"></param>
         /// <param name="inteEventTypePushRuleRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
         public MessagePushService(IMessageService messageService, IEventBus<EventBusInstance1> eventBus,
             IMessageTemplateRepository messageTemplateRepository,
             IInteMessageGroupPushMethodRepository inteMessageGroupPushMethodRepository,
-            IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
             IInteEventTypeUpgradeRepository inteEventTypeUpgradeRepository,
-            IInteEventTypeUpgradeMessageGroupRelationRepository inteEventTypeUpgradeMessageGroupRelationRepository,
             IInteEventTypePushRuleRepository inteEventTypePushRuleRepository,
             IInteMessageManageRepository inteMessageManageRepository)
         {
@@ -96,10 +82,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             _eventBus = eventBus;
             _messageTemplateRepository = messageTemplateRepository;
             _inteMessageGroupPushMethodRepository = inteMessageGroupPushMethodRepository;
-            _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
             _inteEventTypeUpgradeRepository = inteEventTypeUpgradeRepository;
-            _inteEventTypeUpgradeMessageGroupRelationRepository = inteEventTypeUpgradeMessageGroupRelationRepository;
             _inteEventTypePushRuleRepository = inteEventTypePushRuleRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
         }
@@ -143,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public async Task TriggerCallBackAsync(MessageTriggerSucceededIntegrationEvent @event)
+        public async Task TriggerCallBackAsync(MessageTriggerUpgradeEvent @event)
         {
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.EventId);
@@ -163,7 +147,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// 任务回调（接收）
         /// </summary>
         /// <returns></returns>
-        public async Task ReceiveCallBackAsync(MessageReceiveSucceededIntegrationEvent @event)
+        public async Task ReceiveCallBackAsync(MessageReceiveUpgradeEvent @event)
         {
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.EventId);
@@ -183,19 +167,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// 任务回调（处理）
         /// </summary>
         /// <returns></returns>
-        public async Task HandleCallBackAsync(MessageProcessingSucceededIntegrationEvent @event)
+        public async Task HandleCallBackAsync(MessageProcessingUpgradeEvent @event)
         {
             await Task.CompletedTask;
         }
 
-        /// <summary>
-        /// 任务回调（关闭）
-        /// </summary>
-        /// <returns></returns>
-        public async Task CloseCallBackAsync(MessageCloseSucceededIntegrationEvent @event)
-        {
-            await Task.CompletedTask;
-        }
         #endregion
 
         #region 内部方法
@@ -316,10 +292,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (pushScene != PushSceneEnum.ReceiveUpgrade && pushScene != PushSceneEnum.HandleUpgrade) return;
 
             // 添加升级检查任务
-            _eventBus.PublishDelay(new MessageTriggerSucceededIntegrationEvent
+            _eventBus.PublishDelay(new MessageTriggerUpgradeEvent
             {
-                CreationDate = HymsonClock.Now(),
-                EventId = messageEntity.Id,
                 Status = messageEntity.Status,
                 UpgradeBo = new EventTypeUpgradeBo
                 {

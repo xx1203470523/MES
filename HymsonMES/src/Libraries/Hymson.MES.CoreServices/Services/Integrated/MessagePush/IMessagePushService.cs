@@ -20,25 +20,19 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        Task TriggerCallBackAsync(MessageTriggerSucceededIntegrationEvent @event);
+        Task TriggerCallBackAsync(MessageTriggerUpgradeEvent @event);
 
         /// <summary>
         /// 任务回调（接收）
         /// </summary>
         /// <returns></returns>
-        Task ReceiveCallBackAsync(MessageReceiveSucceededIntegrationEvent @event);
+        Task ReceiveCallBackAsync(MessageReceiveUpgradeEvent @event);
 
         /// <summary>
         /// 任务回调（处理）
         /// </summary>
         /// <returns></returns>
-        Task HandleCallBackAsync(MessageProcessingSucceededIntegrationEvent @event);
-
-        /// <summary>
-        /// 任务回调（关闭）
-        /// </summary>
-        /// <returns></returns>
-        Task CloseCallBackAsync(MessageCloseSucceededIntegrationEvent @event);
+        Task HandleCallBackAsync(MessageProcessingUpgradeEvent @event);
 
     }
 }

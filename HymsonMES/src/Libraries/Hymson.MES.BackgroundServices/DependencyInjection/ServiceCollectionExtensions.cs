@@ -69,10 +69,9 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddEventBusServices(IServiceCollection services)
         {
-            services.AddSingleton<IIntegrationEventHandler<MessageCloseSucceededIntegrationEvent>, MessageCloseSucceededIntegrationEventHandler>();
-            services.AddSingleton<IIntegrationEventHandler<MessageProcessingSucceededIntegrationEvent>, MessageProcessingSucceededIntegrationEventHandler>();
-            services.AddSingleton<IIntegrationEventHandler<MessageReceiveSucceededIntegrationEvent>, MessageReceiveSucceededIntegrationEventHandler>();
-            services.AddSingleton<IIntegrationEventHandler<MessageTriggerSucceededIntegrationEvent>, MessageTriggerSucceededIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageProcessingUpgradeEvent>, MessageProcessingUpgradeEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeEvent>, MessageReceiveUpgradeEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeEvent>, MessageTriggerUpgradeEventHandler>();
         }
     }
 }

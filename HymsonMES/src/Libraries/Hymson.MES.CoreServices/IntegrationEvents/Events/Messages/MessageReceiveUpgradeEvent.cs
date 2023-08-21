@@ -5,9 +5,9 @@ using Hymson.MES.CoreServices.Bos.Integrated;
 namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
 {
     /// <summary>
-    /// 消息触发成功事件
+    /// 消息接收成功事件
     /// </summary>
-    public record MessageTriggerSucceededIntegrationEvent : IntegrationEvent
+    public record MessageReceiveUpgradeEvent : IntegrationEvent
     {
         /// <summary>
         /// 消息状态;1、触发2、接收3、处理4、关闭
@@ -17,7 +17,6 @@ namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
         /// <summary>
         /// 升级对象
         /// </summary>
-        public EventTypeUpgradeBo UpgradeBo { get; set; }
-
+        public EventTypeUpgradeBo? UpgradeBo { get; set; }
     }
 }
