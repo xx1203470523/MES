@@ -8,7 +8,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.EquipmentCollect
     public record EquipmentAlarmDto : BaseDto
     {
         /// <summary>
-        ///  状态（0-恢复 1-触发）
+        ///  状态（1-触发，2-恢复 ）
         /// </summary>
         public EquipmentAlarmStatusEnum Status { get; set; } = EquipmentAlarmStatusEnum.Recover;
 

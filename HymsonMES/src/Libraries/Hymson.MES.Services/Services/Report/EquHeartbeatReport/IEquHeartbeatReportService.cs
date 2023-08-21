@@ -1,10 +1,6 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
 {
@@ -16,5 +12,11 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
         /// <param name="pageQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<EquHeartbeatReportViewDto>> GetEquHeartbeatReportPageListAsync(EquHeartbeatReportPagedQueryDto pageQuery);
+        /// <summary>
+        /// 导出设备心跳记录
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<ExportResultDto> EquHeartbeatReportExportAsync(EquHeartbeatReportPagedQueryDto pageQuery);
     }
 }

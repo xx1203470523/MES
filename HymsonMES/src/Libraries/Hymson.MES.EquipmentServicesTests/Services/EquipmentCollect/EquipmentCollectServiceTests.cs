@@ -44,7 +44,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
         /// 模拟上报设备状态
         /// </summary>
         [TestMethod]
-        public async Task EquipmentAlarmAsyncTest()
+        public async Task EquipmentStateAsyncTest()
         {
             long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
             var equEquipmentEntities = await _equEquipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
@@ -84,6 +84,42 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
                 await _equipmentCollectService.EquipmentHeartbeatAsync(new EquipmentHeartbeatDto
                 {
                     IsOnline = Random.Shared.Next(0, 2) == 1,
+                    LocalTime = HymsonClock.Now(),
+                    ResourceCode = item.EquipmentCode
+                });
+            }
+            Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// 模拟设备故障上报
+        /// </summary>
+        [TestMethod()]
+        public async Task EquipmentAlarmAsyncTest()
+        {
+            long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
+            var equEquipmentEntities = await _equEquipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
+            {
+                SiteId = siteId
+            });
+            foreach (var item in equEquipmentEntities)
+            {
+                //设置当前模拟设备名称
+                SetEquInfoAsync(new EquipmentInfoDto { Id = item.Id, FactoryId = item.WorkCenterFactoryId, Code = item.EquipmentCode, Name = item.EquipmentName });
+                await _equipmentCollectService.EquipmentAlarmAsync(new EquipmentAlarmDto
+                {
+                    Status = EquipmentAlarmStatusEnum.Trigger,//触发
+                    AlarmCode = "testAlert" + (char)Random.Shared.Next(97, 122),
+                    AlarmMsg = "测试故障上报" + (char)Random.Shared.Next(97, 122),
+                    LocalTime = HymsonClock.Now(),
+                    ResourceCode = item.EquipmentCode
+                });
+                Thread.Sleep(TimeSpan.FromSeconds(2));
+                await _equipmentCollectService.EquipmentAlarmAsync(new EquipmentAlarmDto
+                {
+                    Status = EquipmentAlarmStatusEnum.Recover,//恢复
+                    AlarmCode = "testAlert" + (char)Random.Shared.Next(97, 122),
+                    AlarmMsg = "测试故障上报" + (char)Random.Shared.Next(97, 122),
                     LocalTime = HymsonClock.Now(),
                     ResourceCode = item.EquipmentCode
                 });

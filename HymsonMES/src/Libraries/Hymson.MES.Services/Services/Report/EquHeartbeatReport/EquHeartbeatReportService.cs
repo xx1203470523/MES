@@ -1,9 +1,13 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
 
 namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
 {
@@ -12,11 +16,19 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
         private readonly IEquHeartbeatRepository _equHeartbeatRepository;
-        public EquHeartbeatReportService(IEquHeartbeatRepository equHeartbeatRepository, ICurrentUser currentUser, ICurrentSite currentSite)
+        private readonly IMinioService _minioService;
+        private readonly IExcelService _excelService;
+        public EquHeartbeatReportService(IEquHeartbeatRepository equHeartbeatRepository,
+            ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            IMinioService minioService,
+            IExcelService excelService)
         {
             _equHeartbeatRepository = equHeartbeatRepository;
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _minioService = minioService;
+            _excelService = excelService;
         }
 
         /// <summary>
@@ -34,6 +46,34 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 return s.ToModel<EquHeartbeatReportViewDto>();
             });
             return new PagedInfo<EquHeartbeatReportViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 导出设备心跳
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<ExportResultDto> EquHeartbeatReportExportAsync(EquHeartbeatReportPagedQueryDto pageQuery)
+        {
+            string fileName = "设备心跳";
+            pageQuery.PageSize = 10000;
+            var pagedQuery = pageQuery.ToQuery<EquHeartbeatReportPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _equHeartbeatRepository.GetEquHeartbeatReportPageListAsync(pagedQuery);
+            var equHeartbeatReports = pagedInfo.Data;
+            var equHeartbeaExports = new List<EquHeartbeaReportExportDto>();
+            foreach (var equHeartbeatReport in equHeartbeatReports)
+            {
+                equHeartbeaExports.Add(equHeartbeatReport.ToExcelModel<EquHeartbeaReportExportDto>());
+            }
+            var filePath = await _excelService.ExportAsync(equHeartbeaExports, fileName, fileName);
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ExportResultDto
+            {
+                FileName = fileName,
+                Path = uploadResult.AbsoluteUrl,
+            };
         }
     }
 }

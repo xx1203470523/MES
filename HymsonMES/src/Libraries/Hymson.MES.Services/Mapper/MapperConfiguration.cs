@@ -8,6 +8,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquAlarm.View;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
@@ -154,6 +155,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
             #endregion
+
+            #region EquHeartbeat
+
+            CreateMap<EquHeartbeatReportView, EquHeartbeaReportExportDto>();
+            #endregion
+
         }
 
         /// <summary>
@@ -585,6 +592,11 @@ namespace Hymson.MES.Services.Mapper
             #region EquHeartbeatReport
             CreateMap<EquHeartbeatReportPagedQueryDto, EquHeartbeatReportPagedQuery>();
             CreateMap<EquHeartbeatReportView, EquHeartbeatReportViewDto>();
+            #endregion
+
+            #region EquAlarmReport
+            CreateMap<EquAlarmReportPagedQueryDto, EquAlarmReportPagedQuery>();
+            CreateMap<EquAlarmReportView, EquAlarmReportViewDto>();
             #endregion
 
             #region ProductTraceReport

@@ -41,6 +41,7 @@ using Hymson.MES.Services.Services.Process.ResourceType;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Report;
+using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.MES.Services.Services.Report.EquHeartbeatReport;
 using Hymson.MES.Services.Services.Report.ProductionManagePanel;
 using Hymson.MES.Services.Services.Warehouse;
@@ -265,6 +266,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region ProductionManagePanel
             services.AddSingleton<IProductionManagePanelService, ProductionManagePanelService>();
+            #endregion
+
+            #region EquAlarmReport
+            services.AddSingleton<IEquAlarmReportService, EquAlarmReportService>();
             #endregion
 
             #endregion
