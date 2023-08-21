@@ -105,7 +105,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             _inteMessageManageRepository = inteMessageManageRepository;
         }
 
-
         #region 推送消息
         /// <summary>
         /// 推送消息并添加事件
@@ -119,8 +118,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             // 发生即时通知，并设置发送升级事件
             await SetNextUpgradeLevelAsync(messageEntity, null);
         }
-
-
 
         /// <summary>
         /// 任务回调（触发）
@@ -176,7 +173,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         }
         #endregion
 
-
         #region 内部方法
         /// <summary>
         /// 发送即时消息
@@ -207,7 +203,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             });
 
             // 如果开启的开关不含有该场景，则不发送即时通知
-            if (eventTypePushRules == null || eventTypePushRules.Any(a => a.PushScene == pushScene) == false) return;
+            if (eventTypePushRules == null || eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == pushScene) == false) return;
 
             // 读取事件绑定的消息组（已缓存）
             var eventTypeMessageGroupRelations = await _inteEventTypeMessageGroupRelationRepository.GetEntitiesAsync(new EntityByParentIdQuery
@@ -324,8 +320,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     Level = eventTypeUpgrade.Level
                 }
             }, eventTypeUpgrade.Duration * 60);
-
         }
         #endregion
+
     }
 }
