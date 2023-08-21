@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
 {
     /// <summary>
-    /// 消息关闭成功事件
+    /// 消息处理成功事件
     /// </summary>
-    public record MessageCloseSucceededIntegrationEvent: IntegrationEvent
+    public record MessageProcessingUpgradeEvent : IntegrationEvent
     {
     }
 }

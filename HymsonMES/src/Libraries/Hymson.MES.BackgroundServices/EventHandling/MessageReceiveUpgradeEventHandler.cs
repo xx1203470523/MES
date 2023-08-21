@@ -5,9 +5,9 @@ using Hymson.MES.CoreServices.Services.Integrated;
 namespace Hymson.MES.BackgroundServices.EventHandling
 {
     /// <summary>
-    /// 事件总线回调（消息处理成功）
+    /// 事件总线回调（消息接收成功）
     /// </summary>
-    public class MessageProcessingSucceededIntegrationEventHandler : IIntegrationEventHandler<MessageProcessingSucceededIntegrationEvent>
+    public class MessageReceiveUpgradeEventHandler : IIntegrationEventHandler<MessageReceiveUpgradeEvent>
     {
         /// <summary>
         /// 消息服务
@@ -18,7 +18,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// 构造函数
         /// </summary>
         /// <param name="messagePushService"></param>
-        public MessageProcessingSucceededIntegrationEventHandler(IMessagePushService messagePushService)
+        public MessageReceiveUpgradeEventHandler(IMessagePushService messagePushService)
         {
             _messagePushService = messagePushService;
         }
@@ -28,9 +28,9 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public async Task Handle(MessageProcessingSucceededIntegrationEvent @event)
+        public async Task Handle(MessageReceiveUpgradeEvent @event)
         {
-            await _messagePushService.HandleCallBackAsync(@event);
+            await _messagePushService.ReceiveCallBackAsync(@event);
         }
     }
 }

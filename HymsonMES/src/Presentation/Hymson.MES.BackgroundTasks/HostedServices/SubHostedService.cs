@@ -1,8 +1,6 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.BackgroundServices.EventHandling;
-using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
-using Hymson.Utils;
 using Microsoft.Extensions.Hosting;
 
 namespace Hymson.MES.BackgroundTasks.HostedServices
@@ -33,21 +31,9 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         /// <returns></returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _eventBus.PublishDelay(new MessageTriggerSucceededIntegrationEvent
-            {
-                CreationDate = HymsonClock.Now(),
-                EventId = 1,
-                Status = Core.Enums.MessageStatusEnum.Receive,
-                UpgradeBo = new EventTypeUpgradeBo
-                {
-                    EventTypeUpgradeId = 1,
-                    Level = Core.Enums.UpgradeLevelEnum.One
-                }
-            }, 15);
-            _eventBus.Subscribe<MessageTriggerSucceededIntegrationEvent, MessageTriggerSucceededIntegrationEventHandler>();
-            _eventBus.Subscribe<MessageReceiveSucceededIntegrationEvent, MessageReceiveSucceededIntegrationEventHandler>();
-            _eventBus.Subscribe<MessageProcessingSucceededIntegrationEvent, MessageProcessingSucceededIntegrationEventHandler>();
-            _eventBus.Subscribe<MessageCloseSucceededIntegrationEvent, MessageCloseSucceededIntegrationEventHandler>();
+            _eventBus.Subscribe<MessageTriggerUpgradeEvent, MessageTriggerUpgradeEventHandler>();
+            _eventBus.Subscribe<MessageReceiveUpgradeEvent, MessageReceiveUpgradeEventHandler>();
+            _eventBus.Subscribe<MessageProcessingUpgradeEvent, MessageProcessingUpgradeEventHandler>();
 
             return Task.CompletedTask;
         }

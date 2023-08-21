@@ -7,7 +7,7 @@ namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
     /// <summary>
     /// 消息接收成功事件
     /// </summary>
-    public record MessageReceiveSucceededIntegrationEvent : IntegrationEvent
+    public record MessageReceiveUpgradeEvent : IntegrationEvent
     {
         /// <summary>
         /// 消息状态;1、触发2、接收3、处理4、关闭
