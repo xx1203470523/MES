@@ -50,7 +50,6 @@ namespace Hymson.MES.Api
             builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
-            builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddHttpClientService(builder.Configuration);
             builder.Services.AddEventBusRabbitMQService(builder.Configuration);
             builder.Services.AddLocalization();

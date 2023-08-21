@@ -1,4 +1,7 @@
-﻿using Hymson.MES.CoreServices.Options;
+﻿using Hymson.EventBus.Abstractions;
+using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
+using Hymson.MES.CoreServices.Options;
 using Hymson.MES.CoreServices.Services.Integrated;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +22,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddCoreService(configuration);
+            AddEventBusServices(services);
             AddServices(services);
             AddValidators(services);
             AddConfig(services, configuration);
@@ -58,6 +62,17 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
             //services.Configure<ConnectionOptions>(configuration);
             return services;
+        }
+        /// <summary>
+        /// 订阅
+        /// </summary>
+        /// <param name="services"></param>
+        static void AddEventBusServices(IServiceCollection services)
+        {
+            services.AddSingleton<IIntegrationEventHandler<MessageCloseSucceededIntegrationEvent>, MessageCloseSucceededIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageProcessingSucceededIntegrationEvent>, MessageProcessingSucceededIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageReceiveSucceededIntegrationEvent>, MessageReceiveSucceededIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageTriggerSucceededIntegrationEvent>, MessageTriggerSucceededIntegrationEventHandler>();
         }
     }
 }

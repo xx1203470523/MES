@@ -20,7 +20,15 @@ namespace Hymson.MES.BackgroundTasks.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             if (context.CancellationToken.IsCancellationRequested) return;
-            await _messageService.SendMessageAsync("MES.PushMessage.BackGroundService");
+            try
+            {
+                await _messageService.SendMessageAsync("MES.PushMessage.BackGroundService");
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex);
+            }
         }
     }
 }

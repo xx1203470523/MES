@@ -15,6 +15,7 @@ using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static K4os.Compression.LZ4.Engine.Pubternal;
 
 namespace Hymson.MES.CoreServices.DependencyInjection
 {
@@ -31,6 +32,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddCoreService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSequenceService(configuration);
             services.AddMessagePushService(configuration);
             services.AddData(configuration);
             AddManuServices(services);

@@ -31,9 +31,8 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// <returns></returns>
         public async Task Handle(MessageTriggerSucceededIntegrationEvent @event)
         {
-            Console.Write($"------{HymsonClock.Now()}-------{@event}--------------");
-            
-            //await _messagePushService.TriggerCallBackAsync(@event);
+
+            await _messagePushService.TriggerCallBackAsync(@event);
         }
     }
 }

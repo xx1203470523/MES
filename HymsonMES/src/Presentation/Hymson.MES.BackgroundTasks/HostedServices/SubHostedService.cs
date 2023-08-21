@@ -33,17 +33,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         /// <returns></returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _eventBus.PublishDelay(new MessageTriggerSucceededIntegrationEvent
-            {
-                CreationDate = HymsonClock.Now(),
-                EventId = 1,
-                Status = Core.Enums.MessageStatusEnum.Receive,
-                UpgradeBo = new EventTypeUpgradeBo
-                {
-                    EventTypeUpgradeId = 1,
-                    Level = Core.Enums.UpgradeLevelEnum.One
-                }
-            }, 15);
+            
             _eventBus.Subscribe<MessageTriggerSucceededIntegrationEvent, MessageTriggerSucceededIntegrationEventHandler>();
             _eventBus.Subscribe<MessageReceiveSucceededIntegrationEvent, MessageReceiveSucceededIntegrationEventHandler>();
             _eventBus.Subscribe<MessageProcessingSucceededIntegrationEvent, MessageProcessingSucceededIntegrationEventHandler>();
