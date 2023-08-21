@@ -667,11 +667,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <returns></returns>
         public async Task SfcCirculationCCSConfirmAsync(SfcCirculationCCSConfirmDto sfcCirculationCCSConfirmDto)
         {
-            //Location不能为空,SFC可以为空
-            if (string.IsNullOrEmpty(sfcCirculationCCSConfirmDto.Location))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19144));
-            }
+            //Location不能为空,SFC可以为空，Location修改为可以为空
+            //if (string.IsNullOrEmpty(sfcCirculationCCSConfirmDto.Location))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19144));
+            //}
             var manuSfcCcsNgRecordEntities = await _manuSfcCcsNgRecordRepository.GetManuSfcCcsNgRecordEntitiesAsync(new ManuSfcCcsNgRecordQuery
             {
                 SiteId = _currentEquipment.SiteId,
