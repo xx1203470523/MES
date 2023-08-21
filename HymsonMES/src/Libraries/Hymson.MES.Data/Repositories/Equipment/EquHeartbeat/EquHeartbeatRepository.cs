@@ -110,6 +110,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.AddParameters(new { AcquisitionStart = pageQuery.AcquisitionTime[0], AcquisitionEnd = pageQuery.AcquisitionTime[1].AddDays(1) });
                 sqlBuilder.Where(" eh.CreatedOn >= @AcquisitionStart AND eh.CreatedOn < @AcquisitionEnd ");
             }
+            if (pageQuery.EquipmentStatus.HasValue)
+            {
+                sqlBuilder.Where(" es.EquipmentStatus = @EquipmentStatus ");
+            }
+
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
@@ -238,18 +243,20 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetPagedInfoEquHeartbeatReportDataSqlTemplate = @" SELECT eh.EquipmentId,ee.EquipmentCode,ee.EquipmentName,eh.`Status`,ee.WorkCenterLineId,
 									pr.ResCode,pr.ResName,pp.`Code` as ProcedureCode,pp.`Name` as ProcedureName,
-								    eh.LastOnLineTime,eh.UpdatedOn,eh.UpdatedBy,eh.CreatedOn,eh.CreatedBy FROM equ_heartbeat eh 
+								    eh.LastOnLineTime,eh.UpdatedOn,eh.UpdatedBy,eh.CreatedOn,eh.CreatedBy,es.`EquipmentStatus` FROM equ_heartbeat eh 
 								    left join equ_equipment ee on eh.EquipmentId=ee.Id and ee.SiteId=eh.SiteId and ee.IsDeleted=0
 								    left join proc_resource_equipment_bind preb on preb.EquipmentId=ee.Id and preb.SiteId=ee.SiteId and preb.IsDeleted=0
 								    left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=0
-								    left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  LIMIT @Offset,@Rows ";
+								    left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  
+                                    left join equ_status es on es.EquipmentId=ee.Id and es.IsDeleted=0  /**where**/  LIMIT @Offset,@Rows ";
 
         const string GetPagedInfoEquHeartbeatReportCountSqlTemplate = @"select COUNT(1) 
                                     FROM equ_heartbeat eh 
 									left join equ_equipment ee on eh.EquipmentId=ee.Id and ee.SiteId=eh.SiteId and ee.IsDeleted=0
 									left join proc_resource_equipment_bind preb on preb.EquipmentId=ee.Id and preb.SiteId=ee.SiteId and preb.IsDeleted=0
 									left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=0
-									left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  /**where**/  "
+									left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=0  
+                                    left join equ_status es on es.EquipmentId=ee.Id and es.IsDeleted=0  /**where**/  "
         ;
         //删除之前的心跳记录
         const string DeleteMonthsBeforeSql = "Delete FROM equ_heartbeat_record WHERE CreatedOn<SUBDATE(CURDATE(), INTERVAL @Months month);";

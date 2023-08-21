@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -20,6 +21,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 状态;0：离线 1、在线
         /// </summary>
         public bool Status { get; set; }
+        /// <summary>
+        /// 设备故障状态
+        /// </summary>
+        public EquipmentStateEnum? EquipmentStatus { get; set; }
         /// <summary>
         /// 工作中心
         /// </summary>
@@ -82,6 +87,11 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 状态;0：离线 1、在线
         /// </summary>
         public bool? Status { get; set; }
+
+        /// <summary>
+        /// 设备故障状态
+        /// </summary>
+        public EquipmentStateEnum? EquipmentStatus { get; set; }
 
         /// <summary>
         /// 采集时间

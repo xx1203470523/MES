@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 状态;0：离线 1、在线
         /// </summary>
         public bool Status { get; set; }
+        /// <summary>
+        /// 设备故障状态
+        /// </summary>
+        public EquipmentStateEnum? EquipmentStatus { get; set; }
         /// <summary>
         /// 工作中心
         /// </summary>
