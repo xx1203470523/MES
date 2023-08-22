@@ -116,5 +116,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 合并时绑定位置
         /// </summary>
         public string? Location { get; set; }
+        /// <summary>
+        /// 绑定时的型号
+        /// </summary>
+        public string ModelCode { get; set; }
     }
 }

@@ -20,6 +20,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 绑定CCS条码信息
         /// </summary>
         public CirculationCCSDto[] BindSFCs { get; set; }
+        /// <summary>
+        /// 绑定时的型号
+        /// </summary>
+        public string ModelCode { get; set; }
     }
     public class CirculationCCSDto
     {
@@ -51,5 +55,9 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 所有待绑定位置
         /// </summary>
         public string[] Locations { get; set; } = Array.Empty<string>();
+        /// <summary>
+        /// 绑定时的型号
+        /// </summary>
+        public string ModelCode { get; set; }
     }
 }

@@ -37,7 +37,13 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcCirculationUnBindDto"></param>
         /// <returns></returns>
         Task SfcCirculationModuleRemoveAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto);
-
+        /// <summary>
+        /// 获取模组/PACK绑定SFC信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
+        /// <returns></returns>
+        Task<IEnumerable<CirculationBindDto>> GetCirculationBindSfcsAsync(string sfc, SfcCirculationTypeEnum? sfcCirculationTypeEnum = SfcCirculationTypeEnum.Merge);
         /// <summary>
         /// CCS绑定
         /// </summary>

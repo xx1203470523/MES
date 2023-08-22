@@ -23,31 +23,34 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 模组条码
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// NG位置;A,B,C,D等
         /// </summary>
         public string Location { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// NG状态;0 NG，1 已确认修复或重新生产
         /// </summary>
         public ManuSfcCcsNgRecordStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// Ng代码
         /// </summary>
         public string NgCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// Ng名称
         /// </summary>
         public string NgName { get; set; }
 
-       
+        /// <summary>
+        /// 流转表绑定时的型号编码
+        /// </summary>
+        public string ModelCode { get; set; }
     }
 }

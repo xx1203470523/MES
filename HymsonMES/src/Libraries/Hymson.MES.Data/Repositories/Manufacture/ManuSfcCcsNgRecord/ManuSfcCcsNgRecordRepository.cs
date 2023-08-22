@@ -12,7 +12,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -188,20 +187,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_sfc_ccsNg_record` /**where**/ /**orderby**/ ";
 
-        const string InsertSql = "INSERT INTO `manu_sfc_ccsNg_record`(  `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Location, @Status, @NgCode, @NgName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc_ccsNg_record`(  `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Location, @Status, @NgCode, @NgName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_sfc_ccsNg_record`(  `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,`ModelCode`) VALUES (   @Id, @SiteId, @SFC, @Location, @Status, @NgCode, @NgName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted,@ModelCode )  ";
+        const string InsertsSql = "INSERT INTO `manu_sfc_ccsNg_record`(  `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,`ModelCode`) VALUES (   @Id, @SiteId, @SFC, @Location, @Status, @NgCode, @NgName, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted,@ModelCode )  ";
 
-        const string UpdateSql = "UPDATE `manu_sfc_ccsNg_record` SET   SiteId = @SiteId, SFC = @SFC, Location = @Location, Status = @Status, NgCode = @NgCode, NgName = @NgName,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc_ccsNg_record` SET   SiteId = @SiteId, SFC = @SFC, Location = @Location, Status = @Status, NgCode = @NgCode, NgName = @NgName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_sfc_ccsNg_record` SET   SiteId = @SiteId, SFC = @SFC, Location = @Location, Status = @Status, NgCode = @NgCode, NgName = @NgName,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, ModelCode = @ModelCode  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_sfc_ccsNg_record` SET   SiteId = @SiteId, SFC = @SFC, Location = @Location, Status = @Status, NgCode = @NgCode, NgName = @NgName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, ModelCode = @ModelCode  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_sfc_ccsNg_record` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_ccsNg_record` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ModelCode`
                             FROM `manu_sfc_ccsNg_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `SFC`, `Location`, `Status`, `NgCode`, `NgName`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ModelCode`
                             FROM `manu_sfc_ccsNg_record`  WHERE Id IN @Ids ";
         #endregion
     }

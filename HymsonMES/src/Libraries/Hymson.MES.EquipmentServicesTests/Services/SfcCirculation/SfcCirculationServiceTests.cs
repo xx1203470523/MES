@@ -178,5 +178,17 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             await _sfcCirculationService.SfcCirculationCCSConfirmAsync(sfcCirculationCCSConfirmDto);
             Assert.IsTrue(true);
         }
+
+        /// <summary>
+        /// 测试绑定条码获取
+        /// </summary>
+        [TestMethod()]
+        public async Task GetCirculationBindSfcsAsyncTest()
+        {
+            string equipmentCode = "QAEM002";
+            await SetEquInfoAsync(equipmentCode);
+            var circulationBinds = await _sfcCirculationService.GetCirculationBindSfcsAsync("AAA2103841XCE12A023");
+            Assert.IsTrue(circulationBinds.Any());
+        }
     }
 }

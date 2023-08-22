@@ -19,6 +19,10 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 模组绑电芯条码/Pack绑模组条码
         /// </summary>
         public CirculationBindDto[] BindSFCs { get; set; }
+        /// <summary>
+        /// 绑定时的型号
+        /// </summary>
+        public string ModelCode { get; set; }
 
         /// <summary>
         /// 是否为模组虚拟条码参数
@@ -42,5 +46,9 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// 绑定的批次条码名称
         /// </summary>
         public string? Name { get; set; }
+        /// <summary>
+        /// 绑定时的型号
+        /// </summary>
+        public string ModelCode { get; set; }
     }
 }

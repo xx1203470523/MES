@@ -509,6 +509,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
+        /// 通过模组/Pack获取绑定条码信息
+        /// </summary>
+        /// <param name="sfc">模组/Pack条码</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetCirculationBindSfcs")]
+        [ProducesResponseType(typeof(IEnumerable<CirculationBindDto>), 200)]
+        public async Task<IEnumerable<CirculationBindDto>> GetCirculationBindSfcsAsync(string sfc)
+        {
+            return await _sfcCirculationService.GetCirculationBindSfcsAsync(sfc);
+        }
+
+        /// <summary>
         /// 条码组件添加
         /// </summary>
         /// <param name="request"></param>
