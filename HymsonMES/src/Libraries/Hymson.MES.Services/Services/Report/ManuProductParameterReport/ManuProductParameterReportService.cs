@@ -2,7 +2,9 @@
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -38,6 +40,10 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
         /// <returns></returns>
         public async Task<PagedInfo<ManuProductParameterReportViewDto>> GetManuProductParameterReportPageListAsync(ManuProductParameterReportPagedQueryDto pageQuery)
         {
+            if (pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0 || string.IsNullOrEmpty(pageQuery.SFCStr))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            }
             var pagedQuery = pageQuery.ToQuery<ManuProductParameterReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterReportPagedInfoAsync(pagedQuery);
@@ -55,6 +61,10 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
         /// <returns></returns>
         public async Task<ExportResultDto> ManuProductParameterReportExportAsync(ManuProductParameterReportPagedQueryDto pageQuery)
         {
+            if (pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0 || string.IsNullOrEmpty(pageQuery.SFCStr))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            }
             string fileName = "产品参数";
             pageQuery.PageSize = 10000;
             var pagedQuery = pageQuery.ToQuery<ManuProductParameterReportPagedQuery>();
