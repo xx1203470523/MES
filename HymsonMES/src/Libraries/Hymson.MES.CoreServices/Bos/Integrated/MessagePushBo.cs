@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Enums;
-
-namespace Hymson.MES.CoreServices.Bos.Integrated
+﻿namespace Hymson.MES.CoreServices.Bos.Integrated
 {
     /// <summary>
     /// BO对象（消息推送）
@@ -21,6 +19,11 @@ namespace Hymson.MES.CoreServices.Bos.Integrated
         /// 状态
         /// </summary>
         public string Status { get; set; } = "";
+
+        /// <summary>
+        /// 紧急程度;1、高2、中3、低
+        /// </summary>
+        public string Level { get; set; } = "";
 
         /// <summary>
         /// 事件类型名称

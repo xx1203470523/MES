@@ -265,25 +265,25 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             // 遍历设置的所有推送方式
             foreach (var item in eventTypeMessageGroupRelations)
             {
-                var pushTypeArray = item.PushTypes.ToDeserialize<IEnumerable<MessageTypeEnum>>();
-                if (pushTypeArray == null) continue;
+                var messageTypeArray = item.PushTypes.ToDeserialize<IEnumerable<MessageTypeEnum>>();
+                if (messageTypeArray == null) continue;
 
                 // 消息组推送方式
                 if (messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods) == false) continue;
 
-                foreach (var pushType in pushTypeArray)
+                foreach (var messageType in messageTypeArray)
                 {
                     // 推送方式配置
-                    var config = messageGroupPushMethods.FirstOrDefault(f => f.Type == pushType);
+                    var config = messageGroupPushMethods.FirstOrDefault(f => f.Type == messageType);
                     if (config == null) continue;
 
                     // 读取对应场景的模板
-                    var templateEntity = messageTemplateEntities.FirstOrDefault(f => f.MessageType == pushType && f.PushScene == pushScene);
+                    var templateEntity = messageTemplateEntities.FirstOrDefault(f => f.MessageType == messageType && f.PushScene == pushScene);
                     if (templateEntity == null) continue;
 
                     // 推送即时消息
-                    var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene);
-                    await _messageService.SendMessageAsync(pushType, config.Address, templateEntity.Content, messagePushBo, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
+                    var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene, messageType);
+                    await _messageService.SendMessageAsync(messageType, config.Address, templateEntity.Content, messagePushBo, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
                 }
             }
         }
@@ -351,8 +351,9 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// </summary>
         /// <param name="messageEntity"></param>
         /// <param name="pushScene"></param>
+        /// <param name="messageType"></param>
         /// <returns></returns>
-        private async Task<MessagePushBo> ConvertEntityToMessagePushBoAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene)
+        private async Task<MessagePushBo> ConvertEntityToMessagePushBoAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene, MessageTypeEnum messageType)
         {
             var eventTypeName = "";
             var eventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(messageEntity.EventTypeId);
@@ -371,6 +372,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 PushScene = (int)pushScene, // 模板里面不支持枚举
                 Code = messageEntity.Code,
                 Status = messageEntity.Status.GetDescription(),
+                Level = messageEntity.UrgencyLevel.GetDescription(),
                 EventTypeName = eventTypeName,
                 WorkShopName = workShopName,
                 WorkLineName = workLineName,
