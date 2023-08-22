@@ -616,7 +616,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 SiteId = _currentEquipment.SiteId,
                 CirculationBarCode = sfcCirculationCCSNgSetDto.SFC,
-                IsDisassemble = TrueOrFalseEnum.No
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationType=SfcCirculationTypeEnum.BindCCS
             });
             if (!manuSfcCirculationEntities.Any())
             {
