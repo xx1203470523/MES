@@ -2,7 +2,6 @@
 using Hymson.MES.BackgroundServices.EventHandling;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.CoreServices.Options;
-using Hymson.MES.CoreServices.Services.Integrated;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -69,7 +68,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddEventBusServices(IServiceCollection services)
         {
-            services.AddSingleton<IIntegrationEventHandler<MessageProcessingUpgradeEvent>, MessageProcessingUpgradeEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageHandleUpgradeEvent>, MessageHandleUpgradeEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeEvent>, MessageReceiveUpgradeEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeEvent>, MessageTriggerUpgradeEventHandler>();
         }
