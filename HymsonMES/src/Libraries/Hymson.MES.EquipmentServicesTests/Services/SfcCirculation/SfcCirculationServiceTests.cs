@@ -95,6 +95,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 ResourceCode = "QAEMZY002",
                 SFC = "AAATESTSFC2308091",
+                ModelCode="TEST",
                 BindSFCs = new CirculationCCSDto[] {
                     new CirculationCCSDto{
                         SFC="CCS0002",
@@ -119,7 +120,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 ResourceCode = "QAEMZY002",
                 SFC = "AAATESTSFC2308091",
-                UnBindSFCs = new string[] { "CCS0001" }
+                UnBindSFCs = new string[] { "CCS0004" }
             };
             await _sfcCirculationService.SfcCirculationCCSUnBindAsync(circulationCCSUnBindDto);
             Assert.IsTrue(true);
@@ -137,7 +138,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 ResourceCode = "QAEMZY002",
                 SFC = "AAATESTSFC2308091",
-                Locations = new string[] { "A" }
+                Locations = new string[] { "B" }
                 //BindSFCs = new string[] { "CCS0002" }
             };
             await _sfcCirculationService.SfcCirculationCCSNgSetAsync(sfcCirculationCCSNgSetDto);
@@ -173,7 +174,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             SfcCirculationCCSConfirmDto sfcCirculationCCSConfirmDto = new SfcCirculationCCSConfirmDto
             {
                 ResourceCode = "QAEMZY002",
-                Location = "A"
+                Location = "B"
             };
             await _sfcCirculationService.SfcCirculationCCSConfirmAsync(sfcCirculationCCSConfirmDto);
             Assert.IsTrue(true);
