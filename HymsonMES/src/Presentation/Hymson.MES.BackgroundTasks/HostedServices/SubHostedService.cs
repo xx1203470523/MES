@@ -33,7 +33,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         {
             _eventBus.Subscribe<MessageTriggerUpgradeEvent, MessageTriggerUpgradeEventHandler>();
             _eventBus.Subscribe<MessageReceiveUpgradeEvent, MessageReceiveUpgradeEventHandler>();
-            _eventBus.Subscribe<MessageProcessingUpgradeEvent, MessageProcessingUpgradeEventHandler>();
+            _eventBus.Subscribe<MessageHandleUpgradeEvent, MessageHandleUpgradeEventHandler>();
 
             return Task.CompletedTask;
         }

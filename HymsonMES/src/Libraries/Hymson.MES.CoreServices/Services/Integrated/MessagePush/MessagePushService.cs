@@ -106,20 +106,22 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     await SetMessageAsync(messageEntity, PushSceneEnum.Trigger);
 
                     // 设置发送升级事件
-                    await SetNextUpgradeLevelAsync(messageEntity, PushSceneEnum.ReceiveUpgrade, null);
+                    await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.ReceiveUpgrade);
                     break;
                 case MessageStatusEnum.Receive:
                     // 发送即时消息
                     await SetMessageAsync(messageEntity, PushSceneEnum.Receive);
 
                     // 设置发送升级事件
-                    await SetNextUpgradeLevelAsync(messageEntity, PushSceneEnum.HandleUpgrade, null);
+                    await SetNextUpgradeLevelAsync(new MessageHandleUpgradeEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.HandleUpgrade);
                     break;
                 case MessageStatusEnum.Handle:
                 case MessageStatusEnum.Close:
                 default:
                     break;
             }
+
+
         }
 
         /// <summary>
@@ -129,18 +131,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task TriggerCallBackAsync(MessageTriggerUpgradeEvent @event)
         {
-            // 查询一次任务状态
-            var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.EventId);
-            if (messageEntity == null) return;
-
-            // 状态已经变更，不再继续
-            if (messageEntity.Status != @event.Status) return;
-
-            // 发送即时消息
-            await SetMessageAsync(messageEntity, PushSceneEnum.ReceiveUpgrade);
-
-            // 设置发送升级事件
-            await SetNextUpgradeLevelAsync(messageEntity, PushSceneEnum.ReceiveUpgrade, @event.UpgradeBo);
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -154,24 +145,34 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (messageEntity == null) return;
 
             // 状态已经变更，不再继续
-            if (messageEntity.Status != @event.Status) return;
+            if (messageEntity.Status != MessageStatusEnum.Trigger) return;
 
             // 发送即时消息
-            await SetMessageAsync(messageEntity, PushSceneEnum.HandleUpgrade);
+            await SetMessageAsync(messageEntity, PushSceneEnum.ReceiveUpgrade);
 
             // 设置发送升级事件
-            await SetNextUpgradeLevelAsync(messageEntity, PushSceneEnum.HandleUpgrade, @event.UpgradeBo);
+            await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.ReceiveUpgrade);
         }
 
         /// <summary>
         /// 任务回调（处理）
         /// </summary>
         /// <returns></returns>
-        public async Task HandleCallBackAsync(MessageProcessingUpgradeEvent @event)
+        public async Task HandleCallBackAsync(MessageHandleUpgradeEvent @event)
         {
-            await Task.CompletedTask;
-        }
+            // 查询一次任务状态
+            var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.EventId);
+            if (messageEntity == null) return;
 
+            // 状态已经变更，不再继续
+            if (messageEntity.Status != MessageStatusEnum.Receive) return;
+
+            // 发送即时消息
+            await SetMessageAsync(messageEntity, PushSceneEnum.HandleUpgrade);
+
+            // 设置发送升级事件
+            await SetNextUpgradeLevelAsync(new MessageHandleUpgradeEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.HandleUpgrade);
+        }
         #endregion
 
         #region 内部方法
@@ -255,14 +256,18 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         }
 
         /// <summary>
-        /// 设置延时事件
+        /// 获取下一等级设置
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="event"></param>
         /// <param name="messageEntity"></param>
         /// <param name="pushScene"></param>
-        /// <param name="upgradeBo"></param>
         /// <returns></returns>
-        private async Task SetNextUpgradeLevelAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene, EventTypeUpgradeBo? upgradeBo)
+        private async Task SetNextUpgradeLevelAsync<T>(T @event, InteMessageManageEntity messageEntity, PushSceneEnum pushScene) where T : IntegrationEvent
         {
+            // 即将检查的等级
+            InteEventTypeUpgradeEntity? eventTypeUpgrade = null;
+
             // 读取接收升级等级设置（已缓存）
             var eventTypeUpgrades = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
             {
@@ -273,34 +278,34 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
 
             // 即将检查的等级
-            InteEventTypeUpgradeEntity? eventTypeUpgrade;
-            if (upgradeBo == null)
+            var nowTime = HymsonClock.Now();
+            var duration = (nowTime - messageEntity.CreatedOn).TotalMinutes;
+
+            switch (pushScene)
             {
-                // 先从级别最低的开始
-                eventTypeUpgrade = eventTypeUpgrades.OrderBy(o => o.Level).FirstOrDefault();
-            }
-            else
-            {
-                // 下一升级等级
-                eventTypeUpgrade = eventTypeUpgrades.OrderBy(o => o.Level).Where(w => w.Level > upgradeBo.Level).FirstOrDefault();
+                case PushSceneEnum.Trigger:
+                case PushSceneEnum.Receive:
+                    // 先从级别最低的开始
+                    eventTypeUpgrade = eventTypeUpgrades.OrderBy(o => o.Level).FirstOrDefault();
+                    break;
+                case PushSceneEnum.ReceiveUpgrade:
+                case PushSceneEnum.HandleUpgrade:
+                    // 下一升级等级
+                    eventTypeUpgrade = eventTypeUpgrades.Where(w => w.Duration >= duration).OrderBy(o => o.Level).FirstOrDefault();
+                    break;
+                case PushSceneEnum.Handle:
+                case PushSceneEnum.Close:
+                default:
+                    break;
             }
 
-            // 没有下一级别了
             if (eventTypeUpgrade == null) return;
 
             // 只有这两种场景才有升级需求
             if (pushScene != PushSceneEnum.ReceiveUpgrade && pushScene != PushSceneEnum.HandleUpgrade) return;
 
             // 添加升级检查任务
-            _eventBus.PublishDelay(new MessageTriggerUpgradeEvent
-            {
-                Status = messageEntity.Status,
-                UpgradeBo = new EventTypeUpgradeBo
-                {
-                    EventTypeUpgradeId = eventTypeUpgrade.Id,
-                    Level = eventTypeUpgrade.Level
-                }
-            }, eventTypeUpgrade.Duration * 60);
+            _eventBus.PublishDelay(@event, eventTypeUpgrade.Duration * 60);
         }
         #endregion
 

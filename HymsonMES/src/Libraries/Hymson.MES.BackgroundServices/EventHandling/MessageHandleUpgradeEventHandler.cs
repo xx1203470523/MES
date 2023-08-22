@@ -7,7 +7,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling
     /// <summary>
     /// 事件总线回调（消息处理成功）
     /// </summary>
-    public class MessageProcessingUpgradeEventHandler : IIntegrationEventHandler<MessageProcessingUpgradeEvent>
+    public class MessageHandleUpgradeEventHandler : IIntegrationEventHandler<MessageHandleUpgradeEvent>
     {
         /// <summary>
         /// 消息服务
@@ -18,7 +18,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// 构造函数
         /// </summary>
         /// <param name="messagePushService"></param>
-        public MessageProcessingUpgradeEventHandler(IMessagePushService messagePushService)
+        public MessageHandleUpgradeEventHandler(IMessagePushService messagePushService)
         {
             _messagePushService = messagePushService;
         }
@@ -28,7 +28,7 @@ namespace Hymson.MES.BackgroundServices.EventHandling
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public async Task Handle(MessageProcessingUpgradeEvent @event)
+        public async Task Handle(MessageHandleUpgradeEvent @event)
         {
             await _messagePushService.HandleCallBackAsync(@event);
         }

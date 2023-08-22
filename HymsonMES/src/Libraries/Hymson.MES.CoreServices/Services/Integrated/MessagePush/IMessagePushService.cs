@@ -32,7 +32,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// 任务回调（处理）
         /// </summary>
         /// <returns></returns>
-        Task HandleCallBackAsync(MessageProcessingUpgradeEvent @event);
+        Task HandleCallBackAsync(MessageHandleUpgradeEvent @event);
 
     }
 }

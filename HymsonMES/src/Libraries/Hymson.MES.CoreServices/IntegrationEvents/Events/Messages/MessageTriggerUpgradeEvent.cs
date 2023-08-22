@@ -1,6 +1,4 @@
 ﻿using Hymson.EventBus.Abstractions;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Bos.Integrated;
 
 namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
 {
@@ -10,14 +8,9 @@ namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
     public record MessageTriggerUpgradeEvent : IntegrationEvent
     {
         /// <summary>
-        /// 消息状态;1、触发2、接收3、处理4、关闭
+        /// 消息Id
         /// </summary>
-        public MessageStatusEnum Status { get; set; }
-
-        /// <summary>
-        /// 升级对象
-        /// </summary>
-        public EventTypeUpgradeBo? UpgradeBo { get; set; }
+        public long MessageId { get; set; }
 
     }
 }
