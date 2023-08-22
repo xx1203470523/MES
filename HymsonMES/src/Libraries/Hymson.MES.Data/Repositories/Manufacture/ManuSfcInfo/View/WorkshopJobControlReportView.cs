@@ -69,4 +69,44 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public decimal Qty { get; set; }
     }
+
+    public class WorkshopJobControlReportOptimizeView : BaseEntity
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum SFCStatus { get; set; }
+
+        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        public decimal Qty { get; set; }
+    }
 }

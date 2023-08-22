@@ -54,23 +54,80 @@ namespace Hymson.MES.Services.Services.Report
             _procBomRepository = procBomRepository;
         }
 
+        ///// <summary>
+        ///// 根据查询条件获取车间作业控制报表分页数据
+        ///// </summary>
+        ///// <param name="param"></param>
+        ///// <returns></returns>
+        //public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param)
+        //{
+        //    var pagedQuery = param.ToQuery<WorkshopJobControlReportPagedQuery>();
+        //    pagedQuery.SiteId = _currentSite.SiteId;
+        //    var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportAsync(pagedQuery);
+
+        //    List<WorkshopJobControlReportViewDto> listDto = new List<WorkshopJobControlReportViewDto>();
+        //    foreach (var item in pagedInfo.Data)
+        //    {
+        //        listDto.Add(item.ToModel<WorkshopJobControlReportViewDto>());
+        //    }
+
+        //    return new PagedInfo<WorkshopJobControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        //}
+
         /// <summary>
         /// 根据查询条件获取车间作业控制报表分页数据
+        /// 优化: 不模糊查询，且通过关联ID查询
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param)
+        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportOptimizePagedQueryDto param)
         {
-            var pagedQuery = param.ToQuery<WorkshopJobControlReportPagedQuery>();
+            var pagedQuery = param.ToQuery<WorkshopJobControlReportOptimizePagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportAsync(pagedQuery);
+            var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportOptimizeAsync(pagedQuery);
 
             List<WorkshopJobControlReportViewDto> listDto = new List<WorkshopJobControlReportViewDto>();
-            foreach (var item in pagedInfo.Data)
+            if (pagedInfo.Data.Any())
             {
-                listDto.Add(item.ToModel<WorkshopJobControlReportViewDto>());
-            }
+                //查询物料
+                var materials = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId).ToArray());
 
+                //查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.WorkOrderId).ToArray());
+
+                //查询工序
+                var procProcedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId).ToArray());
+
+                //查询bom
+                var procBoms = await _procBomRepository.GetByIdsAsync(workOrders.Select(x => x.ProductBOMId).ToArray());
+
+                foreach (var item in pagedInfo.Data)
+                {
+                    var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
+                    var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                    var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
+                    var bom = procBoms.FirstOrDefault(x => x.Id == workOrder?.ProductBOMId);
+
+                    listDto.Add(new WorkshopJobControlReportViewDto()
+                    {
+                        SFC = item.SFC,
+                        SFCStatus = item.SFCStatus,
+                        SFCProduceStatus = item.SFCProduceStatus,
+                        Qty = item.Qty,
+
+                        MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                        MaterialName = material?.MaterialName ?? "",
+                        OrderCode = workOrder?.OrderCode ?? "",
+                        OrderType = workOrder?.Type,
+                        ProcedureCode = procedure?.Code ?? "",
+                        ProcedureName = procedure?.Name ?? "",
+                        BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
+                        BomName = procedure?.Name ?? ""
+
+                    });
+                }
+
+            }
             return new PagedInfo<WorkshopJobControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

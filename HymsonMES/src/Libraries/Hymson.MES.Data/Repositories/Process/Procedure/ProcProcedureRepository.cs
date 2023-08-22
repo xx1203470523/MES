@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -201,6 +202,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(IEnumerable<long>  ids)
         {
+            if (!ids.Any())
+            {
+                return new List<ProcProcedureEntity>();
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcProcedureEntity>(GetByIdsSql, new { ids = ids });
         }

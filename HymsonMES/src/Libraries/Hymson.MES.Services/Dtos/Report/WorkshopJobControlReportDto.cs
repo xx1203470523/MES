@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 工单类型
         /// </summary>
-        public PlanWorkOrderTypeEnum OrderType { get; set; }
+        public PlanWorkOrderTypeEnum? OrderType { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -126,6 +126,48 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public string? ResourceCode { get; set; }
     }
+
+    /// <summary>
+    /// 车间作业控制 分页参数
+    /// </summary>
+    public class WorkshopJobControlReportOptimizePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? SFCStatus { get; set; }
+
+        /// <summary>
+        /// 条码在制状态
+        /// </summary>
+        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+    }
+
 
     public class WorkshopJobControlStepReportDto 
     {

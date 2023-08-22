@@ -286,6 +286,70 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 车间作业控制 报表分页查询
+        /// 优化: 不模糊查询，且通过关联ID查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<WorkshopJobControlReportOptimizeView>> GetPagedInfoWorkshopJobControlReportOptimizeAsync(WorkshopJobControlReportOptimizePagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportOptimizeDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportOptimizeCountSqlTemplate);
+
+            sqlBuilder.Where(" si.SiteId = @SiteId ");
+            sqlBuilder.Where(" si.IsDeleted = 0 ");
+            sqlBuilder.Where(" si.IsUsed = 1 ");
+
+            sqlBuilder.Where(" s.IsDeleted = 0 ");
+
+            if (pageQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where(" si.ProductId = @MaterialId ");
+            }
+            if (pageQuery.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where(" si.WorkOrderId = @WorkOrderId ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                //pageQuery.SFC = $"%{pageQuery.SFC}%";
+                //sqlBuilder.Where(" s.SFC like @SFC ");
+
+                sqlBuilder.Where(" s.SFC = @SFC ");
+            }
+            if (pageQuery.SFCStatus.HasValue)
+            {
+                sqlBuilder.Where(" s.`Status` =  @SFCStatus ");
+            }
+            if (pageQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where(" sp.ProcedureId =  @ProcedureId ");
+            }
+            if (pageQuery.ResourceId.HasValue)
+            {
+                sqlBuilder.Where(" sp.ResourceId =  @ResourceId ");
+            }
+            if (pageQuery.SFCProduceStatus.HasValue)
+            {
+                sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var reportDataTask = conn.QueryAsync<WorkshopJobControlReportOptimizeView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var reportData = await reportDataTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<WorkshopJobControlReportOptimizeView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+
+        /// <summary>
         /// 根据SFC获取已经使用的
         /// </summary>
         /// <param name="sfc"></param>
@@ -367,5 +431,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                Left join manu_sfc s on s.id=si.SfcId
                                                where si.IsDeleted=0 and si.IsUsed=1 
                                                and s.sfc=@sfc ";
+
+        const string GetPagedInfoWorkshopJobControlReportOptimizeDataSqlTemplate = @"
+                        select 
+                            s.SFC,
+                            s.`Status` as SFCStatus,
+                            sp.`Status` as SFCProduceStatus,
+                            si.ProductId,
+                            si.WorkOrderId,
+                            sp.ProcedureId,
+                            sp.ResourceId,
+                            s.Qty
+                        from manu_sfc_info si
+                        LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询关联的工序，资源等
+                        /**where**/ 
+                        Order by si.CreatedOn desc
+                        LIMIT @Offset,@Rows 
+        ";
+        const string GetPagedInfoWorkshopJobControlReportOptimizeCountSqlTemplate = @"
+                        select count(1)
+                        from manu_sfc_info si
+                        LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询关联的工序，资源等
+                        /**where**/ 
+        ";
+
     }
 }
