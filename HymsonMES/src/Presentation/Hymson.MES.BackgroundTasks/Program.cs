@@ -1,10 +1,7 @@
-﻿using Hymson.EventBus.Abstractions;
-using Hymson.MES.BackgroundServices.EventHandling;
-using Hymson.MES.BackgroundTasks;
+﻿using Hymson.MES.BackgroundTasks;
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.CoreServices.DependencyInjection;
-using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -57,7 +54,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.serializer.type", "json");
                persistentStoreOptions.SetProperty("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks";
-               persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName+ hostContext.HostingEnvironment.EnvironmentName);
+               persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
                persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
@@ -72,6 +69,4 @@ Host.CreateDefaultBuilder(args)
 
 
    }));
-
-
 

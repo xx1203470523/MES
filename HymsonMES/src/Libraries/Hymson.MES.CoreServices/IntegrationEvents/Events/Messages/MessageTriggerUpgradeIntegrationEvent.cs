@@ -3,13 +3,14 @@
 namespace Hymson.MES.CoreServices.IntegrationEvents.Events.Messages
 {
     /// <summary>
-    /// 消息处理成功事件
+    /// 消息触发成功事件
     /// </summary>
-    public record MessageHandleUpgradeEvent : IntegrationEvent
+    public record MessageTriggerUpgradeIntegrationEvent : IntegrationEvent
     {
         /// <summary>
         /// 消息Id
         /// </summary>
         public long MessageId { get; set; }
+
     }
 }

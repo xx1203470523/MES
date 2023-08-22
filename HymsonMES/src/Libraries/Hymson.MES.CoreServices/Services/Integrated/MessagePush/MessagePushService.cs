@@ -106,14 +106,14 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     await SetMessageAsync(messageEntity, PushSceneEnum.Trigger);
 
                     // 设置发送升级事件
-                    await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.ReceiveUpgrade);
+                    await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeIntegrationEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.ReceiveUpgrade);
                     break;
                 case MessageStatusEnum.Receive:
                     // 发送即时消息
                     await SetMessageAsync(messageEntity, PushSceneEnum.Receive);
 
                     // 设置发送升级事件
-                    await SetNextUpgradeLevelAsync(new MessageHandleUpgradeEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.HandleUpgrade);
+                    await SetNextUpgradeLevelAsync(new MessageHandleUpgradeIntegrationEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.HandleUpgrade);
                     break;
                 case MessageStatusEnum.Handle:
                 case MessageStatusEnum.Close:
@@ -129,7 +129,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public async Task TriggerCallBackAsync(MessageTriggerUpgradeEvent @event)
+        public async Task TriggerCallBackAsync(MessageTriggerUpgradeIntegrationEvent @event)
         {
             await Task.CompletedTask;
         }
@@ -138,10 +138,10 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// 任务回调（接收）
         /// </summary>
         /// <returns></returns>
-        public async Task ReceiveCallBackAsync(MessageReceiveUpgradeEvent @event)
+        public async Task ReceiveCallBackAsync(MessageReceiveUpgradeIntegrationEvent @event)
         {
             // 查询一次任务状态
-            var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.EventId);
+            var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
 
             // 状态已经变更，不再继续
@@ -151,17 +151,17 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             await SetMessageAsync(messageEntity, PushSceneEnum.ReceiveUpgrade);
 
             // 设置发送升级事件
-            await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.ReceiveUpgrade);
+            await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeIntegrationEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.ReceiveUpgrade);
         }
 
         /// <summary>
         /// 任务回调（处理）
         /// </summary>
         /// <returns></returns>
-        public async Task HandleCallBackAsync(MessageHandleUpgradeEvent @event)
+        public async Task HandleCallBackAsync(MessageHandleUpgradeIntegrationEvent @event)
         {
             // 查询一次任务状态
-            var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.EventId);
+            var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
 
             // 状态已经变更，不再继续
@@ -171,7 +171,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             await SetMessageAsync(messageEntity, PushSceneEnum.HandleUpgrade);
 
             // 设置发送升级事件
-            await SetNextUpgradeLevelAsync(new MessageHandleUpgradeEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.HandleUpgrade);
+            await SetNextUpgradeLevelAsync(new MessageHandleUpgradeIntegrationEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.HandleUpgrade);
         }
         #endregion
 

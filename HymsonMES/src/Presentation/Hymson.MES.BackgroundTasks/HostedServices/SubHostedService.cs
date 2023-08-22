@@ -31,9 +31,9 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         /// <returns></returns>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _eventBus.Subscribe<MessageTriggerUpgradeEvent, MessageTriggerUpgradeEventHandler>();
-            _eventBus.Subscribe<MessageReceiveUpgradeEvent, MessageReceiveUpgradeEventHandler>();
-            _eventBus.Subscribe<MessageHandleUpgradeEvent, MessageHandleUpgradeEventHandler>();
+            _eventBus.Subscribe<MessageTriggerUpgradeIntegrationEvent, MessageTriggerUpgradeIntegrationEventHandler>();
+            _eventBus.Subscribe<MessageReceiveUpgradeIntegrationEvent, MessageReceiveUpgradeIntegrationEventHandler>();
+            _eventBus.Subscribe<MessageHandleUpgradeIntegrationEvent, MessageHandleUpgradeIntegrationEventHandler>();
 
             return Task.CompletedTask;
         }
