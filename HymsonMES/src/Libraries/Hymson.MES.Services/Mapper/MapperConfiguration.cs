@@ -156,15 +156,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
             #endregion
 
-            #region EquHeartbeat
-
-            CreateMap<EquHeartbeatReportView, EquHeartbeaReportExportDto>();
-            #endregion
-
-            #region EquAlarm
-            CreateMap<EquAlarmReportView, EquAlarmReportExportDto>();
-            #endregion
-
         }
 
         /// <summary>
@@ -596,11 +587,20 @@ namespace Hymson.MES.Services.Mapper
             #region EquHeartbeatReport
             CreateMap<EquHeartbeatReportPagedQueryDto, EquHeartbeatReportPagedQuery>();
             CreateMap<EquHeartbeatReportView, EquHeartbeatReportViewDto>();
+            CreateMap<EquHeartbeatReportView, EquHeartbeaReportExportDto>();
             #endregion
 
             #region EquAlarmReport
             CreateMap<EquAlarmReportPagedQueryDto, EquAlarmReportPagedQuery>();
             CreateMap<EquAlarmReportView, EquAlarmReportViewDto>();
+            CreateMap<EquAlarmReportView, EquAlarmReportExportDto>();
+            #endregion
+
+            #region ManuProductParameterReport
+            CreateMap<ManuProductParameterReportView, ManuProductParameterReportExportDto>();
+            CreateMap<ManuProductParameterReportPagedQueryDto, ManuProductParameterReportPagedQuery>();
+            CreateMap<ManuProductParameterReportView, ManuProductParameterReportViewDto>();
+            CreateMap<ManuProductParameterReportView, ManuProductParameterReportExportDto>();
             #endregion
 
             #region ProductTraceReport

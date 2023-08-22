@@ -57,5 +57,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="queryParam"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuProductParameterView>> GetManuProductParameterPagedInfoAsync(ManuProductParameterPagedQuery queryParam);
+
+        /// <summary>
+        /// 产品过程参数报表
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuProductParameterReportView>> GetManuProductParameterReportPagedInfoAsync(ManuProductParameterReportPagedQuery queryParam);
     }
 }

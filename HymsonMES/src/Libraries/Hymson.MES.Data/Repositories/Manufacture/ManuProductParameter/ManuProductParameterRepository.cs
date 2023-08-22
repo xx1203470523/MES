@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Equipment.EquAlarm.View;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -191,6 +192,94 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuProductParameterView>(manuSfcCirculationEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 产品参数报表
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuProductParameterReportView>> GetManuProductParameterReportPagedInfoAsync(ManuProductParameterReportPagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetProductParameterReportDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetProductParameterReportCountSqlTemplate);
+
+            sqlBuilder.Where(" mpp.IsDeleted = 0 ");
+            sqlBuilder.Where(" mpp.SiteId = @SiteId ");
+            sqlBuilder.OrderBy(" mpp.CreatedOn desc");
+
+            if (!string.IsNullOrEmpty(pageQuery.EquipmentCode))
+            {
+                pageQuery.EquipmentCode = $"%{pageQuery.EquipmentCode}%";
+                sqlBuilder.Where(" ee.EquipmentCode like @EquipmentCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.EquipmentName))
+            {
+                pageQuery.EquipmentName = $"%{pageQuery.EquipmentName}%";
+                sqlBuilder.Where(" ee.EquipmentName like @EquipmentName ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureName))
+            {
+                pageQuery.ProcedureName = $"%{pageQuery.ProcedureName}%";
+                sqlBuilder.Where(" pp.`Name` like @ProcedureName ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ProcedureCode))
+            {
+                pageQuery.ProcedureCode = $"%{pageQuery.ProcedureCode}%";
+                sqlBuilder.Where(" pp.`Code` like @ProcedureCode ");
+            }
+            if (pageQuery.ProcedureCodes != null && pageQuery.ProcedureCodes.Length > 0)
+            {
+                sqlBuilder.Where(" pp.`Code` in @ProcedureCodes ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ResCode))
+            {
+                pageQuery.ResCode = $"%{pageQuery.ResCode}%";
+                sqlBuilder.Where(" pr.ResCode like @ResCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ResName))
+            {
+                pageQuery.ResName = $"%{pageQuery.ResName}%";
+                sqlBuilder.Where(" pr.ResName like @ResName ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ParameterCode))
+            {
+                pageQuery.ParameterCode = $"%{pageQuery.ParameterCode}%";
+                sqlBuilder.Where("pp2.ParameterCode like @ParameterCode ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.ParameterName))
+            {
+                pageQuery.ParameterName = $"%{pageQuery.ParameterName}%";
+                sqlBuilder.Where("pp2.ParameterName like @ParameterName ");
+            }
+            if (pageQuery.SFCS != null && pageQuery.SFCS.Length > 0 && string.IsNullOrEmpty(pageQuery.SFCStr))
+            {
+                sqlBuilder.Where("mpp.SFC IN @SFCS ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFCStr))//输入框内容使用;分号分割
+            {
+                pageQuery.SFCS = pageQuery.SFCStr.Split(";");
+                sqlBuilder.Where("mpp.SFC IN @SFCS ");
+            }
+            if (pageQuery.LocalTimes != null && pageQuery.LocalTimes.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { LocalTimeStart = pageQuery.LocalTimes[0], LocalTimeEnd = pageQuery.LocalTimes[1] });
+                sqlBuilder.Where(" mpp.LocalTime >= @LocalTimeStart AND mpp.LocalTime < @LocalTimeEnd ");
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = GetMESDbConnection();
+            var reportDataTask = conn.QueryAsync<ManuProductParameterReportView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var reportData = await reportDataTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuProductParameterReportView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
     }
 
     /// <summary>
@@ -214,5 +303,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetProductParameterPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_product_parameter T1  /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
 
         const string GetProductParameterPagedInfoCountSqlTemplate = @"SELECT count(1) FROM manu_product_parameter T1  /**leftjoin**/ /**where**/ ";
+
+        const string GetProductParameterReportDataSqlTemplate = @" select  mpp.EquipmentId,ee.EquipmentCode,ee.EquipmentName,mpp.SFC,pp2.ParameterCode,pp2.ParameterName,pp2.ParameterUnit,
+										 mpp.`Paramvalue`,mpp.StandardUpperLimit,mpp.StandardLowerLimit,mpp.`LocalTime`,mpp.JudgmentResult,mpp.TestDuration,mpp.TestTime,mpp.TestResult
+										,ee.WorkCenterLineId,pr.ResCode,pr.ResName,pp.`Code` as ProcedureCode,pp.`Name` as ProcedureName,mpp.UpdatedOn,mpp.UpdatedBy,mpp.CreatedOn,mpp.CreatedBy 
+										FROM manu_product_parameter  mpp 
+										left join proc_parameter pp2 on pp2.Id=mpp.ParameterId and pp2.IsDeleted=mpp.IsDeleted
+										left join equ_equipment ee on ee.Id=mpp.EquipmentId and ee.IsDeleted=mpp.IsDeleted
+										left join proc_resource_equipment_bind preb on preb.EquipmentId=mpp.EquipmentId  and preb.IsDeleted=mpp.IsDeleted
+										left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=mpp.IsDeleted
+								        left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=mpp.IsDeleted
+										/**where**/  /**orderby**/ LIMIT @Offset,@Rows ";
+
+        const string GetProductParameterReportCountSqlTemplate = @"select COUNT(1) 
+                                        FROM manu_product_parameter  mpp 
+										left join proc_parameter pp2 on pp2.Id=mpp.ParameterId and pp2.IsDeleted=mpp.IsDeleted
+										left join equ_equipment ee on ee.Id=mpp.EquipmentId and ee.IsDeleted=mpp.IsDeleted
+										left join proc_resource_equipment_bind preb on preb.EquipmentId=mpp.EquipmentId  and preb.IsDeleted=mpp.IsDeleted
+										left join proc_resource  pr on pr.Id = preb.ResourceId and pr.SiteId= preb.SiteId and pr.IsDeleted=mpp.IsDeleted
+								        left join proc_procedure pp on pp.ResourceTypeId=pr.ResTypeId  and pp.SiteId= pr.SiteId and pp.IsDeleted=mpp.IsDeleted
+										/**where**/  ";
     }
 }
