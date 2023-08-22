@@ -366,34 +366,29 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(messageEntity.LineId);
             if (workLineEntity != null) workLineName = workLineEntity.Name;
 
-            var resourceName = "";
-            if (messageEntity.ResourceId.HasValue)
-            {
-                var resourceEntity = await _procResourceRepository.GetByIdAsync(messageEntity.ResourceId.Value);
-                if (resourceEntity != null) resourceName = resourceEntity.ResName;
-            }
-
-            var equipmentName = "";
-            if (messageEntity.EquipmentId.HasValue)
-            {
-                var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(messageEntity.EquipmentId.Value);
-                if (equipmentEntity != null) equipmentName = equipmentEntity.EquipmentName;
-            }
-
-            // 模板里面可能不支持枚举
             var messagePushBo = new MessagePushBo
             {
-                PushScene = pushScene,
+                PushScene = (int)pushScene, // 模板里面不支持枚举
                 Code = messageEntity.Code,
                 Status = messageEntity.Status.GetDescription(),
                 EventTypeName = eventTypeName,
                 WorkShopName = workShopName,
                 WorkLineName = workLineName,
-                ResourceName = resourceName,
-                EquipmentName = equipmentName,
                 TriggerUser = messageEntity.CreatedBy,
                 TriggerTime = $"{messageEntity.CreatedOn:yyyy-MM-dd HH:mm:ss}",
             };
+
+            if (messageEntity.ResourceId.HasValue)
+            {
+                var resourceEntity = await _procResourceRepository.GetByIdAsync(messageEntity.ResourceId.Value);
+                if (resourceEntity != null) messagePushBo.ResourceName = resourceEntity.ResName;
+            }
+
+            if (messageEntity.EquipmentId.HasValue)
+            {
+                var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(messageEntity.EquipmentId.Value);
+                if (equipmentEntity != null) messagePushBo.EquipmentName = equipmentEntity.EquipmentName;
+            }
 
             if (messageEntity.EventName != null) messagePushBo.EventName = messageEntity.EventName;
             if (messageEntity.UpdatedBy != null) messagePushBo.ReceiveUser = messageEntity.UpdatedBy;

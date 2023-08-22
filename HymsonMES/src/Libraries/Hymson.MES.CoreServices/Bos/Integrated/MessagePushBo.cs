@@ -10,7 +10,7 @@ namespace Hymson.MES.CoreServices.Bos.Integrated
         /// <summary>
         /// 推送场景
         /// </summary>
-        public PushSceneEnum PushScene { get; set; }
+        public int PushScene { get; set; }
 
         /// <summary>
         /// 消息编码
@@ -45,12 +45,12 @@ namespace Hymson.MES.CoreServices.Bos.Integrated
         /// <summary>
         /// 资源名称
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string? ResourceName { get; set; }
 
         /// <summary>
         /// 设备名称
         /// </summary>
-        public string EquipmentName { get; set; } = "";
+        public string? EquipmentName { get; set; }
 
         /// <summary>
         /// 触发人
