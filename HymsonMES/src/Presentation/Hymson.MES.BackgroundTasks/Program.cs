@@ -1,9 +1,7 @@
-﻿using Hymson.EventBus.Abstractions;
-using Hymson.MES.BackgroundServices.EventHandling;
-using Hymson.MES.BackgroundTasks;
+﻿using Hymson.MES.BackgroundTasks;
+using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.CoreServices.DependencyInjection;
-using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,8 +33,8 @@ Host.CreateDefaultBuilder(args)
        //{
        //    NLog.LogManager.Configuration = new NLogLoggingConfiguration(configuration.GetSection("NLog"));
        //});
-       AddEventBusServices(services);
        services.AddBackgroundServices(hostContext.Configuration);
+       services.AddMemoryCache();
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        // Add the required Quartz.NET services
        services.AddQuartz(q =>
@@ -56,14 +54,14 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.serializer.type", "json");
                persistentStoreOptions.SetProperty("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks";
-               persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName);
-               persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName);
+               persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
+               persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
        });
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
+       services.AddHostedService<SubHostedService>();
 
        services.AddNLog(hostContext.Configuration);
        services.AddEventBusRabbitMQService(hostContext.Configuration);
@@ -72,12 +70,3 @@ Host.CreateDefaultBuilder(args)
 
    }));
 
-
-
-static void AddEventBusServices(IServiceCollection services)
-{
-    services.AddSingleton<IIntegrationEventHandler<MessageCloseSucceededIntegrationEvent>, MessageCloseSucceededIntegrationEventHandler>();
-    services.AddSingleton<IIntegrationEventHandler<MessageProcessingSucceededIntegrationEvent>, MessageProcessingSucceededIntegrationEventHandler>();
-    services.AddSingleton<IIntegrationEventHandler<MessageReceiveSucceededIntegrationEvent>, MessageReceiveSucceededIntegrationEventHandler>();
-    services.AddSingleton<IIntegrationEventHandler<MessageTriggerSucceededIntegrationEvent>, MessageTriggerSucceededIntegrationEventHandler>();
-}

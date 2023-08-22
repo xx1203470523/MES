@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
@@ -48,6 +49,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualInspectionParameterGroupRepository _procParameterGroupRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
 
         /// <summary>
         /// 构造函数
@@ -62,7 +64,8 @@ namespace Hymson.MES.Services.Services.Quality
             IProcParameterRepository procParameterRepository,
             IQualInspectionParameterGroupRepository qualInspectionParameterGroupRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IProcProcedureRepository procProcedureRepository,
+            IProcResourceRepository procResourceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -75,6 +78,7 @@ namespace Hymson.MES.Services.Services.Quality
             _procParameterGroupRepository = qualInspectionParameterGroupRepository;
             _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
+            _procResourceRepository = procResourceRepository;
         }
 
 
@@ -95,18 +99,47 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
+            #region 校验
+
             // 唯一性校验
             var isExist = await _qualIpqcInspectionRepository.IsExistAsync(new QualIpqcInspectionQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                InspectionParameterGroupId = saveDto.InspectionParameterGroupId,
                 Type = saveDto.Type,
+                ParameterGroupCode = saveDto.ParameterGroupCode,
+                GenerateConditionUnit = saveDto.GenerateConditionUnit,
                 Version = saveDto.Version
             });
             if (isExist)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13101)).WithData("Code", saveDto.ParameterGroupCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES13151)).WithData("Code", saveDto.ParameterGroupCode).WithData("Condition", saveDto.GenerateConditionUnit.GetDescription()).WithData("Type", saveDto.Type.GetDescription()).WithData("Version", saveDto.Version);
             }
+
+            // 状态为启用时校验关联表数据
+            if (saveDto.Status == SysDataStatusEnum.Enable)
+            {
+                if (saveDto.Details == null || !saveDto.Details.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES13121));
+                }
+                //首检校验检验规则
+                if (saveDto.Type == IPQCTypeEnum.FAI)
+                {
+                    if (saveDto.Rules == null || saveDto.Rules.IsEmpty())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES13122));
+                    }
+                    foreach (var rule in saveDto.Rules)
+                    {
+                        if (rule.Resources == null || rule.Resources.IsEmpty())
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
+                        }
+                    }
+                }
+            }
+
+            #endregion
 
             // DTO转换实体
             var entity = saveDto.ToEntity<QualIpqcInspectionEntity>();
@@ -135,15 +168,15 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //检验规则&资源
-            List<QualIpqcInspectionRuleEntity>? rules = null;
-            IEnumerable<QualIpqcInspectionRuleResourceRelationEntity>? ruleResources = null;
+            var rules = new List<QualIpqcInspectionRuleEntity>(); ;
+            var ruleResources = new List<QualIpqcInspectionRuleResourceRelationEntity>();
             if (saveDto.Rules != null && saveDto.Rules.Any())
             {
-                rules = new List<QualIpqcInspectionRuleEntity>();
                 foreach (var item in saveDto.Rules)
                 {
                     var ruleEntity = item.ToEntity<QualIpqcInspectionRuleEntity>();
                     ruleEntity.Id = IdGenProvider.Instance.CreateId();
+                    ruleEntity.IpqcInspectionId = entity.Id;
                     ruleEntity.SiteId = entity.SiteId;
                     ruleEntity.CreatedBy = updatedBy;
                     ruleEntity.CreatedOn = updatedOn;
@@ -153,12 +186,13 @@ namespace Hymson.MES.Services.Services.Quality
                     //关联资源
                     if (item.Resources != null && item.Resources.Any())
                     {
-                        ruleResources = item.Resources.Select(s =>
+                        var resources = item.Resources.Select(s =>
                         {
                             var ruleResourceEntity = s.ToEntity<QualIpqcInspectionRuleResourceRelationEntity>();
                             ruleResourceEntity.Id = IdGenProvider.Instance.CreateId();
                             ruleResourceEntity.SiteId = entity.SiteId;
-                            ruleResourceEntity.IpqcInspectionRuleId = ruleResourceEntity.Id;
+                            ruleResourceEntity.IpqcInspectionId = entity.Id;
+                            ruleResourceEntity.IpqcInspectionRuleId = ruleEntity.Id;
                             ruleResourceEntity.CreatedBy = updatedBy;
                             ruleResourceEntity.CreatedOn = updatedOn;
                             ruleResourceEntity.UpdatedBy = updatedBy;
@@ -166,6 +200,8 @@ namespace Hymson.MES.Services.Services.Quality
 
                             return ruleResourceEntity;
                         });
+
+                        ruleResources.AddRange(resources);
                     }
 
                     rules.Add(ruleEntity);
@@ -210,21 +246,42 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            var dbEntity = await _qualIpqcInspectionRepository.GetByIdAsync(saveDto.Id);
+            var entity = await _qualIpqcInspectionRepository.GetByIdAsync(saveDto.Id);
 
             #region 校验
 
-            if (dbEntity == null)
+            if (entity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            //启用状态只能修改为保留或废除
+            if (entity.Status == SysDataStatusEnum.Enable)
+            {
+                if (saveDto.Status != SysDataStatusEnum.Retain && saveDto.Status != SysDataStatusEnum.Abolish)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10124));
+                }
             }
 
             #endregion
 
+            //原状态为启用，修改为保留或废除，只更改状态
+            if (entity.Status == SysDataStatusEnum.Enable && (saveDto.Status == SysDataStatusEnum.Retain || saveDto.Status == SysDataStatusEnum.Abolish))
+            {
+                entity.Status = saveDto.Status;
+                entity.UpdatedBy = updatedBy;
+                entity.UpdatedOn = updatedOn;
+
+                return await _qualIpqcInspectionRepository.UpdateAsync(entity);
+            }
+
             // DTO转换实体
-            var entity = saveDto.ToEntity<QualIpqcInspectionEntity>();
-            entity.CreatedBy = dbEntity.CreatedBy;
-            entity.CreatedOn = dbEntity.CreatedOn;
+            entity.SampleQty = saveDto.SampleQty;
+            entity.GenerateCondition = saveDto.GenerateCondition;
+            entity.GenerateConditionUnit = saveDto.GenerateConditionUnit;
+            entity.ControlTime = saveDto.ControlTime;
+            entity.ControlTimeUnit = saveDto.ControlTimeUnit;
+            entity.Status = saveDto.Status;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
 
@@ -246,16 +303,16 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //检验规则&资源
-            List<QualIpqcInspectionRuleEntity>? rules = null;
-            IEnumerable<QualIpqcInspectionRuleResourceRelationEntity>? ruleResources = null;
+            var rules = new List<QualIpqcInspectionRuleEntity>(); ;
+            var ruleResources = new List<QualIpqcInspectionRuleResourceRelationEntity>();
             if (saveDto.Rules != null && saveDto.Rules.Any())
             {
-                rules = new List<QualIpqcInspectionRuleEntity>();
                 foreach (var item in saveDto.Rules)
                 {
                     var ruleEntity = item.ToEntity<QualIpqcInspectionRuleEntity>();
                     ruleEntity.Id = IdGenProvider.Instance.CreateId();
                     ruleEntity.SiteId = entity.SiteId;
+                    ruleEntity.IpqcInspectionId = entity.Id;
                     ruleEntity.CreatedBy = updatedBy;
                     ruleEntity.CreatedOn = updatedOn;
                     ruleEntity.UpdatedBy = updatedBy;
@@ -264,12 +321,13 @@ namespace Hymson.MES.Services.Services.Quality
                     //关联资源
                     if (item.Resources != null && item.Resources.Any())
                     {
-                        ruleResources = item.Resources.Select(s =>
+                        var resources = item.Resources.Select(s =>
                         {
                             var ruleResourceEntity = s.ToEntity<QualIpqcInspectionRuleResourceRelationEntity>();
                             ruleResourceEntity.Id = IdGenProvider.Instance.CreateId();
                             ruleResourceEntity.SiteId = entity.SiteId;
-                            ruleResourceEntity.IpqcInspectionRuleId = ruleResourceEntity.Id;
+                            ruleResourceEntity.IpqcInspectionId = entity.Id;
+                            ruleResourceEntity.IpqcInspectionRuleId = ruleEntity.Id;
                             ruleResourceEntity.CreatedBy = updatedBy;
                             ruleResourceEntity.CreatedOn = updatedOn;
                             ruleResourceEntity.UpdatedBy = updatedBy;
@@ -277,6 +335,8 @@ namespace Hymson.MES.Services.Services.Quality
 
                             return ruleResourceEntity;
                         });
+
+                        ruleResources.AddRange(resources);
                     }
 
                     rules.Add(ruleEntity);
@@ -460,23 +520,38 @@ namespace Hymson.MES.Services.Services.Quality
             var ipqcRules = await _qualIpqcInspectionRuleRepository.GetEntitiesAsync(new QualIpqcInspectionRuleQuery { IpqcInspectionId = id });
 
             //获取检验规则关联资源
-            var rulesResources = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
+            List<QualIpqcInspectionRuleResourceRelationDto> ruleResources = new();
+            var ruleResourceEntities = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 IpqcInspectionId = id
             });
-
-            List<QualIpqcInspectionRuleDto> dtos = new();
-            foreach (var item in ipqcRules)
+            if (ruleResourceEntities != null && ruleResourceEntities.Any())
             {
-                var dto = item.ToModel<QualIpqcInspectionRuleDto>();
-                if (rulesResources != null && rulesResources.Any())
-                {
-                    dto.Resources = rulesResources.Where(x => x.IpqcInspectionRuleId == dto.Id).Select(x => { return x.ToModel<QualIpqcInspectionRuleResourceRelationDto>(); });
-                }
+                //资源
+                var resourceEntities = await _procResourceRepository.GetListByIdsAsync(ruleResourceEntities.Select(x => x.ResourceId).Distinct().ToArray());
 
-                dtos.Add(dto);
+                foreach (var item in ruleResourceEntities)
+                {
+                    var ruleResource = item.ToModel<QualIpqcInspectionRuleResourceRelationDto>();
+
+                    var resourceEntity = resourceEntities.FirstOrDefault(x => x.Id == ruleResource.ResourceId);
+                    if (resourceEntity != null)
+                    {
+                        ruleResource.ResCode = resourceEntity.ResCode;
+                        ruleResource.ResName = resourceEntity.ResName;
+                    }
+
+                    ruleResources.Add(ruleResource);
+                }
             }
+
+            var dtos = ipqcRules.Select(item =>
+            {
+                var rule = item.ToModel<QualIpqcInspectionRuleDto>();
+                rule.Resources = ruleResources.Where(x => x.IpqcInspectionRuleId == item.Id);
+                return rule;
+            });
 
             return dtos;
         }

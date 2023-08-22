@@ -196,11 +196,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(IsExistSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Where("InspectionParameterGroupId = @InspectionParameterGroupId");
-            sqlBuilder.Where("Type = @Type");
-            sqlBuilder.Where("Version = @Version");
+            sqlBuilder.Where("qii.IsDeleted = 0");
+            sqlBuilder.Where("qii.SiteId = @SiteId");
+            sqlBuilder.Where("qii.Type = @Type");
+            sqlBuilder.Where("qii.GenerateConditionUnit = @GenerateConditionUnit");
+            sqlBuilder.Where("qii.Version = @Version");
+            sqlBuilder.Where("qipg.Code = @ParameterGroupCode");
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
@@ -237,7 +238,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                                             /**select**/
                                            FROM qual_ipqc_inspection /**where**/  ";
 
-        const string IsExistSqlTemplate = "SELECT COUNT(1) FROM qual_ipqc_inspection /**where**/ ";
+        const string IsExistSqlTemplate = "SELECT COUNT(1) FROM qual_ipqc_inspection qii LEFT JOIN qual_inspection_parameter_group qipg ON qii.InspectionParameterGroupId = qipg.Id /**where**/ ";
 
         const string InsertSql = "INSERT INTO qual_ipqc_inspection(  `Id`, `SiteId`, `Type`, `SampleQty`, `InspectionParameterGroupId`, `GenerateCondition`, `GenerateConditionUnit`, `ControlTime`, `ControlTimeUnit`, `MaterialId`, `ProcedureId`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Type, @SampleQty, @InspectionParameterGroupId, @GenerateCondition, @GenerateConditionUnit, @ControlTime, @ControlTimeUnit, @MaterialId, @ProcedureId, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_ipqc_inspection(  `Id`, `SiteId`, `Type`, `SampleQty`, `InspectionParameterGroupId`, `GenerateCondition`, `GenerateConditionUnit`, `ControlTime`, `ControlTimeUnit`, `MaterialId`, `ProcedureId`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Type, @SampleQty, @InspectionParameterGroupId, @GenerateCondition, @GenerateConditionUnit, @ControlTime, @ControlTimeUnit, @MaterialId, @ProcedureId, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";

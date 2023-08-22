@@ -16,6 +16,13 @@ namespace Hymson.MES.Services.Services.Integrated
         Task<int> TriggerAsync(InteMessageManageTriggerSaveDto dto);
 
         /// <summary>
+        /// 修改
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync(InteMessageManageTriggerSaveDto dto);
+
+        /// <summary>
         /// 接收
         /// </summary>
         /// <param name="dto"></param>

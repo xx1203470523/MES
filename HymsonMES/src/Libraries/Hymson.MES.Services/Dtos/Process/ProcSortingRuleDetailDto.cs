@@ -27,6 +27,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long ProcedureId { get; set; }
 
+        /// <summary>
+        /// 分选规则id
+        /// </summary>
+        public long SortingRuleId { get; set; }
 
         /// <summary>
         /// 描述 :工序代码 
@@ -61,6 +65,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 分选规则版本
+        /// </summary>
+        public string Version { get; set; }
 
         /// <summary>
         /// 描述 :参数单位（字典定义） 

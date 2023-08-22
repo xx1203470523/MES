@@ -544,6 +544,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             var messageGroupRelationEntities = await _inteEventTypeMessageGroupRelationRepository.GetEntitiesAsync(new EntityByParentIdQuery
             {
+                SiteId = _currentSite.SiteId ?? 0,
                 ParentId = id
             });
 
@@ -551,7 +552,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
             // 消息组关联推送方式（已缓存）
-            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityByParentIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
             return GetMessageGroupRelations(messageGroupRelationEntities.Select(s => s.ToModel<MessageGroupBo>()), messageGroupEntities, messageGroupPushMethodEntities);
         }
@@ -566,6 +567,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 升级信息
             var entities = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
             {
+                SiteId = _currentSite.SiteId ?? 0,
                 EventTypeId = query.EventTypeId,
                 PushScene = query.PushScene
             });
@@ -573,6 +575,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 升级消息组关联信息
             var messageGroupRelationEntities = await _inteEventTypeUpgradeMessageGroupRelationRepository.GetEntitiesAsync(new InteEventTypeUpgradeMessageGroupRelationQuery
             {
+                SiteId = _currentSite.SiteId ?? 0,
                 EventTypeId = query.EventTypeId,
                 PushScene = query.PushScene
             });
@@ -582,7 +585,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var messageGroupEntities = await _inteMessageGroupRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
             // 消息组关联推送方式（已缓存）
-            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
+            var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityByParentIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
             // 组装数据
             List<InteEventTypeUpgradeDto> dtos = new();
@@ -607,6 +610,7 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             var entities = await _inteEventTypePushRuleRepository.GetEntitiesAsync(new EntityByParentIdQuery
             {
+                SiteId = _currentSite.SiteId ?? 0,
                 ParentId = id
             });
 

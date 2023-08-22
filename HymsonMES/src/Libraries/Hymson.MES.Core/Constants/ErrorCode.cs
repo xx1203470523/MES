@@ -30,6 +30,7 @@
         public const string MES10121 = "描述最大长度为255";
         public const string MES10122 = "版本不允许有空格";
         public const string MES10123 = "启用状态不允许修改";
+        public const string MES10124 = "启用状态只能修改为保留或废除";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -289,6 +290,7 @@
         #region 异常消息 10900
         public const string MES10901 = "事件类型不能为空";
         public const string MES10902 = "编码生成失败";
+        public const string MES10903 = "消息状态不合法";
         #endregion
 
         #region 降级规则 11000
@@ -520,7 +522,22 @@
 
         #region IPQC检验项目 13100
 
-        public const string MES13101 = "参数集编码{Code}已存在相同生成条件的IPQC检验项目，请重新输入！";
+        public const string MES13101 = "参数集编码不能为空！";
+        public const string MES13102 = "检验类型不合法！";
+        public const string MES13103 = "样本数量必须大于0！";
+        public const string MES13104 = "生成条件必须大于0！";
+        public const string MES13105 = "生成条件单位不合法！";
+        public const string MES13106 = "管控时间必须大于0！";
+        public const string MES13107 = "管控时间单位不合法！";
+        public const string MES13108 = "版本不能为空！";
+        public const string MES13109 = "版本长度不能超过50！";
+        public const string MES13110 = "状态不合法！";
+        public const string MES13111 = "参数项目重复！";
+        public const string MES13112 = "检验规则-检验方式重复！";
+        public const string MES13121 = "启用状态数据参数项目不能为空！";
+        public const string MES13122 = "启用状态数据检验规则与资源不能为空！";
+        public const string MES13123 = "检验规则【{Way}】下关联资源不能为空！";
+        public const string MES13151 = "参数集编码【{Code}】已存在相同生成条件【{Condition}】检验类型【{Type}】版本【{Version}】的IPQC检验项目，请重新输入！";
 
         #endregion
 

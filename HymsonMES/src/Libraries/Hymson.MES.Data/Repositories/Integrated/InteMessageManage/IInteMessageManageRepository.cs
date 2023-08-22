@@ -25,7 +25,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> InsertRangeAsync(IEnumerable<InteMessageManageEntity> entities);
 
         /// <summary>
-        /// 更新
+        /// 修改
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateAsync(InteMessageManageEntity entity);
+
+        /// <summary>
+        /// 接收
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>

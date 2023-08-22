@@ -13,14 +13,19 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 类型
+        /// 检验类型;1、首检 2、尾检 3、巡检
         /// </summary>
         public IPQCTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 全检参数idqual_inspection_parameter_group 的id
+        /// 参数集编码
         /// </summary>
-        public long InspectionParameterGroupId { get; set; }
+        public string ParameterGroupCode { get; set; }
+
+        /// <summary>
+        /// 生成条件单位
+        /// </summary>
+        public GenerateConditionUnitEnum GenerateConditionUnit { get; set; }
 
         /// <summary>
         /// 版本
