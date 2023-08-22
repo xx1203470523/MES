@@ -21,11 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Infrastructure" Version="2.1.75" />
-    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.75" />
-    <PackageReference Include="Hymson.MessagePush" Version="2.1.75" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.75" />
-    <PackageReference Include="Hymson.Settings" Version="2.1.75" />
+    <PackageReference Include="Hymson.Infrastructure" Version="2.1.76" />
+    <PackageReference Include="Hymson.Kafka.Debezium" Version="2.1.76" />
+    <PackageReference Include="Hymson.MessagePush" Version="2.1.76" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.76" />
+    <PackageReference Include="Hymson.Settings" Version="2.1.76" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 

@@ -5,8 +5,11 @@ using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MessagePush.Enum;
 using Hymson.MessagePush.Services;
 using Hymson.Utils;
@@ -44,6 +47,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         private readonly IInteEventTypeMessageGroupRelationRepository _inteEventTypeMessageGroupRelationRepository;
 
         /// <summary>
+        /// 仓储接口（事件类型维护）
+        /// </summary>
+        private readonly IInteEventTypeRepository _inteEventTypeRepository;
+
+        /// <summary>
         /// 仓储接口（事件升级）
         /// </summary>
         private readonly IInteEventTypeUpgradeRepository _inteEventTypeUpgradeRepository;
@@ -58,6 +66,21 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// </summary>
         private readonly IInteMessageManageRepository _inteMessageManageRepository;
 
+        /// <summary>
+        /// 仓储接口（工作中心）
+        /// </summary>
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
+        /// <summary>
+        /// 仓储接口（资源维护）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -67,25 +90,37 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <param name="messageTemplateRepository"></param>
         /// <param name="inteMessageGroupPushMethodRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
+        /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeUpgradeRepository"></param>
         /// <param name="inteEventTypePushRuleRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
         public MessagePushService(IMessageService messageService, IEventBus<EventBusInstance1> eventBus,
             IMessageTemplateRepository messageTemplateRepository,
             IInteMessageGroupPushMethodRepository inteMessageGroupPushMethodRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
+            IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeUpgradeRepository inteEventTypeUpgradeRepository,
             IInteEventTypePushRuleRepository inteEventTypePushRuleRepository,
-            IInteMessageManageRepository inteMessageManageRepository)
+            IInteMessageManageRepository inteMessageManageRepository,
+            IProcResourceRepository procResourceRepository,
+            IEquEquipmentRepository equEquipmentRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository)
         {
             _messageService = messageService;
             _eventBus = eventBus;
             _messageTemplateRepository = messageTemplateRepository;
             _inteMessageGroupPushMethodRepository = inteMessageGroupPushMethodRepository;
             _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
+            _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeUpgradeRepository = inteEventTypeUpgradeRepository;
             _inteEventTypePushRuleRepository = inteEventTypePushRuleRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procResourceRepository = procResourceRepository;
+            _equEquipmentRepository = equEquipmentRepository;
         }
 
         #region 推送消息
@@ -247,10 +282,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     if (templateEntity == null) continue;
 
                     // 推送即时消息
-                    await _messageService.SendMessageAsync(pushType, config.Address, templateEntity.Content, new MessagePushBo
-                    {
-                        Code = messageEntity.Code
-                    }, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
+                    var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene);
+                    await _messageService.SendMessageAsync(pushType, config.Address, templateEntity.Content, messagePushBo, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
                 }
             }
         }
@@ -266,7 +299,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         private async Task SetNextUpgradeLevelAsync<T>(T @event, InteMessageManageEntity messageEntity, PushSceneEnum pushScene) where T : IntegrationEvent
         {
             // 即将检查的等级
-            InteEventTypeUpgradeEntity? eventTypeUpgrade = null;
+            InteEventTypeUpgradeEntity? currentEventTypeUpgrade = null;
+            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = null;
 
             // 读取接收升级等级设置（已缓存）
             var eventTypeUpgrades = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
@@ -286,12 +320,13 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 case PushSceneEnum.Trigger:
                 case PushSceneEnum.Receive:
                     // 先从级别最低的开始
-                    eventTypeUpgrade = eventTypeUpgrades.OrderBy(o => o.Level).FirstOrDefault();
+                    nextEventTypeUpgrade = eventTypeUpgrades.OrderBy(o => o.Level).FirstOrDefault();
                     break;
                 case PushSceneEnum.ReceiveUpgrade:
                 case PushSceneEnum.HandleUpgrade:
                     // 下一升级等级
-                    eventTypeUpgrade = eventTypeUpgrades.Where(w => w.Duration >= duration).OrderBy(o => o.Level).FirstOrDefault();
+                    currentEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Duration < duration).OrderByDescending(o => o.Level).FirstOrDefault();
+                    nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Duration >= duration).OrderBy(o => o.Level).FirstOrDefault();
                     break;
                 case PushSceneEnum.Handle:
                 case PushSceneEnum.Close:
@@ -299,13 +334,72 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     break;
             }
 
-            if (eventTypeUpgrade == null) return;
+            if (nextEventTypeUpgrade == null) return;
 
             // 只有这两种场景才有升级需求
             if (pushScene != PushSceneEnum.ReceiveUpgrade && pushScene != PushSceneEnum.HandleUpgrade) return;
 
             // 添加升级检查任务
-            _eventBus.PublishDelay(@event, eventTypeUpgrade.Duration * 60);
+            var delayMinute = nextEventTypeUpgrade.Duration;
+            if (currentEventTypeUpgrade != null) delayMinute -= currentEventTypeUpgrade.Duration;
+
+            _eventBus.PublishDelay(@event, delayMinute * 60);
+        }
+
+        /// <summary>
+        /// 转换实体为BO对象
+        /// </summary>
+        /// <param name="messageEntity"></param>
+        /// <param name="pushScene"></param>
+        /// <returns></returns>
+        private async Task<MessagePushBo> ConvertEntityToMessagePushBoAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene)
+        {
+            var eventTypeName = "";
+            var eventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(messageEntity.EventTypeId);
+            if (eventTypeEntity != null) eventTypeName = eventTypeEntity.Name;
+
+            var workShopName = "";
+            var workShopEntity = await _inteWorkCenterRepository.GetByIdAsync(messageEntity.WorkShopId);
+            if (workShopEntity != null) workShopName = workShopEntity.Name;
+
+            var workLineName = "";
+            var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(messageEntity.LineId);
+            if (workLineEntity != null) workLineName = workLineEntity.Name;
+
+            var resourceName = "";
+            if (messageEntity.ResourceId.HasValue)
+            {
+                var resourceEntity = await _procResourceRepository.GetByIdAsync(messageEntity.ResourceId.Value);
+                if (resourceEntity != null) resourceName = resourceEntity.ResName;
+            }
+
+            var equipmentName = "";
+            if (messageEntity.EquipmentId.HasValue)
+            {
+                var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(messageEntity.EquipmentId.Value);
+                if (equipmentEntity != null) equipmentName = equipmentEntity.EquipmentName;
+            }
+
+            // 模板里面可能不支持枚举
+            var messagePushBo = new MessagePushBo
+            {
+                PushScene = pushScene,
+                Code = messageEntity.Code,
+                Status = messageEntity.Status.GetDescription(),
+                EventTypeName = eventTypeName,
+                WorkShopName = workShopName,
+                WorkLineName = workLineName,
+                ResourceName = resourceName,
+                EquipmentName = equipmentName,
+                TriggerUser = messageEntity.CreatedBy,
+                TriggerTime = $"{messageEntity.CreatedOn:yyyy-MM-dd HH:mm:ss}",
+            };
+
+            if (messageEntity.EventName != null) messagePushBo.EventName = messageEntity.EventName;
+            if (messageEntity.UpdatedBy != null) messagePushBo.ReceiveUser = messageEntity.UpdatedBy;
+            if (messageEntity.UpdatedOn != null) messagePushBo.ReceiveTime = $"{messageEntity.UpdatedOn.Value:yyyy-MM-dd HH:mm:ss}";
+
+            return messagePushBo;
         }
         #endregion
 
