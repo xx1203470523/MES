@@ -57,20 +57,21 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteEventTypeUpgradeEntity>> GetEntitiesAsync(InteEventTypeUpgradeQuery query)
         {
-            var key = $"inte_event_type_upgrade&SiteId-{query.SiteId}&EventTypeId-{query.EventTypeId}&PushScene-{query.PushScene}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                var sqlBuilder = new SqlBuilder();
-                var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-                sqlBuilder.Where("IsDeleted = 0");
-                sqlBuilder.Where("SiteId = @SiteId");
-                sqlBuilder.Where("PushScene = @PushScene");
-                sqlBuilder.Where("EventTypeId = @EventTypeId");
-                sqlBuilder.Select("*");
+            //var key = $"inte_event_type_upgrade&SiteId-{query.SiteId}&EventTypeId-{query.EventTypeId}&PushScene-{query.PushScene}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("PushScene = @PushScene");
+            sqlBuilder.Where("EventTypeId = @EventTypeId");
+            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("Level");
 
-                using var conn = GetMESDbConnection();
-                return await conn.QueryAsync<InteEventTypeUpgradeEntity>(template.RawSql, query);
-            });
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteEventTypeUpgradeEntity>(template.RawSql, query);
+            //});
         }
 
     }
@@ -81,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteEventTypeUpgradeRepository
     {
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_upgrade /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_upgrade /**where**/ /**orderby**/ ";
 
         const string InsertsSql = "INSERT INTO inte_event_type_upgrade(  `Id`, `EventTypeId`, `PushScene`, `Level`, `Duration`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @EventTypeId, @PushScene, @Level, @Duration, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 

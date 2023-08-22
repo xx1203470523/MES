@@ -7,22 +7,18 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteEvent.Command;
-using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MessagePush.Enum;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
 
 namespace Hymson.MES.Services.Services.Integrated
 {

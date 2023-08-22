@@ -57,20 +57,20 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteEventTypeUpgradeMessageGroupRelationEntity>> GetEntitiesAsync(InteEventTypeUpgradeMessageGroupRelationQuery query)
         {
-            var key = $"inte_event_type_upgrade_message_group_relation&SiteId-{query.SiteId}&EventTypeId-{query.EventTypeId}&PushScene-{query.PushScene}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                var sqlBuilder = new SqlBuilder();
-                var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-                sqlBuilder.Where("IsDeleted = 0");
-                sqlBuilder.Where("SiteId = @SiteId");
-                sqlBuilder.Where("PushScene = @PushScene");
-                sqlBuilder.Where("EventTypeId = @EventTypeId");
-                sqlBuilder.Select("*");
+            //var key = $"inte_event_type_upgrade_message_group_relation&SiteId-{query.SiteId}&EventTypeId-{query.EventTypeId}&PushScene-{query.PushScene}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("PushScene = @PushScene");
+            sqlBuilder.Where("EventTypeId = @EventTypeId");
+            sqlBuilder.Select("*");
 
-                using var conn = GetMESDbConnection();
-                return await conn.QueryAsync<InteEventTypeUpgradeMessageGroupRelationEntity>(template.RawSql, query);
-            });
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteEventTypeUpgradeMessageGroupRelationEntity>(template.RawSql, query);
+            //});
         }
 
     }
