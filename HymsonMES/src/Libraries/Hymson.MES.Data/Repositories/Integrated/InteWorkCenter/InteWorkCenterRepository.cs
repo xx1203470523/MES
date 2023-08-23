@@ -154,11 +154,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterEntity>> GetWorkCenterListByTypeAsync(EntityByTypeQuery query)
         {
-            var key = $"inte_work_center&Type-{query.Type}&SiteId-{query.SiteId}";
+            var key = $"inte_work_center&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryAsync<InteWorkCenterEntity>(GetBySiteIdSql, query);
+                return await conn.QueryAsync<InteWorkCenterEntity>(GetByTypeSql, query);
             });
         }
 
@@ -359,7 +359,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string GetByIdSql = @"SELECT * FROM `inte_work_center` WHERE Id = @Id AND IsDeleted = 0  ";
         const string GetByIdsSql = @"SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Id IN @ids ";
         const string GetByTypeAndParentIdSql = "SELECT /**select**/ FROM inte_work_center IWC /**innerjoin**/ /**leftjoin**/ /**where**/";
-        const string GetBySiteIdSql = "SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Type = @Type AND SiteId = @SiteId ";
+        const string GetByTypeSql = "SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Type = @Type AND Status = @Status AND SiteId = @SiteId ";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
         const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 

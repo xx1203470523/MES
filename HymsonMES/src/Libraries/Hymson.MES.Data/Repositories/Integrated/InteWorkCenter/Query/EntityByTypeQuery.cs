@@ -1,3 +1,4 @@
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Query;
 
@@ -15,6 +16,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query
         /// </summary>
         public WorkCenterTypeEnum Type { get; set; }
 
-
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum Status { get; set; }
     }
 }

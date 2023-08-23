@@ -282,7 +282,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     if (templateEntity == null) continue;
 
                     // 推送即时消息
-                    var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene, messageType);
+                    var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene);
                     await _messageService.SendMessageAsync(messageType, config.Address, templateEntity.Content, messagePushBo, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
                 }
             }
@@ -351,9 +351,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// </summary>
         /// <param name="messageEntity"></param>
         /// <param name="pushScene"></param>
-        /// <param name="messageType"></param>
         /// <returns></returns>
-        private async Task<MessagePushBo> ConvertEntityToMessagePushBoAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene, MessageTypeEnum messageType)
+        private async Task<MessagePushBo> ConvertEntityToMessagePushBoAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene)
         {
             var eventTypeName = "";
             var eventTypeEntity = await _inteEventTypeRepository.GetByIdAsync(messageEntity.EventTypeId);
