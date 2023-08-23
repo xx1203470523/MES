@@ -151,6 +151,9 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     await SetNextUpgradeLevelAsync(new MessageHandleUpgradeIntegrationEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.HandleUpgrade);
                     break;
                 case MessageStatusEnum.Handle:
+                    // 发送即时消息
+                    await SetMessageAsync(messageEntity, PushSceneEnum.Handle);
+                    break;
                 case MessageStatusEnum.Close:
                 default:
                     break;

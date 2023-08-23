@@ -350,6 +350,10 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 trans.Complete();
             }
+
+            // 推送消息
+            if (rows > 0) await _messagePushService.Push(entity);
+
             return rows;
         }
 
