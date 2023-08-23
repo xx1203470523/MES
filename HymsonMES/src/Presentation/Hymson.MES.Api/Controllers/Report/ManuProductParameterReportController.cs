@@ -28,7 +28,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet]//后续查询条码过多可能需要换成POST
         [Route("pagelist")]
         public async Task<PagedInfo<ManuProductParameterReportViewDto>> GetManuProductParameterReportPageListAsync([FromQuery] ManuProductParameterReportPagedQueryDto param)
         {

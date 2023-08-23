@@ -44,6 +44,10 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10111));
             }
+            if (!string.IsNullOrEmpty(pageQuery.SFCStr))
+            {
+                pageQuery.SFCStr = pageQuery.SFCStr.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
+            }
             var pagedQuery = pageQuery.ToQuery<ManuProductParameterReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterReportPagedInfoAsync(pagedQuery);
@@ -64,6 +68,10 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
             if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFCStr))
+            {
+                pageQuery.SFCStr = pageQuery.SFCStr.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
             }
             string fileName = "产品参数";
             pageQuery.PageSize = 10000;
