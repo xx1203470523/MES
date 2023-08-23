@@ -9,10 +9,12 @@ using FluentValidation;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcSortingRule.Query;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hymson.MES.Services.Validators.Process
 {
@@ -36,7 +38,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11310));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11311));
             RuleFor(x => x.Version).MaximumLength(10).WithErrorCode(nameof(ErrorCode.MES11312));
-            RuleFor(x => x.Remark).MaximumLength(10).WithErrorCode(nameof(ErrorCode.MES11313));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11313));
             RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamUpperAndLowerLimitValidator).WithErrorCode(nameof(ErrorCode.MES11306));
             //RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamIntersectionValidator).WithErrorCode(nameof(ErrorCode.MES11314));
             RuleFor(x => x).MustAsync(ManuSortingyCodeAndVersionValidatorasync).WithErrorCode(nameof(ErrorCode.MES11307));
@@ -54,11 +56,26 @@ namespace Hymson.MES.Services.Validators.Process
             {
                 foreach (var item in param)
                 {
-                    if (item.MaxValue != null)
+                    if (item.MaxValue.HasValue && !item.ParameterValue.HasValue)
                     {
-                        if (item.MaxValue < item.MaxValue)
+                        if (item.MinValue.HasValue)
                         {
-                            return false;
+                            var differenceValue = item.MaxValue - item.MinValue;
+                            if (differenceValue == 0)
+                            {
+                                if (item.MaxContainingType == ContainingTypeEnum.LtOrE || item.MaxContainingType == ContainingTypeEnum.LtOrE)
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            else if (differenceValue<0)
+                            {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -135,7 +152,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES11305);
             RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamUpperAndLowerLimitValidator).WithErrorCode(nameof(ErrorCode.MES11306));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11311));
-            RuleFor(x => x.Remark).MaximumLength(10).WithErrorCode(nameof(ErrorCode.MES11313));
+            RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11313));
         }
 
         /// <summary>

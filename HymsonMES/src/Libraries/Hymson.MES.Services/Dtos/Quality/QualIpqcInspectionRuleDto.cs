@@ -85,7 +85,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         public DateTime CreatedOn { get; set; }
 
         /// <summary>
-        /// 更新人
+        /// 更新人 
         /// </summary>
         public string UpdatedBy { get; set; }
 
