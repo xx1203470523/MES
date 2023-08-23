@@ -36,6 +36,7 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
+using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -618,7 +619,8 @@ namespace Hymson.MES.Services.Mapper
 
             #region QualIpqcInspectionHead
 
-
+            CreateMap<QualIpqcInspectionHeadView, QualIpqcInspectionHeadDto>();
+            CreateMap<QualIpqcInspectionHeadPagedQueryDto, QualIpqcInspectionHeadPagedQuery>();
 
             #endregion
         }

@@ -242,6 +242,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionParameterRepository, QualIpqcInspectionParameterRepository>();
             services.AddSingleton<IQualIpqcInspectionRuleRepository, QualIpqcInspectionRuleRepository>();
             services.AddSingleton<IQualIpqcInspectionRuleResourceRelationRepository, QualIpqcInspectionRuleResourceRelationRepository>();
+
+            services.AddSingleton<IQualIpqcInspectionHeadRepository, QualIpqcInspectionHeadRepository>();
+            services.AddSingleton<IQualIpqcInspectionHeadResultRepository, QualIpqcInspectionHeadResultRepository>();
+            services.AddSingleton<IQualIpqcInspectionHeadSampleRepository, QualIpqcInspectionHeadSampleRepository>();
+            services.AddSingleton<IQualIpqcInspectionHeadAnnexRepository, QualIpqcInspectionHeadAnnexRepository>();
             #endregion
 
             #region Manufacture

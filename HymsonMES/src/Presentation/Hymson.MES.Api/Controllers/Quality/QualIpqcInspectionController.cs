@@ -71,7 +71,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        [PermissionDescription("quality:ipqcInspection:update")]
+        [PermissionDescription("quality:ipqcInspection:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualIpqcInspectionService.DeletesAsync(ids);

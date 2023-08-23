@@ -541,6 +541,29 @@
 
         #endregion
 
+        #region 首检 13200
+
+        public const string MES13221 = "工单不存在！";
+        public const string MES13222 = "资源不属于该工序！";
+        public const string MES13223 = "IPQC检验项目不存在，请先维护并启用！";
+        public const string MES13224 = "IPQC检验项目错误，该产品、工序存在多个启用的IPQC检验项目，请检查数据！";
+        public const string MES13225 = "该资源不在对应IPQC检验项目关联资源列表中，请先进行关联！";
+        public const string MES13226 = "没有检验类型为首检的启用状态IPQC检验项目，请先维护！";
+        public const string MES13227 = "没有需要生成首检单的工单！";
+        public const string MES13228 = "没有可生成首件检验单的数据！";
+
+        #endregion
+
+        #region 过程检 13300
+
+
+        #endregion
+
+        #region 尾检 13400
+
+
+        #endregion
+
         #region  14000段项目使用 平台请勿使用
 
         #endregion
