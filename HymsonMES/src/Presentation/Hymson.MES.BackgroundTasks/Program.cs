@@ -33,6 +33,7 @@ Host.CreateDefaultBuilder(args)
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
+       services.AddClearCacheService(hostContext.Configuration);
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        // Add the required Quartz.NET services
        services.AddQuartz(q =>
