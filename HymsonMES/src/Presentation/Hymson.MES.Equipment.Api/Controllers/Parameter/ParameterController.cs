@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection;
+using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers.Parameter
@@ -36,6 +37,7 @@ namespace Hymson.MES.Equipment.Api.Controllers.Parameter
         /// <returns></returns>
         [HttpPost]
         [Route("collection")]
+        [ProducesDefaultResponseType(typeof(ResultDto))]
         public async Task Collection(ProductProcessParameterDto param)
         {
              await _productProcessCollectionService.Collection(param);

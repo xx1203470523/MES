@@ -15,7 +15,6 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
@@ -183,7 +182,8 @@ namespace Hymson.MES.Services.Services.Integrated
             var workShops = await _inteWorkCenterRepository.GetWorkCenterListByTypeAsync(new EntityByTypeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Type = WorkCenterTypeEnum.Farm
+                Type = WorkCenterTypeEnum.Farm,
+                Status = SysDataStatusEnum.Enable
             });
 
             return workShops.Select(s => new SelectOptionDto

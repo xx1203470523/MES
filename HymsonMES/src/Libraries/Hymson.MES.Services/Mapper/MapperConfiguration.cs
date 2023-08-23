@@ -611,7 +611,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionParameterSaveDto, QualIpqcInspectionParameterEntity>();
             CreateMap<QualIpqcInspectionParameterEntity, QualIpqcInspectionParameterDto>();
             CreateMap<QualIpqcInspectionRuleSaveDto, QualIpqcInspectionRuleEntity>();
+            CreateMap<QualIpqcInspectionRuleEntity, QualIpqcInspectionRuleDto>();
             CreateMap<QualIpqcInspectionRuleResourceRelationSaveDto, QualIpqcInspectionRuleResourceRelationEntity>();
+            CreateMap<QualIpqcInspectionRuleResourceRelationEntity, QualIpqcInspectionRuleResourceRelationDto>();
+            #endregion
+
+            #region QualIpqcInspectionHead
+
+
+
             #endregion
         }
 
@@ -772,6 +780,8 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
+
+            CreateMap<WorkshopJobControlReportOptimizePagedQueryDto, WorkshopJobControlReportOptimizePagedQuery>();
 
             CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion

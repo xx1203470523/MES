@@ -65,4 +65,51 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query
         /// </summary>
         public string? ResourceCode { get; set; }
     }
+
+    /// <summary>
+    /// 车间作业控制报告 分页参数
+    /// </summary>
+    public class WorkshopJobControlReportOptimizePagedQuery : PagerInfo
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? SFCStatus { get; set; }
+
+        /// <summary>
+        /// 条码在制状态
+        /// </summary>
+        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+    }
+
 }

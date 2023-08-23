@@ -9,6 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Constants;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -71,6 +72,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(long[] ids)
         {
+            if (ids.Length <= 0)
+            {
+                return new List<ProcBomEntity>();
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcBomEntity>(GetByIdsSql, new { ids = ids });
         }

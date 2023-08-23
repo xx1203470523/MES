@@ -120,6 +120,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<WorkshopJobControlReportView>> GetPagedInfoWorkshopJobControlReportAsync(WorkshopJobControlReportPagedQuery pageQuery);
 
         /// <summary>
+        /// 车间作业控制 报表分页查询
+        /// 优化: 不模糊查询，且通过关联ID查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<WorkshopJobControlReportOptimizeView>> GetPagedInfoWorkshopJobControlReportOptimizeAsync(WorkshopJobControlReportOptimizePagedQuery pageQuery);
+
+        /// <summary>
         /// 根据SFC获取已经使用的
         /// </summary>
         /// <param name="sfc"></param>

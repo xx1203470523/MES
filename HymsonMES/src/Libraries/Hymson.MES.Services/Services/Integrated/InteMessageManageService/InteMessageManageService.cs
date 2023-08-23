@@ -7,16 +7,20 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Services.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
 using Hymson.Sequences.Enums;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Data;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -42,6 +46,21 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<InteMessageManageTriggerSaveDto> _validationSaveRules;
+
+        /// <summary>
+        /// 消息服务
+        /// </summary>
+        private readonly IMessagePushService _messagePushService;
+
+        /// <summary>
+        /// 仓储接口（资源维护）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
         /// 仓储接口（工作中心）
@@ -76,6 +95,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
         /// <param name="validationSaveRules"></param>
+        /// <param name="messagePushService"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
@@ -83,6 +105,9 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteMessageManageHandleProgrammeAttachmentRepository"></param>
         public InteMessageManageService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             AbstractValidator<InteMessageManageTriggerSaveDto> validationSaveRules,
+            IMessagePushService messagePushService,
+            IProcResourceRepository procResourceRepository,
+            IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
@@ -93,6 +118,9 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentSite = currentSite;
             _sequenceService = sequenceService;
             _validationSaveRules = validationSaveRules;
+            _messagePushService = messagePushService;
+            _procResourceRepository = procResourceRepository;
+            _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
@@ -129,7 +157,10 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Status = MessageStatusEnum.Trigger;
 
             // 保存
-            return await _inteMessageManageRepository.InsertAsync(entity);
+            var rows = await _inteMessageManageRepository.InsertAsync(entity);
+            if (rows > 0) await _messagePushService.Push(entity);
+
+            return rows;
         }
 
         /// <summary>
@@ -183,7 +214,10 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Status = MessageStatusEnum.Receive;
             entity.ReceiveDuration = Math.Ceiling((updatedOn - entity.CreatedOn).TotalMinutes);
 
-            return await _inteMessageManageRepository.ReceiveAsync(entity);
+            var rows = await _inteMessageManageRepository.ReceiveAsync(entity);
+            if (rows > 0) await _messagePushService.Push(entity);
+
+            return rows;
         }
 
         /// <summary>
@@ -361,7 +395,13 @@ namespace Hymson.MES.Services.Services.Integrated
             var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
             if (inteMessageManageEntity == null) return null;
 
-            return inteMessageManageEntity.ToModel<InteMessageManageTriggerDto>();
+            var dto = inteMessageManageEntity.ToModel<InteMessageManageTriggerDto>();
+            if (dto.ResourceId.HasValue)
+            {
+                var resourceEntity = await _procResourceRepository.GetByIdAsync(dto.ResourceId.Value);
+                if (resourceEntity != null) dto.ResourceCode = resourceEntity.ResCode;
+            }
+            return dto;
         }
 
         /// <summary>
@@ -455,6 +495,12 @@ namespace Hymson.MES.Services.Services.Integrated
                 var workLineEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.LineId);
                 if (workLineEntity != null) dto.LineName = workLineEntity.Name;
 
+                if (dto.EquipmentId.HasValue)
+                {
+                    var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(dto.EquipmentId.Value);
+                    if (equipmentEntity != null) dto.EquipmentName = equipmentEntity.EquipmentName;
+                }
+
                 dtos.Add(dto);
             }
 
@@ -473,6 +519,8 @@ namespace Hymson.MES.Services.Services.Integrated
             var padNo = $"{serialNumbers}".PadLeft(4, '0');
             return $"EVENT{DateTime.Now:yyyyMMdd}{padNo}";
         }
+
+
 
 
     }

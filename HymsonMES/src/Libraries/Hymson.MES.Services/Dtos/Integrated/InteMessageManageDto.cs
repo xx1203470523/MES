@@ -180,9 +180,19 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long? ResourceId { get; set; }
 
         /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
+
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
 
         /// <summary>
         /// 事件类型id
@@ -265,6 +275,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
 
         /// <summary>
         /// 设备ID
@@ -410,6 +425,38 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// <summary>
     /// 消息管理分页Dto
     /// </summary>
-    public class InteMessageManagePagedQueryDto : PagerInfo { }
+    public class InteMessageManagePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 消息单号
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 事件类型名称
+        /// </summary>
+        public string? EventTypeName { get; set; }
+
+        /// <summary>
+        /// 车间id
+        /// </summary>
+        public long? WorkShopId { get; set; }
+
+        /// <summary>
+        /// 线体id
+        /// </summary>
+        public long? LineId { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string? ResourceName { get; set; }
+
+        /// <summary>
+        /// 更新时间  时间范围  数组
+        /// </summary>
+        public DateTime[]? UpdatedOn { get; set; }
+
+    }
 
 }

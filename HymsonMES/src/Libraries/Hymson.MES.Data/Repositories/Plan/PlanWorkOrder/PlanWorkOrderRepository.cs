@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -90,6 +91,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(long[] ids)
         {
+            if (ids.Length <= 0)
+            {
+                return new List<PlanWorkOrderEntity>();
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids = ids });
         }

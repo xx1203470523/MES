@@ -1,17 +1,7 @@
-﻿using FluentValidation;
-using Hymson.MES.CoreServices.Bos.Job;
+﻿using Hymson.EventBus.Abstractions;
+using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.CoreServices.Options;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.CoreServices.Services.NewJob;
-using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +20,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCoreService(configuration);  
+            services.AddCoreService(configuration);
+            AddEventBusServices(services);
             AddServices(services);
             AddValidators(services);
             AddConfig(services, configuration);
@@ -44,8 +35,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-           
-            //services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
+            //services.AddSingleton<IMessagePushService, MessagePushService>();
             return services;
         }
 
@@ -56,8 +46,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
-           
-
             return services;
         }
 
@@ -73,6 +61,16 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
             //services.Configure<ConnectionOptions>(configuration);
             return services;
+        }
+        /// <summary>
+        /// 订阅
+        /// </summary>
+        /// <param name="services"></param>
+        static void AddEventBusServices(IServiceCollection services)
+        {
+            services.AddSingleton<IIntegrationEventHandler<MessageHandleUpgradeIntegrationEvent>, MessageHandleUpgradeIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeIntegrationEvent>, MessageReceiveUpgradeIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeIntegrationEvent>, MessageTriggerUpgradeIntegrationEventHandler>();
         }
     }
 }

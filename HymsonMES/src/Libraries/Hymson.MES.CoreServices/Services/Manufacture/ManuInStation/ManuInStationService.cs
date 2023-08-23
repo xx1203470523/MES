@@ -24,8 +24,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         /// <returns></returns>
         public async Task InStationByEquipment(EquipmentInStationDto param)
         {
-          
-        }   
+            await Task.CompletedTask;
+        }
 
         /// <summary>
         /// 根据设备批量进站
@@ -34,7 +34,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         /// <returns></returns>
         public async Task InStationRangeByEquipment(EquipmentInStationDto param)
         {
-
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         /// <returns></returns>
         public async Task InStationByResource(ResourceInStationDto param)
         {
-
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -54,12 +54,17 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         /// <returns></returns>
         public async Task InStationRangeByResource(ResourceInStationsDto param)
         {
-
+            await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private async Task ExecuteInStation()
-        { 
-              
+        {
+            await Task.CompletedTask;
         }
+
     }
 }

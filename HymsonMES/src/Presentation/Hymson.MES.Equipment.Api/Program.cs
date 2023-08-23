@@ -42,6 +42,8 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
+            builder.Services.AddEventBusRabbitMQService(builder.Configuration);
+
 #if DEBUG
             builder.Services.AddHostedService<HostedService>();
 #endif

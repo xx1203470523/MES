@@ -88,6 +88,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(long[] ids)
         {
+            if (ids.Length <= 0) 
+            {
+                return new List<ProcMaterialEntity>();
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids = ids });
         }

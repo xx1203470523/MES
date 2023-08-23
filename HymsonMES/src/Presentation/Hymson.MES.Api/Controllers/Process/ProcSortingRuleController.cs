@@ -134,18 +134,6 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getDetails")]
-        public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListAsync([FromQuery] ProcSortingRuleDetailQueryDto parm)
-        {
-            return await _procSortingRuleService.GetSortingRuleDetailListAsync(parm);
-        }
-
-        /// <summary>
-        /// 分页查询列表（分选规则）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
         [Route("getDetailsByMaterialId")]
         public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListByMaterialIdAsync([FromQuery] ProcSortingRuleDetailQueryDto parm)
         {

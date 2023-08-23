@@ -1253,6 +1253,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         LockProductionId = item.LockProductionId,
                         ProductBOMId = item.ProductBOMId,
                         ProcedureId = item.ProcedureId,
+                        ProductId= item.ProductId,
                         Status = item.Status,
                         OrderCode = workOrder != null ? workOrder.OrderCode : "",
                         Code = procedure != null ? procedure.Code : "",

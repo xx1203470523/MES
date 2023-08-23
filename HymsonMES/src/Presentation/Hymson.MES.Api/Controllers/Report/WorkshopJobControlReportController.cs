@@ -43,7 +43,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> QueryPagedWorkshopJobControlAsync([FromQuery] WorkshopJobControlReportPagedQueryDto param)
+        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> QueryPagedWorkshopJobControlAsync([FromQuery] WorkshopJobControlReportOptimizePagedQueryDto param)
         {
             return await _workshopJobControlReportService.GetWorkshopJobControlPageListAsync(param);
         }

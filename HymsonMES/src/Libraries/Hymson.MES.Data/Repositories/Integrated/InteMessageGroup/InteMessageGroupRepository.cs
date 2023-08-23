@@ -136,18 +136,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
-            var key = $"inte_message_group&SiteId-{query.SiteId}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                var sqlBuilder = new SqlBuilder();
-                var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-                sqlBuilder.Where("IsDeleted = 0");
-                sqlBuilder.Where("SiteId = @SiteId");
-                sqlBuilder.Select("*");
+            //var key = $"inte_message_group&SiteId-{query.SiteId}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
 
-                using var conn = GetMESDbConnection();
-                return await conn.QueryAsync<InteMessageGroupEntity>(template.RawSql, query);
-            });
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteMessageGroupEntity>(template.RawSql, query);
+            //});
         }
 
         /// <summary>

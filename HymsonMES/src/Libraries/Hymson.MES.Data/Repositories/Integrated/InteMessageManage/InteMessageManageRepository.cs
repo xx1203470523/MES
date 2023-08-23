@@ -160,6 +160,40 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
 
+            if (pagedQuery.WorkShopId.HasValue)
+            {
+                sqlBuilder.Where("T.WorkShopId = @WorkShopId");
+            }
+
+            if (pagedQuery.LineId.HasValue)
+            {
+                sqlBuilder.Where("T.LineId = @LineId");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("T.Code LIKE @Code");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.EventTypeName) == false)
+            {
+                pagedQuery.EventTypeName = $"%{pagedQuery.EventTypeName}%";
+                sqlBuilder.Where("IET.Name LIKE @EventTypeName");
+            }
+
+            if (string.IsNullOrWhiteSpace(pagedQuery.ResourceName) == false)
+            {
+                pagedQuery.ResourceName = $"%{pagedQuery.ResourceName}%";
+                sqlBuilder.Where("PR.ResName LIKE @ResourceName");
+            }
+
+            if (pagedQuery.UpdatedOn != null && pagedQuery.UpdatedOn.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { StartTime = pagedQuery.UpdatedOn[0], EndTime = pagedQuery.UpdatedOn[1].AddDays(1) });
+                sqlBuilder.Where("T.UpdatedOn >= @StartTime AND T.UpdatedOn < @EndTime");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
