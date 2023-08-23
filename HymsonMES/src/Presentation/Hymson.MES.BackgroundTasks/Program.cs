@@ -29,10 +29,8 @@ IHostBuilder CreateHostBuilder(string[] args) =>
 Host.CreateDefaultBuilder(args)
    .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
    {
-       //hostContext.Configuration.OnChange((configuration) =>
-       //{
-       //    NLog.LogManager.Configuration = new NLogLoggingConfiguration(configuration.GetSection("NLog"));
-       //});
+       
+       services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
