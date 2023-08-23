@@ -29,7 +29,7 @@ IHostBuilder CreateHostBuilder(string[] args) =>
 Host.CreateDefaultBuilder(args)
    .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
    {
-       
+       services.AddLocalization();
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
@@ -44,7 +44,7 @@ Host.CreateDefaultBuilder(args)
 
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
            //q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
-
+           
            #endregion
            q.UsePersistentStore((persistentStoreOptions) =>
            {
@@ -53,6 +53,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.serializer.type", "json");
                persistentStoreOptions.SetProperty("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks";
+               Console.WriteLine(hostContext.HostingEnvironment.EnvironmentName);
                persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
                persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
                persistentStoreOptions.UseMySql(mySqlConnection);
