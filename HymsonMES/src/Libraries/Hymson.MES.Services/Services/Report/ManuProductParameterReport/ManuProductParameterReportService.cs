@@ -40,7 +40,7 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
         /// <returns></returns>
         public async Task<PagedInfo<ManuProductParameterReportViewDto>> GetManuProductParameterReportPageListAsync(ManuProductParameterReportPagedQueryDto pageQuery)
         {
-            if (pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0 || string.IsNullOrEmpty(pageQuery.SFCStr))
+            if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10111));
             }
@@ -61,7 +61,7 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
         /// <returns></returns>
         public async Task<ExportResultDto> ManuProductParameterReportExportAsync(ManuProductParameterReportPagedQueryDto pageQuery)
         {
-            if (pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0 || string.IsNullOrEmpty(pageQuery.SFCStr))
+            if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10111));
             }
