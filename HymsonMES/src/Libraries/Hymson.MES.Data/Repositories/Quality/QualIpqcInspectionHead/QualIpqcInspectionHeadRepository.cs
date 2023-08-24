@@ -135,10 +135,12 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.LeftJoin("qual_ipqc_inspection qii ON T.IpqcInspectionId = qii.Id");
             sqlBuilder.LeftJoin("proc_material pm ON T.MaterialId = pm.Id");
             sqlBuilder.LeftJoin("proc_procedure pp ON T.ProcedureId = pp.Id");
+            sqlBuilder.LeftJoin("proc_resource pr ON T.ResourceId = pr.Id");
+            sqlBuilder.LeftJoin("equ_equipment ee ON T.EquipmentId = ee.Id");
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.OrderBy("T.CreatedOn DESC");
-            sqlBuilder.Select("T.*, qiihr.InspectionBy, qiihr.InspectionOn, qiihr.StartOn, qiihr.CompleteOn, qiihr.CloseOn, qiihr.HandMethod, qiihr.ProcessedBy, qiihr.ProcessedOn, qii.GenerateCondition, qii.GenerateConditionUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName");
+            sqlBuilder.Select("T.*, qiihr.InspectionBy, qiihr.InspectionOn, qiihr.StartOn, qiihr.CompleteOn, qiihr.CloseOn, qiihr.HandMethod, qiihr.ProcessedBy, qiihr.ProcessedOn, qii.GenerateCondition, qii.GenerateConditionUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr.ResourceCode, pr.ResourceName, ee.EquipmentCode, ee.EquipmentName");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {

@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
@@ -25,12 +27,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public bool IsQualified { get; set; }
+        public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public bool Status { get; set; }
+        public InspectionStatusEnum Status { get; set; }
 
         /// <summary>
         /// 报检人
@@ -60,7 +62,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1、让步 2、？
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public HandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
@@ -75,7 +77,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否当前结果;0-否  1、是
         /// </summary>
-        public bool IsCurrent { get; set; }
+        public TrueOrFalseEnum IsCurrent { get; set; }
 
         /// <summary>
         /// 创建人
@@ -128,12 +130,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public bool IsQualified { get; set; }
+        public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public bool Status { get; set; }
+        public InspectionStatusEnum Status { get; set; }
 
         /// <summary>
         /// 报检人
@@ -163,7 +165,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1、让步 2、？
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public HandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
@@ -178,7 +180,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否当前结果;0-否  1、是
         /// </summary>
-        public bool IsCurrent { get; set; }
+        public TrueOrFalseEnum IsCurrent { get; set; }
 
         /// <summary>
         /// 创建人

@@ -116,6 +116,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            if (query.IpqcInspectionHeadId.HasValue)
+            {
+                sqlBuilder.Where("IpqcInspectionHeadId = @IpqcInspectionHeadId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionHeadSampleEntity>(template.RawSql, query);
         }
@@ -147,6 +153,8 @@ namespace Hymson.MES.Data.Repositories.Quality
             var totalCount = await totalCountTask;
             return new PagedInfo<QualIpqcInspectionHeadSampleEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
+
 
     }
 

@@ -236,7 +236,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 首检检验单分页查询参数Dto
     /// </summary>
-    public class QualIpqcInspectionHeadPagedQueryDto : PagerInfo 
+    public class QualIpqcInspectionHeadPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 单号
@@ -274,8 +274,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public InspectionStatusEnum? Status { get; set; }
     }
 
+    /// <summary>
+    /// 状态变更Dto
+    /// </summary>
     public record StatusChangeDto
-    { 
+    {
         /// <summary>
         /// 检验单Id
         /// </summary>
@@ -285,6 +288,22 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
         public InspectionStatusEnum Status { get; set; }
+    }
+
+    /// <summary>
+    /// 不合格处理Dto
+    /// </summary>
+    public record UnqualifiedHandleDto
+    {
+        /// <summary>
+        /// 检验单Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 不合格处理方式;1、让步 2、？
+        /// </summary>
+        public HandMethodEnum? HandMethod { get; set; }
     }
 
 }

@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     /// </summary>
     public class QualIpqcInspectionHeadSampleQuery
     {
-
+        /// <summary>
+        /// 检验单Id
+        /// </summary>
+        public long? IpqcInspectionHeadId { get; set; }
     }
 }
