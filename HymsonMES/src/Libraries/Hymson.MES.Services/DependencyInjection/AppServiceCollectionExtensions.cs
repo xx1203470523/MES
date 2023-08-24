@@ -423,6 +423,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualUnqualifiedGroupModifyDto>, QualUnqualifiedGroupModifyValidator>();
             services.AddSingleton<AbstractValidator<QualIpqcInspectionSaveDto>, QualIpqcInspectionSaveValidator>();
             services.AddSingleton<AbstractValidator<QualIpqcInspectionHeadSaveDto>, QualIpqcInspectionHeadSaveValidator>();
+            services.AddSingleton<AbstractValidator<List<QualIpqcInspectionHeadSampleCreateDto>>, QualIpqcInspectionHeadSampleAddValidator>();
             #endregion
 
             #region Manufacture
