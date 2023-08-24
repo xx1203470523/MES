@@ -22,7 +22,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// <summary>
         /// 绑定时的型号
         /// </summary>
-        public string ModelCode { get; set; }
+        public string? ModelCode { get; set; }
 
         /// <summary>
         /// 是否为模组虚拟条码参数
@@ -47,8 +47,8 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// </summary>
         public string? Name { get; set; }
         /// <summary>
-        /// 绑定时的型号
+        /// 绑定时的型号，查询时返回用
         /// </summary>
-        public string ModelCode { get; set; }
+        public string? ModelCode { get; set; }
     }
 }
