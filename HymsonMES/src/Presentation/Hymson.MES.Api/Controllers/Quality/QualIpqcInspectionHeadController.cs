@@ -102,14 +102,53 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 执行检验
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="updateDto"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("execute")]
         [PermissionDescription("quality:ipqcInspectionHead:execute")]
-        public async Task ExecuteAsync([FromBody] QualIpqcInspectionHeadSaveDto saveDto)
+        public async Task ExecuteAsync([FromBody] StatusChangeDto updateDto)
         {
-            await _qualIpqcInspectionHeadService.ModifyAsync(saveDto);
+            await _qualIpqcInspectionHeadService.ExecuteAsync(updateDto);
+        }
+
+        /// <summary>
+        /// 样品检验数据录入
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("sampleAdd")]
+        [PermissionDescription("quality:ipqcInspectionHead:sampleAdd")]
+        public async Task InsertSampleDataAsync([FromBody] List<QualIpqcInspectionHeadSampleCreateDto> dto)
+        {
+            await _qualIpqcInspectionHeadService.InsertSampleDataAsync(dto);
+        }
+
+        /// <summary>
+        /// 样品检验数据修改
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("sampleUpdate")]
+        [PermissionDescription("quality:ipqcInspectionHead:sampleUpdate")]
+        public async Task UpdateSampleDataAsync([FromBody] QualIpqcInspectionHeadSampleUpdateDto dto)
+        {
+            await _qualIpqcInspectionHeadService.UpdateSampleDataAsync(dto);
+        }
+
+        /// <summary>
+        /// 检验完成
+        /// </summary>
+        /// <param name="updateDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("complete")]
+        [PermissionDescription("quality:ipqcInspectionHead:complete")]
+        public async Task CompleteAsync([FromBody] StatusChangeDto updateDto)
+        {
+            await _qualIpqcInspectionHeadService.CompleteAsync(updateDto);
         }
 
     }

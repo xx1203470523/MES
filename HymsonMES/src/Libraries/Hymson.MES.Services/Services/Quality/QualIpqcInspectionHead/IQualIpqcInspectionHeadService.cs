@@ -57,5 +57,26 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         Task<int> ExecuteAsync(StatusChangeDto dto);
 
+        /// <summary>
+        /// 样品检验数据录入
+        /// </summary>
+        /// <param name="dataList"></param>
+        /// <returns></returns>
+        Task<int> InsertSampleDataAsync(List<QualIpqcInspectionHeadSampleCreateDto> dataList);
+
+        /// <summary>
+        /// 样品检验数据修改
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<int> UpdateSampleDataAsync(QualIpqcInspectionHeadSampleUpdateDto param);
+
+        /// <summary>
+        /// 检验完成
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> CompleteAsync(StatusChangeDto dto);
+
     }
 }

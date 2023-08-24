@@ -1,22 +1,13 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
     /// 首检检验单样本新增/更新Dto
     /// </summary>
-    public record QualIpqcInspectionHeadSampleSaveDto : BaseEntityDto
+    public record QualIpqcInspectionHeadSampleCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
         /// <summary>
         /// 首检检验单Id
         /// </summary>
@@ -50,39 +41,40 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public bool IsQualified { get; set; }
+        public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
+
+
+    }
+
+    /// <summary>
+    /// 首检检验单样本更新Dto
+    /// </summary>
+    public record QualIpqcInspectionHeadSampleUpdateDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键Id
+        /// </summary>
+        public long Id { get; set; }
 
         /// <summary>
-        /// 创建人
+        /// 检验值
         /// </summary>
-        public string CreatedBy { get; set; }
+        public string InspectionValue { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public DateTime CreatedOn { get; set; }
+        public TrueOrFalseEnum IsQualified { get; set; }
 
         /// <summary>
-        /// 更新人
+        /// 备注
         /// </summary>
-        public string UpdatedBy { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 删除标识
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-
+        public string? Remark { get; set; }
     }
 
     /// <summary>
