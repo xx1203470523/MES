@@ -291,6 +291,8 @@
         public const string MES10901 = "事件类型不能为空";
         public const string MES10902 = "编码生成失败";
         public const string MES10903 = "消息状态不合法";
+        public const string MES10904 = "原因分析不允许有空格";
+        public const string MES10905 = "处理方案不允许有空格";
         #endregion
 
         #region 降级规则 11000
