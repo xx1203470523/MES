@@ -68,6 +68,11 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
+        /// 仓储接口（事件类型维护）
+        /// </summary>
+        private readonly IInteEventTypeRepository _inteEventTypeRepository;
+
+        /// <summary>
         /// 仓储接口（附件）
         /// </summary>
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
@@ -99,6 +104,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="procResourceRepository"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
         /// <param name="inteMessageManageAnalysisReportAttachmentRepository"></param>
@@ -109,6 +115,7 @@ namespace Hymson.MES.Services.Services.Integrated
             IProcResourceRepository procResourceRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IInteEventTypeRepository inteEventTypeRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
             IInteMessageManageAnalysisReportAttachmentRepository inteMessageManageAnalysisReportAttachmentRepository,
@@ -122,6 +129,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _procResourceRepository = procResourceRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _inteEventTypeRepository = inteEventTypeRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteMessageManageAnalysisReportAttachmentRepository = inteMessageManageAnalysisReportAttachmentRepository;
@@ -256,6 +264,9 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 entity.HandleDuration = Math.Ceiling((updatedOn - entity.ReceivedOn.Value).TotalMinutes);
             }
+
+            // 判断事件类型是否是自动关闭
+            // TODO 
 
             // 附件处理
             List<InteAttachmentEntity> attachmentEntities = new();
