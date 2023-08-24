@@ -532,11 +532,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 {
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
-
-                await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, parm.Procedure.Code);
+         
                 //提交
                 ts.Complete();
             }
+            await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, parm.Procedure.Code);
         }
 
         /// <summary>

@@ -1,17 +1,5 @@
-﻿using Confluent.Kafka;
-using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using Mysqlx.Crud;
+﻿using Hymson.Infrastructure;
 using OfficeOpenXml.Attributes;
-using Org.BouncyCastle.Asn1.X509;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Report
 {

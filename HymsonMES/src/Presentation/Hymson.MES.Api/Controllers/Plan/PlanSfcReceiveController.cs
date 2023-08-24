@@ -45,7 +45,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost]  
         [Route("receive")]
         [LogDescription("条码接收", BusinessType.INSERT)]
         [PermissionDescription("plan:sfcReceive:receive")]
@@ -66,4 +66,4 @@ namespace Hymson.MES.Api.Controllers.Plan
             return await _planSfcInfoService.PlanSfcReceiveScanCodeAsync(parm);
         }
     }
-}
+}   

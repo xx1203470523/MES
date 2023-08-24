@@ -291,6 +291,8 @@
         public const string MES10901 = "事件类型不能为空";
         public const string MES10902 = "编码生成失败";
         public const string MES10903 = "消息状态不合法";
+        public const string MES10904 = "原因分析不允许有空格";
+        public const string MES10905 = "处理方案不允许有空格";
         #endregion
 
         #region 降级规则 11000
@@ -538,6 +540,39 @@
         public const string MES13122 = "启用状态数据检验规则与资源不能为空！";
         public const string MES13123 = "检验规则【{Way}】下关联资源不能为空！";
         public const string MES13151 = "参数集编码【{Code}】已存在相同生成条件【{Condition}】检验类型【{Type}】版本【{Version}】的IPQC检验项目，请重新输入！";
+
+        #endregion
+
+        #region 首检 13200
+
+        public const string MES13201 = "生成条件不合法！";
+        public const string MES13202 = "工单不能为空！";
+        public const string MES13203 = "工序不能为空！";
+        public const string MES13204 = "资源不能为空！";
+        public const string MES13205 = "检验值不能为空！";
+        public const string MES13206 = "是否合格不能为空！";
+        public const string MES13221 = "工单不存在！";
+        public const string MES13222 = "资源不属于该工序！";
+        public const string MES13223 = "IPQC检验项目不存在，请先维护并启用！";
+        public const string MES13224 = "IPQC检验项目错误，该产品、工序存在多个启用的IPQC检验项目，请检查数据！";
+        public const string MES13225 = "该资源不在对应IPQC检验项目关联资源列表中，请先进行关联！";
+        public const string MES13226 = "没有检验类型为首检的启用状态IPQC检验项目，请先维护！";
+        public const string MES13227 = "没有需要生成首检单的工单！";
+        public const string MES13228 = "没有可生成首件检验单的数据！";
+        public const string MES13229 = "该检验单已完成，不允许再进行当前操作！";
+        public const string MES13230 = "只有检验中的单据才允许完成！";
+        public const string MES13231 = "已检样品数量小于单据应检数量，不允许完成！";
+        public const string MES13232 = "该检验单非完成状态，不允许进行不合格处理！";
+
+        #endregion
+
+        #region 过程检 13300
+
+
+        #endregion
+
+        #region 尾检 13400
+
 
         #endregion
 

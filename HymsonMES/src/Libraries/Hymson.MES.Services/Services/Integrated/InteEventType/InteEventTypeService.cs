@@ -265,17 +265,23 @@ namespace Hymson.MES.Services.Services.Integrated
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                var rowArray = await Task.WhenAll(new List<Task<int>>()
+                rows = await _inteEventTypeRepository.InsertAsync(entity);
+                if (rows <= 0)
                 {
-                    _inteEventRepository.UpdateEventTypeIdAsync(eventCommand),
-                    _inteEventTypeRepository.InsertAsync(entity),
-                    _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
-                    _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
-                    _inteEventTypeUpgradeMessageGroupRelationRepository.InsertRangeAsync(upgradeMessageGroupRelations),
-                    _inteEventTypePushRuleRepository.InsertRangeAsync(ruleEntities)
-                });
-                rows += rowArray.Sum();
-                trans.Complete();
+                    trans.Dispose();
+                }
+                else
+                {
+                    var rowArray = await Task.WhenAll(new List<Task<int>>() {
+                        _inteEventRepository.UpdateEventTypeIdAsync(eventCommand),
+                        _inteEventTypeMessageGroupRelationRepository.InsertRangeAsync(messageGroupEntities),
+                        _inteEventTypeUpgradeRepository.InsertRangeAsync(upgrades),
+                        _inteEventTypeUpgradeMessageGroupRelationRepository.InsertRangeAsync(upgradeMessageGroupRelations),
+                        _inteEventTypePushRuleRepository.InsertRangeAsync(ruleEntities)
+                    });
+                    rows += rowArray.Sum();
+                    trans.Complete();
+                }
             }
             return rows;
         }

@@ -117,6 +117,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("T.*");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            sqlBuilder.Where("T.SiteId = @SiteId");
+            sqlBuilder.Where("T.Type = @Type");
+            if (query.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("T.MaterialId = @MaterialId");
+            }
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("T.ProcedureId = @ProcedureId");
+            }
+            if (query.Status.HasValue)
+            {
+                sqlBuilder.Where("T.Status = @Status");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionEntity>(template.RawSql, query);
         }
@@ -236,7 +252,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM qual_ipqc_inspection /**where**/  ";
+                                           FROM qual_ipqc_inspection T /**where**/  ";
 
         const string IsExistSqlTemplate = "SELECT COUNT(1) FROM qual_ipqc_inspection qii LEFT JOIN qual_inspection_parameter_group qipg ON qii.InspectionParameterGroupId = qipg.Id /**where**/ ";
 

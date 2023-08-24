@@ -27,14 +27,13 @@ finally
 
 IHostBuilder CreateHostBuilder(string[] args) =>
 Host.CreateDefaultBuilder(args)
-   .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
+   .ConfigureServices((hostContext, services) =>
    {
-       //hostContext.Configuration.OnChange((configuration) =>
-       //{
-       //    NLog.LogManager.Configuration = new NLogLoggingConfiguration(configuration.GetSection("NLog"));
-       //});
+       services.AddLocalization();
+       services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
+       services.AddClearCacheService(hostContext.Configuration);
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        // Add the required Quartz.NET services
        services.AddQuartz(q =>
@@ -44,7 +43,6 @@ Host.CreateDefaultBuilder(args)
            #region jobs
 
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
-           //q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
 
            #endregion
            q.UsePersistentStore((persistentStoreOptions) =>
@@ -68,5 +66,5 @@ Host.CreateDefaultBuilder(args)
 
 
 
-   }));
+   });
 

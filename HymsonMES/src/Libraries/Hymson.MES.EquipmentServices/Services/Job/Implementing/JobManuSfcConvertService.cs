@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.Kafka.Debezium;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;

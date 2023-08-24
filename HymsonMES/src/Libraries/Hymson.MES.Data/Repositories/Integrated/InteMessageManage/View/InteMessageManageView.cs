@@ -49,6 +49,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public string EventTypeName { get; set; }
 
         /// <summary>
+        /// 事件id
+        /// </summary>
+        public long EventId { get; set; }
+
+        /// <summary>
         /// 事件名称
         /// </summary>
         public string? EventName { get; set; }

@@ -1,3 +1,4 @@
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 
 namespace Hymson.MES.Data.Repositories.Quality.Query
@@ -31,5 +32,18 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long? MaterialId { get; set; }
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 }
