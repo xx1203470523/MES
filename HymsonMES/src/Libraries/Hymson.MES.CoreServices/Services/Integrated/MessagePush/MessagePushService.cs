@@ -155,6 +155,9 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                     await SetMessageAsync(messageEntity, PushSceneEnum.Handle);
                     break;
                 case MessageStatusEnum.Close:
+                    // 发送即时消息
+                    await SetMessageAsync(messageEntity, PushSceneEnum.Close);
+                    break;
                 default:
                     break;
             }
@@ -230,8 +233,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 case PushSceneEnum.ReceiveUpgrade:
                 case PushSceneEnum.Handle:
                 case PushSceneEnum.HandleUpgrade:
-                    break;
                 case PushSceneEnum.Close:
+                    break;
                 default: return;
             }
 
@@ -397,6 +400,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (messageEntity.EventName != null) messagePushBo.EventName = messageEntity.EventName;
             if (messageEntity.UpdatedBy != null) messagePushBo.ReceiveUser = messageEntity.UpdatedBy;
             if (messageEntity.UpdatedOn != null) messagePushBo.ReceiveTime = $"{messageEntity.UpdatedOn.Value:yyyy-MM-dd HH:mm:ss}";
+            if (messageEntity.EvaluateBy != null) messagePushBo.EvaluateBy = messageEntity.EvaluateBy;
+            if (messageEntity.EvaluateOn != null) messagePushBo.EvaluateOn = messageEntity.EvaluateOn;
 
             return messagePushBo;
         }
