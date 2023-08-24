@@ -68,6 +68,11 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
+        /// 仓储接口（事件维护）
+        /// </summary>
+        private readonly IInteEventRepository _inteEventRepository;
+
+        /// <summary>
         /// 仓储接口（事件类型维护）
         /// </summary>
         private readonly IInteEventTypeRepository _inteEventTypeRepository;
@@ -104,6 +109,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="procResourceRepository"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="inteEventRepository"></param>
         /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
@@ -115,6 +121,7 @@ namespace Hymson.MES.Services.Services.Integrated
             IProcResourceRepository procResourceRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
+            IInteEventRepository inteEventRepository,
             IInteEventTypeRepository inteEventTypeRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
@@ -129,6 +136,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _procResourceRepository = procResourceRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _inteEventRepository = inteEventRepository;
             _inteEventTypeRepository = inteEventTypeRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
@@ -415,6 +423,9 @@ namespace Hymson.MES.Services.Services.Integrated
             if (inteMessageManageEntity == null) return null;
 
             var dto = inteMessageManageEntity.ToModel<InteMessageManageTriggerDto>();
+
+            //var eventEntity = await
+
             if (dto.ResourceId.HasValue)
             {
                 var resourceEntity = await _procResourceRepository.GetByIdAsync(dto.ResourceId.Value);
