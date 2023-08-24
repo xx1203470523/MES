@@ -22,7 +22,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.SerialNumber).Must(it => it != null && Enum.IsDefined(typeof(MaterialSerialNumberEnum), it)).WithErrorCode(ErrorCode.MES10227);
             RuleFor(x => x.Batch).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES10228));
             RuleFor(x => x.BuyType).Must(it => it != null && Enum.IsDefined(typeof(MaterialBuyTypeEnum), it)).WithErrorCode(ErrorCode.MES10229);
-            RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10230);
+            //RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10230);
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(ErrorCode.MES10231);
 
         }
@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.SerialNumber).Must(it => it != null && Enum.IsDefined(typeof(MaterialSerialNumberEnum), it)).WithErrorCode(ErrorCode.MES10227);
             RuleFor(x => x.Batch).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES10228));
             RuleFor(x => x.BuyType).Must(it => it != null && Enum.IsDefined(typeof(MaterialBuyTypeEnum), it)).WithErrorCode(ErrorCode.MES10229);
-            RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10230);
+            //RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES10230);
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(ErrorCode.MES10231);
         }
     }

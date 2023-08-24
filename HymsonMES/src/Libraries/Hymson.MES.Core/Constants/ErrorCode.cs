@@ -31,6 +31,12 @@
         public const string MES10122 = "版本不允许有空格";
         public const string MES10123 = "启用状态不允许修改";
         public const string MES10124 = "启用状态只能修改为保留或废除";
+        public const string MES10125 = "变更状态的ID不能为空";
+        public const string MES10126 = "变更状态的状态不合法";
+        public const string MES10127 = "状态已经是[{status}],无法重复设置";
+        public const string MES10128 = "变更状态的状态不能为新建";
+        public const string MES10129 = "只有新建或者保留才能编辑";
+
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
