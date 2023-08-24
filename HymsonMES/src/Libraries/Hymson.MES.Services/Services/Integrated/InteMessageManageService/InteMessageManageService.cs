@@ -413,7 +413,10 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Status = MessageStatusEnum.Close;
             entity.EvaluateRemark = dto.EvaluateRemark;
 
-            return await _inteMessageManageRepository.CloseAsync(entity); ;
+            var rows = await _inteMessageManageRepository.CloseAsync(entity);
+            if (rows > 0) await _messagePushService.Push(entity);
+
+            return rows;
         }
 
         /// <summary>
