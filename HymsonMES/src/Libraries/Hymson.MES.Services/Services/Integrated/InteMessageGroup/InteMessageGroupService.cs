@@ -130,9 +130,16 @@ namespace Hymson.MES.Services.Services.Integrated
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _inteMessageGroupRepository.InsertAsync(entity);
-                rows += await _inteMessageGroupPushMethodRepository.InsertRangeAsync(details);
-                trans.Complete();
+                rows = await _inteMessageGroupRepository.InsertAsync(entity);
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                }
+                else
+                {
+                    rows += await _inteMessageGroupPushMethodRepository.InsertRangeAsync(details);
+                    trans.Complete();
+                }
             }
             return rows;
         }

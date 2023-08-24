@@ -9,18 +9,17 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Process.ProcessRoute;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -43,12 +42,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<QualIpqcInspectionHeadSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<List<QualIpqcInspectionHeadSampleCreateDto>> _validationSampleAddRules;
 
         /// <summary>
         /// 仓储接口（首检检验单）
         /// </summary>
         private readonly IQualIpqcInspectionHeadRepository _qualIpqcInspectionHeadRepository;
         private readonly IQualIpqcInspectionHeadResultRepository _qualIpqcInspectionHeadResultRepository;
+        private readonly IQualIpqcInspectionHeadSampleRepository _qualIpqcInspectionHeadSampleRepository;
         private readonly IQualIpqcInspectionRepository _qualIpqcInspectionRepository;
         private readonly IQualIpqcInspectionRuleRepository _qualIpqcInspectionRuleRepository;
         private readonly IQualIpqcInspectionRuleResourceRelationRepository _qualIpqcInspectionRuleResourceRelationRepository;
@@ -58,6 +59,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         private readonly ISequenceService _sequenceService;
@@ -67,8 +69,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         public QualIpqcInspectionHeadService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIpqcInspectionHeadSaveDto> validationSaveRules,
+            AbstractValidator<List<QualIpqcInspectionHeadSampleCreateDto>> validationSampleAddRules,
             IQualIpqcInspectionHeadRepository qualIpqcInspectionHeadRepository,
             IQualIpqcInspectionHeadResultRepository qualIpqcInspectionHeadResultRepository,
+            IQualIpqcInspectionHeadSampleRepository qualIpqcInspectionHeadSampleRepository,
             IQualIpqcInspectionRepository qualIpqcInspectionRepository,
             IQualIpqcInspectionRuleRepository qualIpqcInspectionRuleRepository,
             IQualIpqcInspectionRuleResourceRelationRepository qualIpqcInspectionRuleResourceRelationRepository,
@@ -78,14 +82,17 @@ namespace Hymson.MES.Services.Services.Quality
             IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository procResourceRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
+            IEquEquipmentRepository equEquipmentRepository,
             IProcMaterialRepository procMaterialRepository,
             ISequenceService sequenceService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
+            _validationSampleAddRules = validationSampleAddRules;
             _qualIpqcInspectionHeadRepository = qualIpqcInspectionHeadRepository;
             _qualIpqcInspectionHeadResultRepository = qualIpqcInspectionHeadResultRepository;
+            _qualIpqcInspectionHeadSampleRepository = qualIpqcInspectionHeadSampleRepository;
             _qualIpqcInspectionRepository = qualIpqcInspectionRepository;
             _qualIpqcInspectionRuleRepository = qualIpqcInspectionRuleRepository;
             _qualIpqcInspectionRuleResourceRelationRepository = qualIpqcInspectionRuleResourceRelationRepository;
@@ -95,6 +102,7 @@ namespace Hymson.MES.Services.Services.Quality
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
+            _equEquipmentRepository = equEquipmentRepository;
             _procMaterialRepository = procMaterialRepository;
 
             _sequenceService = sequenceService;
@@ -209,7 +217,7 @@ namespace Hymson.MES.Services.Services.Quality
             };
             var resultEntity = new QualIpqcInspectionHeadResultEntity
             {
-                Id = IdGenProvider.Instance.CreateId(),
+                Id = entity.Id,
                 SiteId = entity.SiteId,
                 IpqcInspectionHeadId = entity.Id,
                 IsQualified = null,
@@ -425,14 +433,6 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIpqcInspectionHeadPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _qualIpqcInspectionHeadRepository.GetPagedListAsync(pagedQuery);
-            if (pagedInfo != null && !pagedInfo.Data.IsNullOrEmpty())
-            {
-                var materisls = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.MaterialId).Distinct());
-                if (!materisls.IsNullOrEmpty())
-                {
-
-                }
-            }
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<QualIpqcInspectionHeadDto>());
@@ -485,5 +485,153 @@ namespace Hymson.MES.Services.Services.Quality
             return rows;
         }
 
+        /// <summary>
+        /// 样品检验数据录入
+        /// </summary>
+        /// <param name="dataList"></param>
+        /// <returns></returns>
+        public async Task<int> InsertSampleDataAsync(List<QualIpqcInspectionHeadSampleCreateDto> dataList)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+
+            // 验证DTO
+            await _validationSampleAddRules.ValidateAndThrowAsync(dataList);
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            var entitys = dataList.Select(item =>
+            {
+                var entity = item.ToEntity<QualIpqcInspectionHeadSampleEntity>();
+                entity.Id = IdGenProvider.Instance.CreateId();
+                entity.SiteId = _currentSite.SiteId ?? 0;
+                entity.CreatedBy = updatedBy;
+                entity.CreatedOn = updatedOn;
+                entity.UpdatedBy = updatedBy;
+                entity.UpdatedOn = updatedOn;
+                return entity;
+            });
+
+            return await _qualIpqcInspectionHeadSampleRepository.InsertRangeAsync(entitys);
+        }
+
+        /// <summary>
+        /// 样品检验数据修改
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSampleDataAsync(QualIpqcInspectionHeadSampleUpdateDto param)
+        {
+            var entity = await _qualIpqcInspectionHeadSampleRepository.GetByIdAsync(param.Id);
+            if (entity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            //校验检验单状态
+            var mainEntity = await _qualIpqcInspectionHeadRepository.GetByIdAsync(entity.IpqcInspectionHeadId);
+            if (mainEntity != null && (mainEntity.Status == InspectionStatusEnum.Completed || mainEntity.Status == InspectionStatusEnum.Closed))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13229));
+            }
+
+            entity.InspectionValue = param.InspectionValue;
+            entity.IsQualified = param.IsQualified;
+            entity.Remark = param.Remark;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
+
+            return await _qualIpqcInspectionHeadSampleRepository.UpdateAsync(entity);
+        }
+
+        /// <summary>
+        /// 检验完成
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> CompleteAsync(StatusChangeDto dto)
+        {
+            var entityTask = _qualIpqcInspectionHeadRepository.GetByIdAsync(dto.Id);
+            var resultEntityTask = _qualIpqcInspectionHeadResultRepository.GetCurrentEntityByMainIdAsync(dto.Id);
+            var entity = await entityTask;
+            var resultEntity = await resultEntityTask;
+            if (entity == null || resultEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            if (entity.Status != InspectionStatusEnum.Inspecting || resultEntity.Status != InspectionStatusEnum.Inspecting)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13230));
+            }
+            //获取已检样本数据
+            var samples = await _qualIpqcInspectionHeadSampleRepository.GetEntitiesAsync(new QualIpqcInspectionHeadSampleQuery { IpqcInspectionHeadId = dto.Id });
+            if (samples.IsNullOrEmpty() || samples.Select(x => x.Barcode).Distinct().Count() < entity.SampleQty)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13231));
+            }
+
+            entity.IsQualified = samples.Any(x => x.IsQualified != TrueOrFalseEnum.Yes) ? TrueOrFalseEnum.No : TrueOrFalseEnum.Yes;
+            entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
+
+            resultEntity.IsQualified = entity.IsQualified;
+            resultEntity.Status = entity.Status;
+            resultEntity.UpdatedBy = entity.UpdatedBy;
+            resultEntity.UpdatedOn = entity.UpdatedOn;
+
+            // 保存
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _qualIpqcInspectionHeadRepository.UpdateAsync(entity);
+                rows += await _qualIpqcInspectionHeadResultRepository.UpdateAsync(resultEntity);
+            }
+
+            return rows;
+        }
+
+        /// <summary>
+        /// 不合格处理
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> UnqualifiedHandleAsync(UnqualifiedHandleDto dto)
+        {
+            var entityTask = _qualIpqcInspectionHeadRepository.GetByIdAsync(dto.Id);
+            var resultEntityTask = _qualIpqcInspectionHeadResultRepository.GetCurrentEntityByMainIdAsync(dto.Id);
+            var entity = await entityTask;
+            var resultEntity = await resultEntityTask;
+            if (entity == null || resultEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            if (entity.Status != InspectionStatusEnum.Completed || resultEntity.Status != InspectionStatusEnum.Completed)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13230));
+            }
+
+            entity.Status = InspectionStatusEnum.Closed;
+            entity.UpdatedBy = _currentUser.UserName;
+            entity.UpdatedOn = HymsonClock.Now();
+
+            resultEntity.Status = entity.Status;
+            resultEntity.HandMethod = dto.HandMethod;
+            resultEntity.ProcessedBy = _currentUser.UserName;
+            resultEntity.ProcessedOn = entity.UpdatedOn;
+            resultEntity.UpdatedBy = entity.UpdatedBy;
+            resultEntity.UpdatedOn = entity.UpdatedOn;
+
+            // 保存
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _qualIpqcInspectionHeadRepository.UpdateAsync(entity);
+                rows += await _qualIpqcInspectionHeadResultRepository.UpdateAsync(resultEntity);
+            }
+
+            return rows;
+        }
     }
 }

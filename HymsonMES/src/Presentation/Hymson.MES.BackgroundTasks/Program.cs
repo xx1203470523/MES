@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
+using System;
 using System.Reflection;
 
 try
@@ -27,9 +28,9 @@ finally
 
 IHostBuilder CreateHostBuilder(string[] args) =>
 Host.CreateDefaultBuilder(args)
-   .ConfigureServices((Action<HostBuilderContext, IServiceCollection>)((hostContext, services) =>
+   .ConfigureServices((hostContext, services) =>
    {
-       
+       services.AddLocalization();
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
@@ -43,7 +44,6 @@ Host.CreateDefaultBuilder(args)
            #region jobs
 
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
-           //q.AddJobAndTrigger<HelloWorld2Job>(hostContext.Configuration);
 
            #endregion
            q.UsePersistentStore((persistentStoreOptions) =>
@@ -58,7 +58,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
        });
-
+       
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
        services.AddHostedService<SubHostedService>();
 
@@ -67,5 +67,5 @@ Host.CreateDefaultBuilder(args)
 
 
 
-   }));
+   });
 

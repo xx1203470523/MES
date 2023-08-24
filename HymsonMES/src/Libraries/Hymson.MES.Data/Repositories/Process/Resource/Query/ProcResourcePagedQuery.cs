@@ -77,6 +77,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 设备编码
         /// </summary>
         public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 资源类型Id
+        /// </summary>
+        public long? ResTypeId { get; set; }
     }
 
     /// <summary>

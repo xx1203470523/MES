@@ -512,7 +512,7 @@ namespace Hymson.MES.Services.Services.Process
             var procedureIds = new List<long> { };
             IEnumerable<ProcProcedureEntity> procProcedureEntities = new List<ProcProcedureEntity>();
             procedureIds.AddRange(sortingRuleDetailEntities.Select(a => a.ProcedureId).ToArray());
-            var procedureIdList = parameterIds.Distinct().ToArray();
+            var procedureIdList = procedureIds.Distinct().ToArray();
             if (procedureIdList.Any())
             {
                 procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIdList);

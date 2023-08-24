@@ -154,5 +154,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcResourceEntity>> GetByEquipmentIdsAsync(ProcResourceByEquipmentIdsQuery query);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="procResourceQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetProcResouceEntitiesAsync(ProcResourceQuery procResourceQuery);
     }
 }

@@ -74,5 +74,15 @@
         /// 接收时间
         /// </summary>
         public string ReceiveTime { get; set; } = "";
+
+        /// <summary>
+        /// 评价时间
+        /// </summary>
+        public string EvaluateOn { get; set; } = "";
+
+        /// <summary>
+        /// 评价人
+        /// </summary>
+        public string EvaluateBy { get; set; } = "";
     }
 }
