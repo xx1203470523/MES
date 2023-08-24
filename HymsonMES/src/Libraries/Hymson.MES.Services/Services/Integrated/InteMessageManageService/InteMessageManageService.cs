@@ -172,6 +172,13 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedOn = updatedOn;
             entity.Status = MessageStatusEnum.Trigger;
 
+            // 判断事件类型是否是自动关闭
+            var eventEntity = await _inteEventRepository.GetByIdAsync(entity.EventId);
+            if (eventEntity != null && eventEntity.IsAutoClose == DisableOrEnableEnum.Enable)
+            {
+                entity.Status = MessageStatusEnum.Close;
+            }
+
             // 保存
             var rows = await _inteMessageManageRepository.InsertAsync(entity);
             if (rows > 0) await _messagePushService.Push(entity);
@@ -276,9 +283,6 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 entity.HandleDuration = Math.Ceiling((updatedOn - entity.ReceivedOn.Value).TotalMinutes);
             }
-
-            // 判断事件类型是否是自动关闭
-            // TODO 
 
             // 附件处理
             List<InteAttachmentEntity> attachmentEntities = new();
