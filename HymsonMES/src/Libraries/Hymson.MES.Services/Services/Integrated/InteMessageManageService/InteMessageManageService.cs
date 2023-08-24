@@ -405,7 +405,7 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.EvaluateBy = updatedBy;
-            entity.EvaluateOn = updatedOn;
+            entity.EvaluateOn = $"{updatedOn:yyyy-MM-dd HH:mm:ss}";
             entity.Status = MessageStatusEnum.Close;
             entity.EvaluateRemark = dto.EvaluateRemark;
 

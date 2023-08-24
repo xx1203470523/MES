@@ -135,7 +135,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 评价时间
         /// </summary>
-        public DateTime? EvaluateOn { get; set; }
+        public string? EvaluateOn { get; set; }
 
         /// <summary>
         /// 评价人
