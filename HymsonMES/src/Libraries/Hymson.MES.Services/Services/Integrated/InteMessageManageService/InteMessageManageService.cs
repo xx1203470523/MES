@@ -424,7 +424,8 @@ namespace Hymson.MES.Services.Services.Integrated
 
             var dto = inteMessageManageEntity.ToModel<InteMessageManageTriggerDto>();
 
-            //var eventEntity = await
+            var eventEntity = await _inteEventRepository.GetByIdAsync(dto.EventId);
+            if (eventEntity != null) dto.EventName = eventEntity.Name;
 
             if (dto.ResourceId.HasValue)
             {
@@ -518,6 +519,9 @@ namespace Hymson.MES.Services.Services.Integrated
             foreach (var item in pagedInfo.Data)
             {
                 var dto = item.ToModel<InteMessageManageDto>();
+
+                var eventEntity = await _inteEventRepository.GetByIdAsync(dto.EventId);
+                if (eventEntity != null) dto.EventName = eventEntity.Name;
 
                 var workShopEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.WorkShopId);
                 if (workShopEntity != null) dto.WorkShopName = workShopEntity.Name;
