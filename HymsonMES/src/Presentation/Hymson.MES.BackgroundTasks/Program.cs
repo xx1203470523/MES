@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
+using System;
 using System.Reflection;
 
 try
@@ -57,7 +58,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
        });
-
+       
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
        services.AddHostedService<SubHostedService>();
 
