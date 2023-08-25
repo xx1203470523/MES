@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 设备参数组    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-08-02 01:48:35
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;

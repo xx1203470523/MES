@@ -154,9 +154,16 @@ namespace Hymson.MES.Services.Services.Quality
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _qualEnvParameterGroupRepository.InsertAsync(entity);
-                rows += await _qualEnvParameterGroupDetailRepository.InsertRangeAsync(details);
-                trans.Complete();
+                rows = await _qualEnvParameterGroupRepository.InsertAsync(entity);
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                }
+                else
+                {
+                    rows += await _qualEnvParameterGroupDetailRepository.InsertRangeAsync(details);
+                    trans.Complete();
+                }
             }
             return rows;
         }
