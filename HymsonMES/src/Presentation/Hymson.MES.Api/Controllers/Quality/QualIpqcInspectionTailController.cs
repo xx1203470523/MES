@@ -8,83 +8,83 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
-    /// 控制器（首检检验单）
+    /// 控制器（尾检检验单）
     /// @author xiaofei
-    /// @date 2023-08-21 06:10:55
+    /// @date 2023-08-24 10:52:02
     /// </summary>
     [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class QualIpqcInspectionHeadController : ControllerBase
+    public class QualIpqcInspectionTailController : ControllerBase
     {
         /// <summary>
         /// 日志
         /// </summary>
-        private readonly ILogger<QualIpqcInspectionHeadController> _logger;
+        private readonly ILogger<QualIpqcInspectionTailController> _logger;
         /// <summary>
-        /// 服务接口（首检检验单）
+        /// 服务接口（尾检检验单）
         /// </summary>
-        private readonly IQualIpqcInspectionHeadService _qualIpqcInspectionHeadService;
+        private readonly IQualIpqcInspectionTailService _qualIpqcInspectionTailService;
 
 
         /// <summary>
-        /// 构造函数（首检检验单）
+        /// 构造函数（尾检检验单）
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="qualIpqcInspectionHeadService"></param>
-        public QualIpqcInspectionHeadController(ILogger<QualIpqcInspectionHeadController> logger, IQualIpqcInspectionHeadService qualIpqcInspectionHeadService)
+        /// <param name="qualIpqcInspectionTailService"></param>
+        public QualIpqcInspectionTailController(ILogger<QualIpqcInspectionTailController> logger, IQualIpqcInspectionTailService qualIpqcInspectionTailService)
         {
             _logger = logger;
-            _qualIpqcInspectionHeadService = qualIpqcInspectionHeadService;
+            _qualIpqcInspectionTailService = qualIpqcInspectionTailService;
         }
 
         /// <summary>
-        /// 添加（首检检验单）
+        /// 添加（尾检检验单）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        [PermissionDescription("quality:ipqcInspectionHead:insert")]
-        public async Task AddAsync([FromBody] QualIpqcInspectionHeadSaveDto saveDto)
+        [PermissionDescription("quality:ipqcInspectionTail:insert")]
+        public async Task AddAsync([FromBody] QualIpqcInspectionTailSaveDto saveDto)
         {
-            await _qualIpqcInspectionHeadService.CreateAsync(saveDto);
+            await _qualIpqcInspectionTailService.CreateAsync(saveDto);
         }
 
         /// <summary>
-        /// 删除（首检检验单）
+        /// 删除（尾检检验单）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        [PermissionDescription("quality:ipqcInspectionHead:delete")]
+        [PermissionDescription("quality:ipqcInspectionTail:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
-            await _qualIpqcInspectionHeadService.DeletesAsync(ids);
+            await _qualIpqcInspectionTailService.DeletesAsync(ids);
         }
 
         /// <summary>
-        /// 查询详情（首检检验单）
+        /// 查询详情（尾检检验单）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<QualIpqcInspectionHeadDto?> QueryByIdAsync(long id)
+        public async Task<QualIpqcInspectionTailDto?> QueryByIdAsync(long id)
         {
-            return await _qualIpqcInspectionHeadService.QueryByIdAsync(id);
+            return await _qualIpqcInspectionTailService.QueryByIdAsync(id);
         }
 
         /// <summary>
-        /// 分页查询列表（首检检验单）
+        /// 分页查询列表（尾检检验单）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<QualIpqcInspectionHeadDto>> QueryPagedListAsync([FromQuery] QualIpqcInspectionHeadPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<QualIpqcInspectionTailDto>> QueryPagedListAsync([FromQuery] QualIpqcInspectionTailPagedQueryDto pagedQueryDto)
         {
-            return await _qualIpqcInspectionHeadService.GetPagedListAsync(pagedQueryDto);
+            return await _qualIpqcInspectionTailService.GetPagedListAsync(pagedQueryDto);
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("execute")]
-        [PermissionDescription("quality:ipqcInspectionHead:execute")]
+        [PermissionDescription("quality:ipqcInspectionTail:execute")]
         public async Task ExecuteAsync([FromBody] StatusChangeDto updateDto)
         {
-            await _qualIpqcInspectionHeadService.ExecuteAsync(updateDto);
+            await _qualIpqcInspectionTailService.ExecuteAsync(updateDto);
         }
 
         /// <summary>
@@ -107,10 +107,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("sampleAdd")]
-        [PermissionDescription("quality:ipqcInspectionHead:sampleAdd")]
-        public async Task InsertSampleDataAsync([FromBody] List<QualIpqcInspectionHeadSampleCreateDto> dto)
+        [PermissionDescription("quality:ipqcInspectionTail:sampleAdd")]
+        public async Task InsertSampleDataAsync([FromBody] List<QualIpqcInspectionTailSampleCreateDto> dto)
         {
-            await _qualIpqcInspectionHeadService.InsertSampleDataAsync(dto);
+            await _qualIpqcInspectionTailService.InsertSampleDataAsync(dto);
         }
 
         /// <summary>
@@ -120,10 +120,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("sampleUpdate")]
-        [PermissionDescription("quality:ipqcInspectionHead:sampleUpdate")]
-        public async Task UpdateSampleDataAsync([FromBody] QualIpqcInspectionHeadSampleUpdateDto dto)
+        [PermissionDescription("quality:ipqcInspectionTail:sampleUpdate")]
+        public async Task UpdateSampleDataAsync([FromBody] QualIpqcInspectionTailSampleUpdateDto dto)
         {
-            await _qualIpqcInspectionHeadService.UpdateSampleDataAsync(dto);
+            await _qualIpqcInspectionTailService.UpdateSampleDataAsync(dto);
         }
 
         /// <summary>
@@ -133,10 +133,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("complete")]
-        [PermissionDescription("quality:ipqcInspectionHead:complete")]
+        [PermissionDescription("quality:ipqcInspectionTail:complete")]
         public async Task CompleteAsync([FromBody] StatusChangeDto dto)
         {
-            await _qualIpqcInspectionHeadService.CompleteAsync(dto);
+            await _qualIpqcInspectionTailService.CompleteAsync(dto);
         }
 
         /// <summary>
@@ -146,10 +146,10 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("unqualifiedHandle")]
-        [PermissionDescription("quality:ipqcInspectionHead:unqualifiedHandle")]
+        [PermissionDescription("quality:ipqcInspectionTail:unqualifiedHandle")]
         public async Task UnqualifiedHandleAsync([FromBody] UnqualifiedHandleDto dto)
         {
-            await _qualIpqcInspectionHeadService.UnqualifiedHandleAsync(dto);
+            await _qualIpqcInspectionTailService.UnqualifiedHandleAsync(dto);
         }
 
     }
