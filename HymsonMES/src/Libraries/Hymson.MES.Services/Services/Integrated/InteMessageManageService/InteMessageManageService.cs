@@ -73,11 +73,6 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteEventRepository _inteEventRepository;
 
         /// <summary>
-        /// 仓储接口（事件类型维护）
-        /// </summary>
-        private readonly IInteEventTypeRepository _inteEventTypeRepository;
-
-        /// <summary>
         /// 仓储接口（附件）
         /// </summary>
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
@@ -110,7 +105,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="inteEventRepository"></param>
-        /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
         /// <param name="inteMessageManageAnalysisReportAttachmentRepository"></param>
@@ -122,7 +116,6 @@ namespace Hymson.MES.Services.Services.Integrated
             IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IInteEventRepository inteEventRepository,
-            IInteEventTypeRepository inteEventTypeRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
             IInteMessageManageAnalysisReportAttachmentRepository inteMessageManageAnalysisReportAttachmentRepository,
@@ -137,7 +130,6 @@ namespace Hymson.MES.Services.Services.Integrated
             _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _inteEventRepository = inteEventRepository;
-            _inteEventTypeRepository = inteEventTypeRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteMessageManageAnalysisReportAttachmentRepository = inteMessageManageAnalysisReportAttachmentRepository;

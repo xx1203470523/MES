@@ -42,9 +42,9 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         private readonly IInteMessageGroupPushMethodRepository _inteMessageGroupPushMethodRepository;
 
         /// <summary>
-        /// 仓储接口（事件类型关联群组）
+        /// 仓储接口（事件维护）
         /// </summary>
-        private readonly IInteEventTypeMessageGroupRelationRepository _inteEventTypeMessageGroupRelationRepository;
+        private readonly IInteEventRepository _inteEventRepository;
 
         /// <summary>
         /// 仓储接口（事件类型维护）
@@ -60,6 +60,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// 仓储接口（事件类型推送规则）
         /// </summary>
         private readonly IInteEventTypePushRuleRepository _inteEventTypePushRuleRepository;
+
+        /// <summary>
+        /// 仓储接口（事件类型关联群组）
+        /// </summary>
+        private readonly IInteEventTypeMessageGroupRelationRepository _inteEventTypeMessageGroupRelationRepository;
 
         /// <summary>
         /// 仓储接口（消息管理）
@@ -90,17 +95,19 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <param name="messageTemplateRepository"></param>
         /// <param name="inteMessageGroupPushMethodRepository"></param>
         /// <param name="inteEventTypeMessageGroupRelationRepository"></param>
+        /// <param name="inteEventRepository"></param>
         /// <param name="inteEventTypeRepository"></param>
         /// <param name="inteEventTypeUpgradeRepository"></param>
         /// <param name="inteEventTypePushRuleRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
-        /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="equEquipmentRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
         public MessagePushService(IMessageService messageService, IEventBus<EventBusInstance1> eventBus,
             IMessageTemplateRepository messageTemplateRepository,
             IInteMessageGroupPushMethodRepository inteMessageGroupPushMethodRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
+            IInteEventRepository inteEventRepository,
             IInteEventTypeRepository inteEventTypeRepository,
             IInteEventTypeUpgradeRepository inteEventTypeUpgradeRepository,
             IInteEventTypePushRuleRepository inteEventTypePushRuleRepository,
@@ -113,10 +120,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             _eventBus = eventBus;
             _messageTemplateRepository = messageTemplateRepository;
             _inteMessageGroupPushMethodRepository = inteMessageGroupPushMethodRepository;
-            _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
+            _inteEventRepository = inteEventRepository;
             _inteEventTypeRepository = inteEventTypeRepository;
             _inteEventTypeUpgradeRepository = inteEventTypeUpgradeRepository;
             _inteEventTypePushRuleRepository = inteEventTypePushRuleRepository;
+            _inteEventTypeMessageGroupRelationRepository = inteEventTypeMessageGroupRelationRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procResourceRepository = procResourceRepository;
@@ -384,6 +392,9 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 TriggerUser = messageEntity.CreatedBy,
                 TriggerTime = $"{messageEntity.CreatedOn:yyyy-MM-dd HH:mm:ss}",
             };
+
+            var eventEntity = await _inteEventRepository.GetByIdAsync(messageEntity.EventId);
+            if (eventEntity != null) messagePushBo.EventName = eventEntity.Name;
 
             if (messageEntity.ResourceId.HasValue)
             {
