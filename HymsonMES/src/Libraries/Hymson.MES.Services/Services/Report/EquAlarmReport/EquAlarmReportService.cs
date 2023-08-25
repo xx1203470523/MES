@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
             return new ExportResultDto
             {
                 FileName = fileName,
-                Path = uploadResult.AbsoluteUrl,
+                Path = uploadResult.RelativeUrl,
             };
         }
     }
