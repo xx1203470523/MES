@@ -16,13 +16,6 @@ namespace Hymson.MES.Services.Services.Quality
         Task<int> CreateAsync(QualIpqcInspectionTailSaveDto saveDto);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
@@ -77,5 +70,19 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<int> UnqualifiedHandleAsync(UnqualifiedHandleDto dto);
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> AttachmentAddAsync(AttachmentAddDto dto);
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> AttachmentDeleteAsync(long[] ids);
     }
 }

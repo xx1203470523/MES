@@ -8,9 +8,9 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     public class QualIpqcInspectionPatrolSamplePagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点Id
+        /// 检验单Id
         /// </summary>
-        public long SiteId { get; set; }
+        public long InspectionOrderId { get; set; }
 
     }
 }

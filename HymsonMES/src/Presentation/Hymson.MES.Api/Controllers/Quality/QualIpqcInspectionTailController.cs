@@ -152,5 +152,31 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualIpqcInspectionTailService.UnqualifiedHandleAsync(dto);
         }
 
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("attachmentAdd")]
+        [PermissionDescription("quality:ipqcInspectionTail:attachmentAdd")]
+        public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
+        {
+            await _qualIpqcInspectionTailService.AttachmentAddAsync(dto);
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("attachmentDelete")]
+        [PermissionDescription("quality:ipqcInspectionTail:attachmentDelete")]
+        public async Task AttachmentDeleteAsync([FromBody] long[] ids)
+        {
+            await _qualIpqcInspectionTailService.AttachmentDeleteAsync(ids);
+        }
+
     }
 }

@@ -5,11 +5,13 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -50,6 +52,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIpqcInspectionHeadRepository _qualIpqcInspectionHeadRepository;
         private readonly IQualIpqcInspectionHeadResultRepository _qualIpqcInspectionHeadResultRepository;
         private readonly IQualIpqcInspectionHeadSampleRepository _qualIpqcInspectionHeadSampleRepository;
+        private readonly IQualIpqcInspectionHeadAnnexRepository _qualIpqcInspectionHeadAnnexRepository;
         private readonly IQualIpqcInspectionRepository _qualIpqcInspectionRepository;
         private readonly IQualIpqcInspectionRuleRepository _qualIpqcInspectionRuleRepository;
         private readonly IQualIpqcInspectionRuleResourceRelationRepository _qualIpqcInspectionRuleResourceRelationRepository;
@@ -61,6 +64,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
 
         private readonly ISequenceService _sequenceService;
 
@@ -73,6 +77,7 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIpqcInspectionHeadRepository qualIpqcInspectionHeadRepository,
             IQualIpqcInspectionHeadResultRepository qualIpqcInspectionHeadResultRepository,
             IQualIpqcInspectionHeadSampleRepository qualIpqcInspectionHeadSampleRepository,
+            IQualIpqcInspectionHeadAnnexRepository qualIpqcInspectionHeadAnnexRepository,
             IQualIpqcInspectionRepository qualIpqcInspectionRepository,
             IQualIpqcInspectionRuleRepository qualIpqcInspectionRuleRepository,
             IQualIpqcInspectionRuleResourceRelationRepository qualIpqcInspectionRuleResourceRelationRepository,
@@ -84,6 +89,7 @@ namespace Hymson.MES.Services.Services.Quality
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IProcMaterialRepository procMaterialRepository,
+            IInteAttachmentRepository inteAttachmentRepository,
             ISequenceService sequenceService)
         {
             _currentUser = currentUser;
@@ -93,6 +99,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualIpqcInspectionHeadRepository = qualIpqcInspectionHeadRepository;
             _qualIpqcInspectionHeadResultRepository = qualIpqcInspectionHeadResultRepository;
             _qualIpqcInspectionHeadSampleRepository = qualIpqcInspectionHeadSampleRepository;
+            _qualIpqcInspectionHeadAnnexRepository = qualIpqcInspectionHeadAnnexRepository;
             _qualIpqcInspectionRepository = qualIpqcInspectionRepository;
             _qualIpqcInspectionRuleRepository = qualIpqcInspectionRuleRepository;
             _qualIpqcInspectionRuleResourceRelationRepository = qualIpqcInspectionRuleResourceRelationRepository;
@@ -104,6 +111,7 @@ namespace Hymson.MES.Services.Services.Quality
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _procMaterialRepository = procMaterialRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
 
             _sequenceService = sequenceService;
         }
@@ -642,5 +650,67 @@ namespace Hymson.MES.Services.Services.Quality
 
             return rows;
         }
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> AttachmentAddAsync(AttachmentAddDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            var attachments = dto.Attachments.Select(x => new InteAttachmentEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Name = x.Name,
+                Path = x.Path,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+
+            var annexs = attachments.Select(x => new QualIpqcInspectionHeadAnnexEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                IpqcInspectionHeadId = dto.Id,
+                AnnexId = x.Id,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+
+            int rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteAttachmentRepository.InsertRangeAsync(attachments);
+                rows += await _qualIpqcInspectionHeadAnnexRepository.InsertRangeAsync(annexs);
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> AttachmentDeleteAsync(long[] ids)
+        {
+            return await _qualIpqcInspectionHeadAnnexRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = ids,
+                DeleteOn = HymsonClock.Now(),
+                UserId = _currentUser.UserName
+            });
+        }
+
     }
 }

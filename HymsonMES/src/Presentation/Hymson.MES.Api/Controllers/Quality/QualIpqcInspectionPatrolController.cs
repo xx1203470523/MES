@@ -48,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [PermissionDescription("quality:ipqcInspectionPatrol:insert")]
         public async Task AddAsync([FromBody] QualIpqcInspectionPatrolSaveDto saveDto)
         {
-             await _qualIpqcInspectionPatrolService.CreateAsync(saveDto);
+            await _qualIpqcInspectionPatrolService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -150,6 +150,32 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task UnqualifiedHandleAsync([FromBody] UnqualifiedHandleDto dto)
         {
             await _qualIpqcInspectionPatrolService.UnqualifiedHandleAsync(dto);
+        }
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("attachmentAdd")]
+        [PermissionDescription("quality:ipqcInspectionPatrol:attachmentAdd")]
+        public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
+        {
+            await _qualIpqcInspectionPatrolService.AttachmentAddAsync(dto);
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("attachmentDelete")]
+        [PermissionDescription("quality:ipqcInspectionPatrol:attachmentDelete")]
+        public async Task AttachmentDeleteAsync([FromBody] long[] ids)
+        {
+            await _qualIpqcInspectionPatrolService.AttachmentDeleteAsync(ids);
         }
 
     }

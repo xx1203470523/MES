@@ -70,5 +70,19 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<int> UnqualifiedHandleAsync(UnqualifiedHandleDto dto);
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> AttachmentAddAsync(AttachmentAddDto dto);
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> AttachmentDeleteAsync(long[] ids);
     }
 }

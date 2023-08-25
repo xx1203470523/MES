@@ -88,12 +88,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 是否合格;0、不合格 1、合格
         /// </summary>
-        public bool? IsQualified { get; set; }
+        public TrueOrFalseEnum? IsQualified { get; set; }
 
         /// <summary>
         /// 状态;1、待检验2、检验中3、已检验4、已关闭
         /// </summary>
-        public bool Status { get; set; }
+        public InspectionStatusEnum Status { get; set; }
 
         /// <summary>
         /// 报检人
@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 不合格处理方式;1、让步 2、？
         /// </summary>
-        public bool? HandMethod { get; set; }
+        public HandMethodEnum? HandMethod { get; set; }
 
         /// <summary>
         /// 处理人
@@ -161,6 +161,75 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long IsDeleted { get; set; }
 
 
+        /// <summary>
+        /// 工单编号
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 工作中心（产线）
+        /// </summary>
+        public string WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 生成条件
+        /// </summary>
+        public int GenerateCondition { get; set; }
+
+        /// <summary>
+        /// 生成条件单位;1、小时 2、班次 3、批次 4、罐 5、卷
+        /// </summary>
+        public GenerateConditionUnitEnum GenerateConditionUnit { get; set; }
+
+        /// <summary>
+        /// 管控时间
+        /// </summary>
+        public int? ControlTime { get; set; }
+
+        /// <summary>
+        /// 管控时间单位;1、时 2、分
+        /// </summary>
+        public ControlTimeUnitEnum? ControlTimeUnit { get; set; }
     }
 
     /// <summary>

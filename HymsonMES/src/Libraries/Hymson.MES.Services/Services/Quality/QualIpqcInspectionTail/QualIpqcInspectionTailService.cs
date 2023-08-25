@@ -5,10 +5,14 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
@@ -17,6 +21,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -46,24 +51,36 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         private readonly IQualIpqcInspectionTailRepository _qualIpqcInspectionTailRepository;
         private readonly IQualIpqcInspectionTailSampleRepository _qualIpqcInspectionTailSampleRepository;
+        private readonly IQualIpqcInspectionTailAnnexRepository _qualIpqcInspectionTailAnnexRepository;
         private readonly IQualIpqcInspectionRepository _qualIpqcInspectionRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public QualIpqcInspectionTailService(ICurrentUser currentUser, ICurrentSite currentSite, 
+        public QualIpqcInspectionTailService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIpqcInspectionTailSaveDto> validationSaveRules,
             AbstractValidator<List<QualIpqcInspectionTailSampleCreateDto>> validationSampleAddRules,
             IQualIpqcInspectionTailRepository qualIpqcInspectionTailRepository,
             IQualIpqcInspectionTailSampleRepository qualIpqcInspectionTailSampleRepository,
+            IQualIpqcInspectionTailAnnexRepository qualIpqcInspectionTailAnnexRepository,
             IQualIpqcInspectionRepository qualIpqcInspectionRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository procResourceRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
+            IEquEquipmentRepository equEquipmentRepository,
+            IInteAttachmentRepository inteAttachmentRepository,
             ISequenceService sequenceService)
         {
             _currentUser = currentUser;
@@ -72,10 +89,16 @@ namespace Hymson.MES.Services.Services.Quality
             _validationSampleAddRules = validationSampleAddRules;
             _qualIpqcInspectionTailRepository = qualIpqcInspectionTailRepository;
             _qualIpqcInspectionTailSampleRepository = qualIpqcInspectionTailSampleRepository;
+            _qualIpqcInspectionTailAnnexRepository = qualIpqcInspectionTailAnnexRepository;
             _qualIpqcInspectionRepository = qualIpqcInspectionRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
+            _equEquipmentRepository = equEquipmentRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
             _sequenceService = sequenceService;
         }
 
@@ -166,16 +189,6 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            return await _qualIpqcInspectionTailRepository.DeleteAsync(id);
-        }
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
@@ -200,12 +213,53 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualIpqcInspectionTailDto?> QueryByIdAsync(long id) 
+        public async Task<QualIpqcInspectionTailDto?> QueryByIdAsync(long id)
         {
-           var qualIpqcInspectionTailEntity = await _qualIpqcInspectionTailRepository.GetByIdAsync(id);
-           if (qualIpqcInspectionTailEntity == null) return null;
-           
-           return qualIpqcInspectionTailEntity.ToModel<QualIpqcInspectionTailDto>();
+            var entity = await _qualIpqcInspectionTailRepository.GetByIdAsync(id);
+            if (entity == null) return null;
+
+            var dto = entity.ToModel<QualIpqcInspectionTailDto>();
+            if (dto == null) return null;
+
+            var workOrderTask = _planWorkOrderRepository.GetByIdAsync(entity.WorkOrderId);
+            var materialTask = _procMaterialRepository.GetByIdAsync(entity.MaterialId);
+            var procedureTask = _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
+            var resourceTask = _procResourceRepository.GetByIdAsync(entity.ResourceId);
+            var equipmentTask = _equEquipmentRepository.GetByIdAsync(entity.EquipmentId);
+
+            var workOrder = await workOrderTask;
+            var material = await materialTask;
+            var procedure = await procedureTask;
+            var resource = await resourceTask;
+            var equipment = await equipmentTask;
+
+            if (workOrder != null)
+            {
+                dto.WorkOrderCode = workOrder.OrderCode;
+                dto.WorkCenterCode = (await _inteWorkCenterRepository.GetByIdAsync(workOrder.WorkCenterId.GetValueOrDefault()))?.Code ?? "";
+            }
+            if (material != null)
+            {
+                dto.MaterialCode = material.MaterialCode;
+                dto.MaterialName = material.MaterialName;
+            }
+            if (procedure != null)
+            {
+                dto.ProcedureCode = procedure.Code;
+                dto.ProcedureName = procedure.Name;
+            }
+            if (resource != null)
+            {
+                dto.ResourceCode = resource.ResCode;
+                dto.ResourceName = resource.ResName;
+            }
+            if (equipment != null)
+            {
+                dto.EquipmentCode = equipment.EquipmentCode;
+                dto.EquipmentName = equipment.EquipmentName;
+            }
+
+            return dto;
         }
 
         /// <summary>
@@ -368,6 +422,67 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 保存
             return await _qualIpqcInspectionTailRepository.UpdateAsync(entity);
+        }
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> AttachmentAddAsync(AttachmentAddDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
+
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            var attachments = dto.Attachments.Select(x => new InteAttachmentEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                Name = x.Name,
+                Path = x.Path,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+
+            var annexs = attachments.Select(x => new QualIpqcInspectionTailAnnexEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                IpqcInspectionTailId = dto.Id,
+                AnnexId = x.Id,
+                CreatedBy = updatedBy,
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            });
+
+            int rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteAttachmentRepository.InsertRangeAsync(attachments);
+                rows += await _qualIpqcInspectionTailAnnexRepository.InsertRangeAsync(annexs);
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> AttachmentDeleteAsync(long[] ids)
+        {
+            return await _qualIpqcInspectionTailAnnexRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = ids,
+                DeleteOn = HymsonClock.Now(),
+                UserId = _currentUser.UserName
+            });
         }
 
     }
