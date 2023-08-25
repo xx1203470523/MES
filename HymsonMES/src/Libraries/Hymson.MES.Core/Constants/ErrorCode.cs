@@ -416,7 +416,7 @@
         public const string MES12122 = "工作中心状态不能为空.";
         public const string MES12123 = "工作中心状态不合法，请检查.";
         public const string MES12124 = "工作中心类型不合法，请检查.";
-
+        public const string MES12125 = "对应工作中心数据不存在.";
         #endregion
 
         #region 编码规则 12400

@@ -160,5 +160,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="Id"></param>
         /// <returns></returns>
         Task<IEnumerable<InteWorkCenterResourceRelationView>> GetInteWorkCenterResourceRelatioAsync(long id);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
     }
 }
