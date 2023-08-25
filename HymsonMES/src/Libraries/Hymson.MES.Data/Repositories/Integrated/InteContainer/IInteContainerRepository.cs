@@ -58,5 +58,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<InteContainerView>> GetPagedInfoAsync(InteContainerPagedQuery pagedQuery);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
     }
 }

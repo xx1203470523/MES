@@ -475,6 +475,7 @@
         public const string MES12510 = "非新建状态的数据不能修改为新建状态";
         public const string MES12511 = "状态不合法，请检查";
         public const string MES12512 = "保证等级不合法，请检查";
+        public const string MES12513 = "没有找到对应的容器信息";
         #endregion
 
         #region 设备 12600

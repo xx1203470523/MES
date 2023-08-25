@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
@@ -12,6 +13,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -57,6 +59,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// </summary>
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -67,11 +71,12 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         /// <param name="inteContainerRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaterialGroupRepository"></param>
+        /// <param name="localizationService"></param>
         public InteContainerService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
             AbstractValidator<InteContainerSaveDto> validationSaveRules,
             IInteContainerRepository inteContainerRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcMaterialGroupRepository procMaterialGroupRepository)
+            IProcMaterialGroupRepository procMaterialGroupRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -79,6 +84,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             _inteContainerRepository = inteContainerRepository;
             _procMaterialRepository = procMaterialRepository;
             _procMaterialGroupRepository = procMaterialGroupRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -99,6 +105,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
+
+            entity.Status = SysDataStatusEnum.Build;
 
             // 验证是否相同物料或者物料组已经设置过
             var entityByRelation = await _inteContainerRepository.GetByRelationIdAsync(new InteContainerQuery
@@ -126,10 +134,17 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             await ValidationSaveDto(modifyDto);
             var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
-            if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
+            //if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == inteContainerEntity.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
+
 
             // DTO转换实体
             var entity = modifyDto.ToEntity<InteContainerEntity>();
@@ -210,7 +225,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             var pattern = @"^[1-9]\d*$";
             if (Regex.IsMatch($"{dto.Minimum}", pattern) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12504));
             if (Regex.IsMatch($"{dto.Maximum}", pattern) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12505));
-            if (!Enum.IsDefined(typeof(SysDataStatusEnum), dto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES12511));
+            //if (!Enum.IsDefined(typeof(SysDataStatusEnum), dto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES12511));
 
             // 判断物料/物料组是否存在
             switch (dto.DefinitionMethod)
@@ -226,5 +241,57 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             }
         }
 
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _inteContainerRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12513));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _inteContainerRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }
