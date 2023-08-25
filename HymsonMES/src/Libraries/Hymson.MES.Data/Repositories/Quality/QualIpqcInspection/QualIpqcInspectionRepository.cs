@@ -129,6 +129,10 @@ namespace Hymson.MES.Data.Repositories.Quality
             {
                 sqlBuilder.Where("T.ProcedureId = @ProcedureId");
             }
+            if (query.GenerateConditionUnit.HasValue)
+            {
+                sqlBuilder.Where("T.GenerateConditionUnit = @GenerateConditionUnit");
+            }
             if (query.Status.HasValue)
             {
                 sqlBuilder.Where("T.Status = @Status");

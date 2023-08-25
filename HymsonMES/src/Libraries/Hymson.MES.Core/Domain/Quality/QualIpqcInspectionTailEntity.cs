@@ -1,10 +1,16 @@
-﻿using Hymson.Infrastructure;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 
-namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View
+namespace Hymson.MES.Core.Domain.Quality
 {
-    public class QualIpqcInspectionHeadView : BaseEntity
+    /// <summary>
+    /// 数据实体（尾检检验单）   
+    /// qual_ipqc_inspection_tail
+    /// @author xiaofei
+    /// @date 2023-08-24 10:52:02
+    /// </summary>
+    public class QualIpqcInspectionTailEntity : BaseEntity
     {
         /// <summary>
         /// 站点Id
@@ -27,29 +33,9 @@ namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View
         public long WorkOrderId { get; set; }
 
         /// <summary>
-        /// 工单编号
-        /// </summary>
-        public long WorkOrderCode { get; set; }
-
-        /// <summary>
-        /// 工作中心（产线）
-        /// </summary>
-        public string WorkCenterCode { get; set; }
-
-        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
-
-        /// <summary>
-        /// 产品编码
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 产品名称
-        /// </summary>
-        public string MaterialName { get; set; }
 
         /// <summary>
         /// 工序id
@@ -57,64 +43,14 @@ namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View
         public long ProcedureId { get; set; }
 
         /// <summary>
-        /// 工序编码
-        /// </summary>
-        public string ProcedureCode { get; set; }
-
-        /// <summary>
-        /// 工序名称
-        /// </summary>
-        public string ProcedureName { get; set; }
-
-        /// <summary>
         /// 资源id
         /// </summary>
         public long ResourceId { get; set; }
 
         /// <summary>
-        /// 资源编码
-        /// </summary>
-        public string ResourceCode { get; set; }
-
-        /// <summary>
-        /// 资源名称
-        /// </summary>
-        public string ResourceName { get; set; }
-
-        /// <summary>
         /// 设备Id
         /// </summary>
         public long EquipmentId { get; set; }
-
-        /// <summary>
-        /// 设备编码
-        /// </summary>
-        public string EquipmentCode { get; set; }
-
-        /// <summary>
-        /// 设备名称
-        /// </summary>
-        public string EquipmentName { get; set; }
-
-        /// <summary>
-        /// 触发条件;1、开班检2、停机检3、换型检4、维修检5、换罐检
-        /// </summary>
-        public TriggerConditionEnum TriggerCondition { get; set; }
-
-        /// <summary>
-        /// 是否停机
-        /// </summary>
-        public TrueOrFalseEnum IsStop { get; set; }
-
-        /// <summary>
-        /// 管控时间
-        /// </summary>
-        public int? ControlTime { get; set; }
-
-        /// <summary>
-        /// 管控时间单位;1、时 2、分
-        /// </summary>
-        public ControlTimeUnitEnum? ControlTimeUnit { get; set; }
 
         /// <summary>
         /// 样本数量
@@ -170,5 +106,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View
         /// 处理时间
         /// </summary>
         public DateTime? ProcessedOn { get; set; }
+
+
     }
 }

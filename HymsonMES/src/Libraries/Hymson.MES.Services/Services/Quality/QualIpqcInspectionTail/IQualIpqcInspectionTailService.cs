@@ -4,23 +4,16 @@ using Hymson.MES.Services.Dtos.Quality;
 namespace Hymson.MES.Services.Services.Quality
 {
     /// <summary>
-    /// 服务接口（首检检验单）
+    /// 服务接口（尾检检验单）
     /// </summary>
-    public interface IQualIpqcInspectionHeadService
+    public interface IQualIpqcInspectionTailService
     {
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualIpqcInspectionHeadSaveDto saveDto);
-
-        /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="saveDto"></param>
-        /// <returns></returns>
-        Task<int> ModifyAsync(QualIpqcInspectionHeadSaveDto saveDto);
+        Task<int> CreateAsync(QualIpqcInspectionTailSaveDto saveDto);
 
         /// <summary>
         /// 删除
@@ -41,14 +34,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<QualIpqcInspectionHeadDto?> QueryByIdAsync(long id);
+        Task<QualIpqcInspectionTailDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualIpqcInspectionHeadDto>> GetPagedListAsync(QualIpqcInspectionHeadPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<QualIpqcInspectionTailDto>> GetPagedListAsync(QualIpqcInspectionTailPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 执行检验
@@ -62,14 +55,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="dataList"></param>
         /// <returns></returns>
-        Task<int> InsertSampleDataAsync(List<QualIpqcInspectionHeadSampleCreateDto> dataList);
+        Task<int> InsertSampleDataAsync(List<QualIpqcInspectionTailSampleCreateDto> dataList);
 
         /// <summary>
         /// 样品检验数据修改
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateSampleDataAsync(QualIpqcInspectionHeadSampleUpdateDto param);
+        Task<int> UpdateSampleDataAsync(QualIpqcInspectionTailSampleUpdateDto param);
 
         /// <summary>
         /// 检验完成
@@ -84,6 +77,5 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<int> UnqualifiedHandleAsync(UnqualifiedHandleDto dto);
-
     }
 }

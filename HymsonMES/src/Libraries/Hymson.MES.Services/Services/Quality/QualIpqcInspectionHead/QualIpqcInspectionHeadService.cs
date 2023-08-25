@@ -213,7 +213,9 @@ namespace Hymson.MES.Services.Services.Quality
                 IsQualified = null,
                 Status = InspectionStatusEnum.WaitInspect,
                 CreatedBy = updatedBy,
-                UpdatedBy = updatedBy
+                CreatedOn = updatedOn,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
             };
             var resultEntity = new QualIpqcInspectionHeadResultEntity
             {
@@ -226,7 +228,9 @@ namespace Hymson.MES.Services.Services.Quality
                 InspectionOn = entity.CreatedOn,
                 IsCurrent = TrueOrFalseEnum.Yes,
                 CreatedBy = entity.CreatedBy,
-                UpdatedBy = entity.UpdatedBy
+                CreatedOn = entity.CreatedOn,
+                UpdatedBy = entity.UpdatedBy,
+                UpdatedOn = entity.UpdatedOn
             };
 
             // 保存
@@ -402,6 +406,11 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var entities = await _qualIpqcInspectionHeadRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(x => x.Status != InspectionStatusEnum.WaitInspect))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13233));
+            }
             return await _qualIpqcInspectionHeadRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -609,7 +618,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
             if (entity.Status != InspectionStatusEnum.Completed || resultEntity.Status != InspectionStatusEnum.Completed)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13230));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13232));
             }
 
             entity.Status = InspectionStatusEnum.Closed;

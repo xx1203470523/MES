@@ -3,29 +3,29 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
+using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
-    /// 仓储（首检检验单）
+    /// 仓储（尾检检验单）
     /// </summary>
-    public partial class QualIpqcInspectionHeadRepository : BaseRepository, IQualIpqcInspectionHeadRepository
+    public partial class QualIpqcInspectionTailRepository : BaseRepository, IQualIpqcInspectionTailRepository
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public QualIpqcInspectionHeadRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        public QualIpqcInspectionTailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(QualIpqcInspectionHeadEntity entity)
+        public async Task<int> InsertAsync(QualIpqcInspectionTailEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
@@ -36,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<QualIpqcInspectionHeadEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<QualIpqcInspectionTailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(QualIpqcInspectionHeadEntity entity)
+        public async Task<int> UpdateAsync(QualIpqcInspectionTailEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<QualIpqcInspectionHeadEntity> entities)
+        public async Task<int> UpdateRangeAsync(IEnumerable<QualIpqcInspectionTailEntity> entities)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, entities);
@@ -91,10 +91,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<QualIpqcInspectionHeadEntity> GetByIdAsync(long id)
+        public async Task<QualIpqcInspectionTailEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<QualIpqcInspectionHeadEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryFirstOrDefaultAsync<QualIpqcInspectionTailEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -102,10 +102,10 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIpqcInspectionHeadEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<QualIpqcInspectionTailEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIpqcInspectionHeadEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryAsync<QualIpqcInspectionTailEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -113,12 +113,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIpqcInspectionHeadEntity>> GetEntitiesAsync(QualIpqcInspectionHeadQuery query)
+        public async Task<IEnumerable<QualIpqcInspectionTailEntity>> GetEntitiesAsync(QualIpqcInspectionTailQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIpqcInspectionHeadEntity>(template.RawSql, query);
+            return await conn.QueryAsync<QualIpqcInspectionTailEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -126,12 +126,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualIpqcInspectionHeadView>> GetPagedListAsync(QualIpqcInspectionHeadPagedQuery pagedQuery)
+        public async Task<PagedInfo<QualIpqcInspectionTailView>> GetPagedListAsync(QualIpqcInspectionTailPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.LeftJoin("qual_ipqc_inspection_head_result qiihr ON qiihr.IpqcInspectionHeadId = T.Id");
+
             sqlBuilder.LeftJoin("qual_ipqc_inspection qii ON T.IpqcInspectionId = qii.Id");
             sqlBuilder.LeftJoin("proc_material pm ON T.MaterialId = pm.Id");
             sqlBuilder.LeftJoin("proc_procedure pp ON T.ProcedureId = pp.Id");
@@ -140,7 +140,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.OrderBy("T.CreatedOn DESC");
-            sqlBuilder.Select("T.*, qiihr.InspectionBy, qiihr.InspectionOn, qiihr.StartOn, qiihr.CompleteOn, qiihr.CloseOn, qiihr.HandMethod, qiihr.ProcessedBy, qiihr.ProcessedOn, qii.GenerateCondition, qii.GenerateConditionUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr.ResourceCode, pr.ResourceName, ee.EquipmentCode, ee.EquipmentName");
+            sqlBuilder.Select("T.*, qii.GenerateCondition, qii.GenerateConditionUnit, qii.ControlTime, qii.ControlTimeUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr.ResourceCode, pr.ResourceName, ee.EquipmentCode, ee.EquipmentName");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {
@@ -182,11 +182,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualIpqcInspectionHeadView>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualIpqcInspectionTailView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualIpqcInspectionHeadView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualIpqcInspectionTailView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -195,25 +195,25 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// <summary>
     /// 
     /// </summary>
-    public partial class QualIpqcInspectionHeadRepository
+    public partial class QualIpqcInspectionTailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_head T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_head T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_tail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_tail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
-                                           FROM qual_ipqc_inspection_head /**where**/  ";
+                                           FROM qual_ipqc_inspection_tail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_ipqc_inspection_head(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `TriggerCondition`, `IsStop`, `ControlTime`, `ControlTimeUnit`, `SampleQty`, `IsQualified`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @TriggerCondition, @IsStop, @ControlTime, @ControlTimeUnit, @SampleQty, @IsQualified, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_ipqc_inspection_head(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `TriggerCondition`, `IsStop`, `ControlTime`, `ControlTimeUnit`, `SampleQty`, `IsQualified`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @TriggerCondition, @IsStop, @ControlTime, @ControlTimeUnit, @SampleQty, @IsQualified, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_ipqc_inspection_tail(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SampleQty`, `IsQualified`, `Status`, `InspectionBy`, `InspectionOn`, `StartOn`, `CompleteOn`, `CloseOn`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @SampleQty, @IsQualified, @Status, @InspectionBy, @InspectionOn, @StartOn, @CompleteOn, @CloseOn, @HandMethod, @ProcessedBy, @ProcessedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_ipqc_inspection_tail(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SampleQty`, `IsQualified`, `Status`, `InspectionBy`, `InspectionOn`, `StartOn`, `CompleteOn`, `CloseOn`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @SampleQty, @IsQualified, @Status, @InspectionBy, @InspectionOn, @StartOn, @CompleteOn, @CloseOn, @HandMethod, @ProcessedBy, @ProcessedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_ipqc_inspection_head SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, TriggerCondition = @TriggerCondition, IsStop = @IsStop, ControlTime = @ControlTime, ControlTimeUnit = @ControlTimeUnit, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_ipqc_inspection_head SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, TriggerCondition = @TriggerCondition, IsStop = @IsStop, ControlTime = @ControlTime, ControlTimeUnit = @ControlTimeUnit, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_ipqc_inspection_tail SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, InspectionBy = @InspectionBy, InspectionOn = @InspectionOn, StartOn = @StartOn, CompleteOn = @CompleteOn, CloseOn = @CloseOn, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_ipqc_inspection_tail SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, InspectionBy = @InspectionBy, InspectionOn = @InspectionOn, StartOn = @StartOn, CompleteOn = @CompleteOn, CloseOn = @CloseOn, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
-        const string DeleteSql = "UPDATE qual_ipqc_inspection_head SET IsDeleted = Id WHERE Id = @Id ";
-        const string DeletesSql = "UPDATE qual_ipqc_inspection_head SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
+        const string DeleteSql = "UPDATE qual_ipqc_inspection_tail SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE qual_ipqc_inspection_tail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM qual_ipqc_inspection_head WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM qual_ipqc_inspection_head WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM qual_ipqc_inspection_tail WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM qual_ipqc_inspection_tail WHERE Id IN @Ids ";
 
     }
 }

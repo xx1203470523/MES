@@ -37,6 +37,8 @@ using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
+using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionPatrol.View;
+using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -618,10 +620,24 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region QualIpqcInspectionHead
-
-            CreateMap<QualIpqcInspectionHeadView, QualIpqcInspectionHeadDto>();
             CreateMap<QualIpqcInspectionHeadPagedQueryDto, QualIpqcInspectionHeadPagedQuery>();
             CreateMap<QualIpqcInspectionHeadSampleCreateDto, QualIpqcInspectionHeadSampleEntity>();
+            CreateMap<QualIpqcInspectionHeadView, QualIpqcInspectionHeadDto>();
+            CreateMap<QualIpqcInspectionHeadEntity, QualIpqcInspectionHeadDto>();
+            #endregion
+
+            #region QualIpqcInspectionPatrol
+            CreateMap<QualIpqcInspectionPatrolPagedQueryDto, QualIpqcInspectionPatrolPagedQuery>();
+            CreateMap<QualIpqcInspectionHeadSampleCreateDto, QualIpqcInspectionHeadSampleEntity>();
+            CreateMap<QualIpqcInspectionPatrolView, QualIpqcInspectionPatrolDto>();
+            CreateMap<QualIpqcInspectionPatrolEntity, QualIpqcInspectionPatrolDto>();
+            #endregion
+
+            #region QualIpqcInspectionTail
+            CreateMap<QualIpqcInspectionTailPagedQueryDto, QualIpqcInspectionTailPagedQuery>();
+            CreateMap<QualIpqcInspectionTailSampleCreateDto, QualIpqcInspectionTailSampleEntity>();
+            CreateMap<QualIpqcInspectionTailView, QualIpqcInspectionTailDto>();
+            CreateMap<QualIpqcInspectionTailEntity, QualIpqcInspectionTailDto>();
             #endregion
         }
 
