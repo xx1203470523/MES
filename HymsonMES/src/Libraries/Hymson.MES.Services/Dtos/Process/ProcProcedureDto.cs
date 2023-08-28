@@ -116,10 +116,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -308,10 +308,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 
@@ -78,5 +79,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <param name="code"></param>
         /// <returns></returns>
         Task<ProcProcedureCodeDto> GetByCodeAsync(string code);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
     }
 }
