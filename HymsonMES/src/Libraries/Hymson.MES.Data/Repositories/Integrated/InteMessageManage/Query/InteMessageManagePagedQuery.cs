@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Integrated.Query
 {
@@ -16,6 +17,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
         /// 消息单号
         /// </summary>
         public string? Code { get; set; }
+
+        /// <summary>
+        /// 消息状态;1、触发2、接收3、处理4、关闭
+        /// </summary>
+        public MessageStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 事件类型名称
