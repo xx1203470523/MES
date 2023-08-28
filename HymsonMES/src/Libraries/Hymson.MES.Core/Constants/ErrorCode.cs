@@ -1101,6 +1101,9 @@
         public const string MES18216 = "条码{0}状态修改失败，请联系管理员！";
         public const string MES18217 = "条码{SFC}状态不合法！";
         public const string MES18218 = "条码{0}库存修改失败，请联系管理员！";
+        public const string MES18219 = "条码对应物料和工单对应物料相同！";
+        public const string MES18220 = "条码已是完成状态！";
+
         #endregion
 
         #region 系统Token MES18300
