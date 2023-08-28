@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Resource;
@@ -536,7 +537,7 @@ namespace Hymson.MES.Services.Services.Process
                 Remark = parm.Remark,
                 ResName = parm.ResName,
                 ResTypeId = parm.ResTypeId ?? 0,
-                Status = (int)parm.Status,
+                Status = (int)SysDataStatusEnum.Build,
 
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = siteId,
@@ -840,13 +841,19 @@ namespace Hymson.MES.Services.Services.Process
             var entityOld = await _resourceRepository.GetByIdAsync(param.Id)
                 ?? throw new BusinessException(nameof(ErrorCode.MES10388));
 
-            if (entityOld.Status != (int)SysDataStatusEnum.Build && param.Status == (int)SysDataStatusEnum.Build)
+            //if (entityOld.Status != (int)SysDataStatusEnum.Build && param.Status == (int)SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+            //if (!Enum.IsDefined(typeof(SysDataStatusEnum), (SysDataStatusEnum)param.Status))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10380));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => (int)x == entityOld.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            }
-            if (!Enum.IsDefined(typeof(SysDataStatusEnum), (SysDataStatusEnum)param.Status))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10380));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             //资源类型在系统中不存在,请重新输入!
@@ -911,7 +918,7 @@ namespace Hymson.MES.Services.Services.Process
             var entity = new ProcResourceEntity
             {
                 Id = param.Id,
-                Status = param.Status,
+                //Status = param.Status,
                 ResName = param.ResName,
                 ResTypeId = param.ResTypeId,
                 Remark = param.Remark ?? "",
@@ -1718,6 +1725,56 @@ namespace Hymson.MES.Services.Services.Process
             return selectOptionDtos;
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
 
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _resourceRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10388));
+            }
+            if (entity.Status == (int)changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _resourceRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }
