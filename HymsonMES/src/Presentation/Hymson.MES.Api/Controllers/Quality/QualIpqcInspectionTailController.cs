@@ -200,5 +200,16 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualIpqcInspectionTailService.AttachmentDeleteAsync(ids);
         }
 
+        /// <summary>
+        /// 查询检验单样品应检参数并校验
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("shouldInspectItems")]
+        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync(SampleShouldInspectItemsQueryDto query)
+        {
+            return await _qualIpqcInspectionTailService.GetSampleShouldInspectItemsAsync(query);
+        }
+
     }
 }

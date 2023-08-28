@@ -571,6 +571,7 @@
         public const string MES13231 = "已检样品数量小于单据应检数量，不允许完成！";
         public const string MES13232 = "该检验单非完成状态，不允许进行不合格处理！";
         public const string MES13233 = "存在非待检验状态的单据，不允许删除！";
+        public const string MES13234 = "样品条码【{SampleCode}】已检验，不能重复检验！";
 
         #endregion
 

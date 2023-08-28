@@ -98,5 +98,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> AttachmentDeleteAsync(long[] ids);
+
+        /// <summary>
+        /// 查询检验单样品应检参数并校验
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync(SampleShouldInspectItemsQueryDto query);
     }
 }
