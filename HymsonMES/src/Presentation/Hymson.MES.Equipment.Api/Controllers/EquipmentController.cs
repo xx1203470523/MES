@@ -604,7 +604,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [ProducesResponseType(typeof(CirculationModuleCCSInfoDto), 200)]
         public async Task<CirculationModuleCCSInfoDto> GetModuleCCSInfoAsync(string sfc)
         {
-            return await _sfcCirculationService.GetCirculationModuleCCSInfo(sfc);
+            return await _sfcCirculationService.GetCirculationModuleCCSInfoAsync(sfc);
         }
 
         /// <summary>
