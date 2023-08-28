@@ -595,7 +595,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 获取模组型号和CC信息
+        /// 获取模组型号和CCS信息
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
