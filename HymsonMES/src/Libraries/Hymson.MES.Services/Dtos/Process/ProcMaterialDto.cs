@@ -178,10 +178,10 @@ namespace Hymson.MES.Services.Dtos.Process
         [Required(ErrorMessage = "物料名称不能为空")]
         public string MaterialName { get; set; } = "";
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
@@ -342,10 +342,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string MaterialName { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
@@ -617,4 +617,22 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
     }
+
+    /// <summary>
+    /// 物料维护更新Dto
+    /// </summary>
+    public record ProcMaterialChangeStatusDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 需要变更为的状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
+    }
+
 }

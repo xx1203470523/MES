@@ -130,10 +130,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public LevelEnum Level { get; set; }
 
-        /// <summary>
-        /// 状态;0-新建 1-启用 2-保留3-废弃
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态;0-新建 1-启用 2-保留3-废弃
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 最大值

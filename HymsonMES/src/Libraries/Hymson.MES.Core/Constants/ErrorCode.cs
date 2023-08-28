@@ -31,6 +31,12 @@
         public const string MES10122 = "版本不允许有空格";
         public const string MES10123 = "启用状态不允许修改";
         public const string MES10124 = "启用状态只能修改为保留或废除";
+        public const string MES10125 = "变更状态的ID不能为空";
+        public const string MES10126 = "变更状态的状态不合法";
+        public const string MES10127 = "状态已经是[{status}],无法重复设置";
+        public const string MES10128 = "变更状态的状态不能为新建";
+        public const string MES10129 = "只有新建或者保留才能编辑";
+
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -291,6 +297,8 @@
         public const string MES10901 = "事件类型不能为空";
         public const string MES10902 = "编码生成失败";
         public const string MES10903 = "消息状态不合法";
+        public const string MES10904 = "原因分析不允许有空格";
+        public const string MES10905 = "处理方案不允许有空格";
         #endregion
 
         #region 降级规则 11000
@@ -408,7 +416,7 @@
         public const string MES12122 = "工作中心状态不能为空.";
         public const string MES12123 = "工作中心状态不合法，请检查.";
         public const string MES12124 = "工作中心类型不合法，请检查.";
-
+        public const string MES12125 = "对应工作中心数据不存在.";
         #endregion
 
         #region 编码规则 12400
@@ -467,6 +475,7 @@
         public const string MES12510 = "非新建状态的数据不能修改为新建状态";
         public const string MES12511 = "状态不合法，请检查";
         public const string MES12512 = "保证等级不合法，请检查";
+        public const string MES12513 = "没有找到对应的容器信息";
         #endregion
 
         #region 设备 12600
@@ -561,6 +570,7 @@
         public const string MES13230 = "只有检验中的单据才允许完成！";
         public const string MES13231 = "已检样品数量小于单据应检数量，不允许完成！";
         public const string MES13232 = "该检验单非完成状态，不允许进行不合格处理！";
+        public const string MES13233 = "存在非待检验状态的单据，不允许删除！";
 
         #endregion
 

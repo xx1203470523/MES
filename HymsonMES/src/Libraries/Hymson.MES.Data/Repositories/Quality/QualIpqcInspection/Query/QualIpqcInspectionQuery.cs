@@ -26,7 +26,7 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// <summary>
         /// 生成条件单位
         /// </summary>
-        public GenerateConditionUnitEnum GenerateConditionUnit { get; set; }
+        public GenerateConditionUnitEnum? GenerateConditionUnit { get; set; }
 
         /// <summary>
         /// 版本

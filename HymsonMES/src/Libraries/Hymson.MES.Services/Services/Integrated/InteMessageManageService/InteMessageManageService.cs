@@ -68,9 +68,9 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
-        /// 仓储接口（事件类型维护）
+        /// 仓储接口（事件维护）
         /// </summary>
-        private readonly IInteEventTypeRepository _inteEventTypeRepository;
+        private readonly IInteEventRepository _inteEventRepository;
 
         /// <summary>
         /// 仓储接口（附件）
@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="procResourceRepository"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
-        /// <param name="inteEventTypeRepository"></param>
+        /// <param name="inteEventRepository"></param>
         /// <param name="inteAttachmentRepository"></param>
         /// <param name="inteMessageManageRepository"></param>
         /// <param name="inteMessageManageAnalysisReportAttachmentRepository"></param>
@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Services.Integrated
             IProcResourceRepository procResourceRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
-            IInteEventTypeRepository inteEventTypeRepository,
+            IInteEventRepository inteEventRepository,
             IInteAttachmentRepository inteAttachmentRepository,
             IInteMessageManageRepository inteMessageManageRepository,
             IInteMessageManageAnalysisReportAttachmentRepository inteMessageManageAnalysisReportAttachmentRepository,
@@ -129,7 +129,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _procResourceRepository = procResourceRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
-            _inteEventTypeRepository = inteEventTypeRepository;
+            _inteEventRepository = inteEventRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
             _inteMessageManageRepository = inteMessageManageRepository;
             _inteMessageManageAnalysisReportAttachmentRepository = inteMessageManageAnalysisReportAttachmentRepository;
@@ -163,6 +163,13 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.Status = MessageStatusEnum.Trigger;
+
+            // 判断事件类型是否是自动关闭
+            var eventEntity = await _inteEventRepository.GetByIdAsync(entity.EventId);
+            if (eventEntity != null && eventEntity.IsAutoClose == DisableOrEnableEnum.Enable)
+            {
+                entity.Status = MessageStatusEnum.Close;
+            }
 
             // 保存
             var rows = await _inteMessageManageRepository.InsertAsync(entity);
@@ -238,6 +245,10 @@ namespace Hymson.MES.Services.Services.Integrated
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
+            // 这里可以新建验证器去验证
+            if (dto.ReasonAnalysis.Any(x => char.IsWhiteSpace(x))) throw new CustomerValidationException(nameof(ErrorCode.MES10904));
+            if (dto.HandleSolution.Any(x => char.IsWhiteSpace(x))) throw new CustomerValidationException(nameof(ErrorCode.MES10905));
+
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
@@ -264,9 +275,6 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 entity.HandleDuration = Math.Ceiling((updatedOn - entity.ReceivedOn.Value).TotalMinutes);
             }
-
-            // 判断事件类型是否是自动关闭
-            // TODO 
 
             // 附件处理
             List<InteAttachmentEntity> attachmentEntities = new();
@@ -393,11 +401,14 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.EvaluateBy = updatedBy;
-            entity.EvaluateOn = updatedOn;
+            entity.EvaluateOn = $"{updatedOn:yyyy-MM-dd HH:mm:ss}";
             entity.Status = MessageStatusEnum.Close;
             entity.EvaluateRemark = dto.EvaluateRemark;
 
-            return await _inteMessageManageRepository.CloseAsync(entity); ;
+            var rows = await _inteMessageManageRepository.CloseAsync(entity);
+            if (rows > 0) await _messagePushService.Push(entity);
+
+            return rows;
         }
 
         /// <summary>
@@ -411,6 +422,10 @@ namespace Hymson.MES.Services.Services.Integrated
             if (inteMessageManageEntity == null) return null;
 
             var dto = inteMessageManageEntity.ToModel<InteMessageManageTriggerDto>();
+
+            var eventEntity = await _inteEventRepository.GetByIdAsync(dto.EventId);
+            if (eventEntity != null) dto.EventName = eventEntity.Name;
+
             if (dto.ResourceId.HasValue)
             {
                 var resourceEntity = await _procResourceRepository.GetByIdAsync(dto.ResourceId.Value);
@@ -503,6 +518,9 @@ namespace Hymson.MES.Services.Services.Integrated
             foreach (var item in pagedInfo.Data)
             {
                 var dto = item.ToModel<InteMessageManageDto>();
+
+                var eventEntity = await _inteEventRepository.GetByIdAsync(dto.EventId);
+                if (eventEntity != null) dto.EventName = eventEntity.Name;
 
                 var workShopEntity = await _inteWorkCenterRepository.GetByIdAsync(dto.WorkShopId);
                 if (workShopEntity != null) dto.WorkShopName = workShopEntity.Name;

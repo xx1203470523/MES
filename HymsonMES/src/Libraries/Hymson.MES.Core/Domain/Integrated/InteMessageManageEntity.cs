@@ -16,32 +16,37 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 车间id
         /// </summary>
         public long WorkShopId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 线体id
         /// </summary>
         public long LineId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备ID
         /// </summary>
         public long? EquipmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 事件类型id
         /// </summary>
         public long EventTypeId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 事件id
+        /// </summary>
+        public long EventId { get; set; }
+
+        /// <summary>
         /// 事件名称
         /// </summary>
         public string? EventName { get; set; }
@@ -51,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public MessageStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 紧急程度;1、高2、中3、低
         /// </summary>
         public DegreeEnum UrgencyLevel { get; set; }
@@ -80,17 +85,17 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long? DepartmentId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 责任人
         /// </summary>
         public string? ResponsibleBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 原因分析
         /// </summary>
         public string? ReasonAnalysis { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理方案
         /// </summary>
         public string? HandleSolution { get; set; }
@@ -117,7 +122,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public double? ReceiveDuration { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 处理时长
         /// </summary>
         public double? HandleDuration { get; set; }
@@ -130,7 +135,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 评价时间
         /// </summary>
-        public DateTime? EvaluateOn { get; set; }
+        public string? EvaluateOn { get; set; }
 
         /// <summary>
         /// 评价人
@@ -144,6 +149,6 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }

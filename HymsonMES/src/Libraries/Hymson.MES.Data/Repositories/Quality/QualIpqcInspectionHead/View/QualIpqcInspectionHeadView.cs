@@ -87,12 +87,12 @@ namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View
         public long EquipmentId { get; set; }
 
         /// <summary>
-        /// 资源编码
+        /// 设备编码
         /// </summary>
         public string EquipmentCode { get; set; }
 
         /// <summary>
-        /// 资源名称
+        /// 设备名称
         /// </summary>
         public string EquipmentName { get; set; }
 

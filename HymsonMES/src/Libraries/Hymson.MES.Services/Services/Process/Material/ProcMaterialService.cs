@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
@@ -12,10 +13,12 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -41,6 +44,8 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 
         /// </summary>
@@ -53,6 +58,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procMaterialSupplierRelationRepository"></param>
         /// <param name="procMaskCodeRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="localizationService"></param>
         public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
@@ -60,7 +66,7 @@ namespace Hymson.MES.Services.Services.Process
             ICurrentSite currentSite,
             IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository,
             IProcMaskCodeRepository procMaskCodeRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -72,6 +78,8 @@ namespace Hymson.MES.Services.Services.Process
             _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
             _procMaskCodeRepository = procMaskCodeRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+
+            _localizationService = localizationService;
         }
 
 
@@ -118,6 +126,8 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialEntity.CreatedOn = HymsonClock.Now();
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
             procMaterialEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            procMaterialEntity.Status = SysDataStatusEnum.Build;
 
             //替代品数据
             List<ProcReplaceMaterialEntity> addProcReplaceList = new List<ProcReplaceMaterialEntity>();
@@ -332,9 +342,16 @@ namespace Hymson.MES.Services.Services.Process
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
             }
 
-            if (modelOrigin.Status != SysDataStatusEnum.Build && procMaterialModifyDto.Status == SysDataStatusEnum.Build)
+            //if (modelOrigin.Status != SysDataStatusEnum.Build && procMaterialModifyDto.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+
+            //验证某些是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x=>x== modelOrigin.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             if (procMaterialModifyDto.Origin != modelOrigin.Origin)
@@ -418,7 +435,7 @@ namespace Hymson.MES.Services.Services.Process
                     Id = procMaterialEntity.Id,
                     GroupId = procMaterialEntity.GroupId,
                     MaterialName = procMaterialEntity.MaterialName,
-                    Status = procMaterialEntity.Status,
+                    //Status = procMaterialEntity.Status,
                     Origin = procMaterialEntity.Origin,
                     Version = procMaterialEntity.Version,
                     Remark = procMaterialEntity.Remark,
@@ -549,6 +566,58 @@ namespace Hymson.MES.Services.Services.Process
                 CreatedOn = model.UpdatedOn ?? HymsonClock.Now()
             }).ToList();
         }
+        #endregion
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id==0) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status)) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status== SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand() 
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var material= await _procMaterialRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (material == null || material.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+            }
+            if (material.Status == changeStatusCommand.Status) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), material.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procMaterialRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
         #endregion
     }
 }

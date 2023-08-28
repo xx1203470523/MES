@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
 using Hymson.MessagePush.Enum;
 
 namespace Hymson.MES.Core.Domain.Integrated

@@ -51,18 +51,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             await _qualIpqcInspectionHeadService.CreateAsync(saveDto);
         }
 
-        ///// <summary>
-        ///// 更新（首检检验单）
-        ///// </summary>
-        ///// <param name="saveDto"></param>
-        ///// <returns></returns>
-        //[HttpPut]
-        //[Route("update")]
-        //public async Task UpdateAsync([FromBody] QualIpqcInspectionHeadSaveDto saveDto)
-        //{
-        //    await _qualIpqcInspectionHeadService.ModifyAsync(saveDto);
-        //}
-
         /// <summary>
         /// 删除（首检检验单）
         /// </summary>
@@ -141,14 +129,53 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 检验完成
         /// </summary>
-        /// <param name="updateDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("complete")]
         [PermissionDescription("quality:ipqcInspectionHead:complete")]
-        public async Task CompleteAsync([FromBody] StatusChangeDto updateDto)
+        public async Task CompleteAsync([FromBody] StatusChangeDto dto)
         {
-            await _qualIpqcInspectionHeadService.CompleteAsync(updateDto);
+            await _qualIpqcInspectionHeadService.CompleteAsync(dto);
+        }
+
+        /// <summary>
+        /// 不合格处理
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("unqualifiedHandle")]
+        [PermissionDescription("quality:ipqcInspectionHead:unqualifiedHandle")]
+        public async Task UnqualifiedHandleAsync([FromBody] UnqualifiedHandleDto dto)
+        {
+            await _qualIpqcInspectionHeadService.UnqualifiedHandleAsync(dto);
+        }
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("attachmentAdd")]
+        [PermissionDescription("quality:ipqcInspectionHead:attachmentAdd")]
+        public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
+        {
+            await _qualIpqcInspectionHeadService.AttachmentAddAsync(dto);
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("attachmentDelete")]
+        [PermissionDescription("quality:ipqcInspectionHead:attachmentDelete")]
+        public async Task AttachmentDeleteAsync([FromBody] long[] ids)
+        {
+            await _qualIpqcInspectionHeadService.AttachmentDeleteAsync(ids);
         }
 
     }

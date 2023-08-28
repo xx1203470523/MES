@@ -44,6 +44,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long EventTypeId { get; set; }
 
         /// <summary>
+        /// 事件id
+        /// </summary>
+        public long EventId { get; set; }
+
+        /// <summary>
         /// 事件名称
         /// </summary>
         public string? EventName { get; set; }
@@ -204,6 +209,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string EventTypeName { get; set; }
 
+
+        /// <summary>
+        /// 事件id
+        /// </summary>
+        public long EventId { get; set; }
+
         /// <summary>
         /// 事件名称
         /// </summary>
@@ -295,6 +306,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 事件类型名称
         /// </summary>
         public string EventTypeName { get; set; }
+
+
+        /// <summary>
+        /// 事件id
+        /// </summary>
+        public long EventId { get; set; }
 
         /// <summary>
         /// 事件名称

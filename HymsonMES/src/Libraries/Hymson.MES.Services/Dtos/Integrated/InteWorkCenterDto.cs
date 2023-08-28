@@ -214,10 +214,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public WorkCenterSourceEnum? Source { get; set; }
 
-        /// <summary>
-        /// 状态 
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 状态 
+        ///// </summary>
+        //public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 是否混线 
@@ -267,10 +267,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public WorkCenterSourceEnum? Source { get; set; }
 
-        /// <summary>
-        /// 状态 
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 状态 
+        ///// </summary>
+        //public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 是否混线 

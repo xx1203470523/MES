@@ -489,6 +489,34 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentIdsSql, new { EquipmentIds = query.EquipmentIds, SiteId = query.SiteId });
         }
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="procResourceQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetProcResouceEntitiesAsync(ProcResourceQuery procResourceQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcResouceEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (procResourceQuery.Status.HasValue)
+            {
+                sqlBuilder.Where(" Status= @Status ");
+            }
+            if (procResourceQuery.ResTypeId.HasValue)
+            {
+                sqlBuilder.Where(" ResTypeId= @ResTypeId ");
+            }
+
+            sqlBuilder.AddParameters(procResourceQuery);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procResources = await conn.QueryAsync<ProcResourceEntity>(template.RawSql, procResourceQuery);
+            return procResources;
+        }
+
     }
 
     /// <summary>
@@ -538,5 +566,7 @@ namespace Hymson.MES.Data.Repositories.Process
             WHERE R.IsDeleted = 0 
             AND REB.EquipmentId IN @EquipmentIds 
             AND REB.SiteId = @SiteId ";
+
+        const string GetProcResouceEntitiesSqlTemplate = @"SELECT  /**select**/ FROM `proc_resource` /**where**/  ";
     }
 }

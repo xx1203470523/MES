@@ -148,9 +148,16 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         var rows = 0;
         using (var trans = TransactionHelper.GetTransactionScope())
         {
-            rows += await _procProductParameterGroupRepository.InsertAsync(entity);
-            rows += await _procProductParameterGroupDetailRepository.InsertRangeAsync(details);
-            trans.Complete();
+            rows = await _procProductParameterGroupRepository.InsertAsync(entity);
+            if (rows <= 0)
+            {
+                trans.Dispose();
+            }
+            else
+            {
+                rows += await _procProductParameterGroupDetailRepository.InsertRangeAsync(details);
+                trans.Complete();
+            }
         }
         return rows;
     }

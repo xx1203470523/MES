@@ -171,6 +171,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualUnqualifiedGroupService, QualUnqualifiedGroupService>();
             services.AddSingleton<IQualIpqcInspectionService, QualIpqcInspectionService>();
             services.AddSingleton<IQualIpqcInspectionHeadService, QualIpqcInspectionHeadService>();
+            services.AddSingleton<IQualIpqcInspectionPatrolService, QualIpqcInspectionPatrolService>();
+            services.AddSingleton<IQualIpqcInspectionTailService, QualIpqcInspectionTailService>();
             #endregion
 
             #region Manufacture
@@ -424,6 +426,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QualIpqcInspectionSaveDto>, QualIpqcInspectionSaveValidator>();
             services.AddSingleton<AbstractValidator<QualIpqcInspectionHeadSaveDto>, QualIpqcInspectionHeadSaveValidator>();
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionHeadSampleCreateDto>>, QualIpqcInspectionHeadSampleAddValidator>();
+            services.AddSingleton<AbstractValidator<QualIpqcInspectionPatrolSaveDto>, QualIpqcInspectionPatrolSaveValidator>();
+            services.AddSingleton<AbstractValidator<List<QualIpqcInspectionPatrolSampleCreateDto>>, QualIpqcInspectionPatrolSampleAddValidator>();
+            services.AddSingleton<AbstractValidator<QualIpqcInspectionTailSaveDto>, QualIpqcInspectionTailSaveValidator>();
+            services.AddSingleton<AbstractValidator<List<QualIpqcInspectionTailSampleCreateDto>>, QualIpqcInspectionTailSampleAddValidator>();
             #endregion
 
             #region Manufacture

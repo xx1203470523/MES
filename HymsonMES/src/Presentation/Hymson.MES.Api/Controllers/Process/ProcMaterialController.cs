@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
@@ -119,6 +121,52 @@ namespace Hymson.MES.Api.Controllers.Process
             //long[] idsArr = StringExtension.SpitLongArrary(ids);
            return await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
+
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（物料维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto {Id=id,Status= SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（物料维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（物料维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
 
     }
 }

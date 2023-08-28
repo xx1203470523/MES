@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.Web.Framework.Attributes;
@@ -94,5 +96,50 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             return await _inteContainerService.GetDetailAsync(id);
         }
+
+        #region ×´Ì¬±ä¸ü
+        /// <summary>
+        /// ÆôÓÃ£¨ÈÝÆ÷Î¬»¤£©
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [PermissionDescription("inte:container:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _inteContainerService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// ±£Áô£¨ÈÝÆ÷Î¬»¤£©
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [PermissionDescription("inte:container:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _inteContainerService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// ·Ï³ý£¨ÈÝÆ÷Î¬»¤£©
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [PermissionDescription("inte:container:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _inteContainerService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }
