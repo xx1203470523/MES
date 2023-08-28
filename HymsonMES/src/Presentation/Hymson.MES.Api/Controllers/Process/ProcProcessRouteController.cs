@@ -4,6 +4,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
+using Minio.DataModel;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -79,6 +80,18 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<IEnumerable<ProcProcessRouteDetailNodeViewDto>> GetNodesByRouteId(long id)
         {
             return await _procProcessRouteService.GetNodesByRouteIdAsync(id);
+        }
+
+        /// <summary>
+        /// 分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("procedureList")]    
+        public async Task<PagedInfo<ProcProcedureDto>> GetProcedureListByRouteId([FromQuery] ProcessRouteProcedureQueryDto parm)
+        {
+            return await _procProcessRouteService.GetPagedInfoByProcessRouteIdAsync(parm);
         }
 
         /// <summary>

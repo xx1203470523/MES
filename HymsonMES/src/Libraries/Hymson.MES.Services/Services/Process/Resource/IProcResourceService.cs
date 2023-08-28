@@ -36,6 +36,14 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// <returns></returns>
         Task<PagedInfo<ProcResourceDto>> GetListAsync(ProcResourcePagedQueryDto query);
 
+
+        /// <summary>
+        /// 更具线体和工序查询资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdDto query);
+
         /// <summary>
         /// 查询资源类型下关联的资源(资源类型详情：可用资源，已分配资源)
         /// </summary>

@@ -79,6 +79,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<PagedInfo<ProcResourceView>> GetPageListAsync(ProcResourcePagedQuery query);
 
         /// <summary>
+        /// 更具线体和工序查询资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceEntity>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdQuery query);
+
+        /// <summary>
         /// 获取资源分页列表
         /// </summary>
         /// <param name="query"></param>

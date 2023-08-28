@@ -10,6 +10,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Command;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -49,7 +50,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
         private readonly AbstractValidator<FlowDynamicLinkDto> _validationFlowDynamicLinkRules;
         private readonly AbstractValidator<FlowDynamicNodeDto> _validationFlowDynamicNodeRules;
-        
+
         /// <summary>
         /// 工艺路线表 仓储
         /// </summary>
@@ -140,6 +141,26 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         }
 
         /// <summary>
+        /// 分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="processRouteProcedureQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcProcedureDto>> GetPagedInfoByProcessRouteIdAsync(ProcessRouteProcedureQueryDto processRouteProcedureQueryDto)
+        {
+            var procProcedurePagedQuery = processRouteProcedureQueryDto.ToQuery<ProcessRouteProcedureQuery>();
+            var pagedInfo = await _procProcessRouteNodeRepository.GetProcedureListByProcessRouteIdAsync(procProcedurePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procProcedureDtos = new List<ProcProcedureDto>();
+            foreach (var procProcedureEntity in pagedInfo.Data)
+            {
+                var procProcedureDto = procProcedureEntity.ToModel<ProcProcedureDto>();
+                procProcedureDtos.Add(procProcedureDto);
+            }
+            return new PagedInfo<ProcProcedureDto>(procProcedureDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
         /// 根据ID查询工艺路线工序列表
         /// </summary>
         /// <param name="id"></param>
@@ -195,7 +216,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 {
                     foreach (var item in parm.DynamicData.Nodes)
                     {
-                        if (item.ProcedureId<=0) 
+                        if (item.ProcedureId <= 0)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES10461));
                         }
@@ -204,13 +225,13 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                         {
                             await _validationFlowDynamicNodeRules.ValidateAndThrowAsync(item);
                         }
-                        else 
+                        else
                         {
                             if (string.IsNullOrEmpty(item.ManualSortNumber))
                                 throw new CustomerValidationException(nameof(ErrorCode.MES10474));
                             if (item.ManualSortNumber.Length > 18)
                                 throw new CustomerValidationException(nameof(ErrorCode.MES10475));
-                            if(string.IsNullOrEmpty(item.Extra1))
+                            if (string.IsNullOrEmpty(item.Extra1))
                                 throw new CustomerValidationException(nameof(ErrorCode.MES10468));
                         }
                     }
@@ -222,7 +243,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
 
 
             }
-            else 
+            else
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10453));
             }
@@ -524,7 +545,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 SiteId = entity.SiteId,
                 ProcessRouteId = entity.Id,
                 SerialNo = "",
-                ManualSortNumber=s.ManualSortNumber,
+                ManualSortNumber = s.ManualSortNumber,
                 ProcedureId = s.ProcedureId,
                 CheckType = s.CheckType,
                 CheckRate = s.CheckRate,

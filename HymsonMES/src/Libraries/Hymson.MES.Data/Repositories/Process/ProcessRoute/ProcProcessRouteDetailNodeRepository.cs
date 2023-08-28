@@ -1,6 +1,8 @@
 using Dapper;
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -58,6 +60,47 @@ namespace Hymson.MES.Data.Repositories.Process
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
                 return await conn.QueryAsync<ProcProcessRouteDetailNodeEntity>(GetProcedureByProcessRouteIdSql, new { ProcessRouteId = processRouteId });
             });
+        }
+
+        /// <summary>
+        /// 获取工艺路线工序信息
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcProcedureEntity>> GetProcedureListByProcessRouteIdAsync(ProcessRouteProcedureQuery pagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+ 
+            sqlBuilder.Select("PP.*");
+            sqlBuilder.LeftJoin("proc_procedure PP ON proc_process_route_detail_node.ProcedureId = PP.Id");
+            sqlBuilder.Where("proc_process_route_detail_node.IsDeleted = 0");
+            sqlBuilder.Where("proc_process_route_detail_node.ProcessRouteId = @ProcessRouteId");
+            sqlBuilder.Where("proc_process_route_detail_node.ProcedureId <> 999999999");
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
+            {
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("PP.Code LIKE @Code");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("PP.Name LIKE @Name");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var entitiesTask = conn.QueryAsync<ProcProcedureEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var entities = await entitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcProcedureEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -170,6 +213,8 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcProcessRouteDetailNodeRepository
     {
         const string GetListSqlTemplate = @"select a.*,b.Code,b.Name,b.Type from proc_process_route_detail_node a left join proc_procedure b on a.ProcedureId=b.Id  /**where**/  ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_node` /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/  LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_route_detail_node` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string InsertSql = "INSERT INTO `proc_process_route_detail_node`(  `Id`, `SiteId`, `ProcessRouteId`, `SerialNo`, `ProcedureId`, `CheckType`, `CheckRate`, `IsWorkReport`, `PackingLevel`, `IsFirstProcess`, `Status`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, ManualSortNumber ) VALUES (   @Id, @SiteId, @ProcessRouteId, @SerialNo, @ProcedureId, @CheckType, @CheckRate, @IsWorkReport, @PackingLevel, @IsFirstProcess, @Status, @Extra1, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ManualSortNumber )  ";
         const string UpdateSql = "UPDATE `proc_process_route_detail_node` SET    ProcessRouteId = @ProcessRouteId, SerialNo = @SerialNo, ProcedureId = @ProcedureId, CheckType = @CheckType, CheckRate = @CheckRate, IsWorkReport = @IsWorkReport, PackingLevel = @PackingLevel, IsFirstProcess = @IsFirstProcess, Status = @Status, Extra1 = @Extra1, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted , ManualSortNumber=@ManualSortNumber WHERE Id = @Id ";
