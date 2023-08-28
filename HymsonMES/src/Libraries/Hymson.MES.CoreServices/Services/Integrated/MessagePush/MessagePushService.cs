@@ -355,7 +355,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 if (delayMinute < 0) delayMinute = 1;
             }
 
-            _eventBus.PublishDelay(@event, delayMinute);
+            dyEvent.Level = nextEventTypeUpgrade.Level;
+            _eventBus.PublishDelay(dyEvent, delayMinute);
         }
 
         /// <summary>

@@ -99,10 +99,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            //if (procParameterPagedQuery.SiteId != 0)
-            //{
             sqlBuilder.Where(" SiteId = @SiteId ");
-            //}
 
             if (!string.IsNullOrEmpty(pagedQuery.ParameterUnit))
             {

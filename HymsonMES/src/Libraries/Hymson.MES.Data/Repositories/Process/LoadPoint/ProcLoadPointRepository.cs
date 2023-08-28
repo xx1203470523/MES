@@ -110,7 +110,6 @@ namespace Hymson.MES.Data.Repositories.Process
                 procLoadPointPagedQuery.LoadPointName = $"%{procLoadPointPagedQuery.LoadPointName}%";
                 sqlBuilder.Where(" LoadPointName like @LoadPointName ");
             }
-            //if (procLoadPointPagedQuery.Status>DbDefaultValueConstant.IntDefaultValue)
             if (procLoadPointPagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");

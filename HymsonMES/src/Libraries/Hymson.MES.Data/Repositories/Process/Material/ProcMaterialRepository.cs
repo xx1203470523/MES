@@ -228,15 +228,12 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 if (procMaterialPagedQuery.GroupId == 0)
                 {
-                    //predicate = predicate.And(it => it.GroupId == 0);
                     sqlBuilder.Where(" GroupId = 0 ");
                 }
                 else
                 {
                     sqlBuilder.Where(" ( GroupId = 0 or GroupId =@GroupId ) ");
                 }
-
-                //sqlBuilder.Where(" GroupId = @GroupId ");
             }
             if (procMaterialPagedQuery.Status.HasValue)
             {

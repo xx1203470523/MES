@@ -111,11 +111,6 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
-            //{
-            //    sqlBuilder.Where("SiteId=@SiteId");
-            //}
-
             var offSet = (procLoadPointLinkResourcePagedQuery.PageIndex - 1) * procLoadPointLinkResourcePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procLoadPointLinkResourcePagedQuery.PageSize });

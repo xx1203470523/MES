@@ -61,24 +61,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
-
-            /*
-            StringBuilder stringBuilder = new();
-            var updatesParams = new DynamicParameters();
-            var i = 0;
-            foreach (var item in commands)
-            {
-                stringBuilder.Append(UpdateQtyHeadSql);
-                stringBuilder.AppendFormat(UpdateQtyTailSql, i);
-
-                updatesParams.Add($"{nameof(item.Id)}{i}", item.Id);
-                updatesParams.Add($"{nameof(item.Qty)}{i}", item.Qty);
-                updatesParams.Add($"{nameof(item.UpdatedBy)}{i}", item.UpdatedBy);
-                updatesParams.Add($"{nameof(item.UpdatedOn)}{i}", item.UpdatedOn);
-                i++;
-            }
-            return await conn.ExecuteAsync(stringBuilder.ToString(), updatesParams);
-            */
         }
 
         /// <summary>
