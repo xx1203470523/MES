@@ -21,19 +21,9 @@ namespace Hymson.MES.Services.Dtos.Process
     public record ProcProcessRouteDetailLinkDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键id
-        /// </summary>
-        //public long Id { get; set; }
-
-        /// <summary>
         /// 序号
         /// </summary>
         public string SerialNo { get; set; }
-
-        ///// <summary>
-        // /// 所属工艺路线ID
-        // /// </summary>
-        // public long ProcessRouteId { get; set; }
 
         /// <summary>
         /// 前一工艺路线工序明细ID
@@ -50,35 +40,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Extra1 { get; set; }
 
-        ///// <summary>
-        // /// 说明
-        // /// </summary>
-        // public string Remark { get; set; }
-
-        ///// <summary>
-        // /// 创建人
-        // /// </summary>
-        // public string CreatedBy { get; set; }
-
-        ///// <summary>
-        // /// 创建时间
-        // /// </summary>
-        // public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        // /// 最后修改人
-        // /// </summary>
-        // public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        // /// 修改时间
-        // /// </summary>
-        // public DateTime? UpdatedOn { get; set; }
-
-        ///// <summary>
-        // /// 是否逻辑删除
-        // /// </summary>
-        // public bool? IsDeleted { get; set; }
     }
 
 
@@ -224,10 +185,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcProcessRouteDetailLinkPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
+        
     }
 }

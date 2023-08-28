@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<PlanSfcReceiveSFCDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param)
+        public async Task<PlanSfcReceiveSfcDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param)
         {
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
@@ -429,7 +429,7 @@ namespace Hymson.MES.Services.Services.Plan
                     relevanceOrderCode = relevancePlanWorkOrderEntity.OrderCode;
                 }
             }
-            return new PlanSfcReceiveSFCDto()
+            return new PlanSfcReceiveSfcDto()
             {
                 OrderCode = planWorkOrderEntity.OrderCode,
                 Type = planWorkOrderEntity.Type,

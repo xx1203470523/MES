@@ -554,11 +554,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public int? NoLock { get; set; }
 
-        ///// <summary>
-        ///// 是否报废
-        ///// </summary>
-        //public TrueOrFalseEnum? IsScrap { get; set; }
-
         /// <summary>
         /// 产品编码
         /// </summary>

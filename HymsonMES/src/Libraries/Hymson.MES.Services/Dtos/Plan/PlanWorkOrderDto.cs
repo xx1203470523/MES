@@ -112,11 +112,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long SiteId { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
-
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
@@ -194,11 +189,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public long SiteId { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }= YesOrNoEnum.No;
-
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
@@ -275,11 +265,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public DateTime? PlanEndTime { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
-
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
@@ -320,11 +305,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工单状态;1：未开始；2：下达；3：生产中；4：完成；5：锁定；6：暂停中；
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
-
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
         /// 计划开始时间  时间范围  数组
@@ -431,11 +411,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
-
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
@@ -573,12 +548,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public string PassDownQuantity { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// 废弃
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
-
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例
         /// </summary>
@@ -588,7 +557,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
-
 
         /// <summary>
         /// 物料编码
