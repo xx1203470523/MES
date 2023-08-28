@@ -810,7 +810,7 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<WorkshopJobControlReportOptimizePagedQueryDto, WorkshopJobControlReportOptimizePagedQuery>();
 
-            CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
+            CreateMap<ManuSfcStepBySfcPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
             #region ComUsageReport

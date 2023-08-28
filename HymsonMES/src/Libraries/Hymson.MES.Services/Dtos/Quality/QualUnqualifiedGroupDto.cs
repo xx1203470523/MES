@@ -74,12 +74,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long UnqualifiedGroupId { get; set; }
 
 
-        // <summary>
+        /// <summary>
         /// 不合格代码
         /// </summary>
         public long UnqualifiedId { get; set; }
 
-        // <summary>
+        /// <summary>
         /// 不合格代码
         /// </summary>
         public string UnqualifiedCode { get; set; }
@@ -128,12 +128,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long UnqualifiedGroupId { get; set; }
 
 
-        // <summary>
+        /// <summary>
         /// 工序id
         /// </summary>
         public long ProcedureId { get; set; }
 
-        // <summary>
+        /// <summary>
         /// 工序编码
         /// </summary>
         public string ProcedureCode { get; set; }

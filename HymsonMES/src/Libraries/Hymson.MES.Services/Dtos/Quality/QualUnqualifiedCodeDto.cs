@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public long UnqualifiedGroupId { get; set; }
 
-        // <summary>
+        /// <summary>
         /// 不合格组
         /// </summary>
         public string UnqualifiedGroup { get; set; }
@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public class QualUnqualifiedCodePagedQueryDto : PagerInfo
     {
-        // <summary>
+        /// <summary>
         /// 不合格代码
         /// </summary>
         public string? UnqualifiedCode { get; set; }

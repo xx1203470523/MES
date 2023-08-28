@@ -111,11 +111,6 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
 
-        ///// <summary>
-        ///// 是否锁
-        ///// </summary>
-        //public TrueOrFalseEnum? SFCIsLock { get; set; }
-
         /// <summary>
         /// 工序编码
         /// </summary>
@@ -215,7 +210,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 条码步骤表 分页参数
     /// </summary>
-    public class ManuSfcStepBySFCPagedQueryDto : PagerInfo
+    public class ManuSfcStepBySfcPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 条码
@@ -223,7 +218,7 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? SFC { get; set; }
     }
 
-    public class ManuSfcStepBySFCViewDto 
+    public class ManuSfcStepBySfcViewDto 
     {
         /// <summary>
         /// sfc_step Id

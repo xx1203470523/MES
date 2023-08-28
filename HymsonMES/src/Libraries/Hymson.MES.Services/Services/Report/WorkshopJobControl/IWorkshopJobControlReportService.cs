@@ -48,6 +48,6 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam);
+        Task<PagedInfo<ManuSfcStepBySfcViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySfcPagedQueryDto queryParam);
     }
 }
