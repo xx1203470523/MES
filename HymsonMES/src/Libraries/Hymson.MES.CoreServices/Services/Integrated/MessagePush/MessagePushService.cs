@@ -335,10 +335,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             });
             if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
 
-            // 即将检查的等级
-            var nowTime = HymsonClock.Now();
-            var duration = (nowTime - messageEntity.CreatedOn).TotalMinutes;
-
             dynamic dyEvent = @event;
 
             // 下一升级等级
@@ -350,17 +346,17 @@ namespace Hymson.MES.CoreServices.Services.Integrated
 
             // 添加升级检查任务
             if (nextEventTypeUpgrade == null) return;
+            dyEvent.Level = nextEventTypeUpgrade.Level;
 
-            var delayMinute = nextEventTypeUpgrade.Duration;
-            if (currentEventTypeUpgrade != null)
+            // 即将检查的等级
+            var delayMinute = 1;
+            var duration = (HymsonClock.Now() - messageEntity.CreatedOn).TotalMinutes;
+            if (duration < nextEventTypeUpgrade.Duration)
             {
-                delayMinute -= currentEventTypeUpgrade.Duration;
-                delayMinute *= 60;
-                if (delayMinute < 0) delayMinute = 1;
+                delayMinute = Math.Ceiling(nextEventTypeUpgrade.Duration - duration).ParseToInt(1);
             }
 
-            dyEvent.Level = nextEventTypeUpgrade.Level;
-            _eventBus.PublishDelay(dyEvent, delayMinute);
+            _eventBus.PublishDelay(dyEvent, delayMinute * 60);
         }
 
         /// <summary>
