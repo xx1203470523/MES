@@ -1,4 +1,5 @@
-﻿using Hymson.EventBus.Abstractions;
+﻿using Google.Protobuf.WellKnownTypes;
+using Hymson.EventBus.Abstractions;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Integrated;
@@ -13,6 +14,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MessagePush.Enum;
 using Hymson.MessagePush.Services;
 using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Integrated
 {
@@ -176,26 +178,38 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 await SendMessageAsync(messageEntity, pushScene.Value);
             }
 
-            // 升级场景
-            switch (messageEntity.Status)
+            // 升级场景（因为只有接收升级和处理升级才推送）
+            pushScene = messageEntity.Status switch
             {
-                case MessageStatusEnum.Trigger:
-                    if (eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == PushSceneEnum.ReceiveUpgrade) == false) break;
+                MessageStatusEnum.Trigger => PushSceneEnum.ReceiveUpgrade,
+                MessageStatusEnum.Receive => PushSceneEnum.HandleUpgrade,
+                _ => null
+            };
+            if (pushScene == null) return;
 
-                    // 设置升级事件（接收升级）
-                    await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeIntegrationEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.ReceiveUpgrade);
-                    break;
-                case MessageStatusEnum.Receive:
-                    if (eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == PushSceneEnum.HandleUpgrade) == false) break;
+            // 如果开启的开关不含有该场景，则不发送即时通知（升级场景）
+            if (eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == pushScene.Value) == false) return;
+            dynamic? @event = pushScene.Value switch
+            {
+                PushSceneEnum.ReceiveUpgrade => new MessageReceiveUpgradeIntegrationEvent { MessageId = messageEntity.Id },
+                PushSceneEnum.HandleUpgrade => new MessageHandleUpgradeIntegrationEvent { MessageId = messageEntity.Id },
+                _ => null
+            };
+            if (@event == null) return;
 
-                    // 设置升级事件（处理升级）
-                    await SetNextUpgradeLevelAsync(new MessageHandleUpgradeIntegrationEvent { MessageId = messageEntity.Id }, messageEntity, PushSceneEnum.HandleUpgrade);
-                    break;
-                case MessageStatusEnum.Handle:
-                case MessageStatusEnum.Close:
-                default:
-                    break;
-            }
+            // 读取接收升级等级设置（已缓存）
+            var eventTypeUpgrades = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
+            {
+                SiteId = messageEntity.SiteId,
+                EventTypeId = messageEntity.EventTypeId,
+                PushScene = pushScene.Value
+            });
+            if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
+
+            // 当前匹配的等级（这个一定有数据，因为前面已经做了Any()验证
+            InteEventTypeUpgradeEntity firstLevelEntity = eventTypeUpgrades.OrderBy(o => o.Level).First();
+            @event.Level = firstLevelEntity.Level;
+            _eventBus.PublishDelay(@event, firstLevelEntity.Duration * 60);
         }
 
         /// <summary>
@@ -222,7 +236,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (messageEntity.Status != MessageStatusEnum.Trigger) return;
 
             // 设置发送升级事件
-            await SetNextUpgradeLevelAsync(new MessageReceiveUpgradeIntegrationEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.ReceiveUpgrade);
+            await SetNextUpgradeLevelAsync(@event, PushSceneEnum.ReceiveUpgrade, messageEntity);
         }
 
         /// <summary>
@@ -239,7 +253,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (messageEntity.Status != MessageStatusEnum.Receive) return;
 
             // 设置发送升级事件
-            await SetNextUpgradeLevelAsync(new MessageHandleUpgradeIntegrationEvent { MessageId = @event.MessageId }, messageEntity, PushSceneEnum.HandleUpgrade);
+            await SetNextUpgradeLevelAsync(@event, PushSceneEnum.HandleUpgrade, messageEntity);
         }
         #endregion
 
@@ -299,13 +313,14 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         }
 
         /// <summary>
-        /// 发送即时消息（升级消息）
+        /// 获取下一等级设置
         /// </summary>
-        /// <param name="messageEntity"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="event"></param>
         /// <param name="pushScene"></param>
-        /// <param name="eventTypeUpgradeId"></param>
+        /// <param name="messageEntity"></param>
         /// <returns></returns>
-        private async Task SendUpgradeMessageAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene, long eventTypeUpgradeId)
+        private async Task SetNextUpgradeLevelAsync<T>(T @event, PushSceneEnum pushScene, InteMessageManageEntity messageEntity) where T : IntegrationEvent
         {
             // 读取接收升级等级设置（已缓存）
             var eventTypeUpgrades = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
@@ -316,6 +331,41 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             });
             if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
 
+            // 即将检查的等级
+            var nowTime = HymsonClock.Now();
+            var duration = (nowTime - messageEntity.CreatedOn).TotalMinutes;
+
+            dynamic dyEvent = @event;
+
+            // 下一升级等级
+            var currentEventTypeUpgrade = eventTypeUpgrades.FirstOrDefault(o => dyEvent.Level);
+            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Level >= dyEvent.Level).OrderBy(o => o.Level).FirstOrDefault();
+
+            // 发送即时消息（升级消息）
+            if (currentEventTypeUpgrade != null) await SendUpgradeMessageAsync(messageEntity, pushScene, currentEventTypeUpgrade);
+
+            // 添加升级检查任务
+            if (nextEventTypeUpgrade == null) return;
+
+            var delayMinute = nextEventTypeUpgrade.Duration;
+            if (currentEventTypeUpgrade != null)
+            {
+                delayMinute -= currentEventTypeUpgrade.Duration;
+                if (delayMinute < 0) delayMinute = 0;
+            }
+
+            _eventBus.PublishDelay(@event, delayMinute * 60);
+        }
+
+        /// <summary>
+        /// 发送即时消息（升级消息）
+        /// </summary>
+        /// <param name="messageEntity"></param>
+        /// <param name="pushScene"></param>
+        /// <param name="eventTypeUpgrade"></param>
+        /// <returns></returns>
+        private async Task SendUpgradeMessageAsync(InteMessageManageEntity messageEntity, PushSceneEnum pushScene, InteEventTypeUpgradeEntity eventTypeUpgrade)
+        {
             // 升级消息组关联信息
             var messageGroupRelationEntities = await _inteEventTypeUpgradeMessageGroupRelationRepository.GetEntitiesAsync(new InteEventTypeUpgradeMessageGroupRelationQuery
             {
@@ -324,7 +374,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 PushScene = pushScene
             });
             // 过滤出当前升级等级的消息组关联信息
-            messageGroupRelationEntities = messageGroupRelationEntities.Where(w => w.EventTypeUpgradeId == eventTypeUpgradeId);
+            messageGroupRelationEntities = messageGroupRelationEntities.Where(w => w.EventTypeUpgradeId == eventTypeUpgrade.Id);
 
             // 消息组关联推送方式（已缓存）
             var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityByParentIdQuery { SiteId = messageEntity.SiteId });
@@ -365,53 +415,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             }
         }
 
-        /// <summary>
-        /// 获取下一等级设置
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="event"></param>
-        /// <param name="messageEntity"></param>
-        /// <param name="pushScene"></param>
-        /// <returns></returns>
-        private async Task SetNextUpgradeLevelAsync<T>(T @event, InteMessageManageEntity messageEntity, PushSceneEnum pushScene) where T : IntegrationEvent
-        {
-            // 只有这两种场景才有升级需求
-            if (pushScene != PushSceneEnum.ReceiveUpgrade && pushScene != PushSceneEnum.HandleUpgrade) return;
-
-            // 读取接收升级等级设置（已缓存）
-            var eventTypeUpgrades = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
-            {
-                SiteId = messageEntity.SiteId,
-                EventTypeId = messageEntity.EventTypeId,
-                PushScene = pushScene
-            });
-            if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
-
-            // 即将检查的等级
-            var nowTime = HymsonClock.Now();
-            var duration = (nowTime - messageEntity.CreatedOn).TotalMinutes;
-
-            // 当前匹配的等级
-            InteEventTypeUpgradeEntity? currentEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Duration < duration).OrderByDescending(o => o.Level).FirstOrDefault();
-
-            // 下一升级等级
-            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Duration >= duration).OrderBy(o => o.Level).FirstOrDefault();
-
-            // 发送即时消息（升级消息）
-            if (currentEventTypeUpgrade != null)
-            {
-                //currentEventTypeUpgrade = eventTypeUpgrades.OrderBy(o => o.Level).FirstOrDefault();
-                await SendUpgradeMessageAsync(messageEntity, pushScene, currentEventTypeUpgrade.Id);
-            }
-
-            // 添加升级检查任务
-            if (nextEventTypeUpgrade == null) return;
-
-            var delayMinute = nextEventTypeUpgrade.Duration;
-            if (currentEventTypeUpgrade != null) delayMinute -= currentEventTypeUpgrade.Duration;
-
-            _eventBus.PublishDelay(@event, delayMinute * 60);
-        }
 
         /// <summary>
         /// 转换实体为BO对象
