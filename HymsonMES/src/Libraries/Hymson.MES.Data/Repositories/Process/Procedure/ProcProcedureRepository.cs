@@ -32,47 +32,47 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procProcedurePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedureView>> GetPagedInfoAsync(ProcProcedurePagedQuery query)
+        public async Task<PagedInfo<ProcProcedureView>> GetPagedInfoAsync(ProcProcedurePagedQuery procProcedurePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            if (string.IsNullOrEmpty(query.Sorting))
+            if (string.IsNullOrEmpty(procProcedurePagedQuery.Sorting))
             {
                 sqlBuilder.OrderBy("a.CreatedOn DESC");
             }
             else
             {
-                sqlBuilder.OrderBy(query.Sorting);
+                sqlBuilder.OrderBy(procProcedurePagedQuery.Sorting);
             }
 
             sqlBuilder.Where("a.SiteId = @SiteId");
-            if (!string.IsNullOrWhiteSpace(query.Code))
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.Code))
             {
-                query.Code = $"%{query.Code}%";
+                procProcedurePagedQuery.Code = $"%{procProcedurePagedQuery.Code}%";
                 sqlBuilder.Where("Code like @Code");
             }
-            if (!string.IsNullOrWhiteSpace(query.Name))
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.Name))
             {
-                query.Name = $"%{query.Name}%";
+                procProcedurePagedQuery.Name = $"%{procProcedurePagedQuery.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
-            if (query.Status.HasValue)
+            if (procProcedurePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
-            if (query.StatusArr != null && query.StatusArr.Length > 0)
+            if (procProcedurePagedQuery.StatusArr != null && procProcedurePagedQuery.StatusArr.Length > 0)
             {
                 sqlBuilder.Where("Status in @StatusArr");
             }
-            if (query.TypeArr != null && query.TypeArr.Length > 0)
+            if (procProcedurePagedQuery.TypeArr != null && procProcedurePagedQuery.TypeArr.Length > 0)
             {
-                if (query.Type.HasValue)
+                if (procProcedurePagedQuery.Type.HasValue)
                 {
-                    if (query.TypeArr.Contains(query.Type.Value))
+                    if (procProcedurePagedQuery.TypeArr.Contains(procProcedurePagedQuery.Type.Value))
                     {
                         sqlBuilder.Where("Type=@Type");
                     }
@@ -88,28 +88,28 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             else
             {
-                if (query.Type.HasValue)
+                if (procProcedurePagedQuery.Type.HasValue)
                 {
                     sqlBuilder.Where("Type=@Type");
                 }
             }
-            if (!string.IsNullOrWhiteSpace(query.ResTypeName))
+            if (!string.IsNullOrWhiteSpace(procProcedurePagedQuery.ResTypeName))
             {
-                query.Name = $"%{query.ResTypeName}%";
+                procProcedurePagedQuery.Name = $"%{procProcedurePagedQuery.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procProcedurePagedQuery.PageIndex - 1) * procProcedurePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procProcedurePagedQuery.PageSize });
+            sqlBuilder.AddParameters(procProcedurePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedureEntitiesTask = conn.QueryAsync<ProcProcedureView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcedureEntities = await procProcedureEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcedureView>(procProcedureEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcProcedureView>(procProcedureEntities, procProcedurePagedQuery.PageIndex, procProcedurePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>

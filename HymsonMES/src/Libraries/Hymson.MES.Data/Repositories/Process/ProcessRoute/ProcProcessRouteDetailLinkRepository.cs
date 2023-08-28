@@ -97,9 +97,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procProcessRouteDetailLinkPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcessRouteDetailLinkEntity>> GetPagedInfoAsync(ProcProcessRouteDetailLinkPagedQuery query)
+        public async Task<PagedInfo<ProcProcessRouteDetailLinkEntity>> GetPagedInfoAsync(ProcProcessRouteDetailLinkPagedQuery procProcessRouteDetailLinkPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -110,32 +110,32 @@ namespace Hymson.MES.Data.Repositories.Process
 
             sqlBuilder.Where("SiteId = @SiteId");
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procProcessRouteDetailLinkPagedQuery.PageIndex - 1) * procProcessRouteDetailLinkPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procProcessRouteDetailLinkPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procProcessRouteDetailLinkPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteDetailLinkEntitiesTask = conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcessRouteDetailLinkEntities = await procProcessRouteDetailLinkEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcessRouteDetailLinkEntity>(procProcessRouteDetailLinkEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcProcessRouteDetailLinkEntity>(procProcessRouteDetailLinkEntities, procProcessRouteDetailLinkPagedQuery.PageIndex, procProcessRouteDetailLinkPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
         /// 查询List
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procProcessRouteDetailLinkQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery query)
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery procProcessRouteDetailLinkQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
             sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(procProcessRouteDetailLinkQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
