@@ -338,7 +338,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             dynamic dyEvent = @event;
 
             // 下一升级等级
-            var currentEventTypeUpgrade = eventTypeUpgrades.FirstOrDefault(o => dyEvent.Level);
+            var currentEventTypeUpgrade = eventTypeUpgrades.FirstOrDefault(o => o.Level == dyEvent.Level);
             InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Level >= dyEvent.Level).OrderBy(o => o.Level).FirstOrDefault();
 
             // 发送即时消息（升级消息）
