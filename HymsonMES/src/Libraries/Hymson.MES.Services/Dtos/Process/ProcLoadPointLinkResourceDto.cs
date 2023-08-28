@@ -160,11 +160,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcLoadPointLinkResourcePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
+        
     }
 
     /// <summary>

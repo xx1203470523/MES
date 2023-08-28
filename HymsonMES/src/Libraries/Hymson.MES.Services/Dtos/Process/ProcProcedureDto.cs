@@ -298,11 +298,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-        ///// <summary>
-        ///// 工序BOM代码
-        ///// </summary>
-        //public string Code { get; set; }
-
         /// <summary>
         /// 工序BOM名称
         /// </summary>
@@ -354,11 +349,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcedureJobReleationDto
     {
-        /// <summary>
-        /// 工序配置工作实体类
-        /// </summary>
-        // public InteJobBusinessRelationDto ProcedureConfigJob { get; set; }
-
         /// <summary>
         /// 关联点
         /// </summary>

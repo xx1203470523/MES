@@ -215,10 +215,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
-        ///// <summary>
-        ///// 自定义
-        ///// </summary>
-        //public List<ProcResourceCustomDto> customList { get; set; }
     }
 
     /// <summary>
@@ -282,9 +278,5 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
-        ///// <summary>
-        ///// 自定义
-        ///// </summary>
-        //public List<ProcResourceCustomDto> customList { get; set; }
     }
 }

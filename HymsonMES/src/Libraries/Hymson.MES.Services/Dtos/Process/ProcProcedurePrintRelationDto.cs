@@ -186,11 +186,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcProcedurePrintReleationDto
     {
-        ///// <summary>
-        ///// 工序配置打印实体类
-        ///// </summary>
-        //public ProcProcedurePrintRelationDto ProcedureBomConfigPrint { get; set; }
-
         /// <summary>
         /// 所属物料ID
         /// </summary>
@@ -215,11 +210,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 份数
         /// </summary>
         public int? Copy { get; set; }
-
-        /// <summary>
-        /// 备注
-        /// </summary>
-       // public string Remark { get; set; }
 
         /// <summary>
         /// 物料编码

@@ -178,11 +178,6 @@ namespace Hymson.MES.Services.Dtos.Process
         [Required(ErrorMessage = "物料名称不能为空")]
         public string MaterialName { get; set; } = "";
 
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
-        //public SysDataStatusEnum? Status { get; set; }
-
         /// <summary>
         /// 来源
         /// </summary>
@@ -276,16 +271,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcMaterialReplaceDto : BaseEntityDto
     {
-        ///// <summary>
-        ///// 序号
-        ///// </summary>
-        //public long Sequence { get; set; }
-
-        ///// <summary>
-        ///// 物料维护表Id
-        ///// </summary>
-        //public long Id { get; set; }
-
         /// <summary>
         /// 物料ID
         /// </summary>
@@ -310,11 +295,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
-        ///// <summary>
-        ///// 操作类型
-        ///// </summary>
-        //[Required(ErrorMessage = "操作类型不可为空")]
-        //public OperateTypeEnum OperationType { get; set; }
     }
 
     /// <summary>
@@ -341,11 +321,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
-
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
-        //public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 来源
@@ -534,16 +509,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcMaterialReplaceViewDto : BaseEntityDto
     {
-        ///// <summary>
-        ///// 序号
-        ///// </summary>
-        //public long Sequence { get; set; }
-
-        ///// <summary>
-        ///// 物料维护表Id
-        ///// </summary>
-        //public long Id { get; set; }
-
         /// <summary>
         /// 物料ID
         /// </summary>
@@ -568,11 +533,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否启用
         /// </summary>
         public bool IsEnabled { get; set; }
-        ///// <summary>
-        ///// 操作类型
-        ///// </summary>
-        //[Required(ErrorMessage = "操作类型不可为空")]
-        //public OperateTypeEnum OperationType { get; set; }
     }
 
     /// <summary>
@@ -584,16 +544,6 @@ namespace Hymson.MES.Services.Dtos.Process
         // 摘要:
         //     唯一标识
         public long Id { get; set; }
-
-        ////
-        //// 摘要:
-        ////     创建人
-        //public string CreatedBy { get; set; } = "";
-
-        ////
-        //// 摘要:
-        ////     创建时间
-        //public DateTime CreatedOn { get; set; }
 
         /// <summary>
         /// 物料ID

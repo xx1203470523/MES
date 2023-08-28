@@ -104,18 +104,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-        /*
-        /// <summary>
-        /// 参数代码（这里传值不会修改，仅仅是校验用）
-        /// </summary>
-        public string ParameterCode { get; set; } = "";
-        */
-
-        ///// <summary>
-        ///// 参数名称
-        ///// </summary>
-        //public string ParameterName { get; set; } = "";
-
         /// <summary>
         /// 参数单位
         /// </summary>
