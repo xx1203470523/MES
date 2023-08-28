@@ -279,7 +279,7 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 根据ID获取检验单附件列表
+        /// 根据检验单ID获取检验单附件列表
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -427,7 +427,7 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13230));
             }
             //获取已检样本数据
-            var samples = await _qualIpqcInspectionPatrolSampleRepository.GetEntitiesAsync(new QualIpqcInspectionPatrolSampleQuery { IpqcInspectionPatrolId = dto.Id });
+            var samples = await _qualIpqcInspectionPatrolSampleRepository.GetEntitiesAsync(new QualIpqcInspectionPatrolSampleQuery { InspectionOrderId = dto.Id });
             if (samples.IsNullOrEmpty() || samples.Select(x => x.Barcode).Distinct().Count() < entity.SampleQty)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13231));

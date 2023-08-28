@@ -76,6 +76,28 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 获取检验单已检样本列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("samplelist/{id}")]
+        public async Task<PagedInfo<QualIpqcInspectionTailSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionTailSamplePagedQueryDto pagedQueryDto)
+        {
+            return await _qualIpqcInspectionTailService.GetPagedSampleListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 根据检验单ID获取检验单附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("attachmentlist/{id}")]
+        public async Task<IEnumerable<QualIpqcInspectionTailAnnexDto>?> GetAttachmentListAsync(long id)
+        {
+            return await _qualIpqcInspectionTailService.GetAttachmentListAsync(id);
+        }
+
+        /// <summary>
         /// 分页查询列表（尾检检验单）
         /// </summary>
         /// <param name="pagedQueryDto"></param>

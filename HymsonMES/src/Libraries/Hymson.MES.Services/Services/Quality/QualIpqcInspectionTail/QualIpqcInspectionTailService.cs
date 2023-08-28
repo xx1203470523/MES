@@ -263,6 +263,49 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
+        /// 获取检验单已检样本列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<QualIpqcInspectionTailSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionTailSamplePagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<QualIpqcInspectionTailSamplePagedQuery>();
+
+            var pagedInfo = await _qualIpqcInspectionTailSampleRepository.GetPagedListAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<QualIpqcInspectionTailSampleDto>());
+            return new PagedInfo<QualIpqcInspectionTailSampleDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据检验单ID获取检验单附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualIpqcInspectionTailAnnexDto>?> GetAttachmentListAsync(long id)
+        {
+            var entities = await _qualIpqcInspectionTailAnnexRepository.GetEntitiesAsync(new QualIpqcInspectionTailAnnexQuery { InspectionOrderId = id });
+            if (entities == null) return null;
+
+            var attachments = await _inteAttachmentRepository.GetByIdsAsync(entities.Select(x => x.AnnexId));
+
+            var dtos = entities.Select(item =>
+            {
+                var dto = item.ToModel<QualIpqcInspectionTailAnnexDto>();
+                var attachment = attachments.FirstOrDefault(x => x.Id == item.AnnexId);
+                if (attachment != null)
+                {
+                    dto.Name = attachment.Name;
+                    dto.Path = attachment.Path;
+                }
+                return dto;
+            });
+
+            return dtos;
+        }
+
+        /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
         /// <param name="pagedQueryDto"></param>
@@ -384,7 +427,7 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13230));
             }
             //获取已检样本数据
-            var samples = await _qualIpqcInspectionTailSampleRepository.GetEntitiesAsync(new QualIpqcInspectionTailSampleQuery { IpqcInspectionTailId = dto.Id });
+            var samples = await _qualIpqcInspectionTailSampleRepository.GetEntitiesAsync(new QualIpqcInspectionTailSampleQuery { InspectionOrderId = dto.Id });
             if (samples.IsNullOrEmpty() || samples.Select(x => x.Barcode).Distinct().Count() < entity.SampleQty)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13231));

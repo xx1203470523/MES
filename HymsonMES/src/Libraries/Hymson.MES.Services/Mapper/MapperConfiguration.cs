@@ -624,6 +624,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionHeadSampleCreateDto, QualIpqcInspectionHeadSampleEntity>();
             CreateMap<QualIpqcInspectionHeadView, QualIpqcInspectionHeadDto>();
             CreateMap<QualIpqcInspectionHeadEntity, QualIpqcInspectionHeadDto>();
+            CreateMap<QualIpqcInspectionHeadSampleView, QualIpqcInspectionHeadSampleDto>();
             CreateMap<QualIpqcInspectionHeadSampleEntity, QualIpqcInspectionHeadSampleDto>();
             CreateMap<QualIpqcInspectionHeadAnnexEntity, QualIpqcInspectionHeadAnnexDto>();
             #endregion
@@ -633,6 +634,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionHeadSampleCreateDto, QualIpqcInspectionHeadSampleEntity>();
             CreateMap<QualIpqcInspectionPatrolView, QualIpqcInspectionPatrolDto>();
             CreateMap<QualIpqcInspectionPatrolEntity, QualIpqcInspectionPatrolDto>();
+            CreateMap<QualIpqcInspectionPatrolSampleView, QualIpqcInspectionPatrolSampleDto>();
             CreateMap<QualIpqcInspectionPatrolSampleEntity, QualIpqcInspectionPatrolSampleDto>();
             CreateMap<QualIpqcInspectionPatrolAnnexEntity, QualIpqcInspectionPatrolAnnexDto>();
             #endregion
@@ -642,6 +644,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionTailSampleCreateDto, QualIpqcInspectionTailSampleEntity>();
             CreateMap<QualIpqcInspectionTailView, QualIpqcInspectionTailDto>();
             CreateMap<QualIpqcInspectionTailEntity, QualIpqcInspectionTailDto>();
+            CreateMap<QualIpqcInspectionTailSampleView, QualIpqcInspectionTailSampleDto>();
             CreateMap<QualIpqcInspectionTailSampleEntity, QualIpqcInspectionTailSampleDto>();
             CreateMap<QualIpqcInspectionTailAnnexEntity, QualIpqcInspectionTailAnnexDto>();
             #endregion
