@@ -7,12 +7,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Snowflake;
@@ -125,6 +127,8 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         entity.UpdatedOn = updatedOn;
         entity.SiteId = _currentSite.SiteId ?? 0;
 
+        entity.Status = SysDataStatusEnum.Build;
+
         // 验证唯一性
         await CheckUniqueMaterialProcedureAsync(entity);
 
@@ -184,17 +188,23 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
 
         // 检查数据之前的状态是否允许修改
         var dbEntity = await _procProductParameterGroupRepository.GetByIdAsync(entity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-        switch (dbEntity.Status)
+        //switch (dbEntity.Status)
+        //{
+        //    case SysDataStatusEnum.Enable:
+        //    case SysDataStatusEnum.Retain:
+        //    case SysDataStatusEnum.Abolish:
+        //        if (saveDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
+        //        if (dbEntity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
+        //        break;
+        //    case SysDataStatusEnum.Build:
+        //    default:
+        //        break;
+        //}
+        //验证某些状态是不能编辑的
+        var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+        if (!canEditStatusEnum.Any(x => x == dbEntity.Status))
         {
-            case SysDataStatusEnum.Enable:
-            case SysDataStatusEnum.Retain:
-            case SysDataStatusEnum.Abolish:
-                if (saveDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
-                if (dbEntity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
-                break;
-            case SysDataStatusEnum.Build:
-            default:
-                break;
+            throw new CustomerValidationException(nameof(ErrorCode.MES10129));
         }
 
         // 验证唯一性
@@ -437,4 +447,55 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
     }
     #endregion
 
+    #region 状态变更
+    /// <summary>
+    /// 状态变更
+    /// </summary>
+    /// <param name="param"></param>
+    /// <returns></returns>
+    public async Task UpdateStatusAsync(ChangeStatusDto param)
+    {
+        #region 参数校验
+        if (param.Id == 0)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+        }
+        if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+        }
+        if (param.Status == SysDataStatusEnum.Build)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+        }
+
+        #endregion
+
+        var changeStatusCommand = new ChangeStatusCommand()
+        {
+            Id = param.Id,
+            Status = param.Status,
+
+            UpdatedBy = _currentUser.UserName,
+            UpdatedOn = HymsonClock.Now()
+        };
+
+        #region 校验数据
+        var entity = await _procProductParameterGroupRepository.GetByIdAsync(changeStatusCommand.Id);
+        if (entity == null || entity.IsDeleted != 0)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+        }
+        if (entity.Status == changeStatusCommand.Status)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+        }
+        #endregion
+
+        #region 操作数据库
+        await _procProductParameterGroupRepository.UpdateStatusAsync(changeStatusCommand);
+        #endregion
+    }
+
+    #endregion
 }

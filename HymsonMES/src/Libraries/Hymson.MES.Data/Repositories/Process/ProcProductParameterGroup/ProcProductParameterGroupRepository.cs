@@ -217,6 +217,16 @@ namespace Hymson.MES.Data.Repositories.Process
             return new PagedInfo<ProcProductParameterGroupView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
 
@@ -234,7 +244,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_product_parameter_group` SET IsDeleted = Id WHERE Id = @Id ";
@@ -244,6 +254,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByProductProcedureSql = "SELECT * FROM proc_product_parameter_group WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialId = @ProductId AND ProcedureId = @ProcedureId";
         const string GetByIdSql = @"SELECT * FROM `proc_product_parameter_group`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_product_parameter_group`  WHERE Id IN @Ids ";
+
+        const string UpdateStatusSql = "UPDATE `proc_product_parameter_group` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
     }
 }
