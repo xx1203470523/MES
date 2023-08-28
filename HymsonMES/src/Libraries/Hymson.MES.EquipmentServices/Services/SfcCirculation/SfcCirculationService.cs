@@ -636,6 +636,36 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         }
 
         /// <summary>
+        /// 根据模组条码获取绑定CCS信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfo(string sfc)
+        {
+            if (string.IsNullOrEmpty(sfc))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
+            }
+            CirculationModuleCCSInfoDto circulationModuleCCSInfo = new();
+            //查找当前已有的绑定记录
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCode = sfc,
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationType = SfcCirculationTypeEnum.BindCCS
+            });
+            if (manuSfcCirculationEntities.Any())
+            {
+                var manuSfcCirculation = manuSfcCirculationEntities.First();
+                circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
+                circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
+                circulationModuleCCSInfo.ModelCode = manuSfcCirculation.ModelCode;
+            }
+            return circulationModuleCCSInfo;
+        }
+
+        /// <summary>
         /// CCS NG设定
         /// </summary>
         /// <param name="sfcCirculationCCSNgSetDto"></param>

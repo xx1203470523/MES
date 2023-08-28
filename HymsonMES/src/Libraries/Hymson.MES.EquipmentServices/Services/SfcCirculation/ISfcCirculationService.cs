@@ -71,6 +71,13 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         Task SfcCirculationCCSNgSetAsync(SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto);
 
         /// <summary>
+        /// 根据模组条码获取绑定CCS信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfo(string sfc);
+
+        /// <summary>
         /// CCS确认
         /// </summary>
         /// <param name="sfcCirculationCCSConfirmDto"></param>

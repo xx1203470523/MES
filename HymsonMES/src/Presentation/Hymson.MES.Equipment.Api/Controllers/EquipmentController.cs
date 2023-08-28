@@ -595,6 +595,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
+        /// 获取模组型号和CC信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetModuleCCSInfo")]
+        [ProducesResponseType(typeof(CirculationModuleCCSInfoDto), 200)]
+        public async Task<CirculationModuleCCSInfoDto> GetModuleCCSInfoAsync(string sfc)
+        {
+            return await _sfcCirculationService.GetCirculationModuleCCSInfo(sfc);
+        }
+
+        /// <summary>
         /// CCS状态确认
         /// </summary>
         /// <param name="request"></param>
