@@ -5,11 +5,6 @@ namespace Hymson.MES.Data.Repositories.Process
 {
     public class ProcParameterLinkTypeView :BaseEntity 
     {
-        ///// <summary>
-        ///// 所属站点代码
-        ///// </summary>
-        //public long SiteId { get; set; }
-
         //
         // 摘要:
         //     站点id
