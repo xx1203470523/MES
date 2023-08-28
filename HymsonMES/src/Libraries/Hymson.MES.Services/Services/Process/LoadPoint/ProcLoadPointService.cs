@@ -7,10 +7,12 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -107,6 +109,8 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointEntity.CreatedOn = HymsonClock.Now();
             procLoadPointEntity.UpdatedOn = HymsonClock.Now();
             procLoadPointEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            procLoadPointEntity.Status = SysDataStatusEnum.Build;
 
             #region 数据库验证
             var isExists = (await _procLoadPointRepository.GetProcLoadPointEntitiesAsync(new ProcLoadPointQuery()
@@ -280,12 +284,18 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 数据库验证
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10705));
-            #endregion
-
-            if (modelOrigin.Status != SysDataStatusEnum.Build && procLoadPointModifyDto.Status == SysDataStatusEnum.Build)
+           
+            //if (modelOrigin.Status != SysDataStatusEnum.Build && procLoadPointModifyDto.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10716));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10716));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
+            #endregion
 
             #region 组装数据
 
@@ -552,5 +562,57 @@ namespace Hymson.MES.Services.Services.Process
 
             return toTs;
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _procLoadPointRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10705));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procLoadPointRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

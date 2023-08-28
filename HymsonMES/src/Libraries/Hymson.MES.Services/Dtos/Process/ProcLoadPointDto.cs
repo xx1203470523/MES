@@ -154,10 +154,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string LoadPointName { get; set; }
 
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+       ///// <summary>
+       // /// 状态
+       // /// </summary>
+       // public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
@@ -188,10 +188,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string LoadPointName { get; set; }
 
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+       ///// <summary>
+       // /// 状态
+       // /// </summary>
+       // public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 说明
