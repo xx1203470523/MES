@@ -120,16 +120,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long? BadProcessRouteId { get; set; }
 
-        ///// <summary>
-        // /// 不合格记录开关;1、开启  2、关闭
-        // /// </summary>
-        // public int? Status { get; set; }
-
-        ///// <summary>
-        // /// 不良来源;·1、设备复投不良  2、人工录入不良
-        // /// </summary>
-        // public int? Source { get; set; }
-
         /// <summary>
         /// 说明
         /// </summary>
@@ -222,11 +212,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuProductBadRecordPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        
     }
 
     public class ManuProductBadRecordQueryDto

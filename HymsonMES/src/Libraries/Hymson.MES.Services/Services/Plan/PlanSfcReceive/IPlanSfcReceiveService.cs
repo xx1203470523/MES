@@ -27,6 +27,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<PlanSfcReceiveSFCDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param);
+        Task<PlanSfcReceiveSfcDto> PlanSfcReceiveScanCodeAsync(PlanSfcReceiveScanCodeDto param);
     }
 }

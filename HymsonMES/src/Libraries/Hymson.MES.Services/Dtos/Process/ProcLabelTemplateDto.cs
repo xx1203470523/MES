@@ -174,11 +174,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcLabelTemplatePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
         /// <summary>
         /// 标签名称
         /// </summary>
