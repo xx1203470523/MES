@@ -351,10 +351,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (currentEventTypeUpgrade != null)
             {
                 delayMinute -= currentEventTypeUpgrade.Duration;
-                if (delayMinute < 0) delayMinute = 0;
+                delayMinute *= 60;
+                if (delayMinute < 0) delayMinute = 1;
             }
 
-            _eventBus.PublishDelay(@event, delayMinute * 60);
+            _eventBus.PublishDelay(@event, delayMinute);
         }
 
         /// <summary>
