@@ -30,6 +30,20 @@ namespace Hymson.MES.Services.Services.Quality
         Task<QualIpqcInspectionTailDto?> QueryByIdAsync(long id);
 
         /// <summary>
+        /// 获取检验单已检样本列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<QualIpqcInspectionTailSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionTailSamplePagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 根据检验单ID获取检验单附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualIpqcInspectionTailAnnexDto>?> GetAttachmentListAsync(long id);
+
+        /// <summary>
         /// 获取分页List
         /// </summary>
         /// <param name="pagedQueryDto"></param>

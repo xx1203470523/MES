@@ -2,8 +2,10 @@ using Hymson.Infrastructure;
 
 namespace Hymson.MES.Services.Dtos.Quality
 {
+    #region 请求参数DTO
+
     /// <summary>
-    /// 巡检附件新增/更新Dto
+    /// 巡检附件新增Dto
     /// </summary>
     public record QualIpqcInspectionPatrolAnnexSaveDto : BaseEntityDto
     {
@@ -17,6 +19,15 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string Path { get; set; }
     }
+
+    /// <summary>
+    /// 巡检附件分页Dto
+    /// </summary>
+    public class QualIpqcInspectionPatrolAnnexPagedQueryDto : PagerInfo { }
+
+    #endregion
+
+    #region 返回值DTO
 
     /// <summary>
     /// 巡检附件Dto
@@ -80,9 +91,5 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Path { get; set; }
     }
 
-    /// <summary>
-    /// 巡检附件分页Dto
-    /// </summary>
-    public class QualIpqcInspectionPatrolAnnexPagedQueryDto : PagerInfo { }
-
+    #endregion
 }

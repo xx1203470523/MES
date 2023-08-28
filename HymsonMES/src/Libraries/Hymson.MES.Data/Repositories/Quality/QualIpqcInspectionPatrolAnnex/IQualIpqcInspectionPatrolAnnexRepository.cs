@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(QualIpqcInspectionPatrolAnnexEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(QualIpqcInspectionPatrolAnnexEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         Task<QualIpqcInspectionPatrolAnnexEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<QualIpqcInspectionPatrolAnnexEntity>> GetEntitiesAsync(QualIpqcInspectionPatrolAnnexQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

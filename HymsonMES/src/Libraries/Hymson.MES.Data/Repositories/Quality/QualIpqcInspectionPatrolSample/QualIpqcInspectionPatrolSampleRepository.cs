@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
 
@@ -79,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIpqcInspectionPatrolSampleEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIpqcInspectionPatrolSampleEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionPatrolSampleEntity>(GetByIdsSql, new { Ids = ids });
@@ -118,9 +119,13 @@ namespace Hymson.MES.Data.Repositories.Quality
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
-            if (query.IpqcInspectionPatrolId.HasValue)
+            if (query.SiteId.HasValue)
             {
-                sqlBuilder.Where("IpqcInspectionPatrolId = @IpqcInspectionPatrolId");
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+            if (query.InspectionOrderId.HasValue)
+            {
+                sqlBuilder.Where("IpqcInspectionPatrolId = @InspectionOrderId");
             }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionPatrolSampleEntity>(template.RawSql, query);
@@ -131,15 +136,24 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualIpqcInspectionPatrolSampleEntity>> GetPagedListAsync(QualIpqcInspectionPatrolSamplePagedQuery pagedQuery)
+        public async Task<PagedInfo<QualIpqcInspectionPatrolSampleView>> GetPagedListAsync(QualIpqcInspectionPatrolSamplePagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.LeftJoin("qual_ipqc_inspection_parameter qiip ON T.IpqcInspectionParameterId = qiip.Id");
+            sqlBuilder.LeftJoin("proc_parameter pp ON T.ParameterId = pp.Id");
+            sqlBuilder.Select("T.*, pp.ParameterCode, pp.ParameterName, pp.ParameterUnit, pp.DataType, qiip.UpperLimit, qiip.LowerLimit, qiip.CenterValue, qiip.EnterNumber, qiip.IsDeviceCollect, qiip.Sequence");
+            sqlBuilder.OrderBy("T.CreatedOn DESC");
+            sqlBuilder.Where("T.IsDeleted = 0");
+            if (pagedQuery.SiteId.HasValue)
+            {
+                sqlBuilder.Where("T.SiteId = @SiteId");
+            }
+            if (pagedQuery.InspectionOrderId.HasValue)
+            {
+                sqlBuilder.Where("T.IpqcInspectionPatrolId = @InspectionOrderId");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -147,11 +161,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualIpqcInspectionPatrolSampleEntity>(templateData.RawSql, templateData.Parameters);
+            var entitiesTask = conn.QueryAsync<QualIpqcInspectionPatrolSampleView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<QualIpqcInspectionPatrolSampleEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<QualIpqcInspectionPatrolSampleView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }
@@ -162,8 +176,8 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualIpqcInspectionPatrolSampleRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_patrol_sample /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_patrol_sample /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_patrol_sample T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_patrol_sample T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_ipqc_inspection_patrol_sample /**where**/  ";

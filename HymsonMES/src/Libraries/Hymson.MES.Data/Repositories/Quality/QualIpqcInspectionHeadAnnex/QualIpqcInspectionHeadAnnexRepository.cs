@@ -116,6 +116,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            if (query.InspectionOrderId.HasValue)
+            {
+                sqlBuilder.Where("IpqcInspectionHeadId = @InspectionOrderId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionHeadAnnexEntity>(template.RawSql, query);
         }
