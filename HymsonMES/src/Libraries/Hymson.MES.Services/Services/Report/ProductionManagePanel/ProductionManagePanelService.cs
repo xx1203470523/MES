@@ -324,8 +324,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 DayConsume = dayConsume,
                 DayShift = IsDayShift() ? 1 : 0,
                 InputQty = workOrderRecord?.InputQty,
-                OverallPlanAchievingRate = planAchievingRate,
-                OverallYieldRate = 100 - unqualifiedRate,
+                OverallPlanAchievingRate = planAchievingRate < 0 ? 0 : planAchievingRate,
+                OverallYieldRate = 100 - (unqualifiedRate > 100 ? 100 : unqualifiedRate),//不良率太低
                 ProcessRouteCode = processRouteEntity?.Code,
                 ProcessRouteName = processRouteEntity?.Name,
                 ProductCode = procMaterialEntity?.MaterialCode,
