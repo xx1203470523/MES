@@ -35,9 +35,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="manuSfcProducePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcProduceView>> GetPagedInfoAsync(ManuSfcProducePagedQuery query)
+        public async Task<PagedInfo<ManuSfcProduceView>> GetPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -54,78 +54,78 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id and pr.IsDeleted =0");
 
             //状态
-            if (query.Status.HasValue)
+            if (manuSfcProducePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
-            if (query.Lock.HasValue)
+            if (manuSfcProducePagedQuery.Lock.HasValue)
             {
                 sqlBuilder.Where("msp.Lock=@Lock");
             }
-            if (query.NoLock.HasValue && query.NoLock != 1)
+            if (manuSfcProducePagedQuery.NoLock.HasValue && manuSfcProducePagedQuery.NoLock != 1)
             {
                 sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
             }
-            if (query.IsScrap.HasValue)
+            if (manuSfcProducePagedQuery.IsScrap.HasValue)
             {
                 sqlBuilder.Where("msp.IsScrap=@IsScrap");
             }
-            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Sfc))
             {
-                query.Sfc = $"%{query.Sfc}%";
+                manuSfcProducePagedQuery.Sfc = $"%{manuSfcProducePagedQuery.Sfc}%";
                 sqlBuilder.Where("msp.Sfc like @Sfc");
             }
-            if (query.SfcArray != null && query.SfcArray.Length > 0)
+            if (manuSfcProducePagedQuery.SfcArray != null && manuSfcProducePagedQuery.SfcArray.Length > 0)
             {
                 sqlBuilder.Where("msp.Sfc in @SfcArray");
             }
             //工单
-            if (!string.IsNullOrWhiteSpace(query.OrderCode))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.OrderCode))
             {
-                query.OrderCode = $"%{query.OrderCode}%";
+                manuSfcProducePagedQuery.OrderCode = $"%{manuSfcProducePagedQuery.OrderCode}%";
                 sqlBuilder.Where("pwo.OrderCode like @OrderCode");
             }
             //工序
-            if (!string.IsNullOrWhiteSpace(query.Code))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Code))
             {
-                query.Code = $"%{query.Code}%";
+                manuSfcProducePagedQuery.Code = $"%{manuSfcProducePagedQuery.Code}%";
                 sqlBuilder.Where("pp.Code like @Code");
             }
             //资源
-            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.ResCode))
             {
-                query.ResCode = $"%{query.ResCode}%";
+                manuSfcProducePagedQuery.ResCode = $"%{manuSfcProducePagedQuery.ResCode}%";
                 sqlBuilder.Where("pr.ResCode like @ResCode");
             }
             //资源-》资源类型
-            if (query.ResourceTypeId.HasValue)
+            if (manuSfcProducePagedQuery.ResourceTypeId.HasValue)
             {
                 sqlBuilder.Where("pp.ResourceTypeId=@ResourceTypeId");
             }
             //产品编码
-            if (!string.IsNullOrWhiteSpace(query.MaterialCode))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.MaterialCode))
             {
-                query.MaterialCode = $"%{query.MaterialCode}%";
+                manuSfcProducePagedQuery.MaterialCode = $"%{manuSfcProducePagedQuery.MaterialCode}%";
                 sqlBuilder.Where("pm.MaterialCode like @MaterialCode");
             }
             //产品版本
-            if (!string.IsNullOrWhiteSpace(query.Version))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Version))
             {
-                query.Version = $"%{query.Version}%";
+                manuSfcProducePagedQuery.Version = $"%{manuSfcProducePagedQuery.Version}%";
                 sqlBuilder.Where("pm.Version like @Version");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (manuSfcProducePagedQuery.PageIndex - 1) * manuSfcProducePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = manuSfcProducePagedQuery.PageSize });
+            sqlBuilder.AddParameters(manuSfcProducePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, manuSfcProducePagedQuery.PageIndex, manuSfcProducePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -501,10 +501,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCIdAsync(long sfcInfoId)
+        public async Task<ManuSfcProduceBusinessEntity> GetSfcProduceBusinessBySFCIdAsync(long id)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCIdSql, new { SfcInfoId = sfcInfoId });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCIdSql, new { SfcInfoId = id });
         }
 
         /// <summary>
@@ -532,23 +532,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据SFC获取在制品业务
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceBusinessView>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery query)
+        public async Task<IEnumerable<ManuSfcProduceBusinessView>> GetSfcProduceBusinessListBySFCAsync(SfcListProduceBusinessQuery sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcProduceBusinessView>(GetSfcProduceBusinessBySFCsSql, query);
+            return await conn.QueryAsync<ManuSfcProduceBusinessView>(GetSfcProduceBusinessBySFCsSql, sfc);
         }
 
         /// <summary>
         /// 根据IDs批量获取在制品业务
         /// </summary>
-        /// <param name="sfcInfoIds"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessBySFCIdsAsync(IEnumerable<long> sfcInfoIds)
+        public async Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetSfcProduceBusinessBySFCIdsAsync(IEnumerable<long> ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCIdsSql, new { SfcInfoIds = sfcInfoIds });
+            return await conn.QueryAsync<ManuSfcProduceBusinessEntity>(GetSfcProduceBusinessBySFCIdsSql, new { SfcInfoIds = ids });
         }
 
         /// <summary>
@@ -559,7 +559,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdAsync(DeleteSfcProduceBusinesssBySfcInfoIdCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeleteSfcProduceBusinessBySfcInfoIdSql, command);
         }
 
@@ -615,7 +614,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateWithStatusCheckSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
         const string UpdateWithStatusCheckUseInSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id IN @Ids; ";
         const string UpdateSfcProduceBusinessSql = "UPDATE `manu_sfc_produce_business` SET    BusinessType = @BusinessType, BusinessContent = @BusinessContent, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        //const string UpdateSql = "UPDATE `manu_sfc_produce` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id = @Id ";
         const string DeleteSql = "delete from manu_sfc_produce where Id = @Id  ";
         const string DeleteRangeSql = "UPDATE `manu_sfc_produce` SET IsDeleted = Id ,UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_produce`  WHERE Id = @Id ";

@@ -118,11 +118,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long? LockProductionId { get; set; }
 
-        ///// <summary>
-        ///// 工艺路线
-        ///// </summary>
-        //public long ProcessRouteId { get; set; }
-
         /// <summary>
         /// BOMId
         /// </summary>
