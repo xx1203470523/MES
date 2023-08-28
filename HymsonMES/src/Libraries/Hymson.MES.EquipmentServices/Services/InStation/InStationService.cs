@@ -62,8 +62,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
@@ -71,6 +69,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procResourceRepository"></param>
+        /// <param name="currentEquipment"></param>
         public InStationService(
             ICommonService manuCommonOldService,
             IManuSfcRepository manuSfcRepository,
@@ -117,14 +116,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
 
             //读取挂载的Job并执行
             await _manuCommonOldService.ReadAndExecuteJobAsync(new InStationRequestDto { ProcedureId = procedureEntity.Id, ResourceId = resourceEntitys.Id, Param = dic });
-
-            //var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = inStationDto.SFC, SiteId = _currentEquipment.SiteId });
-            //if (sfcProduceEntity == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES19918));
-            //}
-            ////执行进站
-            //return await InStationExecuteAsync(sfcProduceEntity);
         }
 
         /// <summary>
@@ -216,7 +207,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 // 如果是首工序，更新工单的 InputQty
-                if (isFirstProcedure == true)
+                if (isFirstProcedure)
                 {
                     rows += await _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(new UpdateQtyCommand
                     {

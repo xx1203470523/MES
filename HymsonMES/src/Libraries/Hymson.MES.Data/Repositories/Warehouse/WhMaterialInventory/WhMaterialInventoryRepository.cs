@@ -133,10 +133,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.Where(" wmi.IsDeleted = 0");
             sqlBuilder.Where(" wmi.SiteId=@SiteId");
             sqlBuilder.OrderBy(" wmi.UpdatedOn DESC");
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
 
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryPagedQuery.Batch))
             {
