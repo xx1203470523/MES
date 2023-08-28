@@ -4,12 +4,15 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Command;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -63,6 +66,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteLinkRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -78,7 +83,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             AbstractValidator<ProcProcessRouteModifyDto> validationModifyRules,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository, AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules, AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules)
+            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository, AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules, AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules, ILocalizationService localizationService
+)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -89,6 +95,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             _procProcessRouteLinkRepository = procProcessRouteLinkRepository;
             _validationFlowDynamicLinkRules = validationFlowDynamicLinkRules;
             _validationFlowDynamicNodeRules = validationFlowDynamicNodeRules;
+            _localizationService = localizationService;
         }
 
 
@@ -238,6 +245,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             procProcessRouteEntity.CreatedBy = _currentUser.UserName;
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
 
+            procProcessRouteEntity.Status = SysDataStatusEnum.Build;
+
             var links = ConvertProcessRouteLinkList(parm.DynamicData.Links, procProcessRouteEntity);
             var nodes = ConvertProcessRouteNodeList(parm.DynamicData.Nodes, links, procProcessRouteEntity);
 
@@ -348,9 +357,15 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 判断是否存在
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(parm.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
-            if (processRoute.Status != SysDataStatusEnum.Build && parm.Status == SysDataStatusEnum.Build)
+            //if (processRoute.Status != SysDataStatusEnum.Build && parm.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == processRoute.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             // DTO转换实体
@@ -630,5 +645,56 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         }
         #endregion
 
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _procProcessRouteRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10439));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procProcessRouteRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

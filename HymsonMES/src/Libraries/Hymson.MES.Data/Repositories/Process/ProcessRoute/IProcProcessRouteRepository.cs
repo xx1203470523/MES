@@ -93,5 +93,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }
