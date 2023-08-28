@@ -19,7 +19,7 @@
         /// </summary>
         public string? Location { get; set; }
         /// <summary>
-        /// CCS 是否存在NG
+        /// 模组是否存在NG
         /// </summary>
         public bool IsNg { get; set; } = false;
     }

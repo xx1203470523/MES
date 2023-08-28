@@ -43,6 +43,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuSfcCcsNgRecordRepository _manuSfcCcsNgRecordRepository;
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         public SfcCirculationService(
             ICurrentEquipment currentEquipment,
@@ -57,7 +58,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IManuSfcCcsNgRecordRepository manuSfcCcsNgRecordRepository)
+            IManuSfcCcsNgRecordRepository manuSfcCcsNgRecordRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _currentEquipment = currentEquipment;
             _validationSfcCirculationBindDtoRules = validationSfcCirculationBindDtoRules;
@@ -72,6 +74,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCcsNgRecordRepository = manuSfcCcsNgRecordRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
         /// <summary>
         /// CCS绑定的Location
@@ -658,18 +661,17 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (manuSfcCirculationEntities.Any())
             {
                 var manuSfcCirculation = manuSfcCirculationEntities.First();
-                //查询CCS的NG记录
-                var ccsNgRecordEntities = await _manuSfcCcsNgRecordRepository.GetManuSfcCcsNgRecordEntitiesAsync(new ManuSfcCcsNgRecordQuery
+                //查询模组的NG记录
+                var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
                 {
-                    SiteId = _currentEquipment.SiteId,
-                    SFC = sfc,
-                    Status = ManuSfcCcsNgRecordStatusEnum.NG,
-                    Location = manuSfcCirculation.Location
+                    SFCS = new string[] { sfc },
+                    QualityStatus = 0,//0 不合格，代表NG状态
+                    SiteId = _currentEquipment.SiteId
                 });
                 circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
                 circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
                 circulationModuleCCSInfo.ModelCode = manuSfcCirculation.ModelCode;
-                circulationModuleCCSInfo.IsNg = ccsNgRecordEntities.Any();
+                circulationModuleCCSInfo.IsNg = manuSfcSummaries.Any();
             }
             return circulationModuleCCSInfo;
         }
