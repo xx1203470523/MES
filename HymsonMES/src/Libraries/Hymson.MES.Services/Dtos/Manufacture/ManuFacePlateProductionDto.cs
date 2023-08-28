@@ -189,11 +189,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
-        ///// <summary>
-        // /// 面板Id
-        // /// </summary>
-        // public long? FacePlateId { get; set; }
-
         /// <summary>
         /// 资源id
         /// </summary>
@@ -277,32 +272,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否显示日志
         /// </summary>
         public bool? IsShowLog { get; set; }
-
-        ///// <summary>
-        // /// 创建人
-        // /// </summary>
-        // public string CreatedBy { get; set; }
-
-        ///// <summary>
-        // /// 创建时间
-        // /// </summary>
-        // public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        // /// 更新人
-        // /// </summary>
-        // public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        // /// 更新时间
-        // /// </summary>
-        // public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        // /// 删除标识
-        // /// </summary>
-        // public long IsDeleted { get; set; }
-
 
     }
 
@@ -410,30 +379,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public bool? IsShowLog { get; set; }
 
-        ///// <summary>
-        // /// 创建人
-        // /// </summary>
-        // public string CreatedBy { get; set; }
-
-        ///// <summary>
-        // /// 创建时间
-        // /// </summary>
-        // public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        // /// 更新人
-        // /// </summary>
-        // public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        // /// 更新时间
-        // /// </summary>
-        // public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        // /// 删除标识
-        // /// </summary>
-        // public long IsDeleted { get; set; }
     }
 
     /// <summary>
@@ -570,7 +515,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string CirculationBarCode { get; set; }
 
-        //public decimal CirculationQty { get; set; }
 
         public long BomDetailId { get; set; }
     }

@@ -79,16 +79,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public ResourceJobLinkPointEnum LinkPoint { get; set; }
 
         /// <summary>
-        /// 1资源  2工序 3不合格代码
-        /// </summary>
-        // public int BusinessType { get; set; }
-
-        /// <summary>
-        /// 序号
-        /// </summary>
-        // public string OrderNumber { get; set; }
-
-        /// <summary>
         /// 作业ID
         /// </summary>
         public long JobId { get; set; }
