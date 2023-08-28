@@ -30,9 +30,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procResourceEquipmentBindPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceEquipmentBindView>> GetPagedInfoAsync(ProcResourceEquipmentBindPagedQuery query)
+        public async Task<PagedInfo<ProcResourceEquipmentBindView>> GetPagedInfoAsync(ProcResourceEquipmentBindPagedQuery procResourceEquipmentBindPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -41,17 +41,17 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("a.ResourceId=@ResourceId");
             //TODO 按更新时间倒序排列
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procResourceEquipmentBindPagedQuery.PageIndex - 1) * procResourceEquipmentBindPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procResourceEquipmentBindPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procResourceEquipmentBindPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procResourceEquipmentBindEntitiesTask = conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceEquipmentBindEntities = await procResourceEquipmentBindEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceEquipmentBindView>(procResourceEquipmentBindEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcResourceEquipmentBindView>(procResourceEquipmentBindEntities, procResourceEquipmentBindPagedQuery.PageIndex, procResourceEquipmentBindPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -89,12 +89,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="bindEntitys"></param>
+        /// <param name="procResourceEquipmentBinds"></param>
         /// <returns></returns>
-        public async Task InsertRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> bindEntitys)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            await conn.ExecuteAsync(InsertSql, bindEntitys);
+            await conn.ExecuteAsync(InsertSql, procResourceEquipmentBinds);
         }
 
         /// <summary>

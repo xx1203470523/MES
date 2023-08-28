@@ -177,14 +177,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             if (query.ResTypeId.HasValue && query.ResTypeId > 0)
             {
-                //if (query.ResTypeId == 0)
-                //{
-                //    sqlBuilder.Where("a.ResTypeId=0");
-                //}
-                //else
-                //{
                 sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
-                //}
             }
 
             // 这个是为了查询指定线体下的资源，大部分情况下这个 WorkCenterLineId 是不会有值的

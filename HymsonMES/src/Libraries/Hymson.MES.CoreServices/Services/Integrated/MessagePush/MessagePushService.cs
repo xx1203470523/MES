@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Hymson.EventBus.Abstractions;
+﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Integrated;
@@ -14,7 +13,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MessagePush.Enum;
 using Hymson.MessagePush.Services;
 using Hymson.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Integrated
 {
@@ -228,8 +226,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task ReceiveCallBackAsync(MessageReceiveUpgradeIntegrationEvent @event)
         {
-            Console.WriteLine("ReceiveCallBackAsync -> ", @event.ToSerialize());
-
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
@@ -247,8 +243,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task HandleCallBackAsync(MessageHandleUpgradeIntegrationEvent @event)
         {
-            Console.WriteLine("HandleCallBackAsync -> ", @event.ToSerialize());
-
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
@@ -335,10 +329,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             });
             if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
 
-            // 即将检查的等级
-            var nowTime = HymsonClock.Now();
-            var duration = (nowTime - messageEntity.CreatedOn).TotalMinutes;
-
             dynamic dyEvent = @event;
 
             // 下一升级等级
@@ -350,17 +340,17 @@ namespace Hymson.MES.CoreServices.Services.Integrated
 
             // 添加升级检查任务
             if (nextEventTypeUpgrade == null) return;
+            dyEvent.Level = nextEventTypeUpgrade.Level;
 
-            var delayMinute = nextEventTypeUpgrade.Duration;
-            if (currentEventTypeUpgrade != null)
+            // 即将检查的等级
+            var delayMinute = 1;
+            var duration = (HymsonClock.Now() - messageEntity.CreatedOn).TotalMinutes;
+            if (duration < nextEventTypeUpgrade.Duration)
             {
-                delayMinute -= currentEventTypeUpgrade.Duration;
-                delayMinute *= 60;
-                if (delayMinute < 0) delayMinute = 1;
+                delayMinute = Math.Ceiling(nextEventTypeUpgrade.Duration - duration).ParseToInt(1);
             }
 
-            dyEvent.Level = nextEventTypeUpgrade.Level;
-            _eventBus.PublishDelay(dyEvent, delayMinute);
+            _eventBus.PublishDelay(dyEvent, delayMinute * 60);
         }
 
         /// <summary>
