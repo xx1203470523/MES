@@ -102,7 +102,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long SubWorkCenterId { get; set; }
 
-        // <summary>
+        /// <summary>
         /// 工作中心编码
         /// </summary>
         public string WorkCenterCode { get; set; }
@@ -155,7 +155,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long ResourceId { get; set; }
 
-        // <summary>
+        /// <summary>
         /// 资源编码
         /// </summary>
         public string ResourceCode { get; set; }

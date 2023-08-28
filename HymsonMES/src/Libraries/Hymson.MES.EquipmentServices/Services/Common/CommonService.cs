@@ -130,7 +130,6 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         /// <param name="jobCommonService"></param>
         /// <param name="inteJobRepository"></param>
         /// <param name="currentEquipment"></param>
-        /// <param name="manuInStationService"></param>
         public CommonService(
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
@@ -179,11 +178,11 @@ namespace Hymson.MES.EquipmentServices.Services.Common
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
-            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (!material.MaskCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             // 未设置规则
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
-            if (maskCodeRules == null || maskCodeRules.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (maskCodeRules == null || !maskCodeRules.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             return barCode.VerifyBarCode(maskCodeRules);
         }
@@ -337,7 +336,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         public static ManuSfcProduceEntity VerifyResource(this ManuSfcProduceEntity sfcProduceEntity, long resourceId)
         {
             // 当前资源是否对于的上
-            if (sfcProduceEntity.ResourceId.HasValue == true && sfcProduceEntity.ResourceId != resourceId)
+            if (sfcProduceEntity.ResourceId.HasValue && sfcProduceEntity.ResourceId != resourceId)
                 throw new CustomerValidationException(nameof(ErrorCode.MES16316)).WithData("SFC", sfcProduceEntity.SFC);
 
             return sfcProduceEntity;
@@ -348,6 +347,7 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>
+        /// <param name="produceStatusDescription"></param>
         public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
         {
             // 当前条码是否是被锁定

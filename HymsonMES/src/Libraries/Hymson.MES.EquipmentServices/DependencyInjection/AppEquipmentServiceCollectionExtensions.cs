@@ -54,10 +54,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration"></param>
         private static void AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
-            //services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
-            //return services;
+            
         }
 
         /// <summary>

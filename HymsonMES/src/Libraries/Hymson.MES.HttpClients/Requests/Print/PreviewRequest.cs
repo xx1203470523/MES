@@ -14,10 +14,10 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// <summary>
         /// 模板路径
         /// </summary>
-        public string TemplatePath { get; set; }
+        public string TemplatePath { get; set; } = "";
         /// <summary>
         /// 传递给报表的参数集合
         /// </summary>
-        public List<PrintBody.ParamEntity> Params { get; set; }
+        public List<PrintBody.ParamEntity> Params { get; set; }= new List<PrintBody.ParamEntity>();
     }
 }

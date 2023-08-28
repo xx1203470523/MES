@@ -20,13 +20,7 @@ namespace Hymson.MES.EquipmentServices.Bos.Manufacture
         /// <summary>
         /// 产品条码
         /// </summary>
-        public string SFC { get; set; }
+        public string SFC { get; set; } = "";
 
-        /*
-        /// <summary>
-        /// 额外参数
-        /// </summary>
-        public string Extra { get; set; }
-        */
     }
 }

@@ -121,31 +121,23 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhSupplierEntity>> GetWhSupplierEntitiesAsync(WhSupplierQuery whSupplierQuery)
         {
-            try
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+            if (!string.IsNullOrWhiteSpace(whSupplierQuery.Code))
             {
-                var sqlBuilder = new SqlBuilder();
-                var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
-                sqlBuilder.Select("*");
-                sqlBuilder.Where("IsDeleted=0");
-                sqlBuilder.Where("SiteId=@SiteId");
-                if (!string.IsNullOrWhiteSpace(whSupplierQuery.Code))
-                {
-                    sqlBuilder.Where("Code=@Code");
-                }
-                if (!string.IsNullOrWhiteSpace(whSupplierQuery.Name))
-                {
-                    sqlBuilder.Where("Name=@Name");
-                }
-
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, whSupplierQuery);
-                return whSupplierEntities;
+                sqlBuilder.Where("Code=@Code");
             }
-            catch (Exception ex)
+            if (!string.IsNullOrWhiteSpace(whSupplierQuery.Name))
             {
-
-                throw;
+                sqlBuilder.Where("Name=@Name");
             }
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, whSupplierQuery);
+            return whSupplierEntities;
 
         }
 
@@ -205,7 +197,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string InsertSql = "INSERT INTO `wh_supplier`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `wh_supplier`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        //const string UpdateSql = "UPDATE `wh_supplier` SET    Name = @Name, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdateSql = "UPDATE `wh_supplier` SET    Name = @Name, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `wh_supplier` SET   Name = @Name, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_supplier` SET IsDeleted = Id WHERE Id = @Id ";

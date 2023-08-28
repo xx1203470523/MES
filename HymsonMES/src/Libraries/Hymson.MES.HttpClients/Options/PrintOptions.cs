@@ -8,6 +8,6 @@ namespace Hymson.MES.HttpClients
 {
     public class PrintOptions
     {
-        public string BaseAddressUri { get; set; }
+        public string BaseAddressUri { get; set; } = "";
     }
 }
