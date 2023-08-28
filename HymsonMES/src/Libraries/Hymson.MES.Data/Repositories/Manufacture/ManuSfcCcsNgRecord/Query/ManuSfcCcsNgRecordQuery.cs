@@ -26,7 +26,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// NG位置;A,B,C,D等
         /// </summary>
-        public string Location { get; set; }
+        public string? Location { get; set; }
 
         /// <summary>
         /// CCSNG状态

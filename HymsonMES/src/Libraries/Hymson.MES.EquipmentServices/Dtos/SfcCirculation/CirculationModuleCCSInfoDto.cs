@@ -18,5 +18,9 @@
         /// CCS位置/型号
         /// </summary>
         public string? Location { get; set; }
+        /// <summary>
+        /// CCS 是否存在NG
+        /// </summary>
+        public bool IsNg { get; set; } = false;
     }
 }

@@ -95,7 +95,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 ResourceCode = "QAEMZY002",
                 SFC = "AAATESTSFC2308091",
-                ModelCode="TEST",
+                ModelCode = "TEST",
                 BindSFCs = new CirculationCCSDto[] {
                     new CirculationCCSDto{
                         SFC="CCS0002",
@@ -138,7 +138,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             {
                 ResourceCode = "QAEMZY002",
                 SFC = "AAATESTSFC2308091",
-                Locations = new string[] { "B" }
+                Locations = new string[] { "A" }
                 //BindSFCs = new string[] { "CCS0002" }
             };
             await _sfcCirculationService.SfcCirculationCCSNgSetAsync(sfcCirculationCCSNgSetDto);
@@ -190,6 +190,19 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             await SetEquInfoAsync(equipmentCode);
             var circulationBinds = await _sfcCirculationService.GetCirculationBindSfcsAsync("AAA2103841XCE12A023");
             Assert.IsTrue(circulationBinds.Any());
+        }
+
+        /// <summary>
+        /// 测试模组条码查询信息
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task GetCirculationModuleCCSInfoTest()
+        {
+            string equipmentCode = "QAEM002";
+            await SetEquInfoAsync(equipmentCode);
+            var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("AAATESTSFC2308091");
+            Assert.IsTrue(moduleCCSInfoDto != null);
         }
     }
 }

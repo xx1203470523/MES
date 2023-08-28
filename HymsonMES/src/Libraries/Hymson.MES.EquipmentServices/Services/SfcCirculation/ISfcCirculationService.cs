@@ -75,7 +75,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfo(string sfc);
+        Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfoAsync(string sfc);
 
         /// <summary>
         /// CCS确认

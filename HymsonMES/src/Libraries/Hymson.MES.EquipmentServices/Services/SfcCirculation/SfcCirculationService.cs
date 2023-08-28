@@ -640,7 +640,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfo(string sfc)
+        public async Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfoAsync(string sfc)
         {
             if (string.IsNullOrEmpty(sfc))
             {
@@ -658,9 +658,18 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (manuSfcCirculationEntities.Any())
             {
                 var manuSfcCirculation = manuSfcCirculationEntities.First();
+                //查询CCS的NG记录
+                var ccsNgRecordEntities = await _manuSfcCcsNgRecordRepository.GetManuSfcCcsNgRecordEntitiesAsync(new ManuSfcCcsNgRecordQuery
+                {
+                    SiteId = _currentEquipment.SiteId,
+                    SFC = sfc,
+                    Status = ManuSfcCcsNgRecordStatusEnum.NG,
+                    Location = manuSfcCirculation.Location
+                });
                 circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
                 circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
                 circulationModuleCCSInfo.ModelCode = manuSfcCirculation.ModelCode;
+                circulationModuleCCSInfo.IsNg = ccsNgRecordEntities.Any();
             }
             return circulationModuleCCSInfo;
         }
