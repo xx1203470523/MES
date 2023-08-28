@@ -228,6 +228,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task ReceiveCallBackAsync(MessageReceiveUpgradeIntegrationEvent @event)
         {
+            Console.WriteLine("ReceiveCallBackAsync -> ", @event.ToSerialize());
+
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
@@ -245,6 +247,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task HandleCallBackAsync(MessageHandleUpgradeIntegrationEvent @event)
         {
+            Console.WriteLine("HandleCallBackAsync -> ", @event.ToSerialize());
+
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
@@ -339,7 +343,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
 
             // 下一升级等级
             var currentEventTypeUpgrade = eventTypeUpgrades.FirstOrDefault(o => o.Level == dyEvent.Level);
-            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Level >= dyEvent.Level).OrderBy(o => o.Level).FirstOrDefault();
+            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Level > dyEvent.Level).OrderBy(o => o.Level).FirstOrDefault();
 
             // 发送即时消息（升级消息）
             if (currentEventTypeUpgrade != null) await SendUpgradeMessageAsync(messageEntity, pushScene, currentEventTypeUpgrade);

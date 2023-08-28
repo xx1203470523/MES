@@ -33,9 +33,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procProcedurePrintReleationPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcedurePrintRelationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery query)
+        public async Task<PagedInfo<ProcProcedurePrintRelationEntity>> GetPagedInfoAsync(ProcProcedurePrintReleationPagedQuery procProcedurePrintReleationPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -45,22 +45,22 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Select("*");
 
             sqlBuilder.Where("SiteId = @SiteId");
-            if (query.ProcedureId > 0)
+            if (procProcedurePrintReleationPagedQuery.ProcedureId > 0)
             {
                 sqlBuilder.Where("ProcedureId=@ProcedureId");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procProcedurePrintReleationPagedQuery.PageIndex - 1) * procProcedurePrintReleationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procProcedurePrintReleationPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procProcedurePrintReleationPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcedurePrintReleationEntitiesTask = conn.QueryAsync<ProcProcedurePrintRelationEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcedurePrintRelationEntities = await procProcedurePrintReleationEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcedurePrintRelationEntity>(procProcedurePrintRelationEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcProcedurePrintRelationEntity>(procProcedurePrintRelationEntities, procProcedurePrintReleationPagedQuery.PageIndex, procProcedurePrintReleationPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procProcedurePrintReleationQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedurePrintRelationEntity>> GetProcProcedurePrintReleationEntitiesAsync(ProcProcedurePrintReleationQuery query)
+        public async Task<IEnumerable<ProcProcedurePrintRelationEntity>> GetProcProcedurePrintReleationEntitiesAsync(ProcProcedurePrintReleationQuery procProcedurePrintReleationQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcedurePrintReleationEntitiesSqlTemplate);
@@ -122,20 +122,20 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Select("*");
 
             sqlBuilder.Where("SiteId = @SiteId");
-            if (query.ProcedureId > 0)
+            if (procProcedurePrintReleationQuery.ProcedureId > 0)
             {
                 sqlBuilder.Where("ProcedureId=@ProcedureId");
             }
-            if (query.MaterialId > 0)
+            if (procProcedurePrintReleationQuery.MaterialId > 0)
             {
                 sqlBuilder.Where("MaterialId=@MaterialId");
             }
-            if (!string.IsNullOrWhiteSpace(query.Version))
+            if (!string.IsNullOrWhiteSpace(procProcedurePrintReleationQuery.Version))
             {
                 sqlBuilder.Where("Version=@Version");
             }
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcedurePrintReleationEntities = await conn.QueryAsync<ProcProcedurePrintRelationEntity>(template.RawSql, query);
+            var procProcedurePrintReleationEntities = await conn.QueryAsync<ProcProcedurePrintRelationEntity>(template.RawSql, procProcedurePrintReleationQuery);
             return procProcedurePrintReleationEntities;
             
         }
