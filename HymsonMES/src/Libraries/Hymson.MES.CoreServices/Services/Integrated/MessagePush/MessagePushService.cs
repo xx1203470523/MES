@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Hymson.EventBus.Abstractions;
+﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Integrated;
@@ -14,7 +13,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MessagePush.Enum;
 using Hymson.MessagePush.Services;
 using Hymson.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Integrated
 {
@@ -228,8 +226,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task ReceiveCallBackAsync(MessageReceiveUpgradeIntegrationEvent @event)
         {
-            Console.WriteLine("ReceiveCallBackAsync -> ", @event.ToSerialize());
-
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
@@ -247,8 +243,6 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <returns></returns>
         public async Task HandleCallBackAsync(MessageHandleUpgradeIntegrationEvent @event)
         {
-            Console.WriteLine("HandleCallBackAsync -> ", @event.ToSerialize());
-
             // 查询一次任务状态
             var messageEntity = await _inteMessageManageRepository.GetByIdAsync(@event.MessageId);
             if (messageEntity == null) return;
