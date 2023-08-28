@@ -27,7 +27,6 @@ namespace Hymson.MES.Data.Repositories.Process
             _connectionOptions = connectionOptions.Value;
         }
 
-
         /// <summary>
         /// 删除（软删除）
         /// </summary>
@@ -120,11 +119,6 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
-            //{
-            //    sqlBuilder.Where("SiteId=@SiteId");
-            //}
 
             var offSet = (procLoadPointLinkMaterialPagedQuery.PageIndex - 1) * procLoadPointLinkMaterialPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

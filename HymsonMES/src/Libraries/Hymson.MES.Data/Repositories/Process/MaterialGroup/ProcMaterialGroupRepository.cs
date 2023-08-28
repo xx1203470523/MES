@@ -139,7 +139,6 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedCustomInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedCustomInfoCountSqlTemplate);
             sqlBuilder.Where("g.IsDeleted=0");
-            // sqlBuilder.Select("*");
             sqlBuilder.Where("g.SiteId = @SiteId");
             sqlBuilder.OrderBy("g.UpdatedOn DESC");
 
