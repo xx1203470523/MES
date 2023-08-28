@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             if (createDto.UseStatus == CalendarUseStatusEnum.Enable)
             {
                 var isExists = await _inteCalendarRepository.IsExistsAsync(entity.EquOrLineId);
-                if (isExists == true)
+                if (isExists)
                 {
                     // TODO 错误码
                     return 0;
@@ -127,7 +127,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             #endregion
 
             var resType = 0;
-            if (string.IsNullOrEmpty(createDto.Weekdays) == false)
+            if (!string.IsNullOrEmpty(createDto.Weekdays))
             {
                 var weekdays = createDto.Weekdays.Split(',');
                 foreach (var day in weekdays)
@@ -234,7 +234,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             #endregion
 
             var resType = 0;
-            if (string.IsNullOrEmpty(modifyDto.Weekdays) == false)
+            if (!string.IsNullOrEmpty(modifyDto.Weekdays))
             {
                 var weekdays = modifyDto.Weekdays.Split(',');
                 foreach (var day in weekdays)
@@ -245,7 +245,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
 
             List<InteCalendarDateEntity> inteCalendarDates = new();
             List<InteCalendarDateDetailEntity> dateDetails = new();
-            if (string.IsNullOrWhiteSpace(modifyDto.Month) == false)
+            if (!string.IsNullOrWhiteSpace(modifyDto.Month))
             {
                 var monthArr = modifyDto.Month.Split(',');
                 foreach (var month in monthArr)
@@ -310,11 +310,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         /// <summary>
         /// 查询列表（日历）
         /// </summary>
-        /// <param name="pagedQueryDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync(InteCalendarPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<InteCalendarDto>> GetPagedListAsync(InteCalendarPagedQueryDto parm)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<InteCalendarPagedQuery>();
+            var pagedQuery = parm.ToQuery<InteCalendarPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteCalendarRepository.GetPagedListAsync(pagedQuery);
 
@@ -409,7 +409,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             }
 
             // 日历时间详情
-            if (calendarDateDetails != null && calendarDateDetails.Any() == true)
+            if (calendarDateDetails != null && calendarDateDetails.Any())
             {
                 foreach (var item in calendarDateDetails)
                 {
@@ -495,7 +495,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                     // 如果是工作日
                     var resType = 2;
                     long classValue = 0;
-                    if (weekDays.Contains(week) == true)
+                    if (weekDays.Contains(week))
                     {
                         resType = 1;
                         classValue = classId ?? 0;

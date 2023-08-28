@@ -114,11 +114,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePart
         /// <summary>
         /// 分页查询列表（工装注册）
         /// </summary>
-        /// <param name="equSparePartPagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquConsumableDto>> GetPagedListAsync(EquConsumablePagedQueryDto equSparePartPagedQueryDto)
+        public async Task<PagedInfo<EquConsumableDto>> GetPagedListAsync(EquConsumablePagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = equSparePartPagedQueryDto.ToQuery<EquSparePartPagedQuery>();
+            var pagedQuery = pagedQueryDto.ToQuery<EquSparePartPagedQuery>();
             pagedQuery.Type = EquipmentPartTypeEnum.Consumable; // 工装
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _equConsumableRepository.GetPagedInfoAsync(pagedQuery);

@@ -141,12 +141,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<int> DeletesManuFacePlateAsync(long[] ids)
         {
             var manuFacePlates = await _manuFacePlateRepository.GetByIdsAsync(ids);
-            //if (manuFacePlates != null && manuFacePlates.Any())
-            //{
-            //    var isAnyEnableOrRetain = manuFacePlates.Where(c => c.Status == SysDataStatusEnum.Enable || c.Status == SysDataStatusEnum.Retain).Any();
-            //    if (isAnyEnableOrRetain)
-            //        throw new CustomerValidationException(nameof(ErrorCode.MES16913));
-            //}
             if (manuFacePlates != null && manuFacePlates.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -302,7 +296,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         var manuFacePlateButtonJobRelationDto = manuFacePlateButtonJobRelationEntity.ToModel<ManuFacePlateButtonJobRelationDto>();
                         //填充JOB信息
-                        var jobEntity = inteJobEntitys.Where(c => c.Id == manuFacePlateButtonJobRelationDto.JobId).FirstOrDefault();
+                        var jobEntity = inteJobEntitys.FirstOrDefault(c => c.Id == manuFacePlateButtonJobRelationDto.JobId);
                         if (jobEntity != null)
                         {
                             manuFacePlateButtonJobRelationDto.JobCode = jobEntity.Code;

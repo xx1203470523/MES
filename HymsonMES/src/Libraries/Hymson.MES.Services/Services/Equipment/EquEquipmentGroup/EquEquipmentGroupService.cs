@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _equEquipmentGroupRepository.InsertAsync(entity);
-                if (createDto.EquipmentIDs.Any() == true)
+                if (createDto.EquipmentIDs.Any())
                 {
                     rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(new UpdateEquipmentGroupIdCommand
                     {
