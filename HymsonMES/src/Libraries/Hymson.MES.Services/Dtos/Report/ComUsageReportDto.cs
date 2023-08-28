@@ -18,44 +18,6 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
 
-        ///// <summary>
-        ///// 开始时间 
-        ///// </summary>
-        //public DateTime? CreatedOnS
-        //{
-        //    get
-        //    {
-        //        if (!string.IsNullOrEmpty(this.CreatedOn))
-        //        {
-        //            var dateArr = this.CreatedOn.Split(',');
-        //            return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 结束时间
-        ///// </summary>
-        //public DateTime? CreatedOnE
-        //{
-        //    get
-        //    {
-        //        if (!string.IsNullOrEmpty(this.CreatedOn))
-        //        {
-        //            var dateArr = this.CreatedOn.Split(',');
-        //            return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
-
         /// <summary>
         /// 批次条码
         /// </summary>

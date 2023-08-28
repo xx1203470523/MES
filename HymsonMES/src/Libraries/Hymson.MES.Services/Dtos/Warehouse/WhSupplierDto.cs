@@ -50,27 +50,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-        ///// <summary>
-        ///// 更新人
-        ///// </summary>
-        //public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        ///// 更新时间
-        ///// </summary>
-        //public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        ///// 是否删除;删除时赋值为主键
-        ///// </summary>
-        //public long IsDeleted { get; set; }
-
-        ///// <summary>
-        ///// 站点Id
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-
     }
 
     /// <summary>
@@ -124,37 +103,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public string Remark { get; set; }
 
-        ///// <summary>
-        ///// 创建人
-        ///// </summary>
-        //public string CreatedBy { get; set; }
-
-        ///// <summary>
-        ///// 创建时间
-        ///// </summary>
-        //public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        ///// 更新人
-        ///// </summary>
-        //public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        ///// 更新时间
-        ///// </summary>
-        //public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        ///// 是否删除;删除时赋值为主键
-        ///// </summary>
-        //public long IsDeleted { get; set; }
-
-        ///// <summary>
-        ///// 站点Id
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-
     }
 
     /// <summary>
@@ -182,38 +130,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public string Remark { get; set; }
 
-        ///// <summary>
-        ///// 创建人
-        ///// </summary>
-        //public string CreatedBy { get; set; }
-
-        ///// <summary>
-        ///// 创建时间
-        ///// </summary>
-        //public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        ///// 更新人
-        ///// </summary>
-        //public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        ///// 更新时间
-        ///// </summary>
-        //public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        ///// 是否删除;删除时赋值为主键
-        ///// </summary>
-        //public long IsDeleted { get; set; }
-
-        ///// <summary>
-        ///// 站点Id
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-
-
     }
 
     /// <summary>
@@ -221,13 +137,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// </summary>
     public class WhSupplierPagedQueryDto : PagerInfo
     {
-
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
-
         /// <summary>
         /// 描述 : 供应商编号
         /// 空值 : true  

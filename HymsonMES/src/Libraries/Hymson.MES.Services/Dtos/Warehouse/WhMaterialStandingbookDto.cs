@@ -281,8 +281,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long SiteId { get; set; }
 
-
-
     }
 
     /// <summary>
@@ -290,13 +288,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// </summary>
     public class WhMaterialStandingbookPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
-
-
         /// <summary>
         /// 物料条码
         /// </summary>
