@@ -689,6 +689,7 @@ namespace Hymson.MES.Services.Services.Quality
             resultEntity.HandMethod = dto.HandMethod;
             resultEntity.ProcessedBy = _currentUser.UserName;
             resultEntity.ProcessedOn = entity.UpdatedOn;
+            resultEntity.Remark = dto.Remark;
             resultEntity.UpdatedBy = entity.UpdatedBy;
             resultEntity.UpdatedOn = entity.UpdatedOn;
 
