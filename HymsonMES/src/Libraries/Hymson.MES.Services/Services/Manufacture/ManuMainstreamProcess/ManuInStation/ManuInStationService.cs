@@ -166,7 +166,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
                 tasks.Add(manuSfcStepTask);
 
                 // 如果是首工序，更新工单的 InputQty
-                if (isFirstProcedure == true)
+                if (isFirstProcedure)
                 {
                     var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(new UpdateQtyCommand
                     {
