@@ -279,6 +279,6 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_sorting_rule`   WHERE  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
         #endregion
 
-        const string UpdateStatusSql = "UPDATE `proc_load_point` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE `proc_sorting_rule` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }
 }
