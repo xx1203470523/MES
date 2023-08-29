@@ -129,7 +129,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             }
             */
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.CalendarName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.CalendarName))
             {
                 pagedQuery.CalendarName = $"%{pagedQuery.CalendarName}%";
                 sqlBuilder.Where("IC.CalendarName LIKE @CalendarName");
@@ -145,14 +145,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
                 sqlBuilder.Where("IC.UseStatus = @UseStatus");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("IWC.`Code` LIKE @Code");
                 sqlBuilder.Where("EE.EquipmentCode LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("IWC.`Name` LIKE @Name");

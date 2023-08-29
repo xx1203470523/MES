@@ -295,7 +295,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Plan
-            //services.AddSingleton<IPlanWorkOrderActivationRepository, PlanWorkOrderActivationRepository>();
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
@@ -334,7 +333,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             //数据库连接
             services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
 

@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         public async Task InsertAsync(InteCalendarDateEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity) ;
             entity.Id = id;
         }
 

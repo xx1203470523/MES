@@ -59,12 +59,6 @@ namespace Hymson.MES.Data.Repositories
 
         public void Dispose()
         {
-            //if (_connection.IsValueCreated && _connection.Value.State != ConnectionState.Closed)
-            //{
-            //    _connection.Value.Close();
-            //}
-            //_connection.Value.Dispose();
-
             GC.SuppressFinalize(this);
         }
     }
