@@ -19,6 +19,6 @@ namespace Hymson.MES.CoreServices.Bos.Common
         /// <summary>
         /// 操作人员
         /// </summary>
-        public string UserName { get; set; } = "";
+        public string ?UserName { get; set; } = "";
     }
 }

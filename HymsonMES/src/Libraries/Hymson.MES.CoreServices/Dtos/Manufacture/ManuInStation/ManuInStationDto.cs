@@ -27,7 +27,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuInStation
         /// <summary>
         /// 条码
         /// </summary>
-        public string SFC { get; set; }
+        public string SFC { get; set; } = "";
     }
 
     /// <summary>
