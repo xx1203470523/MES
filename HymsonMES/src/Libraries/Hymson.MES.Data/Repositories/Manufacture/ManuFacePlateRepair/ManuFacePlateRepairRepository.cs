@@ -97,11 +97,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
             var offSet = (manuFacePlateRepairPagedQuery.PageIndex - 1) * manuFacePlateRepairPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlateRepairPagedQuery.PageSize });

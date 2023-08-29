@@ -104,7 +104,7 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0,
                 OrderCode = planWorkOrderCreateDto.OrderCode
             });
-            if (haveEntities != null && haveEntities.Any() == true)
+            if (haveEntities != null && haveEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16001)).WithData("orderCode", planWorkOrderCreateDto.OrderCode);
             }
@@ -355,15 +355,9 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);
-
-                //if (response == parms.Count)
-                //{
+ 
                 ts.Complete();
-                //}
-                //else
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES16005));
-                //}
+               
             }
         }
 
@@ -537,7 +531,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             // 查询已下发数量
             var workOrderRecordEntity = await _planWorkOrderRepository.GetByWorkOrderIdAsync(workOrderEntity.Id);
-            if (workOrderRecordEntity != null && workOrderRecordEntity.PassDownQuantity.HasValue == true)
+            if (workOrderRecordEntity != null && workOrderRecordEntity.PassDownQuantity.HasValue)
             {
                 // 减掉已下达数量
                 residue -= workOrderRecordEntity.PassDownQuantity.Value;
