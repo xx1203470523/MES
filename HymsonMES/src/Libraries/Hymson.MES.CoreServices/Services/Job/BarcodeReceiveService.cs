@@ -131,7 +131,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
 
             //获取首工序
-            //var firstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
             var productId = await _masterDataService.GetProductSetId(new ProductSetBo { SiteId = bo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = bo.ProcedureId, ResourceId = bo.ResourceId }) ?? planWorkOrderEntity.ProductId;
 
             var boms = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(planWorkOrderEntity.ProductBOMId, bo.ProcedureId);
@@ -155,7 +154,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 UpdatedOn = HymsonClock.Now(),
                 SfcIds=new List<long>()
             };
-            var updatInfoUsedSfcs=new List<string>();
             foreach (var sfc in bo.SFCs)
             {
                 if (sfcProduceEntities != null && sfcProduceEntities.Any(x => x.SFC == sfc)) continue;
