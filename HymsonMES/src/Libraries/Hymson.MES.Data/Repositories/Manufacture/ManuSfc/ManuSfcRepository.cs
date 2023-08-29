@@ -125,9 +125,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询（查询所有条码信息）
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="manuSfcProducePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcProduceView>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQuery query)
+        public async Task<PagedInfo<ManuSfcProduceView>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -148,65 +148,62 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id AND pr.IsDeleted =0");
 
             //状态
-            if (query.Status.HasValue)
+            if (manuSfcProducePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
-            if (query.Lock.HasValue)
+            if (manuSfcProducePagedQuery.Lock.HasValue)
             {
                 sqlBuilder.Where("msp.Lock=@Lock");
             }
-            if (query.NoLock.HasValue)
+            if (manuSfcProducePagedQuery.NoLock.HasValue && manuSfcProducePagedQuery.NoLock != 1)
             {
-                if (query.NoLock != 1)
-                {
-                    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
-                }
+                sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
             }
-            if (!string.IsNullOrWhiteSpace(query.Sfc))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Sfc))
             {
-                query.Sfc = $"%{query.Sfc}%";
+                manuSfcProducePagedQuery.Sfc = $"%{manuSfcProducePagedQuery.Sfc}%";
                 sqlBuilder.Where("ms.Sfc like @Sfc");
             }
-            if (query.SfcArray != null && query.SfcArray.Length > 0)
+            if (manuSfcProducePagedQuery.SfcArray != null && manuSfcProducePagedQuery.SfcArray.Length > 0)
             {
                 sqlBuilder.Where("ms.Sfc in @SfcArray");
             }
             //工单
-            if (!string.IsNullOrWhiteSpace(query.OrderCode))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.OrderCode))
             {
-                query.OrderCode = $"%{query.OrderCode}%";
+                manuSfcProducePagedQuery.OrderCode = $"%{manuSfcProducePagedQuery.OrderCode}%";
                 sqlBuilder.Where("pwo.OrderCode like @OrderCode");
             }
             //工序
-            if (!string.IsNullOrWhiteSpace(query.Code))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Code))
             {
-                query.Code = $"%{query.Code}%";
+                manuSfcProducePagedQuery.Code = $"%{manuSfcProducePagedQuery.Code}%";
                 sqlBuilder.Where("pp.Code like @Code");
             }
             //资源
-            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.ResCode))
             {
-                query.ResCode = $"%{query.ResCode}%";
+                manuSfcProducePagedQuery.ResCode = $"%{manuSfcProducePagedQuery.ResCode}%";
                 sqlBuilder.Where("pr.ResCode like @ResCode");
             }
             //资源-》资源类型
-            if (query.ResourceTypeId.HasValue)
+            if (manuSfcProducePagedQuery.ResourceTypeId.HasValue)
             {
                 sqlBuilder.Where("pp.ResourceTypeId=@ResourceTypeId");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (manuSfcProducePagedQuery.PageIndex - 1) * manuSfcProducePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = manuSfcProducePagedQuery.PageSize });
+            sqlBuilder.AddParameters(manuSfcProducePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ManuSfcProduceView>(manuSfcProduceEntities, manuSfcProducePagedQuery.PageIndex, manuSfcProducePagedQuery.PageSize, totalCount);
         }
 
 
@@ -223,20 +220,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
             sqlBuilder.Where("ms.SiteId = @SiteId");
-            //sqlBuilder.Where("ms.Status <> 4");
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            //sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
             sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
                                 , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
-            //sqlBuilder.LeftJoin("proc_material pm  on msi.ProductId =pm.Id  AND pm.IsDeleted=0");
-            //sqlBuilder.LeftJoin("plan_work_order pwo on pwo.Id= msi.WorkOrderId AND pwo.IsDeleted=0");
-            //sqlBuilder.LeftJoin("proc_procedure pp on msp.ProcedureId =pp.Id AND pp.IsDeleted =0");
-            //sqlBuilder.LeftJoin("proc_resource pr on msp.ResourceId =pr.Id AND pr.IsDeleted =0");
 
             //sfc条码状态
             if (query.SfcStatus.HasValue)
@@ -252,12 +243,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Lock=@Lock");
             }
-            if (query.NoLock.HasValue)
+            if (query.NoLock.HasValue && query.NoLock != 1)
             {
-                if (query.NoLock != 1)
-                {
-                    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
-                }
+                sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
             }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {

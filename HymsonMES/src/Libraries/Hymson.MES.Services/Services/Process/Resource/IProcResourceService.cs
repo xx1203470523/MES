@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using System;
@@ -120,6 +121,13 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// <param name="resourceId"></param>
         /// <returns></returns>
         Task<IEnumerable<SelectOptionDto>> QueryEquipmentsByResourceIdAsync(long resourceId);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
 
     }
 }

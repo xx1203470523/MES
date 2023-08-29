@@ -172,11 +172,11 @@ namespace Hymson.MES.Services.Dtos.Process
         //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
         public string ResName { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        //[Required(ErrorMessage = "状态不能为空")]
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        ////[Required(ErrorMessage = "状态不能为空")]
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 所属资源类型
@@ -215,10 +215,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
-        ///// <summary>
-        ///// 自定义
-        ///// </summary>
-        //public List<ProcResourceCustomDto> customList { get; set; }
     }
 
     /// <summary>
@@ -239,11 +235,11 @@ namespace Hymson.MES.Services.Dtos.Process
         //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
         public string ResName { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-       // [Required(ErrorMessage = "状态不能为空")]
-        public int Status { get; set; }
+       // /// <summary>
+       // /// 状态
+       // /// </summary>
+       //// [Required(ErrorMessage = "状态不能为空")]
+       // public int Status { get; set; }
 
         /// <summary>
         /// 所属资源类型
@@ -282,10 +278,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
-        ///// <summary>
-        ///// 自定义
-        ///// </summary>
-        //public List<ProcResourceCustomDto> customList { get; set; }
     }
 
     /// <summary>

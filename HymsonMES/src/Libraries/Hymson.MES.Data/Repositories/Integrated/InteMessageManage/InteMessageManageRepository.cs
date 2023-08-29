@@ -170,6 +170,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.LineId = @LineId");
             }
 
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("T.Status = @Status");
+            }
+
             if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";

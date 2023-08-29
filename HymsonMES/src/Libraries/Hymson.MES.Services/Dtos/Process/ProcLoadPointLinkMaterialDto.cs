@@ -40,10 +40,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? ReferencePoint { get; set; }
 
-       ///// <summary>
-       // /// 说明
-       // /// </summary>
-       // public string? Remark { get; set; }
     }
 
 
@@ -189,11 +185,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcLoadPointLinkMaterialPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
+        
     }
 
     /// <summary>

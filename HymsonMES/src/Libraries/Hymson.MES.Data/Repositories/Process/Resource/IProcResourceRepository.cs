@@ -168,5 +168,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procResourceQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcResourceEntity>> GetProcResouceEntitiesAsync(ProcResourceQuery procResourceQuery);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

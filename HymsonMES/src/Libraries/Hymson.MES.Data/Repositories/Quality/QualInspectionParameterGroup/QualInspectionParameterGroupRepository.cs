@@ -168,37 +168,37 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("T.Status = @Status");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("T.Name LIKE @Name");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.MaterialCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
             {
                 pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
                 sqlBuilder.Where("PM.MaterialCode LIKE @MaterialCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.MaterialName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialName))
             {
                 pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";
                 sqlBuilder.Where("PM.MaterialName LIKE @MaterialName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode))
             {
                 pagedQuery.ProcedureCode = $"%{pagedQuery.ProcedureCode}%";
                 sqlBuilder.Where("PP.Code LIKE @ProcedureCode");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ProcedureName))
             {
                 pagedQuery.ProcedureName = $"%{pagedQuery.ProcedureName}%";
                 sqlBuilder.Where("PP.Name LIKE @ProcedureName");

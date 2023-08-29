@@ -228,7 +228,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     MaterialCode = material?.MaterialCode ?? "",
                     MaterialName = material?.MaterialName ?? "",
                     Version = material?.Version ?? "",
-                    SerialNumber = detailEntity.DataCollectionWay.HasValue == true ? detailEntity.DataCollectionWay.Value : material?.SerialNumber,
+                    SerialNumber = detailEntity.DataCollectionWay.HasValue ? detailEntity.DataCollectionWay.Value : material?.SerialNumber,
                     Code = procedures?.Code ?? "",
                     Name = procedures?.Name ?? "",
                     BomRemark = bom.BomCode + "/" + bom.Version,
@@ -257,7 +257,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         CirculationBarCode = circulation.CirculationBarCode,
                         CirculationQty = circulation.CirculationQty ?? 0,
                         MaterialRemark = barcodeMaterial?.MaterialCode + "/" + barcodeMaterial?.Version,
-                        ResCode = circulation.ResourceId.HasValue == true ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
+                        ResCode = circulation.ResourceId.HasValue ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
                         Status = circulation.IsDisassemble == TrueOrFalseEnum.Yes ? InProductDismantleTypeEnum.Remove : InProductDismantleTypeEnum.Activity,
                         UpdatedBy = circulation.UpdatedBy ?? "",
                         UpdatedOn = circulation.UpdatedOn
@@ -282,12 +282,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             var resourceIds = new List<long>();
             foreach (var item in manuSfcCirculations)
             {
-                if (item.ResourceId.HasValue && item.ResourceId.Value > 0)
+                if (item.ResourceId.HasValue && item.ResourceId.Value > 0 && !resourceIds.Contains(item.ResourceId.Value))
                 {
-                    if (!resourceIds.Contains(item.ResourceId.Value))
-                    {
-                        resourceIds.Add(item.ResourceId.Value);
-                    }
+                    resourceIds.Add(item.ResourceId.Value);
                 }
             }
             var procResources = new List<ProcResourceEntity>();
@@ -444,12 +441,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES16600));
             }
             var manuSfcProduce = manuSfcProduces.ToList()[0];
-            if (addDto.IsAssemble)
+            if (addDto.IsAssemble && manuSfcProduce.ProcedureId != addDto.ProcedureId)
             {
-                if (manuSfcProduce.ProcedureId != addDto.ProcedureId)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16612));
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES16612));
             }
 
             //报废的不能操作
@@ -502,7 +496,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     // 验证外部条码合法性
                     var isCorrect = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(addDto.CirculationBarCode, addDto.CirculationProductId ?? 0);
-                    if (isCorrect == false) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", addDto.CirculationBarCode);
+                    if (!isCorrect) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", addDto.CirculationBarCode);
 
                     circulationQty = await GetOutsideQtyAsync(addDto.CirculationProductId.Value);
                     if (circulationQty < 1)
@@ -635,7 +629,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedBy = _currentUser.UserName
             };
 
-            var type = addDto.IsAssemble == false ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
+            var type = !addDto.IsAssemble ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
             var sfcStepEntity = CreateSFCStepEntity(manuSfcProduce, type, "");
             #endregion
 
@@ -722,11 +716,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             //查询bom明细
             var bomDetailEntity = await _procBomDetailRepository.GetByIdAsync(replaceDto.BomDetailId);
             var remainQty = bomDetailEntity?.Usages - circulationEntities.Sum(item => item.CirculationQty) ?? 0;
-            //if (remainQty <= 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES16615));
-            //}
-            //var circulationQty = circulationEntity.CirculationQty ?? 0M; //0m;
 
             var circulationQty = 0m;
             var whMaterialInventory = new WhMaterialInventoryEntity();
@@ -752,7 +741,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     // 验证外部条码合法性
                     var isCorrect = await _manuCommonOldService.CheckBarCodeByMaskCodeRuleAsync(replaceDto.CirculationBarCode, replaceDto.CirculationProductId ?? 0);
-                    if (isCorrect == false) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", replaceDto.CirculationBarCode);
+                    if (!isCorrect) throw new CustomerValidationException(nameof(ErrorCode.MES16605)).WithData("barCode", replaceDto.CirculationBarCode);
 
                     circulationQty = await GetOutsideQtyAsync(replaceDto.CirculationProductId.Value);
                     if (circulationQty < 1)
@@ -784,7 +773,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16608)).WithData("barCode", replaceDto.CirculationBarCode);
                     }
-                    //var message = _localizationService.GetResource(nameof(ErrorCode.MES16608));
                     if (serialNumber == MaterialSerialNumberEnum.Inside)
                     {
                         circulationQty = ManuSfcCirculation.CirculationQty;

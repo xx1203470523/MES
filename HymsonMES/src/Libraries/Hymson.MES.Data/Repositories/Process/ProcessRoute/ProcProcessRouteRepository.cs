@@ -43,63 +43,63 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procProcessRoutePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcessRouteEntity>> GetPagedInfoAsync(ProcProcessRoutePagedQuery query)
+        public async Task<PagedInfo<ProcProcessRouteEntity>> GetPagedInfoAsync(ProcProcessRoutePagedQuery procProcessRoutePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            if (string.IsNullOrEmpty(query.Sorting))
+            if (string.IsNullOrEmpty(procProcessRoutePagedQuery.Sorting))
             {
                 sqlBuilder.OrderBy("UpdatedOn DESC");
             }
             else
             {
-                sqlBuilder.OrderBy(query.Sorting);
+                sqlBuilder.OrderBy(procProcessRoutePagedQuery.Sorting);
             }
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId = @SiteId");
-            if (!string.IsNullOrWhiteSpace(query.Code))
+            if (!string.IsNullOrWhiteSpace(procProcessRoutePagedQuery.Code))
             {
-                query.Code = $"%{query.Code}%";
+                procProcessRoutePagedQuery.Code = $"%{procProcessRoutePagedQuery.Code}%";
                 sqlBuilder.Where("Code like @Code");
             }
-            if (!string.IsNullOrWhiteSpace(query.Name))
+            if (!string.IsNullOrWhiteSpace(procProcessRoutePagedQuery.Name))
             {
-                query.Name = $"%{query.Name}%";
+                procProcessRoutePagedQuery.Name = $"%{procProcessRoutePagedQuery.Name}%";
                 sqlBuilder.Where("Name like @Name");
             }
-            if (!string.IsNullOrWhiteSpace(query.Version))
+            if (!string.IsNullOrWhiteSpace(procProcessRoutePagedQuery.Version))
             {
-                query.Version = $"%{query.Version}%";
+                procProcessRoutePagedQuery.Version = $"%{procProcessRoutePagedQuery.Version}%";
                 sqlBuilder.Where("Version like @Version");
             }
-            if (query.Status.HasValue)
+            if (procProcessRoutePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
-            if (query.StatusArr != null && query.StatusArr.Length > 0)
+            if (procProcessRoutePagedQuery.StatusArr != null && procProcessRoutePagedQuery.StatusArr.Length > 0)
             {
                 sqlBuilder.Where("Status in @StatusArr");
             }
-            if (query.Type.HasValue)
+            if (procProcessRoutePagedQuery.Type.HasValue)
             {
                 sqlBuilder.Where("Type = @Type");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procProcessRoutePagedQuery.PageIndex - 1) * procProcessRoutePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procProcessRoutePagedQuery.PageSize });
+            sqlBuilder.AddParameters(procProcessRoutePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteEntitiesTask = conn.QueryAsync<ProcProcessRouteEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcessRouteEntities = await procProcessRouteEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcessRouteEntity>(procProcessRouteEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcProcessRouteEntity>(procProcessRouteEntities, procProcessRoutePagedQuery.PageIndex, procProcessRoutePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -231,6 +231,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletesSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     /// <summary>
@@ -247,10 +258,13 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string ResetCurrentVersionSql = "UPDATE proc_process_route SET IsCurrentVersion = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND SiteId = @SiteId AND IsCurrentVersion = 1";
-        const string UpdateSql = "UPDATE `proc_process_route` SET Name=@Name ,Status = @Status, Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_process_route` SET Name=@Name , Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT * FROM `proc_process_route`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_process_route`  WHERE Id IN @ids ";
         const string IsIsExistsEnabledSql = "select Id  from proc_process_route where IsDeleted=0 and Status in @StatusArr and Id  in @Ids  limit 1";
+
+        const string UpdateStatusSql = "UPDATE `proc_process_route` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
     }
 }

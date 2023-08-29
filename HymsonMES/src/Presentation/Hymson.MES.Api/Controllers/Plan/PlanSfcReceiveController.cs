@@ -61,7 +61,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// <returns></returns>
         [HttpGet]
         [Route("scanCode")]
-        public async Task<PlanSfcReceiveSFCDto> ScanCodeInfoAsync([FromQuery] PlanSfcReceiveScanCodeDto parm)
+        public async Task<PlanSfcReceiveSfcDto> ScanCodeInfoAsync([FromQuery] PlanSfcReceiveScanCodeDto parm)
         {
             return await _planSfcInfoService.PlanSfcReceiveScanCodeAsync(parm);
         }

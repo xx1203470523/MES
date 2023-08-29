@@ -197,13 +197,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
             }
 
-            if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0)
+            if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0 && planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
             {
-                if (planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
-                {
-                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
-                    sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
-                }
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
+                sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
 
             var offSet = (planWorkOrderActivationPagedQuery.PageIndex - 1) * planWorkOrderActivationPagedQuery.PageSize;

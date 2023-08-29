@@ -53,17 +53,17 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="createDto"></param>
+        /// <param name="EquFaultReasonCreateDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto createDto)
+        public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto)
         {
             // 验证DTO
-            createDto.FaultReasonCode = createDto.FaultReasonCode.ToTrimSpace();
-            createDto.FaultReasonCode = createDto.FaultReasonCode.ToUpperInvariant();
-            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+            EquFaultReasonCreateDto.FaultReasonCode = EquFaultReasonCreateDto.FaultReasonCode.ToTrimSpace();
+            EquFaultReasonCreateDto.FaultReasonCode = EquFaultReasonCreateDto.FaultReasonCode.ToUpperInvariant();
+            await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonCreateDto);
 
             // DTO转换实体
-            var entity = createDto.ToEntity<EquFaultReasonEntity>();
+            var entity = EquFaultReasonCreateDto.ToEntity<EquFaultReasonEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
@@ -80,22 +80,22 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="modifyDto"></param>
+        /// <param name="EquFaultReasonModifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto modifyDto)
+        public async Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonModifyDto)
         {
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
+            await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonModifyDto);
 
-            var entityOld = await _equFaultReasonRepository.GetByIdAsync(modifyDto.Id)
+            var entityOld = await _equFaultReasonRepository.GetByIdAsync(EquFaultReasonModifyDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES13013));
-            if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
+            if (entityOld.UseStatus != SysDataStatusEnum.Build && EquFaultReasonModifyDto.UseStatus == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10108));
             }
 
             // DTO转换实体
-            var entity = modifyDto.ToEntity<EquFaultReasonEntity>();
+            var entity = EquFaultReasonModifyDto.ToEntity<EquFaultReasonEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
             entity.SiteId = _currentSite.SiteId;
@@ -117,11 +117,11 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesEquFaultReasonAsync(long[] ids)
+        public async Task<int> DeletesEquFaultReasonAsync(long[] idsArr)
         {
-            var entities = await _equFaultReasonRepository.GetByIdsAsync(ids);
+            var entities = await _equFaultReasonRepository.GetByIdsAsync(idsArr);
             if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -129,7 +129,7 @@ namespace Hymson.MES.Services.Services.Equipment
 
             return await _equFaultReasonRepository.DeletesAsync(new DeleteCommand
             {
-                Ids = ids,
+                Ids = idsArr,
                 UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now()
             });

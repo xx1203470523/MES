@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Hymson.EventBus.Abstractions;
+﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Integrated;
@@ -14,7 +13,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MessagePush.Enum;
 using Hymson.MessagePush.Services;
 using Hymson.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Integrated
 {
@@ -331,31 +329,28 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             });
             if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
 
-            // 即将检查的等级
-            var nowTime = HymsonClock.Now();
-            var duration = (nowTime - messageEntity.CreatedOn).TotalMinutes;
-
             dynamic dyEvent = @event;
 
             // 下一升级等级
             var currentEventTypeUpgrade = eventTypeUpgrades.FirstOrDefault(o => o.Level == dyEvent.Level);
-            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Level >= dyEvent.Level).OrderBy(o => o.Level).FirstOrDefault();
+            InteEventTypeUpgradeEntity? nextEventTypeUpgrade = eventTypeUpgrades.Where(w => w.Level > dyEvent.Level).OrderBy(o => o.Level).FirstOrDefault();
 
             // 发送即时消息（升级消息）
             if (currentEventTypeUpgrade != null) await SendUpgradeMessageAsync(messageEntity, pushScene, currentEventTypeUpgrade);
 
             // 添加升级检查任务
             if (nextEventTypeUpgrade == null) return;
+            dyEvent.Level = nextEventTypeUpgrade.Level;
 
-            var delayMinute = nextEventTypeUpgrade.Duration;
-            if (currentEventTypeUpgrade != null)
+            // 即将检查的等级
+            var delayMinute = 1;
+            var duration = (HymsonClock.Now() - messageEntity.CreatedOn).TotalMinutes;
+            if (duration < nextEventTypeUpgrade.Duration)
             {
-                delayMinute -= currentEventTypeUpgrade.Duration;
-                delayMinute *= 60;
-                if (delayMinute < 0) delayMinute = 1;
+                delayMinute = Math.Ceiling(nextEventTypeUpgrade.Duration - duration).ParseToInt(1);
             }
 
-            _eventBus.PublishDelay(@event, delayMinute);
+            _eventBus.PublishDelay(dyEvent, delayMinute * 60);
         }
 
         /// <summary>

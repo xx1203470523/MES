@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Process
@@ -57,5 +58,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="bomId"></param>
         /// <returns></returns>
         Task<List<ProcBomDetailView>> GetProcBomMaterialAsync(long bomId);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
     }
 }

@@ -97,32 +97,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task DeleteManuContainerPackRecordAsync(long id)
         {
             await _manuContainerPackRecordRepository.DeleteAsync(id);
-            //var manuContainerPackEntity = await _manuContainerPackRepository.GetByIdAsync(id);
-            //if (manuContainerPackEntity == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES16701));
-            //}
-            //using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-            //{
-            //    var foo = new ManuContainerPackRecordCreateDto()
-            //    {
-            //        ResourceId = resourceId,
-            //        ProcedureId = procedureId,
-            //        ContainerBarCodeId = manuContainerPackEntity.ContainerBarCodeId,
-            //        LadeBarCode = manuContainerPackEntity.LadeBarCode,
-            //        OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
-            //    };
-            //    await _manuContainerPackRecordService.CreateManuContainerPackRecordAsync(foo);
-
-            //    await _manuContainerPackRepository.DeleteAsync(id);
-            //    //step
-            //    var sfcinfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(foo.LadeBarCode);
-            //    ManuSfcStepEntity manuSfcStepEntity = new ManuSfcStepEntity();
-            //    manuSfcStepEntity.SFC = foo.LadeBarCode;
-
-
-            //    ts.Complete();
-            //}
         }
 
         /// <summary>
@@ -196,7 +170,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuContainerPackRecordDto"></param>
+        /// <param name="manuContainerPackRecordModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuContainerPackRecordAsync(ManuContainerPackRecordModifyDto manuContainerPackRecordModifyDto)
         {

@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
     /// <summary>
     /// 根据老条码生成新条码
     /// </summary>
-    public class CreateBarcodeByOldMesSFCDto
+    public class CreateBarcodeByOldMesSfcDto
     {
         /// <summary>
         /// 设备Id
@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
     /// <summary>
     /// 根据外部条码接收
     /// </summary>
-    public class CreateBarcodeByExternalSFCDto
+    public class CreateBarcodeByExternalSfcDto
     {
         /// <summary>
         /// 设备Id

@@ -571,6 +571,7 @@
         public const string MES13231 = "已检样品数量小于单据应检数量，不允许完成！";
         public const string MES13232 = "该检验单非完成状态，不允许进行不合格处理！";
         public const string MES13233 = "存在非待检验状态的单据，不允许删除！";
+        public const string MES13234 = "样品条码【{SampleCode}】已检验，不能重复检验！";
 
         #endregion
 
@@ -1100,6 +1101,9 @@
         public const string MES18216 = "条码{0}状态修改失败，请联系管理员！";
         public const string MES18217 = "条码{SFC}状态不合法！";
         public const string MES18218 = "条码{0}库存修改失败，请联系管理员！";
+        public const string MES18219 = "条码对应物料和工单对应物料相同！";
+        public const string MES18220 = "条码已是完成状态！";
+
         #endregion
 
         #region 系统Token MES18300

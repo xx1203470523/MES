@@ -63,27 +63,27 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 添加（设备故障现象）
         /// </summary>
-        /// <param name="createDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquFaultPhenomenonSaveDto createDto)
+        public async Task<int> CreateAsync(EquFaultPhenomenonSaveDto parm)
         {
-            await _validationSaveRules.ValidateAndThrowAsync(createDto);
+            await _validationSaveRules.ValidateAndThrowAsync(parm);
 
             // 验证DTO
-            createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToTrimSpace();
-            createDto.FaultPhenomenonCode = createDto.FaultPhenomenonCode.ToUpperInvariant();
+            parm.FaultPhenomenonCode = parm.FaultPhenomenonCode.ToTrimSpace();
+            parm.FaultPhenomenonCode = parm.FaultPhenomenonCode.ToUpperInvariant();
 
-            if (createDto.EquipmentGroupId == 0)
+            if (parm.EquipmentGroupId == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12904));
             }
-            if (!Enum.IsDefined(typeof(SysDataStatusEnum), createDto.UseStatus))
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), parm.UseStatus))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12906));
             }
 
             // DTO转换实体
-            var entity = createDto.ToEntity<EquFaultPhenomenonEntity>();
+            var entity = parm.ToEntity<EquFaultPhenomenonEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
@@ -100,23 +100,23 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 修改（设备故障现象）
         /// </summary>
-        /// <param name="modifyDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
+        public async Task<int> ModifyAsync(EquFaultPhenomenonSaveDto parm)
         {
-            await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
+            await _validationSaveRules.ValidateAndThrowAsync(parm);
 
             // 验证DTO
-            var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(modifyDto.Id.Value)
+            var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(parm.Id.Value)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12905));
 
-            if (entityOld.UseStatus != SysDataStatusEnum.Build && modifyDto.UseStatus == SysDataStatusEnum.Build)
+            if (entityOld.UseStatus != SysDataStatusEnum.Build && parm.UseStatus == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10108));
             }
 
             // DTO转换实体
-            var entity = modifyDto.ToEntity<EquFaultPhenomenonEntity>();
+            var entity = parm.ToEntity<EquFaultPhenomenonEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
             return await _equFaultPhenomenonRepository.UpdateAsync(entity);
@@ -146,11 +146,11 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 查询列表（设备故障现象）
         /// </summary>
-        /// <param name="pagedQueryDto"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync(EquFaultPhenomenonPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync(EquFaultPhenomenonPagedQueryDto parm)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<EquFaultPhenomenonPagedQuery>();
+            var pagedQuery = parm.ToQuery<EquFaultPhenomenonPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _equFaultPhenomenonRepository.GetPagedInfoAsync(pagedQuery);
 

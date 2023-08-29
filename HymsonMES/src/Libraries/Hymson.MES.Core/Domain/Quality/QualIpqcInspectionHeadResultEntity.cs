@@ -73,6 +73,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public DateTime? ProcessedOn { get; set; }
 
         /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
         /// 是否当前结果;0-否  1、是
         /// </summary>
         public TrueOrFalseEnum IsCurrent { get; set; }

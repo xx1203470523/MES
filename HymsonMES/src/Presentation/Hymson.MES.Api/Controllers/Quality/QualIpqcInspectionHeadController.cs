@@ -76,6 +76,28 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
         /// <summary>
+        /// 获取检验单已检样本列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("samplelist/{id}")]
+        public async Task<PagedInfo<QualIpqcInspectionHeadSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionHeadSamplePagedQueryDto pagedQueryDto)
+        {
+            return await _qualIpqcInspectionHeadService.GetPagedSampleListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 根据检验单ID获取检验单附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("attachmentlist/{id}")]
+        public async Task<IEnumerable<QualIpqcInspectionHeadAnnexDto>?> GetAttachmentListAsync(long id)
+        {
+            return await _qualIpqcInspectionHeadService.GetAttachmentListAsync(id);
+        }
+
+        /// <summary>
         /// 分页查询列表（首检检验单）
         /// </summary>
         /// <param name="pagedQueryDto"></param>
@@ -176,6 +198,17 @@ namespace Hymson.MES.Api.Controllers.Quality
         public async Task AttachmentDeleteAsync([FromBody] long[] ids)
         {
             await _qualIpqcInspectionHeadService.AttachmentDeleteAsync(ids);
+        }
+
+        /// <summary>
+        /// 查询检验单样品应检参数并校验
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("shouldInspectItems")]
+        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync(SampleShouldInspectItemsQueryDto query)
+        {
+            return await _qualIpqcInspectionHeadService.GetSampleShouldInspectItemsAsync(query);
         }
 
     }

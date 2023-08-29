@@ -73,6 +73,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="inteJobRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// <param name="executeJobService"></param>
         public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IJobCommonService jobCommonService,
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
@@ -181,7 +182,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 var manuFacePlateButtonJobRelationDto = manuFacePlateButtonJobRelationEntity.ToModel<ManuFacePlateButtonJobRelationDto>();
                 //填充JOB信息
-                var jobEntity = inteJobEntitys.Where(c => c.Id == manuFacePlateButtonJobRelationDto.JobId).FirstOrDefault();
+                var jobEntity = inteJobEntitys.FirstOrDefault(c => c.Id == manuFacePlateButtonJobRelationDto.JobId);
                 if (jobEntity != null)
                 {
                     manuFacePlateButtonJobRelationDto.JobCode = jobEntity.Code;
@@ -277,7 +278,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 var manuFacePlateButtonJobRelationDto = manuFacePlateButtonJobRelationEntity.ToModel<ManuFacePlateButtonJobRelationDto>();
                 //填充JOB信息
-                var jobEntity = inteJobEntitys.Where(c => c.Id == manuFacePlateButtonJobRelationDto.JobId).FirstOrDefault();
+                var jobEntity = inteJobEntitys.FirstOrDefault(c => c.Id == manuFacePlateButtonJobRelationDto.JobId);
                 if (jobEntity != null)
                 {
                     manuFacePlateButtonJobRelationDto.JobCode = jobEntity.Code;
@@ -327,7 +328,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (buttonJobs.Any(a => a.IsClear) == true) isClear = true;
 
             // 如果没有读取到有效作业，就提示错误
-            if (jobs.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
+            if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
 
             // 执行Job
             var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
@@ -351,8 +352,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Time = item.Value.Time
                 });
             }
-
-            //result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
             return result;
         }
 
@@ -445,6 +444,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         ///  新按钮（点击）
         /// </summary>
         /// <param name="dto"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
         public async Task<Dictionary<string, JobResponseBo>> NewClickAsync(ButtonRequestDto dto, dynamic bo)
         {
@@ -470,8 +470,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 jobBos.Add(new JobBo { Name = job.ClassProgram });
             }
             result = await _executeJobService.ExecuteAsync(jobBos, bo);
-            // 执行Job
-            // result = await _jobCommonService.ExecuteJobAsync(jobs, dto.Param);
+
             return result;
         }
 

@@ -145,9 +145,9 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         public async Task VerifyParamAsync(Dictionary<string, string>? param)
         {
             if (param == null ||
-                param.ContainsKey("SFC") == false
-                || param.ContainsKey("EquipmentId") == false
-                || param.ContainsKey("ResourceId") == false)
+                !param.ContainsKey("SFC")
+                || !param.ContainsKey("EquipmentId")
+                || !param.ContainsKey("ResourceId"))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16312));
             }
@@ -181,7 +181,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                 ResourceId = bo.ResourceId,
             };
             var resEquipentBind = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
-            if (resEquipentBind.Any() == false)
+            if (!resEquipentBind.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19910)).WithData("ResCode", procResource.ResCode).WithData("EquCode", _currentEquipment.Code);
             }

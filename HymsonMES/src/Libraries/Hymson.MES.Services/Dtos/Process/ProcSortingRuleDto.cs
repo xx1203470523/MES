@@ -123,10 +123,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long MaterialId { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注
@@ -160,10 +160,10 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Name { get; set; }
 
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注

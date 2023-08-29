@@ -67,7 +67,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getSfcStepBySFCPageList")]
-        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySFCPagedQueryDto param)
+        public async Task<PagedInfo<ManuSfcStepBySfcViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySfcPagedQueryDto param)
         {
             return await _workshopJobControlReportService.GetSFCStepsBySFCPageListAsync(param);
         }

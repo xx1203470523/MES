@@ -114,7 +114,6 @@ namespace Hymson.MES.Services.Services.Integrated
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteSystemTokenCreateDto);
 
-            //inteSystemTokenCreateDto.SystemCode = inteSystemTokenCreateDto.SystemCode.ToUpperInvariant();
             var systemCode = inteSystemTokenCreateDto.SystemCode;
             var inteSystemTokenEntity = await _inteSystemTokenRepository.GetByCodeAsync(new InteSystemTokenQuery
             {

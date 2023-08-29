@@ -41,46 +41,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         public string Version { get; set; }
 
-        ///// <summary>
-        ///// 物料条码
-        ///// </summary>
-        //public string MaterialBarCode { get; set; }
-
-        ///// <summary>
-        ///// 批次
-        ///// </summary>
-        //public string Batch { get; set; }
-
-        ///// <summary>
-        ///// 数量（剩余）
-        ///// </summary>
-        //public decimal QuantityResidue { get; set; }
-
-        ///// <summary>
-        ///// 状态;待使用/使用中/锁定
-        ///// </summary>
-        //public int Status { get; set; }
-
-        ///// <summary>
-        ///// 有效期/到期日
-        ///// </summary>
-        //public DateTime? DueDate { get; set; }
-
-        ///// <summary>
-        ///// 来源/目标;手动录入/WMS/上料点编号
-        ///// </summary>
-        //public int Source { get; set; }
-
-        ///// <summary>
-        ///// 站点Id
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-        ///// <summary>
-        ///// 是否删除 
-        ///// </summary>
-        //public long IsDeleted { get; set; }
-
     }
 
 

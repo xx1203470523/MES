@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 
 namespace Hymson.MES.Data.Repositories.Quality
@@ -78,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualIpqcInspectionTailSampleEntity>> GetPagedListAsync(QualIpqcInspectionTailSamplePagedQuery pagedQuery);
+        Task<PagedInfo<QualIpqcInspectionTailSampleView>> GetPagedListAsync(QualIpqcInspectionTailSamplePagedQuery pagedQuery);
 
     }
 }

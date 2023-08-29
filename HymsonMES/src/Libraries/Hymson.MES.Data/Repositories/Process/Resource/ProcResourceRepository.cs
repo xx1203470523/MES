@@ -177,14 +177,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             if (query.ResTypeId.HasValue && query.ResTypeId > 0)
             {
-                //if (query.ResTypeId == 0)
-                //{
-                //    sqlBuilder.Where("a.ResTypeId=0");
-                //}
-                //else
-                //{
                 sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
-                //}
             }
 
             // 这个是为了查询指定线体下的资源，大部分情况下这个 WorkCenterLineId 是不会有值的
@@ -517,6 +510,16 @@ namespace Hymson.MES.Data.Repositories.Process
             return procResources;
         }
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     /// <summary>
@@ -551,7 +554,7 @@ namespace Hymson.MES.Data.Repositories.Process
             "WHERE R.IsDeleted = 0 AND P.IsDeleted = 0  AND P.Id = @ProcedureId ";
 
         const string InsertSql = "INSERT INTO `proc_resource`(`Id`, `SiteId`, `ResCode`, `ResName`,`Status`,`ResTypeId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResCode, @ResName,@Status,@ResTypeId,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted); ";
-        const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId,Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
         const string DeleteSql = "UPDATE `proc_resource` SET `IsDeleted` = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids;";
 
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
@@ -568,5 +571,8 @@ namespace Hymson.MES.Data.Repositories.Process
             AND REB.SiteId = @SiteId ";
 
         const string GetProcResouceEntitiesSqlTemplate = @"SELECT  /**select**/ FROM `proc_resource` /**where**/  ";
+
+        const string UpdateStatusSql = "UPDATE `proc_resource` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
     }
 }

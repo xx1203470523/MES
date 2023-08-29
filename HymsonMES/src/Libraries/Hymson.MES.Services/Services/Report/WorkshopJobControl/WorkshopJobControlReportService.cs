@@ -245,7 +245,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam)
+        public async Task<PagedInfo<ManuSfcStepBySfcViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySfcPagedQueryDto queryParam)
         {
             var pagedQuery = queryParam.ToQuery<ManuSfcStepBySfcPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId.Value;
@@ -257,11 +257,11 @@ namespace Hymson.MES.Services.Services.Report
 
             var pagedInfo = await _manuSfcStepRepository.GetPagedInfoBySFCAsync(pagedQuery);
 
-            List<ManuSfcStepBySFCViewDto> listDto = new List<ManuSfcStepBySFCViewDto>();
+            List<ManuSfcStepBySfcViewDto> listDto = new List<ManuSfcStepBySfcViewDto>();
 
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                return new PagedInfo<ManuSfcStepBySFCViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+                return new PagedInfo<ManuSfcStepBySfcViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
 
             var materialIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToArray();
@@ -280,7 +280,7 @@ namespace Hymson.MES.Services.Services.Report
                 var workOrder = workOrders != null && workOrders.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
 
 
-                listDto.Add(new ManuSfcStepBySFCViewDto()
+                listDto.Add(new ManuSfcStepBySfcViewDto()
                 {
                     Id = item.Id,
                     SFC = item.SFC,
@@ -296,7 +296,7 @@ namespace Hymson.MES.Services.Services.Report
 
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
             var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).OrderByDescending(o => o.Operatetype).AsEnumerable();
-            return new PagedInfo<ManuSfcStepBySFCViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }
 }

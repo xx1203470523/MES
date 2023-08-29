@@ -6,8 +6,13 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
     public class QualIpqcInspectionPatrolSampleQuery
     {
         /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
         /// 检验单Id
         /// </summary>
-        public long? IpqcInspectionPatrolId { get; set; }
+        public long? InspectionOrderId { get; set; }
     }
 }

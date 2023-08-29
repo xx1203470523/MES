@@ -44,7 +44,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 参考点
         /// </summary>
         public string? ReferencePoint { get; set; }
-        //public decimal Sequence { get; set; }
 
         public string ProcedureId { get; set; }
 
@@ -257,10 +256,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcBomDetailPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
+        
     }
 }

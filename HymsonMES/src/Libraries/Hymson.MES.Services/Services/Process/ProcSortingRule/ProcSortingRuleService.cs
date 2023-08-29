@@ -11,15 +11,18 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -53,6 +56,8 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcSortingRuleCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcSortingRuleModifyDto> _validationModifyRules;
 
+        private readonly ILocalizationService _localizationService;
+
         public ProcSortingRuleService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcSortingRuleRepository procSortingRuleRepository,
             IProcSortingRuleDetailRepository sortingRuleDetailRepository,
@@ -62,7 +67,7 @@ namespace Hymson.MES.Services.Services.Process
             IProcProcedureRepository procProcedureRepository,
             IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcSortingRuleCreateDto> validationCreateRules,
-            AbstractValidator<ProcSortingRuleModifyDto> validationModifyRules)
+            AbstractValidator<ProcSortingRuleModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -75,6 +80,7 @@ namespace Hymson.MES.Services.Services.Process
             _procMaterialRepository = procMaterialRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -99,6 +105,8 @@ namespace Hymson.MES.Services.Services.Process
             procSortingRuleEntity.CreatedOn = HymsonClock.Now();
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
             procSortingRuleEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            procSortingRuleEntity.Status = SysDataStatusEnum.Build;
 
             List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntities = new();
             List<ProcSortingRuleGradeEntity> procSortingRuleGradeEntities = new();
@@ -194,6 +202,17 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcSortingRuleAsync(long[] ids)
         {
+            if (ids.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+
+            var entities = await _procSortingRuleRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
+            }
+
             return await _procSortingRuleRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
@@ -262,18 +281,13 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11309));
             }
-            switch (procSortingRuleEntity.Status)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == procSortingRuleEntity.Status))
             {
-                case SysDataStatusEnum.Enable:
-                case SysDataStatusEnum.Retain:
-                case SysDataStatusEnum.Abolish:
-                    if (procSortingRuleEntity.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
-                    if (procSortingRuleEntity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
-                    break;
-                case SysDataStatusEnum.Build:
-                default:
-                    break;
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
+
             procSortingRuleEntity.Name = procSortingRuleModifyDto.Name.Trim();
             procSortingRuleEntity.Remark = procSortingRuleModifyDto.Remark;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
@@ -544,5 +558,57 @@ namespace Hymson.MES.Services.Services.Process
 
             return ruleDetailViewDtos;
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _procSortingRuleRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10705));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procSortingRuleRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

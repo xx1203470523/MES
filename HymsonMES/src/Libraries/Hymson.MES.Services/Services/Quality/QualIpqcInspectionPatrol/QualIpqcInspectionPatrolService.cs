@@ -6,9 +6,11 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -61,6 +63,9 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
+        private readonly IQualIpqcInspectionParameterRepository _qualIpqcInspectionParameterRepository;
+        private readonly IProcParameterRepository _procParameterRepository;
+        private readonly IManuProductParameterService _manuProductParameterService;
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
@@ -81,6 +86,9 @@ namespace Hymson.MES.Services.Services.Quality
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IEquEquipmentRepository equEquipmentRepository,
             IInteAttachmentRepository inteAttachmentRepository,
+            IQualIpqcInspectionParameterRepository qualIpqcInspectionParameterRepository,
+            IProcParameterRepository procParameterRepository,
+            IManuProductParameterService manuProductParameterService,
             ISequenceService sequenceService)
         {
             _currentUser = currentUser;
@@ -99,6 +107,9 @@ namespace Hymson.MES.Services.Services.Quality
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _inteAttachmentRepository = inteAttachmentRepository;
+            _qualIpqcInspectionParameterRepository = qualIpqcInspectionParameterRepository;
+            _procParameterRepository = procParameterRepository;
+            _manuProductParameterService = manuProductParameterService;
             _sequenceService = sequenceService;
         }
 
@@ -279,7 +290,7 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 根据ID获取检验单附件列表
+        /// 根据检验单ID获取检验单附件列表
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -427,7 +438,7 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13230));
             }
             //获取已检样本数据
-            var samples = await _qualIpqcInspectionPatrolSampleRepository.GetEntitiesAsync(new QualIpqcInspectionPatrolSampleQuery { IpqcInspectionPatrolId = dto.Id });
+            var samples = await _qualIpqcInspectionPatrolSampleRepository.GetEntitiesAsync(new QualIpqcInspectionPatrolSampleQuery { InspectionOrderId = dto.Id });
             if (samples.IsNullOrEmpty() || samples.Select(x => x.Barcode).Distinct().Count() < entity.SampleQty)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13231));
@@ -460,6 +471,10 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             entity.Status = InspectionStatusEnum.Closed;
+            entity.HandMethod = dto.HandMethod;
+            entity.ProcessedBy = _currentUser.UserName;
+            entity.ProcessedOn = HymsonClock.Now();
+            entity.Remark = dto.Remark;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
@@ -528,5 +543,71 @@ namespace Hymson.MES.Services.Services.Quality
             });
         }
 
+        /// <summary>
+        /// 查询检验单样品应检参数并校验
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync(SampleShouldInspectItemsQueryDto query)
+        {
+            var entity = await _qualIpqcInspectionPatrolRepository.GetByIdAsync(query.Id);
+            if (entity == null)
+            {
+                throw new ValidationException(nameof(ErrorCode.MES10104));
+            }
+
+            //校验样品条码是否已检验
+            var samples = await _qualIpqcInspectionPatrolSampleRepository.GetEntitiesAsync(new QualIpqcInspectionPatrolSampleQuery { InspectionOrderId = query.Id });
+            if (samples != null && samples.Any(x => x.Barcode.ToUpper() == query.SampleCode.ToUpper()))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13234)).WithData("SampleCode", query.SampleCode);
+            }
+
+            //IPQC检验项目参数
+            var ipqcParameters = await _qualIpqcInspectionParameterRepository.GetEntitiesAsync(new QualIpqcInspectionParameterQuery { IpqcInspectionId = entity.IpqcInspectionId });
+
+            // 查询已经缓存的参数实体
+            var parameterEntities = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            //设备采集参数值获取
+            IEnumerable<ManuProductParameterEntity>? collectParameterValues = null;
+            if (ipqcParameters.Any(x => x.IsDeviceCollect == YesOrNoEnum.Yes))
+            {
+                collectParameterValues = await _manuProductParameterService.GetProductParameterListByProcedure(new CoreServices.Dtos.Parameter.QueryParameterByProcedureDto
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    ProcedureId = entity.ProcedureId,
+                    SFCs = new[] { query.SampleCode }
+                });
+            }
+
+            List<SampleShouldInspectItemsDto> dtos = new();
+            foreach (var item in ipqcParameters)
+            {
+                var dto = item.ToModel<SampleShouldInspectItemsDto>();
+
+                var parameterEntity = parameterEntities.FirstOrDefault(f => f.Id == item.ParameterId);
+                if (parameterEntity != null)
+                {
+                    dto.ParameterCode = parameterEntity.ParameterCode;
+                    dto.ParameterName = parameterEntity.ParameterName;
+                    dto.ParameterUnit = parameterEntity.ParameterUnit;
+                    dto.DataType = parameterEntity.DataType;
+                }
+
+                //设备采集参数值
+                if (item.IsDeviceCollect == YesOrNoEnum.Yes)
+                {
+                    dto.InspectionValue = collectParameterValues?.FirstOrDefault(x => x.ParameterId == item.ParameterId)?.ParameterValue ?? "";
+                }
+
+                dtos.Add(dto);
+            }
+
+            return dtos;
+        }
     }
 }

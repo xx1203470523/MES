@@ -110,7 +110,6 @@ namespace Hymson.MES.Data.Repositories.Process
                 procLoadPointPagedQuery.LoadPointName = $"%{procLoadPointPagedQuery.LoadPointName}%";
                 sqlBuilder.Where(" LoadPointName like @LoadPointName ");
             }
-            //if (procLoadPointPagedQuery.Status>DbDefaultValueConstant.IntDefaultValue)
             if (procLoadPointPagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where(" Status = @Status ");
@@ -196,6 +195,18 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdatesSql, procLoadPointEntitys);
         }
 
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
     }
 
     /// <summary>
@@ -211,7 +222,7 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertSql = "INSERT INTO `proc_load_point`(  `Id`, `SiteId`, `LoadPoint`, `LoadPointName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @LoadPoint, @LoadPointName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_load_point`(  `Id`, `SiteId`, `LoadPoint`, `LoadPointName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @LoadPoint, @LoadPointName, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `proc_load_point` SET  LoadPointName = @LoadPointName, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_load_point` SET  LoadPointName = @LoadPointName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn   WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_load_point` SET   SiteId = @SiteId, LoadPoint = @LoadPoint, LoadPointName = @LoadPointName, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_load_point` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_load_point` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
@@ -224,5 +235,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByResourceId = @"SELECT PLP.* FROM proc_load_point PLP
                                 LEFT JOIN proc_load_point_link_resource PLPLR ON PLPLR.LoadPointId = PLP.Id
                                 WHERE PLPLR.ResourceId = @resourceId AND PLP.Status=@Status AND   PLP.IsDeleted=0";
+
+
+        const string UpdateStatusSql = "UPDATE `proc_load_point` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }
 }

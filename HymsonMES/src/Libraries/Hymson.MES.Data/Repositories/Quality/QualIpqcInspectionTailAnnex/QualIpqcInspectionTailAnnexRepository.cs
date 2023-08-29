@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIpqcInspectionTailAnnexEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIpqcInspectionTailAnnexEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionTailAnnexEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            if (query.InspectionOrderId.HasValue)
+            {
+                sqlBuilder.Where("IpqcInspectionTailId = @InspectionOrderId");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIpqcInspectionTailAnnexEntity>(template.RawSql, query);
         }

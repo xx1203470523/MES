@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Version).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10450));
 
             //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11109));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10451));
+            //RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10451));
 
             //RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11105));
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(ProcessRouteTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES10452));
@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Name).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10445));
 
             //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11109));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10451));
+            //RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10451));
 
             //RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11105));
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(ProcessRouteTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES10452));

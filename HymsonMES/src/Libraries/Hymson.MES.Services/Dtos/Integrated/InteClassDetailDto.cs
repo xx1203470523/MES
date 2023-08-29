@@ -12,12 +12,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
     {
         /// <summary>
         /// 唯一标识
-        /// <summary
+        /// </summary>
         public long Id { get; set; }
 
         /// <summary>
         /// 序号
-        /// <summary
+        /// </summary>
         public string SerialNo { get; set; }
 
         /// <summary>

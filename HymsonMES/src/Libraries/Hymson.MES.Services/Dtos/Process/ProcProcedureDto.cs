@@ -116,10 +116,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -298,20 +298,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-        ///// <summary>
-        ///// 工序BOM代码
-        ///// </summary>
-        //public string Code { get; set; }
-
         /// <summary>
         /// 工序BOM名称
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        ///// <summary>
+        ///// 状态
+        ///// </summary>
+        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -354,11 +349,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcedureJobReleationDto
     {
-        /// <summary>
-        /// 工序配置工作实体类
-        /// </summary>
-        // public InteJobBusinessRelationDto ProcedureConfigJob { get; set; }
-
         /// <summary>
         /// 关联点
         /// </summary>

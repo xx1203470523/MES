@@ -4,11 +4,14 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -42,6 +45,8 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcBomDetailRepository _procBomDetailRepository;
         private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -52,12 +57,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="validationModifyRules"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
+        /// <param name="localizationService"></param>
         public ProcBomService(ICurrentSite currentSite, ICurrentUser currentUser,
             IProcBomRepository procBomRepository,
             AbstractValidator<ProcBomCreateDto> validationCreateRules,
             AbstractValidator<ProcBomModifyDto> validationModifyRules,
             IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository)
+            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
+            ,ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
@@ -66,6 +73,7 @@ namespace Hymson.MES.Services.Services.Process
             _validationModifyRules = validationModifyRules;
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -101,6 +109,8 @@ namespace Hymson.MES.Services.Services.Process
             procBomEntity.CreatedBy = _currentUser.UserName;
             procBomEntity.UpdatedBy = _currentUser.UserName;
             procBomEntity.BomCode = bomCode;
+
+            procBomEntity.Status = SysDataStatusEnum.Build;
 
             //验证是否存在
             var exists = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
@@ -372,9 +382,15 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10610));
             }
 
-            if (modelOrigin.Status != SysDataStatusEnum.Build && procBomEntity.Status == SysDataStatusEnum.Build)
+            //if (modelOrigin.Status != SysDataStatusEnum.Build && procBomEntity.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             var bomCode = modelOrigin.BomCode.ToUpperInvariant();
@@ -587,5 +603,57 @@ namespace Hymson.MES.Services.Services.Process
 
             return procBomDetailViews;
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _procBomRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procBomRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }
