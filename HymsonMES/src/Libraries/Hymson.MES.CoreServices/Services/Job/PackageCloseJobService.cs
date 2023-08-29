@@ -129,13 +129,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 manuContainerBarcodeEntity.UpdatedBy = bo.UserName;
                 manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
                 defaultDto.ManuContainerBarcode = manuContainerBarcodeEntity;
-                //defaultDto.Message = $"关闭成功！";
+
                 defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16344));
             }
             else
             {
                 success = "false";
-                //defaultDto.Message = $"该容器已经关闭！";
+
                 defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16345));
             }
             defaultDto.Content?.Add("Success", success);

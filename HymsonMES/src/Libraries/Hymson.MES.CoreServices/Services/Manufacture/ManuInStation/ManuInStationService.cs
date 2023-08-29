@@ -9,13 +9,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
     /// </summary>
     public class ManuInStationService : IManuInStationService
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public ManuInStationService()
-        {
-
-        }
 
         /// <summary>
         /// 根据设备进站
@@ -53,15 +46,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuInStation
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task InStationRangeByResource(ResourceInStationsDto param)
-        {
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        private async Task ExecuteInStation()
         {
             await Task.CompletedTask;
         }

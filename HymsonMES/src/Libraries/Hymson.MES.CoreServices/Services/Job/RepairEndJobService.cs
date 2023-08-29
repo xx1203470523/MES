@@ -110,11 +110,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16330));
-            };
+            }
             if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16331));
-            };
+            }
             var sfcProduceActivitys = sfcProduceEntitys.Where(it => it.Status != SfcProduceStatusEnum.Activity);
             if (sfcProduceActivitys.Any())
             {

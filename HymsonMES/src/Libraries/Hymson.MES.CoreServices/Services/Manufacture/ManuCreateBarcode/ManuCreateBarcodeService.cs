@@ -101,29 +101,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 CodeRulesId = inteCodeRulesEntity.Id
             });
 
-
-            //var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
-            //{
-            //    IsTest = false,
-            //    IsSimulation = false,
-            //    CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
-            //    {
-            //        Seq = s.Seq,
-            //        ValueTakingType = s.ValueTakingType,
-            //        SegmentedValue = s.SegmentedValue,
-            //        CustomValue = s.CustomValue,
-            //    }),
-
-            //    CodeRuleKey = $"{inteCodeRulesEntity.Id}",
-            //    Count = discuss,
-            //    Base = inteCodeRulesEntity.Base,
-            //    Increment = inteCodeRulesEntity.Increment,
-            //    IgnoreChar = inteCodeRulesEntity.IgnoreChar,
-            //    OrderLength = inteCodeRulesEntity.OrderLength,
-            //    ResetType = inteCodeRulesEntity.ResetType,
-            //    StartNumber = inteCodeRulesEntity.StartNumber,
-            //    CodeMode = inteCodeRulesEntity.CodeMode,
-            //});
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = false,

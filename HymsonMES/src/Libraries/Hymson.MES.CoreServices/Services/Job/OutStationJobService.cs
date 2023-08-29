@@ -140,7 +140,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 判断条码锁状态
             var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
@@ -205,7 +205,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();
 
             var firstSFCProduceEntity = entities.FirstOrDefault();
@@ -264,7 +264,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages;
-                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
@@ -401,7 +401,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 未完工（这么写仅仅是为了减少if-else的缩进）
-            if (responseBo.IsCompleted == false)
+            if (!responseBo.IsCompleted)
             {
                 var multiUpdateProduceSFCCommand = new MultiUpdateProduceSFCCommand
                 {
@@ -441,7 +441,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新物料库存
             if (data.UpdateQtyByIdCommands.Any())
             {
-                //tasks.Add(_manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands));
                 responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
 
                 // 未更新到全部需更新的数据，事务回滚
@@ -492,7 +491,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             else
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                //tasks.Add(_manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities));
                 var rows = await _manuSfcProduceRepository.MultiUpdateRangeWithStatusCheckAsync(data.MultiUpdateProduceSFCCommand);
 
                 // 未更新到数据，事务回滚
@@ -501,7 +499,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 这里在外层会回滚事务
                     responseBo.Rows = -1;
 
-                    //throw new CustomerValidationException(nameof(ErrorCode.MES18217)).WithData("SFC", data.FirstSFCProduceEntity.SFC);
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFC);
                     return responseBo;
                 }

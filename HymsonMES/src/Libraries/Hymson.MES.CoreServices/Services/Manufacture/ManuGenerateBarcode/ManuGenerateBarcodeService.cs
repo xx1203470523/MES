@@ -56,29 +56,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             var codeRulesMakeList = await getCodeRulesMakeListTask;
             var codeRule = await getCodeRulesTask;
 
-            //return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
-            //{
-            //    IsTest = param.IsTest,
-            //    IsSimulation = false,
-            //    CodeRulesMakeBos = codeRulesMakeList.Select(s => new CodeRulesMakeBo
-            //    {
-            //        Seq = s.Seq,
-            //        ValueTakingType = s.ValueTakingType,
-            //        SegmentedValue = s.SegmentedValue,
-            //        CustomValue = s.CustomValue,
-            //    }),
-
-            //    CodeRuleKey = $"{param.CodeRuleId}",
-            //    Count = param.Count,
-            //    Base = codeRule.Base,
-            //    Increment = codeRule.Increment,
-            //    IgnoreChar = codeRule.IgnoreChar,
-            //    OrderLength = codeRule.OrderLength,
-            //    ResetType = codeRule.ResetType,
-            //    StartNumber = codeRule.StartNumber,
-            //    CodeMode = codeRule.CodeMode,
-            //});
-
             var barcodes = await GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = param.IsTest,
@@ -116,27 +93,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         /// <returns></returns>
         public async Task<IEnumerable<string>> GenerateBarcodeListAsync(CodeRuleBo param)
         {
-            //return await GenerateBarCodeSerialNumberAsync(new BarCodeSerialNumberBo
-            //{
-            //    IsTest = param.IsTest,
-            //    CodeRulesMakeBos = param.CodeRulesMakeList.Select(s => new CodeRulesMakeBo
-            //    {
-            //        Seq = s.Seq,
-            //        ValueTakingType = s.ValueTakingType,
-            //        SegmentedValue = s.SegmentedValue,
-            //        CustomValue=s.CustomValue??""
-            //    }),
-
-            //    CodeRuleKey = $"{param.ProductId}",
-            //    Count = param.Count,
-            //    Base = param.Base,
-            //    IgnoreChar = param.IgnoreChar ?? "",
-            //    Increment = param.Increment,
-            //    OrderLength = param.OrderLength,
-            //    ResetType = param.ResetType,
-            //    StartNumber = param.StartNumber,
-            //    CodeMode=param.CodeMode,
-            //});
             var barcodes = await GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = param.IsTest,
@@ -178,7 +134,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
             var serialStrings = await GetSerialNumbersAsync(bo);
 
-            if (serialStrings == null || serialStrings.Any() == false)
+            if (serialStrings == null || !serialStrings.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
@@ -492,7 +448,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             var startNumber = param.StartNumber - param.Increment;
 
             // 真实生成
-            if (param.IsTest == false && param.IsSimulation == false)
+            if (!param.IsTest && !param.IsSimulation)
             {
                 var serialNumbers = await _sequenceService.GetSerialNumbersAsync(param.ResetType, param.CodeRuleKey, param.Count, startNumber, param.Increment, maxLength)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES16200));
