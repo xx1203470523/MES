@@ -30,6 +30,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -457,6 +458,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
 
             CreateMap<ProcResourceProcedurePagedQueryDto, ProcResourceProcedurePagedQuery>();
+            CreateMap<ProcResourcePagedlineIdAndProcProcedureIdDto, ProcResourcePagedlineIdAndProcProcedureIdQuery>();
             #endregion
 
             #region Procedure
@@ -477,6 +479,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessRouteModifyDto, ProcProcessRouteEntity>();
             CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
             CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
+            CreateMap<ProcessRouteProcedureQueryDto, ProcessRouteProcedureQuery>();
             #endregion
 
             #region PrintConfig

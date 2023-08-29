@@ -342,4 +342,26 @@ namespace Hymson.MES.Services.Dtos.Process
     {
         public long[] Ids { get; set; }
     }
+
+    /// <summary>
+    /// 查询工序
+    /// </summary>
+    public class ProcessRouteProcedureQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? Name { get; set; }
+
+
+        /// <summary>
+        /// 工艺路线id
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+    }
 }

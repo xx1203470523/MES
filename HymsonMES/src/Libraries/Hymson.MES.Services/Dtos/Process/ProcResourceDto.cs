@@ -279,4 +279,32 @@ namespace Hymson.MES.Services.Dtos.Process
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
     }
+
+    /// <summary>
+    /// 资源维护表查询对象
+    /// </summary>
+    public class ProcResourcePagedlineIdAndProcProcedureIdDto : PagerInfo
+    {
+        /// <summary>
+        /// 描述 :资源代码 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 描述 :资源名称 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResName { get; set; }
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long? WorkCenterLineId { get; set; }
+
+        /// <summary>
+        /// 资源类型id
+        /// </summary>
+        public long? ResTypeId { get; set; }
+    }
 }

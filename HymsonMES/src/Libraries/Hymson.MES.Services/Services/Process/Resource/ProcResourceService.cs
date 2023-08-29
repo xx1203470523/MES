@@ -228,6 +228,26 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
+        /// 更具线体和工序查询资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdDto query)
+        {
+            var resourcePagedQuery = query.ToQuery<ProcResourcePagedlineIdAndProcProcedureIdQuery>();
+            var pagedInfo = await _resourceRepository.GetPageListBylineIdAndProcProcedureIdAsync(resourcePagedQuery);
+
+            //实体到DTO转换 装载数据
+            var procResourceDtos = new List<ProcResourceDto>();
+            foreach (var entity in pagedInfo.Data)
+            {
+                var resourceTypeDto = entity.ToModel<ProcResourceDto>();
+                procResourceDtos.Add(resourceTypeDto);
+            }
+            return new PagedInfo<ProcResourceDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
         /// 查询资源类型下关联的资源(资源类型详情：可用资源，已分配资源)
         /// </summary>
         /// <param name="query"></param>
@@ -268,7 +288,6 @@ namespace Hymson.MES.Services.Services.Process
             }
             return new PagedInfo<ProcResourceViewDto>(procResourceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-
 
         /// <summary>
         /// 资源关联打印机数据
