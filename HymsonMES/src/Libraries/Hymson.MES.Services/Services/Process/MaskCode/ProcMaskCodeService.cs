@@ -226,11 +226,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         {
             if (linkeRuleList.Any(a => string.IsNullOrWhiteSpace(a.Rule))) throw new CustomerValidationException(nameof(ErrorCode.MES10803));
             if (linkeRuleList.Any(a => a.MatchWay < 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10804));
-            ////全码验证
-            //if (linkeRuleList.Any(a => a.MatchWay == (int)MatchModeEnum .Whole&& a.Rule.Trim().Length != 10))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10805));
-            //}
+
             var validationFailures = new List<FluentValidation.Results.ValidationFailure>();
 
             //全码:4,起始:1,结束:3,中间:2;根据匹配方式校验规则
@@ -238,7 +234,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             //起始：系统只会校验掩码的起始字符，不校验长度，结束位不为‘?’；
             //结束：系统只会校验掩码的结束字符，不校验长度，起始字符不为‘?’；
             //中间：系统只会校验掩码的中间字符，不校验长度，结束和起始为不为‘?’；
-            var errorMessage = new StringBuilder();
             foreach (var rule in linkeRuleList)
             {
                 var validationFailure = new FluentValidation.Results.ValidationFailure();
@@ -277,7 +272,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             }
                             validationFailure.ErrorCode = nameof(ErrorCode.MES10806);
                             validationFailures.Add(validationFailure);
-                            // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10806)));
+
                         }
                         break;
                     case MatchModeEnum.Middle:
@@ -296,8 +291,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             }
                             validationFailure.ErrorCode = nameof(ErrorCode.MES10807);
                             validationFailures.Add(validationFailure);
-                            //errorMessage.Append($"中间方式掩码首位和末尾不能为特殊字符\"?\";");
-                            // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10807)));
+
                         }
                         break;
                     case MatchModeEnum.End:
@@ -316,8 +310,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             }
                             validationFailure.ErrorCode = nameof(ErrorCode.MES10808);
                             validationFailures.Add(validationFailure);
-                            // errorMessage.Append($"结束方式掩码首位不能为特殊字符\"?\";");
-                            // errorMessage.Append(_localizationService.GetResource(nameof(ErrorCode.MES10808)));
                         }
                         break;
                     default:
@@ -329,11 +321,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             {
                 throw new ValidationException(_localizationService.GetResource("MaskCodeError"), validationFailures);
             }
-
-            //if (!string.IsNullOrWhiteSpace(errorMessage.ToString()))
-            //{
-            //    throw new CustomerValidationException(errorMessage.ToString());
-            //}
         }
     }
 }

@@ -152,8 +152,8 @@ namespace Hymson.MES.Services.Services.Process
 
             // 判断物料是否已被使用
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialList.Select(x => x.Id).ToArray());
-            if (procMaterials.Any() == true
-                && procMaterials.Any(x => x.GroupId != 0 && x.GroupId != entity.Id) == true)
+            if (procMaterials.Any()
+                && procMaterials.Any(x => x.GroupId != 0 && x.GroupId != entity.Id))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
@@ -169,7 +169,6 @@ namespace Hymson.MES.Services.Services.Process
                 await _procMaterialRepository.UpdateProcMaterialUnboundAsync(entity.Id);
 
                 rows = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
-                //if (rows < procMaterialList.Count()) throw new BusinessException(nameof(ErrorCode.MES10220));
 
                 trans.Complete();
             }
@@ -300,7 +299,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public static IEnumerable<ProcMaterialEntity> ConvertProcMaterialList(IEnumerable<string>? dynamicList, ProcMaterialGroupEntity entity)
         {
-            if (dynamicList == null || dynamicList.Any() == false) return new List<ProcMaterialEntity> { };
+            if (dynamicList == null || !dynamicList.Any()) return new List<ProcMaterialEntity> { };
 
             return dynamicList.Select(s => new ProcMaterialEntity
             {

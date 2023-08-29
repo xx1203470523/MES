@@ -136,46 +136,32 @@ namespace Hymson.MES.Services.Services.Process
                 if (materialList.Any(a => a.IsMain != 1 && string.IsNullOrWhiteSpace(a.ReplaceMaterialId)))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10604));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料编码不能为空!";
-                    //return apiResult;
                 }
                 var mainList = materialList.Where(a => a.IsMain == 1).ToList();
                 if (mainList.Any(a => string.IsNullOrWhiteSpace(a.Code) || a.ProcedureId == "0"))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10605));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"工序不能为空!";
-                    //return apiResult;
+
                 }
                 if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10606));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料编码+工序不能重复!";
-                    //return apiResult;
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10607));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
-                    //return apiResult;
+
                 }
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
                 if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10608));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料关联的替代物料不能重复!";
-                    //return apiResult;
+
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10607));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
-                    //return apiResult;
+
                 }
 
                 long mainId = 0;
@@ -302,10 +288,6 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(ids);
-            //if (bomList.Any(x => x.Status == SysDataStatusEnum.Enable))
-            //{
-            //    throw new BusinessException(nameof(ErrorCode.MES10611));
-            //}
             if (bomList != null && bomList.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -382,10 +364,6 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10610));
             }
 
-            //if (modelOrigin.Status != SysDataStatusEnum.Build && procBomEntity.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            //}
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
@@ -418,40 +396,30 @@ namespace Hymson.MES.Services.Services.Process
                 if (materialList.Any(a => a.IsMain != 1 && string.IsNullOrWhiteSpace(a.ReplaceMaterialId)))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10604));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料编码不能为空!";
-                    //return apiResult;
+
                 }
                 var mainList = materialList.Where(a => a.IsMain == 1).ToList();
                 if (mainList.Any(a => string.IsNullOrWhiteSpace(a.Code) || a.ProcedureId == "0"))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10605));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"工序不能为空!";
-                    //return apiResult;
+
                 }
                 if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10606));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料编码+工序不能重复!";
-                    //return apiResult;
+
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10607));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
-                    //return apiResult;
+
                 }
 
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
                 if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10608));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料关联的替代物料不能重复!";
-                    //return apiResult;
+
                 }
 
                 long mainId = 0;

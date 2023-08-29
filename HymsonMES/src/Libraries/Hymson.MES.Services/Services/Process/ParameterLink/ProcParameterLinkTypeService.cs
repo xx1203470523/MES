@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = _currentSite.SiteId,
                 ParameterType = procParameterLinkTypeCreateDto.ParameterType ?? ParameterTypeEnum.Equipment
             });
-            var adds = links.Where(w => currentEntities.Any(e => e.ParameterID == w.ParameterID) == false);
+            var adds = links.Where(w => !currentEntities.Any(e => e.ParameterID == w.ParameterID));
 
             await _procParameterLinkTypeRepository.InsertsAsync(adds);
         }
@@ -96,10 +96,7 @@ namespace Hymson.MES.Services.Services.Process
             var links = procParameterLinkTypeModifyDto.Parameters.Select(s =>
             {
                 var item = new ProcParameterLinkTypeEntity();
-                //item.Id = IdGenProvider.Instance.CreateId();
-                //item.CreatedBy = _currentUser.UserName;
                 item.UpdatedBy = _currentUser.UserName;
-                //item.CreatedOn = HymsonClock.Now();
                 item.UpdatedOn = HymsonClock.Now();
                 item.ParameterType = procParameterLinkTypeModifyDto.ParameterType;
                 item.ParameterID = s;
@@ -112,7 +109,7 @@ namespace Hymson.MES.Services.Services.Process
                 ParameterType = procParameterLinkTypeModifyDto.ParameterType
             });
 
-            var adds = links.Where(w => current.Any(e => e.ParameterID == w.ParameterID) == false)
+            var adds = links.Where(w => !current.Any(e => e.ParameterID == w.ParameterID))
                    .Select(s =>
                    {
                        s.Id = IdGenProvider.Instance.CreateId();
@@ -122,9 +119,9 @@ namespace Hymson.MES.Services.Services.Process
                    })
                    .ToList();
 
-            var deletes = current.Where(w => links.Any(e => e.ParameterID == w.ParameterID) == false).ToList();
+            var deletes = current.Where(w => !links.Any(e => e.ParameterID == w.ParameterID)).ToList();
 
-            links.RemoveAll(w => adds.Any(e => e.ParameterID == w.ParameterID) == true);
+            links.RemoveAll(w => adds.Any(e => e.ParameterID == w.ParameterID));
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
@@ -171,7 +168,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
         public async Task<int> DeletesProcParameterLinkTypeAsync(long[] idsArr)
         {
