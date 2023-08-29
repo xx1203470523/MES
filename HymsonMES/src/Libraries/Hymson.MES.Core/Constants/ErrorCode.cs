@@ -331,6 +331,7 @@
         public const string MES11112 = "状态不合法，请检查!";
         public const string MES11113 = "类型不合法，请检查!";
         public const string MES11114 = "等级不合法，请检查!";
+        public const string MES11115 = "该不合格代码不存在";
         #endregion
 
         #region 不合格组 11200

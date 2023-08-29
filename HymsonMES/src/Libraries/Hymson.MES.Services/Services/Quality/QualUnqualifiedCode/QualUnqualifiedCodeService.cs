@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
@@ -12,6 +13,7 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -33,6 +35,8 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 不合格代码服务
         /// </summary>
@@ -42,7 +46,8 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <param name="validationModifyRules"></param>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        public QualUnqualifiedCodeService(IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository, AbstractValidator<QualUnqualifiedCodeCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedCodeModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
+        /// <param name="localizationService"></param>
+        public QualUnqualifiedCodeService(IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository, IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository, AbstractValidator<QualUnqualifiedCodeCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedCodeModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite, ILocalizationService localizationService)
         {
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _qualUnqualifiedGroupRepository = qualUnqualifiedGroupRepository;
@@ -50,6 +55,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -210,6 +216,9 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             qualUnqualifiedCodeEntity.CreatedBy = userId;
             qualUnqualifiedCodeEntity.UpdatedBy = userId;
             qualUnqualifiedCodeEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            qualUnqualifiedCodeEntity.Status = SysDataStatusEnum.Build;
+
             List<QualUnqualifiedCodeGroupRelation> list = new List<QualUnqualifiedCodeGroupRelation>();
             if (param.UnqualifiedGroupIds != null && param.UnqualifiedGroupIds.Any())
             {
@@ -264,10 +273,13 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(param);
             var qualUnqualifiedEntity = await _qualUnqualifiedCodeRepository.GetByIdAsync(param.Id);
-            if (qualUnqualifiedEntity != null && qualUnqualifiedEntity.Status != SysDataStatusEnum.Build && param.Status == SysDataStatusEnum.Build)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == qualUnqualifiedEntity.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11111));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
+
             var userId = _currentUser.UserName;
             //DTO转换实体
             var qualUnqualifiedCodeEntity = param.ToEntity<QualUnqualifiedCodeEntity>();
@@ -320,5 +332,57 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             }
             return qualUnqualifiedCodeDtos;
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _qualUnqualifiedCodeRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11115));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _qualUnqualifiedCodeRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }
