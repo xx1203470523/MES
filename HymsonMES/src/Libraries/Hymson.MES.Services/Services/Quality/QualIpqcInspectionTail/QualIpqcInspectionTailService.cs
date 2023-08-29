@@ -471,6 +471,10 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             entity.Status = InspectionStatusEnum.Closed;
+            entity.HandMethod = dto.HandMethod;
+            entity.ProcessedBy = _currentUser.UserName;
+            entity.ProcessedOn = HymsonClock.Now();
+            entity.Remark = dto.Remark;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 

@@ -304,6 +304,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 不合格处理方式;1、让步 2、？
         /// </summary>
         public HandMethodEnum? HandMethod { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 
     /// <summary>
