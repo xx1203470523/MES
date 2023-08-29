@@ -100,19 +100,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuOutStationService _manuOutStationService;
 
         /// <summary>
-        /// 接口（进站）
-        /// </summary>
-        private readonly IManuInStationService _manuInStationService;
-
-        /// <summary>
         /// 仓储接口（条码步骤）
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
-        /// <summary>
-        /// 不合格代码
-        /// </summary>
-        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
         /// <summary>
         /// 仓储接口（工艺路线工序连线）
         /// </summary>
@@ -160,10 +151,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
-            _manuInStationService = manuInStationService;
-            _manuInStationService = manuInStationService;
             _manuSfcStepRepository = manuSfcStepRepository;
-            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _manuCommonService = manuCommonService;
             _manuContainerPackRepository = manuContainerPackRepository;
@@ -202,7 +190,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
-            if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
+            if (resJob == null || !resJob.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
             foreach (var item in resJob)
@@ -379,8 +367,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UnqualifiedCode = s.UnqualifiedCode,
                     UnqualifiedCodeName = s.UnqualifiedCodeName,
                     Type = s.Type,
-                    CauseAnalyse = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.Where(it => it.ProductBadId == s.Id).FirstOrDefault()?.CauseAnalyse ?? "",
-                    RepairMethod = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.Where(it => it.ProductBadId == s.Id).FirstOrDefault()?.RepairMethod ?? "",
+                    CauseAnalyse = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.FirstOrDefault(it => it.ProductBadId == s.Id)?.CauseAnalyse ?? "",
+                    RepairMethod = manuSfcRepairDetailList == null ? "" : manuSfcRepairDetailList.FirstOrDefault(it => it.ProductBadId == s.Id)?.RepairMethod ?? "",
                     ResCode = s.ResCode,
                     IsClose = s.Status,
                 });
@@ -541,7 +529,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 foreach (var item in confirmSubmitDto.confirmSubmitDetail)
                 {
                     var validationFailure = new ValidationFailure();
-                    var badRecordEntit = badRecordList.Where(it => it.Id == item.BadRecordId).FirstOrDefault();
+                    var badRecordEntit = badRecordList.FirstOrDefault(it => it.Id == item.BadRecordId);
                     if (badRecordEntit == null)
                     {
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -638,7 +626,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //维修明细
                     if (GetManuSfcRepairDetails != null && GetManuSfcRepairDetails.Any())
                     {
-                        var detail = GetManuSfcRepairDetails.Where(it => it.ProductBadId == item.BadRecordId && it.SfcRepairId == manuSfcRepairRecordEntity.Id).FirstOrDefault();
+                        var detail = GetManuSfcRepairDetails.FirstOrDefault(it => it.ProductBadId == item.BadRecordId && it.SfcRepairId == manuSfcRepairRecordEntity.Id);
                         if (detail != null)
                         {
                             detail.RepairMethod = item.RepairMethod;
@@ -659,7 +647,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProductBadId = item.BadRecordId,
                         RepairMethod = item.RepairMethod,
                         CauseAnalyse = item.CauseAnalyse,
-                        IsClose = isClose,// ManuSfcRepairDetailIsIsCloseEnum.Close,
+                        IsClose = isClose,
 
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = _currentUser.UserName,
@@ -929,7 +917,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             return sfcProduceRepairBo;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ProcessRouteId"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         private async Task<long> GetEndProcessRouteDetailIdAsync(long ProcessRouteId)
         {
             //获取尾工序

@@ -127,19 +127,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
-        /// 物料库存 服务
-        /// </summary>
-        private readonly IWhMaterialInventoryService _whMaterialInventoryService;
-
-        /// <summary>
         /// 物料维护 仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
-
-        /// <summary>
-        /// 仓储接口（工艺路线工序连线）
-        /// </summary>
-        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
         /// 物料台账 仓储
@@ -186,9 +176,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuContainerPackRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="whMaterialInventoryService"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="procBomRepository"></param>
@@ -212,9 +200,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuContainerPackRepository manuContainerPackRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialInventoryService whMaterialInventoryService,
             IProcMaterialRepository procMaterialRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcBomRepository procBomRepository,
@@ -238,9 +224,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuContainerPackRepository = manuContainerPackRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _whMaterialInventoryService = whMaterialInventoryService;
             _procMaterialRepository = procMaterialRepository;
-            _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _procProcessRouteRepository = procProcessRouteRepository;
             _procBomRepository = procBomRepository;
@@ -763,9 +747,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             3.取消锁定：产品条码已经是锁定状态：将条码更新到锁定前状态
            指定将来锁定工序，且条码还没流转到指定工序：关闭将来锁定的工序指定，即取消将来锁定*/
             var sfcStepList = new List<ManuSfcStepEntity>();
-            var sfcProduceBusinessList = new List<ManuSfcProduceBusinessEntity>();
             var unLockList = new List<long>();
-            var sfcStepBusinessList = new List<MaunSfcStepBusinessEntity>();
             #region  组装数据
             foreach (var sfc in sfcList)
             {
@@ -1346,7 +1328,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                 }
 
-                var manuSfcProduceStep = manuSfcProduceStepList.Where(it => it.ProcedureId == item.ProcedureId).FirstOrDefault();
+                var manuSfcProduceStep = manuSfcProduceStepList.FirstOrDefault(it => it.ProcedureId == item.ProcedureId);
                 if (manuSfcProduceStep == null)
                 {
                     validationFailure.ErrorCode = nameof(ErrorCode.MES18007);
@@ -1386,7 +1368,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                 }
-                var manuSfcProduceStep = manuSfcProduceStepList.Where(it => it.ProcedureId == endProcessRouteDetailId).FirstOrDefault();
+                var manuSfcProduceStep = manuSfcProduceStepList.FirstOrDefault(it => it.ProcedureId == endProcessRouteDetailId);
                 if (manuSfcProduceStep == null)
                 {
                     validationFailure.ErrorCode = nameof(ErrorCode.MES18007);
@@ -1420,7 +1402,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcInfoEntitiesParam = new ManuSfcStatusQuery { Sfcs = manuSfcs, Statuss = new SfcStatusEnum?[3] { SfcStatusEnum.InProcess, SfcStatusEnum.Complete, SfcStatusEnum.Received } };
             var manuSfcInfos = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(manuSfcInfoEntitiesParam);
 
-            if (manuSfcInfos == null || manuSfcInfos.Any() == false)
+            if (manuSfcInfos == null || !manuSfcInfos.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18001));
             }

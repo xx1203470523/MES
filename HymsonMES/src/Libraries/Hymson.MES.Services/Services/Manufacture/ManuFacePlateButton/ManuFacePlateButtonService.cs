@@ -232,7 +232,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
             }
-            return null;
+            return new ManuFacePlateButtonDto();
         }
 
         /// <summary>
@@ -456,7 +456,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 根据面板ID和按钮ID找出绑定的作业job
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
-            if (buttonJobs.Any() == false) return result;
+            if (!buttonJobs.Any()) return result;
 
             // 根据 buttonJobs 读取对应的job对象
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());

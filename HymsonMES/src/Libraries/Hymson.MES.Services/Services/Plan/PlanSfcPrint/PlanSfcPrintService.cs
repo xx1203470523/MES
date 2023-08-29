@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             var resourceEntity = await _procResourceRepository.GetResByIdAsync(createDto.ResourceId);
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(createDto.ProcedureId);
-            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue == true)
+            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue)
             {
                 // 对工序资源类型和资源的资源类型校验
                 if (resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
@@ -270,8 +270,8 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
-            if (sfcEntities.Any(it => it.IsUsed == YesOrNoEnum.Yes) == true) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
-            if (sfcEntities.Any(it => it.Status == SfcStatusEnum.Scrapping) == true) throw new CustomerValidationException(nameof(ErrorCode.MES16130));
+            if (sfcEntities.Any(it => it.IsUsed == YesOrNoEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
+            if (sfcEntities.Any(it => it.Status == SfcStatusEnum.Scrapping)) throw new CustomerValidationException(nameof(ErrorCode.MES16130));
 
             // 对锁定状态进行验证
             await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
@@ -305,9 +305,6 @@ namespace Hymson.MES.Services.Services.Plan
                     Qty = s.Qty,
                     ProductId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.ProductId,
                     WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId,
-                    //ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                    //WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                    //ProcedureId = processRouteFirstProcedure.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Delete,
                     CurrentStatus = SfcProduceStatusEnum.Complete,
                     CreatedBy = _currentUser.UserName,

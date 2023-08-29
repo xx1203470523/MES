@@ -29,7 +29,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// </summary>
         public JobContextProxy()
         {
-            // dictionary = new();
             int num = Math.Max(Environment.ProcessorCount * 8, 32);
             _semaphores = new SemaphoreSlim[num];
             for (int i = 0; i < _semaphores.Length; i++)
@@ -431,8 +430,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            //uint hash = cacheKey % (uint)_semaphores.Length;
-            //await _semaphores[hash].WaitAsync();
             try
             {
                 var obj = await func(parameters);
@@ -443,7 +440,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                //_semaphores[hash].Release();
             }
         }
 
@@ -455,7 +451,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         protected object Set(uint key, object value)
         {
-            //var valueStr = value.ToSerialize();
+
             return dictionary.AddOrUpdate(key, value, (k, v) => value);
         }
 

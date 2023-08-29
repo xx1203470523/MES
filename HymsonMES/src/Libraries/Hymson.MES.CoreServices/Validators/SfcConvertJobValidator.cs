@@ -21,7 +21,6 @@ namespace Hymson.MES.Services.Validators.Equipment
             RuleFor(x => x.EquipmentId).NotEmpty().WithErrorCode(ErrorCode.MES16339);
             RuleFor(x => x.ProcedureId).NotEmpty().WithErrorCode(ErrorCode.MES16335);
             RuleFor(x => x.ResourceId).NotEmpty().WithErrorCode(ErrorCode.MES16334);
-            //RuleFor(x => x.UserName).NotEmpty().WithErrorCode(ErrorCode.);
         }
     }
 }

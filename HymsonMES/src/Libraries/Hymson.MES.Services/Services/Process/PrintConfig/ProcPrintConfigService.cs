@@ -170,7 +170,6 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         public async Task UpdateProcPrintConfigAsync(ProcPrinterUpdateDto param)
         {
             param.PrintName = param.PrintName.ToTrimSpace();
-            //param.PrintIp = param.PrintIp.ToTrimSpace();
             param.Remark = param.Remark.Trim();
 
             // 验证DTO
@@ -202,7 +201,6 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             }
 
             //查询资源类型是否关联资源
-            var siteId = _currentSite.SiteId ?? 0;
             var query = new ProcResourceConfigPrintQuery
             {
                 Ids = idsArr

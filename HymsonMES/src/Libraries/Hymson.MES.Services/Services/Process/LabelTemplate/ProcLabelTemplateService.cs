@@ -104,11 +104,10 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
         public async Task<int> DeletesProcLabelTemplateAsync(long[] idsArr)
         {
-            //  var idsArr = StringExtension.SpitLongArrary(ids);
             return await _procLabelTemplateRepository.DeletesAsync(idsArr);
         }
 

@@ -274,7 +274,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
-            if (isVerifyActivation == true)
+            if (isVerifyActivation)
             {
                 // 判断是否是激活的工单
                 _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
@@ -385,7 +385,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             });
 
             // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntities.Any() == false)
+            if (!sfcProduceEntities.Any())
             {
                 //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
                 //{
@@ -417,7 +417,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             });
 
             // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntities.Any() == false)
+            if (!sfcProduceEntities.Any())
             {
                 //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
                 //{
@@ -492,7 +492,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 };
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
                     if (replaceMaterialsDic.TryGetValue(item.Id, out var replaces))
                     {
@@ -514,7 +514,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     });
 
                     // 启用的替代物料
-                    deduct.ReplaceMaterials = replaceMaterialsForMain.Where(w => w.IsEnabled == true).Select(s => new MaterialDeductItemBo
+                    deduct.ReplaceMaterials = replaceMaterialsForMain.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
                     {
                         MaterialId = s.MaterialId,
                         Usages = item.Usages,
@@ -591,7 +591,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
 
             // 随机工序Key
-            //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
             var cacheKey = $"{workOrderId}-{processRouteId}-{procedureId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
 
@@ -658,10 +657,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             long processRouteId, long procedureId)
         {
             processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
-            if (processRouteDetailLinks.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+            if (!processRouteDetailLinks.Any()) return false; 
 
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
-            if (processRouteDetailNodes.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+            if (!processRouteDetailNodes.Any()) return false; 
 
             // 有多工序分叉的情况（取第一个当默认值）
             ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
@@ -694,7 +693,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 ProcessRouteId = processRouteId,
                 ProcedureId = procedureId
             });
-            if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+            if (preProcessRouteDetailLinks == null || !preProcessRouteDetailLinks.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 获取当前工序在工艺路线里面的扩展信息
             var procedureNodes = await _procProcessRouteDetailNodeRepository
@@ -770,7 +769,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         {
             var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedureId);
 
-            if (resources == null || resources.Any() == false) return Array.Empty<long>();
+            if (resources == null || !resources.Any()) return Array.Empty<long>();
             return resources.Select(s => s.Id);
         }
 
@@ -843,8 +842,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 return null;
             }
             else
-            {
-                var jobEntitys = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(x => x.JobId));
+            {           
                 var jobs = new List<JobBo>();
                 foreach (var job in jobs)
                 {
@@ -929,7 +927,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
             // 未设置物料（克明说化成和返工的是没有投料的）
-            if (mainMaterials == null || mainMaterials.Any() == false)
+            if (mainMaterials == null || !mainMaterials.Any())
             {
                 return initialMaterials;
                 // throw new CustomerValidationException(nameof(ErrorCode.MES10612));
@@ -971,9 +969,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
-                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces) == true)
+                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
                     {
                         // 启用的替代物料（BOM）
                         deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
@@ -988,10 +986,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 // 填充物料替代料
                 else
                 {
-                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces) == true)
+                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces))
                     {
                         // 启用的替代物料（物料维护）
-                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled == true).Select(s => new MaterialDeductItemBo
+                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
                         {
                             MaterialId = s.MaterialId,
                             Usages = item.Usages,
@@ -1060,10 +1058,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         {
             decimal defaultConsumeRatio = 100;
 
-            if (materialEntities == null || materialEntities.Any() == false) return defaultConsumeRatio;
+            if (materialEntities == null || !materialEntities.Any()) return defaultConsumeRatio;
 
             var materialEntity = materialEntities.FirstOrDefault(f => f.Id == replaceMaterialId);
-            if (materialEntity == null || materialEntity.ConsumeRatio.HasValue == false) return defaultConsumeRatio;
+            if (materialEntity == null || !materialEntity.ConsumeRatio.HasValue) return defaultConsumeRatio;
 
             return materialEntity.ConsumeRatio.Value;
         }
@@ -1093,11 +1091,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             // 取得当前物料的库存
             if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
-            if (feedingEntities.Any() == false) return;
+            if (!feedingEntities.Any()) return;
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
             decimal originQty = currentBo.Usages;
-            if (currentBo.Loss.HasValue == true && currentBo.Loss > 0) originQty *= currentBo.Loss.Value;
+            if (currentBo.Loss.HasValue && currentBo.Loss > 0) originQty *= currentBo.Loss.Value;
             if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
@@ -1116,7 +1114,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     {
                         // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                         targetQty = replaceBo.Usages;
-                        if (replaceBo.Loss.HasValue == true && replaceBo.Loss > 0) targetQty *= replaceBo.Loss.Value;
+                        if (replaceBo.Loss.HasValue && replaceBo.Loss > 0) targetQty *= replaceBo.Loss.Value;
                         if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
                     }
                 }
@@ -1169,7 +1167,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
 
             // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
-            if (isMain == false || residue <= 0) return;
+            if (!isMain || residue <= 0) return;
 
             // 扣除替代料
             foreach (var replaceFeeding in currentBo.ReplaceMaterials)

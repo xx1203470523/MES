@@ -30,19 +30,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         private readonly IProcBomDetailRepository _procBomDetailRepository;
-        private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
         /// <summary>
         /// 条码流转表仓储
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
-        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
-
-        /// <summary>
-        ///  仓储（物料库存）
-        /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
         /// 构造函数
@@ -63,11 +56,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procBomDetailRepository = procBomDetailRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _procMaterialRepository = procMaterialRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
         }
 
@@ -132,9 +122,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     var mainReplaceMaterials = new List<MainReplaceMaterial>();
 
-                    if (replaceBomDetails == null || replaceBomDetails.Count() == 0)
+                    if (replaceBomDetails == null || replaceBomDetails.Count == 0)
                     {
-                        replaceBomDetails = new List<ProcBomDetailView>();
+                        replaceBomDetails = null;
 
                         if (item.IsEnableReplace)
                         {
@@ -184,7 +174,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 MaterialName = replace.MaterialName,
                                 MaterialVersion = replace.Version,
 
-                                SerialNumber = replace.DataCollectionWay.HasValue ? replace.DataCollectionWay.Value : needQueryMaterialInfos.Where(x => x.Id == replace.ReplaceMaterialId.ParseToLong()).FirstOrDefault()?.SerialNumber
+                                SerialNumber = replace.DataCollectionWay.HasValue ? replace.DataCollectionWay.Value : needQueryMaterialInfos.FirstOrDefault(x => x.Id == replace.ReplaceMaterialId.ParseToLong())?.SerialNumber
                             });
                         }
                     }
@@ -201,14 +191,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                         BomMainMaterialNum = mainBomDetails.Count,
                         CurrentMainMaterialIndex = mainBomDetails.IndexOf(item) + 1,
-
-                        Id = item.Id,// 表proc_bom_detail对应的ID
+                        // 表proc_bom_detail对应的ID
+                        Id = item.Id,
                         MainReplaceMaterials = mainReplaceMaterials
                     };
                 }
             }
 
-            return null;
+            return new ManuFacePlateProductionPackageDto();
         }
 
     }

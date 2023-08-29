@@ -15,14 +15,5 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<ManuFacePlateProductionPackageDto> GetManuFacePlateProductionPackageInfoAsync(ManuFacePlateProductionPackageQueryDto param);
 
-        /*
-        /// <summary>
-        /// 组装
-        /// </summary>
-        /// <param name="addDto"></param>
-        /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto);
-        */
     }
 }

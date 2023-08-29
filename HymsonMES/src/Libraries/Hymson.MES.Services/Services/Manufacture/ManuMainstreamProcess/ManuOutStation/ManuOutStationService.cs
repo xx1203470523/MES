@@ -85,24 +85,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
-        /// 仓储接口（BOM明细）
-        /// </summary>
-        private readonly IProcBomDetailRepository _procBomDetailRepository;
-
-        /// <summary>
-        /// 仓储接口（BOM替代料明细）
-        /// </summary>
-        private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
-
-        /// <summary>
         /// 仓储接口（物料维护）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
-
-        /// <summary>
-        /// 仓储接口（物料替代料）
-        /// </summary>
-        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
         /// <summary>
         /// 仓储接口（工艺路线）
@@ -134,10 +119,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
-        /// <param name="procBomDetailRepository"></param>
-        /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="procReplaceMaterialRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
@@ -151,10 +133,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository,
              IProcProcessRouteRepository procProcessRouteRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository, ILocalizationService localizationService)
@@ -169,10 +148,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
-            _procBomDetailRepository = procBomDetailRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
-            _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _procProcessRouteRepository = procProcessRouteRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
@@ -243,7 +219,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             {
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                 decimal residue = materialBo.Usages;
-                if (materialBo.Loss.HasValue == true && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
@@ -282,7 +258,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             List<Task> tasks = new();
 
             // 更新物料库存
-            if (updates.Any() == true)
+            if (updates.Any())
             {
                 rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
 
@@ -295,7 +271,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             }
 
             // 添加流转记录
-            if (adds.Any() == true)
+            if (adds.Any())
             {
                 var manuSfcCirculationInsertRangeTask = _manuSfcCirculationRepository.InsertRangeAsync(adds);
                 tasks.Add(manuSfcCirculationInsertRangeTask);
