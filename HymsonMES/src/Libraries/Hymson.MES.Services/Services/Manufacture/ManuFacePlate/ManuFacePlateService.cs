@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -119,6 +120,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
             manuFacePlateEntity.SiteId = _currentSite.SiteId ?? 0;
 
+            manuFacePlateEntity.Status = SysDataStatusEnum.Build;
+
             //入库
             await _manuFacePlateRepository.InsertAsync(manuFacePlateEntity);
         }
@@ -199,10 +202,11 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var entity = await _manuFacePlateRepository.GetByIdAsync(manuFacePlateModifyDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17209));
-
-            if (entity.Status != SysDataStatusEnum.Build && manuFacePlateModifyDto.Status == SysDataStatusEnum.Build)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == entity.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             await _manuFacePlateRepository.UpdateAsync(manuFacePlateEntity);
@@ -571,6 +575,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
             manuFacePlateEntity.SiteId = _currentSite.SiteId ?? 0;
 
+            manuFacePlateEntity.Status = SysDataStatusEnum.Build;
+
             #region 生产过站
             ManuFacePlateProductionEntity manuFacePlateProductionEntity = new ManuFacePlateProductionEntity();
             if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
@@ -783,9 +789,15 @@ namespace Hymson.MES.Services.Services.Manufacture
             var entity = await _manuFacePlateRepository.GetByIdAsync(updateManuFacePlateDto.FacePlate.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17209));
 
-            if (entity.Status != SysDataStatusEnum.Build && updateManuFacePlateDto.FacePlate.Status == SysDataStatusEnum.Build)
+            //if (entity.Status != SysDataStatusEnum.Build && updateManuFacePlateDto.FacePlate.Status == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == entity.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             //DTO转换实体
@@ -978,6 +990,59 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ts.Complete();
             }
             #endregion
+
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _manuFacePlateRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17209));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _manuFacePlateRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

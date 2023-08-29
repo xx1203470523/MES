@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17206));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17207));
-            RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES17211));
+            //RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES17211));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
                 var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.Id);
@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17206));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17207));
-            RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES17211));
+            //RuleFor(x => x.Status).Must(it => it != null && Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES17211));
             RuleFor(x => x).MustAsync(async (manuFacePlate, cancellation) =>
             {
                 var isExists = await _manuFacePlateRepository.IsExists(manuFacePlate.Code.Trim(), manuFacePlate.Id);
