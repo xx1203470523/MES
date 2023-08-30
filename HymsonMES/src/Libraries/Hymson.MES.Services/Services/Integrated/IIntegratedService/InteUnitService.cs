@@ -45,7 +45,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="validationSaveRules"></param>
         /// <param name="inteUnitRepository"></param>
         public InteUnitService(ICurrentUser currentUser, ICurrentSite currentSite, 
             //AbstractValidator<InteUnitSaveDto> validationSaveRules, 
@@ -53,7 +52,6 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            //_validationSaveRules = validationSaveRules;
             _inteUnitRepository = inteUnitRepository;
         }
 
@@ -67,14 +65,12 @@ namespace Hymson.MES.Services.Services.Integrated
         {
 
             // 验证DTO
-            if(saveDto.Code.Contains(" "))
+            if(saveDto.Code.Contains(' '))
                 throw new CustomerValidationException(nameof(ErrorCode.MES18800));
             
             saveDto.Name = saveDto.Name.ToTrimSpace();
             if (saveDto.Name == "")
                 throw new CustomerValidationException(nameof(ErrorCode.MES18801));
-
-            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -109,12 +105,14 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> ModifyInteUnitAsync(InteUnitSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
 
              // 验证DTO
              saveDto.Name = saveDto.Name.ToTrimSpace();
              if (saveDto.Name == "")   throw new CustomerValidationException(nameof(ErrorCode.MES18801));
-             // await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
             var entity = saveDto.ToEntity<InteUnitEntity>();

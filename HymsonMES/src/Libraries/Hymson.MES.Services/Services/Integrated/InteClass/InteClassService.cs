@@ -73,7 +73,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
         public async Task<int> CreateAsync(InteClassSaveDto createDto)
         {
             // 验证DTO
-            //await validationSaveRules.ValidateAndThrowAsync(createDto);
 
             // DTO转换实体
             var entity = createDto.ToEntity<InteClassEntity>();
@@ -209,30 +208,5 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
 
             return response;
         }
-
-
-
-        /*
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="startTime"></param>
-        /// <param name="endTime"></param>
-        /// <returns></returns>
-        private static bool TimeComparison(DateOnly startTime, DateOnly endTime)
-        {
-            if (startTime == endTime) return false;
-            if (endTime == "00:00:00") return true;
-
-            string[] startTimeArry = startTime.Split(':');
-            string[] endTimeArry = endTime.Split(':');
-            if ((int.Parse(startTimeArry.First()) * 60 + int.Parse(startTimeArry[1]) * 60 + int.Parse(startTimeArry[2])) > (int.Parse(endTimeArry[0]) * 60 + int.Parse(endTimeArry[1]) * 60 + int.Parse(endTimeArry[2])))
-            {
-                return false;
-            }
-            return true;
-        }
-        */
-
     }
 }

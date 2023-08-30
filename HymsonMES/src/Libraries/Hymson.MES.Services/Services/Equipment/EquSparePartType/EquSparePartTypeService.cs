@@ -75,7 +75,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
         public async Task<int> CreateAsync(EquSparePartTypeSaveDto createDto)
         {
             // TODO 验证DTO
-            //TODO  _enumService.GetEnumTypes();
 
             // DTO转换实体
             var entity = createDto.ToEntity<EquSparePartTypeEntity>();

@@ -134,10 +134,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             await ValidationSaveDto(modifyDto);
             var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
-            //if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12510));
-            //}
+
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == inteContainerEntity.Status))
