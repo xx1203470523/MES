@@ -245,7 +245,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         ///// <summary>
         ///// 载具id
         ///// </summary>
-        //public long VehicleId { get; set; }
 
         /// <summary>
         /// 有效期
