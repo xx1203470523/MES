@@ -28,10 +28,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Version { get; set; }
 
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
-
         /// <summary>
         /// 物料id
         /// </summary>

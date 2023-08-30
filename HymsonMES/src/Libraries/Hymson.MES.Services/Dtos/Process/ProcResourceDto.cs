@@ -172,11 +172,6 @@ namespace Hymson.MES.Services.Dtos.Process
         //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
         public string ResName { get; set; }
 
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
-        ////[Required(ErrorMessage = "状态不能为空")]
-
         /// <summary>
         /// 所属资源类型
         /// </summary>
@@ -233,11 +228,6 @@ namespace Hymson.MES.Services.Dtos.Process
         //[Required(ErrorMessage = "资源名称不能为空")]
         //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
         public string ResName { get; set; }
-
-       // /// <summary>
-       // /// 状态
-       // /// </summary>
-       //// [Required(ErrorMessage = "状态不能为空")]
 
         /// <summary>
         /// 所属资源类型

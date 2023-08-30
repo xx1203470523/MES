@@ -143,23 +143,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcList.Select(x => x.SFC).ToArray(),
             });
-            ////找到锁定状态的
-            //var lockedSfcs = new List<string>();
-            //foreach (var item in sfcProduces)
-            //{
-            //    if (item.Status == SfcProduceStatusEnum.Locked) 
-            //    {
-            //        lockedSfcs.Add(item.SFC);
-            //    }
-            //}
-            //if (lockedSfcs.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
-            //}
             #endregion
 
             ////DTO转换实体
-            //var manuDowngradingEntity = manuDowngradingSaveDto.ToEntity<ManuDowngradingEntity>();
             var downgradings = await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery 
             {
                 SiteId=_currentSite.SiteId??0,
@@ -175,26 +161,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             allRuleList = allRuleList.OrderBy(x => x.SerialNumber);
 
-            //上面有该验证，这块就注释了
-            //var currentEntryGrade= allRuleList.FirstOrDefault(x => x.Code == manuDowngradingSaveDto.Grade);
-            //if (currentEntryGrade == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES21206)).WithData("code", manuDowngradingSaveDto.Grade);
-            //}
-
             //查询sfc的降级等级是否大于当前需要修改的等级 （按照等级编码的顺序，排序靠前等级越高）
             foreach (var item in downgradings)
             {
                 var oldRule = allRuleList.FirstOrDefault(x => x.Code == item.Grade);
-                if (oldRule != null) 
+                if (oldRule != null && manuDowngradingRule.SerialNumber < oldRule.SerialNumber)
                 {
-                    if (manuDowngradingRule.SerialNumber < oldRule.SerialNumber)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES11409)).WithData("sfc",item.SFC);
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11409)).WithData("sfc", item.SFC);
                 }
-                //else   //该验证 不需要了，海龙说： 如果移除了，重新录入，不用判断之前的信息，就当成第一次录入就好
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES11408)).WithData("sfc", item.SFC);
             }
 
 

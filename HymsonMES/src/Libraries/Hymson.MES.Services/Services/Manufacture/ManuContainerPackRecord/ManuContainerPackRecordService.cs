@@ -197,7 +197,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuContainerPackRecordEntity.ToModel<ManuContainerPackRecordDto>();
             }
-            return null;
+            return new ManuContainerPackRecordDto();
         }
 
         public async Task CreateManuContainerPackRecordsAsync(List<ManuContainerPackRecordCreateDto> manuContainerPackRecordCreateDtos)
