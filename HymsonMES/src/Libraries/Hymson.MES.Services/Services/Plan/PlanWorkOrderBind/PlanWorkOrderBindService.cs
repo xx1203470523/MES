@@ -237,8 +237,6 @@ namespace Hymson.MES.Services.Services.Plan
 
             List<PlanWorkOrderBindRecordEntity> bindRecordEntities = new List<PlanWorkOrderBindRecordEntity>();
 
-            ////找到不需要操作的
-            //hasBindWorkOrderIds.Intersect(bindActivationWorkOrder.WorkOrderIds);
             //找到需要删除的
             var needDeletes= bindActivationWorkOrder.WorkOrderIds!=null&& bindActivationWorkOrder.WorkOrderIds.Any()?  hasBindWorkOrderIds.Except(bindActivationWorkOrder.WorkOrderIds): hasBindWorkOrderIds;
             //找到需要新增的

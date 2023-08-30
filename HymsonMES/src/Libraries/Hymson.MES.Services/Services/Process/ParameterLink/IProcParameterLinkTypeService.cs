@@ -37,14 +37,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procParameterLinkTypeDto"></param>
+        /// <param name="procParameterLinkTypeCreateDto"></param>
         /// <returns></returns>
         Task CreateProcParameterLinkTypeAsync(ProcParameterLinkTypeCreateDto procParameterLinkTypeCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procParameterLinkTypeDto"></param>
+        /// <param name="procParameterLinkTypeModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcParameterLinkTypeAsync(ProcParameterLinkTypeModifyDto procParameterLinkTypeModifyDto);
 

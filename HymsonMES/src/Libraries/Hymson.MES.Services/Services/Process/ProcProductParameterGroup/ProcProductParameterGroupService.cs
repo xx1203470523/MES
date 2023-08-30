@@ -53,12 +53,10 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
     /// <summary>
     /// 仓储接口（物料）
     /// </summary>
-    /// </summary>
     private readonly IProcMaterialRepository _procMaterialRepository;
 
     /// <summary>
     /// 仓储接口（工序）
-    /// </summary>
     /// </summary>
     private readonly IProcProcedureRepository _procProcedureRepository;
 

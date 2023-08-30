@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.Web.Framework.Attributes;
@@ -121,5 +123,50 @@ namespace Hymson.MES.Api.Controllers.Quality
         {
             return await _qualInspectionParameterGroupService.QueryDetailPagedListAsync(pagedQueryDto);
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（全检参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("全检参数表", BusinessType.UPDATE)]
+        [PermissionDescription("quality:qualInspectionParameterGroup:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _qualInspectionParameterGroupService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（全检参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("全检参数表", BusinessType.UPDATE)]
+        [PermissionDescription("quality:qualInspectionParameterGroup:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _qualInspectionParameterGroupService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（全检参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("全检参数表", BusinessType.UPDATE)]
+        [PermissionDescription("quality:qualInspectionParameterGroup:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _qualInspectionParameterGroupService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

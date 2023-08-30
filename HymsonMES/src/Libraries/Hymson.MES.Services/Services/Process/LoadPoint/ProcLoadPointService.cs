@@ -55,6 +55,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procLoadPointLinkMaterialRepository"></param>
         /// <param name="procLoadPointLinkResourceRepository"></param>
         /// <param name="currentSite"></param>
+        /// /// <param name="localizationService"></param>
         public ProcLoadPointService(ICurrentUser currentUser, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
@@ -87,7 +88,7 @@ namespace Hymson.MES.Services.Services.Process
             await _validationCreateRules.ValidateAndThrowAsync(procLoadPointCreateDto);
             if (procLoadPointCreateDto.LinkMaterials != null)
             {
-                if (procLoadPointCreateDto.LinkMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
+                if (!procLoadPointCreateDto.LinkMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointCreateDto.LinkMaterials.Any(a => a.MaterialId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointCreateDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointCreateDto.LinkMaterials.GroupBy(x => x.MaterialId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10710));
@@ -95,7 +96,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (procLoadPointCreateDto.LinkResources != null)
             {
-                if (procLoadPointCreateDto.LinkResources.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
+                if (!procLoadPointCreateDto.LinkResources.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointCreateDto.LinkResources.Any(a => a.ResourceId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointCreateDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointCreateDto.LinkResources.GroupBy(x => x.ResourceId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
@@ -118,7 +119,7 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = procLoadPointEntity.SiteId,
                 LoadPoint = procLoadPointEntity.LoadPoint
             })).Any();
-            if (isExists == true)
+            if (isExists)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10701)).WithData("LoadPoint", procLoadPointEntity.LoadPoint);
             }
@@ -262,7 +263,7 @@ namespace Hymson.MES.Services.Services.Process
             await _validationModifyRules.ValidateAndThrowAsync(procLoadPointModifyDto);
             if (procLoadPointModifyDto.LinkMaterials != null)
             {
-                if (procLoadPointModifyDto.LinkMaterials.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
+                if (!procLoadPointModifyDto.LinkMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointModifyDto.LinkMaterials.Any(a => a.MaterialId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointModifyDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointModifyDto.LinkMaterials.GroupBy(x => x.MaterialId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10710));
@@ -270,7 +271,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (procLoadPointModifyDto.LinkResources != null)
             {
-                if (procLoadPointModifyDto.LinkResources.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
+                if (!procLoadPointModifyDto.LinkResources.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointModifyDto.LinkResources.Any(a => a.ResourceId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointModifyDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointModifyDto.LinkResources.GroupBy(x => x.ResourceId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
@@ -440,10 +441,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             var loadPoints = await _procLoadPointRepository.GetByIdsAsync(idsArr);
-            //if (loadPoints.Any(x => (SysDataStatusEnum.Enable == x.Status || SysDataStatusEnum.Retain == x.Status)))
-            //{
-            //    throw new BusinessException(nameof(ErrorCode.MES10709));
-            //}
+
             if (loadPoints != null && loadPoints.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -513,7 +511,6 @@ namespace Hymson.MES.Services.Services.Process
             {
                 return new ProcLoadPointDetailDto();
 
-                //return procLoadPointEntity.ToModel<ProcLoadPointDto>();
             }
 
             ProcLoadPointDetailDto loadPointDto = new ProcLoadPointDetailDto

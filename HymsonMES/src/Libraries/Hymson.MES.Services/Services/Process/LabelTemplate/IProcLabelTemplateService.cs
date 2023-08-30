@@ -18,14 +18,14 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procLabelTemplateDto"></param>
+        /// <param name="procLabelTemplateCreateDto"></param>
         /// <returns></returns>
         Task CreateProcLabelTemplateAsync(ProcLabelTemplateCreateDto procLabelTemplateCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procLabelTemplateDto"></param>
+        /// <param name="procLabelTemplateModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcLabelTemplateAsync(ProcLabelTemplateModifyDto procLabelTemplateModifyDto);
 

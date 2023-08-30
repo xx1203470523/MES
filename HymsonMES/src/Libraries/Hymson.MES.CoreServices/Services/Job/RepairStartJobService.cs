@@ -145,11 +145,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16330));
-            };
+            }
             if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16331));
-            };
+            }
             var sfcProduceEntity = sfcProduceEntitys.FirstOrDefault();
             // 如果工序对应不上
             if (sfcProduceEntity?.ProcedureId != bo.ProcedureId)
@@ -169,7 +169,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     var procedureId = (long)parameters[3];
                     return await _masterDataService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, procedureId);
                 }, new object[] { processRouteDetailLinks, processRouteDetailNodes, sfcProduceEntity.ProcessRouteId, bo.ProcedureId });
-                if (IsRandomPreProcedure == false) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                if (!IsRandomPreProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序
                 sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
@@ -177,7 +177,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 校验工序和资源是否对应
             var resourceIds = await param.Proxy.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
-            if (resourceIds == null || resourceIds.Any(a => a == bo.ResourceId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
 
 
@@ -236,11 +236,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             //事务入库
-            //using var trans = TransactionHelper.GetTransactionScope();
 
             responseBo.Rows += await _manuSfcProduceRepository.UpdateProcedureAndResourceRangeAsync(data.UpdateResourceCommand);
-
-            //trans.Complete();
             return responseBo;
         }
 

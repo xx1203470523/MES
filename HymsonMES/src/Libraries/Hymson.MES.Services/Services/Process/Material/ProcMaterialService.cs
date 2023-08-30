@@ -361,7 +361,7 @@ namespace Hymson.MES.Services.Services.Process
 
             // 判断替代品是否包含当前物料
             var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList, procMaterialEntity);
-            if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id) == true)
+            if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10206));
             }
@@ -556,7 +556,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public static List<ProcReplaceMaterialEntity> ConvertProcReplaceMaterialList(IEnumerable<ProcMaterialReplaceDto> dynamicList, ProcMaterialEntity model)
         {
-            if (dynamicList == null || dynamicList.Any() == false) return new List<ProcReplaceMaterialEntity> { };
+            if (dynamicList == null || !dynamicList.Any()) return new List<ProcReplaceMaterialEntity> { };
             return dynamicList.Select(s => new ProcReplaceMaterialEntity
             {
                 MaterialId = model.Id,
