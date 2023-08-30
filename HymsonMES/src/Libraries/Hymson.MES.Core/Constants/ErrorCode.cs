@@ -299,6 +299,9 @@
         public const string MES10903 = "消息状态不合法";
         public const string MES10904 = "原因分析不允许有空格";
         public const string MES10905 = "处理方案不允许有空格";
+        public const string MES10906 = "推送对象不允许有空格";
+        public const string MES10907 = "私钥不允许有空格";
+        public const string MES10908 = "关键字不允许有空格";
         #endregion
 
         #region 降级规则 11000

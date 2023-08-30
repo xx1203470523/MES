@@ -19,7 +19,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Correlation
         public async Task<JobBo> GetJob()
         {
             return await Task.FromResult(new JobBo { });
-            //throw new NotImplementedException();
         }
     }
 }

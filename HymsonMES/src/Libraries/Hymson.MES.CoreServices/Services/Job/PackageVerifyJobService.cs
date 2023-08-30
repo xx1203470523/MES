@@ -17,11 +17,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     public class PackageVerifyJobService : IJobService
     {
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
@@ -37,11 +32,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="localizationService"></param>
-        public PackageVerifyJobService(IManuCommonService manuCommonService,
-            IMasterDataService masterDataService,
+        public PackageVerifyJobService(IMasterDataService masterDataService,
             ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _localizationService = localizationService;
         }
@@ -58,7 +51,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 合法性校验

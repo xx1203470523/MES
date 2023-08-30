@@ -13,6 +13,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MessagePush.Enum;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -99,11 +100,25 @@ namespace Hymson.MES.Services.Services.Integrated
             });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
 
+            // 检查空格
+            if (saveDto.Details.Any(a => a.Address.Any(x => char.IsWhiteSpace(x))))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10906));
+            }
+            if (saveDto.Details.Any(a => a.Type != MessageTypeEnum.Email && a.SecretKey != null && a.SecretKey.Any(x => char.IsWhiteSpace(x))))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10907));
+            }
+            if (saveDto.Details.Any(a => a.Type != MessageTypeEnum.Email && a.KeyWord != null && a.KeyWord.Any(x => char.IsWhiteSpace(x))))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10908));
+            }
+
             // 判断规格上限和规格下限（数据类型为数值）
             List<ValidationFailure> validationFailures = new();
             foreach (var item in saveDto.Details)
             {
-                // TODO
+
             }
 
             // 是否存在错误
@@ -173,6 +188,20 @@ namespace Hymson.MES.Services.Services.Integrated
             if (checkEntity != null && checkEntity.Id != entity.Id)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+            }
+
+            // 检查空格
+            if (saveDto.Details.Any(a => a.Address.Any(x => char.IsWhiteSpace(x))))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10906));
+            }
+            if (saveDto.Details.Any(a => a.Type != MessageTypeEnum.Email && a.SecretKey != null && a.SecretKey.Any(x => char.IsWhiteSpace(x))))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10907));
+            }
+            if (saveDto.Details.Any(a => a.Type != MessageTypeEnum.Email && a.KeyWord != null && a.KeyWord.Any(x => char.IsWhiteSpace(x))))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10908));
             }
 
             // 判断规格上限和规格下限（数据类型为数值）

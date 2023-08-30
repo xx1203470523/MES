@@ -173,13 +173,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("T.Name LIKE @Name");
@@ -190,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.WorkShopId = @WorkShopId");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.WorkShopName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkShopName))
             {
                 pagedQuery.WorkShopName = $"%{pagedQuery.WorkShopName}%";
                 sqlBuilder.Where("IWC.Name LIKE @WorkShopName");
