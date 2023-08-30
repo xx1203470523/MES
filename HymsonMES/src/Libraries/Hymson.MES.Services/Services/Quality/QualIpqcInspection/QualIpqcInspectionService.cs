@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
@@ -12,10 +13,12 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -51,6 +54,8 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -65,7 +70,7 @@ namespace Hymson.MES.Services.Services.Quality
             IQualInspectionParameterGroupRepository qualInspectionParameterGroupRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
-            IProcResourceRepository procResourceRepository)
+            IProcResourceRepository procResourceRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -79,6 +84,7 @@ namespace Hymson.MES.Services.Services.Quality
             _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -115,29 +121,29 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13151)).WithData("Code", saveDto.ParameterGroupCode).WithData("Condition", saveDto.GenerateConditionUnit.GetDescription()).WithData("Type", saveDto.Type.GetDescription()).WithData("Version", saveDto.Version);
             }
 
-            // 状态为启用时校验关联表数据
-            if (saveDto.Status == SysDataStatusEnum.Enable)
-            {
-                if (saveDto.Details == null || !saveDto.Details.Any())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES13121));
-                }
-                //首检校验检验规则
-                if (saveDto.Type == IPQCTypeEnum.FAI)
-                {
-                    if (saveDto.Rules == null || saveDto.Rules.IsEmpty())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES13122));
-                    }
-                    foreach (var rule in saveDto.Rules)
-                    {
-                        if (rule.Resources == null || rule.Resources.IsEmpty())
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
-                        }
-                    }
-                }
-            }
+            //// 状态为启用时校验关联表数据
+            //if (saveDto.Status == SysDataStatusEnum.Enable)
+            //{
+            //    if (saveDto.Details == null || !saveDto.Details.Any())
+            //    {
+            //        throw new CustomerValidationException(nameof(ErrorCode.MES13121));
+            //    }
+            //    //首检校验检验规则
+            //    if (saveDto.Type == IPQCTypeEnum.FAI)
+            //    {
+            //        if (saveDto.Rules == null || saveDto.Rules.IsEmpty())
+            //        {
+            //            throw new CustomerValidationException(nameof(ErrorCode.MES13122));
+            //        }
+            //        foreach (var rule in saveDto.Rules)
+            //        {
+            //            if (rule.Resources == null || rule.Resources.IsEmpty())
+            //            {
+            //                throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
+            //            }
+            //        }
+            //    }
+            //}
 
             #endregion
 
@@ -149,6 +155,8 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
+
+            entity.Status = SysDataStatusEnum.Build;
 
             //参数项目
             IEnumerable<QualIpqcInspectionParameterEntity>? details = null;
@@ -254,26 +262,14 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10104));
             }
-            //启用状态只能修改为保留或废除
-            if (entity.Status == SysDataStatusEnum.Enable)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == entity.Status))
             {
-                if (saveDto.Status != SysDataStatusEnum.Retain && saveDto.Status != SysDataStatusEnum.Abolish)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10124));
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             #endregion
-
-            //原状态为启用，修改为保留或废除，只更改状态
-            if (entity.Status == SysDataStatusEnum.Enable && (saveDto.Status == SysDataStatusEnum.Retain || saveDto.Status == SysDataStatusEnum.Abolish))
-            {
-                entity.Status = saveDto.Status;
-                entity.UpdatedBy = updatedBy;
-                entity.UpdatedOn = updatedOn;
-
-                return await _qualIpqcInspectionRepository.UpdateAsync(entity);
-            }
 
             // DTO转换实体
             entity.SampleQty = saveDto.SampleQty;
@@ -281,7 +277,7 @@ namespace Hymson.MES.Services.Services.Quality
             entity.GenerateConditionUnit = saveDto.GenerateConditionUnit;
             entity.ControlTime = saveDto.ControlTime;
             entity.ControlTimeUnit = saveDto.ControlTimeUnit;
-            entity.Status = saveDto.Status;
+            //entity.Status = saveDto.Status;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
 
@@ -556,5 +552,130 @@ namespace Hymson.MES.Services.Services.Quality
             return dtos;
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 状态更新为启用
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task UpdateStatusEnable(long id) 
+        {
+            if (id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Enable,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验基础数据
+            var entity = await _qualIpqcInspectionRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            //校验关联表数据
+            var ipqcParameters = await _qualIpqcInspectionParameterRepository.GetEntitiesAsync(new QualIpqcInspectionParameterQuery { IpqcInspectionId = id });
+            if (ipqcParameters == null || !ipqcParameters.Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13121));
+            }
+
+            //首检校验检验规则
+            if (entity.Type == IPQCTypeEnum.FAI) 
+            {
+                var ipqcRules = await _qualIpqcInspectionRuleRepository.GetEntitiesAsync(new QualIpqcInspectionRuleQuery { IpqcInspectionId = id });
+
+                if (ipqcRules == null || !ipqcRules.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES13122));
+                }
+
+                var ruleResourceEntities = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    IpqcInspectionId = id
+                });
+
+                foreach (var rule in ipqcRules)
+                {
+                    var resources= ruleResourceEntities.Where(x => x.IpqcInspectionRuleId == rule.Id);
+
+                    if (resources==null || !resources.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
+                    }
+                }
+            }
+
+            #region 操作数据库
+            await _qualIpqcInspectionRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _qualIpqcInspectionRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _qualIpqcInspectionRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }
