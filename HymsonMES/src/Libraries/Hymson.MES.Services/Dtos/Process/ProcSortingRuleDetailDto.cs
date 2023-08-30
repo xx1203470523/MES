@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MinValue { get; set; }
 
        /// <summary>
-        /// 包含最小值类型;1< 2.≤
+        /// 包含最小值类型;1＜2.≤
         /// </summary>
         public ContainingTypeEnum? MinContainingType { get; set; }
 
@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MaxValue { get; set; }
 
        /// <summary>
-        /// 包含最大值类型;1< 2.≥
+        /// 包含最大值类型;1＜ 2.≥
         /// </summary>
         public ContainingTypeEnum? MaxContainingType { get; set; }
 
@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MinValue { get; set; }
 
        /// <summary>
-        /// 包含最小值类型;1< 2.≤
+        /// 包含最小值类型;1＜ 2.≤
         /// </summary>
         public bool? MinContainingType { get; set; }
 
@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MaxValue { get; set; }
 
        /// <summary>
-        /// 包含最大值类型;1< 2.≥
+        /// 包含最大值类型;1＜ 2.≥
         /// </summary>
         public bool? MaxContainingType { get; set; }
 
@@ -230,7 +230,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MinValue { get; set; }
 
        /// <summary>
-        /// 包含最小值类型;1< 2.≤
+        /// 包含最小值类型;1＜ 2.≤
         /// </summary>
         public bool? MinContainingType { get; set; }
 
@@ -239,8 +239,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public decimal? MaxValue { get; set; }
 
-       /// <summary>
-        /// 包含最大值类型;1< 2.≥
+        /// <summary>
+        /// 包含最大值类型;1＜ 2.≥
         /// </summary>
         public bool? MaxContainingType { get; set; }
 

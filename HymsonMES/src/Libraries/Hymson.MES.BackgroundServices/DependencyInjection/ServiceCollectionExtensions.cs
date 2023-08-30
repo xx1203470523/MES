@@ -35,7 +35,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-            //services.AddSingleton<IMessagePushService, MessagePushService>();
             return services;
         }
 
