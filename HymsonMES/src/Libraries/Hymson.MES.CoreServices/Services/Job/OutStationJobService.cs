@@ -139,11 +139,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 判断条码锁状态
-            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
@@ -203,7 +203,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             OutStationResponseBo responseBo = new();
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();
@@ -472,15 +472,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                     // manu_sfc_info 修改为完成 且入库
                     tasks.Add(_manuSfcRepository.MultiUpdateSfcStatusAsync(data.MultiSFCUpdateStatusCommand));
-
-                    //// 2023.05.29 克明说不在这里更新完成时间
-                    //// 更新工单统计表的 RealEnd
-                    //rows += await _planWorkOrderRepository.UpdatePlanWorkOrderRealEndByWorkOrderIdAsync(new UpdateWorkOrderRealTimeCommand
-                    //{
-                    //    UpdatedOn = sfcProduceEntity.UpdatedOn,
-                    //    UpdatedBy = sfcProduceEntity.UpdatedBy,
-                    //    WorkOrderIds = new long[] { sfcProduceEntity.WorkOrderId }
-                    //});
 
                     // 入库
                     tasks.Add(_whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities));
