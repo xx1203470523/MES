@@ -24,7 +24,7 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10118));
             RuleFor(x => x.Version).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES10119));
             RuleFor(x => x.Version).Must(x => x.Any(x => char.IsWhiteSpace(x)) == false).WithErrorCode(nameof(ErrorCode.MES10122));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10120));
+            //RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES10120));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES10121));
 
             RuleFor(x => x.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10518));

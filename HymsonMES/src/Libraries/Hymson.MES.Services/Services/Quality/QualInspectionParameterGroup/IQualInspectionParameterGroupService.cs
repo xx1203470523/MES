@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -63,6 +64,13 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<QualInspectionParameterGroupDetailViewDto>> QueryDetailPagedListAsync(QualInspectionParameterGroupDetailPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
 
     }
 }
