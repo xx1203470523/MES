@@ -168,6 +168,18 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<EquFaultPhenomenonEntity>(GetByIdsSql, new { ids });
         }
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
     }
 
     /// <summary>
@@ -190,5 +202,8 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetByIdsSql = @"SELECT * FROM equ_fault_phenomenon WHERE IsDeleted = 0 AND Id IN @ids ";
+
+        const string UpdateStatusSql = "UPDATE `equ_fault_phenomenon` SET UseStatus= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
     }
 }
