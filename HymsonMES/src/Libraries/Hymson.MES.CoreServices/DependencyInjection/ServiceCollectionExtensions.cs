@@ -56,8 +56,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobCommonService, JobCommonService>();
             services.AddSingleton<ScopedServiceFactory>();
             services.AddTransient<IJobContextProxy, JobContextProxy>();
-            //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService<,>));
-            //services.AddSingleton(typeof(IJobService<,>), typeof(InStationJobService));
             services.AddSingleton<IJobService, InStationJobService>();
             services.AddSingleton<IJobService, OutStationJobService>();
             services.AddSingleton<IJobService, StopJobService>();
@@ -71,7 +69,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, BarcodeReceiveService>();
             services.AddSingleton<IJobService, ProductBadRecordJobService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
-            //services.AddSingleton<ExecuteJobService<OutStationRequestBo>, ExecuteJobService<OutStationRequestBo>>();
             services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             return services;
         }
@@ -113,7 +110,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         {
             //数据库连接
             services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
     }

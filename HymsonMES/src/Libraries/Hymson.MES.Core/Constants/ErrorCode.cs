@@ -1181,13 +1181,11 @@
         public const string MES18700 = "Recipe参数错误";
         public const string MES18701 = "对应Recipe参数不存在";
         public const string MES18702 = "Recipe参数编码已存在";
-        //public const string MES18603 = "载具编码[{codes}]有关联的产品序列码,请先解绑该载具所关联的产品序列码！";
         public const string MES18704 = "Recipe参数编码不能为空";
         public const string MES18703 = "Recipe参数编码不允许空格";
         public const string MES18705 = "Recipe参数名称不能为空";
         public const string MES18706 = "Recipe参数编码最大长度为100";
         public const string MES18707 = "Recipe参数名称最大长度为100";
-        //public const string MES18708 = "Recipe参数描述最大长度为255";
         public const string MES18709 = "Recipe参数状态不合法";
         public const string MES18710 = "Recipe参数功能类型不合法";
 
@@ -1277,7 +1275,7 @@
         #endregion
 
         #region 调用第三方服务出错
-        //public const string MES30001 = "MES30001";
+
         #endregion
     }
 }

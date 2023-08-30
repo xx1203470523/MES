@@ -338,10 +338,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupDto>();
             CreateMap<ProcProcessEquipmentGroupRelationEntity, ProcProcessEquipmentGroupRelationDto>();
 
-            //CreateMap<ProcProcessEquipmentGroupRuleDto, ProcProcessEquipmentGroupRuleEntity>();
             CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
             CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
-            //CreateMap<ProcProcessEquipmentGroupRelationRuleDto, ProcProcessEquipmentGroupRelationRuleEntity>();
             CreateMap<ProcProcessEquipmentGroupRelationSaveDto, ProcProcessEquipmentGroupRelationEntity>();
             CreateMap<ProcProcessEquipmentGroupRelationPagedQueryDto, ProcProcessEquipmentGroupRelationPagedQuery>();
 
