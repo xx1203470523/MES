@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("T.Status = @Status");
             }
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIpqcInspectionEntity>(template.RawSql, query);
+                return await conn.QueryAsync<QualIpqcInspectionEntity>(template.RawSql, query);
         }
 
         /// <summary>

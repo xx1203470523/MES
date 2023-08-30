@@ -116,7 +116,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("execute")]
-        [PermissionDescription("quality:ipqcInspectionTail:execute")]
+        //[PermissionDescription("quality:ipqcInspectionTail:execute")]
         public async Task ExecuteAsync([FromBody] StatusChangeDto updateDto)
         {
             await _qualIpqcInspectionTailService.ExecuteAsync(updateDto);
@@ -206,7 +206,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("shouldInspectItems")]
-        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync(SampleShouldInspectItemsQueryDto query)
+        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync([FromQuery] SampleShouldInspectItemsQueryDto query)
         {
             return await _qualIpqcInspectionTailService.GetSampleShouldInspectItemsAsync(query);
         }

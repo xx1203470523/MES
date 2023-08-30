@@ -303,13 +303,13 @@ namespace Hymson.MES.Services.Services.Quality
                 foreach (var procedure in procedureList)
                 {
                     //获取首件检验项目
-                    var ipqcInspection = ipqcInspectionList.Where(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.Id).FirstOrDefault();
+                    var ipqcInspection = ipqcInspectionList.Where(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.ProcedureId).FirstOrDefault();
                     if (ipqcInspection == null)
                     {
                         continue;
                     }
                     //获取应检资源列表
-                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.Id);
+                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.ProcedureId);
                     if (procedureResourceList.IsNullOrEmpty())
                     {
                         continue;
@@ -334,7 +334,7 @@ namespace Hymson.MES.Services.Services.Quality
                             IpqcInspectionId = ipqcInspection.Id,
                             WorkOrderId = workOrder.Id,
                             MaterialId = workOrder.ProductId,
-                            ProcedureId = procedure.Id,
+                            ProcedureId = procedure.ProcedureId,
                             ResourceId = resource.Id,
                             EquipmentId = equipmentId,
                             TriggerCondition = TriggerConditionEnum.Shift,
@@ -375,6 +375,8 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     rows += await _qualIpqcInspectionHeadRepository.InsertRangeAsync(entities);
                     rows += await _qualIpqcInspectionHeadResultRepository.InsertRangeAsync(resultEntites);
+
+                    trans.Complete();
                 }
             }
             else
@@ -549,6 +551,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 rows += await _qualIpqcInspectionHeadRepository.UpdateAsync(entity);
                 rows += await _qualIpqcInspectionHeadResultRepository.UpdateAsync(resultEntity);
+                trans.Complete();
             }
 
             return rows;
