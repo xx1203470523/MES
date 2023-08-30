@@ -22,29 +22,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         {
             services.AddCoreService(configuration);
             AddEventBusServices(services);
-            AddServices(services);
-            AddValidators(services);
             AddConfig(services, configuration);
-            return services;
-        }
-
-        /// <summary>
-        /// 添加服务依赖
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddServices(this IServiceCollection services)
-        {
-            return services;
-        }
-
-        /// <summary>
-        /// 添加验证器相关服务
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddValidators(IServiceCollection services)
-        {
             return services;
         }
 

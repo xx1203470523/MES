@@ -127,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySFCDto param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySfcDto param)
         {
             var list = new List<ManuProductParameterEntity>();
             var dic = new Dictionary<string, List<string>>();

@@ -32,7 +32,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySFCDto param);
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySfcDto param);
 
         /// <summary>
         /// 修改参数

@@ -20,7 +20,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 条码
         /// </summary>
-        public string SFC { get; set; }
+        public string SFC { get; set; } = "";
 
         /// <summary>
         /// 工序Id
@@ -35,7 +35,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }
+        public string ParameterValue { get; set; } = "";
 
         /// <summary>
         /// 采集时间
@@ -45,7 +45,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 
         /// </summary>
-        public string UserName { get; set; }
+        public string UserName { get; set; } = "";
 
         public DateTime Date { get; set; }
     }
