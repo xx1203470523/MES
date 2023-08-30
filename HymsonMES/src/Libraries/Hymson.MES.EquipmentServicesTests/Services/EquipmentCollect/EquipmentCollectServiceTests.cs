@@ -126,5 +126,87 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
             }
             Assert.IsTrue(true);
         }
+
+        /// <summary>
+        /// 设备产品参数上报
+        /// </summary>
+        [TestMethod()]
+        public async Task EquipmentProductProcessParamAsyncTest()
+        {
+            string resourceCode = "QAEMZY002";
+            long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
+            var equEquipmentEntities = await _equEquipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
+            {
+                SiteId = siteId,
+                EquipmentCodes = new[] { "QAEM002" }
+            });
+            var equEquipmentEntitie = equEquipmentEntities.First();
+            //设置当前模拟设备名称
+            SetEquInfoAsync(new EquipmentInfoDto { Id = equEquipmentEntitie.Id, FactoryId = equEquipmentEntitie.WorkCenterFactoryId, Code = equEquipmentEntitie.EquipmentCode, Name = equEquipmentEntitie.EquipmentName });
+            await _equipmentCollectService.EquipmentProductProcessParamAsync(new EquipmentProductProcessParamDto
+            {
+                EquipmentCode = equEquipmentEntitie.EquipmentCode,
+                LocalTime = HymsonClock.Now(),
+                ResourceCode = resourceCode,
+                SFCParams = new EquipmentProductProcessParamSFCDto[] {
+                    new EquipmentProductProcessParamSFCDto(){
+                        SFC="AAATEST01",
+                        NgList = new Ng[] {
+                            new Ng{NGCode="NGCODE1" }
+                        },
+                        ParamList=new  EquipmentProcessParamInfoDto[]{
+                            new EquipmentProcessParamInfoDto{
+                                ParamCode="TEST001",
+                                ParamValue="TEST00001"
+                            }
+                        }
+                    },
+                    new EquipmentProductProcessParamSFCDto(){
+                        SFC="AAATEST02",
+                        NgList = new Ng[] {
+                            new Ng{NGCode="NGCODE2" }
+                        },
+                        ParamList=new  EquipmentProcessParamInfoDto[]{
+                            new EquipmentProcessParamInfoDto{
+                                ParamCode="TEST002",
+                                ParamValue="TEST00002"
+                            }
+                        }
+                    }
+                }
+            });
+
+            Assert.IsTrue(true);
+        }
+
+        [TestMethod()]
+        public async Task EquipmentProductNgAsyncTest()
+        {
+            string resourceCode = "QAEMZY002";
+            long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
+            var equEquipmentEntities = await _equEquipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
+            {
+                SiteId = siteId,
+                EquipmentCodes = new[] { "QAEM002" }
+            });
+            var equEquipmentEntitie = equEquipmentEntities.First();
+            //设置当前模拟设备名称
+            SetEquInfoAsync(new EquipmentInfoDto { Id = equEquipmentEntitie.Id, FactoryId = equEquipmentEntitie.WorkCenterFactoryId, Code = equEquipmentEntitie.EquipmentCode, Name = equEquipmentEntitie.EquipmentName });
+            await _equipmentCollectService.EquipmentProductNgAsync(new EquipmentProductNgDto
+            {
+                EquipmentCode = equEquipmentEntitie.EquipmentCode,
+                LocalTime = HymsonClock.Now(),
+                ResourceCode = resourceCode,
+                SFCParams = new EquipmentProductNgSFCDto[] {
+                    new EquipmentProductNgSFCDto{ 
+                        SFC="AAA2103841XCE12A060",
+                        NgList =new Ng[]{ 
+                            new Ng{ NGCode="NGCODE1" }
+                        }
+                    }
+                }
+            });
+            Assert.IsTrue(true);
+        }
     }
 }

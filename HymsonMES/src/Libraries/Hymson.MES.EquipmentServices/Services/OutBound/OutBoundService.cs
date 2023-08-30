@@ -271,7 +271,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
-                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId== planWorkOrderEntity.Id).First();
+                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).First();
                 //汇总信息
                 var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 // 更新时间

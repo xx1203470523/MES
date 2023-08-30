@@ -22,9 +22,26 @@
         public string SFC { get; set; }
 
         /// <summary>
+        /// NG列表
+        /// </summary>
+        public Ng[]? NgList { get; set; }
+
+        /// <summary>
         ///  故障详细信息
         /// </summary>
         public IEnumerable<EquipmentProcessParamInfoDto> ParamList { get; set; }
+    }
+
+
+    /// <summary>
+    /// NG代码
+    /// </summary>
+    public class Ng
+    {
+        /// <summary>
+        /// NG代码
+        /// </summary>
+        public string NGCode { get; set; } = string.Empty;
     }
 
 }

@@ -215,11 +215,12 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
             //进站不允许不合格产品
-            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
-            if (includeNoQuality.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
-            }
+            //var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+            //if (includeNoQuality.Any())
+            //{
+            //    //允许进站不合格产品
+            //    //throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+            //}
 
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();

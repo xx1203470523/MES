@@ -60,7 +60,12 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamDto request);
 
-
+        /// <summary>
+        /// 设备产品NG录入
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task EquipmentProductNgAsync(EquipmentProductNgDto request);
 
     }
 }

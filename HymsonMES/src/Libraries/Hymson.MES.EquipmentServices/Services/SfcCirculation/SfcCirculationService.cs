@@ -79,7 +79,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <summary>
         /// CCS绑定的Location
         /// </summary>
-        private readonly string[] locationArray = new string[] { "A", "B", "C", "D" };
+        private readonly string[] locationArray = new string[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 
         #endregion
 
@@ -529,7 +529,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             var exceptLocations = sfcLocations.Except(locationArray).ToArray();
             if (exceptLocations.Any())
             {
-                //错误的Location  1,2，只能为：A,B,C,D
+                //错误的Location  1,2，只能为：A,B,C,D,E,F,G
                 throw new CustomerValidationException(nameof(ErrorCode.MES19140)).WithData("SFCLocation", string.Join(",", exceptLocations))
                     .WithData("Location", string.Join(",", locationArray));
             }

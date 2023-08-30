@@ -89,6 +89,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
 
         /// <summary>
         /// 是否合格
+        ///  0不合格,1合格
         /// </summary>
         public int? Passed { get; set; }
 

@@ -618,5 +618,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcCirculationService.SfcCirculationCCSConfirmAsync(request);
         }
+
+        /// <summary>
+        /// 产品NG信息单独录入接口
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("EquipmentProductNg")]
+        public async Task EquipmentProductNgAsync(EquipmentProductNgDto request)
+        {
+            await _equipmentService.EquipmentProductNgAsync(request);
+        }
     }
 }

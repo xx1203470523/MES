@@ -156,6 +156,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 解包
         /// </summary>
         [Description("解包")]
-        Unpack = 30
+        Unpack = 30,
+        /// <summary>
+        /// 手动上报NG
+        /// </summary>
+        [Description("手动上报NG")]
+        NG = 31
     }
 }

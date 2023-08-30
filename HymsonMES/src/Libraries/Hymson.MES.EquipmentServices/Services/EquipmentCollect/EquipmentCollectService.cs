@@ -3,16 +3,22 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.EquipmentServices.Bos;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -75,6 +81,14 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        private readonly IManuSfcStepNgRepository _manuSfcStepNgRepository;
+
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -89,6 +103,10 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <param name="manuProductParameterRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
+        /// <param name="manuSfcStepNgRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="manuSfcSummaryRepository"></param>
         public EquipmentCollectService(ICurrentEquipment currentEquipment,
             IEquHeartbeatRepository equipmentHeartbeatRepository,
             IEquAlarmRepository equipmentAlarmRepository,
@@ -98,7 +116,11 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             IProcParameterRepository procParameterRepository,
             IManuProductParameterRepository manuProductParameterRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IManuSfcStepNgRepository manuSfcStepNgRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _currentEquipment = currentEquipment;
             _equipmentHeartbeatRepository = equipmentHeartbeatRepository;
@@ -110,6 +132,10 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             _manuProductParameterRepository = manuProductParameterRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _manuSfcStepNgRepository = manuSfcStepNgRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
 
 
@@ -424,7 +450,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 EquipmentId = _currentEquipment.Id ?? 0,
                 LocalTime = request.LocalTime,
                 WorkOrderId = planWorkOrder.Id,//工单ID
-                ProcedureId = planWorkOrder.ProductId,//工序ID
+                //ProcedureId = planWorkOrder.ProductId,//工序ID
                 ProductId = planWorkOrder.ProductId,//产品ID
                 SFC = s.SFC,
                 ResourceId = resourceEntity.Id,
@@ -438,14 +464,219 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
                 TestResult = s.TestResult,
                 Timestamp = s.Timestamp
             });
+
+            //查询已有汇总信息
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                SFCS = request.SFCParams.Select(c => c.SFC).ToArray()
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
+            List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
+            //Ng列表
+            var manuSfcStepEntities = request.SFCParams.Select(s =>
+            {
+                //汇总信息
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == s.SFC).FirstOrDefault();
+                //汇总表
+                if (manuSfcSummaryEntity != null)
+                {
+                    manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
+                    manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
+                    manuSfcSummaryEntity.QualityStatus = 0;
+                    manuSfcSummaryEntity.NgNum++;
+                    manuSfcSummaryList.Add(manuSfcSummaryEntity);
+                }
+                return new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentEquipment.SiteId,
+                    SFC = s.SFC,
+                    ProductId = planWorkOrder.ProductId,
+                    WorkOrderId = planWorkOrder.Id,
+                    WorkCenterId = planWorkOrder.WorkCenterId,
+                    ProductBOMId = planWorkOrder.ProductBOMId,
+                    //ProcedureId = planWorkOrder.ProcedureId,
+                    Qty = 1,//数量1
+                    Operatetype = ManuSfcStepTypeEnum.NG,
+                    CurrentStatus = SfcProduceStatusEnum.Activity,
+                    EquipmentId = _currentEquipment.Id,
+                    ResourceId = procResource.Id,
+                    CreatedBy = _currentEquipment.Name,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
+                    Passed = 0//NG上报的都不合格
+                };
+            }).ToList();
+            var manuSfcStepNgs = await PrepareProductNgEntityAsync(request.SFCParams, manuSfcStepEntities);
+
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope();
+            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
+            await _manuSfcStepNgRepository.InsertsAsync(manuSfcStepNgs);
             await _procParameterRepository.InsertsAsync(procParameterEntities);
             await _manuProductParameterRepository.InsertsAsync(entities);
+            await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryList);
             trans.Complete();
         }
 
 
+        /// <summary>
+        /// 设备产品NG录入
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task EquipmentProductNgAsync(EquipmentProductNgDto request)
+        {
+            var nowTime = HymsonClock.Now();
+
+            if (request.SFCParams == null || request.SFCParams.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19110));
+            //查询当前资源
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = request.ResourceCode });
+            //查找当前工作中心（产线）
+            var workLine = await _inteWorkCenterRepository.GetByResourceIdAsync(procResource.Id);
+            if (workLine == null)
+            {
+                //通过资源未找到关联产线
+                throw new CustomerValidationException(nameof(ErrorCode.MES19123)).WithData("ResourceCode", procResource.ResCode);
+            }
+            //查找激活工单
+            var planWorkOrders = await _planWorkOrderRepository.GetByWorkLineIdAsync(workLine.Id);
+            if (!planWorkOrders.Any())
+            {
+                //产线未激活工单
+                throw new CustomerValidationException(nameof(ErrorCode.MES19124)).WithData("WorkCenterCode", workLine.Code);
+            }
+            //不考虑混线
+            var planWorkOrder = planWorkOrders.First();
+
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = _currentEquipment.SiteId,
+                Code = request.ResourceCode,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", request.ResourceCode);
+
+            //查询已有汇总信息
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                SFCS = request.SFCParams.Select(c => c.SFC).ToArray()
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
+            List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
+            //Ng列表
+            var manuSfcStepEntities = request.SFCParams.Select(s =>
+            {
+                //汇总信息
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == s.SFC).FirstOrDefault();
+                //汇总表
+                if (manuSfcSummaryEntity != null)
+                {
+                    manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
+                    manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
+                    manuSfcSummaryEntity.QualityStatus = 0;
+                    manuSfcSummaryEntity.NgNum++;
+                    manuSfcSummaryList.Add(manuSfcSummaryEntity);
+                }
+                return new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentEquipment.SiteId,
+                    SFC = s.SFC,
+                    ProductId = planWorkOrder.ProductId,
+                    WorkOrderId = planWorkOrder.Id,
+                    WorkCenterId = planWorkOrder.WorkCenterId,
+                    ProductBOMId = planWorkOrder.ProductBOMId,
+                    //ProcedureId = planWorkOrder.ProcedureId,
+                    Qty = 1,//数量1
+                    Operatetype = ManuSfcStepTypeEnum.NG,
+                    CurrentStatus = SfcProduceStatusEnum.Activity,
+                    EquipmentId = _currentEquipment.Id,
+                    ResourceId = procResource.Id,
+                    CreatedBy = _currentEquipment.Name,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
+                    Passed = 0//NG上报的都不合格
+                };
+            }).ToList();
+            var productProcessParamSFCDtos = request.SFCParams.Select(c => new EquipmentProductProcessParamSFCDto
+            {
+                SFC = c.SFC,
+                NgList = c.NgList,
+            });
+            var manuSfcStepNgs = await PrepareProductNgEntityAsync(productProcessParamSFCDtos, manuSfcStepEntities);
+
+            // 开启事务
+            using var trans = TransactionHelper.GetTransactionScope();
+            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
+            await _manuSfcStepNgRepository.InsertsAsync(manuSfcStepNgs);
+            await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryList);
+            trans.Complete();
+        }
+
+
+        /// <summary>
+        /// 组装NG信息
+        /// </summary>
+        /// <param name="productProcessParamSFCDtos"></param>
+        /// <param name="manuSfcStepEntities"></param>
+        /// <returns></returns>
+        private async Task<List<ManuSfcStepNgEntity>> PrepareProductNgEntityAsync(IEnumerable<EquipmentProductProcessParamSFCDto> productProcessParamSFCDtos, List<ManuSfcStepEntity> manuSfcStepEntities)
+        {
+            List<ManuSfcStepNgEntity> manuSfcStepNgEntities = new();
+            //所有NG编码
+            List<string> ngCodeList = new();
+            foreach (var item in productProcessParamSFCDtos)
+            {
+                if (item.NgList != null)
+                {
+                    var ngCodes = item.NgList.Select(c => c.NGCode.ToUpper());
+                    ngCodeList.AddRange(ngCodes);
+                }
+            }
+            //如果所有NG都为空
+            if (ngCodeList.Count <= 0)
+            {
+                return manuSfcStepNgEntities;
+            }
+            var codesQuery = new QualUnqualifiedCodeByCodesQuery
+            {
+                Site = _currentEquipment.SiteId,
+                Codes = ngCodeList.ToArray()
+            };
+            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync(codesQuery);
+            //如果有不存在的参数编码就提示
+            var noIncludeCodes = ngCodeList.Where(w => qualUnqualifiedCodes.Select(s => s.UnqualifiedCode.ToUpper()).Contains(w.ToUpper()) == false);
+            if (noIncludeCodes.Any() == true)
+                throw new CustomerValidationException(nameof(ErrorCode.MES19114)).WithData("Code", string.Join(',', noIncludeCodes));
+
+            foreach (var processParamSFCDto in productProcessParamSFCDtos)
+            {
+                var stepId = manuSfcStepEntities.Where(c => c.SFC == processParamSFCDto.SFC).First().Id;
+                if (processParamSFCDto.NgList != null)
+                {
+                    var ngList = processParamSFCDto.NgList.Select(s =>
+                     new ManuSfcStepNgEntity
+                     {
+                         Id = IdGenProvider.Instance.CreateId(),
+                         SiteId = _currentEquipment.SiteId,
+                         BarCodeStepId = stepId,
+                         UnqualifiedCode = s.NGCode.ToUpper(),
+                         CreatedBy = _currentEquipment.Code,
+                         UpdatedBy = _currentEquipment.Code,
+                         CreatedOn = HymsonClock.Now(),
+                         UpdatedOn = HymsonClock.Now()
+                     });
+                    manuSfcStepNgEntities.AddRange(ngList);
+                }
+            }
+            return manuSfcStepNgEntities;
+        }
 
         #region 内部方法
         /// <summary>
