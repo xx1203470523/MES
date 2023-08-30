@@ -35,18 +35,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("包装", JobTypeEnum.Standard)]
     public class PackageOpenJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
-        /// 服务接口（主数据）
-        /// </summary>
-        private readonly IMasterDataService _masterDataService;
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -62,14 +50,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public PackageOpenJobService(IManuCommonService manuCommonService,
-            AbstractValidator<PackageOpenRequestBo> validationRepairJob,
-            IMasterDataService masterDataService,
+        public PackageOpenJobService(AbstractValidator<PackageOpenRequestBo> validationRepairJob,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository)
         {
-            _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
-            _masterDataService = masterDataService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         }
 
@@ -109,7 +93,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<PackageOpenRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             var defaultDto = new PackageOpenResponseBo();
             string success = "true";
-            var manuContainerBarcodeEntity = await param.Proxy.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
+            var manuContainerBarcodeEntity = await param.Proxy!.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
             if (manuContainerBarcodeEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16702));
@@ -149,7 +133,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var rows = await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = rows, Time = data.Time };
+            return new JobResponseBo { Content = data.Content!, Message = data.Message, Rows = rows, Time = data.Time };
         }
 
 
