@@ -86,7 +86,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         ///// <summary>
         ///// 主键id
         ///// </summary>
-        //public long Id { get; set; }
 
         /// <summary>
         /// 供应商编码

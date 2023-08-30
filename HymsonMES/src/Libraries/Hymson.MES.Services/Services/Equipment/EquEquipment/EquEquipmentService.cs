@@ -368,7 +368,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             var equipmentTypeDic = list.ToLookup(g => g.EquipmentType);
             foreach (var item in equipmentTypeDic)
             {
-                if (item.Key.HasValue == false) continue;
+                if (!item.Key.HasValue) continue;
 
                 dics.Add(new EquEquipmentDictionaryDto
                 {

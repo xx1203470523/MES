@@ -14,6 +14,7 @@ using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -59,6 +60,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIpqcInspectionRuleRepository _qualIpqcInspectionRuleRepository;
         private readonly IQualIpqcInspectionRuleResourceRelationRepository _qualIpqcInspectionRuleResourceRelationRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IProcProcessRouteRepository _procProcessRouteRepository;
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
@@ -86,6 +88,7 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIpqcInspectionRuleRepository qualIpqcInspectionRuleRepository,
             IQualIpqcInspectionRuleResourceRelationRepository qualIpqcInspectionRuleResourceRelationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
@@ -111,6 +114,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualIpqcInspectionRuleRepository = qualIpqcInspectionRuleRepository;
             _qualIpqcInspectionRuleResourceRelationRepository = qualIpqcInspectionRuleResourceRelationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
             _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcedureRepository = procProcedureRepository;
@@ -445,10 +449,64 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<QualIpqcInspectionHeadDto?> QueryByIdAsync(long id)
         {
-            var qualIpqcInspectionHeadEntity = await _qualIpqcInspectionHeadRepository.GetByIdAsync(id);
-            if (qualIpqcInspectionHeadEntity == null) return null;
+            var entity = await _qualIpqcInspectionHeadRepository.GetByIdAsync(id);
+            if (entity == null) return null;
 
-            return qualIpqcInspectionHeadEntity.ToModel<QualIpqcInspectionHeadDto>();
+            var dto = entity.ToModel<QualIpqcInspectionHeadDto>();
+            if (dto == null) return null;
+
+            var resultEntityTask = _qualIpqcInspectionHeadResultRepository.GetCurrentEntityByMainIdAsync(dto.Id);
+            var workOrderTask = _planWorkOrderRepository.GetByIdAsync(entity.WorkOrderId);
+            var materialTask = _procMaterialRepository.GetByIdAsync(entity.MaterialId);
+            var procedureTask = _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
+            var resourceTask = _procResourceRepository.GetByIdAsync(entity.ResourceId);
+            var equipmentTask = _equEquipmentRepository.GetByIdAsync(entity.EquipmentId);
+
+            var resultEntity = await resultEntityTask;
+            var workOrder = await workOrderTask;
+            var material = await materialTask;
+            var procedure = await procedureTask;
+            var resource = await resourceTask;
+            var equipment = await equipmentTask;
+
+            if (resultEntity != null)
+            {
+                dto.InspectionBy = resultEntity.InspectionBy;
+                dto.InspectionOn = resultEntity.InspectionOn;
+                dto.StartOn = resultEntity.StartOn;
+                dto.CompleteOn = resultEntity.CompleteOn;
+                dto.CloseOn = resultEntity.CloseOn;
+                dto.HandMethod = resultEntity.HandMethod;
+                dto.ProcessedBy = resultEntity.ProcessedBy;
+                dto.ProcessedOn = resultEntity.ProcessedOn;
+            }
+            if (workOrder != null)
+            {
+                dto.WorkOrderCode = workOrder.OrderCode;
+                dto.WorkCenterCode = (await _inteWorkCenterRepository.GetByIdAsync(workOrder.WorkCenterId.GetValueOrDefault()))?.Code ?? "";
+            }
+            if (material != null)
+            {
+                dto.MaterialCode = material.MaterialCode;
+                dto.MaterialName = material.MaterialName;
+            }
+            if (procedure != null)
+            {
+                dto.ProcedureCode = procedure.Code;
+                dto.ProcedureName = procedure.Name;
+            }
+            if (resource != null)
+            {
+                dto.ResourceCode = resource.ResCode;
+                dto.ResourceName = resource.ResName;
+            }
+            if (equipment != null)
+            {
+                dto.EquipmentCode = equipment.EquipmentCode;
+                dto.EquipmentName = equipment.EquipmentName;
+            }
+
+            return dto;
         }
 
         /// <summary>
