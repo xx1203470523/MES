@@ -358,26 +358,6 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 获取资源关联作业数据
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        //public async Task<PagedInfo<ProcResourceConfigJobViewDto>> GetcResourceConfigJoAsync(ProcResourceConfigJobPagedQueryDto query)
-        //{
-        //    var jobPagedQuery = query.ToQuery<ProcResourceConfigJobPagedQuery>();
-        //    var pagedInfo = await _jobBusinessRelationRepository.GetPagedInfoAsync(jobPagedQuery);
-
-        //    //实体到DTO转换 装载数据
-        //    var procResourceConfigJobViews = new List<ProcResourceConfigJobViewDto>();
-        //    foreach (var entity in pagedInfo.Data)
-        //    {
-        //        var resourceTypeDto = entity.ToModel<ProcResourceConfigJobViewDto>();
-        //        procResourceConfigJobViews.Add(resourceTypeDto);
-        //    }
-        //    return new PagedInfo<ProcResourceConfigJobViewDto>(procResourceConfigJobViews, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        //}
-
-        /// <summary>
         /// 获取资源配置Job信息
         /// </summary>
         /// <param name="queryDto"></param>
@@ -476,22 +456,22 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 添加资源维护表所有页签的数据
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task AddProcResourceAsync(ProcResourceCreateDto parm)
+        public async Task AddProcResourceAsync(ProcResourceCreateDto param)
         {
             #region 验证
-            if (parm == null)
+            if (param == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            parm.ResCode = parm.ResCode.ToTrimSpace().ToUpperInvariant();
-            parm.ResName = parm.ResName.Trim();
-            parm.Remark = parm.Remark.Trim();
+            param.ResCode = param.ResCode.ToTrimSpace().ToUpperInvariant();
+            param.ResName = param.ResName.Trim();
+            param.Remark = param.Remark.Trim();
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(parm);
+            await _validationCreateRules.ValidateAndThrowAsync(param);
 
-            var resCode = parm.ResCode;
+            var resCode = param.ResCode;
             var query = new ProcResourceQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -499,12 +479,12 @@ namespace Hymson.MES.Services.Services.Process
             };
             if (await _resourceRepository.IsExistsAsync(query))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10308)).WithData("ResCode", parm.ResCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10308)).WithData("ResCode", param.ResCode);
             }
 
-            if (parm.ResTypeId > 0)
+            if (param.ResTypeId > 0)
             {
-                var resourceType = await _resourceTypeRepository.GetByIdAsync(parm.ResTypeId ?? 0);
+                var resourceType = await _resourceTypeRepository.GetByIdAsync(param.ResTypeId ?? 0);
                 if (resourceType == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10310));
@@ -512,32 +492,22 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //打印机验证
-            if (parm.PrintList != null && parm.PrintList.Count > 0)
+            //判断打印机是否重复配置  数据库中 已经存储的情况
+            if (param.PrintList != null && param.PrintList.Count > 0 && param.PrintList.GroupBy(x => x.PrintId).Any(g => g.Count() >= 2))
             {
-                //判断打印机是否重复配置  数据库中 已经存储的情况
-                if (parm.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10313));
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES10313));
             }
 
             //判断是否勾选了多个主设备，只能有一个主设备
-            if (parm.EquList != null && parm.EquList.Count > 0)
+            if (param.EquList != null && param.EquList.Count > 0)
             {
-                var equNumber = parm.EquList.ToLookup(w => w.EquipmentId).ToDictionary(d => d.Key, d => d);
-                if (equNumber.Keys.Count < parm.EquList.Count)
+                var equNumber = param.EquList.ToLookup(w => w.EquipmentId).ToDictionary(d => d.Key, d => d);
+                if (equNumber.Keys.Count < param.EquList.Count)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10314));
                 }
 
-                /*
-                if (parm.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() >= 2).Count() >= 1)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10306));
-                }
-                */
-
-                var ismianCount = parm.EquList.Where(a => a.IsMain == true).ToList().Count;
+                var ismianCount = param.EquList.Where(a => a.IsMain).ToList().Count;
                 if (ismianCount > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
@@ -553,9 +523,9 @@ namespace Hymson.MES.Services.Services.Process
             //DTO转换实体
             var entity = new ProcResourceEntity
             {
-                Remark = parm.Remark,
-                ResName = parm.ResName,
-                ResTypeId = parm.ResTypeId ?? 0,
+                Remark = param.Remark,
+                ResName = param.ResName,
+                ResTypeId = param.ResTypeId ?? 0,
                 Status = (int)SysDataStatusEnum.Build,
 
                 Id = IdGenProvider.Instance.CreateId(),
@@ -569,10 +539,10 @@ namespace Hymson.MES.Services.Services.Process
 
             //打印机数据
             List<ProcResourceConfigPrintEntity> printList = new List<ProcResourceConfigPrintEntity>();
-            if (parm.PrintList != null && parm.PrintList.Count > 0)
+            if (param.PrintList != null && param.PrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.PrintList)
+                foreach (var item in param.PrintList)
                 {
                     i++;
                     if (item.PrintId <= 0)
@@ -609,10 +579,10 @@ namespace Hymson.MES.Services.Services.Process
 
             //设备绑定设置数据
             List<ProcResourceEquipmentBindEntity> equList = new List<ProcResourceEquipmentBindEntity>();
-            if (parm.EquList != null && parm.EquList.Count > 0)
+            if (param.EquList != null && param.EquList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.EquList)
+                foreach (var item in param.EquList)
                 {
                     i++;
                     if (item.EquipmentId <= 0)
@@ -650,10 +620,10 @@ namespace Hymson.MES.Services.Services.Process
 
             //资源设置数据
             List<ProcResourceConfigResEntity> resSetList = new List<ProcResourceConfigResEntity>();
-            if (parm.ResList != null && parm.ResList.Count > 0)
+            if (param.ResList != null && param.ResList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.ResList)
+                foreach (var item in param.ResList)
                 {
                     i++;
                     if (item.SetType == null || !Enum.IsDefined(typeof(ResourceSetTypeEnum), item.SetType))
@@ -696,7 +666,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = entity.Id,
                         SetType = (int)item.SetType,
-                        Value = item.Value.ToString(),
+                        Value = item.Value.ToString()!,
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
@@ -708,10 +678,10 @@ namespace Hymson.MES.Services.Services.Process
 
             //作业设置数据
             List<InteJobBusinessRelationEntity> jobList = new List<InteJobBusinessRelationEntity>();
-            if (parm.JobList != null && parm.JobList.Count > 0)
+            if (param.JobList != null && param.JobList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.JobList)
+                foreach (var item in param.JobList)
                 {
                     i++;
                     if (item.LinkPoint == null || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
@@ -788,9 +758,9 @@ namespace Hymson.MES.Services.Services.Process
 
             //productSet
             List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
-            if (parm.ProductSetList != null && parm.ProductSetList.Count > 0)
+            if (param.ProductSetList != null && param.ProductSetList.Count > 0)
             {
-                foreach (var item in parm.ProductSetList)
+                foreach (var item in param.ProductSetList)
                 {
                     var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
@@ -814,19 +784,19 @@ namespace Hymson.MES.Services.Services.Process
                 //入库
                 await _resourceRepository.InsertAsync(entity);
 
-                if (parm.PrintList != null && parm.PrintList.Count > 0)
+                if (param.PrintList != null && param.PrintList.Count > 0)
                 {
                     await _resourceConfigPrintRepository.InsertRangeAsync(printList);
                 }
-                if (parm.EquList != null && parm.EquList.Count > 0)
+                if (param.EquList != null && param.EquList.Count > 0)
                 {
                     await _resourceEquipmentBindRepository.InsertRangeAsync(equList);
                 }
-                if (parm.ResList != null && parm.ResList.Count > 0)
+                if (param.ResList != null && param.ResList.Count > 0)
                 {
                     await _procResourceConfigResRepository.InsertRangeAsync(resSetList);
                 }
-                if (parm.JobList != null && parm.JobList.Count > 0)
+                if (param.JobList != null && param.JobList.Count > 0)
                 {
                     await _jobBusinessRelationRepository.InsertRangeAsync(jobList);
                 }
@@ -846,7 +816,6 @@ namespace Hymson.MES.Services.Services.Process
         public async Task UpdateProcResrouceAsync(ProcResourceModifyDto param)
         {
             string userName = _currentUser.UserName;
-            var siteCode = _currentSite.SiteId ?? 0;
             #region 验证
             if (param == null)
             {
@@ -860,14 +829,6 @@ namespace Hymson.MES.Services.Services.Process
             var entityOld = await _resourceRepository.GetByIdAsync(param.Id)
                 ?? throw new BusinessException(nameof(ErrorCode.MES10388));
 
-            //if (entityOld.Status != (int)SysDataStatusEnum.Build && param.Status == (int)SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            //}
-            //if (!Enum.IsDefined(typeof(SysDataStatusEnum), (SysDataStatusEnum)param.Status))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10380));
-            //}
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => (int)x == entityOld.Status))
@@ -895,7 +856,7 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
-                if (param.PrintList.GroupBy(x => x.PrintId).Where(g => g.Count() >= 2).Count() >= 1)
+                if (param.PrintList.GroupBy(x => x.PrintId).Any(g => g.Count() >= 2))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10313));
                 }
@@ -910,22 +871,10 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10314));
                 }
 
-                /*
-                if (param.EquList.GroupBy(x => x.EquipmentId).Where(g => g.Count() >= 2).Count() >= 1)
-                {
-                    throw new Exception(nameof(ErrorCode.MES10314));
-                }
-                */
-
                 //判断打印机是否重复配置  数据库中 已经存储的情况
                 var parmEquIds = param.EquList.Select(x => x.EquipmentId).ToArray();
-                var equQuery = new ProcResourceEquipmentBindQuery
-                {
-                    ResourceId = param.Id,
-                    Ids = parmEquIds
-                };
 
-                var ismianList = param.EquList.Where(a => a.IsMain == true).ToList();
+                var ismianList = param.EquList.Where(a => a.IsMain).ToList();
                 if (ismianList.Count > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10307));
@@ -1075,7 +1024,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = param.Id,
                         SetType = (int)item.SetType,
-                        Value = item?.Value.ToString(),
+                        Value = item?.Value.ToString()!,
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
@@ -1199,7 +1148,6 @@ namespace Hymson.MES.Services.Services.Process
                 if (addPrintList != null && addPrintList.Count > 0)
                 {
                     await _resourceConfigPrintRepository.InsertRangeAsync(addPrintList);
-                    // return Error(ResultCode.FAIL, "插入资源关联打印表失败");
                 }
 
                 //删除之前的数据
@@ -1208,7 +1156,6 @@ namespace Hymson.MES.Services.Services.Process
                 if (addEquList != null && addEquList.Count > 0)
                 {
                     await _resourceEquipmentBindRepository.InsertRangeAsync(addEquList);
-                    //  return Error(ResultCode.FAIL, "插入资源关联设备失败");
                 }
 
                 //删除之前的数据
@@ -1217,7 +1164,6 @@ namespace Hymson.MES.Services.Services.Process
                 if (addResSetList != null && addResSetList.Count > 0)
                 {
                     await _procResourceConfigResRepository.InsertRangeAsync(addResSetList);
-                    // return Error(ResultCode.FAIL, "插入工序关联作业表失败");
                 }
 
                 //删除之前的数据
@@ -1242,34 +1188,23 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="idsAr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcResourceAsync(long[] idsArr)
+        public async Task<int> DeleteProcResourceAsync(long[] idsAr)
         {
-            if (idsArr.Length < 1)
+            if (idsAr.Length < 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
-            ////不能删除启用状态的资源
-            //var query = new ProcResourceQuery
-            //{
-            //    IdsArr = idsArr,
-            //    Status = (int)SysDataStatusEnum.Enable
-            //};
-            //var resourceList = await _resourceRepository.GetByIdsAsync(query);
-            //if (resourceList != null && resourceList.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10319));
-            //}
-            var entitys = await _resourceRepository.GetListByIdsAsync(idsArr);
+            var entitys = await _resourceRepository.GetListByIdsAsync(idsAr);
             if (entitys != null && entitys.Any(a => a.Status != (int)SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             //资源被工作中心引用不能删除
-            var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(idsArr);
+            var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(idsAr);
             if (workCenterIds != null && workCenterIds.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10355));
@@ -1279,13 +1214,13 @@ namespace Hymson.MES.Services.Services.Process
             {
                 UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now(),
-                Ids = idsArr
+                Ids = idsAr
             };
             int rows = 0;
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 rows += await _resourceRepository.DeleteRangeAsync(command);
-                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsArr);
+                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
                 ts.Complete();
             }
             return rows;

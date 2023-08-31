@@ -220,10 +220,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             var dtos = new List<ProcProcedurePrintReleationDto>();
             if (pagedInfo.Data != null && pagedInfo.Data.Any())
             {
-                var materialIds = pagedInfo.Data.ToList().Select(a => a.MaterialId).ToArray();
+                var materialIds = pagedInfo.Data.Select(a => a.MaterialId).ToArray();
                 var materialLsit = await _procMaterialRepository.GetByIdsAsync(materialIds);
 
-                var templateIds = pagedInfo.Data.ToList().Select(a => a.TemplateId).ToArray();
+                var templateIds = pagedInfo.Data.Select(a => a.TemplateId).ToArray();
                 var templateLsit = await _procLabelTemplateRepository.GetByIdsAsync(templateIds);
                 foreach (var entity in pagedInfo.Data)
                 {
@@ -344,29 +344,29 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="procProcedureCreateDto"></param>
         /// <returns></returns>
-        public async Task AddProcProcedureAsync(AddProcProcedureDto parm)
+        public async Task AddProcProcedureAsync(AddProcProcedureDto procProcedureCreateDto)
         {
             #region 验证
-            if (parm == null)
+            if (procProcedureCreateDto == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
-            if (parm.Procedure == null)
+            if (procProcedureCreateDto.Procedure == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
 
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
-            parm.Procedure.Code = parm.Procedure.Code.ToTrimSpace().ToUpperInvariant();
-            parm.Procedure.Name = parm.Procedure.Name.Trim();
-            parm.Procedure.Remark = parm.Procedure.Remark.Trim();
+            procProcedureCreateDto.Procedure.Code = procProcedureCreateDto.Procedure.Code.ToTrimSpace().ToUpperInvariant();
+            procProcedureCreateDto.Procedure.Name = procProcedureCreateDto.Procedure.Name.Trim();
+            procProcedureCreateDto.Procedure.Remark = procProcedureCreateDto.Procedure.Remark.Trim();
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(parm.Procedure);
+            await _validationCreateRules.ValidateAndThrowAsync(procProcedureCreateDto.Procedure);
 
-            var code = parm.Procedure.Code;
+            var code = procProcedureCreateDto.Procedure.Code;
             var query = new ProcProcedureQuery
             {
                 SiteId = siteId,
@@ -374,12 +374,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             };
             if (await _procProcedureRepository.IsExistsAsync(query))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", parm.Procedure.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10405)).WithData("Code", procProcedureCreateDto.Procedure.Code);
             }
             #endregion
 
             //DTO转换实体
-            var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
+            var procProcedureEntity = procProcedureCreateDto.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.Id = IdGenProvider.Instance.CreateId();
             procProcedureEntity.Code = code;
             procProcedureEntity.SiteId = siteId;
@@ -392,10 +392,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             //打印
             List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
-            if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
+            if (procProcedureCreateDto.ProcedurePrintList != null && procProcedureCreateDto.ProcedurePrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.ProcedurePrintList)
+                foreach (var item in procProcedureCreateDto.ProcedurePrintList)
                 {
                     i++;
                     if (item.MaterialId <= 0)
@@ -432,10 +432,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             //job
             List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
-            if (parm.ProcedureJobList != null && parm.ProcedureJobList.Count > 0)
+            if (procProcedureCreateDto.ProcedureJobList != null && procProcedureCreateDto.ProcedureJobList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.ProcedureJobList)
+                foreach (var item in procProcedureCreateDto.ProcedureJobList)
                 {
                     i++;
                     if (item.LinkPoint <= 0 || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
@@ -500,9 +500,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             //productSet
             List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
-            if (parm.ProductSetList != null && parm.ProductSetList.Count > 0)
+            if (procProcedureCreateDto.ProductSetList != null && procProcedureCreateDto.ProductSetList.Count > 0)
             {
-                foreach (var item in parm.ProductSetList)
+                foreach (var item in procProcedureCreateDto.ProductSetList)
                 {
                     var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
@@ -539,34 +539,30 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 //提交
                 ts.Complete();
             }
-            await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, parm.Procedure.Code);
+            await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, procProcedureCreateDto.Procedure.Code);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="procProcedureModifyDto"></param>
         /// <returns></returns>
-        public async Task UpdateProcProcedureAsync(UpdateProcProcedureDto parm)
+        public async Task UpdateProcProcedureAsync(UpdateProcProcedureDto procProcedureModifyDto)
         {
             #region
-            if (parm == null)
+            if (procProcedureModifyDto == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             }
             var siteId = _currentSite.SiteId ?? 0;
             var userName = _currentUser.UserName;
 
-            parm.Procedure.Name = parm.Procedure.Name.Trim();
-            parm.Procedure.Remark = parm.Procedure.Remark.Trim();
+            procProcedureModifyDto.Procedure.Name = procProcedureModifyDto.Procedure.Name.Trim();
+            procProcedureModifyDto.Procedure.Remark = procProcedureModifyDto.Procedure.Remark.Trim();
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(parm.Procedure);
+            await _validationModifyRules.ValidateAndThrowAsync(procProcedureModifyDto.Procedure);
 
-            var procProcedureEntityOld = await _procProcedureRepository.GetByIdAsync(parm.Procedure.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
-            //if (procProcedureEntityOld.Status != SysDataStatusEnum.Build && parm.Procedure.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            //}
+            var procProcedureEntityOld = await _procProcedureRepository.GetByIdAsync(procProcedureModifyDto.Procedure.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == procProcedureEntityOld.Status))
@@ -576,7 +572,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             #endregion
 
             //DTO转换实体
-            var procProcedureEntity = parm.Procedure.ToEntity<ProcProcedureEntity>();
+            var procProcedureEntity = procProcedureModifyDto.Procedure.ToEntity<ProcProcedureEntity>();
             procProcedureEntity.UpdatedBy = _currentUser.UserName;
 
             //TODO 现在关联表批量删除批量新增，后面再修改
@@ -584,10 +580,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             var validationFailures = new List<ValidationFailure>();
             List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
-            if (parm.ProcedurePrintList != null && parm.ProcedurePrintList.Count > 0)
+            if (procProcedureModifyDto.ProcedurePrintList != null && procProcedureModifyDto.ProcedurePrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.ProcedurePrintList)
+                foreach (var item in procProcedureModifyDto.ProcedurePrintList)
                 {
                     i++;
                     if (item.MaterialId <= 0)
@@ -623,10 +619,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             //job
             List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
-            if (parm.ProcedureJobList != null && parm.ProcedureJobList.Count > 0)
+            if (procProcedureModifyDto.ProcedureJobList != null && procProcedureModifyDto.ProcedureJobList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in parm.ProcedureJobList)
+                foreach (var item in procProcedureModifyDto.ProcedureJobList)
                 {
                     i++;
                     if (item.LinkPoint <= 0 || !Enum.IsDefined(typeof(ResourceJobLinkPointEnum), item.LinkPoint))
@@ -690,9 +686,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
             //productSet
             List<ProcProductSetEntity> productSetList = new List<ProcProductSetEntity>();
-            if (parm.ProductSetList != null && parm.ProductSetList.Count > 0)
+            if (procProcedureModifyDto.ProductSetList != null && procProcedureModifyDto.ProductSetList.Count > 0)
             {
-                foreach (var item in parm.ProductSetList)
+                foreach (var item in procProcedureModifyDto.ProductSetList)
                 {
                     var relationEntity = new ProcProductSetEntity();
                     relationEntity.Id = IdGenProvider.Instance.CreateId();
@@ -737,16 +733,16 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="idsAr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcProcedureAsync(long[] idsArr)
+        public async Task<int> DeleteProcProcedureAsync(long[] idsAr)
         {
-            if (idsArr.Length < 1)
+            if (idsAr.Length < 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
 
-            var entitys = await _procProcedureRepository.GetByIdsAsync(idsArr);
+            var entitys = await _procProcedureRepository.GetByIdsAsync(idsAr);
             if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -757,11 +753,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 rows += await _procProcedureRepository.DeleteRangeAsync(new DeleteCommand
                 {
-                    Ids = idsArr,
+                    Ids = idsAr,
                     DeleteOn = HymsonClock.Now(),
                     UserId = _currentUser.UserName
                 });
-                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsArr);
+                rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsAr);
                 ts.Complete();
             }
             return rows;

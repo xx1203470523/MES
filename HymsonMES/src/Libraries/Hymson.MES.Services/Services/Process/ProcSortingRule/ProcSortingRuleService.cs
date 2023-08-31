@@ -230,7 +230,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             var procSortingRulePagedQuery = procSortingRulePagedQueryDto.ToQuery<ProcSortingRulePagedQuery>();
             procSortingRulePagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            procSortingRulePagedQuery.MaterialIds = procMaterials.Select(m => m.Id).ToList();
+            procSortingRulePagedQuery.MaterialIds = procMaterials!.Select(m => m.Id).ToList();
             var pagedInfo = await _procSortingRuleRepository.GetPagedInfoAsync(procSortingRulePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -397,7 +397,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 return procSortingRuleDto;
             }
-            return null;
+            return new ProcSortingRuleDto();
         }
 
         /// <summary>

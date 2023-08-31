@@ -191,11 +191,11 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="idsArr"></param>
+        /// <param name="idsAr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteProcPrintConfigAsync(long[] idsArr)
+        public async Task<int> DeleteProcPrintConfigAsync(long[] idsAr)
         {
-            if (idsArr.Length < 1)
+            if (idsAr.Length < 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10102));
             }
@@ -203,7 +203,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             //查询资源类型是否关联资源
             var query = new ProcResourceConfigPrintQuery
             {
-                Ids = idsArr
+                Ids = idsAr
             };
             var resourceList = await _resourceRepository.GetByPrintIdAsync(query);
             if (resourceList != null && resourceList.Any())
@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             {
                 UserId = _currentUser.UserName,
                 DeleteOn = HymsonClock.Now(),
-                Ids = idsArr
+                Ids = idsAr
             };
             return await _printConfigRepository.DeletesAsync(command);
         }
