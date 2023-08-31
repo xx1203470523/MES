@@ -168,7 +168,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //检验规则&资源
-            var rules = new List<QualIpqcInspectionRuleEntity>(); ;
+            var rules = new List<QualIpqcInspectionRuleEntity>(); 
             var ruleResources = new List<QualIpqcInspectionRuleResourceRelationEntity>();
             if (saveDto.Rules != null && saveDto.Rules.Any())
             {
@@ -303,7 +303,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //检验规则&资源
-            var rules = new List<QualIpqcInspectionRuleEntity>(); ;
+            var rules = new List<QualIpqcInspectionRuleEntity>(); 
             var ruleResources = new List<QualIpqcInspectionRuleResourceRelationEntity>();
             if (saveDto.Rules != null && saveDto.Rules.Any())
             {

@@ -388,7 +388,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
                 if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Any())
                 {
-                    //转换
+                    //转换    
                     foreach (var item in inteCodeRulesMakeEntitys)
                     {
                         inteCodeRulesDtos.Add(item.ToModel<InteCodeRulesMakeDto>());

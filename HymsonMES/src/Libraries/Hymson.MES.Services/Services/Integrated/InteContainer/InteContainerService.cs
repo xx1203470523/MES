@@ -222,7 +222,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             var pattern = @"^[1-9]\d*$";
             if (!Regex.IsMatch($"{dto.Minimum}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES12504));
             if (!Regex.IsMatch($"{dto.Maximum}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES12505));
-            //if (!Enum.IsDefined(typeof(SysDataStatusEnum), dto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES12511));
 
             // 判断物料/物料组是否存在
             switch (dto.DefinitionMethod)

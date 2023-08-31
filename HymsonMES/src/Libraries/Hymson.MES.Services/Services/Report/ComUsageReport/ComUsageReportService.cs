@@ -39,6 +39,13 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="planWorkOrderRepository"></param> 
+        /// /// <param name="procMaterialRepository"></param> 
+        ///  <param name="excelService"></param> 
+        /// <param name="circulationRepository"></param> 
+        /// <param name="localizationService"></param> 
+
         public ComUsageReportService(ICurrentUser currentUser, ICurrentSite currentSite, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IManuSfcCirculationRepository circulationRepository, IExcelService excelService, IMinioService minioService, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
@@ -84,8 +91,8 @@ namespace Hymson.MES.Services.Services.Report
 
             foreach (var item in pagedInfo.Data)
             {
-                var product = materials != null && materials.Any() ? materials.Where(x => x.Id == item.ProductId).FirstOrDefault() : null;
-                var circulationProduct= materials != null && materials.Any() ? materials.Where(x => x.Id == item.CirculationProductId).FirstOrDefault() : null;
+                var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
+                var circulationProduct= materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.CirculationProductId) : null;
 
                 var workOrder = materials != null && materials.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
 
@@ -145,7 +152,7 @@ namespace Hymson.MES.Services.Services.Report
                 var product = materials != null && materials.Any() ? materials.Where(x => x.Id == item.ProductId).FirstOrDefault() : null;
                 var circulationProduct = materials != null && materials.Any() ? materials.Where(x => x.Id == item.CirculationProductId).FirstOrDefault() : null;
 
-                var workOrder = materials != null && materials.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
+                var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
 
                 listDto.Add(new ComUsageReportExcelExportDto()
                 {
