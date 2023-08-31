@@ -24,4 +24,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         public string[] Sfcs { get; set; }
     }
+
+    /// <summary>
+    /// 降级录入 查询参数
+    /// </summary>
+    public class ManuDowngradingBySFCsQuery
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码集合
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+    }
+
 }

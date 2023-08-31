@@ -208,6 +208,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();
 
+            // 读取条码信息
+            //var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
+
             var firstSFCProduceEntity = entities.FirstOrDefault();
             if (firstSFCProduceEntity == null) return default;
 
@@ -216,27 +219,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var updatedOn = HymsonClock.Now();
             responseBo.FirstSFC = firstSFCProduceEntity.SFC;
 
-            // 读取条码信息
-            var manuSfcEntitiesTask = _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
-
             // 读取产品基础信息
             var procMaterialEntityTask = _masterDataService.GetProcMaterialEntityWithNullCheck(firstSFCProduceEntity.ProductId);
 
             // 读取当前工艺路线信息
             var procProcessRouteEntityTask = _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstSFCProduceEntity.ProcessRouteId);
 
-            var manuSfcEntities = await manuSfcEntitiesTask;
             var procMaterialEntity = await procMaterialEntityTask;
             var procProcessRouteEntity = await procProcessRouteEntityTask;
-
-            // 合格品出站
-            // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstSFCProduceEntity);
-            if (nextProcedure != null)
-            {
-                responseBo.IsCompleted = false;
-                responseBo.NextProcedureCode = nextProcedure.Code;
-            }
 
             // 组合物料数据
             var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstSFCProduceEntity);
@@ -262,8 +252,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 if (manuFeedingsDictionary == null) continue;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                decimal residue = materialBo.Usages;
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100（因为存在多条码同时出站情况,所以直接消耗 * 条码数量）
+                decimal residue = materialBo.Usages * entities.Count;
+
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
@@ -283,6 +274,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
             responseBo.UpdateQtyByIdCommands = updates;
             responseBo.ManuSfcCirculationEntities = adds;
+
+            // 合格品出站
+            // 获取下一个工序（如果没有了，就表示完工）
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstSFCProduceEntity);
+            if (nextProcedure != null)
+            {
+                responseBo.IsCompleted = false;
+                responseBo.NextProcedureCode = nextProcedure.Code;
+            }
 
             // 组装（出站步骤数据）
             entities.ForEach(sfcProduceEntity =>
@@ -354,7 +354,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn,
                     Status = SfcStatusEnum.Complete,
-                    SFCs = manuSfcEntities.Select(s => s.SFC)
+                    SFCs = entities.Select(s => s.SFC) //manuSfcEntities
                 };
 
                 // 入库

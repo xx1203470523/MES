@@ -19,13 +19,11 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
-using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -146,6 +144,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="procProductSetRepository"></param>
+        /// <param name="inteJobBusinessRelationRepository"></param>
+        /// <param name="inteJobRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
         public MasterDataService(ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -631,10 +634,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             long processRouteId, long procedureId)
         {
             processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
-            if (!processRouteDetailLinks.Any()) return false; 
+            if (!processRouteDetailLinks.Any()) return false;
 
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
-            if (!processRouteDetailNodes.Any()) return false; 
+            if (!processRouteDetailNodes.Any()) return false;
 
             // 有多工序分叉的情况（取第一个当默认值）
             ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
@@ -816,7 +819,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 return null;
             }
             else
-            {           
+            {
                 var jobs = new List<JobBo>();
                 foreach (var job in jobs)
                 {
