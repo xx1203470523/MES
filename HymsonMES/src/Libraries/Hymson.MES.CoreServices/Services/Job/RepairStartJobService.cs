@@ -2,28 +2,19 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.Snowflake;
 using Hymson.Utils;
-using Hymson.Utils.Tools;
-using MySqlX.XDevAPI.Common;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -173,12 +164,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 获取生产工单（附带工单状态校验）
-            _ = await param.Proxy.GetValueAsync(async parameters =>
-            {
-                long workOrderId = (long)parameters[0];
-                bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
-                return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
-            }, new object[] { sfcProduceEntity.WorkOrderId, true });
+            _ = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdAsync, new WorkOrderIdBo { WorkOrderId = sfcProduceEntity.WorkOrderId });
 
             // 获取当前工序信息
             var procedureEntity = await param.Proxy.GetValueAsync(_procProcedureRepository.GetByIdAsync, sfcProduceEntity.ProcedureId);

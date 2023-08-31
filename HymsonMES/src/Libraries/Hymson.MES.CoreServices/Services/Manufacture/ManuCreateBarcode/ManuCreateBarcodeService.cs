@@ -74,7 +74,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <returns></returns>
         public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param)
         {
-            var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(param.WorkOrderId, false);
+            var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
+            {
+                WorkOrderId = param.WorkOrderId,
+                IsVerifyActivation = false
+            });
 
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
             var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
@@ -134,9 +138,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             var issQty = param.Qty;
             foreach (var item in barcodeList)
             {
-                var qty = issQty > procMaterialEntity.Batch * item.BarCodes.Count() ? procMaterialEntity.Batch : issQty/ item.BarCodes.Count();
-                foreach (var sfc in item.BarCodes) {
-          
+                var qty = issQty > procMaterialEntity.Batch * item.BarCodes.Count() ? procMaterialEntity.Batch : issQty / item.BarCodes.Count();
+                foreach (var sfc in item.BarCodes)
+                {
+
                     issQty -= procMaterialEntity.Batch;
 
                     var manuSfcEntity = new ManuSfcEntity

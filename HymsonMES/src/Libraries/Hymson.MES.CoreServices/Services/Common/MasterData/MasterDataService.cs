@@ -252,12 +252,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获取生产工单
         /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true)
+        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo)
         {
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(bo.WorkOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
@@ -266,7 +265,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
-            if (isVerifyActivation)
+            if (bo.IsVerifyActivation)
             {
                 // 判断是否是激活的工单
                 _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
