@@ -200,6 +200,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var EquFaultReasonEntities = await conn.QueryAsync<EquFaultReasonEntity>(template.RawSql, EquFaultReasonQuery);
             return EquFaultReasonEntities;
         }
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     /// <summary>
@@ -215,7 +226,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string InsertSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `equ_fault_reason` SET FaultReasonName = @FaultReasonName, UseStatus = @UseStatus, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_fault_reason` SET FaultReasonName = @FaultReasonName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_fault_reason` SET SiteId = @SiteId, FaultReasonCode = @FaultReasonCode, FaultReasonName = @FaultReasonName, UseStatus = @UseStatus, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_fault_reason` SET IsDeleted = Id WHERE Id = @Id  ";
         const string DeletesSql = "UPDATE `equ_fault_reason` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids";
@@ -226,5 +237,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
                                           `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `equ_fault_reason`  WHERE Id IN @ids ";
         const string GetByCodeSql = "SELECT * FROM equ_fault_reason WHERE `IsDeleted` = 0 AND SiteId = @Site AND FaultReasonCode = @Code LIMIT 1";
+
+        const string UpdateStatusSql = "UPDATE `equ_fault_reason` SET UseStatus= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
     }
 }

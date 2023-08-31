@@ -136,9 +136,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteMessageGroupEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
-            //var key = $"inte_message_group&SiteId-{query.SiteId}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
@@ -147,7 +144,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteMessageGroupEntity>(template.RawSql, query);
-            //});
         }
 
         /// <summary>
@@ -171,19 +167,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.Status = @Status");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("T.Name LIKE @Name");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.WorkShopName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkShopName))
             {
                 pagedQuery.WorkShopName = $"%{pagedQuery.WorkShopName}%";
                 sqlBuilder.Where("IWC.Name LIKE @WorkShopName");

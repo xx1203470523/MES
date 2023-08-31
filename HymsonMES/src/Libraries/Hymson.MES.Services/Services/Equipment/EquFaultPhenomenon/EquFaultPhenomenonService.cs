@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
@@ -11,6 +12,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -42,6 +44,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// </summary>
         private readonly IEquFaultPhenomenonRepository _equFaultPhenomenonRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -49,14 +53,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <param name="currentUser"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equFaultPhenomenonRepository"></param>
+        /// <param name="localizationService"></param>
         public EquFaultPhenomenonService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquFaultPhenomenonSaveDto> validationSaveRules,
-            IEquFaultPhenomenonRepository equFaultPhenomenonRepository)
+            IEquFaultPhenomenonRepository equFaultPhenomenonRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equFaultPhenomenonRepository = equFaultPhenomenonRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -77,10 +83,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12904));
             }
-            if (!Enum.IsDefined(typeof(SysDataStatusEnum), parm.UseStatus))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12906));
-            }
 
             // DTO转换实体
             var entity = parm.ToEntity<EquFaultPhenomenonEntity>();
@@ -88,6 +90,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
+
+            entity.UseStatus = SysDataStatusEnum.Build;
 
             // 编码唯一性验证
             var checkEntity = await _equFaultPhenomenonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultPhenomenonCode });
@@ -110,9 +114,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(parm.Id.Value)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12905));
 
-            if (entityOld.UseStatus != SysDataStatusEnum.Build && parm.UseStatus == SysDataStatusEnum.Build)
+            //if (entityOld.UseStatus != SysDataStatusEnum.Build && parm.UseStatus == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             // DTO转换实体
@@ -169,6 +179,56 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             return (await _equFaultPhenomenonRepository.GetViewByIdAsync(id)).ToModel<EquFaultPhenomenonDto>();
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
 
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _equFaultPhenomenonRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12905));
+            }
+            if (entity.UseStatus == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.UseStatus)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _equFaultPhenomenonRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

@@ -83,12 +83,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+          
             var offSet = (manuDowngradingPagedQuery.PageIndex - 1) * manuDowngradingPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuDowngradingPagedQuery.PageSize });
@@ -173,6 +168,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据sfcs获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuDowngradingEntity>> GetBySFCsAsync(ManuDowngradingBySFCsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuDowngradingEntity>(GetBySFCsSql, query);
+        }
+
+        /// <summary>
         /// 真实删除
         /// </summary>
         /// <param name="ids"></param>
@@ -211,6 +217,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #endregion
 
         const string GetBySfcsSql = @"SELECT * FROM  `manu_downgrading` WHERE IsDeleted=0 AND SFC in @Sfcs AND SiteId=@SiteId ";
+        const string GetBySFCsSql = @"SELECT * FROM  manu_downgrading WHERE IsDeleted = 0 AND SiteId = @SiteId AND SFC IN @SFCs ";
         const string DeletesTrueByIdsSql = @"DELETE FROM `manu_downgrading` WHERE Id in @Ids ";
     }
 }

@@ -28,12 +28,12 @@ namespace Hymson.MES.EquipmentServices.Validators.SfcBinding
             RuleFor(x => x.BindSfc).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES19926);
             //每个条码都不允许为空
             RuleFor(x => x.BindSfc).Must(list =>
-                list.Where(c => !string.IsNullOrEmpty(c.SFC.Trim())).Any()).WithErrorCode(ErrorCode.MES19927);
+                list.Any(c => !string.IsNullOrEmpty(c.SFC.Trim()))).WithErrorCode(ErrorCode.MES19927);
             //条码不允许重复
-            RuleFor(x => x.BindSfc).Must(list => list.GroupBy(c => c.SFC.Trim()).Where(c => c.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19925);
+            RuleFor(x => x.BindSfc).Must(list => list.GroupBy(c => c.SFC.Trim()).Any(c => c.Count() < 2)).WithErrorCode(ErrorCode.MES19925);
 
             //位置不允许重复
-            RuleFor(x => x.BindSfc).Must(list => list.GroupBy(c => c.Seq).Where(c => c.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19924);
+            RuleFor(x => x.BindSfc).Must(list => list.GroupBy(c => c.Seq).Any(c => c.Count() < 2)).WithErrorCode(ErrorCode.MES19924);
         }
     }
 }

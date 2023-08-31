@@ -19,13 +19,11 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
-using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
@@ -123,17 +121,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
         private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
 
-        private readonly IInteJobRepository _inteJobRepository;
-
         /// <summary>
         /// 不合格代码仓储
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
-
-        /// <summary>
-        /// 产品不良录入 仓储
-        /// </summary>
-        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
         /// 构造函数
@@ -153,6 +144,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="procProductSetRepository"></param>
+        /// <param name="inteJobBusinessRelationRepository"></param>
+        /// <param name="inteJobRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
         public MasterDataService(ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -170,9 +166,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcProductSetRepository procProductSetRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
-            IInteJobRepository inteJobRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-            IManuProductBadRecordRepository manuProductBadRecordRepository)
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
@@ -191,9 +185,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procProductSetRepository = procProductSetRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
-            _inteJobRepository = inteJobRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -387,16 +379,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             // 不存在在制表的话，就去库存查找
             if (!sfcProduceEntities.Any())
             {
-                //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
-                //{
-                //    SiteId = sfcBos.SiteId,
-                //    BarCodes = sfcBos.SFCs
-                //});
-                //if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
-
             return sfcProduceEntities;
         }
 
@@ -419,13 +403,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             // 不存在在制表的话，就去库存查找
             if (!sfcProduceEntities.Any())
             {
-                //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
-                //{
-                //    SiteId = sfcBos.SiteId,
-                //    BarCodes = sfcBos.SFCs
-                //});
-                //if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
 
@@ -657,10 +634,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             long processRouteId, long procedureId)
         {
             processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
-            if (!processRouteDetailLinks.Any()) return false; 
+            if (!processRouteDetailLinks.Any()) return false;
 
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
-            if (!processRouteDetailNodes.Any()) return false; 
+            if (!processRouteDetailNodes.Any()) return false;
 
             // 有多工序分叉的情况（取第一个当默认值）
             ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
@@ -842,7 +819,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 return null;
             }
             else
-            {           
+            {
                 var jobs = new List<JobBo>();
                 foreach (var job in jobs)
                 {
@@ -930,7 +907,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (mainMaterials == null || !mainMaterials.Any())
             {
                 return initialMaterials;
-                // throw new CustomerValidationException(nameof(ErrorCode.MES10612));
             }
 
             // 取得特定工序的物料
@@ -1090,7 +1066,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (residue <= 0) return;
 
             // 取得当前物料的库存
-            if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
+            if (!manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities)) return;
             if (!feedingEntities.Any()) return;
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100

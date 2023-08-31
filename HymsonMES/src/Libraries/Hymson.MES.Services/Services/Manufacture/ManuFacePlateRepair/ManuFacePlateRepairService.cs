@@ -615,8 +615,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             UpdatedOn = HymsonClock.Now(),
                         });
 
-
-                        badRecordEntit.Status = item.IsClose;// ProductBadRecordStatusEnum.Close;
+                        badRecordEntit.Status = item.IsClose;
                         badRecordEntit.UpdatedBy = _currentUser.UserName;
                         badRecordEntit.UpdatedOn = HymsonClock.Now();
                         badRecordsList.Add(badRecordEntit);
@@ -629,8 +628,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var detail = GetManuSfcRepairDetails.FirstOrDefault(it => it.ProductBadId == item.BadRecordId && it.SfcRepairId == manuSfcRepairRecordEntity.Id);
                         if (detail != null)
                         {
-                            detail.RepairMethod = item.RepairMethod;
-                            detail.CauseAnalyse = item.CauseAnalyse;
+                            detail.RepairMethod = item.RepairMethod!;
+                            detail.CauseAnalyse = item.CauseAnalyse!;
                             detail.IsClose = isClose;
                             detail.UpdatedBy = _currentUser.UserName;
                             detail.UpdatedOn = HymsonClock.Now();
@@ -645,8 +644,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         SfcRepairId = manuSfcRepairRecordEntity.Id,
                         ProductBadId = item.BadRecordId,
-                        RepairMethod = item.RepairMethod,
-                        CauseAnalyse = item.CauseAnalyse,
+                        RepairMethod = item.RepairMethod!,
+                        CauseAnalyse = item.CauseAnalyse!,
                         IsClose = isClose,
 
                         Id = IdGenProvider.Instance.CreateId(),
@@ -890,7 +889,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuFacePlateRepairEntity.ToModel<ManuFacePlateRepairDto>();
             }
-            return null;
+            return new ManuFacePlateRepairDto();
         }
 
 

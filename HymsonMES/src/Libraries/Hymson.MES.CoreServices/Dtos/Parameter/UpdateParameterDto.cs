@@ -24,7 +24,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 条码
         /// </summary>
-        public string  SFC { get; set; }
+        public string SFC { get; set; } = "";
 
         /// <summary>
         /// 主键
@@ -34,12 +34,12 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }
+        public string ParameterValue { get; set; } = "";
 
         /// <summary>
         /// 操作人员
         /// </summary>
-        public string UserId { get; set; }
+        public string UserId { get; set; } = "";
 
         /// <summary>
         /// 更新时间

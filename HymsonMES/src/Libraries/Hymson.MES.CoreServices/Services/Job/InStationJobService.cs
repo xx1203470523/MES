@@ -120,7 +120,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 校验工序和资源是否对应
-            var resourceIds = await bo.Proxy.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
+            var resourceIds = await bo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
             if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 获取生产条码信息
@@ -214,11 +214,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<InStationRequestBo>();
             if (bo == null) return default;
 
-            // 待执行的命令
-            InStationResponseBo responseBo = new();
-
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();

@@ -22,20 +22,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("包装", JobTypeEnum.Standard)]
     public class PackageCloseJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
         /// <summary>
         /// 服务接口（主数据）
         /// </summary>
-        private readonly IMasterDataService _masterDataService;
-
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
-        private readonly IManuContainerPackRepository _manuContainerPackRepository;
-        private readonly IInteContainerRepository _inteContainerRepository;
 
         private readonly ILocalizationService _localizationService;
 
@@ -49,19 +39,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public PackageCloseJobService(IManuCommonService manuCommonService,
+        public PackageCloseJobService(
             AbstractValidator<PackageCloseRequestBo> validationRepairJob,
-            IMasterDataService masterDataService,
-            IManuContainerBarcodeRepository manuContainerBarcodeRepository,
-            IManuContainerPackRepository manuContainerPackRepository,
-            IInteContainerRepository inteContainerRepository, ILocalizationService localizationService)
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository, ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
-            _masterDataService = masterDataService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
-            _manuContainerPackRepository = manuContainerPackRepository;
-            _inteContainerRepository = inteContainerRepository;
             _localizationService = localizationService;
         }
 
@@ -76,17 +59,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<PackageCloseRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
-            try
-            {
-
-                // 验证DTO
-                await _validationRepairJob.ValidateAndThrowAsync(bo);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            // 验证DTO
+            await _validationRepairJob.ValidateAndThrowAsync(bo);
         }
 
 
@@ -114,7 +88,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var defaultDto = new PackageCloseResponseBo { };
 
             string success = "true";
-            var manuContainerBarcodeEntity = await param.Proxy.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
+            var manuContainerBarcodeEntity = await param.Proxy!.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
             if (manuContainerBarcodeEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16702));
@@ -155,7 +129,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             responseBo.Rows += await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = responseBo.Rows, Time = data.Time };
+            return new JobResponseBo { Content = data.Content!, Message = data.Message, Rows = responseBo.Rows, Time = data.Time };
         }
 
 

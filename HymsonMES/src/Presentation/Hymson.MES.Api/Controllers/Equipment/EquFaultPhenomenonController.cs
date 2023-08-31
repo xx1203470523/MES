@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
 using Hymson.Utils;
@@ -98,5 +100,49 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _equFaultPhenomenonService.GetDetailAsync(id);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("设备故障现象", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultPhenomenon:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("设备故障现象", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultPhenomenon:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（设备故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("设备故障现象", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultPhenomenon:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

@@ -178,7 +178,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
-            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (!material.MaskCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             // 未设置规则
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
@@ -534,7 +534,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 .GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
                 {
                     ProcessRouteId = processRouteId,
-                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
+                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId!.Value)
                 }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 有多工序分叉的情况（取第一个当默认值）

@@ -61,17 +61,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobByBusinessIdAsync(InteJobBusinessRelationByBusinessIdQuery query)
         {
-            try
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobBybusinessIdSql, query);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-         
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobBybusinessIdSql, query);
         }
 
         /// <summary>

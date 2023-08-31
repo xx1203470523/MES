@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
@@ -43,6 +44,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         Task<EquFaultPhenomenonDto> GetDetailAsync(long id);
 
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
 
     }
 }

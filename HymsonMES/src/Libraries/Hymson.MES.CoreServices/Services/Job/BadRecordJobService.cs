@@ -21,11 +21,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     public class BadRecordJobService : IJobService
     {
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
@@ -44,16 +39,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="localizationService"></param>
-        public BadRecordJobService(IManuCommonService manuCommonService,
+        public BadRecordJobService(
             IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _localizationService = localizationService;
@@ -120,7 +113,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             });
 
             responseBo.SFCs = bo.SFCs;
-            responseBo.IsShow = sfcProduceBusinessEntities.Any() == false;
+            responseBo.IsShow = !sfcProduceBusinessEntities.Any();
             return responseBo;
         }
 

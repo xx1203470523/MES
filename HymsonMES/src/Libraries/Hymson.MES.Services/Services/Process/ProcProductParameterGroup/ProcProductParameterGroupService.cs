@@ -486,7 +486,7 @@ public class ProcProductParameterGroupService : IProcProductParameterGroupServic
         }
         if (entity.Status == changeStatusCommand.Status)
         {
-            throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+            throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
         }
         #endregion
 

@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.ControlTimeUnit).IsInEnum().When(x => x.ControlTimeUnit.HasValue).WithErrorCode(nameof(ErrorCode.MES13107));
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13108));
             RuleFor(x => x.Version).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES13109));
-            RuleFor(x => x.Status).IsInEnum().WithErrorCode(nameof(ErrorCode.MES13110));
+            //RuleFor(x => x.Status).IsInEnum().WithErrorCode(nameof(ErrorCode.MES13110));
 
             //参数项目校验
             When(x => x.Details != null && x.Details.Any(), () =>
@@ -65,15 +65,15 @@ namespace Hymson.MES.Services.Validators.Quality
                 }).WithErrorCode(nameof(ErrorCode.MES13112));
             });
 
-            //状态为启用时校验关联表数据
-            When(x => x.Status == SysDataStatusEnum.Enable, () =>
-            {
-                RuleFor(x => x.Details).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13121));
-            });
-            When(x => x.Status == SysDataStatusEnum.Enable && x.Type == IPQCTypeEnum.FAI, () =>
-            {
-                RuleFor(x => x.Rules).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13122));
-            });
+            ////状态为启用时校验关联表数据
+            //When(x => x.Status == SysDataStatusEnum.Enable, () =>
+            //{
+            //    RuleFor(x => x.Details).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13121));
+            //});
+            //When(x => x.Status == SysDataStatusEnum.Enable && x.Type == IPQCTypeEnum.FAI, () =>
+            //{
+            //    RuleFor(x => x.Rules).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13122));
+            //});
         }
     }
 

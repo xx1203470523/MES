@@ -122,13 +122,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             sqlBuilder.LeftJoin("inte_work_center IWC ON IC.EquOrLineId = IWC.Id");
             sqlBuilder.LeftJoin("equ_equipment EE ON IC.EquOrLineId = EE.Id");
 
-            /*
-            if (string.IsNullOrWhiteSpace(pagedQuery.SiteCode) == false)
-            {
-                sqlBuilder.Where("IC.SiteCode = @SiteCode");
-            }
-            */
-
             if (!string.IsNullOrWhiteSpace(pagedQuery.CalendarName))
             {
                 pagedQuery.CalendarName = $"%{pagedQuery.CalendarName}%";

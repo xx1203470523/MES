@@ -157,7 +157,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("SiteId = @SiteId");
                 sqlBuilder.Select("*");
 
-                if (string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode) == false)
+                if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
                 {
                     sqlBuilder.Where("ParameterCode = @ParameterCode");
                 }

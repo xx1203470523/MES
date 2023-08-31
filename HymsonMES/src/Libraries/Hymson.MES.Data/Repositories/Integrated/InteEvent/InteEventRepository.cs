@@ -171,9 +171,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteEventEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
-            //var key = $"inte_event&SiteId-{query.SiteId}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
@@ -182,7 +179,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteEventEntity>(template.RawSql, query);
-            //});
         }
 
         /// <summary>
@@ -211,19 +207,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.EventTypeId = @EventTypeId");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("T.Name LIKE @Name");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EventTypeName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EventTypeName))
             {
                 pagedQuery.EventTypeName = $"%{pagedQuery.EventTypeName}%";
                 sqlBuilder.Where("IET.Name LIKE @EventTypeName");

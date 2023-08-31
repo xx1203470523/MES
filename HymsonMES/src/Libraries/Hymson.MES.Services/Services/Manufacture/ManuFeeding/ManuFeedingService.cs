@@ -276,7 +276,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 查询不到物料
-            if (materialIds == null || materialIds.Any() == false) return Array.Empty<ManuFeedingMaterialDto>();
+            if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
 
             // 通过物料ID获取物料集合
             var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
@@ -364,7 +364,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
                 // 检查是否符合替代料
                 var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                if (!bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId)) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
             }
 
             var rows = 0;
@@ -571,7 +571,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 判断是否有激活中的工单
             var planWorkOrderActivationEntities = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(workOrders.Select(s => s.Id).ToArray());
-            if (planWorkOrderActivationEntities == null || planWorkOrderActivationEntities.Any() == false)
+            if (planWorkOrderActivationEntities == null || !planWorkOrderActivationEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15501));
             }

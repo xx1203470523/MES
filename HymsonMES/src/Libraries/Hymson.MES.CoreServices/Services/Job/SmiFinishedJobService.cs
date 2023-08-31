@@ -119,10 +119,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 判断条码锁状态
-            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
@@ -181,7 +181,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();
 
             var firstSFCProduceEntity = entities.FirstOrDefault();
@@ -190,7 +190,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新时间
             var updatedBy = bo.UserName;
             var updatedOn = HymsonClock.Now();
-            //responseBo.FirstSFC = firstSFCProduceEntity.SFC;
 
             // 读取条码信息
             var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
@@ -343,26 +342,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
-
-            /*
-            // 面板需要的参数
-            responseBo.Content = new Dictionary<string, string> {
-                { "PackageCom", "False" },
-                { "BadEntryCom", "False" },
-                { "Qty", $"{data.SFCStepEntities.Count()}" },
-                { "IsLastProcedure", $"{data.IsCompleted}" },
-                { "NextProcedureCode", $"{data.NextProcedureCode}" },
-            };
-
-            if (data.IsCompleted)
-            {
-                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), data.FirstSFC);
-            }
-            else
-            {
-                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), data.FirstSFC, data.NextProcedureCode);
-            }
-            */
 
             return responseBo;
         }

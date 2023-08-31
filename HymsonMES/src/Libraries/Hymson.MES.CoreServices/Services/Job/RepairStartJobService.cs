@@ -33,12 +33,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("维修开始", JobTypeEnum.Standard)]
     public class RepairStartJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
         /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
@@ -48,11 +42,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 仓储接口（在制）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 服务接口（主数据）
@@ -77,22 +66,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数 
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public RepairStartJobService(IManuCommonService manuCommonService,
-            IProcProcedureRepository procProcedureRepository,
+        public RepairStartJobService(IProcProcedureRepository procProcedureRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             AbstractValidator<RepairStartRequestBo> validationRepairJob,
             IMasterDataService masterDataService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
         {
-            _manuCommonService = manuCommonService;
             _procProcedureRepository = procProcedureRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _validationRepairJob = validationRepairJob;
             _masterDataService = masterDataService;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
@@ -137,7 +121,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<RepairStartRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
+            var sfcProduceEntitys = await param.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
@@ -154,7 +138,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 如果工序对应不上
             if (sfcProduceEntity?.ProcedureId != bo.ProcedureId)
             {
-                var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(sfcProduceEntity.ProcessRouteId)
+                var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(sfcProduceEntity!.ProcessRouteId)
                  ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
 
                 var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(sfcProduceEntity.ProcessRouteId)

@@ -609,7 +609,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             if (material.Status == changeStatusCommand.Status) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), material.Status)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), material.Status)}"));
             }
             #endregion
 
