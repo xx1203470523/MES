@@ -665,6 +665,15 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationType = SfcCirculationTypeEnum.BindCCS
             });
+
+            //查找模组绑定时的录入的ModelCode，使用绑定时的
+            var manuSfcCirculations = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCode = sfc,
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationType = SfcCirculationTypeEnum.Merge
+            });
             if (manuSfcCirculationEntities.Any())
             {
                 var manuSfcCirculation = manuSfcCirculationEntities.First();
@@ -677,7 +686,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 });
                 circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
                 circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
-                circulationModuleCCSInfo.ModelCode = manuSfcCirculation.ModelCode;
+                circulationModuleCCSInfo.ModelCode = manuSfcCirculations.FirstOrDefault()?.ModelCode ?? string.Empty;
                 circulationModuleCCSInfo.IsNg = manuSfcSummaries.Any();
             }
             return circulationModuleCCSInfo;
