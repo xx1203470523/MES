@@ -42,9 +42,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
             RuleFor(x => x.Id).Must(x=>x>0).WithErrorCode(nameof(ErrorCode.MES18512));
-            //RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18503));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18504));
-            //RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18505));
             RuleFor(x => x.Name).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18506));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18507));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES18508));
