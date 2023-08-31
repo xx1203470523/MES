@@ -25,11 +25,12 @@ namespace Hymson.MES.Services.Validators.Manufacture
         /// <returns></returns>
         private async Task<bool> ManuSfcProduceSFCSValidatorAsync(string[] sfcs, CancellationToken cancellationToken)
         {
+
             if (sfcs == null || !sfcs.Any())
             {
-                return false;
+                return await Task.FromResult(false);
             }
-            return true;
+            return await Task.FromResult(true);
         }
 
         /// <summary>
@@ -42,9 +43,9 @@ namespace Hymson.MES.Services.Validators.Manufacture
         {
             if (sfcs != null && sfcs.Any() && sfcs.Length > 100)
             {
-                return false;
+                return await Task.FromResult(false);
             }
-            return true;
+            return await Task.FromResult(true);
         }
 
         /// <summary>
@@ -55,14 +56,11 @@ namespace Hymson.MES.Services.Validators.Manufacture
         /// <returns></returns>
         private async Task<bool> ManuSfcProduceValidatorAsync(ManuSfcProduceLockDto parm, CancellationToken cancellationToken)
         {
-            if (parm.OperationType == QualityLockEnum.FutureLock)
+            if (parm.OperationType == QualityLockEnum.FutureLock&& !parm.LockProductionId.HasValue)
             {
-                if (!parm.LockProductionId.HasValue)
-                {
-                    return false;
-                }
+                    return await Task.FromResult(false); 
             }
-            return true;
+            return await Task.FromResult(true); 
         }
     }
 
@@ -73,8 +71,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public ManuSfcProduceModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+
         }
     }
 }

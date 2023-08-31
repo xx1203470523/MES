@@ -27,8 +27,6 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.ParameterType).NotNull().Must(x => x != null && Enum.IsDefined(typeof(ParameterTypeEnum), x)).WithErrorCode(nameof(ErrorCode.MES10513));
             RuleFor(x => x.Parameters).NotNull().Must(x => x != null && !x.Where(it => it <= 0).Any()).WithErrorCode(nameof(ErrorCode.MES10514));
 
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
 
@@ -41,8 +39,6 @@ namespace Hymson.MES.Services.Validators.Process
         {
             RuleFor(x => x.ParameterType).Must(x => Enum.IsDefined(typeof(ParameterTypeEnum), x)).WithErrorCode(nameof(ErrorCode.MES10513));
             RuleFor(x => x.Parameters).NotEmpty().Must(x => !x.Where(it => it <= 0).Any()).WithErrorCode(nameof(ErrorCode.MES10514));
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
 }
