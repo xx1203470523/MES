@@ -30,10 +30,7 @@ namespace Hymson.MES.Services.Validators.Quality
             //参数项目校验
             When(x => x.Details != null && x.Details.Any(), () =>
             {
-                //RuleForEach(x => x.Details).ChildRules(c =>
-                //{
-                //    c.RuleFor(x => x.ParameterId).NotEmpty();
-                //});
+            
                 RuleFor(x => x.Details).Must((details) =>
                 {
                     if (details == null) return true;
@@ -49,10 +46,6 @@ namespace Hymson.MES.Services.Validators.Quality
             //检验规则校验
             When(x => x.Rules != null && x.Rules.Any(), () =>
             {
-                //RuleForEach(x => x.Rules).ChildRules(c =>
-                //{
-                //    c.RuleFor(x => x.Way).IsInEnum();
-                //});
                 RuleFor(x => x.Rules).Must((rules) =>
                 {
                     if (rules == null) return true;

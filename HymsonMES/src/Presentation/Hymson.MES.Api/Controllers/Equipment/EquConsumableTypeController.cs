@@ -27,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（工装类型）
         /// </summary>
         /// <param name="equSparePartTypeService"></param>
+        /// <param name="logger"></param>
         public EquConsumableTypeController(IEquConsumableTypeService equSparePartTypeService, ILogger<EquConsumableTypeController> logger)
         {
             _equConsumableTypeService = equSparePartTypeService;

@@ -30,6 +30,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（设备故障现象）
         /// </summary>
         /// <param name="equFaultPhenomenonService"></param>
+        /// <param name="logger"></param>
         public EquFaultPhenomenonController(IEquFaultPhenomenonService equFaultPhenomenonService, ILogger<EquFaultPhenomenonController> logger)
         {
             _equFaultPhenomenonService = equFaultPhenomenonService;

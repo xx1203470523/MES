@@ -19,8 +19,6 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.UnqualifiedCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11102));
             RuleFor(x => x.UnqualifiedCodeName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11103));
             RuleFor(x => x.UnqualifiedCodeName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES11104));
-            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11109));
-            //RuleFor(x => x.Status).Must(it => it == null || Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES11112));
 
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11105));
             RuleFor(x => x.Type).Must(it => it == null || Enum.IsDefined(typeof(QualUnqualifiedCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES11113));
@@ -46,8 +44,6 @@ namespace Hymson.MES.Services.Validators.Quality
             RuleFor(x => x.UnqualifiedCodeName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11103));
             RuleFor(x => x.UnqualifiedCodeName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES11104));
 
-            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11109));
-            //RuleFor(x => x.Status).Must(it => it == null || Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES11112));
 
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11105));
             RuleFor(x => x.Type).Must(it => it == null || Enum.IsDefined(typeof(QualUnqualifiedCodeTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES11113));
