@@ -242,6 +242,31 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
+        /// 设备产品过程参数单个采集
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("EquipmentProductProcessParamSingle")]
+        public async Task EquipmentProductProcessParamAsync(EquipmentProductProcessParamSingleDto request)
+        {
+            //单个参数采集，解决设置上位机特殊程序无法处理外层嵌套JSON问题
+            var param = new EquipmentProductProcessParamDto
+            {
+                EquipmentCode = request.EquipmentCode,
+                LocalTime = request.LocalTime,
+                ResourceCode = request.ResourceCode,
+                SFCParams = new EquipmentProductProcessParamSFCDto[] {
+                    new EquipmentProductProcessParamSFCDto{
+                        NgList=request.NgList,
+                        ParamList=request.ParamList,
+                        SFC=request.SFC
+                    }
+                }
+            };
+            await _equipmentService.EquipmentProductProcessParamAsync(param);
+        }
+
+        /// <summary>
         /// 上料-原材料上料
         /// HY-MES-EQU-013
         /// </summary>

@@ -79,7 +79,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <summary>
         /// CCS绑定的Location
         /// </summary>
-        private readonly string[] locationArray = new string[] { "A", "B", "C", "D", "E", "F", "G", "H" };
+        //private readonly string[] locationArray = new string[] { "A", "B", "C", "D", "E", "F", "G", "H" };
 
         #endregion
 
@@ -234,6 +234,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     Location = circulationBindSFC.Location.ToString(),
                     CirculationQty = 1,
+                    ModelCode = circulationBindSFC.ModelCode ?? string.Empty,
                     //使用虚拟码记录为转换
                     CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
                     CreatedBy = _currentEquipment.Name,
@@ -525,14 +526,15 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <returns></returns>
         private async Task VerifyCSSLocationAsync(SfcCirculationBindDto sfcCirculationBindDto)
         {
-            var sfcLocations = sfcCirculationBindDto.BindSFCs.Select(c => c.Location ?? string.Empty).ToArray();
-            var exceptLocations = sfcLocations.Except(locationArray).ToArray();
-            if (exceptLocations.Any())
-            {
-                //错误的Location  1,2，只能为：A,B,C,D,E,F,G
-                throw new CustomerValidationException(nameof(ErrorCode.MES19140)).WithData("SFCLocation", string.Join(",", exceptLocations))
-                    .WithData("Location", string.Join(",", locationArray));
-            }
+            //不校验
+            //var sfcLocations = sfcCirculationBindDto.BindSFCs.Select(c => c.Location ?? string.Empty).ToArray();
+            //var exceptLocations = sfcLocations.Except(locationArray).ToArray();
+            //if (exceptLocations.Any())
+            //{
+            //    //错误的Location  1,2，只能为：A,B,C,D,E,F,G
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19140)).WithData("SFCLocation", string.Join(",", exceptLocations))
+            //        .WithData("Location", string.Join(",", locationArray));
+            //}
             //查找当前已有的绑定记录
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
             {
