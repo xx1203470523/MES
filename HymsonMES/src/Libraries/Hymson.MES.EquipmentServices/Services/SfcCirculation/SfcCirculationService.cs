@@ -567,10 +567,10 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19119));//绑定条码列表不能为空
             }
-            if (string.IsNullOrEmpty(sfcCirculationCCSBindDto.ModelCode))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19145));//模组对应型号编码【ModelCode】不能为空
-            }
+            //if (string.IsNullOrEmpty(sfcCirculationCCSBindDto.ModelCode))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19145));//模组对应型号编码【ModelCode】不能为空
+            //}
 
             var sfcCirculationBindDto = new SfcCirculationBindDto()
             {

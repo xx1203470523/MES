@@ -23,7 +23,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.SfcCirculation
         /// <summary>
         /// 绑定时的型号
         /// </summary>
-        public string ModelCode { get; set; }
+        public string ModelCode { get; set; } = string.Empty;
     }
     public class CirculationCCSDto
     {
