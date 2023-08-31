@@ -34,6 +34,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// 构造函数（条码接收）
         /// </summary>
         /// <param name="planSfcInfoService"></param>
+        /// <param name="logger"></param>
         public PlanSfcReceiveController(IPlanSfcReceiveService planSfcInfoService, ILogger<PlanSfcReceiveController> logger)
         {
             _planSfcInfoService = planSfcInfoService;

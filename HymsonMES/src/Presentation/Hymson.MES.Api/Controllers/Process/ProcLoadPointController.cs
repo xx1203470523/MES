@@ -99,7 +99,6 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:loadPoint:delete")]
         public async Task DeleteProcLoadPointAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procLoadPointService.DeletesProcLoadPointAsync(ids);
         }
 

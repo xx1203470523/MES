@@ -33,6 +33,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（降级品录入记录）
         /// </summary>
         /// <param name="manuDowngradingRecordService"></param>
+        /// <param name="logger"></param>
         public ManuDowngradingRecordController(IManuDowngradingRecordService manuDowngradingRecordService, ILogger<ManuDowngradingRecordController> logger)
         {
             _manuDowngradingRecordService = manuDowngradingRecordService;

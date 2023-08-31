@@ -37,6 +37,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（设备参数组）
         /// </summary>
         /// <param name="procEquipmentGroupParamService"></param>
+        /// <param name="logger"></param>
         public ProcEquipmentGroupParamController(IProcEquipmentGroupParamService procEquipmentGroupParamService, ILogger<ProcEquipmentGroupParamController> logger)
         {
             _procEquipmentGroupParamService = procEquipmentGroupParamService;

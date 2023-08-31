@@ -26,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（标准参数表）
         /// </summary>
         /// <param name="procParameterService"></param>
+        /// <param name="logger"></param>
         public ProcParameterController(IProcParameterService procParameterService, ILogger<ProcParameterController> logger)
         {
             _procParameterService = procParameterService;
@@ -94,7 +95,6 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:parameter:delete")]
         public async Task<int> DeleteProcParameterAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             return await _procParameterService.DeletesProcParameterAsync(ids);
         }
 

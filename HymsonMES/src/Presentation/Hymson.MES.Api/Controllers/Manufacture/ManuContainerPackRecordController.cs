@@ -33,6 +33,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（容器装载记录）
         /// </summary>
         /// <param name="manuContainerPackRecordService"></param>
+        /// <param name="logger"></param>
         public ManuContainerPackRecordController(IManuContainerPackRecordService manuContainerPackRecordService, ILogger<ManuContainerPackRecordController> logger)
         {
             _manuContainerPackRecordService = manuContainerPackRecordService;
