@@ -1,5 +1,7 @@
 namespace Hymson.MES.Equipment.Api
 {
+
+
     public class WeatherForecast
     {
         public DateTime Date { get; set; }

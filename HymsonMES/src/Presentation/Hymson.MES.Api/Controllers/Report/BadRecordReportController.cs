@@ -27,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// 构造函数（不良报告）
         /// </summary>
         /// <param name="badRecordReportService"></param>
+        /// <param name="logger"></param>
         public BadRecordReportController(IBadRecordReportService badRecordReportService, ILogger<BadRecordReportController> logger)
         {
             _badRecordReportService = badRecordReportService;

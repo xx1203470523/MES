@@ -26,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（标准参数关联类型表）
         /// </summary>
         /// <param name="procParameterLinkTypeService"></param>
+        /// <param name="logger"></param>
         public ProcParameterLinkTypeController(IProcParameterLinkTypeService procParameterLinkTypeService, ILogger<ProcParameterLinkTypeController> logger)
         {
             _procParameterLinkTypeService = procParameterLinkTypeService;
@@ -95,7 +96,6 @@ namespace Hymson.MES.Api.Controllers.Process
        // [PermissionDescription("proc:parameterLink:delete")]
         public async Task<int> DeleteProcParameterLinkTypeAsync(long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             return await _procParameterLinkTypeService.DeletesProcParameterLinkTypeAsync(ids);
         }
 
