@@ -36,7 +36,6 @@ namespace Hymson.MES.Services.Validators.Integrated
             
             RuleFor(x => x.CodeRulesMakes).Must((x, CodeRulesMakes) => x.CodeRulesMakes != null && x.CodeRulesMakes.Any()).WithErrorCode(nameof(ErrorCode.MES12416));
 
-            //RuleFor(x => x.CodeRulesMakes).NotEmpty().Must((x, CodeRulesMakes) => x.CodeRulesMakes.Count == 0).WithMessage(ErrorCode.MES12416);
 
             RuleFor(x => x.IgnoreChar).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES16030));
