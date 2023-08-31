@@ -49,7 +49,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddManuServices(this IServiceCollection services)
         {
-            services.AddSingleton<IDegradedProductExtendService, DegradedProductExtendService>();
+            services.AddSingleton<IManuDegradedProductExtendService, ManuDegradedProductExtendService>();
             services.AddSingleton<IManuCreateBarcodeService, ManuCreateBarcodeService>();
             services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuCommonService, ManuCommonService>();

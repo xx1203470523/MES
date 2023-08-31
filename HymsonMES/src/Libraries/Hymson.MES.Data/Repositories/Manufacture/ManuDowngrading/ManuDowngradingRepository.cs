@@ -12,7 +12,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -127,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuDowngradingEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(List<ManuDowngradingEntity> manuDowngradingEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ManuDowngradingEntity> manuDowngradingEntitys)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, manuDowngradingEntitys);

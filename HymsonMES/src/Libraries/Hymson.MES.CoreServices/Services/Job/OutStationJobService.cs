@@ -13,6 +13,7 @@ using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
@@ -24,6 +25,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -42,6 +44,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
+        /// 仓储接口（降级品继承）
+        /// </summary>
+        private readonly IManuDegradedProductExtendService _manuDegradedProductExtendService;
 
         /// <summary>
         /// 仓储接口（生产工单）
@@ -93,6 +100,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
+        /// <param name="manuDegradedProductExtendService"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcRepository"></param>
@@ -104,6 +112,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="localizationService"></param>
         public OutStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
+            IManuDegradedProductExtendService manuDegradedProductExtendService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcRepository manuSfcRepository,
@@ -116,6 +125,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
+            _manuDegradedProductExtendService = manuDegradedProductExtendService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcRepository = manuSfcRepository;
@@ -253,7 +263,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (manuFeedingsDictionary == null) continue;
 
                 // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100（因为存在多条码同时出站情况,所以直接消耗 * 条码数量）
-                decimal residue = materialBo.Usages * entities.Count;
+                materialBo.Usages *= entities.Count;
+                decimal residue = materialBo.Usages;
 
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
@@ -357,9 +368,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     SFCs = entities.Select(s => s.SFC) //manuSfcEntities
                 };
 
+                // 降级品信息
+                var degradedProductExtendBo = new DegradedProductExtendBo
+                {
+                    SiteId = bo.SiteId,
+                    UserName = bo.UserName
+                };
+
                 // 入库
                 entities.ForEach(sfcProduceEntity =>
                 {
+                    // 添加降级品记录
+                    degradedProductExtendBo.KeyValues.AddRange(adds.Select(s => new DegradedProductExtendKeyValueBo
+                    {
+                        BarCode = s.CirculationBarCode,
+                        SFC = sfcProduceEntity.SFC
+                    }));
+
                     // 新增 wh_material_inventory
                     responseBo.WhMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
                     {
@@ -398,6 +423,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         UpdatedOn = updatedOn
                     });
                 });
+
+                responseBo.DegradedProductExtendBo = degradedProductExtendBo;
+                responseBo.DowngradingEntities = await _manuDegradedProductExtendService.GetManuDownGradingsAsync(degradedProductExtendBo);
             }
 
             // 未完工（这么写仅仅是为了减少if-else的缩进）
@@ -476,6 +504,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 入库
                     tasks.Add(_whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities));
                     tasks.Add(_whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities));
+
+                    // 降级品记录
+                    tasks.Add(_manuDegradedProductExtendService.CreateManuDowngradingsByConsumesAsync(data.DegradedProductExtendBo, data.DowngradingEntities));
                 }
             }
             // 未完工
