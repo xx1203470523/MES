@@ -100,15 +100,15 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 条码接收
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="planSfcInfoCreateDto"></param>
         /// <returns></returns>
-        public async Task CreatePlanSfcInfoAsync(PlanSfcReceiveCreateDto param)
+        public async Task CreatePlanSfcInfoAsync(PlanSfcReceiveCreateDto planSfcInfoCreateDto)
         {
             //#region 验证与数据组装
-            await _validationCreateRules.ValidateAndThrowAsync(param);
-            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            await _validationCreateRules.ValidateAndThrowAsync(planSfcInfoCreateDto);
+            var planWorkOrderEntity = await _manuCommonOldService.GetWorkOrderByIdAsync(planSfcInfoCreateDto.WorkOrderId);
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
-            if (param.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
+            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.SupplierSfc && procMaterialEntity.Batch == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16502)).WithData("product", procMaterialEntity.MaterialCode);
             }
@@ -116,20 +116,20 @@ namespace Hymson.MES.Services.Services.Plan
             var validationFailures = new List<ValidationFailure>();
             var barcodeList = new List<BarcodeDto>();
             IEnumerable<ManuContainerPackEntity> ManuContainerPackList = new List<ManuContainerPackEntity>();
-            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
                 ManuContainerPackList = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery
                 {
                     SiteId = _currentSite.SiteId ?? 0,
-                    LadeBarCodes = param.SFCs,
+                    LadeBarCodes = planSfcInfoCreateDto.SFCs,
                 });
             }
             var whMaterialInventoryList = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
-                BarCodes = param.SFCs,
+                BarCodes = planSfcInfoCreateDto.SFCs,
                 SiteId = _currentSite.SiteId ?? 0
             });
-            var manuSfcList = await _manuSfcRepository.GetBySFCsAsync(param.SFCs);
+            var manuSfcList = await _manuSfcRepository.GetBySFCsAsync(planSfcInfoCreateDto.SFCs);
             //TODO  考虑库存中是否存放工单字段 王克明
             IEnumerable<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             var sfcids = manuSfcList.Select(x => x.Id).ToList();
@@ -138,13 +138,13 @@ namespace Hymson.MES.Services.Services.Plan
                 manuSfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcids);
             }
 
-            foreach (var sfc in param.SFCs)
+            foreach (var sfc in planSfcInfoCreateDto.SFCs)
             {
                 decimal qty = 0;
                 var manuSfcEntity = manuSfcList.FirstOrDefault(x => x.SFC == sfc);
-                if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+                if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
                 {
-                    if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == param.RelevanceWorkOrderId))
+                    if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == planSfcInfoCreateDto.RelevanceWorkOrderId))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -316,13 +316,13 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             using var ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Suppress);
-            if (param.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
+            if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
             {
                 await _manuCreateBarcodeService.CreateBarcodeByOldMESSFCAsync(new CreateBarcodeByOldMesSFCBo
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     UserName = _currentUser.UserName,
-                    WorkOrderId = param.WorkOrderId,
+                    WorkOrderId = planSfcInfoCreateDto.WorkOrderId,
                     OldSFCs = barcodeList
                 });
                 await _whMaterialInventoryRepository.UpdateWhMaterialInventoryEmptyByBarCodeAync(new UpdateWhMaterialInventoryEmptyCommand
@@ -339,7 +339,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     UserName = _currentUser.UserName,
-                    WorkOrderId = param.WorkOrderId,
+                    WorkOrderId = planSfcInfoCreateDto.WorkOrderId,
                     ExternalSFCs = barcodeList
                 });
             }

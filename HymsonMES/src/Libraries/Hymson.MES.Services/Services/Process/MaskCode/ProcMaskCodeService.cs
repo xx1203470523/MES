@@ -43,7 +43,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <summary>
         /// 序列号生成服务
         /// </summary>
-        private readonly ISequenceService _sequenceService;
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         /// <summary>
         /// 构造函数
         /// </summary>
-        public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite, ISequenceService sequenceService,
+        public ProcMaskCodeService(ICurrentUser currentUser, ICurrentSite currentSite,
             ILocalizationService localizationService,
             AbstractValidator<ProcMaskCodeSaveDto> validationSaveRules,
             IProcMaskCodeRepository procMaskCodeRepository,
@@ -68,7 +67,6 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _sequenceService = sequenceService;
             _localizationService = localizationService;
             _validationSaveRules = validationSaveRules;
             _procMaskCodeRepository = procMaskCodeRepository;
@@ -213,8 +211,9 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
             if (dto != null)
             {
                 dto.RuleList = (await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(dto.Id)).Select(s => s.ToModel<ProcMaskCodeRuleDto>());
+                return dto;
             }
-            return dto;
+            return new ProcMaskCodeDto();
         }
 
         /// <summary>
@@ -243,7 +242,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                     {
                         validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                               { "CollectionIndex", rule.SerialNo}
+                               { "CollectionIndex", rule.SerialNo!}
                                };
                     }
                     else
@@ -263,7 +262,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                               { "CollectionIndex", rule.SerialNo}
+                               { "CollectionIndex", rule.SerialNo !}
                                };
                             }
                             else
@@ -282,7 +281,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                               { "CollectionIndex", rule.SerialNo}
+                               { "CollectionIndex", rule.SerialNo !}
                                };
                             }
                             else
@@ -301,7 +300,7 @@ namespace Hymson.MES.Services.Services.Process.MaskCode
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
                                 validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                               { "CollectionIndex", rule.SerialNo}
+                               { "CollectionIndex", rule.SerialNo !}
                                };
                             }
                             else

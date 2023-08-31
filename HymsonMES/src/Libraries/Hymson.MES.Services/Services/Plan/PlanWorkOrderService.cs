@@ -58,6 +58,9 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderStatusRecordRepository"></param>
+        /// <param name="planWorkOrderActivationRecordRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="validationChangeStatusRules"></param>
         public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules,
             AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules,
@@ -213,7 +216,7 @@ namespace Hymson.MES.Services.Services.Plan
 
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
-            if (workOrders == null || !workOrders.Any() || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
+            if (workOrders == null || !workOrders.Any() || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16014));
             }
@@ -376,12 +379,12 @@ namespace Hymson.MES.Services.Services.Plan
             #region//判断订单是否可以继续修改为锁定/解锁  且组装数据
             //查询需要改变的工单
             var workOrders = await _planWorkOrderRepository.GetByIdsAsync(parms.Select(x => x.Id).ToArray());
-            if (workOrders == null || workOrders.Count() == 0 || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count())
+            if (workOrders == null || !workOrders.Any() || workOrders.Any(x => x.IsDeleted > 0) || workOrders.Count() != parms.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16014));
             }
 
-            List<UpdateLockedCommand> updateLockedCommands = new List<UpdateLockedCommand>();
+            List<UpdateLockedCommand> updateLockedCommands = new();
 
             if (parms.First().IsLocked == YesOrNoEnum.Yes) //需要修改为锁定
             {
@@ -420,7 +423,7 @@ namespace Hymson.MES.Services.Services.Plan
                     updateLockedCommands.Add(new UpdateLockedCommand()
                     {
                         Id = item.Id,
-                        Status = item.LockedStatus.Value,
+                        Status = item.LockedStatus!.Value,
                         LockedStatus = null,
 
                         UpdatedBy = _currentUser.UserName,
@@ -498,11 +501,11 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="pagedQueryDto"></param>
+        /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<PlanWorkOrderListDetailViewDto>> GetPageListAsync(PlanWorkOrderPagedQueryDto planWorkOrderPagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
+            var pagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(pagedQuery);
 
@@ -558,7 +561,7 @@ namespace Hymson.MES.Services.Services.Plan
                 if (material != null)
                 {
                     planWorkOrderDetailView.MaterialCode = material.MaterialCode;
-                    planWorkOrderDetailView.MaterialVersion = material.Version;
+                    planWorkOrderDetailView.MaterialVersion = material.Version!;
                 }
 
                 //关联BOM
@@ -586,7 +589,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 return planWorkOrderDetailView;
             }
-            return null;
+            return new PlanWorkOrderDetailViewDto();
         }
 
     }

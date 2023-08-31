@@ -119,7 +119,7 @@ namespace Hymson.MES.Services.Services.Process
                 Version = procBomEntity.Version,
                 SiteId = _currentSite.SiteId ?? 0
             });
-            if (exists != null && exists.Count() > 0)
+            if (exists != null && exists.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10601)).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
             }
@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10605));
 
                 }
-                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
+                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10606));
                 }
@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 }
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
-                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
+                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10608));
 
@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Process
                             BomId = procBomEntity.Id,
                             MaterialId = item.MaterialId.ParseToLong(),
                             ProcedureId = item.ProcedureId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
@@ -197,8 +197,8 @@ namespace Hymson.MES.Services.Services.Process
                             SiteId = _currentSite.SiteId ?? 0,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
-                            ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReplaceMaterialId = item.ReplaceMaterialId!.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
@@ -372,17 +372,6 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             var bomCode = modelOrigin.BomCode.ToUpperInvariant();
-            //验证是否存在
-            //var exists = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
-            //{
-            //    SiteId = siteId,
-            //    BomCode = bomCode,
-            //    Version = procBomEntity.Version,
-            //})).Where(x => x.Id != procBomEntity.Id && x.IsDeleted == 0);
-            //if (exists != null && exists.Count() > 0)
-            //{
-            //    throw new BusinessException(ErrorCode.MES10601).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
-            //}
 
             var materialList = procBomModifyDto.MaterialList.ToList();
             var bomDetails = new List<ProcBomDetailEntity>();
@@ -404,7 +393,7 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10605));
 
                 }
-                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
+                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10606));
 
@@ -416,7 +405,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
-                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
+                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10608));
 
@@ -434,7 +423,7 @@ namespace Hymson.MES.Services.Services.Process
                             BomId = procBomEntity.Id,
                             MaterialId = item.MaterialId.ParseToLong(),
                             ProcedureId = item.ProcedureId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss,
                             CreatedBy = user,
@@ -455,8 +444,8 @@ namespace Hymson.MES.Services.Services.Process
                             SiteId = siteId,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
-                            ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReplaceMaterialId = item.ReplaceMaterialId!.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss ?? 0,
                             CreatedBy = user,
@@ -544,7 +533,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 return procBomEntity.ToModel<ProcBomDto>();
             }
-            return null;
+            return new ProcBomDto();
         }
 
         /// <summary>
@@ -558,13 +547,13 @@ namespace Hymson.MES.Services.Services.Process
             var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(bomId);
             var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(bomId);
 
-            if (mainBomDetails.Count() > 0)
+            if (mainBomDetails.Any())
             {
                 mainBomDetails = mainBomDetails.OrderBy(x => x.Seq).ToList();
 
                 procBomDetailViews.AddRange(mainBomDetails);
             }
-            if (replaceBomDetails.Count() > 0)
+            if (replaceBomDetails.Any())
             {
                 procBomDetailViews.AddRange(replaceBomDetails);
             }
