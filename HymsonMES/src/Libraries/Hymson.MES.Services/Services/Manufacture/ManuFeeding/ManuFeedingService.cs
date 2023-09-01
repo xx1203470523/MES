@@ -177,11 +177,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     }));
                     break;
                 case FeedingSourceEnum.Resource:
-                    resources.Add(await _procResourceRepository.GetByResourceCodeAsync(new ProcResourceQuery
+                    var resource = await _procResourceRepository.GetByResourceCodeAsync(new ProcResourceQuery
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         ResCode = queryDto.Code
-                    }));
+                    });
+
+                    if (resource != null) resources.Add(resource);
                     break;
             }
 
