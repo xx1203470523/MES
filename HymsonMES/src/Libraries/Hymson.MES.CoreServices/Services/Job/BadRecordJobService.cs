@@ -64,10 +64,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
-            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
@@ -134,7 +134,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 { "IsShow", $"{data.IsShow}" },
             };
 
-            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), data.SFCs.FirstOrDefault());
+            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), data.SFCs.FirstOrDefault()!);
             return await Task.FromResult(responseBo);
         }
 

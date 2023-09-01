@@ -108,11 +108,11 @@ namespace Hymson.MES.CoreServices.Services.Job
             var bo = param.ToBo<BarcodeSfcReceiveBo>();
             if (bo == null) return default;
 
-            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync<MultiSFCBo, ManuSfcProduceEntity>(
+            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(
                _masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, new MultiSFCBo { SiteId = param.SiteId, SFCs = param.SFCs }
                 );
 
-            var sfcEntitys = await bo.Proxy.GetDataBaseValueAsync<ManuSfcQuery, ManuSfcEntity>(
+            var sfcEntitys = await bo.Proxy.GetDataBaseValueAsync(
               _manuSfcRepository.GetManuSfcEntitiesAsync, new ManuSfcQuery { SiteId = param.SiteId, SFCs = param.SFCs }
                );
 
