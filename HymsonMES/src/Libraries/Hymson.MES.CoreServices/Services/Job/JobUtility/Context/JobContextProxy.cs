@@ -339,7 +339,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 
                 if (expectCount != 0 && cacheResult.Count() < expectCount)
                 {
-                    var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+                    var obj = await GetValueAsync(func, parameters);
 
                     if (obj != null)
                     {
@@ -349,11 +349,11 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         Set(cacheKey, cacheResult);
                     }
                 }
-                return (IEnumerable<TResult>)cacheResult;
+                return cacheResult;
             }
             try
             {
-                var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+                var obj = await GetValueAsync(func, parameters);
                 if (obj == null) return default;
                 Set(cacheKey, obj);
                 return obj;
@@ -388,18 +388,12 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 
                 return (TResult)cacheObj;
             }
-            try
-            {
-                var obj = func(parameter);
-                if (obj == null) return default;
 
-                Set(cacheKey, obj);
-                return obj;
-            }
-            finally
-            {
-                
-            }
+            var tResult = func(parameter);
+            if (tResult == null) return default;
+
+            Set(cacheKey, tResult);
+            return tResult;
         }
 
         /// <summary>
@@ -422,18 +416,11 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            try
-            {
-                var obj = await func(parameter);
-                if (obj == null) return default;
+            var tResult = await func(parameter);
+            if (tResult == null) return default;
 
-                Set(cacheKey, obj);
-                return obj;
-            }
-            finally
-            {
-
-            }
+            Set(cacheKey, tResult);
+            return tResult;
         }
 
         /// <summary>
