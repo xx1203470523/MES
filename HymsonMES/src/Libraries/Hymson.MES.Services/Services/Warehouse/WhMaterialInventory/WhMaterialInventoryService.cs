@@ -143,19 +143,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                         FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.MaterialBarCode } },
                         ErrorCode = nameof(ErrorCode.MES15107)
                     });
-                    //var validationFailure = new ValidationFailure();
-                    //if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    //{
-                    //    validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                    //        { "CollectionIndex", item.MaterialBarCode}
-                    //    };
-                    //}
-                    //else
-                    //{
-                    //    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
-                    //}
-                    //validationFailure.ErrorCode = nameof(ErrorCode.MES15107);
-                    //validationFailures.Add(validationFailure);
+
                     continue;
                 }
 

@@ -90,7 +90,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
 
-            return defaultDto;
+            return  defaultDto;
         }
 
         /// <summary>

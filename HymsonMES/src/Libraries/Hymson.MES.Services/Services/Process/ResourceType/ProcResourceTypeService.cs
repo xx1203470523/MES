@@ -237,7 +237,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
                 //清除之前的绑定关系
                 await _resourceRepository.ResetResTypeAsync(updateCommand);
 
-                if (resourceIds != null && resourceIds.Any())
+                if (resourceIds != null)
                 {
                     //更新资源的资源类型（重新绑定）
                     await _resourceRepository.UpdateResTypeAsync(updateCommand);

@@ -302,6 +302,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         //入库
                         rows += await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+
                     }
 
                     if (sfcStepList.Any())

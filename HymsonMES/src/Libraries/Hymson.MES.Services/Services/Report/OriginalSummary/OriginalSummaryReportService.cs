@@ -143,7 +143,6 @@ namespace Hymson.MES.Services.Services.Report
             {
                 materialIds.AddRange(orderProducts);
             }
-            //materialIds.Add(manuSfc.ProductId);
 
             //查询物料信息
             var procMaterials = new List<ProcMaterialEntity>();
