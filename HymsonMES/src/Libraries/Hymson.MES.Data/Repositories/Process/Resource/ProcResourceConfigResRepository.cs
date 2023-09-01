@@ -80,12 +80,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procResourceConfigRes"></param>
+        /// <param name="procResourceConfigRess"></param>
         /// <returns></returns>
-        public async Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRes)
+        public async Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            await conn.ExecuteAsync(InsertSql, procResourceConfigRes);
+            await conn.ExecuteAsync(InsertSql, procResourceConfigRess);
         }
 
         /// <summary>
