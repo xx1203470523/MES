@@ -36,6 +36,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（分选规则）
         /// </summary>
         /// <param name="procSortingRuleService"></param>
+        /// <param name="logger"></param>
         public ProcSortingRuleController(IProcSortingRuleService procSortingRuleService, ILogger<ProcSortingRuleController> logger)
         {
             _procSortingRuleService = procSortingRuleService;

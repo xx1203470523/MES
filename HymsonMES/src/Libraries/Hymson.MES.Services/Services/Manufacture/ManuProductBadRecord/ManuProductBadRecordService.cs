@@ -227,13 +227,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (!isOnlyScrap)
                 {
                     // 不良录入条码步骤
-                    var sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadEntry, manuProductBadRecordCreateDto.Remark ?? "");
+                    var sfcStepEntity = CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, manuProductBadRecordCreateDto.Remark ?? "");
                     sfcStepList.Add(sfcStepEntity);
                 }
 
                 if (scrapCode != null)
                 {
-                    var scrapStep = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.Discard, manuProductBadRecordCreateDto.Remark ?? "");
+                    var scrapStep = CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard, manuProductBadRecordCreateDto.Remark ?? "");
                     sfcStepList.Add(scrapStep);
                 }
 
@@ -751,7 +751,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuProductBadRecordEntity.ToModel<ManuProductBadRecordDto>();
             }
-            return null;
+            return new ManuProductBadRecordDto();
         }
 
         /// <summary>

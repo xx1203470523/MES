@@ -29,7 +29,6 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
             RuleFor(x => x.Qty).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES16022));
-            //RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
             RuleFor(x => x.ProcessRouteId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16024));
             RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16025));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16026));
@@ -37,7 +36,6 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.PlanEndTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16028));
 
             RuleFor(x => x.PlanStartTime).LessThanOrEqualTo(x => x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16029));
-            //RuleFor(x => x.PlanStartTime).Must((x,planStatTime)=>x.PlanStartTime<=x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16028));
 
             RuleFor(x => x.OrderCode).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(500).WithErrorCode(nameof(ErrorCode.MES16031));
@@ -47,10 +45,8 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.WorkCenterId).Must(it => it != null && it > 0).WithErrorCode(nameof(ErrorCode.MES16039));
             RuleFor(x => x.WorkCenterType).Must(it => it != null && Enum.IsDefined(typeof(WorkCenterTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16040));
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(PlanWorkOrderTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16041));
-            //RuleFor(x => x.OverScale).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16042));
             RuleFor(x => x.ProductId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16021));
-            //RuleFor(x => x.Qty).Must(it => it > 0 && new Regex("^[0-9]\\d*$").IsMatch(it.ToString())).WithErrorCode(nameof(ErrorCode.MES16044));
-            //RuleFor(x => x.Qty).Must(it => it > 0 && it % 1 == 0 ).WithErrorCode(nameof(ErrorCode.MES16044));
+
             RuleFor(x => x.OrderCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES16043));
         }
     }
@@ -63,12 +59,12 @@ namespace Hymson.MES.Services.Validators.Plan
         public PlanWorkOrderModifyValidator()
         {
             RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16032));
-            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
+
 
             RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));
             RuleFor(x => x.Qty).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES16022));
-            //RuleFor(x => x.ProductBOMId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16023));
+
             RuleFor(x => x.ProcessRouteId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16024));
             RuleFor(x => x.WorkCenterId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16025));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16026));
@@ -76,7 +72,7 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.PlanEndTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16028));
 
             RuleFor(x => x.PlanStartTime).LessThanOrEqualTo(x => x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16029));
-            //RuleFor(x => x.PlanStartTime).Must((x,planStatTime)=>x.PlanStartTime<=x.PlanEndTime).WithErrorCode(nameof(ErrorCode.MES16028));
+
 
             RuleFor(x => x.OrderCode).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES16030));
             RuleFor(x => x.Remark).MaximumLength(500).WithErrorCode(nameof(ErrorCode.MES16031));
@@ -88,9 +84,9 @@ namespace Hymson.MES.Services.Validators.Plan
             RuleFor(x => x.WorkCenterId).Must(it => it != null && it > 0).WithErrorCode(nameof(ErrorCode.MES16039));
             RuleFor(x => x.WorkCenterType).Must(it => it != null && Enum.IsDefined(typeof(WorkCenterTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16040));
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(PlanWorkOrderTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES16041));
-            //RuleFor(x => x.OverScale).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16042));
+
             RuleFor(x => x.ProductId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES16021));
-            //RuleFor(x => x.Qty).Must(it => it > 0 && new Regex("^[0-9]\\d*$").IsMatch(it.ToString())).WithErrorCode(nameof(ErrorCode.MES16044));
+
             RuleFor(x => x.OrderCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES16043));
         }
     }

@@ -29,6 +29,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（工艺路线表）
         /// </summary>
         /// <param name="procProcessRouteService"></param>
+        /// <param name="logger"></param>
         public ProcProcessRouteController(IProcProcessRouteService procProcessRouteService, ILogger<ProcProcessRouteController> logger)
         {
             _procProcessRouteService = procProcessRouteService;

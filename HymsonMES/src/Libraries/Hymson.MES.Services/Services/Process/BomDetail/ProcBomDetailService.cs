@@ -145,7 +145,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcBomDetailDto> QueryProcBomDetailByIdAsync(long id)
         {
             var procBomDetailEntity = await _procBomDetailRepository.GetByIdAsync(id);
-            if (procBomDetailEntity == null) return null;
+            if (procBomDetailEntity == null) return new ProcBomDetailDto();
 
             return procBomDetailEntity.ToModel<ProcBomDetailDto>();
         }

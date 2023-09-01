@@ -192,7 +192,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 return procParameterLinkTypeEntity.ToModel<ProcParameterLinkTypeDto>();
             }
-            return null;
+            return new ProcParameterLinkTypeDto();
         }
 
         /// <summary>

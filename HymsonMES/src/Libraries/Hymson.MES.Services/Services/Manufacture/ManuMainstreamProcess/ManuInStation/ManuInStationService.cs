@@ -31,11 +31,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         private readonly IManuCommonOldService _manuCommonOldService;
 
         /// <summary>
-        /// 仓储接口（条码信息）
-        /// </summary>
-        private readonly IManuSfcRepository _manuSfcRepository;
-
-        /// <summary>
         /// 仓储接口（条码步骤）
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
@@ -61,14 +56,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="manuCommonOldService"></param>
-        /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
         public ManuInStationService(ICurrentUser currentUser,
             IManuCommonOldService manuCommonOldService,
-            IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -76,7 +69,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInS
         {
             _currentUser = currentUser;
             _manuCommonOldService = manuCommonOldService;
-            _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;

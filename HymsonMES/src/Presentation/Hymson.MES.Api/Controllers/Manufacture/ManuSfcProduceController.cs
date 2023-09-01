@@ -188,7 +188,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="sfcs"></param>
         /// <returns></returns>
         [HttpPost("getManuSfcProduceStep")]
         public async Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)

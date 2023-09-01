@@ -313,9 +313,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (!string.IsNullOrEmpty(pageQuery.SFC))
             {
-                //pageQuery.SFC = $"%{pageQuery.SFC}%";
-                //sqlBuilder.Where(" s.SFC like @SFC ");
-
                 sqlBuilder.Where(" s.SFC = @SFC ");
             }
             if (pageQuery.SFCStatus.HasValue)

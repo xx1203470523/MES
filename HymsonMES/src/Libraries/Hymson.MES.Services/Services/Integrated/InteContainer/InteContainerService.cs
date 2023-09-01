@@ -134,10 +134,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             await _validationSaveRules.ValidateAndThrowAsync(modifyDto);
             await ValidationSaveDto(modifyDto);
             var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(modifyDto.Id ?? 0);
-            //if (inteContainerEntity.Status != SysDataStatusEnum.Build && modifyDto.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12510));
-            //}
+
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == inteContainerEntity.Status))
@@ -225,7 +222,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             var pattern = @"^[1-9]\d*$";
             if (!Regex.IsMatch($"{dto.Minimum}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES12504));
             if (!Regex.IsMatch($"{dto.Maximum}", pattern)) throw new CustomerValidationException(nameof(ErrorCode.MES12505));
-            //if (!Enum.IsDefined(typeof(SysDataStatusEnum), dto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES12511));
 
             // 判断物料/物料组是否存在
             switch (dto.DefinitionMethod)
@@ -283,7 +279,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
             }
             if (entity.Status == changeStatusCommand.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
 

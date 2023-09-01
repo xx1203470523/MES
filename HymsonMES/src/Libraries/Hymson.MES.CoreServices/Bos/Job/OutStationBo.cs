@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
@@ -101,6 +102,16 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 下一工序编码
         /// </summary>
         public string NextProcedureCode { get; set; } = "";
+
+        /// <summary>
+        /// 降级品录入对象
+        /// </summary>
+        public DegradedProductExtendBo DegradedProductExtendBo { get; set; }
+
+        /// <summary>
+        /// 降级品录入对象
+        /// </summary>
+        public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
 
     }
 }

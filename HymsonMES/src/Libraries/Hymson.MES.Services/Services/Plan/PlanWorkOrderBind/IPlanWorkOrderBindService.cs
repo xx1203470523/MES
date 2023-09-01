@@ -15,48 +15,6 @@ namespace Hymson.MES.Services.Services.Plan
     /// </summary>
     public interface IPlanWorkOrderBindService
     {
-        ///// <summary>
-        ///// 获取分页List
-        ///// </summary>
-        ///// <param name="planWorkOrderBindPagedQueryDto"></param>
-        ///// <returns></returns>
-        //Task<PagedInfo<PlanWorkOrderBindDto>> GetPagedListAsync(PlanWorkOrderBindPagedQueryDto planWorkOrderBindPagedQueryDto);
-
-        ///// <summary>
-        ///// 新增
-        ///// </summary>
-        ///// <param name="planWorkOrderBindCreateDto"></param>
-        ///// <returns></returns>
-        //Task CreatePlanWorkOrderBindAsync(PlanWorkOrderBindCreateDto planWorkOrderBindCreateDto);
-
-        ///// <summary>
-        ///// 修改
-        ///// </summary>
-        ///// <param name="planWorkOrderBindModifyDto"></param>
-        ///// <returns></returns>
-        //Task ModifyPlanWorkOrderBindAsync(PlanWorkOrderBindModifyDto planWorkOrderBindModifyDto);
-
-        ///// <summary>
-        ///// 删除
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //Task DeletePlanWorkOrderBindAsync(long id);
-
-        ///// <summary>
-        ///// 批量删除
-        ///// </summary>
-        ///// <param name="ids"></param>
-        ///// <returns></returns>
-        //Task<int> DeletesPlanWorkOrderBindAsync(long[] ids);
-
-        ///// <summary>
-        ///// 根据ID查询
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //Task<PlanWorkOrderBindDto> QueryPlanWorkOrderBindByIdAsync(long id);
-
         /// <summary>
         /// 批量绑定激活的工单
         /// </summary>

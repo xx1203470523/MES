@@ -91,7 +91,7 @@ namespace Hymson.MES.Services.Services.Process
                 if (!procLoadPointCreateDto.LinkMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointCreateDto.LinkMaterials.Any(a => a.MaterialId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointCreateDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
-                if (procLoadPointCreateDto.LinkMaterials.GroupBy(x => x.MaterialId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10710));
+                if (procLoadPointCreateDto.LinkMaterials.GroupBy(x => x.MaterialId).Any(g => g.Count() >= 2)) throw new CustomerValidationException(nameof(ErrorCode.MES10710));
             }
 
             if (procLoadPointCreateDto.LinkResources != null)
@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Services.Process
                 if (!procLoadPointCreateDto.LinkResources.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointCreateDto.LinkResources.Any(a => a.ResourceId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointCreateDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
-                if (procLoadPointCreateDto.LinkResources.GroupBy(x => x.ResourceId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
+                if (procLoadPointCreateDto.LinkResources.GroupBy(x => x.ResourceId).Any(g => g.Count() >= 2)) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
             }
 
             // DTO转换实体
@@ -260,13 +260,13 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointModifyDto.Remark = procLoadPointModifyDto?.Remark ?? "".Trim();
 
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procLoadPointModifyDto);
-            if (procLoadPointModifyDto.LinkMaterials != null)
+            await _validationModifyRules!.ValidateAndThrowAsync(procLoadPointModifyDto);
+            if (procLoadPointModifyDto!.LinkMaterials != null)
             {
                 if (!procLoadPointModifyDto.LinkMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointModifyDto.LinkMaterials.Any(a => a.MaterialId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
                 if (procLoadPointModifyDto.LinkMaterials.Any(a => string.IsNullOrWhiteSpace(a.MaterialCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10702));
-                if (procLoadPointModifyDto.LinkMaterials.GroupBy(x => x.MaterialId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10710));
+                if (procLoadPointModifyDto.LinkMaterials.GroupBy(x => x.MaterialId).Any(g => g.Count() >= 2)) throw new CustomerValidationException(nameof(ErrorCode.MES10710));
             }
 
             if (procLoadPointModifyDto.LinkResources != null)
@@ -274,7 +274,7 @@ namespace Hymson.MES.Services.Services.Process
                 if (!procLoadPointModifyDto.LinkResources.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointModifyDto.LinkResources.Any(a => a.ResourceId == 0)) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
                 if (procLoadPointModifyDto.LinkResources.Any(a => string.IsNullOrWhiteSpace(a.ResCode))) throw new CustomerValidationException(nameof(ErrorCode.MES10703));
-                if (procLoadPointModifyDto.LinkResources.GroupBy(x => x.ResourceId).Where(g => g.Count() >= 2).Count() >= 1) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
+                if (procLoadPointModifyDto.LinkResources.GroupBy(x => x.ResourceId).Any(g => g.Count() >= 2)) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
             }
 
             //DTO转换实体
@@ -286,10 +286,6 @@ namespace Hymson.MES.Services.Services.Process
             #region 数据库验证
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10705));
            
-            //if (modelOrigin.Status != SysDataStatusEnum.Build && procLoadPointModifyDto.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10716));
-            //}
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
@@ -332,8 +328,8 @@ namespace Hymson.MES.Services.Services.Process
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
                         MaterialId = material.MaterialId,
-                        Version = material.Version,
-                        ReferencePoint = material.ReferencePoint,
+                        Version = material.Version!,
+                        ReferencePoint = material.ReferencePoint!,
                         CreatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now()
                     });
@@ -527,14 +523,14 @@ namespace Hymson.MES.Services.Services.Process
 
             //上料点关联物料
             var loadPointLinkMaterials = await _procLoadPointLinkMaterialRepository.GetLoadPointLinkMaterialAsync(new long[] { id });
-            if (loadPointLinkMaterials != null && loadPointLinkMaterials.Count() > 0)
+            if (loadPointLinkMaterials != null && loadPointLinkMaterials.Any())
             {
                 loadPointDto.LinkMaterials = PrepareEntityToDto<ProcLoadPointLinkMaterialView, ProcLoadPointLinkMaterialViewDto>(loadPointLinkMaterials);
             }
 
             //上料点关联资源
             var loadPointLinkResources = await _procLoadPointLinkResourceRepository.GetLoadPointLinkResourceAsync(new long[] { id });
-            if (loadPointLinkResources != null && loadPointLinkResources.Count() > 0)
+            if (loadPointLinkResources != null && loadPointLinkResources.Any())
             {
                 loadPointDto.LinkResources = PrepareEntityToDto<ProcLoadPointLinkResourceView, ProcLoadPointLinkResourceViewDto>(loadPointLinkResources);
             }
@@ -601,7 +597,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             if (entity.Status == changeStatusCommand.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
 

@@ -143,14 +143,14 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <summary>
         /// 推送消息并添加事件
         /// </summary>
-        /// <param name="messageEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task Push(InteMessageManageEntity messageEntity)
+        public async Task Push(InteMessageManageEntity entity)
         {
-            if (messageEntity == null) return;
+            if (entity == null) return;
 
             // 当前场景
-            PushSceneEnum? pushScene = messageEntity.Status switch
+            PushSceneEnum? pushScene = entity.Status switch
             {
                 MessageStatusEnum.Trigger => PushSceneEnum.Trigger,
                 MessageStatusEnum.Receive => PushSceneEnum.Receive,
@@ -163,8 +163,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             // 查看推送开关
             var eventTypePushRules = await _inteEventTypePushRuleRepository.GetEntitiesAsync(new EntityByParentIdQuery
             {
-                SiteId = messageEntity.SiteId,
-                ParentId = messageEntity.EventTypeId
+                SiteId = entity.SiteId,
+                ParentId = entity.EventTypeId
             });
 
             if (eventTypePushRules == null) return;
@@ -173,11 +173,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == pushScene.Value))
             {
                 // 发送即时消息
-                await SendMessageAsync(messageEntity, pushScene.Value);
+                await SendMessageAsync(entity, pushScene.Value);
             }
 
             // 升级场景（因为只有接收升级和处理升级才推送）
-            pushScene = messageEntity.Status switch
+            pushScene = entity.Status switch
             {
                 MessageStatusEnum.Trigger => PushSceneEnum.ReceiveUpgrade,
                 MessageStatusEnum.Receive => PushSceneEnum.HandleUpgrade,
@@ -186,11 +186,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (pushScene == null) return;
 
             // 如果开启的开关不含有该场景，则不发送即时通知（升级场景）
-            if (eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == pushScene.Value) == false) return;
+            if (!eventTypePushRules.Any(a => a.IsEnabled == DisableOrEnableEnum.Enable && a.PushScene == pushScene.Value)) return;
             dynamic? @event = pushScene.Value switch
             {
-                PushSceneEnum.ReceiveUpgrade => new MessageReceiveUpgradeIntegrationEvent { MessageId = messageEntity.Id },
-                PushSceneEnum.HandleUpgrade => new MessageHandleUpgradeIntegrationEvent { MessageId = messageEntity.Id },
+                PushSceneEnum.ReceiveUpgrade => new MessageReceiveUpgradeIntegrationEvent { MessageId = entity.Id },
+                PushSceneEnum.HandleUpgrade => new MessageHandleUpgradeIntegrationEvent { MessageId = entity.Id },
                 _ => null
             };
             if (@event == null) return;
@@ -198,11 +198,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             // 读取接收升级等级设置（已缓存）
             var eventTypeUpgrades = await _inteEventTypeUpgradeRepository.GetEntitiesAsync(new InteEventTypeUpgradeQuery
             {
-                SiteId = messageEntity.SiteId,
-                EventTypeId = messageEntity.EventTypeId,
+                SiteId = entity.SiteId,
+                EventTypeId = entity.EventTypeId,
                 PushScene = pushScene.Value
             });
-            if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
+            if (eventTypeUpgrades == null || !eventTypeUpgrades.Any()) return;
 
             // 当前匹配的等级（这个一定有数据，因为前面已经做了Any()验证
             InteEventTypeUpgradeEntity firstLevelEntity = eventTypeUpgrades.OrderBy(o => o.Level).First();
@@ -270,7 +270,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 SiteId = messageEntity.SiteId,
                 ParentId = messageEntity.EventTypeId
             });
-            if (eventTypeMessageGroupRelations == null || eventTypeMessageGroupRelations.Any() == false) return;
+            if (eventTypeMessageGroupRelations == null || !eventTypeMessageGroupRelations.Any()) return;
 
             // 消息组关联推送方式（已缓存）
             var messageGroupPushMethodEntities = await _inteMessageGroupPushMethodRepository.GetEntitiesAsync(new EntityByParentIdQuery { SiteId = messageEntity.SiteId });
@@ -282,7 +282,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 SiteId = messageEntity.SiteId,
                 BusinessType = BusinessTypeEnum.Abnormity
             });
-            if (messageTemplateEntities == null || messageTemplateEntities.Any() == false) return;
+            if (messageTemplateEntities == null || !messageTemplateEntities.Any()) return;
 
             // 遍历设置的所有推送方式
             foreach (var item in eventTypeMessageGroupRelations)
@@ -291,7 +291,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 if (messageTypeArray == null) continue;
 
                 // 消息组推送方式
-                if (messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods) == false) continue;
+                if (!messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods)) continue;
 
                 foreach (var messageType in messageTypeArray)
                 {
@@ -327,7 +327,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 EventTypeId = messageEntity.EventTypeId,
                 PushScene = pushScene
             });
-            if (eventTypeUpgrades == null || eventTypeUpgrades.Any() == false) return;
+            if (eventTypeUpgrades == null || !eventTypeUpgrades.Any()) return;
 
             dynamic dyEvent = @event;
 
@@ -382,7 +382,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 SiteId = messageEntity.SiteId,
                 BusinessType = BusinessTypeEnum.Abnormity
             });
-            if (messageTemplateEntities == null || messageTemplateEntities.Any() == false) return;
+            if (messageTemplateEntities == null || !messageTemplateEntities.Any()) return;
 
             // 遍历设置的所有推送方式
             foreach (var item in messageGroupRelationEntities)
@@ -392,7 +392,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
                 if (messageTypeArray == null) return;
 
                 // 消息组推送方式
-                if (messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods) == false) continue;
+                if (!messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods)) continue;
 
                 foreach (var messageType in messageTypeArray)
                 {

@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -120,7 +121,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 校验工序和资源是否对应
-            var resourceIds = await bo.Proxy.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
+            var resourceIds = await bo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
             if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 获取生产条码信息
@@ -142,12 +143,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstProduceEntity == null) return;
 
             // 获取生产工单（附带工单状态校验）
-            var planWorkOrderEntity = await bo.Proxy.GetValueAsync(async parameters =>
-            {
-                long workOrderId = (long)parameters[0];
-                bool isVerifyActivation = parameters.Length <= 1 || (bool)parameters[1];
-                return await _masterDataService.GetProduceWorkOrderByIdAsync(workOrderId, isVerifyActivation);
-            }, new object[] { firstProduceEntity.WorkOrderId, true });
+            var planWorkOrderEntity = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdAsync, new WorkOrderIdBo { WorkOrderId = firstProduceEntity.WorkOrderId });
 
             // 当工单已激活且完工状态，且条码处于工艺路线的首工序，进站时，提示“工单状态为完工，不允许再对工单投入”
             if (planWorkOrderEntity?.Status == PlanWorkOrderStatusEnum.Finish)
@@ -214,11 +210,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<InStationRequestBo>();
             if (bo == null) return default;
 
-            // 待执行的命令
-            InStationResponseBo responseBo = new();
-
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
 
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();

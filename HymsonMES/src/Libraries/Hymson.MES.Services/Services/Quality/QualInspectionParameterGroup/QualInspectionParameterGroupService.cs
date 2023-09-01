@@ -389,7 +389,7 @@ namespace Hymson.MES.Services.Services.Quality
                 ProductId = entity.MaterialId,
                 ProcedureId = entity.ProcedureId
             });
-            if (checkUniqueMaterialProcedureEntities == null || checkUniqueMaterialProcedureEntities.Any() == false) return;
+            if (checkUniqueMaterialProcedureEntities == null || !checkUniqueMaterialProcedureEntities.Any()) return;
 
             // 校验产品编码+工序编码+版本是否唯一
             if (checkUniqueMaterialProcedureEntities.Any(a => a.MaterialId == entity.MaterialId
@@ -443,7 +443,6 @@ namespace Hymson.MES.Services.Services.Quality
             // 是否存在错误
             if (validationFailures.Any())
             {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 throw new ValidationException("", validationFailures);
             }
         }
@@ -490,7 +489,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
             if (entity.Status == changeStatusCommand.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
 

@@ -175,19 +175,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.Status = @Status");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EventTypeName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EventTypeName))
             {
                 pagedQuery.EventTypeName = $"%{pagedQuery.EventTypeName}%";
                 sqlBuilder.Where("IET.Name LIKE @EventTypeName");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.ResourceName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ResourceName))
             {
                 pagedQuery.ResourceName = $"%{pagedQuery.ResourceName}%";
                 sqlBuilder.Where("PR.ResName LIKE @ResourceName");

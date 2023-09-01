@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Validators.Quality
             {
                 RuleForEach(x => x).ChildRules(c =>
                 {
-                    //c.RuleFor(x => x.InspectionValue).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13205));
+  
                     c.RuleFor(x => x.IsQualified).Must(it => Enum.IsDefined(typeof(TrueOrFalseEnum), it)).WithErrorCode(nameof(ErrorCode.MES13206));
                 });
             });

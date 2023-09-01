@@ -9,7 +9,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
-//using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -36,6 +35,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// 构造函数（供应商）
         /// </summary>
         /// <param name="whSupplierService"></param>
+        /// <param name="logger"></param>
         public WhSupplierController(IWhSupplierService whSupplierService, ILogger<WhSupplierController> logger)
         {
             _whSupplierService = whSupplierService;

@@ -4,12 +4,14 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -33,6 +35,8 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquFaultReasonRepository _equFaultReasonRepository;
         private readonly AbstractValidator<EquFaultReasonSaveDto> _validationSaveRules;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -40,14 +44,16 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equFaultReasonRepository"></param>
+        /// <param name="localizationService"></param>
         public EquFaultReasonService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquFaultReasonSaveDto> validationSaveRules,
-            IEquFaultReasonRepository equFaultReasonRepository)
+            IEquFaultReasonRepository equFaultReasonRepository, ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
             _validationSaveRules = validationSaveRules;
             _equFaultReasonRepository = equFaultReasonRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -69,6 +75,8 @@ namespace Hymson.MES.Services.Services.Equipment
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
 
+            entity.UseStatus = SysDataStatusEnum.Build;
+
             // 编码唯一性验证
             var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultReasonCode });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.FaultReasonCode);
@@ -89,9 +97,15 @@ namespace Hymson.MES.Services.Services.Equipment
 
             var entityOld = await _equFaultReasonRepository.GetByIdAsync(EquFaultReasonModifyDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES13013));
-            if (entityOld.UseStatus != SysDataStatusEnum.Build && EquFaultReasonModifyDto.UseStatus == SysDataStatusEnum.Build)
+            //if (entityOld.UseStatus != SysDataStatusEnum.Build && EquFaultReasonModifyDto.UseStatus == SysDataStatusEnum.Build)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+            //}
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             // DTO转换实体
@@ -179,5 +193,57 @@ namespace Hymson.MES.Services.Services.Equipment
             var dto = EquFaultReasonEntity.ToModel<CustomEquFaultReasonDto>();
             return dto;
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _equFaultReasonRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13013));
+            }
+            if (entity.UseStatus == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.UseStatus)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _equFaultReasonRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

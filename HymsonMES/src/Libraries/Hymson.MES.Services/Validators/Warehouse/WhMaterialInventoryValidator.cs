@@ -23,17 +23,6 @@ namespace Hymson.MES.Services.Validators.Warehouse
     {
         public WhMaterialInventoryCreateValidator()
         {
-            //RuleFor(x => x.MaterialCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15201));
-            //RuleFor(x => x.SupplierId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES152015));
-            //RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15202));
-            //RuleFor(x => x.MaterialBarCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15203));
-            //RuleFor(x => x.Batch).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15204));
-            //RuleFor(x => x.QuantityResidue).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15205));
-            //RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15206));
-            //RuleFor(x => x.Source).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15208));
-
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
 
 
@@ -46,8 +35,7 @@ namespace Hymson.MES.Services.Validators.Warehouse
     {
         public WhMaterialInventoryModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+
         }
     }
 }

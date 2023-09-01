@@ -21,7 +21,6 @@ using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Text.RegularExpressions;
-//using Hymson.Utils.Extensions;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -80,7 +79,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 SiteId = _currentSite.SiteId ?? 0,
                 Code = whSupplierCreateDto.Code
             });
-            if (exists != null && exists.Count() > 0)
+            if (exists != null && exists.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15002)).WithData("Code", whSupplierCreateDto.Code);
             }
@@ -202,7 +201,6 @@ namespace Hymson.MES.Services.Services.Warehouse
             if (whSupplierEntity != null)
             {
                 return new WhSupplierDto { Id = whSupplierEntity.Id, Code = whSupplierEntity.Code, Name = whSupplierEntity.Name, Remark = whSupplierEntity.Remark, CreatedBy = whSupplierEntity.CreatedBy, CreatedOn = whSupplierEntity.CreatedOn };
-                //return whSupplierEntity.ToModel<WhSupplierDto>();
             }
             return null;
         }

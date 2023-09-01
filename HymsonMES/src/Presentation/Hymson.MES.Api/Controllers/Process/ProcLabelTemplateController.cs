@@ -27,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（仓库标签模板）
         /// </summary>
         /// <param name="procLabelTemplateService"></param>
+        /// <param name="logger"></param>
         public ProcLabelTemplateController(IProcLabelTemplateService procLabelTemplateService, ILogger<ProcLabelTemplateController> logger)
         {
             _procLabelTemplateService = procLabelTemplateService;
@@ -95,14 +96,12 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:labelTemplate:delete")]
         public async Task DeleteProcLabelTemplateAsync(DeleteDto deleteDto)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procLabelTemplateService.DeletesProcLabelTemplateAsync(deleteDto.Ids);
         }
         [HttpGet]
         [Route("preview/{id}")]
         public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(long id)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(id);
             return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };
         }

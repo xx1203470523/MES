@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Quality
@@ -64,5 +66,19 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         Task<IEnumerable<QualIpqcInspectionRuleDto>?> QueryRulesByMainIdAsync(long id);
 
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
+        /// <summary>
+        /// 状态更新为启用
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task UpdateStatusEnable(long id);
     }
 }

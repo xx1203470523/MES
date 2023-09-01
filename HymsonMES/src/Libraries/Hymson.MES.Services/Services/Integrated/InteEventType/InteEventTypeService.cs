@@ -178,7 +178,6 @@ namespace Hymson.MES.Services.Services.Integrated
             });
 
             // 升级
-            //List<ValidationFailure> validationFailures = new();
             List<InteEventTypeUpgradeEntity> upgrades = new();
             List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
 
@@ -343,8 +342,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 return detailEntity;
             });
 
-            // 升级
-            //List<ValidationFailure> validationFailures = new();
+            // 升级           
             List<InteEventTypeUpgradeEntity> upgrades = new();
             List<InteEventTypeUpgradeMessageGroupRelationEntity> upgradeMessageGroupRelations = new();
 
@@ -594,7 +592,7 @@ namespace Hymson.MES.Services.Services.Integrated
             foreach (var entity in entities)
             {
                 var dto = entity.ToModel<InteEventTypeUpgradeDto>();
-                if (messageGroupRelationDic.TryGetValue(entity.Id, out var messageGroupRelations) == false) continue;
+                if (!messageGroupRelationDic.TryGetValue(entity.Id, out var messageGroupRelations)) continue;
 
                 dto.MessageGroups = GetMessageGroupRelations(messageGroupRelations.Select(s => s.ToModel<MessageGroupBo>()), messageGroupEntities, messageGroupPushMethodEntities);
                 dtos.Add(dto);
@@ -661,7 +659,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 if (messageGroupEntity == null) continue;
 
                 // 消息组推送方式
-                if (messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods) == false) continue;
+                if (!messageGroupPushMethodDic.TryGetValue(item.MessageGroupId, out var messageGroupPushMethods)) continue;
 
                 dtos.Add(new InteEventTypeMessageGroupRelationDto
                 {

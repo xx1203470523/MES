@@ -46,7 +46,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             //
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
 

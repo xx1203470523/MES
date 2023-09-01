@@ -50,10 +50,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获取生产工单
         /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true);
+        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo);
 
         /// <summary>
         /// 获取生产工单

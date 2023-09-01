@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Enums
     /// <summary>
     /// 条码打印状态
     /// </summary>
-    public enum PlanSFCPrintStatusEnum : sbyte
+    public enum PlanSfcPrintStatusEnum : sbyte
     {
         /// <summary>
         /// 未打印 

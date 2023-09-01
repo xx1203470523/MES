@@ -31,8 +31,6 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.SegmentedValue).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES12433));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES12434));
 
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
             RuleFor(x => x.ValueTakingType).Must(it => Enum.IsDefined(typeof(CodeValueTakingTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES12437));
         }
     }

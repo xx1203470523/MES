@@ -140,59 +140,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             }
 
             #region 组合数据生成条码
-            //var codeRulesMakeBosArray = bo.CodeRulesMakeBos.ToArray();
-            //foreach (var serialStr in serialStrings)
-            //{
-            //    var ruleMakeValues = new string[bo.CodeRulesMakeBos.Count()][];
-            //    //根据编码规则获取到每行数据会生成的值
-            //    for (int i = 0; i < codeRulesMakeBosArray.Length; i++)
-            //    {
-            //        var item = codeRulesMakeBosArray[i];
-
-            //        if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
-            //        {
-            //            ruleMakeValues[i] = new string[] { item.SegmentedValue };
-            //            continue;
-            //        }
-
-            //        if (string.IsNullOrEmpty(item.CustomValue))
-            //        {
-            //            continue;
-            //        }
-
-            //        switch (item.SegmentedValue)
-            //        {
-            //            case GenerateBarcodeWildcard.Activity:
-            //                ruleMakeValues[i] = new string[] { serialStr };
-            //                break;
-            //            case GenerateBarcodeWildcard.Yymmdd:
-            //                ruleMakeValues[i] = new string[] { HymsonClock.Now().ToString("yyMMdd") };
-            //                break;
-            //            case GenerateBarcodeWildcard.MultipleVariable:
-            //                //模式是多个时，生成多个条码
-            //                if (bo.CodeMode == CodeRuleCodeModeEnum.More)
-            //                {
-            //                    ruleMakeValues[i] = item.CustomValue.Split(';');//查询出自定义值能转换成几个
-            //                }
-            //                break;
-            //            default:
-            //                throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
-            //        }
-            //    }
-
-            //    //将上方 根据编码规则组成的数组值组成各种情况   ，如获取到[['A1'],['B1','B2'],['C1']]  去生成 A1B1C1、A1B2C1两个条码
-            //    List<string[]> combinations = new List<string[]>();
-            //    GenerateCombinationsHelper(ruleMakeValues, 0, new string[ruleMakeValues.Length], combinations);
-            //    foreach (var combination in combinations)
-            //    {
-            //        list.Add(new BarCodeInfo
-            //        {
-            //            BarCode = string.Join("", combination),
-            //            SerialNumber = serialStr
-            //        });
-            //    }
-            //}
-
             foreach (var serialStr in serialStrings)
             {
                 var rules = new List<List<string>>();
@@ -200,7 +147,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 {
                     if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
                     {
-                        rules.Add(new List<string> { item.SegmentedValue });
+                        rules.Add(new List<string> { item.SegmentedValue! });
                         continue;
                     }
 
@@ -225,7 +172,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             }
                             break;
                         default:
-                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
                     }
                 }
 
@@ -265,7 +212,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
 
                 if (codeRulesMakeBo != null)
                 {
-                    var values = codeRulesMakeBo.CustomValue.Split(';');//查询出自定义值能转换成几个
+                    var values = codeRulesMakeBo.CustomValue!.Split(';');//查询出自定义值能转换成几个
                     count = (int)Math.Ceiling(param.Count / (values.Length * 1.0));//修改生成的数量
                 }
             }

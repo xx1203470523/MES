@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
 
             var planWorkOrderActivationPagedQuery = param.ToQuery<PlanWorkOrderActivationPagedQuery>();
-            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId.Value;
+            planWorkOrderActivationPagedQuery.SiteId = _currentSite.SiteId!.Value;
 
             //将对应的工作中心ID放置查询条件中
             planWorkOrderActivationPagedQuery.WorkCenterIds.Add(workCenterEntity.Id);
@@ -280,7 +280,7 @@ namespace Hymson.MES.Services.Services.Plan
                 return;
             }
 
-            if (line.IsMixLine.Value)
+            if (line.IsMixLine!.Value)
             {//混线
                 await DoActivationWorkOrderAsync(workOrder, activationWorkOrderDto);
             }
@@ -439,7 +439,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 return planWorkOrderActivationEntity.ToModel<PlanWorkOrderActivationDto>();
             }
-            return null;
+            return new PlanWorkOrderActivationDto();
         }
     }
 }

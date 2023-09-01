@@ -28,6 +28,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（备件类型）
         /// </summary>
         /// <param name="equSparePartTypeService"></param>
+        /// <param name="logger"></param>
         public EquSparePartTypeController(IEquSparePartTypeService equSparePartTypeService, ILogger<EquSparePartTypeController> logger)
         {
             _equSparePartTypeService = equSparePartTypeService;

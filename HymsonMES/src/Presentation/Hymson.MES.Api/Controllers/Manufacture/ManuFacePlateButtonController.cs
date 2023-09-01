@@ -27,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（操作面板按钮）
         /// </summary>
         /// <param name="manuFacePlateButtonService"></param>
+        /// <param name="logger"></param>
         public ManuFacePlateButtonController(IManuFacePlateButtonService manuFacePlateButtonService, ILogger<ManuFacePlateButtonController> logger)
         {
             _manuFacePlateButtonService = manuFacePlateButtonService;

@@ -23,7 +23,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 构造函数（操作面板）
         /// </summary>
-        /// <param name="manuFacePlateProductionService"></param>        
+        /// <param name="manuFacePlateProductionService"></param>    
+        /// <param name="logger"></param>   
         public ManuFacePlateProductionController(IManuFacePlateProductionService manuFacePlateProductionService, ILogger<ManuFacePlateController> logger)
         {
             _manuFacePlateProductionService = manuFacePlateProductionService;

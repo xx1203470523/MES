@@ -21,7 +21,6 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public class ManuFacePlateProductionService : IManuFacePlateProductionService
     {
-        private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
@@ -40,7 +39,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procBomDetailRepository"></param>
@@ -50,9 +48,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="procReplaceMaterialRepository"></param>
-        public ManuFacePlateProductionService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository)
+        public ManuFacePlateProductionService(ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository)
         {
-            _currentUser = currentUser;
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procBomDetailRepository = procBomDetailRepository;
@@ -116,7 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.CirculationMainProductId == mainMaterialId).Sum(x => x.CirculationQty);
                 if (hasAssembleNum >= item.Usages)
                 {
-                    continue;
+                    
                 }
                 else
                 {
@@ -141,7 +138,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                     MaterialId = replace.Id,
                                     MaterialCode = replace.MaterialCode,
                                     MaterialName = replace.MaterialName,
-                                    MaterialVersion = replace.Version,
+                                    MaterialVersion = replace.Version!,
 
                                     SerialNumber = replace.SerialNumber
                                 });

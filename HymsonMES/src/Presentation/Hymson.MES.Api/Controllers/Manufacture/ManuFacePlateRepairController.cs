@@ -42,6 +42,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（在制品维修）
         /// </summary>
         /// <param name="manuFacePlateRepairService"></param>
+        /// <param name="logger"></param>
         public ManuFacePlateRepairController(IManuFacePlateRepairService manuFacePlateRepairService, ILogger<ManuFacePlateRepairController> logger)
         {
             _manuFacePlateRepairService = manuFacePlateRepairService;

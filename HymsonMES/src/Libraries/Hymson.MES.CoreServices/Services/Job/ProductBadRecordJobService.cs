@@ -105,8 +105,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetManuSfcProduceInfoEntitiesAsync, bo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetManuSfcProduceInfoEntitiesAsync, bo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
                 return;
             }
@@ -128,11 +128,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES15407)).WithData("sfcs", strs);
             }
 
-            //var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
-            //sfcProduceBusinessEntities?.VerifyProcedureLock(bo.SFCs, bo.ProcedureId);
-
             //获取不合格代码信息
-            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodes, bo.UnqualifiedIds);
+            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodes!, bo.UnqualifiedIds);
             if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15405));
@@ -147,7 +144,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             });
 
             var existUnqualifiedIds = productBadRecordList.Select(x => x.UnqualifiedId).Distinct().ToList();
-            var sameUnqualifiedIds = existUnqualifiedIds.Intersect(bo.UnqualifiedIds).ToList();
+            var sameUnqualifiedIds = existUnqualifiedIds.Intersect(bo.UnqualifiedIds!).ToList();
             if (sameUnqualifiedIds.Any())
             {
                 var codes = qualUnqualifiedCodes.Where(x => sameUnqualifiedIds.Contains(x.Id)).Select(x => x.UnqualifiedCode).ToArray();
@@ -198,12 +195,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return default;
             }
 
-            // 待执行的命令
-            ProductBadRecordResponseBo responseBo = new();
-
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetManuSfcProduceInfoEntitiesAsync, bo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetManuSfcProduceInfoEntitiesAsync, bo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
                 return default;
             }
@@ -211,7 +205,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
 
             //获取不合格代码信息
-            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodes, bo.UnqualifiedIds);
+            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodes!, bo.UnqualifiedIds);
             if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
             {
                 return default;
@@ -266,13 +260,13 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (!isOnlyScrap)
                 {
                     // 不良录入条码步骤
-                    var sfcStepEntity = _masterDataService.CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadEntry, bo.SiteId,bo.Remark ?? "");
+                    var sfcStepEntity = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, bo.SiteId,bo.Remark ?? "");
                     sfcStepList.Add(sfcStepEntity);
                 }
 
                 if (scrapCode != null)
                 {
-                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.Discard,  bo.SiteId,bo.Remark ?? "");
+                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard,  bo.SiteId,bo.Remark ?? "");
                     sfcStepList.Add(scrapStep);
                 }
 

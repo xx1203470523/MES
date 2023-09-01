@@ -225,10 +225,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-       ///// <summary>
-       // /// 状态
-       // /// </summary>
-
        /// <summary>
         /// 类型
         /// </summary>
@@ -279,10 +275,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 当前版本
         /// </summary>
         public bool IsCurrentVersion { get; set; }
-
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
 
         /// <summary>
         /// 类型

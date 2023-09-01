@@ -127,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySFCDto param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySfcDto param)
         {
             var list = new List<ManuProductParameterEntity>();
             var dic = new Dictionary<string, List<string>>();
@@ -223,10 +223,10 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         ///创建数据库表
         /// </summary>
         /// <returns></returns>
-        public async Task CreateProductParameterTable(string tableName)
+        public async Task CreateProductParameterTable(string tabname)
         {
             var sql = await _manuProductParameterRepository.ShowCreateTable(ProductParameter.ProductProcedureParameterTemplateNmae);
-            sql= sql?.Replace(ProductParameter.ProductProcedureParameterTemplateNmae, tableName);
+            sql= sql?.Replace(ProductParameter.ProductProcedureParameterTemplateNmae, tabname);
             sql= sql?.Replace($"CREATE TABLE", $"CREATE TABLE  IF NOT EXISTS");
             await _manuProductParameterRepository.CreateProductParameterTable(sql ?? "");
         }
@@ -263,7 +263,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <param name="siteId"></param>
         /// <param name="procedureCode"></param>
         /// <returns></returns>.
-        private string GetTableNameByProcedureCode(long siteId, string procedureCode)
+        private static string GetTableNameByProcedureCode(long siteId, string procedureCode)
         {
             var key = $"{siteId}_{procedureCode}";
 
@@ -275,7 +275,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public BigInteger CalculateSHA256Hash(string input)
+        public static BigInteger CalculateSHA256Hash(string input)
         {
             using (SHA256 hasher = SHA256.Create())
             {
@@ -288,7 +288,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
             }
         }
 
-        public uint CalculateCrc32(string input)
+        public static uint CalculateCrc32(string input)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(input);
             return Crc32Algorithm.Compute(bytes);

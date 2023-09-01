@@ -168,12 +168,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13221));
             }
-            ////工序
-            //var procedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId);
-            //if (procedureEntity == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-            //}
+
             //校验工序、资源是否匹配
             var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedureId);
             if (procedureResourceList.IsNullOrEmpty() || !procedureResourceList.Any(x => x.Id == resourceId))
@@ -312,13 +307,13 @@ namespace Hymson.MES.Services.Services.Quality
                 foreach (var procedure in procedureList)
                 {
                     //获取首件检验项目
-                    var ipqcInspection = ipqcInspectionList.Where(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.ProcedureId).FirstOrDefault();
+                    var ipqcInspection = ipqcInspectionList.FirstOrDefault(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.Id);
                     if (ipqcInspection == null)
                     {
                         continue;
                     }
                     //获取应检资源列表
-                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.ProcedureId);
+                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.Id);
                     if (procedureResourceList.IsNullOrEmpty())
                     {
                         continue;

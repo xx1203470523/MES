@@ -28,6 +28,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（容器装载表（物理删除））
         /// </summary>
         /// <param name="manuContainerPackService"></param>
+        /// <param name="logger"></param>
         public ManuContainerPackController(IManuContainerPackService manuContainerPackService, ILogger<ManuContainerPackController> logger)
         {
             _manuContainerPackService = manuContainerPackService;

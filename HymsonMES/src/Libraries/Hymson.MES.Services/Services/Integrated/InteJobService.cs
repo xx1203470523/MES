@@ -81,7 +81,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<PagedInfo<InteJobDto>> GetPageListAsync(InteJobPagedQueryDto pram)
         {
-            //await _executeJobService.ExecuteAsync(new List<JobBo> { new JobBo { Name = "BarcodeReceiveService" }, new JobBo { Name = "InStationJobService" } }, new JobRequestBo { SFCs = new List<string> { "test000011" }, SiteId = 123456 });
             var inteJobPagedQuery = pram.ToQuery<InteJobPagedQuery>();
             inteJobPagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _inteJobRepository.GetPagedInfoAsync(inteJobPagedQuery);
@@ -118,7 +117,6 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobService>();
-            //var services = _serviceProvider.GetServices<IJobManufactureService>();
             if (!services.Any(it => it.GetType().Name == param.ClassProgram))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12011));

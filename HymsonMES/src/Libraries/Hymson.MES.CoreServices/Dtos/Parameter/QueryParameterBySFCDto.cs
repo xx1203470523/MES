@@ -9,7 +9,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
     /// <summary>
     /// 更具sfcs查询
     /// </summary>
-    public  class QueryParameterBySFCDto
+    public  class QueryParameterBySfcDto
     {
         /// <summary>
         /// 站点Id
@@ -19,6 +19,6 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 条码集合
         /// </summary>
-        public IEnumerable<string> SFCs { get; set; }
+        public IEnumerable<string> SFCs { get; set; } = new List<string>();
     }
 }

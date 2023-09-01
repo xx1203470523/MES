@@ -30,14 +30,14 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="whSupplierDto"></param>
+        /// <param name="whSupplierCreateDto"></param>
         /// <returns></returns>
         Task CreateWhSupplierAsync(WhSupplierCreateDto whSupplierCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="whSupplierDto"></param>
+        /// <param name="whSupplierModifyDto"></param>
         /// <returns></returns>
         Task ModifyWhSupplierAsync(WhSupplierModifyDto whSupplierModifyDto);
 

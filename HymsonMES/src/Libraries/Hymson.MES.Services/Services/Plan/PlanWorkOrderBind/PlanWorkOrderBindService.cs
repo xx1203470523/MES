@@ -35,22 +35,18 @@ namespace Hymson.MES.Services.Services.Plan
         /// 工单激活（物理删除） 仓储
         /// </summary>
         private readonly IPlanWorkOrderBindRepository _planWorkOrderBindRepository;
-        private readonly AbstractValidator<PlanWorkOrderBindCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<PlanWorkOrderBindModifyDto> _validationModifyRules;
 
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
         private readonly IPlanWorkOrderBindRecordRepository _planWorkOrderBindRecordRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
-        public PlanWorkOrderBindService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderBindRepository planWorkOrderBindRepository, AbstractValidator<PlanWorkOrderBindCreateDto> validationCreateRules, AbstractValidator<PlanWorkOrderBindModifyDto> validationModifyRules,
+        public PlanWorkOrderBindService(ICurrentUser currentUser, ICurrentSite currentSite, IPlanWorkOrderBindRepository planWorkOrderBindRepository,
             IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, IPlanWorkOrderBindRecordRepository planWorkOrderBindRecordRepository, IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _planWorkOrderBindRepository = planWorkOrderBindRepository;
-            _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
 
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
@@ -202,7 +198,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (bindActivationWorkOrder.WorkOrderIds != null && bindActivationWorkOrder.WorkOrderIds.Any())
             {
                 //检查当前工单是否重复
-                if (bindActivationWorkOrder.WorkOrderIds.Distinct().Count() != bindActivationWorkOrder.WorkOrderIds.Count())
+                if (bindActivationWorkOrder.WorkOrderIds.Distinct().Count() != bindActivationWorkOrder.WorkOrderIds.Count)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16804));
                 }
@@ -220,10 +216,6 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16802));
                 }
             }
-            else 
-            {
-                
-            }
 
             //查询已经绑定在该资源上的工单
             var hasBindWorkOrders= await _planWorkOrderBindRepository.GetPlanWorkOrderBindEntitiesAsync(new PlanWorkOrderBindQuery() {
@@ -232,10 +224,9 @@ namespace Hymson.MES.Services.Services.Plan
             });
             var hasBindWorkOrderIds = hasBindWorkOrders.Select(x => x.WorkOrderId).ToList();
 
-            List< PlanWorkOrderBindEntity > addPlanWorkOrderBindEntities = new List< PlanWorkOrderBindEntity >();
-            List<PlanWorkOrderBindEntity> deletePlanWorkOrderBindEntities = new List<PlanWorkOrderBindEntity>();
+            List< PlanWorkOrderBindEntity > addPlanWorkOrderBindEntities = new();
 
-            List<PlanWorkOrderBindRecordEntity> bindRecordEntities = new List<PlanWorkOrderBindRecordEntity>();
+            List<PlanWorkOrderBindRecordEntity> bindRecordEntities = new();
 
             //找到需要删除的
             var needDeletes= bindActivationWorkOrder.WorkOrderIds!=null&& bindActivationWorkOrder.WorkOrderIds.Any()?  hasBindWorkOrderIds.Except(bindActivationWorkOrder.WorkOrderIds): hasBindWorkOrderIds;
@@ -296,7 +287,7 @@ namespace Hymson.MES.Services.Services.Plan
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //先删除对应资源和工单ids的工单
-                if (needDeletes.Count() > 0) 
+                if (needDeletes.Any()) 
                 {
                     await _planWorkOrderBindRepository.DeletesTrueByResourceIdAndWorkOrderIdsAsync(new DeleteplanWorkOrderBindCommand()
                     {

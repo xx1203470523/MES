@@ -99,7 +99,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto)
         {
-            //procParameterModifyDto.ParameterName = procParameterModifyDto.ParameterName.Trim();
             procParameterModifyDto.Remark = procParameterModifyDto.Remark ?? "".Trim();
 
             //DTO转换实体
@@ -113,20 +112,6 @@ namespace Hymson.MES.Services.Services.Process
 
             var modelOrigin = await _procParameterRepository.GetByIdAsync(procParameterEntity.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10504));
-
-            /*
-            //判断编号是否已经存在
-            var procParams = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
-            {
-                SiteId = procParameterEntity.SiteId,
-                ParameterCode = procParameterEntity.ParameterCode,
-            });
-            var exists = procParams.Count() > 0 ? procParams.Where(x => x.Id != procParameterEntity.Id).ToList() : null;
-            if (exists != null && exists.Count() > 0)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
-            }
-            */
 
             await _procParameterRepository.UpdateAsync(procParameterEntity);
         }
@@ -155,7 +140,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //查询参数是否关联产品参数和设备参数
             var lists = await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
-            if (lists != null && lists.Count() > 0)
+            if (lists != null && lists.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10506));
             }
@@ -214,13 +199,11 @@ namespace Hymson.MES.Services.Services.Process
                     SiteId = siteId,
                     ParameterID = dto.Id
                 });
-                //dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
-                //dto.Type = (ParameterTypeEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).Sum();
                 dto.Type = linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToArray();
 
                 return dto;
             }
-            return null;
+            return new ProcParameterDto();
         }
 
     }

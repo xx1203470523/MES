@@ -23,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// 构造函数（不合格代码组）
         /// </summary>
         /// <param name="qualUnqualifiedGroupService"></param>
+        /// <param name="logger"></param>
         public QualUnqualifiedGroupController(IQualUnqualifiedGroupService qualUnqualifiedGroupService, ILogger<QualUnqualifiedGroupController> logger)
         {
             _qualUnqualifiedGroupService = qualUnqualifiedGroupService;

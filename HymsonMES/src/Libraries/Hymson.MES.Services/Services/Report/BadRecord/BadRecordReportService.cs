@@ -44,6 +44,8 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// /// <param name="manuProductBadRecordRepository"></param>
+        /// /// <param name="qualUnqualifiedCodeRepository"></param>
         public BadRecordReportService(ICurrentUser currentUser, ICurrentSite currentSite, IManuProductBadRecordRepository manuProductBadRecordRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _currentUser = currentUser;
@@ -70,7 +72,7 @@ namespace Hymson.MES.Services.Services.Report
             List< ManuProductBadRecordReportViewDto > listDto=new List< ManuProductBadRecordReportViewDto >();
             foreach (var item in pagedInfo.Data)
             {
-                var unqualifiedCodeEntitie = unqualifiedCodeEntities.Where(y => y.Id == item.UnqualifiedId).FirstOrDefault();
+                var unqualifiedCodeEntitie = unqualifiedCodeEntities.FirstOrDefault(y => y.Id == item.UnqualifiedId);
 
                 listDto.Add(new ManuProductBadRecordReportViewDto
                 {
@@ -104,7 +106,7 @@ namespace Hymson.MES.Services.Services.Report
             List<ManuProductBadRecordReportViewDto> listDto = new List<ManuProductBadRecordReportViewDto>();
             foreach (var item in badRecordslist)
             {
-                var unqualifiedCodeEntitie = unqualifiedCodeEntities.Where(y => y.Id == item.UnqualifiedId).FirstOrDefault();
+                var unqualifiedCodeEntitie = unqualifiedCodeEntities.FirstOrDefault((y => y.Id == item.UnqualifiedId));
 
                 listDto.Add(new ManuProductBadRecordReportViewDto
                 {

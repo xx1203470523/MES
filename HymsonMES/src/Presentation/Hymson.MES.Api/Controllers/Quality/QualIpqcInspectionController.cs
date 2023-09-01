@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.Web.Framework.Attributes;
@@ -122,5 +124,49 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIpqcInspectionService.QueryRulesByMainIdAsync(id);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（IPQC检验项目）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("IPQC检验项目", BusinessType.UPDATE)]
+        [PermissionDescription("quality:ipqcInspection:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _qualIpqcInspectionService.UpdateStatusEnable(id);
+        }
+
+        /// <summary>
+        /// 保留（IPQC检验项目）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("IPQC检验项目", BusinessType.UPDATE)]
+        [PermissionDescription("quality:ipqcInspection:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _qualIpqcInspectionService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（IPQC检验项目）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("IPQC检验项目", BusinessType.UPDATE)]
+        [PermissionDescription("quality:ipqcInspection:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _qualIpqcInspectionService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

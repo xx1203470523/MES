@@ -27,7 +27,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Minio.DataModel;
-//using Hymson.Utils.Extensions;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -121,7 +120,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             var list = new List<WhMaterialInventoryEntity>();
             var listStandingbook = new List<WhMaterialStandingbookEntity>();
 
-            if (whMaterialInventoryLists == null || whMaterialInventoryLists.Count() <= 0)
+            if (whMaterialInventoryLists == null || whMaterialInventoryLists.Count<= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15106));
             }
@@ -194,7 +193,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                var materialInfo = procMaterials.Where(it => it.Id == item.MaterialId).FirstOrDefault();
+                var materialInfo = procMaterials.FirstOrDefault(it => it.Id == item.MaterialId);
                 if (materialInfo == null)
                 {
                     var validationFailure = new ValidationFailure();
@@ -212,12 +211,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierId);
-                //if (materialInfo == null || supplierInfo.Count() <= 0)
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
-                //}
-
                 await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
 
                 #endregion
@@ -258,7 +251,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialStandingbookEntity.Batch = item.Batch;
                 whMaterialStandingbookEntity.Quantity = item.QuantityResidue;
                 whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
-                whMaterialStandingbookEntity.Type = item.Type; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+                whMaterialStandingbookEntity.Type = item.Type; 
                 whMaterialStandingbookEntity.Source = item.Source;
                 whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
 
@@ -274,7 +267,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 #endregion
             }
             // 是否存在错误
-            if (validationFailures.Any() == true)
+            if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
@@ -581,7 +574,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
 
             whMaterialStandingbookEntity.MaterialBarCode = oldWhMIEntirty.MaterialBarCode;
-            whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.InventoryModify; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+            whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.InventoryModify; 
             whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.InventoryModify;
             whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
 

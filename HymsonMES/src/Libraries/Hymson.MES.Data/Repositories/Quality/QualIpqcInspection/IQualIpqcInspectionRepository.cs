@@ -88,5 +88,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         Task<bool> IsExistAsync(QualIpqcInspectionQuery query);
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

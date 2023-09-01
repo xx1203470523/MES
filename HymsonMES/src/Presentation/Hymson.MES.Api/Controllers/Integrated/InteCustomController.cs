@@ -34,6 +34,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 构造函数（客户维护）
         /// </summary>
         /// <param name="inteCustomService"></param>
+        /// <param name="logger"></param>
         public InteCustomController(IInteCustomService inteCustomService, ILogger<InteCustomController> logger)
         {
             _inteCustomService = inteCustomService;

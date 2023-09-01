@@ -56,11 +56,6 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonOldService _manuCommonOldService;
-
-        /// <summary>
         /// 仓储（条码）
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
@@ -111,7 +106,6 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="validationCreateRules"></param>
         /// <param name="validationCreatePrintRules"></param>
         /// <param name="manuCommonService"></param>
-        /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="procPrintConfigRepository"></param>
         /// <param name="procResourceRepository"></param>
@@ -129,7 +123,6 @@ namespace Hymson.MES.Services.Services.Plan
             AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
             AbstractValidator<PlanSfcPrintCreatePrintDto> validationCreatePrintRules,
             IManuCommonService manuCommonService,
-            IManuCommonOldService manuCommonOldService,
             IManuSfcRepository manuSfcRepository,
             IProcPrintConfigRepository procPrintConfigRepository,
             IProcResourceRepository procResourceRepository,
@@ -149,7 +142,6 @@ namespace Hymson.MES.Services.Services.Plan
             _validationCreateRules = validationCreateRules;
             _validationCreatePrintRules = validationCreatePrintRules;
             _manuCommonService = manuCommonService;
-            _manuCommonOldService = manuCommonOldService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -189,13 +181,10 @@ namespace Hymson.MES.Services.Services.Plan
 
             var resourceEntity = await _procResourceRepository.GetResByIdAsync(createDto.ResourceId);
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(createDto.ProcedureId);
-            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue)
+            // 对工序资源类型和资源的资源类型校验
+            if (resourceEntity != null && procedureEntity != null && procedureEntity.ResourceTypeId.HasValue && resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
             {
-                // 对工序资源类型和资源的资源类型校验
-                if (resourceEntity.ResTypeId != procedureEntity.ResourceTypeId.Value)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16507));
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES16507));
             }
 
             var print = await _procPrintConfigRepository.GetByIdAsync(createDto.PrintId);
@@ -240,7 +229,7 @@ namespace Hymson.MES.Services.Services.Plan
                             new PrintBody.ParamEntity()
                             {
                                 ParamName = "SFC",
-                                ParamValue = createDto.SFC
+                                ParamValue = createDto.SFC !
                             },
                             new PrintBody.ParamEntity()
                             {
@@ -361,26 +350,26 @@ namespace Hymson.MES.Services.Services.Plan
         /// <summary>
         /// 工单下达及打印
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto param)
+        public async Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto parm)
         {
             var list = await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
-                WorkOrderId = param.WorkOrderId,
-                Qty = param.Qty
+                WorkOrderId = parm.WorkOrderId,
+                Qty = parm.Qty
             });
 
             foreach (var item in list)
             {
                 await CreatePrintAsync(new Dtos.Plan.PlanSfcPrintCreatePrintDto()
                 {
-                    PrintId = param.PrintId,
-                    ProcedureId = param.ProcedureId,
+                    PrintId = parm.PrintId,
+                    ProcedureId = parm.ProcedureId,
                     SFC = item.SFC,
-                    WorkOrderId = param.WorkOrderId
+                    WorkOrderId = parm.WorkOrderId
                 });
             }
         }

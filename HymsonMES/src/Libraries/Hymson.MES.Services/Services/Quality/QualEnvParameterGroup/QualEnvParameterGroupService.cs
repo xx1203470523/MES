@@ -55,12 +55,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 仓储接口（工作中心）
         /// </summary>
-        /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
         /// 仓储接口（工序）
-        /// </summary>
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
@@ -380,7 +378,7 @@ namespace Hymson.MES.Services.Services.Quality
                 WorkCenterId = entity.WorkCenterId,
                 ProcedureId = entity.ProcedureId
             });
-            if (checkUniqueWorkCenterProcedureEntities == null || checkUniqueWorkCenterProcedureEntities.Any() == false) return;
+            if (checkUniqueWorkCenterProcedureEntities == null || !checkUniqueWorkCenterProcedureEntities.Any()) return;
 
             // 校验工作中心编码+工序编码+版本是否唯一
             if (checkUniqueWorkCenterProcedureEntities.Any(a => a.WorkCenterId == entity.WorkCenterId
@@ -434,7 +432,6 @@ namespace Hymson.MES.Services.Services.Quality
             // 是否存在错误
             if (validationFailures.Any())
             {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 throw new ValidationException("", validationFailures);
             }
         }
@@ -481,7 +478,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
             if (entity.Status == changeStatusCommand.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), entity.Status)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
 

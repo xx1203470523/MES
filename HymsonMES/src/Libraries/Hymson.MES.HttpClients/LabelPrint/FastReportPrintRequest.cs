@@ -35,7 +35,6 @@ namespace Hymson.MES.HttpClients
             }
             catch (Exception ex)
             {
-                //上传文件到打印服务器  return (msg: "上传文件到打印服务器异常", result: false, data: "");
                 return (msg: ex.Message, result: false, data: "");
             }
         }
