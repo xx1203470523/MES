@@ -213,9 +213,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();
 
-            // 读取条码信息
-            //var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
-
             var firstSFCProduceEntity = entities.FirstOrDefault();
             if (firstSFCProduceEntity == null) return default;
 

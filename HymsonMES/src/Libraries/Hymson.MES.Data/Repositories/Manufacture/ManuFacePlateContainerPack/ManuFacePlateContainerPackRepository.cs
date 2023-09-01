@@ -147,10 +147,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuFacePlateProductionEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ManuFacePlateContainerPackEntity manuFacePlateContainerPackEntity)
+        public async Task<int> UpdateAsync(ManuFacePlateContainerPackEntity ManuFacePlateContainerPackEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, manuFacePlateContainerPackEntity);
+            return await conn.ExecuteAsync(UpdateSql, ManuFacePlateContainerPackEntity);
         }
 
         /// <summary>
@@ -167,12 +167,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="manuFacePlateContainerPackEntitys"></param>
+        /// <param name="manuFacePlateContainerPackEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ManuFacePlateContainerPackEntity> manuFacePlateContainerPackEntitys)
+        public async Task<int> UpdatesAsync(List<ManuFacePlateContainerPackEntity> manuFacePlateContainerPackEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, manuFacePlateContainerPackEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, manuFacePlateContainerPackEntity);
         }
 
      

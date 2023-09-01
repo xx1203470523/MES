@@ -45,7 +45,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             if (bo == null) return 0;
 
             var downgradingEntities = await GetManuDownGradingsAsync(bo);
-            if (downgradingEntities == null || downgradingEntities.Any() == false) return 0;
+            if (downgradingEntities == null || !downgradingEntities.Any()) return 0;
 
             return await CreateManuDowngradingsByConsumesAsync(bo, downgradingEntities);
         }
@@ -71,10 +71,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <returns></returns>
         public async Task<int> CreateManuDowngradingsByConsumesAsync(DegradedProductExtendBo bo, IEnumerable<ManuDowngradingEntity>? downgradingEntities)
         {
-            if (bo == null || downgradingEntities == null || downgradingEntities.Any() == false) return 0;
-
-            // 更新时间
-            var updatedOn = HymsonClock.Now();
+            if (bo == null || downgradingEntities == null || !downgradingEntities.Any()) return 0;
 
             List<ManuDowngradingEntity> manuDowngradingEntities = new();
             List<ManuDowngradingRecordEntity> manuDowngradingRecordEntities = new();

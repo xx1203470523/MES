@@ -76,16 +76,16 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = TransactionHelper.GetTransactionScope();
 
-            foreach (var job in execJobBos)
+            foreach (var jobName in execJobBos.Select(job=>job.Name))
             {
-                var service = services.FirstOrDefault(x => x.GetType().Name == job.Name);
+                var service = services.FirstOrDefault(x => x.GetType().Name == jobName);
                 if (service == null) continue;
 
                 var obj = await param.Proxy.GetValueAsync(service.DataAssemblingAsync<T>, param);
                 if (obj == null) continue;
 
                 var responseDto = await service.ExecuteAsync(obj);
-                responseDtos.Add(job.Name, responseDto);
+                responseDtos.Add(jobName, responseDto);
 
                 if (responseDto.Rows < 0) break;
             }
