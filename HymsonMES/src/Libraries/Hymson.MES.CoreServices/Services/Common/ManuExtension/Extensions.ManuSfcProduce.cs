@@ -230,7 +230,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// <returns></returns>
         public static TBo ToBo<TBo>(this JobBaseBo bo) where TBo : JobBaseBo
         {
-            if (bo == null) throw new ArgumentNullException("bo");
+            if (bo == null) throw new ArgumentNullException(nameof(bo));
             return AutoMapperConfiguration.Mapper.Map<TBo>(bo);
         }
 

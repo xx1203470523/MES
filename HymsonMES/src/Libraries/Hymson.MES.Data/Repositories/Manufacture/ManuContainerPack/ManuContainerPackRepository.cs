@@ -217,10 +217,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             });
         }
 
-        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid, long siteId)
+        public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdAsync(long cid, long siteid)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid, SiteId = siteId });
+            return await conn.QueryAsync<ManuContainerPackEntity>(GetByPackcodeSql, new { ContainerBarCodeId = cid, SiteId = siteid });
         }
 
         public async Task<IEnumerable<ManuContainerPackEntity>> GetByContainerBarCodeIdsAsync(long[] ids, long siteId)

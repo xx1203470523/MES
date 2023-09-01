@@ -260,6 +260,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 rows += await _qualIpqcInspectionHeadRepository.InsertAsync(entity);
                 rows += await _qualIpqcInspectionHeadResultRepository.InsertAsync(resultEntity);
+                trans.Complete();
             }
             return rows;
         }
@@ -307,13 +308,13 @@ namespace Hymson.MES.Services.Services.Quality
                 foreach (var procedure in procedureList)
                 {
                     //获取首件检验项目
-                    var ipqcInspection = ipqcInspectionList.FirstOrDefault(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.Id);
+                    var ipqcInspection = ipqcInspectionList.FirstOrDefault(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.ProcedureId);
                     if (ipqcInspection == null)
                     {
                         continue;
                     }
                     //获取应检资源列表
-                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.Id);
+                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.ProcedureId);
                     if (procedureResourceList.IsNullOrEmpty())
                     {
                         continue;

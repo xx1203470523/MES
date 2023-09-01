@@ -136,10 +136,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             List<ManuSfcProduceEntity> manuSfcProduceList = new();
             List<ManuSfcStepEntity> manuSfcStepList = new();
             var issQty = param.Qty;
-            foreach (var item in barcodeList)
+            foreach (var barCodeInfoBarCodes in barcodeList.Select(barCodeInfo=> barCodeInfo.BarCodes))
             {
-                var qty = issQty > procMaterialEntity.Batch * item.BarCodes.Count() ? procMaterialEntity.Batch : issQty / item.BarCodes.Count();
-                foreach (var sfc in item.BarCodes)
+                var qty = issQty > procMaterialEntity.Batch * barCodeInfoBarCodes.Count() ? procMaterialEntity.Batch : issQty / barCodeInfoBarCodes.Count();
+                foreach (var sfc in barCodeInfoBarCodes)
                 {
 
                     issQty -= procMaterialEntity.Batch;

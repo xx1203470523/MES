@@ -146,9 +146,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procProductSetRepository"></param>
         /// <param name="inteJobBusinessRelationRepository"></param>
-        /// <param name="inteJobRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
-        /// <param name="manuProductBadRecordRepository"></param>
         public MasterDataService(ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -676,7 +674,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 .GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
                 {
                     ProcessRouteId = processRouteId,
-                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
+                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId!.Value)
                 }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 有多工序分叉的情况（取第一个当默认值）
@@ -723,10 +721,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var processRouteDetails = processRouteDetailList.Where(x => x.ProcedureIds.Contains(startProcedureId) && x.ProcedureIds.Contains(endProcedureId));
             if (processRouteDetails != null && processRouteDetails.Any())
             {
-                foreach (var processRouteDetail in processRouteDetails)
+                foreach (var processRouteDetailIds in processRouteDetails.Select(processRouteDetail => processRouteDetail.ProcedureIds))
                 {
-                    var startIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
-                    var endIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
+                    var startIndex = processRouteDetailIds.IndexOf(startProcedureId);
+                    var endIndex = processRouteDetailIds.IndexOf(startProcedureId);
                     if (startIndex < endIndex)
                     {
                         return true;

@@ -84,13 +84,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<PackageIngRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            _ = param.ToBo<PackageIngRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
             var defaultDto = new PackageIngResponseBo { };
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
 
-            return  defaultDto;
+            return await Task.FromResult(defaultDto);
         }
 
         /// <summary>

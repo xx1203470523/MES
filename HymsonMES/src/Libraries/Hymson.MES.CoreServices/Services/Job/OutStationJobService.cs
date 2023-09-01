@@ -3,7 +3,6 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -214,9 +213,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
             var entities = sfcProduceEntities.AsList();
 
-            // 读取条码信息
-            //var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
-
             var firstSFCProduceEntity = entities.FirstOrDefault();
             if (firstSFCProduceEntity == null) return default;
 
@@ -270,7 +266,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     // 进行扣料
                     _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstSFCProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
-                    continue;
+                    continue;   
                 }
 
                 // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
