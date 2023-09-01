@@ -43,6 +43,16 @@ namespace Hymson.MES.Core.Domain.Quality
         public DateTime InspectionOn { get; set; }
 
         /// <summary>
+        /// 执行人
+        /// </summary>
+        public string ExecuteBy { get; set; }
+
+        /// <summary>
+        /// 执行时间
+        /// </summary>
+        public DateTime? ExecuteOn { get; set; }
+
+        /// <summary>
         /// 开始时间
         /// </summary>
         public DateTime? StartOn { get; set; }

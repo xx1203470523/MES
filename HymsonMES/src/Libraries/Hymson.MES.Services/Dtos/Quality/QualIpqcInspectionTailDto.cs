@@ -243,6 +243,17 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string? InspectionOrder { get; set; }
 
         /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+
+        /// <summary>
         /// 产品编码
         /// </summary>
         public string? MaterialCode { get; set; }

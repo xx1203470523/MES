@@ -170,5 +170,10 @@ namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View
         /// 处理时间
         /// </summary>
         public DateTime? ProcessedOn { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
     }
 }

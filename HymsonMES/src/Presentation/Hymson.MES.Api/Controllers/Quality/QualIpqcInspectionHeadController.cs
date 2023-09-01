@@ -45,7 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        //[PermissionDescription("quality:ipqcInspectionHead:insert")]
+        [PermissionDescription("quality:ipqcInspectionHead:insert")]
         public async Task AddAsync([FromBody] QualIpqcInspectionHeadSaveDto saveDto)
         {
             await _qualIpqcInspectionHeadService.CreateAsync(saveDto);
@@ -80,8 +80,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("samplelist/{id}")]
-        public async Task<PagedInfo<QualIpqcInspectionHeadSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionHeadSamplePagedQueryDto pagedQueryDto)
+        [HttpGet("samplelist")]
+        public async Task<PagedInfo<QualIpqcInspectionHeadSampleDto>> GetPagedSampleListAsync([FromQuery] QualIpqcInspectionHeadSamplePagedQueryDto pagedQueryDto)
         {
             return await _qualIpqcInspectionHeadService.GetPagedSampleListAsync(pagedQueryDto);
         }
@@ -116,7 +116,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("execute")]
-        //[PermissionDescription("quality:ipqcInspectionHead:execute")]
+        [PermissionDescription("quality:ipqcInspectionHead:execute")]
         public async Task ExecuteAsync([FromBody] StatusChangeDto updateDto)
         {
             await _qualIpqcInspectionHeadService.ExecuteAsync(updateDto);

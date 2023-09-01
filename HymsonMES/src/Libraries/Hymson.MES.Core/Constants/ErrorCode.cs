@@ -573,7 +573,8 @@
         public const string MES13232 = "该检验单非完成状态，不允许进行不合格处理！";
         public const string MES13233 = "存在非待检验状态的单据，不允许删除！";
         public const string MES13234 = "样品条码【{SampleCode}】已检验，不能重复检验！";
-
+        public const string MES13235 = "样品条码【{SampleCode}】不存在！";
+        public const string MES13236 = "样品条码【{SampleCode}】已经报废！";
         #endregion
 
         #region 过程检 13300

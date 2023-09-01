@@ -5,6 +5,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Domain.Query;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
@@ -24,11 +25,13 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Scriban.Runtime.Accessors;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -235,6 +238,15 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdDto query)
         {
             var resourcePagedQuery = query.ToQuery<ProcResourcePagedlineIdAndProcProcedureIdQuery>();
+            var workCenters = await _inteWorkCenterRepository.GetInteWorkCenterRelationAsync(query.WorkCenterLineId ?? 0);
+            if (workCenters != null && workCenters.Any())
+            {
+                resourcePagedQuery.WorkCenterLineIds = workCenters.Select(x => (long?)x.SubWorkCenterId);
+            }
+            else
+            {
+                resourcePagedQuery.WorkCenterLineIds = new List<long?> { query.WorkCenterLineId } ?? new List<long?>();
+            }
             var pagedInfo = await _resourceRepository.GetPageListBylineIdAndProcProcedureIdAsync(resourcePagedQuery);
 
             //实体到DTO转换 装载数据

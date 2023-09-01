@@ -629,6 +629,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionHeadSampleEntity, QualIpqcInspectionHeadSampleDto>();
             CreateMap<QualIpqcInspectionHeadAnnexEntity, QualIpqcInspectionHeadAnnexDto>();
             CreateMap<QualIpqcInspectionParameterEntity, SampleShouldInspectItemsDto>();
+            CreateMap<QualIpqcInspectionHeadSamplePagedQueryDto, QualIpqcInspectionHeadSamplePagedQuery>();
+            CreateMap<QualIpqcInspectionHeadSampleView, QualIpqcInspectionHeadSampleDto>();
             #endregion
 
             #region QualIpqcInspectionPatrol

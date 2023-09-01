@@ -169,6 +169,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// <summary>
         /// 产线ID
         /// </summary>
+        public  IEnumerable<long?>  WorkCenterLineIds { get; set; }
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
         public long? ResTypeId { get; set; }
     }
 }

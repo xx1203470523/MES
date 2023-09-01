@@ -81,5 +81,11 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         Task<PagedInfo<QualIpqcInspectionHeadSampleView>> GetPagedListAsync(QualIpqcInspectionHeadSamplePagedQuery pagedQuery);
 
+        /// <summary>
+        /// 获取样本数量
+        /// </summary>
+        /// <param name="ipqcInspectionHeadId"></param>
+        /// <returns></returns>
+        Task<int> GetCountByIpqcInspectionHeadId(long ipqcInspectionHeadId);
     }
 }

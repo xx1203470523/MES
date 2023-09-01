@@ -138,11 +138,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.LeftJoin("proc_resource pr ON T.ResourceId = pr.Id");
             sqlBuilder.LeftJoin("equ_equipment ee ON T.EquipmentId = ee.Id");
             sqlBuilder.LeftJoin("plan_work_order pwo ON T.WorkOrderId = pwo.Id");
-            sqlBuilder.LeftJoin("inte_work_center iwc ON T.WorkCenterId = iwc.Id");
+            sqlBuilder.LeftJoin("inte_work_center iwc ON pwo.WorkCenterId = iwc.Id");
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.OrderBy("T.CreatedOn DESC");
-            sqlBuilder.Select("T.*, qii.GenerateCondition, qii.GenerateConditionUnit, qii.ControlTime, qii.ControlTimeUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr.ResourceCode, pr.ResourceName, ee.EquipmentCode, ee.EquipmentName, pwo.OrderCode WorkOrderCode, iwc.Code WorkCenterCode");
+            sqlBuilder.Select("T.*, qii.GenerateCondition, qii.GenerateConditionUnit, qii.ControlTime, qii.ControlTimeUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr. ResCode ResourceCode, pr.ResName ResourceName, ee.EquipmentCode, ee.EquipmentName, pwo.OrderCode WorkOrderCode, iwc.Code WorkCenterCode");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {
@@ -178,6 +178,16 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("T.IsQualified = @IsQualified");
             }
 
+            if (pagedQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("T.ProcedureId LIKE @ProcedureId");
+            }
+
+            if (pagedQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("T.MaterialId LIKE @MaterialId");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -199,8 +209,8 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualIpqcInspectionTailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_tail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_tail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_tail T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_tail T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_ipqc_inspection_tail /**where**/  ";

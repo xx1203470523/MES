@@ -142,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.OrderBy("T.CreatedOn DESC");
-            sqlBuilder.Select("T.*, qiihr.InspectionBy, qiihr.InspectionOn, qiihr.StartOn, qiihr.CompleteOn, qiihr.CloseOn, qiihr.HandMethod, qiihr.ProcessedBy, qiihr.ProcessedOn, qii.GenerateCondition, qii.GenerateConditionUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode ,pp.Name ProcedureName, pr. ResCode ResourceCode, pr.ResName ResourceName, ee.EquipmentCode, ee.EquipmentName, pwo.OrderCode WorkOrderCode, iwc.Code WorkCenterCode");
+            sqlBuilder.Select("T.*, qiihr.InspectionBy, qiihr.InspectionOn, qiihr.StartOn, qiihr.CompleteOn, qiihr.CloseOn, qiihr.HandMethod, qiihr.Remark, qiihr.ProcessedBy, qiihr.ProcessedOn, qii.GenerateCondition, qii.GenerateConditionUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode ,pp.Name ProcedureName, pr. ResCode ResourceCode, pr.ResName ResourceName, ee.EquipmentCode, ee.EquipmentName, pwo.OrderCode WorkOrderCode, iwc.Code WorkCenterCode");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {
@@ -178,6 +178,16 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("T.IsQualified = @IsQualified");
             }
 
+            if (pagedQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("T.ProcedureId LIKE @ProcedureId");
+            }
+
+            if (pagedQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("T.MaterialId LIKE @MaterialId");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -190,9 +200,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             var totalCount = await totalCountTask;
             return new PagedInfo<QualIpqcInspectionHeadView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
-
 
     /// <summary>
     /// 

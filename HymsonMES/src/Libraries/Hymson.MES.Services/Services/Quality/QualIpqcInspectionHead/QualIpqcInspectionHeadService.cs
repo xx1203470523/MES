@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -26,6 +27,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.IdentityModel.Tokens;
+using System.Reactive.Concurrency;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -72,6 +74,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIpqcInspectionParameterRepository _qualIpqcInspectionParameterRepository;
         private readonly IProcParameterRepository _procParameterRepository;
         private readonly IManuProductParameterService _manuProductParameterService;
+        private readonly IManuSfcRepository _manuSfcRepository;
         private readonly ISequenceService _sequenceService;
 
         /// <summary>
@@ -100,6 +103,7 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIpqcInspectionParameterRepository qualIpqcInspectionParameterRepository,
             IProcParameterRepository procParameterRepository,
             IManuProductParameterService manuProductParameterService,
+            IManuSfcRepository manuSfcRepository,
             ISequenceService sequenceService)
         {
             _currentUser = currentUser;
@@ -126,6 +130,7 @@ namespace Hymson.MES.Services.Services.Quality
             _qualIpqcInspectionParameterRepository = qualIpqcInspectionParameterRepository;
             _procParameterRepository = procParameterRepository;
             _manuProductParameterService = manuProductParameterService;
+            _manuSfcRepository = manuSfcRepository;
             _sequenceService = sequenceService;
         }
 
@@ -479,6 +484,9 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.HandMethod = resultEntity.HandMethod;
                 dto.ProcessedBy = resultEntity.ProcessedBy;
                 dto.ProcessedOn = resultEntity.ProcessedOn;
+                dto.Remark = resultEntity.Remark;
+                dto.ExecuteBy = resultEntity.ExecuteBy;
+                dto.ExecuteOn = resultEntity.ExecuteOn;
             }
             if (workOrder != null)
             {
@@ -505,6 +513,7 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.EquipmentCode = equipment.EquipmentCode;
                 dto.EquipmentName = equipment.EquipmentName;
             }
+            dto.InspectCount = await _qualIpqcInspectionHeadSampleRepository.GetCountByIpqcInspectionHeadId(id);
 
             return dto;
         }
@@ -602,7 +611,8 @@ namespace Hymson.MES.Services.Services.Quality
             resultEntity.Status = entity.Status;
             resultEntity.UpdatedBy = entity.UpdatedBy;
             resultEntity.UpdatedOn = entity.UpdatedOn;
-
+            resultEntity.ExecuteBy = _currentUser.UserName;
+            resultEntity.ExecuteOn = HymsonClock.Now();
             // 保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -622,9 +632,6 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> InsertSampleDataAsync(List<QualIpqcInspectionHeadSampleCreateDto> dataList)
         {
-            // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
-
             // 验证DTO
             await _validationSampleAddRules.ValidateAndThrowAsync(dataList);
 
@@ -710,13 +717,18 @@ namespace Hymson.MES.Services.Services.Quality
             resultEntity.Status = entity.Status;
             resultEntity.UpdatedBy = entity.UpdatedBy;
             resultEntity.UpdatedOn = entity.UpdatedOn;
-
+            resultEntity.CompleteOn = HymsonClock.Now();
+            if (entity.IsQualified == TrueOrFalseEnum.Yes)
+            {
+                resultEntity.CloseOn = HymsonClock.Now();
+            }
             // 保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _qualIpqcInspectionHeadRepository.UpdateAsync(entity);
                 rows += await _qualIpqcInspectionHeadResultRepository.UpdateAsync(resultEntity);
+                trans.Complete();
             }
 
             return rows;
@@ -753,6 +765,7 @@ namespace Hymson.MES.Services.Services.Quality
             resultEntity.Remark = dto.Remark;
             resultEntity.UpdatedBy = entity.UpdatedBy;
             resultEntity.UpdatedOn = entity.UpdatedOn;
+            resultEntity.CloseOn = HymsonClock.Now();
 
             // 保存
             var rows = 0;
@@ -760,6 +773,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 rows += await _qualIpqcInspectionHeadRepository.UpdateAsync(entity);
                 rows += await _qualIpqcInspectionHeadResultRepository.UpdateAsync(resultEntity);
+                trans.Complete();
             }
 
             return rows;
@@ -777,36 +791,42 @@ namespace Hymson.MES.Services.Services.Quality
 
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
-
-            var attachments = dto.Attachments.Select(x => new InteAttachmentEntity
+            List<InteAttachmentEntity> attachments = new();
+            List<QualIpqcInspectionHeadAnnexEntity> annexs = new();
+            foreach (var item in dto.Attachments)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
-                Name = x.Name,
-                Path = x.Path,
-                CreatedBy = updatedBy,
-                CreatedOn = updatedOn,
-                UpdatedBy = updatedBy,
-                UpdatedOn = updatedOn
-            });
-
-            var annexs = attachments.Select(x => new QualIpqcInspectionHeadAnnexEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
-                IpqcInspectionHeadId = dto.Id,
-                AnnexId = x.Id,
-                CreatedBy = updatedBy,
-                CreatedOn = updatedOn,
-                UpdatedBy = updatedBy,
-                UpdatedOn = updatedOn
-            });
+                var attachment = new InteAttachmentEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Name = item.Name,
+                    Path = item.Path,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                };
+                attachments.Add(attachment);
+                var annex = new QualIpqcInspectionHeadAnnexEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    IpqcInspectionHeadId = dto.Id,
+                    AnnexId = attachment.Id,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                };
+                annexs.Add(annex);
+            }
 
             int rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachments);
                 rows += await _qualIpqcInspectionHeadAnnexRepository.InsertRangeAsync(annexs);
+                trans.Complete();
             }
             return rows;
         }
@@ -837,6 +857,16 @@ namespace Hymson.MES.Services.Services.Quality
             if (entity == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10104));
+            }
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySfcQuery { SFC = query.SampleCode, SiteId = _currentSite.SiteId });
+            if (manuSfcEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13235)).WithData("SampleCode", query.SampleCode);
+            }
+
+            if (manuSfcEntity.Status == SfcStatusEnum.Scrapping)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13236)).WithData("SampleCode", query.SampleCode);
             }
 
             //校验样品条码是否已检验

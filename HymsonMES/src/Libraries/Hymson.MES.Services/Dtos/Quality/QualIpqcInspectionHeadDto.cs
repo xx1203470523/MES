@@ -230,6 +230,23 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public long IsDeleted { get; set; }
 
+        public int InspectCount { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+
+        /// <summary>
+        /// 执行人
+        /// </summary>
+        public string ExecuteBy { get; set; }
+
+        /// <summary>
+        /// 执行时间
+        /// </summary>
+        public DateTime? ExecuteOn { get; set; }
 
     }
 
@@ -252,6 +269,17 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 产品名称
         /// </summary>
         public string? MaterialName { get; set; }
+
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -422,5 +450,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 检验值(设备采集参数需要)
         /// </summary>
         public string InspectionValue { get; set; }
+
     }
 }

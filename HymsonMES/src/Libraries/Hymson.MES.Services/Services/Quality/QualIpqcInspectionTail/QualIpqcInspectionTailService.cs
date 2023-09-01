@@ -505,7 +505,7 @@ namespace Hymson.MES.Services.Services.Quality
                 CreatedOn = updatedOn,
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
-            });
+            }).ToList();
 
             var annexs = attachments.Select(x => new QualIpqcInspectionTailAnnexEntity
             {

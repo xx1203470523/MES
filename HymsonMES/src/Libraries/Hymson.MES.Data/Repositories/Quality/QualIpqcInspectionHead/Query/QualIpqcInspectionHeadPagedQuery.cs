@@ -49,5 +49,14 @@ namespace Hymson.MES.Data.Repositories.Quality.Query
         /// </summary>
         public InspectionStatusEnum? Status { get; set; }
 
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public long? ProcedureId { get; set; }
     }
 }
