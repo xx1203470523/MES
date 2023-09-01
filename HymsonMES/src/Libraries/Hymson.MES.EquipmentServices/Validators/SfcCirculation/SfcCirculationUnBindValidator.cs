@@ -24,11 +24,11 @@ namespace Hymson.MES.EquipmentServices.Validators.SfcCirculation
 
             RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
             //RuleFor(x => x.UnBindSFCs).NotEmpty().Must(list => list.Length > 0).WithErrorCode(ErrorCode.MES19101);
-            //每个条码都不允许为空
-            RuleFor(x => x.UnBindSFCs).Must(list =>
-                list.Where(c => !string.IsNullOrEmpty(c.Trim())).Any()).WithErrorCode(ErrorCode.MES19120);
-            //条码不允许重复
-            RuleFor(x => x.UnBindSFCs).Must(list => list.GroupBy(sfc => sfc.Trim()).Where(sfc => sfc.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19007);
+            //如果不传入条码，支持解绑所有
+            //RuleFor(x => x.UnBindSFCs).Must(list =>
+            //    list.Where(c => !string.IsNullOrEmpty(c.Trim())).Any()).WithErrorCode(ErrorCode.MES19120);
+            ////条码不允许重复
+            //RuleFor(x => x.UnBindSFCs).Must(list => list.GroupBy(sfc => sfc.Trim()).Where(sfc => sfc.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19007);
             //资源编码校验
             RuleFor(x => x).MustAsync(async (sfcCirculationUnBindDto, cancellation) =>
             {
