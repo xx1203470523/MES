@@ -36,7 +36,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         }
 
         /// <summary>
-        /// 创建降级品记录
+        /// 创建降级品记录（里面包含读数据和写数据）
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
@@ -65,7 +65,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         }
 
         /// <summary>
-        ///
+        /// 创建降级品记录（当需要读写分拆时，调用该方法）
         /// </summary>
         /// <param name="currentEntities"></param>
         /// <returns></returns>
