@@ -260,6 +260,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 rows += await _qualIpqcInspectionHeadRepository.InsertAsync(entity);
                 rows += await _qualIpqcInspectionHeadResultRepository.InsertAsync(resultEntity);
+                trans.Complete();
             }
             return rows;
         }
