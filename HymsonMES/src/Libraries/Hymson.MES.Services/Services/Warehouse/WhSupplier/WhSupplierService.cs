@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesWhSupplierAsync(long[] ids)
         {
-            VerifySupplier(ids);
+            await VerifySupplier(ids);
             return await _whSupplierRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
@@ -127,12 +127,12 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 验证
         /// </summary>
-        private async void VerifySupplier(long[] ids)
+        private async Task VerifySupplier(long[] ids)
         {
             var data = await _procMaterialSupplierRelationRepository.GetBySupplierIdsAsync(ids);
             if (data != null && ids.Any())
             {
-                throw new(nameof(ErrorCode.MES15011));
+                throw new CustomerValidationException(nameof(ErrorCode.MES15011));
             }
         }
 
