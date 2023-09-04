@@ -300,7 +300,7 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
-            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).OrderByDescending(o => o.Operatetype).AsEnumerable();
+            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).ThenByDescending(o => o.Operatetype).AsEnumerable();
             return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }
