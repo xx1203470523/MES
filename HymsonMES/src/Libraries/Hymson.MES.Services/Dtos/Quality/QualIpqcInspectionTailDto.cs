@@ -230,6 +230,26 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 管控时间单位;1、时 2、分
         /// </summary>
         public ControlTimeUnitEnum? ControlTimeUnit { get; set; }
+
+        /// <summary>
+        /// 已检次数
+        /// </summary>
+        public int InspectCount { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 执行人
+        /// </summary>
+        public string? ExecuteBy { get; set; }
+
+        /// <summary>
+        /// 执行时间
+        /// </summary>
+        public DateTime? ExecuteOn { get; set; }
     }
 
     /// <summary>

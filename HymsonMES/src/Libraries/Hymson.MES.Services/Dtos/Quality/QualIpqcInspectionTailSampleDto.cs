@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验值
         /// </summary>
-        public string InspectionValue { get; set; }
+        public string? InspectionValue { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格
@@ -62,7 +62,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验值
         /// </summary>
-        public string InspectionValue { get; set; }
+        public string? InspectionValue { get; set; }
 
         /// <summary>
         /// 是否合格;0、不合格 1、合格

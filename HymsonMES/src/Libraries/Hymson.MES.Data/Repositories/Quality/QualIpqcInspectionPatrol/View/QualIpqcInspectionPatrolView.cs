@@ -8,7 +8,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionPatrol.View
         /// <summary>
         /// 工单编号
         /// </summary>
-        public long WorkOrderCode { get; set; }
+        public string WorkOrderCode { get; set; }
 
         /// <summary>
         /// 工作中心（产线）

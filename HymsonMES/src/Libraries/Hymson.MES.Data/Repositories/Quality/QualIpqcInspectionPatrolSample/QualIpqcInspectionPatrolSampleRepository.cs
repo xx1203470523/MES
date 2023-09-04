@@ -168,6 +168,16 @@ namespace Hymson.MES.Data.Repositories.Quality
             return new PagedInfo<QualIpqcInspectionPatrolSampleView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 获取检验样本数量
+        /// </summary>
+        /// <param name="ipqcInspectionHeadId"></param>
+        /// <returns></returns>
+        public async Task<int> GetCountByIpqcInspectionId(long ipqcInspectionId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteScalarAsync<int>(GetCountByIpqcInspectionIdsql, new { ipqcInspectionId = ipqcInspectionId });
+        }
     }
 
 
@@ -181,6 +191,9 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_ipqc_inspection_patrol_sample /**where**/  ";
+        const string GetCountByIpqcInspectionIdsql = @"SELECT 
+                                           COUNT( DISTINCT Barcode) 
+                                           FROM qual_ipqc_inspection_patrol_sample  WHERE IpqcInspectionPatrolId = @ipqcInspectionId AND IsDeleted=0  ";
 
         const string InsertSql = "INSERT INTO qual_ipqc_inspection_patrol_sample(  `Id`, `SiteId`, `IpqcInspectionPatrolId`, `IpqcInspectionParameterId`, `InspectionParameterGroupDetailId`, `ParameterId`, `Barcode`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IpqcInspectionPatrolId, @IpqcInspectionParameterId, @InspectionParameterGroupDetailId, @ParameterId, @Barcode, @InspectionValue, @IsQualified, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_ipqc_inspection_patrol_sample(  `Id`, `SiteId`, `IpqcInspectionPatrolId`, `IpqcInspectionParameterId`, `InspectionParameterGroupDetailId`, `ParameterId`, `Barcode`, `InspectionValue`, `IsQualified`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @IpqcInspectionPatrolId, @IpqcInspectionParameterId, @InspectionParameterGroupDetailId, @ParameterId, @Barcode, @InspectionValue, @IsQualified, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";

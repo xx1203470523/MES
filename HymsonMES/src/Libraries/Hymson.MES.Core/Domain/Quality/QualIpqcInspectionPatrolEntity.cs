@@ -111,5 +111,15 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 执行人
+        /// </summary>
+        public string ExecuteBy { get; set; }
+
+        /// <summary>
+        /// 执行时间
+        /// </summary>
+        public DateTime? ExecuteOn { get; set; }
     }
 }
