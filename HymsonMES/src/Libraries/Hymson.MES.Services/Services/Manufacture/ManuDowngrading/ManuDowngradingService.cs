@@ -418,15 +418,26 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                if (delIds.Any())
-                    await _manuDowngradingRepository.DeletesTrueByIdsAsync(delIds.ToArray());
-                
-                //保存记录 
-                if (addRecordEntitys.Any())
-                    await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+                var result = 0;
+                if (delIds.Any()) 
+                {
+                    result = await _manuDowngradingRepository.DeletesTrueByIdsAsync(delIds.ToArray());
 
-                if (manuSfcStepList.Any())
-                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    if (result > 0 && result == delIds.Distinct().Count())
+                    {
+                        //保存记录 
+                        if (addRecordEntitys.Any())
+                            await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+
+                        if (manuSfcStepList.Any())
+                            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    }
+                    else
+                    {
+                        //ts.Dispose();
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11410));
+                    }
+                }
 
                 ts.Complete();
             }
