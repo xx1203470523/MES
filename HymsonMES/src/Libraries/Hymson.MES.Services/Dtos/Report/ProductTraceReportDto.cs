@@ -262,6 +262,21 @@ namespace Hymson.MES.Services.Dtos.Report
         public ParameterTypeEnum ParameterType { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 上限
+        /// </summary>
+        public string StandardUpperLimit { get; set; }
+
+        /// <summary>
+        /// 下限
+        /// </summary>
+        public string StandardLowerLimit { get; set; }
+
+        /// <summary>
+        /// 判断结果
+        /// </summary>
+        public string JudgmentResult { get; set; }
     }
     #endregion
 

@@ -61,5 +61,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 参数类型
         /// </summary>
         public ParameterTypeEnum? ParameterType { get; set; }
+
+        /// <summary>
+        /// 上限
+        /// </summary>
+        public string StandardUpperLimit { get; set; }
+
+        /// <summary>
+        /// 下限
+        /// </summary>
+        public string StandardLowerLimit { get; set; }
+
+        /// <summary>
+        /// 判断结果
+        /// </summary>
+        public string JudgmentResult { get; set; }
     }
 }

@@ -672,7 +672,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 SiteId = _currentEquipment.SiteId,
                 CirculationBarCode = sfc,
                 IsDisassemble = TrueOrFalseEnum.No,
-                CirculationType = SfcCirculationTypeEnum.BindCCS
+                CirculationType = SfcCirculationTypeEnum.Merge
             });
             if (manuSfcCirculationEntities.Any())
             {
@@ -686,8 +686,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 });
                 circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
                 circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
-                circulationModuleCCSInfo.ModelCode = manuSfcCirculations.Where(x=>!string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x=>x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
                 circulationModuleCCSInfo.IsNg = manuSfcSummaries.Any();
+            }
+            if (manuSfcCirculations.Any())
+            {
+                circulationModuleCCSInfo.ModelCode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
             }
             return circulationModuleCCSInfo;
         }

@@ -14,7 +14,36 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         /// </summary>
         public string SFC { get; set; }
     }
-
+    /// <summary>
+    /// 流转记录层级关系查询Dto
+    /// </summary>
+    public class ManuSfcTraceQueryDto
+    {
+        /// <summary>
+        /// 成品条码Pack码/模组条码
+        /// </summary>
+        public string SFC { get; set; }
+    }
+    /// <summary>
+     /// 流转记录层级关系查询Dto
+     /// </summary>
+    public class ManuSfcPrameterQueryDto
+    {
+        /// <summary>
+        /// 成品条码Pack码/模组条码
+        /// </summary>
+        public string SFC { get; set; }
+    }
+    /// <summary>
+     /// 流转记录层级关系查询Dto
+     /// </summary>
+    public class ManuSfcStepQueryDto
+    {
+        /// <summary>
+        /// 成品条码Pack码/模组条码
+        /// </summary>
+        public string SFC { get; set; }
+    }
     /// <summary>
     /// 流转记录Dto
     /// 名称为对接方要求的字段定义

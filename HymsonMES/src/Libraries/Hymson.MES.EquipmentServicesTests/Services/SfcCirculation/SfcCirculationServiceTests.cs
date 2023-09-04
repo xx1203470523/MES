@@ -4,6 +4,7 @@ using Hymson.MES.EquipmentServicesTests;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Hymson.Authentication.JwtBearer;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
 {
@@ -57,7 +58,34 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             var bindCCSLocationDto = await _sfcCirculationService.GetBindCCSLocationAsync("AAATESTSFC2308091");
             Assert.IsTrue(!string.IsNullOrEmpty(bindCCSLocationDto.CurrentLocation));
         }
-
+        /// <summary>
+        /// 测试CCS绑定A
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task SfcCirculationBindAsyncTest()
+        {
+            string equipmentCode = "YTLPACK01AE014";
+            await SetEquInfoAsync(equipmentCode);
+            SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
+            {
+                SFC = "1AsakiA4A4",
+                ModelCode="12S",
+                //IsVirtualSFC=false,
+                BindSFCs = new CirculationBindDto[] {
+                    new CirculationBindDto{
+                        SFC="21A1A4A0",
+                        Location="0",
+                        //Name="CCS01"
+                    }
+                },
+                EquipmentCode= "YTLPACK01AE014",
+                ResourceCode= "YTLPACK01ER014",
+                LocalTime=DateTime.Now
+            };
+            await _sfcCirculationService.SfcCirculationBindAsync(sfcCirculationCCS);
+            Assert.IsTrue(true);
+        }
         /// <summary>
         /// 测试CCS绑定A
         /// </summary>
@@ -199,10 +227,19 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task GetCirculationModuleCCSInfoTest()
         {
-            string equipmentCode = "QAEM002";
-            await SetEquInfoAsync(equipmentCode);
-            var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("AAATESTSFC2308091");
-            Assert.IsTrue(moduleCCSInfoDto != null);
+            string equipmentCode = "YTLPACK01VIR06";
+            try
+            {
+                await SetEquInfoAsync(equipmentCode);
+                var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("21AsakiA4A4");
+                Assert.IsTrue(moduleCCSInfoDto != null);
+            }
+            catch (Exception ex)
+            {
+                int s = 1;
+                throw;
+            }
+           
         }
     }
 }
