@@ -161,7 +161,6 @@ namespace Hymson.MES.Services.Services.Report
                 throw new CustomerValidationException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
             }
             #region 查询基础数据
-            //var oneSfcStep = sfcSteps.Where(x=>x.WorkOrderId == sfcInfo.WorkOrderId).FirstOrDefault();
             //查询工单信息
             var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId);
             if (workOrder == null)
@@ -218,8 +217,6 @@ namespace Hymson.MES.Services.Services.Report
                     var currentStep = inSfcSteps[i];
                     ManuSfcStepEntity? nextStep = null;
                     ManuSfcStepEntity? outStep = null;
-
-                    var viewDto = new WorkshopJobControlStepReportDto();
 
                     //是否有下一个进站
                     if (i + 1 < inSfcSteps.Count)
@@ -303,7 +300,7 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
-            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).OrderByDescending(o => o.Operatetype).AsEnumerable();
+            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).ThenByDescending(o => o.Operatetype).AsEnumerable();
             return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }

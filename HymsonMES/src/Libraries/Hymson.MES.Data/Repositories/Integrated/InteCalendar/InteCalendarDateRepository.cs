@@ -71,12 +71,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="calendarIdsArr"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteByCalendarIdsAsync(long[] calendarIdsArr)
+        public async Task<int> DeleteByCalendarIdsAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { calendarId = calendarIdsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { calendarId = idsArr });
 
         }
 

@@ -41,17 +41,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateProductionService.GetManuFacePlateProductionPackageInfoAsync(param);
         }
-
-        ///// <summary>
-        ///// 组装
-        ///// </summary>
-        ///// <param name="addDto"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("addPackageCom")]
-        //public async Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto) 
-        //{
-        //    return await _manuFacePlateProductionService.AddPackageCom(addDto);
-        //}
     }
 }

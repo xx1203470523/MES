@@ -56,14 +56,12 @@ namespace Hymson.MES.Services.Validators.Process
             {
                 foreach (var item in param)
                 {
-                    if (item.MaxValue.HasValue && !item.ParameterValue.HasValue)
+                    if (item.MaxValue.HasValue && !item.ParameterValue.HasValue&&item.MinValue.HasValue)
                     {
-                        if (item.MinValue.HasValue)
-                        {
                             var differenceValue = item.MaxValue - item.MinValue;
                             if (differenceValue == 0)
                             {
-                                if (item.MaxContainingType == ContainingTypeEnum.LtOrE || item.MaxContainingType == ContainingTypeEnum.LtOrE)
+                                if (item.MaxContainingType == ContainingTypeEnum.LtOrE)
                                 {
                                     return true;
                                 }
@@ -76,7 +74,6 @@ namespace Hymson.MES.Services.Validators.Process
                             {
                                 return false;
                             }
-                        }
                     }
                 }
             }
@@ -162,7 +159,7 @@ namespace Hymson.MES.Services.Validators.Process
             {
                 foreach (var item in param)
                 {
-                    if (item.MaxValue != null&& item.MaxValue < item.MaxValue)
+                    if (item.MaxValue != null)
                     {
                             return false;     
                     }

@@ -16,8 +16,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcProcessEquipmentGroupRepository : BaseRepository, IProcProcessEquipmentGroupRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
         /// <summary>
         /// 
         /// </summary>

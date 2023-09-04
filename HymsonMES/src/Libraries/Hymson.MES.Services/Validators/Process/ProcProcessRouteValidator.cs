@@ -39,53 +39,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(ProcessRouteTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES10452));
 
             RuleFor(x => x.DynamicData).Cascade(CascadeMode.Stop).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10453)).Must(x => x.Links != null && x.Links.Any()).WithErrorCode(nameof(ErrorCode.MES10454)).Must(x => x.Nodes != null && x.Links.Any()).WithErrorCode(nameof(ErrorCode.MES10455));
-            //RuleForEach(x => x.DynamicData.Links)
-            //    .ChildRules(inner =>
-            //    {
-            //        inner.RuleFor(i => i.SerialNo)
-            //            .NotEmpty()
-            //            .WithErrorCode(nameof(ErrorCode.MES10456));
-            //        inner.RuleFor(i => i.PreProcessRouteDetailId)
-            //            .NotEmpty()
-            //            .WithErrorCode(nameof(ErrorCode.MES10457));
-            //        inner.RuleFor(i => i.ProcessRouteDetailId)
-            //            .NotEmpty()
-            //            .WithErrorCode(nameof(ErrorCode.MES10458));
-            //        inner.RuleFor(i => i.Extra1)
-            //            .NotEmpty()
-            //            .WithErrorCode(nameof(ErrorCode.MES10459));
-            //    });
-            //RuleForEach(x => x.DynamicData.Nodes)
-            //    .ChildRules(inner =>
-            //    {
-            //        inner.RuleFor(i => i.SerialNo)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点序号不能为空");
-            //        inner.RuleFor(i => i.ProcedureId)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点工序不能为空");
-            //        inner.RuleFor(i => i.Code)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点编码不能为空");
-            //        inner.RuleFor(i => i.Name)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点名称不能为空");
-            //        inner.RuleFor(i => i.ProcessType)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点工序类型不能为空");
-            //        inner.RuleFor(i => i.CheckType)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点抽检类型不能为空");
-            //        inner.RuleFor(i => i.IsWorkReport)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点是否报工不能为空");
-            //        inner.RuleFor(i => i.IsFirstProcess)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点是否首工序不能为空");
-            //        inner.RuleFor(i => i.Extra1)
-            //            .NotEmpty()
-            //            .WithMessage("工序节点中扩展信息不能为空");
-            //    });
+   
         }
     }
 
