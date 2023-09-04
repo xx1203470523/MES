@@ -520,6 +520,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 FeedingPointId = entity.FeedingPointId,
                 ProductId = entity.ProductId,
                 BarCode = entity.BarCode,
+                MaterialId = entity.MaterialId,
                 Qty = entity.Qty,
                 DirectionType = directionType,
                 CreatedBy = entity.CreatedBy,   // 这里用原纪录的值？

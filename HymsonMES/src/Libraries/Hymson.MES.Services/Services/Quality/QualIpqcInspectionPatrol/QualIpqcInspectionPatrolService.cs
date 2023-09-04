@@ -237,12 +237,13 @@ namespace Hymson.MES.Services.Services.Quality
             var procedureTask = _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
             var resourceTask = _procResourceRepository.GetByIdAsync(entity.ResourceId);
             var equipmentTask = _equEquipmentRepository.GetByIdAsync(entity.EquipmentId);
-
+            var qualIpqcInspectionTask = _qualIpqcInspectionRepository.GetByIdAsync(entity.IpqcInspectionId);
             var workOrder = await workOrderTask;
             var material = await materialTask;
             var procedure = await procedureTask;
             var resource = await resourceTask;
             var equipment = await equipmentTask;
+            var qualIpqcInspection = await qualIpqcInspectionTask;
 
             if (workOrder != null)
             {
@@ -270,6 +271,10 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.EquipmentName = equipment.EquipmentName;
             }
             dto.InspectCount = await _qualIpqcInspectionPatrolSampleRepository.GetCountByIpqcInspectionId(id);
+            if (qualIpqcInspection != null)
+            {
+                dto.GenerateConditionUnit = qualIpqcInspection.GenerateConditionUnit;
+            }
             return dto;
         }
 

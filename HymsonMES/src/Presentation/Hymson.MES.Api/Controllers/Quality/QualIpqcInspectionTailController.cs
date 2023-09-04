@@ -45,7 +45,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:insert")]
+        [PermissionDescription("quality:ipqcInspectionTail:insert")]
         public async Task AddAsync([FromBody] QualIpqcInspectionTailSaveDto saveDto)
         {
             await _qualIpqcInspectionTailService.CreateAsync(saveDto);
@@ -57,8 +57,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
-        //[PermissionDescription("quality:qualIpqcInspectionPatrol:delete")]
+        [PermissionDescription("quality:ipqcInspectionTail:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _qualIpqcInspectionTailService.DeletesAsync(ids);
@@ -116,7 +115,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("execute")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:execute")]
+        [PermissionDescription("quality:ipqcInspectionTail:execute")]
         public async Task ExecuteAsync([FromBody] StatusChangeDto updateDto)
         {
             await _qualIpqcInspectionTailService.ExecuteAsync(updateDto);
@@ -129,7 +128,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("sampleAdd")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:sampleAdd")]
+        [PermissionDescription("quality:ipqcInspectionTail:sampleAdd")]
         public async Task InsertSampleDataAsync([FromBody] List<QualIpqcInspectionTailSampleCreateDto> dto)
         {
             await _qualIpqcInspectionTailService.InsertSampleDataAsync(dto);
@@ -142,7 +141,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("sampleUpdate")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:sampleUpdate")]
+        [PermissionDescription("quality:ipqcInspectionTail:sampleUpdate")]
         public async Task UpdateSampleDataAsync([FromBody] QualIpqcInspectionTailSampleUpdateDto dto)
         {
             await _qualIpqcInspectionTailService.UpdateSampleDataAsync(dto);
@@ -155,7 +154,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("complete")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:complete")]
+        [PermissionDescription("quality:ipqcInspectionTail:complete")]
         public async Task CompleteAsync([FromBody] StatusChangeDto dto)
         {
             await _qualIpqcInspectionTailService.CompleteAsync(dto);
@@ -168,7 +167,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("unqualifiedHandle")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:unqualifiedHandle")]
+        [PermissionDescription("quality:ipqcInspectionTail:unqualifiedHandle")]
         public async Task UnqualifiedHandleAsync([FromBody] UnqualifiedHandleDto dto)
         {
             await _qualIpqcInspectionTailService.UnqualifiedHandleAsync(dto);
@@ -181,7 +180,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpPut]
         [Route("attachmentAdd")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:attachmentAdd")]
+        [PermissionDescription("quality:ipqcInspectionTail:attachmentAdd")]
         public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
         {
             await _qualIpqcInspectionTailService.AttachmentAddAsync(dto);
@@ -194,7 +193,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <returns></returns>
         [HttpDelete]
         [Route("attachmentDelete")]
-        [PermissionDescription("quality:qualIpqcInspectionPatrol:attachmentDelete")]
+        [PermissionDescription("quality:ipqcInspectionTail:attachmentDelete")]
         public async Task AttachmentDeleteAsync([FromBody] long[] ids)
         {
             await _qualIpqcInspectionTailService.AttachmentDeleteAsync(ids);

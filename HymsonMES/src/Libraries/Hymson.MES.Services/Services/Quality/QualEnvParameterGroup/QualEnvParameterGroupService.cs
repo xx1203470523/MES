@@ -393,7 +393,8 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 状态为启用时，校验启用状态的 工作中心编码+工序编码 唯一性
-            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueWorkCenterProcedureEntities.Any(a => a.ProcedureId == entity.ProcedureId
+            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueWorkCenterProcedureEntities.Any(a => a.WorkCenterId == entity.WorkCenterId
+            && a.ProcedureId == entity.ProcedureId
             && a.Status == entity.Status
             && a.Id != entity.Id))
             {
@@ -480,6 +481,10 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
+
+            // 验证唯一性
+            entity.Status = changeStatusCommand.Status;
+            await CheckUniqueWorkCenterProcedureAsync(entity);
             #endregion
 
             #region 操作数据库
