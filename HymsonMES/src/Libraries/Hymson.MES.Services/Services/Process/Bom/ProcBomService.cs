@@ -361,7 +361,7 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procBomRepository.GetByIdAsync(procBomEntity.Id);
             if (modelOrigin == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10610));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10612));
             }
 
             //验证某些状态是不能编辑的
