@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13221));
             }
             //校验工序、资源是否匹配
-            var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(saveDto.ResourceId);
+            var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(saveDto.ProcedureId);
             if (procedureResourceList.IsNullOrEmpty() || !procedureResourceList.Any(x => x.Id == saveDto.ResourceId))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13222));
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.EquipmentCode = equipment.EquipmentCode;
                 dto.EquipmentName = equipment.EquipmentName;
             }
-
+            dto.InspectCount = await _qualIpqcInspectionPatrolSampleRepository.GetCountByIpqcInspectionId(id);
             return dto;
         }
 
@@ -356,6 +356,8 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Status = InspectionStatusEnum.Inspecting;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.ExecuteBy = _currentUser.UserName;
+            entity.ExecuteOn = HymsonClock.Now();
 
             // 保存
             return await _qualIpqcInspectionPatrolRepository.UpdateAsync(entity);
@@ -383,6 +385,7 @@ namespace Hymson.MES.Services.Services.Quality
                 var entity = item.ToEntity<QualIpqcInspectionPatrolSampleEntity>();
                 entity.Id = IdGenProvider.Instance.CreateId();
                 entity.SiteId = _currentSite.SiteId ?? 0;
+                entity.IpqcInspectionPatrolId = item.IpqcInspectionPatrolId;
                 entity.CreatedBy = updatedBy;
                 entity.CreatedOn = updatedOn;
                 entity.UpdatedBy = updatedBy;
@@ -448,7 +451,10 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-
+            if (entity.IsQualified == TrueOrFalseEnum.Yes)
+            {
+                entity.CloseOn = HymsonClock.Now();
+            }
             // 保存
             return await _qualIpqcInspectionPatrolRepository.UpdateAsync(entity);
         }
@@ -477,6 +483,7 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Remark = dto.Remark;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.CloseOn = HymsonClock.Now();
 
             // 保存
             return await _qualIpqcInspectionPatrolRepository.UpdateAsync(entity);
@@ -505,7 +512,7 @@ namespace Hymson.MES.Services.Services.Quality
                 CreatedOn = updatedOn,
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
-            });
+            }).ToList();
 
             var annexs = attachments.Select(x => new QualIpqcInspectionPatrolAnnexEntity
             {
@@ -517,13 +524,14 @@ namespace Hymson.MES.Services.Services.Quality
                 CreatedOn = updatedOn,
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
-            });
+            }).ToList();
 
             int rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachments);
                 rows += await _qualIpqcInspectionPatrolAnnexRepository.InsertRangeAsync(annexs);
+                trans.Complete();
             }
             return rows;
         }
