@@ -40,10 +40,11 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
         /// <returns></returns>
         public async Task<PagedInfo<ManuProductParameterReportViewDto>> GetManuProductParameterReportPageListAsync(ManuProductParameterReportPagedQueryDto pageQuery)
         {
-            if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
-            }
+            //注释SFC非必填
+            //if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            //}
             if (!string.IsNullOrEmpty(pageQuery.SFCStr))
             {
                 pageQuery.SFCStr = pageQuery.SFCStr.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
