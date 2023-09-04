@@ -15,12 +15,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Parameter
         /// <summary>
         /// 资源编码
         /// </summary>
-        public string ResourceCode { get; set; }
+        public string ResourceCode { get; set; } = "";
 
         /// <summary>
         /// 产品列表
         /// </summary>
-        public IEnumerable<ProductDto> Products { get; set; }
+        public IEnumerable<ProductDto> Products { get; set; }=new List<ProductDto>();
     }
 
     /// <summary>
@@ -31,12 +31,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Parameter
         /// <summary>
         /// 条码
         /// </summary>
-        public string SFC { get; set; }
+        public string SFC { get; set; } = "";
 
         /// <summary>
         /// 参数
         /// </summary>
-        public IEnumerable<ProductParameterDto> Parameters { get; set; }
+        public IEnumerable<ProductParameterDto> Parameters { get; set; } = new List<ProductParameterDto>();
     }
 
     /// <summary>
@@ -47,12 +47,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Parameter
         /// <summary>
         /// 参数编码
         /// </summary>
-        public string ParameterCode { get; set; }
+        public string ParameterCode { get; set; } = "";
 
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }
+        public string ParameterValue { get; set; } = "";
 
         /// <summary>
         /// 采集时间

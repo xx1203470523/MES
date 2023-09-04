@@ -19,7 +19,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.InBound
         /// <summary>
         /// 条码明细
         /// </summary>
-        public List<SfcBindingDetailDto> BindSfc { get; set; }
+        public List<SfcBindingDetailDto> BindSfc { get; set; } = new List<SfcBindingDetailDto>();
     }
 
     /// <summary>
