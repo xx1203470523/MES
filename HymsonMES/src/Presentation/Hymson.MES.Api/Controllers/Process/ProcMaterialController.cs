@@ -117,9 +117,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("delete")]
         [LogDescription("物料维护", BusinessType.DELETE)]
         [PermissionDescription("proc:material:delete")]
-        public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
+        public async Task DeleteProcMaterialAsync([FromBody] long[] ids)
         {
-           return await _procMaterialService.DeletesProcMaterialAsync(ids);
+           await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
 
