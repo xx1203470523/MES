@@ -90,7 +90,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             var bo = param.ToBo<InStationRequestBo>();
             if (bo == null) return null;
-            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
@@ -131,7 +131,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
 
             //获取首工序
-            var productId = await _masterDataService.GetProductSetId(new ProductSetBo { SiteId = bo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = bo.ProcedureId, ResourceId = bo.ResourceId }) ?? planWorkOrderEntity.ProductId;
+            var productId = await _masterDataService.GetProductSetIdAsync(new ProductSetBo { SiteId = bo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = bo.ProcedureId, ResourceId = bo.ResourceId }) ?? planWorkOrderEntity.ProductId;
 
             var boms = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(planWorkOrderEntity.ProductBOMId, bo.ProcedureId);
             var bomMaterials = GetBomMaterials(boms);

@@ -23,28 +23,28 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId);
+        Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId);
 
         /// <summary>
         /// 获取工序基础信息（带空检查）
         /// </summary>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId);
+        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId);
 
         /// <summary>
         /// 获取物料基础信息（带空检查）
         /// </summary>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId);
+        Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheckAsync(long processRouteId);
 
         /// <summary>
         /// 获取条码基础信息（带空检查）
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo);
+        Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo);
 
 
         /// <summary>
@@ -174,14 +174,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<long?> GetProductSetId(ProductSetBo param);
+        Task<long?> GetProductSetIdAsync(ProductSetBo param);
 
         /// <summary>
         /// 获取关联的job
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param);
+        Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
 
         /// <summary>
         /// 获取即将扣料的物料数据
@@ -195,7 +195,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="unqualifiedIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds);
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodesAsync(long[] unqualifiedIds);
 
         /// <summary>
         /// 创建条码步骤数据

@@ -186,7 +186,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<InStationRequestBo>();
             if (bo == null) return null;
-            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,
@@ -222,10 +222,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.FirstSFC = firstSFCProduceEntity.SFC;
 
             // 读取产品基础信息
-            var procMaterialEntityTask = _masterDataService.GetProcMaterialEntityWithNullCheck(firstSFCProduceEntity.ProductId);
+            var procMaterialEntityTask = _masterDataService.GetProcMaterialEntityWithNullCheckAsync(firstSFCProduceEntity.ProductId);
 
             // 读取当前工艺路线信息
-            var procProcessRouteEntityTask = _masterDataService.GetProcProcessRouteEntityWithNullCheck(firstSFCProduceEntity.ProcessRouteId);
+            var procProcessRouteEntityTask = _masterDataService.GetProcProcessRouteEntityWithNullCheckAsync(firstSFCProduceEntity.ProcessRouteId);
 
             var procMaterialEntity = await procMaterialEntityTask;
             var procProcessRouteEntity = await procProcessRouteEntityTask;
@@ -563,7 +563,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<InStationRequestBo>();
             if (bo == null) return null;
-            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId,

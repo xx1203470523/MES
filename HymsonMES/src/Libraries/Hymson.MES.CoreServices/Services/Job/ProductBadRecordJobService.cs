@@ -129,7 +129,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //获取不合格代码信息
-            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodes!, bo.UnqualifiedIds);
+            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodesAsync!, bo.UnqualifiedIds);
             if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15405));
@@ -205,7 +205,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
 
             //获取不合格代码信息
-            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodes!, bo.UnqualifiedIds);
+            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodesAsync!, bo.UnqualifiedIds);
             if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
             {
                 return default;

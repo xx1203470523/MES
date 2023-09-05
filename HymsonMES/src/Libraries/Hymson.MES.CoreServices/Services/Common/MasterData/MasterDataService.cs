@@ -119,6 +119,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
 
+        /// <summary>
+        /// 仓储接口（作业）
+        /// </summary>
+        private readonly IInteJobRepository _inteJobRepository;
+
+        /// <summary>
+        /// 仓储接口（作业业务配置）
+        /// </summary>
         private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
 
         /// <summary>
@@ -145,6 +153,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procProductSetRepository"></param>
+        /// <param name="inteJobRepository"></param>
         /// <param name="inteJobBusinessRelationRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
         public MasterDataService(ISequenceService sequenceService,
@@ -163,6 +172,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcProductSetRepository procProductSetRepository,
+            IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
@@ -182,6 +192,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procProductSetRepository = procProductSetRepository;
+            _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
         }
@@ -192,7 +203,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId)
+        public async Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId)
         {
             // 读取产品基础信息
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(materialId)
@@ -206,7 +217,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId)
+        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId)
         {
             // 获取工序信息
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId)
@@ -220,7 +231,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="processRouteId"></param>
         /// <returns></returns>
-        public async Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId)
+        public async Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheckAsync(long processRouteId)
         {
             // 读取当前工艺路线信息
             var processRouteEntity = await _procProcessRouteRepository.GetByIdAsync(processRouteId)
@@ -234,7 +245,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo)
+        public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo)
         {
             // 条码信息
             var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new ManuSfcQuery
@@ -777,7 +788,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<long?> GetProductSetId(ProductSetBo param)
+        public async Task<long?> GetProductSetIdAsync(ProductSetBo param)
         {
             var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ResourceId, SiteId = param.SiteId });
             if (productSetEntity == null)
@@ -796,7 +807,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param)
+        public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
@@ -811,22 +822,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     LinkPoint = param.LinkPoint
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
-            {
-                return null;
-            }
-            else
-            {
-                var jobs = new List<JobBo>();
-                foreach (var job in jobs)
-                {
-                    jobs.Add(new JobBo
-                    {
-                        Name = job.Name,
-                    });
-                }
-                return jobs;
-            }
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return null;
+
+            var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
+            return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
         }
 
 
@@ -984,7 +983,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="unqualifiedIds"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds)
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodesAsync(long[] unqualifiedIds)
         {
             return await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
         }
