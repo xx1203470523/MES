@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Services.Services.Report;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
@@ -43,6 +44,8 @@ namespace Hymson.MES.SystemServices.DependencyInjection
 
             #region Manfacture
             services.AddSingleton<IManuSfcCirculationService, ManuSfcCirculationService>();
+
+            services.AddSingleton<IProductTraceReportService, ProductTraceReportService>();
 
             #endregion
 
