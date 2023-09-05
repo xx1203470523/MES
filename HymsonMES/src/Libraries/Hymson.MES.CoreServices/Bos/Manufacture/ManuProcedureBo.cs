@@ -18,7 +18,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 工序
     /// </summary>
-    public class ManuRouteProcedureWithInfoBo
+    public class ManuRouteProcedureWithInfoBo : ManuRouteProcedureBo
     {
         /// <summary>
         /// 连线
@@ -29,16 +29,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 节点
         /// </summary>
         public IEnumerable<ProcProcessRouteDetailNodeEntity> ProcessRouteDetailNodes { get; set; }
-
-        /// <summary>
-        /// 工艺路线Id
-        /// </summary>
-        public long ProcessRouteId { get; set; }
-
-        /// <summary>
-        /// 工序Id
-        /// </summary>
-        public long ProcedureId { get; set; }
 
     }
 
@@ -56,6 +46,18 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 工序Id
         /// </summary>
         public long ProcedureId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 工序
+    /// </summary>
+    public class ManuRouteProcedureWithWorkOrderBo : ManuRouteProcedureBo
+    {
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; } = 0;
 
     }
 }
