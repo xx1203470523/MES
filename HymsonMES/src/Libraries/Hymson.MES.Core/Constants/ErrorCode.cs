@@ -376,6 +376,7 @@
         public const string MES11407 = "产品序列码[{sfc}]没有录入降级编码，无法移除！";
         public const string MES11408 = "产品序列码【{sfc}】的降级规则不存在";
         public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
+        public const string MES11410 = "降级移除失败:有数据已经被移除了,请清除后重新处理";
 
         #endregion
 

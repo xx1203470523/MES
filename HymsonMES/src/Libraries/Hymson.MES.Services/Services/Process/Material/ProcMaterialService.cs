@@ -230,7 +230,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcMaterialAsync(long[] idsArr)
+        public async Task DeletesProcMaterialAsync(long[] idsArr)
         {
             if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
@@ -258,12 +258,23 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10225));
             }
 
-            return await _procMaterialRepository.DeletesAsync(new DeleteCommand
+            #region 删除物料的关联供应商关系
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                Ids = idsArr,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                await _procMaterialRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    DeleteOn = HymsonClock.Now(),
+                    UserId = _currentUser.UserName
+                });
+
+                //await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(idsArr);
+
+                await _procMaterialSupplierRelationRepository.DeleteTrueByMaterialIdsAsync(idsArr);
+
+                ts.Complete();
+            }
+            #endregion
         }
 
         /// <summary>

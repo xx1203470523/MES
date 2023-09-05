@@ -404,12 +404,13 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 状态为启用时，校验启用状态的 产品编码+工序编码 唯一性
-            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueMaterialProcedureEntities.Any(a => a.ProcedureId == entity.ProcedureId
+            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueMaterialProcedureEntities.Any(a => a.MaterialId == entity.MaterialId
+            && a.ProcedureId == entity.ProcedureId
             && a.Status == entity.Status
             && a.Id != entity.Id))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10524))
-                    .WithData("WorkCenterCode", materialEntity.MaterialCode)
+                throw new CustomerValidationException(nameof(ErrorCode.MES10523))
+                    .WithData("ProductCode", materialEntity.MaterialCode)
                     .WithData("ProcedureCode", procedureEntity.Code);
             }
         }
@@ -491,6 +492,10 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
+
+            // 验证唯一性
+            entity.Status = changeStatusCommand.Status;
+            await CheckUniqueMaterialProcedureAsync(entity);
             #endregion
 
             #region 操作数据库

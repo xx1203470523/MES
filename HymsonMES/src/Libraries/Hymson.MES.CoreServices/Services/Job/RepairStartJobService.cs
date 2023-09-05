@@ -2,7 +2,6 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Common;
@@ -136,14 +135,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await param.Proxy.GetValueAsync(async parameters =>
+                var IsRandomPreProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsRandomPreProcedureAsync, new ManuRouteProcedureWithInfoBo
                 {
-                    var processRouteDetailLinks = (IEnumerable<ProcProcessRouteDetailLinkEntity>)parameters[0];
-                    var processRouteDetailNodes = (IEnumerable<ProcProcessRouteDetailNodeEntity>)parameters[1];
-                    var processRouteId = (long)parameters[2];
-                    var procedureId = (long)parameters[3];
-                    return await _masterDataService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, procedureId);
-                }, new object[] { processRouteDetailLinks, processRouteDetailNodes, sfcProduceEntity.ProcessRouteId, bo.ProcedureId });
+                    ProcessRouteDetailLinks = processRouteDetailLinks,
+                    ProcessRouteDetailNodes = processRouteDetailNodes,
+                    ProcessRouteId = sfcProduceEntity.ProcessRouteId,
+                    ProcedureId = bo.ProcedureId
+                });
                 if (!IsRandomPreProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
 
                 // 将SFC对应的工序改为当前工序

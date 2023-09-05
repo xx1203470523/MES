@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         private async Task VerifySupplier(long[] ids)
         {
             var data = await _procMaterialSupplierRelationRepository.GetBySupplierIdsAsync(ids);
-            if (data != null && ids.Any())
+            if (data != null && data.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15011));
             }

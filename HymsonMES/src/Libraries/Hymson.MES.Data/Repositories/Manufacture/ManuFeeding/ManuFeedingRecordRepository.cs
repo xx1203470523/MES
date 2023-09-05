@@ -1,6 +1,5 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -49,6 +48,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// </summary>
     public partial class ManuFeedingRecordRepository
     {
-        const string InsertSql = "INSERT INTO `manu_feeding_record`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, `Qty`, `DirectionType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @Qty, @DirectionType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `manu_feeding_record`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, `BarCode`, MaterialId, `Qty`, `DirectionType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @BarCode, @MaterialId, @Qty, @DirectionType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
     }
 }

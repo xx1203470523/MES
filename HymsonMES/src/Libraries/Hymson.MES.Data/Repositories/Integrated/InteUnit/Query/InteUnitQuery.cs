@@ -5,6 +5,6 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     /// </summary>
     public class InteUnitQuery
     {
-    
+        public string[] Codes { get; set; }
     }
 }

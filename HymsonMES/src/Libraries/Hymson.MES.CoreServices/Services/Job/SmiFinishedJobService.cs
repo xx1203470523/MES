@@ -192,10 +192,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var updatedOn = HymsonClock.Now();
 
             // 读取条码信息
-            var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheck(bo);
+            var manuSfcEntities = await _masterDataService.GetManuSFCEntitiesWithNullCheckAsync(bo);
 
             // 读取产品基础信息
-            var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheck(firstSFCProduceEntity.ProductId);
+            var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheckAsync(firstSFCProduceEntity.ProductId);
 
             // 组装（出站步骤数据）
             responseBo.SFCStepEntities = entities.Select(sfcProduceEntity => new ManuSfcStepEntity
