@@ -28,6 +28,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（物料维护）
         /// </summary>
         /// <param name="procMaterialService"></param>
+        /// <param name="logger"></param>
         public ProcMaterialController(IProcMaterialService procMaterialService, ILogger<ProcMaterialController> logger)
         {
             _procMaterialService = procMaterialService;
@@ -116,10 +117,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("delete")]
         [LogDescription("物料维护", BusinessType.DELETE)]
         [PermissionDescription("proc:material:delete")]
-        public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
+        public async Task DeleteProcMaterialAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
-           return await _procMaterialService.DeletesProcMaterialAsync(ids);
+           await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
 

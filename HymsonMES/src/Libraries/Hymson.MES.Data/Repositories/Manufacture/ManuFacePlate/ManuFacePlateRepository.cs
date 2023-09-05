@@ -207,6 +207,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
         #endregion
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     public partial class ManuFacePlateRepository
@@ -221,7 +231,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string InsertSql = "INSERT INTO `manu_face_plate`(  `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Type, @Status, @ConversationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `manu_face_plate`(  `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Type, @Status, @ConversationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_face_plate` SET IsDeleted = Id WHERE Id = @Id ";
@@ -240,5 +250,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string IsExistsSql = "SELECT Id FROM manu_face_plate WHERE `IsDeleted` = 0 AND Code = @Code AND Id != @id LIMIT 1";
         #endregion
+
+        const string UpdateStatusSql = "UPDATE `manu_face_plate` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
     }
 }

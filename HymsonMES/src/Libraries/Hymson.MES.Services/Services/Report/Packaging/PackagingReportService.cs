@@ -65,8 +65,6 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<ManuContainerBarcodeViewDto> QueryManuContainerByCodeAsync(PackagingQueryDto queryDto)
         {
-            var barcodeViewDto = new ManuContainerBarcodeViewDto();
-
             var barcodeEntity = new ManuContainerBarcodeEntity();
             if (queryDto.Type == PackagingTypeEnum.Container)
             {
@@ -232,7 +230,7 @@ namespace Hymson.MES.Services.Services.Report
                     CreatedBy = item.CreatedBy,
                     CreatedOn = item.CreatedOn,
                     ParentContainerCode = parentContainers.FirstOrDefault(x => x.Id == pack?.ContainerBarCodeId)?.BarCode ?? "",
-                    PackQuantity = containerPackEntities.Where(x => x.ContainerBarCodeId == item.Id).Count()
+                    PackQuantity = containerPackEntities.Count(x => x.ContainerBarCodeId == item.Id)
                 });
             }
             return new PagedInfo<PlanWorkPackingDto>(workPackingDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

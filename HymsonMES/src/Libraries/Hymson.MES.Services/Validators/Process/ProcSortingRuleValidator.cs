@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         private readonly IProcSortingRuleRepository _procSortingRuleRepository;
         private readonly ICurrentSite _currentSite;
-        private string code = "";
+
         public ProcSortingRuleCreateValidator(IProcSortingRuleRepository procSortingRuleRepository, ICurrentSite currentSite)
         {
             _procSortingRuleRepository = procSortingRuleRepository;
@@ -34,13 +34,13 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11302));
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11303));
             RuleFor(x => x.MaterialId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11304));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES11305);
+
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11310));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11311));
             RuleFor(x => x.Version).MaximumLength(10).WithErrorCode(nameof(ErrorCode.MES11312));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11313));
             RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamUpperAndLowerLimitValidator).WithErrorCode(nameof(ErrorCode.MES11306));
-            //RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamIntersectionValidator).WithErrorCode(nameof(ErrorCode.MES11314));
+
             RuleFor(x => x).MustAsync(ManuSortingyCodeAndVersionValidatorasync).WithErrorCode(nameof(ErrorCode.MES11307));
             RuleFor(x => x).MustAsync(ManuSortingCodeAndMaterialIdValidatorasync).WithErrorCode(nameof(ErrorCode.MES11308));
         }
@@ -56,14 +56,12 @@ namespace Hymson.MES.Services.Validators.Process
             {
                 foreach (var item in param)
                 {
-                    if (item.MaxValue.HasValue && !item.ParameterValue.HasValue)
+                    if (item.MaxValue.HasValue && !item.ParameterValue.HasValue&&item.MinValue.HasValue)
                     {
-                        if (item.MinValue.HasValue)
-                        {
                             var differenceValue = item.MaxValue - item.MinValue;
                             if (differenceValue == 0)
                             {
-                                if (item.MaxContainingType == ContainingTypeEnum.LtOrE || item.MaxContainingType == ContainingTypeEnum.LtOrE)
+                                if (item.MaxContainingType == ContainingTypeEnum.LtOrE)
                                 {
                                     return true;
                                 }
@@ -76,7 +74,6 @@ namespace Hymson.MES.Services.Validators.Process
                             {
                                 return false;
                             }
-                        }
                     }
                 }
             }
@@ -112,7 +109,7 @@ namespace Hymson.MES.Services.Validators.Process
         /// 编码和版本 唯一验证
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="">cancellationToken</param>
+        /// <param name="cancellationtoken">cancellationToken</param>
         /// <returns></returns>
         private async Task<bool> ManuSortingyCodeAndVersionValidatorasync(ProcSortingRuleCreateDto param, CancellationToken cancellationtoken)
         {
@@ -125,17 +122,14 @@ namespace Hymson.MES.Services.Validators.Process
         /// 编码和物物料唯一验证WW
         /// </summary>
         /// <param name="param"></param>
-        /// <param name="">cancellationToken</param>
+        /// <param name="cancellationtoken">cancellationToken</param>
         /// <returns></returns>
         private async Task<bool> ManuSortingCodeAndMaterialIdValidatorasync(ProcSortingRuleCreateDto param, CancellationToken cancellationtoken)
         {
             var procSortingRuleEntity = await _procSortingRuleRepository.GetByCodeAndMaterialId(new ProcSortingRuleCodeAndMaterialIdQuery { SiteId = _currentSite.SiteId ?? 0, MaterialId = param.MaterialId });
-            if (procSortingRuleEntity != null)
+            if (procSortingRuleEntity != null&& param.Code != procSortingRuleEntity.Code)
             {
-                if (param.Code != procSortingRuleEntity.Code)
-                {
                     return false;
-                }
             }
             return true;
         }
@@ -149,7 +143,6 @@ namespace Hymson.MES.Services.Validators.Process
         public ProcSortingRuleModifyValidator()
         {
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES11302));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(ErrorCode.MES11305);
             RuleFor(x => x.SortingParamDtos).Must(ManuSortingParamUpperAndLowerLimitValidator).WithErrorCode(nameof(ErrorCode.MES11306));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES11311));
             RuleFor(x => x.Remark).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES11313));
@@ -168,10 +161,7 @@ namespace Hymson.MES.Services.Validators.Process
                 {
                     if (item.MaxValue != null)
                     {
-                        if (item.MaxValue < item.MaxValue)
-                        {
-                            return false;
-                        }
+                            return false;     
                     }
                 }
             }

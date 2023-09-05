@@ -9,7 +9,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
-//using Hymson.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -36,6 +35,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// 构造函数（物料台账）
         /// </summary>
         /// <param name="whMaterialStandingbookService"></param>
+        /// <param name="logger"></param>
         public WhMaterialStandingbookController(IWhMaterialStandingbookService whMaterialStandingbookService, ILogger<WhMaterialStandingbookController> logger)
         {
             _whMaterialStandingbookService = whMaterialStandingbookService;
@@ -104,7 +104,6 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [PermissionDescription("wh:materialStandingbook:delete")]
         public async Task DeleteWhMaterialStandingbookAsync(string ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _whMaterialStandingbookService.DeletesWhMaterialStandingbookAsync(ids);
         }
 

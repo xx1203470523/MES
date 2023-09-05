@@ -33,74 +33,12 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// 构造函数（工单激活（物理删除））
         /// </summary>
         /// <param name="planWorkOrderBindService"></param>
+        /// <param name="logger"></param>
         public PlanWorkOrderBindController(IPlanWorkOrderBindService planWorkOrderBindService, ILogger<PlanWorkOrderBindController> logger)
         {
             _planWorkOrderBindService = planWorkOrderBindService;
             _logger = logger;
         }
-
-        #region 框架生成方法
-
-        ///// <summary>
-        ///// 分页查询列表（工单激活（物理删除））
-        ///// </summary>
-        ///// <param name="parm"></param>
-        ///// <returns></returns>
-        //[HttpGet]
-        //[Route("pagelist")]
-        //public async Task<PagedInfo<PlanWorkOrderBindDto>> QueryPagedPlanWorkOrderBindAsync([FromQuery] PlanWorkOrderBindPagedQueryDto parm)
-        //{
-        //    return await _planWorkOrderBindService.GetPagedListAsync(parm);
-        //}
-
-        ///// <summary>
-        ///// 查询详情（工单激活（物理删除））
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //[HttpGet("{id}")]
-        //public async Task<PlanWorkOrderBindDto> QueryPlanWorkOrderBindByIdAsync(long id)
-        //{
-        //    return await _planWorkOrderBindService.QueryPlanWorkOrderBindByIdAsync(id);
-        //}
-
-        ///// <summary>
-        ///// 添加（工单激活（物理删除））
-        ///// </summary>
-        ///// <param name="parm"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("create")]
-        //public async Task AddPlanWorkOrderBindAsync([FromBody] PlanWorkOrderBindCreateDto parm)
-        //{
-        //     await _planWorkOrderBindService.CreatePlanWorkOrderBindAsync(parm);
-        //}
-
-        ///// <summary>
-        ///// 更新（工单激活（物理删除））
-        ///// </summary>
-        ///// <param name="parm"></param>
-        ///// <returns></returns>
-        //[HttpPut]
-        //[Route("update")]
-        //public async Task UpdatePlanWorkOrderBindAsync([FromBody] PlanWorkOrderBindModifyDto parm)
-        //{
-        //     await _planWorkOrderBindService.ModifyPlanWorkOrderBindAsync(parm);
-        //}
-
-        ///// <summary>
-        ///// 删除（工单激活（物理删除））
-        ///// </summary>
-        ///// <param name="ids"></param>
-        ///// <returns></returns>
-        //[HttpDelete]
-        //[Route("delete")]
-        //public async Task DeletePlanWorkOrderBindAsync([FromBody] long[] ids)
-        //{
-        //    await _planWorkOrderBindService.DeletesPlanWorkOrderBindAsync(ids);
-        //}
-
-        #endregion
 
         /// <summary>
         /// 绑定/取消绑定工单

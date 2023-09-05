@@ -49,7 +49,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesProcMaterialAsync(long[] idsArr);
+        Task DeletesProcMaterialAsync(long[] idsArr);
 
         /// <summary>
         /// 根据ID查询

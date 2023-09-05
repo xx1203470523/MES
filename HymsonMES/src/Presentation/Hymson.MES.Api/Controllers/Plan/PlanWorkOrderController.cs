@@ -26,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// 构造函数（工单信息表）
         /// </summary>
         /// <param name="planWorkOrderService"></param>
+        /// <param name="logger"></param>
         public PlanWorkOrderController(IPlanWorkOrderService planWorkOrderService, ILogger<PlanWorkOrderController> logger)
         {
             _planWorkOrderService = planWorkOrderService;

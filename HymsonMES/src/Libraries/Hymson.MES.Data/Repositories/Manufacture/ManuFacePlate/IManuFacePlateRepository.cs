@@ -103,5 +103,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuFacePlateEntity>> GetPagedInfoAsync(ManuFacePlatePagedQuery manuFacePlatePagedQuery);
         #endregion
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

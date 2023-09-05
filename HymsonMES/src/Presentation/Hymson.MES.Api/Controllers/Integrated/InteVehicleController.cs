@@ -34,6 +34,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 构造函数（载具注册表）
         /// </summary>
         /// <param name="inteVehicleService"></param>
+        /// <param name="logger"></param>
         public InteVehicleController(IInteVehicleService inteVehicleService, ILogger<InteVehicleController> logger)
         {
             _inteVehicleService = inteVehicleService;

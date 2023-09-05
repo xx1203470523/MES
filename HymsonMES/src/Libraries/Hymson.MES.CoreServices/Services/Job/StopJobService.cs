@@ -24,11 +24,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     public class StopJobService : IJobService
     {
         /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
@@ -51,18 +46,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="localizationService"></param>
-        public StopJobService(IManuCommonService manuCommonService,
-            IMasterDataService masterDataService,
+        public StopJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
@@ -81,10 +73,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
-            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
@@ -117,18 +109,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             StopResponseBo responseBo = new();
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
-            if (responseBo.SFCProduceEntities == null || responseBo.SFCProduceEntities.Any() == false) return default;
+            if (responseBo.SFCProduceEntities == null || !responseBo.SFCProduceEntities.Any()) return default;
 
-            responseBo.FirstSFCProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault();
+            responseBo.FirstSFCProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault()!;
             if (responseBo.FirstSFCProduceEntity == null) return default;
 
             // 更新时间
             var updatedBy = bo.UserName;
             var updatedOn = HymsonClock.Now();
 
-            List<ManuSfcStepEntity> sfcStepEntities = new();
             responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
                 // 更改状态，将条码由"活动"改为"排队"

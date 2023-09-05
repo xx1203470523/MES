@@ -32,6 +32,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（产品不良录入）
         /// </summary>
         /// <param name="manuProductBadRecordService"></param>
+        /// <param name="logger"></param>
         public ManuProductBadRecordController(IManuProductBadRecordService manuProductBadRecordService, ILogger<ManuProductBadRecordController> logger)
         {
             _manuProductBadRecordService = manuProductBadRecordService;

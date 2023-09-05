@@ -18,14 +18,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterCreateDto"></param>
         /// <returns></returns>
         Task<int> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto);
 

@@ -94,5 +94,13 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListByGroupIdAsync(QualUnqualifiedCodeQuery query);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

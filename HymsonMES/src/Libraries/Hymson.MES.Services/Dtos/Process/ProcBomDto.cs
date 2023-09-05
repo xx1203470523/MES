@@ -100,11 +100,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string BomName { get; set; }
 
-       ///// <summary>
-       // /// 状态
-       // /// </summary>
-       // public SysDataStatusEnum Status { get; set; }
-
        /// <summary>
         /// 版本
         /// </summary>
@@ -140,11 +135,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// BOM名称
         /// </summary>
         public string BomName { get; set; }
-
-       ///// <summary>
-       // /// 状态
-       // /// </summary>
-       // public SysDataStatusEnum Status { get; set; }
 
         public string Version { get; set; }
 

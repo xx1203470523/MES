@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18715));
             RuleFor(x => x.Version).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18717));
             RuleFor(x => x.Version).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18716));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES18709));
+
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(EquipmentGroupParamTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES18710));
             RuleFor(x => x.ProductId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18718));
             RuleFor(x => x.ProcedureId).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES18719));
@@ -51,7 +51,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18715));
             RuleFor(x => x.Version).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18717));
             RuleFor(x => x.Version).MaximumLength(100).WithErrorCode(nameof(ErrorCode.MES18716));
-            RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(SysDataStatusEnum), it)).WithErrorCode(nameof(ErrorCode.MES18709));
+
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(EquipmentGroupParamTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES18710));
             RuleFor(x => x.ProductId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18718));
             RuleFor(x => x.ProcedureId).Must(it => it>0).WithErrorCode(nameof(ErrorCode.MES18719));

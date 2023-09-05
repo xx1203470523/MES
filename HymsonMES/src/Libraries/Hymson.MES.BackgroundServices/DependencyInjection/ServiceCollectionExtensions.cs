@@ -22,30 +22,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         {
             services.AddCoreService(configuration);
             AddEventBusServices(services);
-            AddServices(services);
-            AddValidators(services);
             AddConfig(services, configuration);
-            return services;
-        }
-
-        /// <summary>
-        /// 添加服务依赖
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddServices(this IServiceCollection services)
-        {
-            //services.AddSingleton<IMessagePushService, MessagePushService>();
-            return services;
-        }
-
-        /// <summary>
-        /// 添加验证器相关服务
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddValidators(IServiceCollection services)
-        {
             return services;
         }
 
@@ -59,7 +36,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         {
             //数据库连接
             services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
         /// <summary>

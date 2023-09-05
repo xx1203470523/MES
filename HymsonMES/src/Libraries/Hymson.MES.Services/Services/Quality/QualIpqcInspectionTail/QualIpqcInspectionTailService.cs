@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13221));
             }
             //校验工序、资源是否匹配
-            var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(saveDto.ResourceId);
+            var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(saveDto.ProcedureId);
             if (procedureResourceList.IsNullOrEmpty() || !procedureResourceList.Any(x => x.Id == saveDto.ResourceId))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13222));
@@ -194,7 +194,7 @@ namespace Hymson.MES.Services.Services.Quality
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             };
-
+ 
             // 保存
             return await _qualIpqcInspectionTailRepository.InsertAsync(entity);
         }
@@ -237,13 +237,13 @@ namespace Hymson.MES.Services.Services.Quality
             var procedureTask = _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
             var resourceTask = _procResourceRepository.GetByIdAsync(entity.ResourceId);
             var equipmentTask = _equEquipmentRepository.GetByIdAsync(entity.EquipmentId);
-
+            var qualIpqcInspectionTask =  _qualIpqcInspectionRepository.GetByIdAsync(entity.IpqcInspectionId);
             var workOrder = await workOrderTask;
             var material = await materialTask;
             var procedure = await procedureTask;
             var resource = await resourceTask;
             var equipment = await equipmentTask;
-
+            var qualIpqcInspection = await qualIpqcInspectionTask;
             if (workOrder != null)
             {
                 dto.WorkOrderCode = workOrder.OrderCode;
@@ -269,7 +269,11 @@ namespace Hymson.MES.Services.Services.Quality
                 dto.EquipmentCode = equipment.EquipmentCode;
                 dto.EquipmentName = equipment.EquipmentName;
             }
-
+            dto.InspectCount = await _qualIpqcInspectionTailSampleRepository.GetCountByIpqcInspectionId(id);
+            if (qualIpqcInspection != null)
+            {
+                dto.GenerateConditionUnit = qualIpqcInspection.GenerateConditionUnit;
+            }
             return dto;
         }
 
@@ -356,6 +360,8 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Status = InspectionStatusEnum.Inspecting;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.ExecuteBy= _currentUser.UserName;
+            entity.ExecuteOn = HymsonClock.Now();
 
             // 保存
             return await _qualIpqcInspectionTailRepository.UpdateAsync(entity);
@@ -382,6 +388,7 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 var entity = item.ToEntity<QualIpqcInspectionTailSampleEntity>();
                 entity.Id = IdGenProvider.Instance.CreateId();
+                entity.IpqcInspectionTailId = item.IpqcInspectionPatrolId;
                 entity.SiteId = _currentSite.SiteId ?? 0;
                 entity.CreatedBy = updatedBy;
                 entity.CreatedOn = updatedOn;
@@ -448,7 +455,11 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-
+            entity.CompleteOn= HymsonClock.Now();
+            if (entity.IsQualified == TrueOrFalseEnum.Yes)
+            {
+                entity.CloseOn = HymsonClock.Now();
+            }
             // 保存
             return await _qualIpqcInspectionTailRepository.UpdateAsync(entity);
         }
@@ -471,9 +482,13 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             entity.Status = InspectionStatusEnum.Closed;
+            entity.HandMethod = dto.HandMethod;
+            entity.ProcessedBy = _currentUser.UserName;
+            entity.ProcessedOn = HymsonClock.Now();
+            entity.Remark = dto.Remark;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-
+            entity.CloseOn = HymsonClock.Now();
             // 保存
             return await _qualIpqcInspectionTailRepository.UpdateAsync(entity);
         }
@@ -491,35 +506,43 @@ namespace Hymson.MES.Services.Services.Quality
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            var attachments = dto.Attachments.Select(x => new InteAttachmentEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
-                Name = x.Name,
-                Path = x.Path,
-                CreatedBy = updatedBy,
-                CreatedOn = updatedOn,
-                UpdatedBy = updatedBy,
-                UpdatedOn = updatedOn
-            });
+            List<InteAttachmentEntity> attachments = new();
+            List<QualIpqcInspectionTailAnnexEntity> annexs = new();
 
-            var annexs = attachments.Select(x => new QualIpqcInspectionTailAnnexEntity
+            foreach (var item in dto.Attachments)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
-                IpqcInspectionTailId = dto.Id,
-                AnnexId = x.Id,
-                CreatedBy = updatedBy,
-                CreatedOn = updatedOn,
-                UpdatedBy = updatedBy,
-                UpdatedOn = updatedOn
-            });
+                var attachment = new InteAttachmentEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Name = item.Name,
+                    Path = item.Path,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                };
+                attachments.Add(attachment);
+                var annex = new QualIpqcInspectionTailAnnexEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    IpqcInspectionTailId = dto.Id,
+                    AnnexId = attachment.Id,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                };
+                annexs.Add(annex);
+            }
 
             int rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _inteAttachmentRepository.InsertRangeAsync(attachments);
                 rows += await _qualIpqcInspectionTailAnnexRepository.InsertRangeAsync(annexs);
+                trans.Complete();
             }
             return rows;
         }

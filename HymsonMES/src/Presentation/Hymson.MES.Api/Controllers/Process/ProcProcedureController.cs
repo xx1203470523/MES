@@ -32,6 +32,7 @@ namespace Hymson.MES.Api.Controllers
         /// 构造函数（工序表）
         /// </summary>
         /// <param name="procProcedureService"></param>
+        /// <param name="logger"></param>
         public ProcProcedureController(IProcProcedureService procProcedureService, ILogger<ProcProcedureController> logger)
         {
             _procProcedureService = procProcedureService;

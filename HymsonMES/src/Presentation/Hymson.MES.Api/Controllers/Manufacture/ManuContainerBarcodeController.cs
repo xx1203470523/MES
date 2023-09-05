@@ -35,6 +35,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（容器条码表）
         /// </summary>
         /// <param name="manuContainerBarcodeService"></param>
+        /// <param name="logger"></param>
         public ManuContainerBarcodeController(IManuContainerBarcodeService manuContainerBarcodeService, ILogger<ManuContainerBarcodeController> logger)
         {
             _manuContainerBarcodeService = manuContainerBarcodeService;

@@ -23,7 +23,8 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 构造函数（操作面板）
         /// </summary>
-        /// <param name="manuFacePlateProductionService"></param>        
+        /// <param name="manuFacePlateProductionService"></param>    
+        /// <param name="logger"></param>   
         public ManuFacePlateProductionController(IManuFacePlateProductionService manuFacePlateProductionService, ILogger<ManuFacePlateController> logger)
         {
             _manuFacePlateProductionService = manuFacePlateProductionService;
@@ -40,17 +41,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateProductionService.GetManuFacePlateProductionPackageInfoAsync(param);
         }
-
-        ///// <summary>
-        ///// 组装
-        ///// </summary>
-        ///// <param name="addDto"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("addPackageCom")]
-        //public async Task<string> AddPackageCom(ManuFacePlateProductionPackageAddDto addDto) 
-        //{
-        //    return await _manuFacePlateProductionService.AddPackageCom(addDto);
-        //}
     }
 }

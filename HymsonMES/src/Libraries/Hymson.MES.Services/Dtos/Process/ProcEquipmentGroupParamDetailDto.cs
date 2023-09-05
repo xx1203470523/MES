@@ -110,11 +110,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long ParamId { get; set; }
 
-       ///// <summary>
-       // /// 参数值
-       // /// </summary>
-       // public string ParamValue { get; set; }
-
        /// <summary>
         /// 中心值
         /// </summary>
@@ -134,11 +129,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 小数位数
         /// </summary>
         public int? DecimalPlaces { get; set; }
-
-       ///// <summary>
-       // /// 说明
-       // /// </summary>
-       // public string Remark { get; set; }
 
     }
 

@@ -221,10 +221,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string MaterialName { get; set; }
 
-        /// <summary>
-        /// 物料
-        /// </summary>
-      //  public ProcMaterialDto Material { get; set; }
 
         //TODO 模板 by wangkeming 
     }

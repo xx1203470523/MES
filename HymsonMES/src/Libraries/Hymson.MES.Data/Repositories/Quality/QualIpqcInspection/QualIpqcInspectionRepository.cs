@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
@@ -138,7 +139,7 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("T.Status = @Status");
             }
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<QualIpqcInspectionEntity>(template.RawSql, query);
+                return await conn.QueryAsync<QualIpqcInspectionEntity>(template.RawSql, query);
         }
 
         /// <summary>
@@ -229,6 +230,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             return totalCount > 0;
         }
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
     }
 
 
@@ -263,7 +275,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string InsertSql = "INSERT INTO qual_ipqc_inspection(  `Id`, `SiteId`, `Type`, `SampleQty`, `InspectionParameterGroupId`, `GenerateCondition`, `GenerateConditionUnit`, `ControlTime`, `ControlTimeUnit`, `MaterialId`, `ProcedureId`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Type, @SampleQty, @InspectionParameterGroupId, @GenerateCondition, @GenerateConditionUnit, @ControlTime, @ControlTimeUnit, @MaterialId, @ProcedureId, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO qual_ipqc_inspection(  `Id`, `SiteId`, `Type`, `SampleQty`, `InspectionParameterGroupId`, `GenerateCondition`, `GenerateConditionUnit`, `ControlTime`, `ControlTimeUnit`, `MaterialId`, `ProcedureId`, `Version`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Type, @SampleQty, @InspectionParameterGroupId, @GenerateCondition, @GenerateConditionUnit, @ControlTime, @ControlTimeUnit, @MaterialId, @ProcedureId, @Version, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_ipqc_inspection SET   SiteId = @SiteId, Type = @Type, SampleQty = @SampleQty, InspectionParameterGroupId = @InspectionParameterGroupId, GenerateCondition = @GenerateCondition, GenerateConditionUnit = @GenerateConditionUnit, ControlTime = @ControlTime, ControlTimeUnit = @ControlTimeUnit, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_ipqc_inspection SET   SiteId = @SiteId, Type = @Type, SampleQty = @SampleQty, InspectionParameterGroupId = @InspectionParameterGroupId, GenerateCondition = @GenerateCondition, GenerateConditionUnit = @GenerateConditionUnit, ControlTime = @ControlTime, ControlTimeUnit = @ControlTimeUnit, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Version = @Version, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_ipqc_inspection SET   SiteId = @SiteId, Type = @Type, SampleQty = @SampleQty, InspectionParameterGroupId = @InspectionParameterGroupId, GenerateCondition = @GenerateCondition, GenerateConditionUnit = @GenerateConditionUnit, ControlTime = @ControlTime, ControlTimeUnit = @ControlTimeUnit, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Version = @Version, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_ipqc_inspection SET IsDeleted = Id WHERE Id = @Id ";
@@ -271,6 +283,8 @@ namespace Hymson.MES.Data.Repositories.Quality
 
         const string GetByIdSql = @"SELECT * FROM qual_ipqc_inspection WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_ipqc_inspection WHERE Id IN @Ids ";
+
+        const string UpdateStatusSql = "UPDATE `qual_ipqc_inspection` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
     }
 }

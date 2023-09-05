@@ -37,35 +37,23 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobManufactureService>();
-            //using var trans = new TransactionScope();
             foreach (var job in jobs)
             {
                 var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
                 if (service == null) continue;
 
                 // TODO 如果job有额外参数，可以在这里进行拼装
-                //param.Add(job.extra);
 
                 // 验证参数
                 await service.VerifyParamAsync(param);
 
                 // 执行job
-                //result.Add(job.ClassProgram, await service.ExecuteAsync(param));
+
                 var responseDto = await service.ExecuteAsync(param);
                 responseDtos.Add(job.ClassProgram, responseDto);
 
                 if (responseDto.Rows < 0) break;
             }
-
-            //if (responseDtos.Any(a => a.Value.Rows < 0))
-            //{
-            //    trans.Dispose();
-            //}
-            //else
-            //{
-            //    trans.Complete();
-            //}
-
             return responseDtos;
         }
 
@@ -76,7 +64,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<IEnumerable<JobClassBo>> GetJobClassBoListAsync()
         {
             // 获取所有实现类
-            //var services = _serviceProvider.GetServices<IJobManufactureService>();
+
             var services = _serviceProvider.GetServices<IJobService>();
             return await Task.FromResult(services.Select(s =>
             {

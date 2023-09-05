@@ -1,4 +1,4 @@
-using Hymson.Authentication;
+    using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
@@ -193,9 +193,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             {
                 // TODO 错误码
                 return 0;
-
-                //responseDto.Msg = "此日历不存在！";
-                //return responseDto;
             }
 
             var enable = CalendarUseStatusEnum.Enable;
@@ -203,9 +200,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             {
                 // TODO 错误码
                 return 0;
-
-                //responseDto.Msg = "启用的日历不能修改！";
-                //return responseDto;
             }
 
             if (modifyDto.UseStatus == CalendarUseStatusEnum.Enable)
@@ -472,7 +466,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
         {
             var monthArr = monthStr.Split(',');
             var weekDays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
-            var weekEnds = new[] { "Saturday", "Sunday" };
             var day = DateTime.MinValue;
             int days = 0;
             List<InteCalendarDateDetailEntity> dateDetails = new();
@@ -521,11 +514,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                 var details = calendarDataList.OrderBy(a => a.Day);
                 foreach (var item in details)
                 {
-                    // TODO 原句是  var calendarData = dateDetails.FirstOrDefault(a => a.Day.ToString("yyyy-MM-dd") == item.Day.ToString("yyyy-MM-dd"));
                     var calendarData = dateDetails.FirstOrDefault(a => a.Day.ToShortDateString() == item.Day.ToShortDateString());
                     if (calendarData != null)
                     {
-                        calendarData.ClassId = string.IsNullOrWhiteSpace(item.ClassId) == true ? 0 : item.ClassId.ParseToLong(0);
+                        calendarData.ClassId = string.IsNullOrWhiteSpace(item.ClassId) ? 0 : item.ClassId.ParseToLong(0);
                         calendarData.RestType = item.RestType ?? 0;
                     }
                 }

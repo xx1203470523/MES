@@ -43,6 +43,16 @@ namespace Hymson.MES.Core.Domain.Quality
         public DateTime InspectionOn { get; set; }
 
         /// <summary>
+        /// 执行人
+        /// </summary>
+        public string ExecuteBy { get; set; }
+
+        /// <summary>
+        /// 执行时间
+        /// </summary>
+        public DateTime? ExecuteOn { get; set; }
+
+        /// <summary>
         /// 开始时间
         /// </summary>
         public DateTime? StartOn { get; set; }
@@ -71,6 +81,11 @@ namespace Hymson.MES.Core.Domain.Quality
         /// 处理时间
         /// </summary>
         public DateTime? ProcessedOn { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 是否当前结果;0-否  1、是

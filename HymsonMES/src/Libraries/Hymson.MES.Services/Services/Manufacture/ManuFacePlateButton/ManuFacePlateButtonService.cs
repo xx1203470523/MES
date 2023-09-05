@@ -31,11 +31,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 服务接口（作业通用）
-        /// </summary>
-        private readonly IJobCommonService _jobCommonService;
-
-        /// <summary>
         /// 操作面板按钮 仓储
         /// </summary>
         private readonly IManuFacePlateButtonRepository _manuFacePlateButtonRepository;
@@ -67,7 +62,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="jobCommonService"></param>
         /// <param name="manuFacePlateButtonRepository"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
         /// <param name="inteJobRepository"></param>
@@ -75,7 +69,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="validationModifyRules"></param>
         /// <param name="executeJobService"></param>
         public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
-            IJobCommonService jobCommonService,
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
             IInteJobRepository inteJobRepository,
@@ -84,7 +77,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _jobCommonService = jobCommonService;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
             _inteJobRepository = inteJobRepository;
@@ -232,7 +224,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
             }
-            return null;
+            return new ManuFacePlateButtonDto();
         }
 
         /// <summary>
@@ -306,7 +298,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 根据面板ID和按钮ID找出绑定的作业job
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
-            if (buttonJobs.Any() == false) return result;
+            if (!buttonJobs.Any()) return result;
 
             // 根据 buttonJobs 读取对应的job对象
             var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
@@ -321,11 +313,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             // 是否清除条码
-            if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
+            if (buttonJobs.Any(a => a.IsClear)) dto.Param?.Add("IsClear", "True");
 
             // 是否清除条码
             var isClear = false;
-            if (buttonJobs.Any(a => a.IsClear) == true) isClear = true;
+            if (buttonJobs.Any(a => a.IsClear)) isClear = true;
 
             // 如果没有读取到有效作业，就提示错误
             if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
@@ -335,7 +327,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
-                ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
+                ProcedureId = dto.Param!["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] }
             });
@@ -366,7 +358,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var bo = new ManufactureBo
             {
-                SFC = dto.Param["SFC"],
+                SFC = dto.Param!["SFC"],
                 ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong()
             };
@@ -408,7 +400,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var bo = new ManufactureBo
             {
-                SFC = dto.Param["SFC"],
+                SFC = dto.Param!["SFC"],
                 ProcedureId = dto.Param["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong()
             };
@@ -456,13 +448,13 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 根据面板ID和按钮ID找出绑定的作业job
             var buttonJobs = await _manuFacePlateButtonJobRelationRepository.GetByFacePlateButtonIdAsync(dto.FacePlateButtonId);
-            if (buttonJobs.Any() == false) return result;
+            if (!buttonJobs.Any()) return result;
 
             // 根据 buttonJobs 读取对应的job对象
             var jobs = await _inteJobRepository.GetByIdsAsync(buttonJobs.Select(s => s.JobId).ToArray());
 
             // 是否清除条码
-            if (buttonJobs.Any(a => a.IsClear) == true) dto.Param?.Add("IsClear", "True");
+            if (buttonJobs.Any(a => a.IsClear)) dto.Param?.Add("IsClear", "True");
 
             var jobBos = new List<JobBo>();
             foreach (var job in jobs)

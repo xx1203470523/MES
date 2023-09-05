@@ -6,6 +6,8 @@
  *build datetime: 2023-04-01 02:05:24
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
@@ -35,6 +37,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（操作面板）
         /// </summary>
         /// <param name="manuFacePlateService"></param>
+        /// <param name="logger"></param>
         public ManuFacePlateController(IManuFacePlateService manuFacePlateService, ILogger<ManuFacePlateController> logger)
         {
             _manuFacePlateService = manuFacePlateService;
@@ -121,6 +124,51 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateService.QueryManuFacePlateByCodeAsync(code);
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（操作面板）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("操作面板", BusinessType.UPDATE)]
+        [PermissionDescription("manu:facePlate:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _manuFacePlateService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（操作面板）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("操作面板", BusinessType.UPDATE)]
+        [PermissionDescription("manu:facePlate:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _manuFacePlateService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（上料点维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("上料点维护", BusinessType.UPDATE)]
+        [PermissionDescription("manu:facePlate:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _manuFacePlateService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
         #endregion
     }
 }

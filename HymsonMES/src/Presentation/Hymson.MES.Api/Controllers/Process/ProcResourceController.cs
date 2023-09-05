@@ -76,8 +76,20 @@ namespace Hymson.MES.Api.Controllers
             return await _procResourceService.GetByIdAsync(id);
         }
 
+
         /// <summary>
-        /// 查询资源类型下关联的资源
+        /// 查询资源维护表详情
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet("workCenterLineresAndResTypeRources")]
+        public async Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureId([FromQuery] ProcResourcePagedlineIdAndProcProcedureIdDto param)
+        {
+            return await _procResourceService.GetPageListBylineIdAndProcProcedureIdAsync(param);
+        }
+
+        /// <summary>
+        /// 查询资源类型下关    联的资源
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -184,7 +196,7 @@ namespace Hymson.MES.Api.Controllers
         public async Task UpdateProcResourceAsync([FromBody] ProcResourceModifyDto parm)
         {
             await _procResourceService.UpdateProcResrouceAsync(parm);
-        }
+        }   
 
         /// <summary>
         /// 删除资源维护表

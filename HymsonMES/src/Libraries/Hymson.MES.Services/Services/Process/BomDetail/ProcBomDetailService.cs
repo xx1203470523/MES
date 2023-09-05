@@ -33,6 +33,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procBomDetailRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// /// <param name="currentSite"></param>
         public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
@@ -144,7 +145,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcBomDetailDto> QueryProcBomDetailByIdAsync(long id)
         {
             var procBomDetailEntity = await _procBomDetailRepository.GetByIdAsync(id);
-            if (procBomDetailEntity == null) return null;
+            if (procBomDetailEntity == null) return new ProcBomDetailDto();
 
             return procBomDetailEntity.ToModel<ProcBomDetailDto>();
         }

@@ -40,6 +40,14 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
+        /// <param name="procBomRepository"></param>
+
         public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository)
         {
             _currentUser = currentUser;
@@ -153,7 +161,6 @@ namespace Hymson.MES.Services.Services.Report
                 throw new CustomerValidationException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
             }
             #region 查询基础数据
-            //var oneSfcStep = sfcSteps.Where(x=>x.WorkOrderId == sfcInfo.WorkOrderId).FirstOrDefault();
             //查询工单信息
             var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId);
             if (workOrder == null)
@@ -210,8 +217,6 @@ namespace Hymson.MES.Services.Services.Report
                     var currentStep = inSfcSteps[i];
                     ManuSfcStepEntity? nextStep = null;
                     ManuSfcStepEntity? outStep = null;
-
-                    var viewDto = new WorkshopJobControlStepReportDto();
 
                     //是否有下一个进站
                     if (i + 1 < inSfcSteps.Count)
@@ -275,9 +280,9 @@ namespace Hymson.MES.Services.Services.Report
 
             foreach (var item in pagedInfo.Data)
             {
-                var material = materials != null && materials.Any() ? materials.Where(x => x.Id == item.ProductId).FirstOrDefault() : null;
-                var procedure = procedures != null && procedures.Any() ? procedures.Where(x => x.Id == item.ProcedureId).FirstOrDefault() : null;
-                var workOrder = workOrders != null && workOrders.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
+                var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
+                var procedure = procedures != null && procedures.Any() ? procedures.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
+                var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
 
 
                 listDto.Add(new ManuSfcStepBySfcViewDto()
@@ -295,7 +300,7 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
-            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).OrderByDescending(o => o.Operatetype).AsEnumerable();
+            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).ThenByDescending(o => o.Operatetype).AsEnumerable();
             return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }

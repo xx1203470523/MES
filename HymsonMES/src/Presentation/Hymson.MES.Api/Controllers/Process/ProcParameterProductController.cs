@@ -26,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（产品参数）
         /// </summary>
         /// <param name="procParameterLinkTypeService"></param>
+        /// <param name="logger"></param>
         public ProcParameterProductController(IProcParameterLinkTypeService procParameterLinkTypeService, ILogger<ProcParameterLinkTypeController> logger)
         {
             _procParameterLinkTypeService = procParameterLinkTypeService;

@@ -39,6 +39,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（BOM表）
         /// </summary>
         /// <param name="procBomService"></param>
+        /// <param name="logger"></param>
         public ProcBomController(IProcBomService procBomService, ILogger<ProcBomController> logger)
         {
             _procBomService = procBomService;

@@ -90,11 +90,6 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             var bomDetailViews = new List<OriginalSummaryReportDto>();
-            //var manuSfc = await _manuSfcProduceRepository.GetBySFCAsync(queryDto.Sfc);
-            //if (manuSfc == null)
-            //{
-            //    return bomDetailViews;
-            //}
 
             //查询组件信息
             var manuSfcCirculations = await GetCirculationsBySfcAsync(queryDto.Sfc, queryDto.Type);
@@ -113,7 +108,6 @@ namespace Hymson.MES.Services.Services.Report
 
             //根据工单拿到所有bom信息
             var bomIds = orders.Select(x => x.ProductBOMId).ToList();
-           // bomIds.Add(manuSfc.ProductBOMId);
             var boms = await _procBomRepository.GetByIdsAsync(bomIds.Distinct().ToArray());
             if (!boms.Any())
             {
@@ -149,7 +143,6 @@ namespace Hymson.MES.Services.Services.Report
             {
                 materialIds.AddRange(orderProducts);
             }
-            //materialIds.Add(manuSfc.ProductId);
 
             //查询物料信息
             var procMaterials = new List<ProcMaterialEntity>();
@@ -180,15 +173,12 @@ namespace Hymson.MES.Services.Services.Report
                     continue;
                 }
 
-                //var product = procMaterials.FirstOrDefault(item => item.Id == manuSfc.ProductId);
-                //var productBom = boms.FirstOrDefault(item => item.Id == manuSfc.ProductBOMId);
                 var order = orders.FirstOrDefault(x => x.ProductBOMId == detailEntity.BomId);
                 var product = procMaterials.FirstOrDefault(item => item.Id == order?.ProductId);
                 var productBom = boms.FirstOrDefault(item => item.Id == order?.ProductBOMId);
         
                 var material = procMaterials.FirstOrDefault(item => item.Id == detailEntity.MaterialId);
                 var procedures = procProcedures.FirstOrDefault(item => item.Id == detailEntity.ProcedureId);
-                var bom = boms.FirstOrDefault(item => item.Id == detailEntity.BomId);
 
                 var bomDetail = new OriginalSummaryReportDto
                 {
@@ -218,7 +208,7 @@ namespace Hymson.MES.Services.Services.Report
                         BomDetailId = detailEntity.Id,
                         CirculationRemark = barcodeMaterial?.MaterialCode  + "/" + barcodeMaterial?.Version??"",
                         CirculationName= barcodeMaterial?.MaterialName ??"",
-                        ResCode = circulation.ResourceId.HasValue == true ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
+                        ResCode = circulation.ResourceId.HasValue ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
                         CirculationBarCode = circulation.CirculationBarCode,
                         CirculationQty = circulation.CirculationQty ?? 0,
                         Status = circulation.IsDisassemble == TrueOrFalseEnum.Yes ? InProductDismantleTypeEnum.Remove : InProductDismantleTypeEnum.Activity,
@@ -282,7 +272,7 @@ namespace Hymson.MES.Services.Services.Report
             foreach (var item in manuSfcCirculations)
             {
                 if (item.ResourceId.HasValue && item.ResourceId.Value > 0)
-                {
+                {   
                     if (!resourceIds.Contains(item.ResourceId.Value))
                     {
                         resourceIds.Add(item.ResourceId.Value);

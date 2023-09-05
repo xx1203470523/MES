@@ -50,7 +50,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private readonly AbstractValidator<ManuContainerPackCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackModifyDto> _validationModifyRules;
-        private readonly IManuContainerPackRecordService _manuContainerPackRecordService;
         /// <summary>
         /// 接口（操作面板按钮）
         /// </summary>
@@ -64,7 +63,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            IManuContainerPackRecordService manuContainerPackRecordService,
             IManuContainerPackRecordRepository manuContainerPackRecordRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
@@ -89,7 +87,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFacePlateButtonService = manuFacePlateButtonService;
-            _manuContainerPackRecordService = manuContainerPackRecordService;
         }
 
         /// <summary>
@@ -137,7 +134,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16732));
             }
-            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault().ContainerBarCodeId);
+            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault()!.ContainerBarCodeId);
 
             IEnumerable<ManuSfcEntity> manuSfclist = new List<ManuSfcEntity>();
             IEnumerable<ManuSfcInfoEntity> manuSfcInfolist = new List<ManuSfcInfoEntity>();
@@ -421,7 +418,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuContainerPackEntity.ToModel<ManuContainerPackDto>();
             }
-            return null;
+            return new ManuContainerPackDto();
         }
 
 
@@ -434,10 +431,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<Dictionary<string, JobResponseBo>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
-            //if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES16708));
-            //}
+
             #endregion
 
             #region 调用作业
@@ -448,10 +442,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateContainerPackExJobDto.FacePlateButtonId,
                 Param = new Dictionary<string, string>()
             };
-            //jobDto.Param?.Add("SFC", manuFacePlateContainerPackExJobDto.SFC);
-            //jobDto.Param?.Add("ProcedureId", $"{manuFacePlateContainerPackExJobDto.ProcedureId}");
-            //jobDto.Param?.Add("ResourceId", $"{manuFacePlateContainerPackExJobDto.ResourceId}");
-            //jobDto.Param?.Add("ContainerId", $"{manuFacePlateContainerPackExJobDto.ContainerId}");
             var sfcs = new List<string>() { manuFacePlateContainerPackExJobDto.SFC };
             JobRequestBo bo = new()
             {
@@ -465,8 +455,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 调用作业
             var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
-            //var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16709));
+            if (resJob == null || !resJob.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16709));
             return resJob;
             #endregion
         }

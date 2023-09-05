@@ -34,6 +34,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 构造函数（系统Token）
         /// </summary>
         /// <param name="inteSystemTokenService"></param>
+        /// <param name="logger"></param>
         public InteSystemTokenController(IInteSystemTokenService inteSystemTokenService, ILogger<InteSystemTokenController> logger)
         {
             _inteSystemTokenService = inteSystemTokenService;

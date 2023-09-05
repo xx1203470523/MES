@@ -19,7 +19,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
     public partial class EquEquipmentGroupRepository : IEquEquipmentGroupRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-        //private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 构造方法

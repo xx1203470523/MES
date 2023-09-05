@@ -19,16 +19,13 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
-using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 
@@ -121,19 +118,20 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
 
-        private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
-
+        /// <summary>
+        /// 仓储接口（作业）
+        /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
+
+        /// <summary>
+        /// 仓储接口（作业业务配置）
+        /// </summary>
+        private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
 
         /// <summary>
         /// 不合格代码仓储
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
-
-        /// <summary>
-        /// 产品不良录入 仓储
-        /// </summary>
-        private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
         /// 构造函数
@@ -153,6 +151,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="procProductSetRepository"></param>
+        /// <param name="inteJobRepository"></param>
+        /// <param name="inteJobBusinessRelationRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
         public MasterDataService(ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -169,10 +171,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcProductSetRepository procProductSetRepository,
-            IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IInteJobRepository inteJobRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-            IManuProductBadRecordRepository manuProductBadRecordRepository)
+            IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
@@ -190,10 +191,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procProductSetRepository = procProductSetRepository;
-            _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _inteJobRepository = inteJobRepository;
+            _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _manuProductBadRecordRepository = manuProductBadRecordRepository;
         }
 
 
@@ -202,7 +202,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        public async Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId)
+        public async Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId)
         {
             // 读取产品基础信息
             var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(materialId)
@@ -216,7 +216,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId)
+        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId)
         {
             // 获取工序信息
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId)
@@ -230,7 +230,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="processRouteId"></param>
         /// <returns></returns>
-        public async Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId)
+        public async Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheckAsync(long processRouteId)
         {
             // 读取当前工艺路线信息
             var processRouteEntity = await _procProcessRouteRepository.GetByIdAsync(processRouteId)
@@ -244,7 +244,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo)
+        public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo)
         {
             // 条码信息
             var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new ManuSfcQuery
@@ -256,16 +256,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return manuSfcEntities;
         }
 
-
         /// <summary>
         /// 获取生产工单
         /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true)
+        public async Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo)
         {
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(bo.WorkOrderId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
 
             // 判断是否被锁定
@@ -274,7 +272,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
             }
 
-            if (isVerifyActivation == true)
+            if (bo.IsVerifyActivation)
             {
                 // 判断是否是激活的工单
                 _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
@@ -330,47 +328,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <returns></returns>
-        public async Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo)
-        {
-            if (string.IsNullOrWhiteSpace(sfcBo.SFC)
-                || sfcBo.SFC.Contains(' ')) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
-
-            // 条码在制表
-            var sfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
-            {
-                SiteId = sfcBo.SiteId,
-                Sfc = sfcBo.SFC
-            });
-
-            // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntity == null)
-            {
-                var whMaterialInventoryEntity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
-                {
-                    SiteId = sfcBo.SiteId,
-                    BarCode = sfcBo.SFC
-                });
-                if (whMaterialInventoryEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
-
-            // 获取锁状态
-            var sfcProduceBusinessEntity = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCAsync(new SfcProduceBusinessQuery
-            {
-                SiteId = sfcBo.SiteId,
-                Sfc = sfcProduceEntity.SFC,
-                BusinessType = ManuSfcProduceBusinessType.Lock
-            });
-
-            return (sfcProduceEntity, sfcProduceBusinessEntity);
-        }
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsWithCheckAsync(MultiSFCBo sfcBos)
@@ -385,18 +342,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             });
 
             // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntities.Any() == false)
+            if (!sfcProduceEntities.Any())
             {
-                //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
-                //{
-                //    SiteId = sfcBos.SiteId,
-                //    BarCodes = sfcBos.SFCs
-                //});
-                //if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
-
             return sfcProduceEntities;
         }
 
@@ -417,15 +366,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             });
 
             // 不存在在制表的话，就去库存查找
-            if (sfcProduceEntities.Any() == false)
+            if (!sfcProduceEntities.Any())
             {
-                //var whMaterialInventoryEntities = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
-                //{
-                //    SiteId = sfcBos.SiteId,
-                //    BarCodes = sfcBos.SFCs
-                //});
-                //if (whMaterialInventoryEntities.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16318));
-
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
 
@@ -492,7 +434,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 };
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
                     if (replaceMaterialsDic.TryGetValue(item.Id, out var replaces))
                     {
@@ -514,7 +456,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     });
 
                     // 启用的替代物料
-                    deduct.ReplaceMaterials = replaceMaterialsForMain.Where(w => w.IsEnabled == true).Select(s => new MaterialDeductItemBo
+                    deduct.ReplaceMaterials = replaceMaterialsForMain.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
                     {
                         MaterialId = s.MaterialId,
                         Usages = item.Usages,
@@ -567,32 +509,34 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
-            return await GetNextProcedureAsync(manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId, manuSfcProduce.WorkOrderId);
+            return await GetNextProcedureAsync(new ManuRouteProcedureWithWorkOrderBo
+            {
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureId = manuSfcProduce.ProcedureId,
+                WorkOrderId = manuSfcProduce.WorkOrderId
+            });
         }
 
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="workOrderId"></param>
+        /// <param name="routeProcedureWithWorkOrderBo"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0)
+        private async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuRouteProcedureWithWorkOrderBo routeProcedureWithWorkOrderBo)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
-            var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(processRouteId)
+            var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(routeProcedureWithWorkOrderBo.ProcessRouteId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
 
-            var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId)
+            var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(routeProcedureWithWorkOrderBo.ProcessRouteId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
             // 数据过滤
-            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.PreProcessRouteDetailId == procedureId);
+            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.PreProcessRouteDetailId == routeProcedureWithWorkOrderBo.ProcedureId);
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
 
             // 随机工序Key
-            //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
-            var cacheKey = $"{workOrderId}-{processRouteId}-{procedureId}";
+            var cacheKey = $"{routeProcedureWithWorkOrderBo.WorkOrderId}-{routeProcedureWithWorkOrderBo.ProcessRouteId}-{routeProcedureWithWorkOrderBo.ProcedureId}";
             var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
 
             // 默认下一工序
@@ -654,21 +598,20 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="processRouteId"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes,
-            long processRouteId, long procedureId)
+        public async Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureWithInfoBo routeProcedureWithInfoBo)
         {
-            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
-            if (processRouteDetailLinks.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+            routeProcedureWithInfoBo.ProcessRouteDetailLinks = routeProcedureWithInfoBo.ProcessRouteDetailLinks.Where(w => w.ProcessRouteDetailId == routeProcedureWithInfoBo.ProcedureId);
+            if (!routeProcedureWithInfoBo.ProcessRouteDetailLinks.Any()) return false;
 
-            processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
-            if (processRouteDetailNodes.Any() == false) return false; //throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+            routeProcedureWithInfoBo.ProcessRouteDetailNodes = routeProcedureWithInfoBo.ProcessRouteDetailNodes.Where(w => routeProcedureWithInfoBo.ProcessRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
+            if (!routeProcedureWithInfoBo.ProcessRouteDetailNodes.Any()) return false;
 
             // 有多工序分叉的情况（取第一个当默认值）
-            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
-            if (processRouteDetailLinks.Count() > 1)
+            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = routeProcedureWithInfoBo.ProcessRouteDetailNodes.FirstOrDefault();
+            if (routeProcedureWithInfoBo.ProcessRouteDetailLinks.Count() > 1)
             {
                 // 下工序找上工序，执照正常流程的工序
-                defaultPreProcedure = processRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                defaultPreProcedure = routeProcedureWithInfoBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
             }
 
@@ -677,31 +620,31 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
 
             // 继续检查上一工序
-            return await IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, defaultPreProcedure.Id);
+            routeProcedureWithInfoBo.ProcedureId = defaultPreProcedure.Id;
+            return await IsRandomPreProcedureAsync(routeProcedureWithInfoBo);
         }
 
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedureAsync(long processRouteId, long procedureId)
+        public async Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureBo routeProcedureBo)
         {
             // 因为可能有分叉，所以返回的上一步工序是集合
             var preProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetPreProcessRouteDetailLinkAsync(new ProcProcessRouteDetailLinkQuery
             {
-                ProcessRouteId = processRouteId,
-                ProcedureId = procedureId
+                ProcessRouteId = routeProcedureBo.ProcessRouteId,
+                ProcedureId = routeProcedureBo.ProcedureId
             });
-            if (preProcessRouteDetailLinks == null || preProcessRouteDetailLinks.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
+            if (preProcessRouteDetailLinks == null || !preProcessRouteDetailLinks.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 获取当前工序在工艺路线里面的扩展信息
             var procedureNodes = await _procProcessRouteDetailNodeRepository
                 .GetByProcedureIdsAsync(new ProcProcessRouteDetailNodesQuery
                 {
-                    ProcessRouteId = processRouteId,
-                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId.Value)
+                    ProcessRouteId = routeProcedureBo.ProcessRouteId,
+                    ProcedureIds = preProcessRouteDetailLinks.Where(w => w.PreProcessRouteDetailId.HasValue).Select(s => s.PreProcessRouteDetailId!.Value)
                 }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10442));
 
             // 有多工序分叉的情况（取第一个当默认值）
@@ -718,47 +661,24 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
 
             // 继续检查上一工序
-            return await IsRandomPreProcedureAsync(processRouteId, defaultPreProcedure.Id);
+            return await IsRandomPreProcedureAsync(new ManuRouteProcedureBo
+            {
+                ProcessRouteId = routeProcedureBo.ProcessRouteId,
+                ProcedureId = defaultPreProcedure.Id
+            });
         }
 
         /// <summary>
         /// 判断是否首工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
-        public async Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId)
+        public async Task<bool> IsFirstProcedureAsync(ManuRouteProcedureBo routeProcedureBo)
         {
-            var firstProcedureDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetFirstProcedureByProcessRouteIdAsync(processRouteId)
+            var firstProcedureDetailNodeEntity = await _procProcessRouteDetailNodeRepository.GetFirstProcedureByProcessRouteIdAsync(routeProcedureBo.ProcessRouteId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10435));
 
-            return firstProcedureDetailNodeEntity.ProcedureId == procedureId;
-        }
-
-        /// <summary>
-        /// 验证开始工序是否在结束工序之前
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="startProcedureId"></param>
-        /// <param name="endProcedureId"></param>
-        /// <returns></returns>
-        public async Task<bool> IsProcessStartBeforeEndAsync(long processRouteId, long startProcedureId, long endProcedureId)
-        {
-            var processRouteDetailList = await GetProcessRouteAsync(processRouteId);
-            var processRouteDetails = processRouteDetailList.Where(x => x.ProcedureIds.Contains(startProcedureId) && x.ProcedureIds.Contains(endProcedureId));
-            if (processRouteDetails != null && processRouteDetails.Any())
-            {
-                foreach (var processRouteDetail in processRouteDetails)
-                {
-                    var startIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
-                    var endIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
-                    if (startIndex < endIndex)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return firstProcedureDetailNodeEntity.ProcedureId == routeProcedureBo.ProcedureId;
         }
 
         /// <summary>
@@ -770,33 +690,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         {
             var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedureId);
 
-            if (resources == null || resources.Any() == false) return Array.Empty<long>();
+            if (resources == null || !resources.Any()) return Array.Empty<long>();
             return resources.Select(s => s.Id);
-        }
-
-        /// <summary>
-        /// 获取工艺路线
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId)
-        {
-            var processRouteDetailLinkListTask = _procProcessRouteDetailLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = processRouteId });
-            var processRouteDetailNodeListTask = _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId);
-            var processRouteDetailLinkList = await processRouteDetailLinkListTask;
-            var processRouteDetailNodeList = await processRouteDetailNodeListTask;
-
-            IList<ProcessRouteDetailDto> list = new List<ProcessRouteDetailDto>();
-            if (processRouteDetailLinkList != null && processRouteDetailLinkList.Any()
-                && processRouteDetailNodeList != null && processRouteDetailNodeList.Any())
-            {
-                var firstProcedure = processRouteDetailNodeList.FirstOrDefault(x => x.IsFirstProcess == 1);
-                if (firstProcedure != null)
-                {
-                    CombinationProcessRoute(ref list, firstProcedure.ProcedureId, processRouteDetailLinkList);
-                }
-            }
-            return list;
         }
 
         /// <summary>
@@ -804,7 +699,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<long?> GetProductSetId(ProductSetBo param)
+        public async Task<long?> GetProductSetIdAsync(ProductSetBo param)
         {
             var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ResourceId, SiteId = param.SiteId });
             if (productSetEntity == null)
@@ -823,7 +718,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param)
+        public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
@@ -838,23 +733,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     LinkPoint = param.LinkPoint
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
-            {
-                return null;
-            }
-            else
-            {
-                var jobEntitys = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(x => x.JobId));
-                var jobs = new List<JobBo>();
-                foreach (var job in jobs)
-                {
-                    jobs.Add(new JobBo
-                    {
-                        Name = job.Name,
-                    });
-                }
-                return jobs;
-            }
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return null;
+
+            var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
+            return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
         }
 
 
@@ -929,10 +811,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
 
             // 未设置物料（克明说化成和返工的是没有投料的）
-            if (mainMaterials == null || mainMaterials.Any() == false)
+            if (mainMaterials == null || !mainMaterials.Any())
             {
                 return initialMaterials;
-                // throw new CustomerValidationException(nameof(ErrorCode.MES10612));
             }
 
             // 取得特定工序的物料
@@ -971,9 +852,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
-                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces) == true)
+                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
                     {
                         // 启用的替代物料（BOM）
                         deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
@@ -988,10 +869,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 // 填充物料替代料
                 else
                 {
-                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces) == true)
+                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces))
                     {
                         // 启用的替代物料（物料维护）
-                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled == true).Select(s => new MaterialDeductItemBo
+                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
                         {
                             MaterialId = s.MaterialId,
                             Usages = item.Usages,
@@ -1013,7 +894,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="unqualifiedIds"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds)
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodesAsync(long[] unqualifiedIds)
         {
             return await _qualUnqualifiedCodeRepository.GetByIdsAsync(unqualifiedIds);
         }
@@ -1060,10 +941,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         {
             decimal defaultConsumeRatio = 100;
 
-            if (materialEntities == null || materialEntities.Any() == false) return defaultConsumeRatio;
+            if (materialEntities == null || !materialEntities.Any()) return defaultConsumeRatio;
 
             var materialEntity = materialEntities.FirstOrDefault(f => f.Id == replaceMaterialId);
-            if (materialEntity == null || materialEntity.ConsumeRatio.HasValue == false) return defaultConsumeRatio;
+            if (materialEntity == null || !materialEntity.ConsumeRatio.HasValue) return defaultConsumeRatio;
 
             return materialEntity.ConsumeRatio.Value;
         }
@@ -1092,12 +973,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (residue <= 0) return;
 
             // 取得当前物料的库存
-            if (manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities) == false) return;
-            if (feedingEntities.Any() == false) return;
+            if (!manuFeedingsDictionary.TryGetValue(currentBo.MaterialId, out var feedingEntities)) return;
+            if (!feedingEntities.Any()) return;
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
             decimal originQty = currentBo.Usages;
-            if (currentBo.Loss.HasValue == true && currentBo.Loss > 0) originQty *= currentBo.Loss.Value;
+            if (currentBo.Loss.HasValue && currentBo.Loss > 0) originQty *= currentBo.Loss.Value;
             if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
@@ -1116,7 +997,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     {
                         // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
                         targetQty = replaceBo.Usages;
-                        if (replaceBo.Loss.HasValue == true && replaceBo.Loss > 0) targetQty *= replaceBo.Loss.Value;
+                        if (replaceBo.Loss.HasValue && replaceBo.Loss > 0) targetQty *= replaceBo.Loss.Value;
                         if (replaceBo.ConsumeRatio > 0) targetQty *= (replaceBo.ConsumeRatio / 100);
                     }
                 }
@@ -1169,7 +1050,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
 
             // 主物料才扣除检索下级替代料，当还有剩余未扣除的数量时，扣除替代料（替代料不再递归扣除下级替代料库存）
-            if (isMain == false || residue <= 0) return;
+            if (!isMain || residue <= 0) return;
 
             // 扣除替代料
             foreach (var replaceFeeding in currentBo.ReplaceMaterials)

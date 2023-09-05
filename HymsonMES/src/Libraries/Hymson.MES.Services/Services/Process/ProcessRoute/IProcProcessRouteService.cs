@@ -36,6 +36,13 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         Task<CustomProcessRouteDto> GetCustomProcProcessRouteAsync(long id);
 
         /// <summary>
+        /// 分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="processRouteProcedureQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcProcedureDto>> GetPagedInfoByProcessRouteIdAsync(ProcessRouteProcedureQueryDto processRouteProcedureQueryDto);
+
+        /// <summary>
         /// 根据ID查询工艺路线工序列表
         /// </summary>
         /// <param name="id"></param>

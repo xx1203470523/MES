@@ -138,11 +138,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.LeftJoin("proc_resource pr ON T.ResourceId = pr.Id");
             sqlBuilder.LeftJoin("equ_equipment ee ON T.EquipmentId = ee.Id");
             sqlBuilder.LeftJoin("plan_work_order pwo ON T.WorkOrderId = pwo.Id");
-            sqlBuilder.LeftJoin("inte_work_center iwc ON T.WorkCenterId = iwc.Id");
+            sqlBuilder.LeftJoin("inte_work_center iwc ON pwo.WorkCenterId = iwc.Id");
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
             sqlBuilder.OrderBy("T.CreatedOn DESC");
-            sqlBuilder.Select("T.*, qii.GenerateCondition, qii.GenerateConditionUnit, qii.ControlTime, qii.ControlTimeUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr.ResourceCode, pr.ResourceName, ee.EquipmentCode, ee.EquipmentName, pwo.OrderCode WorkOrderCode, iwc.Code WorkCenterCode");
+            sqlBuilder.Select("T.*, qii.GenerateCondition, qii.GenerateConditionUnit, qii.ControlTime, qii.ControlTimeUnit, pm.MaterialCode, pm.MaterialName, pp.Code ProcedureCode, pp.Name ProcedureName, pr. ResCode ResourceCode, pr.ResName ResourceName, ee.EquipmentCode, ee.EquipmentName, pwo.OrderCode WorkOrderCode, iwc.Code WorkCenterCode");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.InspectionOrder))
             {
@@ -178,6 +178,16 @@ namespace Hymson.MES.Data.Repositories.Quality
                 sqlBuilder.Where("T.IsQualified = @IsQualified");
             }
 
+            if (pagedQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("T.ProcedureId = @ProcedureId");
+            }
+
+            if (pagedQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where("T.MaterialId = @MaterialId");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -199,17 +209,17 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// </summary>
     public partial class QualIpqcInspectionTailRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_tail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_tail /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_ipqc_inspection_tail T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_ipqc_inspection_tail T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_ipqc_inspection_tail /**where**/  ";
 
-        const string InsertSql = "INSERT INTO qual_ipqc_inspection_tail(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SampleQty`, `IsQualified`, `Status`, `InspectionBy`, `InspectionOn`, `StartOn`, `CompleteOn`, `CloseOn`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @SampleQty, @IsQualified, @Status, @InspectionBy, @InspectionOn, @StartOn, @CompleteOn, @CloseOn, @HandMethod, @ProcessedBy, @ProcessedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO qual_ipqc_inspection_tail(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SampleQty`, `IsQualified`, `Status`, `InspectionBy`, `InspectionOn`, `StartOn`, `CompleteOn`, `CloseOn`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @SampleQty, @IsQualified, @Status, @InspectionBy, @InspectionOn, @StartOn, @CompleteOn, @CloseOn, @HandMethod, @ProcessedBy, @ProcessedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT INTO qual_ipqc_inspection_tail(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SampleQty`, `IsQualified`, `Status`, `InspectionBy`, `InspectionOn`, `StartOn`, `CompleteOn`, `CloseOn`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @SampleQty, @IsQualified, @Status, @InspectionBy, @InspectionOn, @StartOn, @CompleteOn, @CloseOn, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT INTO qual_ipqc_inspection_tail(  `Id`, `SiteId`, `InspectionOrder`, `IpqcInspectionId`, `WorkOrderId`, `MaterialId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SampleQty`, `IsQualified`, `Status`, `InspectionBy`, `InspectionOn`, `StartOn`, `CompleteOn`, `CloseOn`, `HandMethod`, `ProcessedBy`, `ProcessedOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @InspectionOrder, @IpqcInspectionId, @WorkOrderId, @MaterialId, @ProcedureId, @ResourceId, @EquipmentId, @SampleQty, @IsQualified, @Status, @InspectionBy, @InspectionOn, @StartOn, @CompleteOn, @CloseOn, @HandMethod, @ProcessedBy, @ProcessedOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string UpdateSql = "UPDATE qual_ipqc_inspection_tail SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, InspectionBy = @InspectionBy, InspectionOn = @InspectionOn, StartOn = @StartOn, CompleteOn = @CompleteOn, CloseOn = @CloseOn, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE qual_ipqc_inspection_tail SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, InspectionBy = @InspectionBy, InspectionOn = @InspectionOn, StartOn = @StartOn, CompleteOn = @CompleteOn, CloseOn = @CloseOn, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_ipqc_inspection_tail SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, InspectionBy = @InspectionBy, InspectionOn = @InspectionOn, StartOn = @StartOn, CompleteOn = @CompleteOn, CloseOn = @CloseOn, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, ExecuteBy = @ExecuteBy, ExecuteOn = @ExecuteOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE qual_ipqc_inspection_tail SET   SiteId = @SiteId, InspectionOrder = @InspectionOrder, IpqcInspectionId = @IpqcInspectionId, WorkOrderId = @WorkOrderId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SampleQty = @SampleQty, IsQualified = @IsQualified, Status = @Status, InspectionBy = @InspectionBy, InspectionOn = @InspectionOn, StartOn = @StartOn, CompleteOn = @CompleteOn, CloseOn = @CloseOn, HandMethod = @HandMethod, ProcessedBy = @ProcessedBy, ProcessedOn = @ProcessedOn, ExecuteBy = @ExecuteBy, ExecuteOn = @ExecuteOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_ipqc_inspection_tail SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE qual_ipqc_inspection_tail SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

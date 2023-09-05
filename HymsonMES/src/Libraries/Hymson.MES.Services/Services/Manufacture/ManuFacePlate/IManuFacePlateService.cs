@@ -6,6 +6,7 @@
  *build datetime: 2023-04-01 01:56:57
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
@@ -78,6 +79,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="updateManuFacePlateDto"></param>
         /// <returns></returns>
         Task UpdateManuFacePlateAsync(UpdateManuFacePlateDto updateManuFacePlateDto);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
 
     }
 }

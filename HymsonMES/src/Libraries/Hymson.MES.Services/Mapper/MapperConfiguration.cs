@@ -30,6 +30,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -337,10 +338,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupDto>();
             CreateMap<ProcProcessEquipmentGroupRelationEntity, ProcProcessEquipmentGroupRelationDto>();
 
-            //CreateMap<ProcProcessEquipmentGroupRuleDto, ProcProcessEquipmentGroupRuleEntity>();
             CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
             CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
-            //CreateMap<ProcProcessEquipmentGroupRelationRuleDto, ProcProcessEquipmentGroupRelationRuleEntity>();
             CreateMap<ProcProcessEquipmentGroupRelationSaveDto, ProcProcessEquipmentGroupRelationEntity>();
             CreateMap<ProcProcessEquipmentGroupRelationPagedQueryDto, ProcProcessEquipmentGroupRelationPagedQuery>();
 
@@ -457,6 +456,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcResourceEquipmentBindPagedQueryDto, ProcResourceEquipmentBindPagedQuery>();
 
             CreateMap<ProcResourceProcedurePagedQueryDto, ProcResourceProcedurePagedQuery>();
+            CreateMap<ProcResourcePagedlineIdAndProcProcedureIdDto, ProcResourcePagedlineIdAndProcProcedureIdQuery>();
             #endregion
 
             #region Procedure
@@ -477,6 +477,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcProcessRouteModifyDto, ProcProcessRouteEntity>();
             CreateMap<ProcProcessRouteDetailNodeView, ProcProcessRouteDetailNodeViewDto>();
             CreateMap<ProcProcessRouteDetailLinkEntity, ProcProcessRouteDetailLinkDto>();
+            CreateMap<ProcessRouteProcedureQueryDto, ProcessRouteProcedureQuery>();
             #endregion
 
             #region PrintConfig
@@ -628,6 +629,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionHeadSampleEntity, QualIpqcInspectionHeadSampleDto>();
             CreateMap<QualIpqcInspectionHeadAnnexEntity, QualIpqcInspectionHeadAnnexDto>();
             CreateMap<QualIpqcInspectionParameterEntity, SampleShouldInspectItemsDto>();
+            CreateMap<QualIpqcInspectionHeadSamplePagedQueryDto, QualIpqcInspectionHeadSamplePagedQuery>();
+            CreateMap<QualIpqcInspectionHeadSampleView, QualIpqcInspectionHeadSampleDto>();
             #endregion
 
             #region QualIpqcInspectionPatrol
@@ -638,6 +641,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionPatrolSampleView, QualIpqcInspectionPatrolSampleDto>();
             CreateMap<QualIpqcInspectionPatrolSampleEntity, QualIpqcInspectionPatrolSampleDto>();
             CreateMap<QualIpqcInspectionPatrolAnnexEntity, QualIpqcInspectionPatrolAnnexDto>();
+            CreateMap<QualIpqcInspectionPatrolSamplePagedQueryDto, QualIpqcInspectionPatrolSamplePagedQuery>();
             #endregion
 
             #region QualIpqcInspectionTail
@@ -648,6 +652,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionTailSampleView, QualIpqcInspectionTailSampleDto>();
             CreateMap<QualIpqcInspectionTailSampleEntity, QualIpqcInspectionTailSampleDto>();
             CreateMap<QualIpqcInspectionTailAnnexEntity, QualIpqcInspectionTailAnnexDto>();
+            CreateMap<QualIpqcInspectionTailSamplePagedQueryDto, QualIpqcInspectionTailSamplePagedQuery>();
+            CreateMap<QualIpqcInspectionPatrolSampleCreateDto, QualIpqcInspectionPatrolSampleEntity>();
             #endregion
         }
 

@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
@@ -218,6 +219,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             return new PagedInfo<QualEnvParameterGroupView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
     }
 
 
@@ -235,7 +247,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string InsertSql = "INSERT IGNORE qual_env_parameter_group(`Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT IGNORE qual_env_parameter_group(`Id`, `Code`, `Name`, `Version`, `Status`, `WorkCenterId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @WorkCenterId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE qual_env_parameter_group SET Name = @Name, Version = @Version, Status = @Status, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE qual_env_parameter_group SET Name = @Name, Version = @Version, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE qual_env_parameter_group SET Name = @Name, Version = @Version, Status = @Status, WorkCenterId = @WorkCenterId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE qual_env_parameter_group SET IsDeleted = Id WHERE Id = @Id ";
@@ -246,5 +258,6 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByIdSql = @"SELECT * FROM qual_env_parameter_group WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM qual_env_parameter_group WHERE Id IN @Ids ";
 
+        const string UpdateStatusSql = "UPDATE `qual_env_parameter_group` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }
 }

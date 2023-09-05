@@ -16,17 +16,17 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 取值方式;1：固定值；2：可变值；
         /// </summary>
-        public CodeValueTakingTypeEnum ValueTakingType { get; set; }
+        public CodeValueTakingTypeEnum? ValueTakingType { get; set; }
 
         /// <summary>
         /// 分段值
         /// </summary>
-        public string SegmentedValue { get; set; }= "";
+        public string? SegmentedValue { get; set; }= "";
 
         /// <summary>
         /// 自定义值
         /// </summary>
-        public string CustomValue { get; set; } = "";
+        public string? CustomValue { get; set; } = "";
     }
 
     /// <summary>

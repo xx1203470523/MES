@@ -14,8 +14,6 @@ namespace Hymson.MES.Services.Validators.Integrated
         /// </summary>
         public InteClassSaveValidator()
         {
-            //RuleFor(x => x.ClassName).NotEmpty().WithErrorCode(ErrorCode.MES10214);
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
             RuleFor(x => x.ClassType).NotEmpty().WithErrorCode(ErrorCode.MES10215);
 
         }

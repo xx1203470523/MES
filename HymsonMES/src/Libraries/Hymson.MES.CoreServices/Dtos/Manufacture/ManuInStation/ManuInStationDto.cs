@@ -27,7 +27,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuInStation
         /// <summary>
         /// 条码
         /// </summary>
-        public string SFC { get; set; }
+        public string SFC { get; set; } = "";
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuInStation
         /// <summary>
         /// 条码
         /// </summary>
-        public IEnumerable<string> SFCs { get; set; }
+        public IEnumerable<string> SFCs { get; set; }= new List<string>();
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuInStation
         /// <summary>
         /// 条码
         /// </summary>
-        public string SFC { get; set; }
+        public string SFC { get; set; } = "";
     }
 
     /// <summary>
@@ -101,6 +101,6 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuInStation
         /// <summary>
         /// 条码
         /// </summary>
-        public IEnumerable<string> SFCs { get; set; }
+        public IEnumerable<string> SFCs { get; set; }=new List<string>();
     }
 }

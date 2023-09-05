@@ -136,11 +136,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string UnqualifiedCodeName { get; set; }
 
-        /// <summary>
-        /// 描述 :状态 
-        /// 空值 : true  
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 描述 :状态 
+        ///// 空值 : true  
+        ///// </summary>
 
         /// <summary>
         /// 类型
@@ -186,11 +185,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string UnqualifiedCodeName { get; set; }
 
 
-        /// <summary>
-        /// 描述 :状态 
-        /// 空值 : true  
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 描述 :状态 
+        ///// 空值 : true  
+        ///// </summary>
 
         /// <summary>
         /// 类型

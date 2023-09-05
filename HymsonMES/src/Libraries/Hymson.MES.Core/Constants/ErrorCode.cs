@@ -299,6 +299,9 @@
         public const string MES10903 = "消息状态不合法";
         public const string MES10904 = "原因分析不允许有空格";
         public const string MES10905 = "处理方案不允许有空格";
+        public const string MES10906 = "推送对象不允许有空格";
+        public const string MES10907 = "私钥不允许有空格";
+        public const string MES10908 = "关键字不允许有空格";
         #endregion
 
         #region 降级规则 11000
@@ -331,6 +334,7 @@
         public const string MES11112 = "状态不合法，请检查!";
         public const string MES11113 = "类型不合法，请检查!";
         public const string MES11114 = "等级不合法，请检查!";
+        public const string MES11115 = "该不合格代码不存在";
         #endregion
 
         #region 不合格组 11200
@@ -372,6 +376,7 @@
         public const string MES11407 = "产品序列码[{sfc}]没有录入降级编码，无法移除！";
         public const string MES11408 = "产品序列码【{sfc}】的降级规则不存在";
         public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
+        public const string MES11410 = "降级移除失败:有数据已经被移除了,请清除后重新处理";
 
         #endregion
 
@@ -572,7 +577,8 @@
         public const string MES13232 = "该检验单非完成状态，不允许进行不合格处理！";
         public const string MES13233 = "存在非待检验状态的单据，不允许删除！";
         public const string MES13234 = "样品条码【{SampleCode}】已检验，不能重复检验！";
-
+        public const string MES13235 = "样品条码【{SampleCode}】不存在！";
+        public const string MES13236 = "样品条码【{SampleCode}】已经报废！";
         #endregion
 
         #region 过程检 13300
@@ -1180,13 +1186,11 @@
         public const string MES18700 = "Recipe参数错误";
         public const string MES18701 = "对应Recipe参数不存在";
         public const string MES18702 = "Recipe参数编码已存在";
-        //public const string MES18603 = "载具编码[{codes}]有关联的产品序列码,请先解绑该载具所关联的产品序列码！";
         public const string MES18704 = "Recipe参数编码不能为空";
         public const string MES18703 = "Recipe参数编码不允许空格";
         public const string MES18705 = "Recipe参数名称不能为空";
         public const string MES18706 = "Recipe参数编码最大长度为100";
         public const string MES18707 = "Recipe参数名称最大长度为100";
-        //public const string MES18708 = "Recipe参数描述最大长度为255";
         public const string MES18709 = "Recipe参数状态不合法";
         public const string MES18710 = "Recipe参数功能类型不合法";
 
@@ -1276,7 +1280,7 @@
         #endregion
 
         #region 调用第三方服务出错
-        //public const string MES30001 = "MES30001";
+
         #endregion
     }
 }

@@ -143,4 +143,37 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// </summary>
         public string? ResType { get; set; }
     }
+
+    /// <summary>
+    /// 资源维护表查询对象
+    /// </summary>
+    public class ProcResourcePagedlineIdAndProcProcedureIdQuery : PagerInfo
+    {
+        /// <summary>
+        /// 描述 :资源代码 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 描述 :资源名称 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResName { get; set; }
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long? WorkCenterLineId { get; set; }
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public  IEnumerable<long?>  WorkCenterLineIds { get; set; }
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long? ResTypeId { get; set; }
+    }
 }

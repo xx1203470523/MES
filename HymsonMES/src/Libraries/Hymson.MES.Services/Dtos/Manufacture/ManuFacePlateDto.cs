@@ -108,11 +108,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public ManuFacePlateTypeEnum Type { get; set; }
 
        /// <summary>
-        /// 状态;0、新建、1、启用、2、保留、3、废除；
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
-
-       /// <summary>
         /// 会话时间（分钟）
         /// </summary>
         public int ConversationTime { get; set; }
@@ -147,11 +142,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 类型;1、生产过站；2、在制品维修
         /// </summary>
         public ManuFacePlateTypeEnum Type { get; set; }
-
-       /// <summary>
-        /// 状态;0、新建、1、启用、2、保留、3、废除；
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
 
        /// <summary>
         /// 会话时间（分钟）

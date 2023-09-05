@@ -95,11 +95,11 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialCreateDto.MaterialName = procMaterialCreateDto.MaterialName.Trim();
             procMaterialCreateDto.Version = procMaterialCreateDto.Version.Trim();
             procMaterialCreateDto.Remark = procMaterialCreateDto?.Remark ?? "".Trim();
-            procMaterialCreateDto.Unit = procMaterialCreateDto?.Unit ?? "".Trim();
+            procMaterialCreateDto!.Unit = procMaterialCreateDto?.Unit ?? "".Trim();
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
+            await _validationCreateRules!.ValidateAndThrowAsync(procMaterialCreateDto);
 
-            procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToUpper();
+            procMaterialCreateDto!.MaterialCode = procMaterialCreateDto.MaterialCode.ToUpper();
             procMaterialCreateDto.Origin = MaterialOriginEnum.ManualEntry; // ERP/EIS（sys_source_type）
 
             //判断编号是否已存在
@@ -230,7 +230,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcMaterialAsync(long[] idsArr)
+        public async Task DeletesProcMaterialAsync(long[] idsArr)
         {
             if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
@@ -258,12 +258,23 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10225));
             }
 
-            return await _procMaterialRepository.DeletesAsync(new DeleteCommand
+            #region 删除物料的关联供应商关系
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                Ids = idsArr,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                await _procMaterialRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    DeleteOn = HymsonClock.Now(),
+                    UserId = _currentUser.UserName
+                });
+
+                //await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(idsArr);
+
+                await _procMaterialSupplierRelationRepository.DeleteTrueByMaterialIdsAsync(idsArr);
+
+                ts.Complete();
+            }
+            #endregion
         }
 
         /// <summary>
@@ -325,27 +336,22 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialModifyDto.MaterialName = procMaterialModifyDto.MaterialName.Trim();
             procMaterialModifyDto.Version = procMaterialModifyDto.Version.Trim();
             procMaterialModifyDto.Remark = procMaterialModifyDto?.Remark ?? "".Trim();
-            procMaterialModifyDto.Unit = procMaterialModifyDto?.Unit ?? "".Trim();
+            procMaterialModifyDto!.Unit = procMaterialModifyDto?.Unit ?? "".Trim();
 
             //DTO转换实体
-            var procMaterialEntity = procMaterialModifyDto.ToEntity<ProcMaterialEntity>();
+            var procMaterialEntity = procMaterialModifyDto!.ToEntity<ProcMaterialEntity>();
             procMaterialEntity.UpdatedBy = _currentUser.UserName;
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
 
             #region 校验
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procMaterialModifyDto);
+            await _validationModifyRules!.ValidateAndThrowAsync(procMaterialModifyDto);
 
-            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId ?? 0);
+            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto!.Id, _currentSite.SiteId ?? 0);
             if (modelOrigin == null)
             {
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
             }
-
-            //if (modelOrigin.Status != SysDataStatusEnum.Build && procMaterialModifyDto.Status == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            //}
 
             //验证某些是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
@@ -360,8 +366,8 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             // 判断替代品是否包含当前物料
-            var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList, procMaterialEntity);
-            if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id) == true)
+            var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList!, procMaterialEntity);
+            if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10206));
             }
@@ -375,7 +381,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (exists != null && exists.Id != procMaterialEntity.Id)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version!);
             }
 
             #endregion
@@ -464,12 +470,9 @@ namespace Hymson.MES.Services.Services.Process
                 response = await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(new long[] { procMaterialEntity.Id });
 
                 //替代组设置数据
-                if (addProcReplaceList != null && addProcReplaceList.Count > 0)
+                if (addProcReplaceList != null && addProcReplaceList.Count > 0 && (await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList)) <= 0)
                 {
-                    if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList)) <= 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10209));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10209));
                 }
 
 
@@ -525,7 +528,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 return procMaterialViewDto;
             }
-            return null;
+            return new ProcMaterialViewDto();
         }
 
         /// <summary>
@@ -556,13 +559,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public static List<ProcReplaceMaterialEntity> ConvertProcReplaceMaterialList(IEnumerable<ProcMaterialReplaceDto> dynamicList, ProcMaterialEntity model)
         {
-            if (dynamicList == null || dynamicList.Any() == false) return new List<ProcReplaceMaterialEntity> { };
+            if (dynamicList == null || !dynamicList.Any()) return new List<ProcReplaceMaterialEntity> { };
             return dynamicList.Select(s => new ProcReplaceMaterialEntity
             {
                 MaterialId = model.Id,
                 ReplaceMaterialId = s.Id,
                 IsUse = s.IsEnabled,
-                CreatedBy = model.UpdatedBy,
+                CreatedBy = model.UpdatedBy!,
                 CreatedOn = model.UpdatedOn ?? HymsonClock.Now()
             }).ToList();
         }
@@ -609,7 +612,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             if (material.Status == changeStatusCommand.Status) 
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SfcProduceStatusEnum), material.Status)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), material.Status)}"));
             }
             #endregion
 

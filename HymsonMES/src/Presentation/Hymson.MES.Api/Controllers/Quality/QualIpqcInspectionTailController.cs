@@ -57,7 +57,6 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("delete")]
         [PermissionDescription("quality:ipqcInspectionTail:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
@@ -80,8 +79,8 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet("samplelist/{id}")]
-        public async Task<PagedInfo<QualIpqcInspectionTailSampleDto>> GetPagedSampleListAsync(QualIpqcInspectionTailSamplePagedQueryDto pagedQueryDto)
+        [HttpGet("samplelist")]
+        public async Task<PagedInfo<QualIpqcInspectionTailSampleDto>> GetPagedSampleListAsync([FromQuery]QualIpqcInspectionTailSamplePagedQueryDto pagedQueryDto)
         {
             return await _qualIpqcInspectionTailService.GetPagedSampleListAsync(pagedQueryDto);
         }
@@ -206,7 +205,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("shouldInspectItems")]
-        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync(SampleShouldInspectItemsQueryDto query)
+        public async Task<IEnumerable<SampleShouldInspectItemsDto>?> GetSampleShouldInspectItemsAsync([FromQuery] SampleShouldInspectItemsQueryDto query)
         {
             return await _qualIpqcInspectionTailService.GetSampleShouldInspectItemsAsync(query);
         }

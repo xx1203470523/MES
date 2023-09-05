@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment
@@ -49,5 +50,13 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
     }
 }

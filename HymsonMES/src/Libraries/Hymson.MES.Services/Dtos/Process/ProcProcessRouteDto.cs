@@ -225,11 +225,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-       ///// <summary>
-       // /// 状态
-       // /// </summary>
-       // public SysDataStatusEnum Status { get; set; }
-
        /// <summary>
         /// 类型
         /// </summary>
@@ -280,11 +275,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 当前版本
         /// </summary>
         public bool IsCurrentVersion { get; set; }
-
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
-        //public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -341,5 +331,27 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcProcessRouteQueryDto
     {
         public long[] Ids { get; set; }
+    }
+
+    /// <summary>
+    /// 查询工序
+    /// </summary>
+    public class ProcessRouteProcedureQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? Name { get; set; }
+
+
+        /// <summary>
+        /// 工艺路线id
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
     }
 }

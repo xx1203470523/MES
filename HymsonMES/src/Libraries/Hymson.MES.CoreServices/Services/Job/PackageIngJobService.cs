@@ -34,17 +34,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("包装", JobTypeEnum.Standard)]
     public class PackageIngJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
-        /// 服务接口（主数据）
-        /// </summary>
-        private readonly IMasterDataService _masterDataService;
-
         /// <summary>
         /// 验证器
         /// </summary>
@@ -55,13 +44,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public PackageIngJobService(IManuCommonService manuCommonService,
-            AbstractValidator<PackageIngRequestBo> validationRepairJob,
-            IMasterDataService masterDataService)
+        public PackageIngJobService(AbstractValidator<PackageIngRequestBo> validationRepairJob)
         {
-            _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
-            _masterDataService = masterDataService;
         }
 
 
@@ -99,13 +84,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<PackageIngRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
+            _ = param.ToBo<PackageIngRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
             var defaultDto = new PackageIngResponseBo { };
 
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageService.ParseToInt().ToString());
 
-            return defaultDto;
+            return await Task.FromResult(defaultDto);
         }
 
         /// <summary>
@@ -117,7 +102,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             JobResponseBo responseBo = new();
             if (obj is not PackageIngResponseBo data) return responseBo;
-            return await Task.FromResult(new JobResponseBo { Content = data.Content });
+            return await Task.FromResult(new JobResponseBo { Content = data.Content! });
         }
 
 

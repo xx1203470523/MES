@@ -158,7 +158,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             if (manuContainerPackEntities != null && manuContainerPackEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFC", string.Join(",", sfcBos.SFCs));
-                //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
             }
         }
 
@@ -174,8 +173,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
             // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
             procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureBomBo.ProcedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
-            if (procBomDetailEntities == null || procBomDetailEntities.Any() == false) return;
-
+            if (procBomDetailEntities == null || !procBomDetailEntities.Any()) return;
             // 流转信息（多条码）
             var sfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
             {
@@ -190,7 +188,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 IsDisassemble = TrueOrFalseEnum.No
             });
 
-            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
+            if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
@@ -228,11 +226,11 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
-            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (!material.MaskCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             // 未设置规则
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
-            if (maskCodeRules == null || maskCodeRules.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (maskCodeRules == null || !maskCodeRules.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             return barCode.VerifyBarCode(maskCodeRules);
         }

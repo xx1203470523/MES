@@ -38,6 +38,9 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// <param name="qualUnqualifiedGroupRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// /// <param name="inteJobBusinessRelationRepository"></param>
+        /// /// <param name="currentUser"></param>
+        /// /// <param name="currentSite"></param>
         public QualUnqualifiedGroupService(IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository, AbstractValidator<QualUnqualifiedGroupCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedGroupModifyDto> validationModifyRules, IInteJobBusinessRelationRepository inteJobBusinessRelationRepository, ICurrentUser currentUser, ICurrentSite currentSite)
         {
             _qualUnqualifiedGroupRepository = qualUnqualifiedGroupRepository;

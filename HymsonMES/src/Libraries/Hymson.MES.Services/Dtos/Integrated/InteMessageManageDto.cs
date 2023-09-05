@@ -450,6 +450,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Code { get; set; }
 
         /// <summary>
+        /// 消息状态;1、触发2、接收3、处理4、关闭
+        /// </summary>
+        public MessageStatusEnum? Status { get; set; }
+
+        /// <summary>
         /// 事件类型名称
         /// </summary>
         public string? EventTypeName { get; set; }

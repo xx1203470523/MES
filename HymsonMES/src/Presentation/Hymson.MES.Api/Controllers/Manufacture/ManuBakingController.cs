@@ -33,6 +33,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（烘烤工序）
         /// </summary>
         /// <param name="manuBakingService"></param>
+        /// <param name="logger"></param>
         public ManuBakingController(IManuBakingService manuBakingService, ILogger<ManuBakingController> logger)
         {
             _manuBakingService = manuBakingService;

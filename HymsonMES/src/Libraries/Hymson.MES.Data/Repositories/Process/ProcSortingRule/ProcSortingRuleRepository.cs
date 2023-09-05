@@ -234,6 +234,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByCodeAndMaterialIdSql, param);
         }
         #endregion
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     public partial class ProcSortingRuleRepository
@@ -248,7 +259,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_sorting_rule`(  `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Version, @MaterialId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_sorting_rule`(  `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Version, @MaterialId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version, MaterialId = @MaterialId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version, MaterialId = @MaterialId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version, MaterialId = @MaterialId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_sorting_rule` SET IsDeleted = Id WHERE Id = @Id ";
@@ -267,5 +278,7 @@ namespace Hymson.MES.Data.Repositories.Process
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`   WHERE  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
         #endregion
+
+        const string UpdateStatusSql = "UPDATE `proc_sorting_rule` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }
 }

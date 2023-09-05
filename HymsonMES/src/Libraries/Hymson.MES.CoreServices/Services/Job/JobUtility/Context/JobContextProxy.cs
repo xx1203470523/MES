@@ -22,14 +22,13 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <summary>
         /// 
         /// </summary>
-        private static SemaphoreSlim[] _semaphores;
+        private static SemaphoreSlim[]? _semaphores;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         public JobContextProxy()
         {
-            // dictionary = new();
             int num = Math.Max(Environment.ProcessorCount * 8, 32);
             _semaphores = new SemaphoreSlim[num];
             for (int i = 0; i < _semaphores.Length; i++)
@@ -183,7 +182,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                     }
                 }
             }
-            return (TResult)obj;
+            return obj;
         }
 
         /// <summary>
@@ -330,7 +329,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         public async Task<IEnumerable<TResult>?> GetDataBaseValueAsync<T, TResult>(Func<T, Task<IEnumerable<TResult>>> func, T parameters, int expectCount = 0) where TResult : BaseEntity
         {
-            var name = typeof(IEnumerable<TResult>);
             var cacheKey = (uint)$"{typeof(IEnumerable<TResult>)}".GetHashCode();
 
             if (Has(cacheKey))
@@ -341,32 +339,28 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
 
                 if (expectCount != 0 && cacheResult.Count() < expectCount)
                 {
-                    var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+                    var obj = await GetValueAsync(func, parameters);
 
                     if (obj != null)
                     {
-                        var incompleteKey = (uint)$"{IncompleteKey}{typeof(IEnumerable<TResult>)}".GetHashCode();
                         IncompleteDatabaseMerge(cacheKey, obj);
 
                         _ = cacheResult.Concat(obj.Where(x => !cacheResult.Any(o => o.Id == x.Id)));
                         Set(cacheKey, cacheResult);
                     }
                 }
-                return (IEnumerable<TResult>)cacheResult;
+                return cacheResult;
             }
-
-            //uint hash = cacheKey % (uint)_semaphores.Length;
-            //_semaphores[hash].Wait();
             try
             {
-                var obj = await GetValueAsync<T, IEnumerable<TResult>>(func, parameters);
+                var obj = await GetValueAsync(func, parameters);
                 if (obj == null) return default;
                 Set(cacheKey, obj);
                 return obj;
             }
             finally
             {
-                //_semaphores[hash].Release();
+                
             }
         }
 
@@ -378,12 +372,12 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// 取值
         /// </summary>
         /// <param name="func"></param>
-        /// <param name="parameters"></param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
-        public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameters)
+        public TResult? GetValue<T, TResult>(Func<T, TResult> func, T parameter)
         {
             var paramString = "";
-            if (parameters != null && parameters.IsNotEmpty()) paramString = parameters.ToSerialize();
+            if (parameter != null && parameter.IsNotEmpty()) paramString = parameter.ToSerialize();
 
             var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{paramString}".GetHashCode();
 
@@ -395,32 +389,23 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            //uint hash = cacheKey % (uint)_semaphores.Length;
-            //_semaphores[hash].Wait();
-            try
-            {
-                var obj = func(parameters);
-                if (obj == null) return default;
+            var tResult = func(parameter);
+            if (tResult == null) return default;
 
-                Set(cacheKey, obj);
-                return obj;
-            }
-            finally
-            {
-                //_semaphores[hash].Release();
-            }
+            Set(cacheKey, tResult);
+            return tResult;
         }
 
         /// <summary>
         /// 取值
         /// </summary>
         /// <param name="func"></param>
-        /// <param name="parameters"></param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
-        public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameters)
+        public async Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameter)
         {
             var paramString = "";
-            if (parameters != null && parameters.IsNotEmpty()) paramString = parameters.ToSerialize();
+            if (parameter != null && parameter.IsNotEmpty()) paramString = parameter.ToSerialize();
 
             var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{paramString}".GetHashCode();
             if (Has(cacheKey))
@@ -431,20 +416,11 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 return (TResult)cacheObj;
             }
 
-            //uint hash = cacheKey % (uint)_semaphores.Length;
-            //await _semaphores[hash].WaitAsync();
-            try
-            {
-                var obj = await func(parameters);
-                if (obj == null) return default;
+            var tResult = await func(parameter);
+            if (tResult == null) return default;
 
-                Set(cacheKey, obj);
-                return obj;
-            }
-            finally
-            {
-                //_semaphores[hash].Release();
-            }
+            Set(cacheKey, tResult);
+            return tResult;
         }
 
         /// <summary>
@@ -455,7 +431,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <returns></returns>
         protected object Set(uint key, object value)
         {
-            //var valueStr = value.ToSerialize();
+
             return dictionary.AddOrUpdate(key, value, (k, v) => value);
         }
 

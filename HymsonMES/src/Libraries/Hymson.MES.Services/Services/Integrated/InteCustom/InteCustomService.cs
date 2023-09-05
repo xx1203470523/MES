@@ -132,7 +132,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteCustomDto"></param>
+        /// <param name="inteCustomModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyInteCustomAsync(InteCustomModifyDto inteCustomModifyDto)
         {

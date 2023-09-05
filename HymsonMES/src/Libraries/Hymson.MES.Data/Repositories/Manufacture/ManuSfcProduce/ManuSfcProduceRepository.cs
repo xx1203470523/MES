@@ -570,7 +570,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSfcProduceBusinesssBySfcInfoIdsCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(DeleteSfcProduceBusinessBySfcInfoIdsSql, command);
         }
 

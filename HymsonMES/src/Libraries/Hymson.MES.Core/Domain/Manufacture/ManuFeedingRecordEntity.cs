@@ -32,6 +32,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public string BarCode { get; set; }
 
         /// <summary>
+        /// 条码对应的物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal? Qty { get; set; }

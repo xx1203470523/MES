@@ -142,7 +142,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="manuDowngradingRuleDto"></param>
+        /// <param name="manuDowngradingRuleModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyManuDowngradingRuleAsync(ManuDowngradingRuleModifyDto manuDowngradingRuleModifyDto)
         {
@@ -169,7 +169,7 @@ namespace Hymson.MES.Services.Services.Manufacture
            {
                return manuDowngradingRuleEntity.ToModel<ManuDowngradingRuleDto>();
            }
-            return null;
+            return new ManuDowngradingRuleDto();
         }
 
         /// <summary>

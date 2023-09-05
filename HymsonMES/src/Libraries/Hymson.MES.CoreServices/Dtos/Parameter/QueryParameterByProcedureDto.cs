@@ -24,6 +24,6 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 条码集合
         /// </summary>
-        public IEnumerable<string>  SFCs { get; set;}
+        public IEnumerable<string> SFCs { get; set; } = new List<string>();
     }
 }

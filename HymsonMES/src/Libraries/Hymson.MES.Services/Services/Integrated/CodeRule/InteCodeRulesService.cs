@@ -89,13 +89,13 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12438));
             }
-            if (inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%").Count()!=1)
+            if (inteCodeRulesCreateDto.CodeRulesMakes.Count(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%") !=1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12444));
             }
             if (inteCodeRulesCreateDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%")) 
             {
-                if (inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%").Count() != 1)
+                if (inteCodeRulesCreateDto.CodeRulesMakes.Count(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%") != 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12445));
                 }
@@ -128,7 +128,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId = _currentSite.SiteId ?? 0, ProductId = inteCodeRulesCreateDto.ProductId });
             if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
             {
-                IEnumerable<InteCodeRulesEntity> repeats = new List<InteCodeRulesEntity>();
+                IEnumerable<InteCodeRulesEntity> repeats;
                 //判断 编码类型和包装类型是否重复，重复则报错   2023/04/25 加的需求
                 if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
                 {
@@ -245,7 +245,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteCodeRulesDto"></param>
+        /// <param name="inteCodeRulesModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyInteCodeRulesAsync(InteCodeRulesModifyDto inteCodeRulesModifyDto)
         {
@@ -259,13 +259,13 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12438));
             }
-            if (inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%").Count() != 1)
+            if (inteCodeRulesModifyDto.CodeRulesMakes.Count(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%ACTIVITY%") != 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12444));
             }
             if (inteCodeRulesModifyDto.CodeRulesMakes.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%"))
             {
-                if (inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%").Count() != 1)
+                if (inteCodeRulesModifyDto.CodeRulesMakes.Count(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%") != 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12445));
                 }
@@ -294,7 +294,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
             var hasCodeRulesEntities = await _inteCodeRulesRepository.GetInteCodeRulesEntitiesEqualAsync(new InteCodeRulesQuery { SiteId=_currentSite.SiteId??0,ProductId = inteCodeRulesModifyDto.ProductId });
             if (hasCodeRulesEntities != null && hasCodeRulesEntities.Any())
             {
-                IEnumerable<InteCodeRulesEntity> repeats = new List<InteCodeRulesEntity>();
+                IEnumerable<InteCodeRulesEntity> repeats;
                 //判断 编码类型和包装类型是否重复，重复则报错   2023/04/25 加的需求
                 if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
                 {
@@ -386,9 +386,9 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 var inteCodeRulesMakeEntitys = (await _inteCodeRulesMakeRepository.GetInteCodeRulesMakeEntitiesAsync(new InteCodeRulesMakeQuery { SiteId = _currentSite.SiteId ?? 0, CodeRulesId = inteCodeRulesEntity.Id })).OrderBy(x=>x.Seq);
 
                 List<InteCodeRulesMakeDto> inteCodeRulesDtos = new List<InteCodeRulesMakeDto>();
-                if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Count() > 0)
+                if (inteCodeRulesMakeEntitys != null && inteCodeRulesMakeEntitys.Any())
                 {
-                    //转换
+                    //转换    
                     foreach (var item in inteCodeRulesMakeEntitys)
                     {
                         inteCodeRulesDtos.Add(item.ToModel<InteCodeRulesMakeDto>());

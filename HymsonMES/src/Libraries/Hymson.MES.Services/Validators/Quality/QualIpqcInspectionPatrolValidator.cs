@@ -1,5 +1,6 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Validators.Quality
@@ -37,8 +38,7 @@ namespace Hymson.MES.Services.Validators.Quality
             {
                 RuleForEach(x => x).ChildRules(c =>
                 {
-                    //c.RuleFor(x => x.InspectionValue).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13205));
-                    c.RuleFor(x => x.IsQualified).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13206));
+                    c.RuleFor(x => x.IsQualified).Must(it => Enum.IsDefined(typeof(TrueOrFalseEnum), it)).WithErrorCode(nameof(ErrorCode.MES13206));
                 });
             });
         }

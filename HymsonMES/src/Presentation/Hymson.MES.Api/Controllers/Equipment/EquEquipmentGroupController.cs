@@ -27,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（设备组）
         /// </summary>
         /// <param name="equEquipmentGroupService"></param>
+        /// <param name="logger"></param>
         public EquEquipmentGroupController(IEquEquipmentGroupService equEquipmentGroupService, ILogger<EquEquipmentGroupController> logger)
         {
             _equEquipmentGroupService = equEquipmentGroupService;

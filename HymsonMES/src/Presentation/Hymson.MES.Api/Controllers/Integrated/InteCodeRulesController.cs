@@ -35,6 +35,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 构造函数（编码规则）
         /// </summary>
         /// <param name="inteCodeRulesService"></param>
+        /// <param name="logger"></param>
         public InteCodeRulesController(IInteCodeRulesService inteCodeRulesService, ILogger<InteCodeRulesController> logger)
         {
             _inteCodeRulesService = inteCodeRulesService;
@@ -104,7 +105,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [PermissionDescription("inte:codeRules:delete")]
         public async Task DeleteInteCodeRulesAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _inteCodeRulesService.DeletesInteCodeRulesAsync(ids);
         }
 

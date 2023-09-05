@@ -80,6 +80,5 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<QualIpqcInspectionPatrolView>> GetPagedListAsync(QualIpqcInspectionPatrolPagedQuery pagedQuery);
-
     }
 }

@@ -34,12 +34,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("维修结束", JobTypeEnum.Standard)]
     public class RepairEndJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
         /// <summary>
         /// 服务接口（主数据）
         /// </summary>
@@ -55,11 +49,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public RepairEndJobService(IManuCommonService manuCommonService,
-            AbstractValidator<RepairEndRequestBo> validationRepairJob,
+        public RepairEndJobService(AbstractValidator<RepairEndRequestBo> validationRepairJob,
             IMasterDataService masterDataService)
         {
-            _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
             _masterDataService = masterDataService;
         }
@@ -102,7 +94,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<RepairEndRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
             // 获取生产条码信息
-            var sfcProduceEntitys = await param.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
+            var sfcProduceEntitys = await param.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, new MultiSFCBo { SFCs = bo.SFCs, SiteId = bo.SiteId });
             if (sfcProduceEntitys == null || !sfcProduceEntitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
@@ -110,11 +102,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16330));
-            };
+            }
             if (sfcProduceEntitys.GroupBy(it => it.ProcedureId).Count() > 1)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16331));
-            };
+            }
             var sfcProduceActivitys = sfcProduceEntitys.Where(it => it.Status != SfcProduceStatusEnum.Activity);
             if (sfcProduceActivitys.Any())
             {
