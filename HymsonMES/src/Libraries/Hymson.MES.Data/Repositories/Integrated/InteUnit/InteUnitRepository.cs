@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -102,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteUnitEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteUnitEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteUnitEntity>(GetByIdsSql, new { Ids = ids });
@@ -128,6 +128,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteUnitEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted =0");
+            if (query.Codes != null && query.Codes.Any())
+            {
+                sqlBuilder.Where(" Code  in @Codes ");
+            }
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteUnitEntity>(template.RawSql, query);
         }
@@ -143,11 +149,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-           
-            
+
+
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
@@ -187,7 +192,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                             /**select**/
                                            FROM `inte_unit` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `inte_unit`(  `Id`, SiteId, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `inte_unit`(  `Id`,`Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `inte_unit`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `inte_unit` SET   Code = @Code, Name = @Name, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
@@ -200,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT * FROM `inte_unit`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `inte_unit`  WHERE Id IN @Ids ";
 
-        const string GetByCodeSql = "SELECT * FROM inte_unit WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM inte_unit WHERE `IsDeleted` = 0 AND Code = @Code LIMIT 1";
 
     }
 }
