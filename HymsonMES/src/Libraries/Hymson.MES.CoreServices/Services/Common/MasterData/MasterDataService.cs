@@ -519,7 +519,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procedureId"></param>
         /// <param name="workOrderId"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0)
+        private async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
             var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(processRouteId)
@@ -595,21 +595,20 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="processRouteId"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public async Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes,
-            long processRouteId, long procedureId)
+        public async Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureWithInfoBo routeProcedureWithInfoBo)
         {
-            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.ProcessRouteDetailId == procedureId);
-            if (!processRouteDetailLinks.Any()) return false;
+            routeProcedureWithInfoBo.ProcessRouteDetailLinks = routeProcedureWithInfoBo.ProcessRouteDetailLinks.Where(w => w.ProcessRouteDetailId == routeProcedureWithInfoBo.ProcedureId);
+            if (!routeProcedureWithInfoBo.ProcessRouteDetailLinks.Any()) return false;
 
-            processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
-            if (!processRouteDetailNodes.Any()) return false;
+            routeProcedureWithInfoBo.ProcessRouteDetailNodes = routeProcedureWithInfoBo.ProcessRouteDetailNodes.Where(w => routeProcedureWithInfoBo.ProcessRouteDetailLinks.Select(s => s.PreProcessRouteDetailId).Contains(w.ProcedureId));
+            if (!routeProcedureWithInfoBo.ProcessRouteDetailNodes.Any()) return false;
 
             // 有多工序分叉的情况（取第一个当默认值）
-            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = processRouteDetailNodes.FirstOrDefault();
-            if (processRouteDetailLinks.Count() > 1)
+            ProcProcessRouteDetailNodeEntity? defaultPreProcedure = routeProcedureWithInfoBo.ProcessRouteDetailNodes.FirstOrDefault();
+            if (routeProcedureWithInfoBo.ProcessRouteDetailLinks.Count() > 1)
             {
                 // 下工序找上工序，执照正常流程的工序
-                defaultPreProcedure = processRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
+                defaultPreProcedure = routeProcedureWithInfoBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
             }
 
@@ -618,7 +617,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (defaultPreProcedure.CheckType == ProcessRouteInspectTypeEnum.RandomInspection) return true;
 
             // 继续检查上一工序
-            return await IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, defaultPreProcedure.Id);
+            routeProcedureWithInfoBo.ProcedureId = defaultPreProcedure.Id;
+            return await IsRandomPreProcedureAsync(routeProcedureWithInfoBo);
         }
 
         /// <summary>

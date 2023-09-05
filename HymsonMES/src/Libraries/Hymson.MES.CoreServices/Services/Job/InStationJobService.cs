@@ -169,15 +169,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                 // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await bo.Proxy.GetValueAsync(async parameters =>
+                var IsRandomPreProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsRandomPreProcedureAsync, new ManuRouteProcedureWithInfoBo
                 {
-                    var processRouteDetailLinks = (IEnumerable<ProcProcessRouteDetailLinkEntity>)parameters[0];
-                    var processRouteDetailNodes = (IEnumerable<ProcProcessRouteDetailNodeEntity>)parameters[1];
-                    var processRouteId = (long)parameters[2];
-                    var procedureId = (long)parameters[3];
-                    return await _masterDataService.IsRandomPreProcedureAsync(processRouteDetailLinks, processRouteDetailNodes, processRouteId, procedureId);
-                }, new object[] { processRouteDetailLinks, processRouteDetailNodes, firstProduceEntity.ProcessRouteId, bo.ProcedureId });
-
+                    ProcessRouteDetailLinks = processRouteDetailLinks,
+                    ProcessRouteDetailNodes = processRouteDetailNodes,
+                    ProcessRouteId = firstProduceEntity.ProcessRouteId,
+                    ProcedureId = bo.ProcedureId
+                });
                 if (!IsRandomPreProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
             }
         }
