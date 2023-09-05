@@ -187,4 +187,119 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         /// </summary>
         public DateTime? CreatedOn { get; set; }
     }
+
+    /// <summary>
+    /// ManuSfcTrace
+    /// </summary>
+    public record ManuSfcTracedDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 对应条码
+        /// </summary>
+        public string CodeId { get; set; }
+        /// <summary>
+        /// 对应设备编码
+        /// </summary>
+        public string DeviceCode { get; set; }
+        /// <summary>
+        /// 流转后条码信息
+        /// </summary>
+        public string CirculationBarCode { get; set; }
+    }
+    /// <summary>
+    /// ManuSfcStepDto
+    /// </summary>
+    public record ManuSfcStepDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string EquipmentName { get; set; }
+
+        /// <summary>
+        /// 生产工单类型
+        /// </summary>
+        public PlanWorkOrderTypeEnum WorkOrderType { get; set; }
+
+        /// <summary>
+        /// 产品料号
+        /// </summary>
+        public string ProductName { get; set; }
+
+        /// <summary>
+        /// 过站时间
+        /// </summary>
+        public DateTime? CreatedOn { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+        
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        public string ResourceName { get; set; }
+
+        /// <summary>
+        /// 工序类型
+        /// </summary>
+        public int? ProcedureType { get; set; }
+
+        /// <summary>
+        /// 过站结果
+        /// </summary>
+        public int? Passed { get; set; }
+    }
+
+    /// <summary>
+    /// ManuSfcPrameterDto
+    /// </summary>
+    public record ManuSfcPrameterDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 参考上限
+        /// </summary>
+        public string StandardUpperLimit { get; set; }
+
+        /// <summary>
+        /// 参考下限
+        /// </summary>
+        public string StandardLowerLimit { get; set; }
+
+        /// <summary>
+        /// 检测工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 检测工序名称
+        /// </summary>
+        public string ProcedureName { get; set; }
+        
+        /// <summary>
+        /// 检测时间
+        /// </summary>
+        public DateTime? LocalTime { get; set; }
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string? EquipmentName { get; set; }
+    }
 }

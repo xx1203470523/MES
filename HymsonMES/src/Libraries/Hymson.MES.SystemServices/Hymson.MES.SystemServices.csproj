@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
+    <ProjectReference Include="..\Hymson.MES.Services\Hymson.MES.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

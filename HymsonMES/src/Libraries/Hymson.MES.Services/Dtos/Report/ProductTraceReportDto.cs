@@ -375,6 +375,15 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        public PlanWorkOrderTypeEnum WorkOrderType { get; set; }
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string ProductName { get; set; }
         /// <summary>
         /// 创建人
         /// </summary>

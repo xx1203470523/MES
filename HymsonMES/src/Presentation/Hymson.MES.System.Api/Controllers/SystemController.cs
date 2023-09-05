@@ -9,7 +9,9 @@ using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Drawing.Printing;
+using static Mysqlx.Notice.Warning.Types;
 
 namespace Hymson.MES.System.Api.Controllers
 {
@@ -73,7 +75,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("producttrace")]
-        public async Task<PagedInfo<Hymson.MES.Services.Dtos.Report.ManuSfcCirculationViewDto>> GetProductTracePagedListAsync([FromQuery] ManuSfcTraceQueryDto manuSfcTraceQueryDto)
+        public async Task<IEnumerable<ManuSfcTracedDto>> GetProductTracePagedListAsync(ManuSfcTraceQueryDto manuSfcTraceQueryDto)
         {
             if (string.IsNullOrEmpty(manuSfcTraceQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             ProductTracePagedQueryDto productTracePagedQueryDto = new ProductTracePagedQueryDto()
@@ -83,7 +85,19 @@ namespace Hymson.MES.System.Api.Controllers
                 PageSize = 2000,
                 PageIndex = 1
             };
-            return await _productTraceReportService.GetProductTracePagedListAsync(productTracePagedQueryDto);
+            var manuSfcCirculationList = await _productTraceReportService.GetProductTracePagedListAsync(productTracePagedQueryDto);
+            List<ManuSfcTracedDto> manuSfcTracedDtoList = new List<ManuSfcTracedDto>();
+            foreach (var manuSfcCirculationViewDto in manuSfcCirculationList.Data)
+            {
+                ManuSfcTracedDto manuSfcTracedDto = new()
+                {
+                    DeviceCode = manuSfcCirculationViewDto.EquipentCode,
+                    CodeId = manuSfcCirculationViewDto.SFC,
+                    CirculationBarCode = manuSfcCirculationViewDto.CirculationBarCode
+                };
+                manuSfcTracedDtoList.Add(manuSfcTracedDto);
+            }
+            return manuSfcTracedDtoList;
         }
 
         /// <summary>
@@ -93,7 +107,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("productprameter")]
-        public async Task<PagedInfo<ManuProductParameterViewDto>> GetProductPrameterPagedListAsync([FromQuery] ManuSfcPrameterQueryDto manuSfcPrameterQueryDto)
+        public async Task<IEnumerable<ManuSfcPrameterDto>> GetProductPrameterPagedListAsync(ManuSfcPrameterQueryDto manuSfcPrameterQueryDto)
         {
            if (string.IsNullOrEmpty(manuSfcPrameterQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             ManuProductPrameterPagedQueryDto param = new ManuProductPrameterPagedQueryDto()
@@ -103,7 +117,25 @@ namespace Hymson.MES.System.Api.Controllers
                 PageSize = 2000,
                 PageIndex = 1
             };
-            return await _productTraceReportService.GetProductPrameterPagedListAsync(param);
+            var manuProductParameterViewDtoList =  await _productTraceReportService.GetProductPrameterPagedListAsync(param);
+
+            List<ManuSfcPrameterDto> manuSfcPrameterDtoList = new List<ManuSfcPrameterDto>();
+            foreach (var ManuSfcCirculationViewDto in manuProductParameterViewDtoList.Data)
+            {
+                ManuSfcPrameterDto manuSfcTracedDto = new()
+                {
+                    ParameterName = ManuSfcCirculationViewDto.ParameterName,
+                    ParameterCode = ManuSfcCirculationViewDto.ParameterCode,
+                    StandardUpperLimit = ManuSfcCirculationViewDto.StandardUpperLimit,
+                    StandardLowerLimit = ManuSfcCirculationViewDto.StandardLowerLimit,
+                    ProcedureCode = ManuSfcCirculationViewDto.ProcedureCode,
+                    ProcedureName = ManuSfcCirculationViewDto.ProcedureName,
+                    LocalTime = ManuSfcCirculationViewDto.LocalTime,
+                    EquipmentName = ManuSfcCirculationViewDto.EquipmentName,
+                };
+                manuSfcPrameterDtoList.Add(manuSfcTracedDto);
+            }
+            return manuSfcPrameterDtoList;
         }
 
         /// <summary>
@@ -113,7 +145,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sfcstep")]
-        public async Task<PagedInfo<ManuSfcStepViewDto>> GetSfcStepPagedListAsync([FromQuery] ManuSfcStepQueryDto manuSfcStepQueryDto)
+        public async Task<IEnumerable<ManuSfcStepDto>> GetSfcStepPagedListAsync(ManuSfcStepQueryDto manuSfcStepQueryDto)
         {
             if (string.IsNullOrEmpty(manuSfcStepQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             ManuSfcStepPagedQueryDto param = new ManuSfcStepPagedQueryDto()
@@ -122,7 +154,27 @@ namespace Hymson.MES.System.Api.Controllers
                 PageSize = 2000,
                 PageIndex = 1
             };
-            return await _productTraceReportService.GetSfcStepPagedListAsync(param);
+            var manuSfcStepViewDtoList = await _productTraceReportService.GetSfcStepPagedListAsync(param);
+
+            List<ManuSfcStepDto> manuSfcPrameterDtoList = new List<ManuSfcStepDto>();
+            foreach (var ManuSfcCirculationViewDto in manuSfcStepViewDtoList.Data)
+            {
+                ManuSfcStepDto manuSfcTracedDto = new()
+                {
+                    EquipmentName = ManuSfcCirculationViewDto.EquipmentName,
+                    WorkOrderType = ManuSfcCirculationViewDto.WorkOrderType,
+                    ProductName = ManuSfcCirculationViewDto.ProductName,
+                    CreatedOn = ManuSfcCirculationViewDto.CreatedOn,
+                    ProcedureCode = ManuSfcCirculationViewDto.ProcedureCode,
+                    ProcedureName = ManuSfcCirculationViewDto.ProcedureName,
+                    ResourceName = ManuSfcCirculationViewDto.ResourceName,
+                    ProcedureType = 0,
+                    Passed = ManuSfcCirculationViewDto.Passed
+                };
+                manuSfcPrameterDtoList.Add(manuSfcTracedDto);
+            }
+
+            return manuSfcPrameterDtoList;
         }
 
     }

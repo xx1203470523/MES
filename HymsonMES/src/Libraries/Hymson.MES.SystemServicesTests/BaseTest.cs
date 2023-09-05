@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using AutoMapper;
+using Hymson.MES.Services.Services.Report;
 
 namespace Hymson.MES.SystemServicesTests
 {
@@ -55,6 +56,7 @@ namespace Hymson.MES.SystemServicesTests
                 .AddSingleton<ICurrentUser, TestCurrentUser>()//测试所用CurrentUser服务
                 .AddSingleton<ICurrentSite, TestCurrentSite>()//测试所用CurrentSite服务
                 .AddSingleton<IManuSfcCirculationService, ManuSfcCirculationService>()//条码流转服务
+                .AddSingleton<IProductTraceReportService, ProductTraceReportService>()//
                 .AddSingleton<AbstractValidator<PlanWorkOrderDto>, PlanWorkOrderValidator>()
                 .AddSingleton<AbstractValidator<ManuSfcCirculationDto>, ManuSfcCirculationValidator>()
                 .BuildServiceProvider();

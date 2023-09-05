@@ -111,7 +111,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<ManuSfcCirculationViewDto>> GetProductTracePagedListAsync(ProductTracePagedQueryDto productTracePagedQueryDto)
         {
             var productTraceReportPagedQuery = productTracePagedQueryDto.ToQuery<ProductTraceReportPagedQuery>();
-            productTraceReportPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            productTraceReportPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             //追溯分页查询
             var pagedInfo = await _manuSfcCirculationRepository.GetProductTraceReportPagedInfoAsync(productTraceReportPagedQuery);
             //工单信息
@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<PagedInfo<ManuProductParameterViewDto>> GetProductPrameterPagedListAsync(ManuProductPrameterPagedQueryDto manuProductPrameterPagedQueryDto)
         {
             var manuProductParameterPagedQuery = manuProductPrameterPagedQueryDto.ToQuery<ManuProductParameterPagedQuery>();
-            manuProductParameterPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuProductParameterPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             //参数分页查询
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterPagedInfoAsync(manuProductParameterPagedQuery);
             //资源信息
@@ -260,8 +260,22 @@ namespace Hymson.MES.Services.Services.Report
         {
             //查询条码所有步骤数据
             var manuSfcStepPagedQuery = manuSfcStepPagedQueryDto.ToQuery<ManuSfcStepPagedQuery>();
-            manuSfcStepPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            manuSfcStepPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
             var pagedInfo = await _manuSfcStepRepository.GetPagedInfoAsync(manuSfcStepPagedQuery);
+            //工单信息
+            IEnumerable<PlanWorkOrderEntity> planWorkOrders = new List<PlanWorkOrderEntity>();
+            var workOrderIds = pagedInfo.Data.Select(c => c.WorkOrderId).ToArray();
+            if (workOrderIds.Any())
+            {
+                planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            }
+            //产品ID
+            IEnumerable<ProcMaterialEntity> procMaterials = new List<ProcMaterialEntity>();
+            var procMaterialIds = planWorkOrders.Select(c => c.ProductId).ToArray();
+            if (procMaterialIds.Any())
+            {
+                procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
+            }
             //资源信息
             IEnumerable<ProcResourceEntity> procResources = new List<ProcResourceEntity>();
             var procResourcesIds = pagedInfo.Data.Select(c => c.ResourceId ?? -1).ToArray();
@@ -308,6 +322,15 @@ namespace Hymson.MES.Services.Services.Report
                     returnView.EquipmentCode = equEquipment.EquipmentCode;
                     returnView.EquipmentName = equEquipment.EquipmentName;
                 }
+
+                //工单信息
+                var planWorkOrder = planWorkOrders.Where(c => c.Id == s.WorkOrderId).FirstOrDefault();
+                if (planWorkOrder != null)
+                {
+                    returnView.WorkOrderType = planWorkOrder.Type;
+                    returnView.ProductName = procMaterials?.FirstOrDefault(x => x.Id == planWorkOrder.ProductId)?.MaterialName ?? "";
+                }
+
                 return returnView;
             });
             return new PagedInfo<ManuSfcStepViewDto>(returnDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
