@@ -149,12 +149,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (planWorkOrderEntity?.Status == PlanWorkOrderStatusEnum.Finish)
             {
                 // 检查是否首工序
-                var isFirstProcedure = await bo.Proxy.GetValueAsync(async parameters =>
+                var isFirstProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
                 {
-                    var processRouteId = (long)parameters[0];
-                    var procedureId = (long)parameters[1];
-                    return await _masterDataService.IsFirstProcedureAsync(processRouteId, procedureId);
-                }, new object[] { firstProduceEntity.ProcessRouteId, firstProduceEntity.ProcedureId });
+                    ProcessRouteId = firstProduceEntity.ProcessRouteId,
+                    ProcedureId = firstProduceEntity.ProcedureId
+                });
 
                 // 因为获取工单方法已经对激活状态做了校验，这里不需要再校验
                 if (isFirstProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16350));
@@ -224,12 +223,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var updatedOn = HymsonClock.Now();
 
             // 检查是否首工序
-            var isFirstProcedure = await bo.Proxy.GetValueAsync(async parameters =>
+            var isFirstProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
             {
-                var processRouteId = (long)parameters[0];
-                var procedureId = (long)parameters[1];
-                return await _masterDataService.IsFirstProcedureAsync(processRouteId, procedureId);
-            }, new object[] { firstSFCProduceEntity.ProcessRouteId, firstSFCProduceEntity.ProcedureId });
+                ProcessRouteId = firstSFCProduceEntity.ProcessRouteId,
+                ProcedureId = firstSFCProduceEntity.ProcedureId
+            });
 
             // 获取当前工序信息
             var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheckAsync(firstSFCProduceEntity.ProcedureId);

@@ -64,13 +64,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
-        /// <param name="sfcBo"></param>
-        /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo);
-
-        /// <summary>
-        /// 获取生产条码信息
-        /// </summary>
         /// <param name="sfcBos"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsWithCheckAsync(MultiSFCBo sfcBos);
@@ -133,27 +126,16 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
-        Task<bool> IsRandomPreProcedureAsync(long processRouteId, long procedureId);
+        Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
 
         /// <summary>
         /// 判断是否首工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
-        Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId);
-
-        /// <summary>
-        /// 验证开始工序是否在结束工序之前
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="startProcedureId"></param>
-        /// <param name="endProcedureId"></param>
-        /// <returns></returns>
-        Task<bool> IsProcessStartBeforeEndAsync(long processRouteId, long startProcedureId, long endProcedureId);
+        Task<bool> IsFirstProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
 
         /// <summary>
         /// 获取工序关联的资源
@@ -161,13 +143,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
-
-        /// <summary>
-        /// 获取工艺路线
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId);
 
         /// <summary>
         /// 获取生产配置中产品id
