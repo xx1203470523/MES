@@ -469,14 +469,19 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string? Code { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? OrderId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
         /// 条码列表
         /// </summary>
         public string[]? Sfcs { get; set; }
-
-        /// <summary>
-        /// 资源id
-        /// </summary>
-        public long? ResourceId { get; set; }
 
         /// <summary>
         /// 资源编码
@@ -484,19 +489,24 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string? ResCode { get; set; }
 
         /// <summary>
-        /// 锁定状态
+        /// 资源Id
         /// </summary>
-        public int? Lock { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
-        /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
+        /// 资源类型Id
         /// </summary>
-        public int? NoLock { get; set; }
+        public long? ResourceTypeId { get; set; }
 
         /// <summary>
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long? ProductId { get; set; }
 
         /// <summary>
         /// 产品编码
@@ -609,7 +619,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public int Status { get; set; }
+        public SfcProduceStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 工单

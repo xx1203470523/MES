@@ -129,6 +129,73 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="manuSfcProducePagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceEntity>> GetPagedListAsync(ManuSfcProducePagedQuery manuSfcProducePagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+
+            sqlBuilder.Where("msp.SiteId = @SiteId");
+            sqlBuilder.OrderBy("msp.UpdatedOn DESC");
+            sqlBuilder.Select("msp.*");
+
+            //状态
+            if (manuSfcProducePagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("msp.Status=@Status");
+            }
+            if (manuSfcProducePagedQuery.IsScrap.HasValue)
+            {
+                sqlBuilder.Where("msp.IsScrap=@IsScrap");
+            }
+            if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Sfc))
+            {
+                manuSfcProducePagedQuery.Sfc = $"%{manuSfcProducePagedQuery.Sfc}%";
+                sqlBuilder.Where("msp.Sfc like @Sfc");
+            }
+            if (manuSfcProducePagedQuery.SfcArray != null && manuSfcProducePagedQuery.SfcArray.Length > 0)
+            {
+                sqlBuilder.Where("msp.Sfc in @SfcArray");
+            }
+            //工单
+            if (manuSfcProducePagedQuery.OrderId.HasValue && manuSfcProducePagedQuery.OrderId > 0)
+            {
+                sqlBuilder.Where(" msp.WorkOrderId = @OrderId ");
+            }
+            //工序
+            if (manuSfcProducePagedQuery.ProcedureId.HasValue && manuSfcProducePagedQuery.ProcedureId > 0)
+            {
+                sqlBuilder.Where("  msp.ProcedureId = @ProcedureId ");
+            }
+            //资源
+            if (manuSfcProducePagedQuery.ResourceId.HasValue && manuSfcProducePagedQuery.ResourceId > 0)
+            {
+                sqlBuilder.Where("  msp.ResourceId = @ResourceId ");
+            }
+            //物料
+            if (manuSfcProducePagedQuery.ProductId.HasValue && manuSfcProducePagedQuery.ProductId > 0)
+            {
+                sqlBuilder.Where("  msp.ProductId = @ProductId ");
+            }
+
+            var offSet = (manuSfcProducePagedQuery.PageIndex - 1) * manuSfcProducePagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = manuSfcProducePagedQuery.PageSize });
+            sqlBuilder.AddParameters(manuSfcProducePagedQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcProduceEntitiesTask = conn.QueryAsync<ManuSfcProduceEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ManuSfcProduceEntity>(manuSfcProduceEntities, manuSfcProducePagedQuery.PageIndex, manuSfcProducePagedQuery.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>

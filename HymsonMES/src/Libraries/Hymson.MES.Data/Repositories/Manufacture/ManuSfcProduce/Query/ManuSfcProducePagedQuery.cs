@@ -46,6 +46,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? Code { get; set; }
 
         /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? OrderId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
         /// 条码列表
         /// </summary>
         public string[]? SfcArray { get; set; }
@@ -56,24 +66,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? ResCode { get; set; }
 
         /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
         /// 资源类型Id
         /// </summary>
         public long? ResourceTypeId { get; set; }
 
         /// <summary>
-        /// 锁定状态
-        /// </summary>
-        public int? Lock { get; set; }
-
-        /// <summary>
-        /// 查询锁定状态不为某个状态的sfc信息，即时锁定的不能操作不查
-        /// </summary>
-        public int? NoLock { get; set; }
-
-        /// <summary>
         /// 是否报废
         /// </summary>
         public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 产品Id
+        /// </summary>
+        public long? ProductId { get; set; }
 
         /// <summary>
         /// 产品编码

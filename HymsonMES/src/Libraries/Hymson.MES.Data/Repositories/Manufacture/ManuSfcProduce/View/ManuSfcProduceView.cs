@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public int Status { get; set; }
+        public SfcProduceStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工单

@@ -46,6 +46,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 分页查询列表（条码生产信息（物理删除））
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pagelistNew")]
+        public async Task<PagedInfo<ManuSfcProduceViewDto>> GetPageListAsync([FromQuery] ManuSfcProducePagedQueryDto parm)
+        {
+            return await _manuSfcProduceService.GetPageListNewAsync(parm);
+        }
+
+        /// <summary>
         /// 质量锁定
         /// </summary>
         /// <param name="parm"></param>
