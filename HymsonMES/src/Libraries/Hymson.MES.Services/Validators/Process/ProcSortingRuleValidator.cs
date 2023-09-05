@@ -153,19 +153,35 @@ namespace Hymson.MES.Services.Validators.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        private bool ManuSortingParamUpperAndLowerLimitValidator(IEnumerable<SortingParamDto> param)
+        private bool ManuSortingParamUpperAndLowerLimitValidator(IEnumerable<SortingParamDto>? param)
         {
             if (param != null)
             {
                 foreach (var item in param)
                 {
-                    if (item.MaxValue != null)
+                    if (item.MaxValue.HasValue && !item.ParameterValue.HasValue && item.MinValue.HasValue)
                     {
-                            return false;     
+                        var differenceValue = item.MaxValue - item.MinValue;
+                        if (differenceValue == 0)
+                        {
+                            if (item.MaxContainingType == ContainingTypeEnum.LtOrE)
+                            {
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else if (differenceValue < 0)
+                        {
+                            return false;
+                        }
                     }
                 }
             }
             return true;
         }
+
     }
 }
