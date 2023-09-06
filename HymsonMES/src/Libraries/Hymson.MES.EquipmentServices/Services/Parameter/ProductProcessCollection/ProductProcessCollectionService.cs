@@ -196,8 +196,6 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                     });
             }
 
-            await _manuEquipmentParameterService.CreateEquipmentParameterTable("equ_parameter_wwkkmm");
-
             if (errorParameter.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19101)).WithData("ParameterCodes", string.Join(",", errorParameter));
