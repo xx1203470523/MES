@@ -193,6 +193,17 @@ namespace Hymson.MES.Data.Repositories.Quality
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationSql, new { UnqualifiedGroupId = id });
         }
+
+        /// <summary>
+        /// 删除不合格组关联不合格代码
+        /// </summary>
+        /// <param name="unqualifiedCodeId"></param>
+        /// <returns></returns>
+        public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(long unqualifiedCodeId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdSql, new { UnqualifiedCodeId = unqualifiedCodeId });
+        }
         #endregion
 
         #region 不合格组关联工序
@@ -268,6 +279,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string UpdatesSql = "UPDATE `qual_unqualified_group` SET    UnqualifiedGroupName = @UnqualifiedGroupName, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `qual_unqualified_group` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0 ";
         const string DelteQualUnqualifiedCodeGroupRelationSql = "DELETE  FROM qual_unqualified_code_group_relation WHERE  UnqualifiedGroupId = @UnqualifiedGroupId AND IsDeleted=0";
+        const string DelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdSql = "DELETE  FROM qual_unqualified_code_group_relation WHERE  UnqualifiedCodeId = @UnqualifiedCodeId AND IsDeleted=0";
         const string RealDelteQualUnqualifiedGroupProcedureRelationSql = "DELETE  FROM qual_unqualified_group_procedure_relation WHERE  UnqualifiedGroupId = @UnqualifiedGroupId AND IsDeleted=0";
     }
 }

@@ -70,8 +70,9 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, BarcodeReceiveService>();
             services.AddSingleton<IJobService, ProductBadRecordJobService>();
             services.AddSingleton<IJobService, SmiFinishedJobService>();
-            services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
+            services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
+            services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
             return services;
         }
 

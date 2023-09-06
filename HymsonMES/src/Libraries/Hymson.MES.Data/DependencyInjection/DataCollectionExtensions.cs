@@ -255,6 +255,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionTailRepository, QualIpqcInspectionTailRepository>();
             services.AddSingleton<IQualIpqcInspectionTailSampleRepository, QualIpqcInspectionTailSampleRepository>();
             services.AddSingleton<IQualIpqcInspectionTailAnnexRepository, QualIpqcInspectionTailAnnexRepository>();
+            services.AddSingleton<IManuEquipmentParameterRepository, ManuEquipmentParameterRepository>();
             #endregion
 
             #region Manufacture

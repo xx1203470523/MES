@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="param"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public async Task<string?> ShowCreateTable(string tableName)
+        public async Task<string?> ShowCreateTableAsync(string tableName)
         {
             string sql = $"SHOW  CREATE TABLE {tableName}";
             using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public async Task<int> CreateProductParameterTable(string tableName)
+        public async Task<int> CreateProductParameterTableAsync(string tableName)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
             return await conn.ExecuteAsync(tableName);

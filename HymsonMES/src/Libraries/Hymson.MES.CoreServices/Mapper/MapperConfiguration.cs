@@ -47,6 +47,7 @@ namespace Hymson.MES.CoreServices.Mapper
         protected virtual void CreateParameterBoMaps()
         {
             CreateMap<ParameterDto,ManuProductParameterEntity> ();
+            CreateMap<EquipmentParameterDto, EquipmentParameterEntity>();
         }
 
         /// <summary>

@@ -17,6 +17,13 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task Collection(ProductProcessParameterDto param);
+        Task CollectionAsync(ProductProcessParameterDto param);
+
+        /// <summary>
+        /// 设备参数采集
+        /// </summary>
+        /// <param name="equipmentProductProcessParameters"></param>
+        /// <returns></returns>
+        Task EquipmentCollectionAsync(IEnumerable<EquipmentProductProcessParameterDto> equipmentProductProcessParameters);
     }
 }

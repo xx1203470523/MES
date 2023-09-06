@@ -307,7 +307,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             //更新不合格代码表
             await _qualUnqualifiedCodeRepository.UpdateAsync(qualUnqualifiedCodeEntity);
             //TODO 清理关联表
-            await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedCodeGroupRelationAsync(param.Id);
+            await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(param.Id);
 
             if (list != null && list.Any())
             {

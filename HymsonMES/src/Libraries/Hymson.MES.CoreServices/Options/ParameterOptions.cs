@@ -12,5 +12,10 @@ namespace Hymson.MES.CoreServices.Options
         /// 参数取模
         /// </summary>
         public int ParameterDelivery { get; set; } = 2048;
+
+        /// <summary>
+        /// 设备参数取模
+        /// </summary>
+        public int EquipmentParameterDelivery { get; set; } = 2048;
     }
 }

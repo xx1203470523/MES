@@ -42,12 +42,12 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        Task<int> CreateProductParameterTable(string tableName);
+        Task<int> CreateProductParameterTableAsync(string tableName);
 
         /// <summary>
         /// 获取创建表脚本
         /// </summary>
         /// <returns></returns>
-        Task<string?> ShowCreateTable(string tableName);
+        Task<string?> ShowCreateTableAsync(string tableName);
     }
 }

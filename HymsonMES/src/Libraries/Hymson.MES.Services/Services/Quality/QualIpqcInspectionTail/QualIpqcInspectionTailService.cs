@@ -595,7 +595,7 @@ namespace Hymson.MES.Services.Services.Quality
             IEnumerable<ManuProductParameterEntity>? collectParameterValues = null;
             if (ipqcParameters.Any(x => x.IsDeviceCollect == YesOrNoEnum.Yes))
             {
-                collectParameterValues = await _manuProductParameterService.GetProductParameterListByProcedure(new CoreServices.Dtos.Parameter.QueryParameterByProcedureDto
+                collectParameterValues = await _manuProductParameterService.GetProductParameterListByProcedureAsync(new CoreServices.Dtos.Parameter.QueryParameterByProcedureDto
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     ProcedureId = entity.ProcedureId,
