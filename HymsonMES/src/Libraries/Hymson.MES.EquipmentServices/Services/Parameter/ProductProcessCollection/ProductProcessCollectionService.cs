@@ -9,14 +9,6 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
-using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection
 {
