@@ -76,6 +76,7 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IManuProductParameterService _manuProductParameterService;
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly ISequenceService _sequenceService;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
         /// 构造函数
@@ -104,7 +105,7 @@ namespace Hymson.MES.Services.Services.Quality
             IProcParameterRepository procParameterRepository,
             IManuProductParameterService manuProductParameterService,
             IManuSfcRepository manuSfcRepository,
-            ISequenceService sequenceService)
+            ISequenceService sequenceService, IManuSfcInfoRepository manuSfcInfoRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -132,6 +133,7 @@ namespace Hymson.MES.Services.Services.Quality
             _manuProductParameterService = manuProductParameterService;
             _manuSfcRepository = manuSfcRepository;
             _sequenceService = sequenceService;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
         }
 
 
@@ -864,7 +866,14 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13236)).WithData("SampleCode", query.SampleCode);
             }
-
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            if (manuSfcInfoEntity != null)
+            {
+                if (entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES13237));
+                }
+            }
             //校验样品条码是否已检验
             var samples = await _qualIpqcInspectionHeadSampleRepository.GetEntitiesAsync(new QualIpqcInspectionHeadSampleQuery { InspectionOrderId = query.Id });
             if (samples != null && samples.Any(x => x.Barcode.ToUpper() == query.SampleCode.ToUpper()))

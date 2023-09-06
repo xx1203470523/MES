@@ -579,6 +579,7 @@
         public const string MES13234 = "样品条码【{SampleCode}】已检验，不能重复检验！";
         public const string MES13235 = "样品条码【{SampleCode}】不存在！";
         public const string MES13236 = "样品条码【{SampleCode}】已经报废！";
+        public const string MES13237 = "条码工单和检验单工单不一致！";
         #endregion
 
         #region 过程检 13300

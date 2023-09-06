@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
@@ -67,6 +68,8 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IProcParameterRepository _procParameterRepository;
         private readonly IManuProductParameterService _manuProductParameterService;
         private readonly ISequenceService _sequenceService;
+        private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
         /// 构造函数
@@ -89,7 +92,8 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIpqcInspectionParameterRepository qualIpqcInspectionParameterRepository,
             IProcParameterRepository procParameterRepository,
             IManuProductParameterService manuProductParameterService,
-            ISequenceService sequenceService)
+            ISequenceService sequenceService, IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -111,6 +115,8 @@ namespace Hymson.MES.Services.Services.Quality
             _procParameterRepository = procParameterRepository;
             _manuProductParameterService = manuProductParameterService;
             _sequenceService = sequenceService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
         }
 
 
@@ -567,6 +573,25 @@ namespace Hymson.MES.Services.Services.Quality
             if (entity == null)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10104));
+            }
+
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySfcQuery { SFC = query.SampleCode, SiteId = _currentSite.SiteId });
+            if (manuSfcEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13235)).WithData("SampleCode", query.SampleCode);
+            }
+
+            if (manuSfcEntity.Status == SfcStatusEnum.Scrapping)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13236)).WithData("SampleCode", query.SampleCode);
+            }
+            var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+            if (manuSfcInfoEntity != null)
+            {
+                if (entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES13237));
+                }
             }
 
             //校验样品条码是否已检验
