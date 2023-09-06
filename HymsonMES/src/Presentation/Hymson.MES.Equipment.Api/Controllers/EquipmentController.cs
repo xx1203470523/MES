@@ -584,6 +584,19 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
+        /// 取工单物料编码48还是52
+        /// </summary>
+        /// <param name="baseDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetWorkOrder")]
+        [ProducesResponseType(typeof(PlanWorkOrderDto), 200)]
+        public async Task<PlanWorkOrderDto> GetWorkOrderAsync([FromQuery] BaseDto baseDto)
+        {
+            return await _inBoundService.GetWorkOrderAsync(baseDto);
+        }
+
+        /// <summary>
         /// CCS盖板NG设定
         /// </summary>
         /// <param name="request"></param>

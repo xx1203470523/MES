@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -44,6 +45,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+        /// <summary>
+        /// 物料维护 仓储
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
         public InBoundService(AbstractValidator<InBoundDto> validationInBoundDtoRules,
             ICurrentEquipment currentEquipment,
@@ -61,7 +66,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IProcProcedureRepository procProcedureRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IManuSfcSummaryRepository manuSfcSummaryRepository)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            IProcMaterialRepository procMaterialRepository)
         {
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -80,6 +86,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
         #endregion
 
@@ -587,6 +594,51 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 Cycle = procProcedureEntity.Cycle,
                 IsRepairReturn = procProcedureEntity.IsRepairReturn
             };
+        }
+
+        /// <summary>
+        /// 获取工单
+        /// </summary>
+        /// <param name="baseDto"></param>
+        /// <returns></returns>
+        public async Task<PlanWorkOrderDto> GetWorkOrderAsync(BaseDto baseDto)
+        {
+            PlanWorkOrderDto planWorkOrderDto = new();
+
+            long _site = _currentEquipment.SiteId;
+            if (_site == 0)
+            {
+                _site = (long)123456;
+            }
+            //已经验证过资源是否存在直接使用
+            var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _site, Code = baseDto.ResourceCode });
+
+            //查找当前工作中心（产线）
+            var workLine = await _inteWorkCenterRepository.GetByResourceIdAsync(procResource.Id);
+            if (workLine == null)
+            {
+                //通过资源未找到关联产线
+                throw new CustomerValidationException(nameof(ErrorCode.MES19123)).WithData("ResourceCode", procResource.ResCode);
+            }
+            //查找激活工单
+            var planWorkOrders = await _planWorkOrderRepository.GetByWorkLineIdAsync(workLine.Id);
+            if (!planWorkOrders.Any())
+            {
+                //产线未激活工单
+                throw new CustomerValidationException(nameof(ErrorCode.MES19124)).WithData("WorkCenterCode", workLine.Code);
+            }
+            //不考虑混线
+            var planWorkOrder = planWorkOrders.First();
+            //var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(planWorkOrder.Id);
+
+            //产品ID
+            var procMaterials = await _procMaterialRepository.GetByIdAsync(planWorkOrder.ProductId);
+
+            planWorkOrderDto.OrderCode = planWorkOrder.OrderCode;
+            planWorkOrderDto.MaterialCode = procMaterials?.MaterialCode ?? "";
+            planWorkOrderDto.MaterialName = procMaterials?.MaterialName ?? "";
+
+            return planWorkOrderDto;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.InBound;
+using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,5 +26,12 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// <param name="inBoundMoreDto"></param>
         /// <returns></returns>
         Task InBoundMoreAsync(InBoundMoreDto inBoundMoreDto);
+
+        /// <summary>
+        /// 获取工单
+        /// </summary>
+        /// <param name="baseDto"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderDto> GetWorkOrderAsync(BaseDto baseDto);
     }
 }
