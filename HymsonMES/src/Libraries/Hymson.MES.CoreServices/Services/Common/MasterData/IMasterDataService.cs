@@ -126,6 +126,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<bool> IsFirstProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
 
         /// <summary>
+        /// 判断当前工序是否在指定工序之前
+        /// </summary>
+        /// <param name="routeProcedureWithCompareBo"></param>
+        /// <returns></returns>
+        Task<bool> IsBeforeProcedureAsync(ManuRouteProcedureWithCompareBo routeProcedureWithCompareBo);
+
+        /// <summary>
         /// 获取工序关联的资源
         /// </summary>
         /// <param name="procedureId"></param>
@@ -144,7 +151,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
+        Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
 
         /// <summary>
         /// 获取即将扣料的物料数据

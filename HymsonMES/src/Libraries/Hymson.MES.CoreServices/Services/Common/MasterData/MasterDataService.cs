@@ -28,6 +28,7 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Sequences;
 using Hymson.Snowflake;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -682,6 +683,27 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 判断当前工序是否在指定工序之前
+        /// </summary>
+        /// <param name="routeProcedureWithCompareBo"></param>
+        /// <returns></returns>
+        public async Task<bool> IsBeforeProcedureAsync(ManuRouteProcedureWithCompareBo routeProcedureWithCompareBo)
+        {
+            var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(routeProcedureWithCompareBo.ProcessRouteId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+
+            // 找出目标工序
+            var targetProcedureNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureWithCompareBo.ProcedureId);
+            if (targetProcedureNode == null) return false;
+
+            // 找出目标工序前面的工序
+            var compareProcedureNodes = processRouteDetailNodes.Where(f => f.SerialNo.ParseToInt() <= targetProcedureNode.SerialNo.ParseToInt());
+
+            // 如果满足排序号条件的工序中不包含当前工序，则返回false
+            return compareProcedureNodes.Any(a => a.ProcedureId == routeProcedureWithCompareBo.CurrentProcedureId);
+        }
+
+        /// <summary>
         /// 获取工序关联的资源
         /// </summary>
         /// <param name="procedureId"></param>
@@ -718,7 +740,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
+        public async Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {

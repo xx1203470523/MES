@@ -60,4 +60,17 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long WorkOrderId { get; set; } = 0;
 
     }
+
+    /// <summary>
+    /// 工序
+    /// </summary>
+    public class ManuRouteProcedureWithCompareBo : ManuRouteProcedureBo
+    {
+        /// <summary>
+        /// 当前工序Id
+        /// </summary>
+        public long CurrentProcedureId { get; set; }
+
+    }
+
 }
