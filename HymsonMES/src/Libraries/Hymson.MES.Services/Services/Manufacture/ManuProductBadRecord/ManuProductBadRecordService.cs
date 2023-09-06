@@ -127,6 +127,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = manuProductBadRecordCreateDto.Sfcs, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
+            if(manuSfcs == null|| !manuSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15402));
+            }
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
 
             var scrapSfcs = manuSfcs.Where(x => x.IsScrap == TrueOrFalseEnum.Yes).Select(x => x.SFC).ToArray();

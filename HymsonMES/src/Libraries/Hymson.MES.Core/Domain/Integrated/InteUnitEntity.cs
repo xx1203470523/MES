@@ -24,7 +24,5 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        public long SiteId { get; set; }
     }
 }

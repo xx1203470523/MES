@@ -18,7 +18,6 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -70,7 +69,8 @@ namespace Hymson.MES.Services.Services.Quality
             IQualInspectionParameterGroupRepository qualInspectionParameterGroupRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
-            IProcResourceRepository procResourceRepository, ILocalizationService localizationService)
+            IProcResourceRepository procResourceRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //检验规则&资源
-            var rules = new List<QualIpqcInspectionRuleEntity>(); 
+            var rules = new List<QualIpqcInspectionRuleEntity>();
             var ruleResources = new List<QualIpqcInspectionRuleResourceRelationEntity>();
             if (saveDto.Rules != null && saveDto.Rules.Any())
             {
@@ -299,7 +299,7 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             //检验规则&资源
-            var rules = new List<QualIpqcInspectionRuleEntity>(); 
+            var rules = new List<QualIpqcInspectionRuleEntity>();
             var ruleResources = new List<QualIpqcInspectionRuleResourceRelationEntity>();
             if (saveDto.Rules != null && saveDto.Rules.Any())
             {
@@ -559,7 +559,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="id"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task UpdateStatusEnable(long id) 
+        public async Task UpdateStatusEnable(long id)
         {
             if (id == 0)
             {
@@ -589,37 +589,37 @@ namespace Hymson.MES.Services.Services.Quality
 
             //校验关联表数据
             var ipqcParameters = await _qualIpqcInspectionParameterRepository.GetEntitiesAsync(new QualIpqcInspectionParameterQuery { IpqcInspectionId = id });
-            if (ipqcParameters == null || !ipqcParameters.Any()) 
+            if (ipqcParameters == null || !ipqcParameters.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13121));
             }
 
-            //首检校验检验规则
-            if (entity.Type == IPQCTypeEnum.FAI) 
-            {
-                var ipqcRules = await _qualIpqcInspectionRuleRepository.GetEntitiesAsync(new QualIpqcInspectionRuleQuery { IpqcInspectionId = id });
+            ////首检校验检验规则
+            //if (entity.Type == IPQCTypeEnum.FAI)
+            //{
+            //    var ipqcRules = await _qualIpqcInspectionRuleRepository.GetEntitiesAsync(new QualIpqcInspectionRuleQuery { IpqcInspectionId = id });
 
-                if (ipqcRules == null || !ipqcRules.Any())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES13122));
-                }
+            //    if (ipqcRules == null || !ipqcRules.Any())
+            //    {
+            //        throw new CustomerValidationException(nameof(ErrorCode.MES13122));
+            //    }
 
-                var ruleResourceEntities = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
-                {
-                    SiteId = _currentSite.SiteId ?? 0,
-                    IpqcInspectionId = id
-                });
+            //    var ruleResourceEntities = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
+            //    {
+            //        SiteId = _currentSite.SiteId ?? 0,
+            //        IpqcInspectionId = id
+            //    });
 
-                foreach (var rule in ipqcRules)
-                {
-                    var resources= ruleResourceEntities.Where(x => x.IpqcInspectionRuleId == rule.Id);
+            //    foreach (var rule in ipqcRules)
+            //    {
+            //        var resources = ruleResourceEntities.Where(x => x.IpqcInspectionRuleId == rule.Id);
 
-                    if (resources==null || !resources.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
-                    }
-                }
-            }
+            //        if (resources == null || !resources.Any())
+            //        {
+            //            throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
+            //        }
+            //    }
+            //}
 
             #region 操作数据库
             await _qualIpqcInspectionRepository.UpdateStatusAsync(changeStatusCommand);

@@ -37,6 +37,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using IdGen;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -284,6 +285,69 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Version = item.Version,
                     IsScrap = item.IsScrap,
                     ResCode = item.ResCode
+                });
+            }
+            return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="manuSfcProducePagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuSfcProduceViewDto>> GetPageListNewAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto)
+        {
+            var manuSfcProducePagedQuery = manuSfcProducePagedQueryDto.ToQuery<ManuSfcProducePagedQuery>();
+            manuSfcProducePagedQuery.SiteId = _currentSite.SiteId;
+
+            //实体到DTO转换 装载数据
+            List<ManuSfcProduceViewDto> manuSfcProduceDtos = new List<ManuSfcProduceViewDto>();
+            //查询多个条码
+            if (manuSfcProducePagedQueryDto.Sfcs != null && manuSfcProducePagedQueryDto.Sfcs.Any())
+            {
+                manuSfcProducePagedQuery.SfcArray = manuSfcProducePagedQueryDto.Sfcs;
+            }
+
+            var pagedInfo = await _manuSfcProduceRepository.GetPagedListAsync(manuSfcProducePagedQuery);
+            if (pagedInfo == null || !pagedInfo.Data.Any())
+            {
+                return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
+
+            //查询工单
+            var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.WorkOrderId > 0).Select(x => x.WorkOrderId).Distinct().ToArray());
+            //查询工序
+            var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.ProcedureId > 0).Select(x => x.ProcedureId).Distinct().ToArray());
+            //查询资源
+            var resources = await _resourceRepository.GetListByIdsAsync(pagedInfo.Data.Where(x => x.ResourceId.HasValue&&x.ResourceId.Value>0).Select(x => x.ResourceId.GetValueOrDefault()).Distinct().ToArray());
+            //查询物料
+            var materials = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.ProductId > 0).Select(x => x.ProductId).Distinct().ToArray());
+
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
+                var procedure = procedures != null && procedures.Any() ? procedures.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
+                var resource = resources != null && resources.Any() ? resources.FirstOrDefault(x => x.Id == item.ResourceId) : null;
+                var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
+
+                manuSfcProduceDtos.Add(new ManuSfcProduceViewDto
+                {
+                    Id = item.Id,
+                    Sfc = item.SFC,
+                    ProcessRouteId = item.ProcessRouteId,
+                    ProductBOMId = item.ProductBOMId,
+                    ProcedureId = item.ProcedureId,
+                    ProductId = item.ProductId,
+                    Status = item.Status,
+                    OrderCode = workOrder?.OrderCode??"",
+                    Code = procedure?.Code??"",
+                    Name = procedure?.Name ?? "",
+                    MaterialCode = material?.MaterialCode??"",
+                    MaterialName = material?.MaterialName ?? "",
+                    Version =  material?.Version ?? "",
+                    IsScrap = item.IsScrap,
+                    ResCode = resource?.ResCode??""
                 });
             }
             return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

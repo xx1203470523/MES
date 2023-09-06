@@ -83,12 +83,10 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
             var checkEntity = await _inteUnitRepository.GetByCodeAsync(new EntityByCodeQuery
             {
-                Site = entity.SiteId,
                 Code = entity.Code
             });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
