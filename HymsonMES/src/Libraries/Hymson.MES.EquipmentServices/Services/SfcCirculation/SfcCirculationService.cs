@@ -724,15 +724,25 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19142)).WithData("SFC", sfcCirculationCCSNgSetDto.SFC);//条码：{SFC}没找到关联CCS码绑定关系
             }
-            //根据传入条件找出已经NG的CSS绑定记录
-            var delEntities = manuSfcCirculationEntities.Where(c =>
+
+            var delEntities = manuSfcCirculationEntities;
+            //根据传入条件找出已经NG的CSS绑定记录   
+            //BindSFCs 和  Locations 允许为空
+            if (sfcCirculationCCSNgSetDto.BindSFCs == null && sfcCirculationCCSNgSetDto.Locations == null)
             {
-                return sfcCirculationCCSNgSetDto.BindSFCs != null && sfcCirculationCCSNgSetDto.BindSFCs.Contains(c.SFC)
-                    || sfcCirculationCCSNgSetDto.Locations != null && sfcCirculationCCSNgSetDto.Locations.Contains(c.Location);
-            });
-            if (!delEntities.Any())
+                delEntities = manuSfcCirculationEntities;
+            }
+            else
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19143));//条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系
+                delEntities = manuSfcCirculationEntities.Where(c =>
+                {
+                    return sfcCirculationCCSNgSetDto.BindSFCs != null && sfcCirculationCCSNgSetDto.BindSFCs.Contains(c.SFC)
+                        || sfcCirculationCCSNgSetDto.Locations != null && sfcCirculationCCSNgSetDto.Locations.Contains(c.Location);
+                });
+                if (!delEntities.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19143));//条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系
+                }
             }
             //记录CCS的NG记录
             List<ManuSfcCcsNgRecordEntity> manuSfcCcsNgRecords = new();
