@@ -8,7 +8,12 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public record QualIpqcInspectionParameterSaveDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
+        /// 全检参数idqual_inspection_parameter_group 的id
+        /// </summary>
+        public long InspectionParameterGroupId { get; set; }
+
+        /// <summary>
         /// 全检参数明细Id
         /// </summary>
         public long InspectionParameterGroupDetailId { get; set; }
@@ -33,7 +38,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public decimal? CenterValue { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
+
+        /// <summary>
         /// 录入次数
         /// </summary>
         public int? EnterNumber { get; set; }
@@ -111,7 +121,12 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public decimal? CenterValue { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
+
+        /// <summary>
         /// 录入次数
         /// </summary>
         public int? EnterNumber { get; set; }

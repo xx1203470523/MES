@@ -96,6 +96,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public decimal? LowerLimit { get; set; }
 
+        /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
+
     }
 
     public class QualInspectionParameterGroupDetailPagedQueryDto : PagerInfo
@@ -122,6 +127,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 主键id
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 全检检验参数id
+        /// </summary>
+        public long ParameterGroupId { get; set; }
 
         /// <summary>
         /// 参数id（产品参数）
@@ -162,6 +172,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 规格下限
         /// </summary>
         public decimal? LowerLimit { get; set; }
+
+        /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
 
         /// <summary>
         /// 备注
