@@ -121,6 +121,11 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13151)).WithData("Code", saveDto.ParameterGroupCode).WithData("Condition", saveDto.GenerateConditionUnit.GetDescription()).WithData("Type", saveDto.Type.GetDescription()).WithData("Version", saveDto.Version);
             }
 
+            if (saveDto.Details != null && saveDto.Details.Any(x => x.InspectionParameterGroupId != saveDto.InspectionParameterGroupId))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES13152));
+            }
+
             //// 状态为启用时校验关联表数据
             //if (saveDto.Status == SysDataStatusEnum.Enable)
             //{
@@ -150,6 +155,7 @@ namespace Hymson.MES.Services.Services.Quality
             // DTO转换实体
             var entity = saveDto.ToEntity<QualIpqcInspectionEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.Version = saveDto.Version.Replace(" ", "");
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
