@@ -13,6 +13,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -1630,6 +1631,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                     MaterialId = procMaterial.Id,
                                     MaterialBarCode = item.SFC,
                                     Batch = "",//自制品 没有
+                                    MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                                     QuantityResidue = procMaterial.Batch,
                                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                                     Source = MaterialInventorySourceEnum.ManuComplete,

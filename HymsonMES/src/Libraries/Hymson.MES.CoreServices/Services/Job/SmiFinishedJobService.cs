@@ -8,6 +8,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -255,6 +256,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     MaterialId = sfcProduceEntity.ProductId,
                     MaterialBarCode = sfcProduceEntity.SFC,
                     Batch = "",//自制品 没有
+                    MaterialType= MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                     QuantityResidue = procMaterialEntity.Batch,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                     Source = MaterialInventorySourceEnum.ManuComplete,

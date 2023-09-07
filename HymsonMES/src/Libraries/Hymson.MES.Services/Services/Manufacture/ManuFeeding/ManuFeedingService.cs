@@ -341,7 +341,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             entity.SiteId = _currentSite.SiteId ?? 0;
             entity.MaterialId = inventory.MaterialId;
             entity.SupplierId = inventory.SupplierId;
-
+            entity.MaterialType = inventory.MaterialType;
             // 一次性上完料
             entity.InitQty = inventory.QuantityResidue;
             entity.Qty += entity.InitQty;

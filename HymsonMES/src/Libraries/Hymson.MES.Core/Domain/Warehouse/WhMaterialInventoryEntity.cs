@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Warehouse;
 
 namespace Hymson.MES.Core.Domain.Warehouse
 {
@@ -68,6 +69,9 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// </summary>
         public long SiteId { get; set; }
 
-
+        /// <summary>
+        /// 物料类型
+        /// </summary>
+        public MaterialInventoryMaterialTypeEnum MaterialType { get; set; }
     }
 }

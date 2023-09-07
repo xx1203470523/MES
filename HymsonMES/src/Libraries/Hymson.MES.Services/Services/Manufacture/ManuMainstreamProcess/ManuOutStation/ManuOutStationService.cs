@@ -8,6 +8,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -324,7 +325,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
                     //// 2023.05.29 克明说不在这里更新完成时间
                     //// 更新工单统计表的 RealEnd
-             
+
                     // 入库
                     SaveToWarehouseAsync(ref tasks, sfcProduceEntity, procMaterialEntity);
                 }
@@ -402,6 +403,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 MaterialId = manuSfcProduceEntity.ProductId,
                 MaterialBarCode = manuSfcProduceEntity.SFC,
                 Batch = "",//自制品 没有
+                MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                 QuantityResidue = procMaterialEntity.Batch,
                 Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                 Source = MaterialInventorySourceEnum.ManuComplete,
