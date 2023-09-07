@@ -42,6 +42,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public decimal? CenterValue { get; set; }
 
         /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
+
+        /// <summary>
         /// 录入次数
         /// </summary>
         public int? EnterNumber { get; set; }

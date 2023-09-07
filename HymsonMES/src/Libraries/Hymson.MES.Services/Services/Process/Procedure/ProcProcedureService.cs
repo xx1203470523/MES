@@ -539,7 +539,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 //提交
                 ts.Complete();
             }
-            await _manuProductParameterService.CreateProductParameterProcedureCodeTable(siteId, procProcedureCreateDto.Procedure.Code);
+            await _manuProductParameterService.CreateProductParameterProcedureCodeTableAsync(siteId, procProcedureCreateDto.Procedure.Code);
         }
 
         /// <summary>

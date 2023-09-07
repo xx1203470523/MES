@@ -107,7 +107,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedure(QueryParameterByProcedureDto param)
+        public async Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param)
         {
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
             if (procProcedureEntity == null)
@@ -127,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySfcDto param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFCAsync(QueryParameterBySfcDto param)
         {
             var list = new List<ManuProductParameterEntity>();
             var dic = new Dictionary<string, List<string>>();
@@ -161,7 +161,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task UpdateProductParameterById(List<UpdateParameterDto> param)
+        public async Task UpdateProductParameterByIdAsync(List<UpdateParameterDto> param)
         {
             var dic = new Dictionary<string, List<ManuProductParameterUpdateCommand>>();
 
@@ -223,12 +223,12 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         ///创建数据库表
         /// </summary>
         /// <returns></returns>
-        public async Task CreateProductParameterTable(string tabname)
+        public async Task CreateProductParameterTableAsync(string tabname)
         {
-            var sql = await _manuProductParameterRepository.ShowCreateTable(ProductParameter.ProductProcedureParameterTemplateNmae);
+            var sql = await _manuProductParameterRepository.ShowCreateTableAsync(ProductParameter.ProductProcedureParameterTemplateNmae);
             sql= sql?.Replace(ProductParameter.ProductProcedureParameterTemplateNmae, tabname);
             sql= sql?.Replace($"CREATE TABLE", $"CREATE TABLE  IF NOT EXISTS");
-            await _manuProductParameterRepository.CreateProductParameterTable(sql ?? "");
+            await _manuProductParameterRepository.CreateProductParameterTableAsync(sql ?? "");
         }
 
         /// <summary>
@@ -237,11 +237,11 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <param name="siteId"></param>
         /// <param name="procedureCode"></param>
         /// <returns></returns>
-        public async Task CreateProductParameterProcedureCodeTable(long siteId, string procedureCode)
+        public async Task CreateProductParameterProcedureCodeTableAsync(long siteId, string procedureCode)
         {
             var tabname = GetTableNameByProcedureCode(siteId, procedureCode);
 
-            await CreateProductParameterTable(tabname);
+            await CreateProductParameterTableAsync(tabname);
         }
 
         #region 内部方法

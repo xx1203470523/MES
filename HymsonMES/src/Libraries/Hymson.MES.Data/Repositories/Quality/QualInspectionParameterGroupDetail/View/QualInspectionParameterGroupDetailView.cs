@@ -54,5 +54,10 @@ namespace Hymson.MES.Data.Repositories.Quality.View
         /// 规格下限
         /// </summary>
         public decimal? LowerLimit { get; set; }
+
+        /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
     }
 }

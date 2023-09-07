@@ -14,7 +14,7 @@ namespace Hymson.MES.Equipment.Api.Controllers.Parameter
     [ApiController]
     //[AllowAnonymous]
     [Route("EquipmentService/api/v1/[controller]")]
-    public class ParameterController : ControllerBase
+    public class EquipmentParameterController : ControllerBase
     {
         /// <summary>
         /// 参数采集
@@ -25,22 +25,22 @@ namespace Hymson.MES.Equipment.Api.Controllers.Parameter
         /// 参数采集
         /// </summary>
         /// <param name="productProcessCollectionService"></param>
-        public ParameterController(IProductProcessCollectionService productProcessCollectionService)
+        public EquipmentParameterController(IProductProcessCollectionService productProcessCollectionService)
         {
             _productProcessCollectionService = productProcessCollectionService;
         }
 
         /// <summary>
-        ///产品过程参数采集
+        ///设备过程参数采集
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("collection")]
         [ProducesDefaultResponseType(typeof(ResultDto))]
-        public async Task Collection(ProductProcessParameterDto param)
+        public async Task Collection(IEnumerable<EquipmentProductProcessParameterDto> param)
         {
-             await _productProcessCollectionService.CollectionAsync(param);
+             await _productProcessCollectionService.EquipmentCollectionAsync(param);
         }
     }
 }

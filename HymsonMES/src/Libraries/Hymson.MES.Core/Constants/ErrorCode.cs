@@ -538,10 +538,10 @@
 
         public const string MES13101 = "参数集编码不能为空！";
         public const string MES13102 = "检验类型不合法！";
-        public const string MES13103 = "样本数量必须大于0！";
-        public const string MES13104 = "生成条件必须大于0！";
+        public const string MES13103 = "样本数量必须大于0且小于等于10000！";
+        public const string MES13104 = "生成条件必须大于0且小于等于10000！";
         public const string MES13105 = "生成条件单位不合法！";
-        public const string MES13106 = "管控时间必须大于0！";
+        public const string MES13106 = "管控时间必须大于0且小于等于10000！";
         public const string MES13107 = "管控时间单位不合法！";
         public const string MES13108 = "版本不能为空！";
         public const string MES13109 = "版本长度不能超过50！";
@@ -552,6 +552,7 @@
         public const string MES13122 = "启用状态数据检验规则与资源不能为空！";
         public const string MES13123 = "检验规则【{Way}】下关联资源不能为空！";
         public const string MES13151 = "参数集编码【{Code}】已存在相同生成条件【{Condition}】检验类型【{Type}】版本【{Version}】的IPQC检验项目，请重新输入！";
+        public const string MES13152 = "参数项目与所选参数集不匹配！";
 
         #endregion
 
@@ -579,6 +580,7 @@
         public const string MES13234 = "样品条码【{SampleCode}】已检验，不能重复检验！";
         public const string MES13235 = "样品条码【{SampleCode}】不存在！";
         public const string MES13236 = "样品条码【{SampleCode}】已经报废！";
+        public const string MES13237 = "条码工单和检验单工单不一致！";
         #endregion
 
         #region 过程检 13300
@@ -1268,6 +1270,7 @@
         public const string MES19931 = "条码：{SFC}已锁定";
         public const string MES19932 = "条码：{SFC}已报废";
         public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
+        public const string MES19934 = "设备{EquipmentCode}不存在";
 
 
 

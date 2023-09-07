@@ -104,6 +104,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
+        /// 获取设备列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task< IEnumerable<EquEquipmentEntity> > GetByIdAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<EquEquipmentEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>
@@ -243,6 +254,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string DeleteSql = "UPDATE `equ_equipment` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string GetByCodeSql = "SELECT * FROM equ_equipment WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentCode = @Code LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `equ_equipment` WHERE `Id` = @Id;";
+        const string GetByIdsSql = "SELECT * FROM `equ_equipment` WHERE `Id` IN @Ids  AND `IsDeleted` = 0";
         const string GetByGroupIdSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND (EquipmentGroupId = 0 AND  SiteId=@SiteId OR EquipmentGroupId = @EquipmentGroupId);";
         const string GetBaseListSql = "SELECT * FROM `equ_equipment` WHERE `IsDeleted` = 0 AND SiteId = @SiteId;";
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";

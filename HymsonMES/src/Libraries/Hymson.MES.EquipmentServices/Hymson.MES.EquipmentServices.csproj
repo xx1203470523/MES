@@ -20,7 +20,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Dtos\Bootup\" />
-	  <Folder Include="Dtos\Parameter\" />
 	  <Folder Include="Services\Bootup\" />
 	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>

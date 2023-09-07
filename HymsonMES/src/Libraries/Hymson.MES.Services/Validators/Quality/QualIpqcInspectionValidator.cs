@@ -18,10 +18,10 @@ namespace Hymson.MES.Services.Validators.Quality
         {
             RuleFor(x => x.ParameterGroupCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13101));
             RuleFor(x => x.Type).IsInEnum().WithErrorCode(nameof(ErrorCode.MES13102));
-            RuleFor(x => x.SampleQty).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES13103));
-            RuleFor(x => x.GenerateCondition).GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES13104));
+            RuleFor(x => x.SampleQty).GreaterThan(0).LessThanOrEqualTo(10000).WithErrorCode(nameof(ErrorCode.MES13103));
+            RuleFor(x => x.GenerateCondition).GreaterThan(0).LessThanOrEqualTo(10000).WithErrorCode(nameof(ErrorCode.MES13104));
             RuleFor(x => x.GenerateConditionUnit).IsInEnum().WithErrorCode(nameof(ErrorCode.MES13105));
-            RuleFor(x => x.ControlTime).GreaterThan(0).When(x => x.ControlTime.HasValue && x.ControlTime != 0).WithErrorCode(nameof(ErrorCode.MES13106));
+            RuleFor(x => x.ControlTime).GreaterThan(0).LessThanOrEqualTo(10000).When(x => x.ControlTime.HasValue && x.ControlTime != 0).WithErrorCode(nameof(ErrorCode.MES13106));
             RuleFor(x => x.ControlTimeUnit).IsInEnum().When(x => x.ControlTimeUnit.HasValue).WithErrorCode(nameof(ErrorCode.MES13107));
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(nameof(ErrorCode.MES13108));
             RuleFor(x => x.Version).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES13109));

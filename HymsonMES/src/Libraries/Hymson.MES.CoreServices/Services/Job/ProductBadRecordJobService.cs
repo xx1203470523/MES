@@ -216,7 +216,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var processRouteProcedure = new ProcessRouteProcedureDto();
             if (isDefect)
             {
-               processRouteProcedure = await _masterDataService.GetFirstProcedureAsync(bo.BadProcessRouteId ?? 0);
+                processRouteProcedure = await _masterDataService.GetFirstProcedureAsync(bo.BadProcessRouteId ?? 0);
             }
 
             var sfcStepList = new List<ManuSfcStepEntity>();
@@ -227,6 +227,12 @@ namespace Hymson.MES.CoreServices.Services.Job
             var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
             foreach (var item in manuSfcs)
             {
+                var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
+
+                // 不良录入条码步骤
+                var sfcStepEntity = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, bo.SiteId, bo.Remark ?? "");
+                sfcStepList.Add(sfcStepEntity);
+
                 foreach (var unqualified in qualUnqualifiedCodes)
                 {
                     //报废的不需要记录不良，不需要关闭和展示
@@ -243,6 +249,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         FoundBadResourceId = bo.ResourceId,
                         OutflowOperationId = bo.ProcedureId,
                         UnqualifiedId = unqualified.Id,
+                        SfcStepId= sfcStepEntity.Id,
                         SFC = item.SFC,
                         SfcInfoId = item.SfcInfoId,
                         Qty = item.Qty,
@@ -255,18 +262,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                     });
                 }
 
-                var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
-
-                if (!isOnlyScrap)
-                {
-                    // 不良录入条码步骤
-                    var sfcStepEntity = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, bo.SiteId,bo.Remark ?? "");
-                    sfcStepList.Add(sfcStepEntity);
-                }
 
                 if (scrapCode != null)
                 {
-                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard,  bo.SiteId,bo.Remark ?? "");
+                    var scrapStep = _masterDataService.CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.Discard, bo.SiteId, bo.Remark ?? "");
                     sfcStepList.Add(scrapStep);
                 }
 
@@ -307,7 +306,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var isScrapCode = scrapCode != null;
             var updateCommand = new ManuSfcUpdateCommand();
             var isScrapCommand = new UpdateIsScrapCommand();
-            if(isScrapCode)
+            if (isScrapCode)
             {
                 updateCommand = new ManuSfcUpdateCommand
                 {
@@ -329,13 +328,13 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             return new ProductBadRecordResponseBo
             {
-                IsScrapCode= isScrapCode,
-                ManuProductBadRecords= manuProductBadRecords,
-                SfcStepList=sfcStepList,
-                ManuSfcProduceList= manuSfcProduceList,
-                UpdateRouteCommand= updateRouteCommand,
+                IsScrapCode = isScrapCode,
+                ManuProductBadRecords = manuProductBadRecords,
+                SfcStepList = sfcStepList,
+                ManuSfcProduceList = manuSfcProduceList,
+                UpdateRouteCommand = updateRouteCommand,
                 UpdateCommand = updateCommand,
-                IsScrapCommand= isScrapCommand
+                IsScrapCommand = isScrapCommand
             };
         }
 
@@ -355,7 +354,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (data.IsScrapCode)
             {
                 //修改在制品状态
-                responseBo.Rows+= await _manuSfcProduceRepository.UpdateIsScrapAsync(data.IsScrapCommand);
+                responseBo.Rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(data.IsScrapCommand);
                 //修改条码状态
                 responseBo.Rows += await _manuSfcRepository.UpdateStatusAsync(data.UpdateCommand);
 

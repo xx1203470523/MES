@@ -97,7 +97,5 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equConsumableService.GetDetailAsync(id);
         }
-
-
     }
 }
