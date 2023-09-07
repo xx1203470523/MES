@@ -198,6 +198,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             var isOnlyScrap = (scrapCode != null && qualUnqualifiedCodes.Count() == 1);
             foreach (var item in manuSfcs)
             {
+                var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
+                // 不良录入条码步骤
+                var sfcStepEntity = CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, manuProductBadRecordCreateDto.Remark ?? "");
+                sfcStepList.Add(sfcStepEntity);
+
                 foreach (var unqualified in qualUnqualifiedCodes)
                 {
                     //报废的不需要记录不良，不需要关闭和展示
@@ -205,7 +210,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         continue;
                     }
-
+                 
                     manuProductBadRecords.Add(new ManuProductBadRecordEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -214,6 +219,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         FoundBadResourceId = badResourceId,
                         OutflowOperationId = manuProductBadRecordCreateDto.OutflowOperationId,
                         UnqualifiedId = unqualified.Id,
+                        SfcStepId = sfcStepEntity.Id,
                         SFC = item.SFC,
                         SfcInfoId = item.SfcInfoId,
                         Qty = item.Qty,
@@ -226,14 +232,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     });
                 }
 
-                var manuSfc = manuSfcs.FirstOrDefault(x => x.SFC == item.SFC);
+                //if (!isOnlyScrap)
+                //{
 
-                if (!isOnlyScrap)
-                {
-                    // 不良录入条码步骤
-                    var sfcStepEntity = CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, manuProductBadRecordCreateDto.Remark ?? "");
-                    sfcStepList.Add(sfcStepEntity);
-                }
+                //    // 不良录入条码步骤
+                //    var sfcStepEntity = CreateSFCStepEntity(manuSfc!, ManuSfcStepTypeEnum.BadEntry, manuProductBadRecordCreateDto.Remark ?? "");
+                //    sfcStepList.Add(sfcStepEntity);
+                //}
 
                 if (scrapCode != null)
                 {

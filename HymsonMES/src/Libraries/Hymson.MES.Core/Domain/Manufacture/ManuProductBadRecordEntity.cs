@@ -60,6 +60,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? SfcInfoId { get; set; }
 
         /// <summary>
+        /// 条码步骤表
+        /// </summary>
+        public long? SfcStepId { get; set; }
+
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal? Qty { get; set; }
