@@ -234,7 +234,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     Location = circulationBindSFC.Location.ToString(),
                     CirculationQty = 1,
-                    ModelCode = circulationBindSFC.ModelCode ?? string.Empty,
+                    ModelCode = sfcCirculationBindDto.ModelCode ?? string.Empty,
                     //使用虚拟码记录为转换
                     CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
                     CreatedBy = _currentEquipment.Name,
@@ -329,6 +329,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
                     CirculationMainProductId = sfcProduceEntity.ProductId,
                     CirculationQty = 1,
+                    ModelCode = sfcCirculationBindDto?.ModelCode ?? string.Empty,
                     CirculationType = SfcCirculationTypeEnum.Merge,
                     CreatedBy = _currentEquipment.Name,
                     CreatedOn = HymsonClock.Now(),

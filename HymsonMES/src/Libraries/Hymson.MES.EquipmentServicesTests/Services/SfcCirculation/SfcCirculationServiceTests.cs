@@ -69,12 +69,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             await SetEquInfoAsync(equipmentCode);
             SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
             {
-                SFC = "1AsakiA4A4",
-                ModelCode="12S",
+                SFC = "2121AsakiA4A4",
+                ModelCode="12S",  //ModelCode
                 //IsVirtualSFC=false,
                 BindSFCs = new CirculationBindDto[] {
                     new CirculationBindDto{
-                        SFC="21A1A4A0",
+                        SFC="2121A1A4A0",
                         Location="0",
                         //Name="CCS01"
                     }
@@ -160,17 +160,26 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task SfcCirculationCCSNgSetAsyncTest()
         {
-            string equipmentCode = "QAEM002";
+            string equipmentCode = "YTLPACK01AE018";
             await SetEquInfoAsync(equipmentCode);
-            SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto = new SfcCirculationCCSNgSetDto
+            try
             {
-                ResourceCode = "QAEMZY002",
-                SFC = "AAATESTSFC2308091",
-                Locations = new string[] { "A" }
+SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto = new SfcCirculationCCSNgSetDto
+            {
+                ResourceCode = "YTLPACK01AE018",
+                SFC = "YTP280024A23960001EVE",
+                //Locations = new string[] { "A" }
                 //BindSFCs = new string[] { "CCS0002" }
             };
             await _sfcCirculationService.SfcCirculationCCSNgSetAsync(sfcCirculationCCSNgSetDto);
-            Assert.IsTrue(true);
+           
+            }
+            catch (Exception ex)
+            {
+                int ss = 1;
+                throw;
+            }
+             Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -227,6 +236,29 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task GetCirculationModuleCCSInfoTest()
         {
+            string equipmentCode = "YTLPACK01VIR06";
+            try
+            {
+                await SetEquInfoAsync(equipmentCode);
+                var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("21AsakiA4A4");
+                Assert.IsTrue(moduleCCSInfoDto != null);
+            }
+            catch (Exception ex)
+            {
+                int s = 1;
+                throw;
+            }
+           
+        }
+        
+        /// <summary>
+        /// 测试模组条码查询信息
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task GetCirculationModuleCCSInfoAsyncTest()
+        {
+            //        return await _sfcCirculationService.GetCirculationModuleCCSInfoAsync(sfc);
             string equipmentCode = "YTLPACK01VIR06";
             try
             {
