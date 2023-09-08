@@ -93,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
+            sqlBuilder.OrderBy(" UpdatedOn DESC ");
             if (!string.IsNullOrWhiteSpace(pagedQuery.SystemCode))
             {
                 pagedQuery.SystemCode = $"%{pagedQuery.SystemCode}%";
