@@ -128,7 +128,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
 
-            var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(planWorkOrderBindEntity.WorkOrderId);
+            var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
+            {
+                WorkOrderId = planWorkOrderBindEntity.WorkOrderId,
+                IsVerifyActivation = false
+            });
 
             //获取首工序
             var productId = await _masterDataService.GetProductSetIdAsync(new ProductSetBo { SiteId = bo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = bo.ProcedureId, ResourceId = bo.ResourceId }) ?? planWorkOrderEntity.ProductId;
