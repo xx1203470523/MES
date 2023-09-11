@@ -715,14 +715,16 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
                 BusinessId = param.ResourceId,
-                LinkPoint = param.LinkPoint
+                LinkPoint = param.LinkPoint,
+                IsUse = true
             });
             if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
             {
                 InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
                     BusinessId = param.ProcedureId,
-                    LinkPoint = param.LinkPoint
+                    LinkPoint = param.LinkPoint,
+                    IsUse = true
                 });
             }
             if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return null;
