@@ -193,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteSystemTokenRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_system_token` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_system_token` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_system_token` /**where**/ ";
         const string GetInteSystemTokenEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
