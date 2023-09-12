@@ -163,11 +163,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 物料ID/产品ID
         /// </summary>
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
 
         /// <summary>
         /// 物料条码
         /// </summary>
         public string BarCode { get; set; }
+
+        /// <summary>
+        /// 全部物料ID集合
+        /// </summary>
+        public IEnumerable<long> MaterialIds { get; set; }
+
     }
 }

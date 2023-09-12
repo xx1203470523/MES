@@ -331,7 +331,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 查询物料
-            var material = await _procMaterialRepository.GetByIdAsync(saveDto.ProductId) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+            var materials = await _procMaterialRepository.GetByIdsAsync(saveDto.MaterialIds);
+            if (materials == null || materials.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15101));
+            }
+
+            // 如果有设置物料，就用设置的物料
+            if (saveDto.ProductId.HasValue) materials = materials.Where(w => w.Id == saveDto.ProductId.Value);
 
             // DTO转换实体
             var entity = saveDto.ToEntity<ManuFeedingEntity>();
@@ -356,18 +363,31 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             if (bomIds == null || !bomIds.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
             #endregion
 
-            // 检查物料条码和物料是否对应的上，如果不是主物料，就找下替代料
-            if (inventory.MaterialId != material.Id)
+            ProcMaterialEntity? material = null;
+            foreach (var item in materials)
             {
+                // 检查物料条码和物料是否对应的上
+                if (inventory.MaterialId == item.Id)
+                {
+                    material = item;
+                    break;
+                }
+
+                // 如果不是主物料，就找下替代料
                 // 获取关联BOM
                 var bomDetailEntities = await _procBomDetailRepository.GetByBomIdsAsync(bomIds);
-                var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == material.Id)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == item.Id);
+                if (bomDetailEntitiy == null) continue;
+                //?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
 
                 // 检查是否符合替代料
                 var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                if (!bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId)) throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) continue;
+                //throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
             }
+
+            if (material == null) throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+            entity.ProductId = material.Id;
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
