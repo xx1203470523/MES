@@ -212,12 +212,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes)
                     throw new CustomerValidationException(nameof(ErrorCode.MES16720));
                 //是否允许活动产品
-                if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
+                if (sfcProduceEntity.Status == SfcStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16711));
                 }
                 //是否允许排队产品
-                if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
+                if (sfcProduceEntity.Status == SfcStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16713));
                 }
@@ -253,7 +253,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProductBOMId = 0,
                         EquipmentId = 0,
                         Qty = sfcEntity?.Qty ?? 0,
-                        Status = SfcProduceStatusEnum.Complete,
+                        Status = SfcStatusEnum.Complete,
                         ResourceId = createManuContainerBarcodeDto.ResourceId,
                         ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                     };

@@ -77,9 +77,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
-        /// 状态;1：排队；2：活动；
+        /// 状态
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
@@ -110,5 +110,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 锁定前状态
         /// </summary>
         public TrueOrFalseEnum BeforeLockedStatus { get; set; }
+
+        /// <summary>
+        /// 汇总表id
+        /// </summary>
+        public long? SfcSummaryId { get; set; }
     }
 }

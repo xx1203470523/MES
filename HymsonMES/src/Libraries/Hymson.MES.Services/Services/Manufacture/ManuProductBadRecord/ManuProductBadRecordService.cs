@@ -275,7 +275,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcessRouteId = manuProductBadRecordCreateDto.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = _currentUser.UserName,
-                    Status = SfcProduceStatusEnum.lineUp,
+                    Status = SfcStatusEnum.lineUp,
                     Ids = manuSfcs.Select(x => x.Id).ToArray()
                 };
             }
@@ -546,7 +546,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = _currentUser.UserName,
-                    Status = SfcProduceStatusEnum.lineUp,
+                    Status = SfcStatusEnum.lineUp,
                     Ids = new long[] { manuSfc.Id }
                 };
                 #endregion

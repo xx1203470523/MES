@@ -252,7 +252,9 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             {
                 switch (sfcEntity.Status)
                 {
-                    case SfcStatusEnum.InProcess:
+                    case SfcStatusEnum.lineUp:
+                    case SfcStatusEnum.Activity:
+                    case SfcStatusEnum.InProductionComplete:
                         //获取在制进站
                         var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery { Sfc = bo.SFC, SiteId = _currentEquipment.SiteId });
                         if (manuSfcProduceEntity == null)
@@ -260,14 +262,14 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             throw new CustomerValidationException(nameof(ErrorCode.MES19930)).WithData("SFC", bo.SFC);
                         }
                         //当前工序在制
-                        if (manuSfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && procedureEntity.Id == manuSfcProduceEntity.ProcedureId)
+                        if (manuSfcProduceEntity.Status == SfcStatusEnum.lineUp && procedureEntity.Id == manuSfcProduceEntity.ProcedureId)
                         {
                             //进站
                             await _inStationService.InStationAsync(manuSfcProduceEntity);
                         }
                         else
                         {
-                            var statusMsg = _localizationService.GetResource($"Hymson.MES.Core.Enums.SfcProduceStatusEnum.{Enum.GetName(typeof(SfcProduceStatusEnum), manuSfcProduceEntity.Status) ?? ""}");
+                            var statusMsg = _localizationService.GetResource($"Hymson.MES.Core.Enums.SfcProduceStatusEnum.{Enum.GetName(typeof(SfcStatusEnum), manuSfcProduceEntity.Status) ?? ""}");
                             var procedure = await _procProcedureRepository.GetByIdAsync(manuSfcProduceEntity.ProcedureId);
                             var procedureMsg = procedure == null ? "" : procedure.Code;
                             throw new CustomerValidationException(nameof(ErrorCode.MES19933)).WithData("SFC", bo.SFC).WithData("Procedure", procedureMsg).WithData("Status", statusMsg);
@@ -275,7 +277,6 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         break;
                     //完成或入库=》扣减库存
                     case SfcStatusEnum.Complete:
-                    case SfcStatusEnum.Received:
                         var manuSfcInfoEntity = _manuSfcInfoRepository.GetBySFCAsync(sfcEntity.Id);
                         //库存
                         var updateQuantityCommand = new UpdateQuantityCommand
@@ -288,7 +289,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         var updateSfc = new ManuSfcUpdateStatusAndIsUsedCommand
                         {
                             Sfcs = new string[] { bo.SFC },
-                            Status = SfcStatusEnum.InProcess,
+                            Status = SfcStatusEnum.lineUp,
                             IsUsed = YesOrNoEnum.Yes,
                             UserId = _currentEquipment.Name,
                             UpdatedOn = HymsonClock.Now()
@@ -329,7 +330,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             ProductBOMId = planWorkOrder.ProductBOMId,
                             Qty = 1,
                             ProcedureId = processRouteFirstProcedure.ProcedureId,
-                            Status = SfcProduceStatusEnum.Activity,//直接活动  不用再进站
+                            Status = SfcStatusEnum.Activity,//直接活动  不用再进站
                             RepeatedCount = 0,
                             IsScrap = TrueOrFalseEnum.No,
                             CreatedBy = _currentEquipment.Name,
@@ -348,7 +349,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                             Qty = 1,
                             ProcedureId = processRouteFirstProcedure.ProcedureId,
                             Operatetype = ManuSfcStepTypeEnum.InStock,
-                            CurrentStatus = SfcProduceStatusEnum.Activity,
+                            CurrentStatus = SfcStatusEnum.Activity,
                             CreatedBy = _currentEquipment.Name,
                             UpdatedBy = _currentEquipment.Name
                         };
@@ -387,7 +388,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                     SFC = bo.SFC,
                     Qty = 1,
                     IsUsed = YesOrNoEnum.Yes,
-                    Status = SfcStatusEnum.InProcess,
+                    Status = SfcStatusEnum.lineUp,
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
                 };
@@ -419,7 +420,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                     ProductBOMId = planWorkOrder.ProductBOMId,
                     Qty = 1,
                     ProcedureId = processRouteFirstProcedure.ProcedureId,
-                    Status = SfcProduceStatusEnum.Activity,//直接活动  不用再进站
+                    Status = SfcStatusEnum.Activity,//直接活动  不用再进站
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = _currentEquipment.Name,
@@ -441,7 +442,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         Qty = 1,
                         ProcedureId = processRouteFirstProcedure.ProcedureId,
                         Operatetype = ManuSfcStepTypeEnum.Change,
-                        CurrentStatus = SfcProduceStatusEnum.lineUp,
+                        CurrentStatus = SfcStatusEnum.lineUp,
                         CreatedBy = _currentEquipment.Name,
                         UpdatedBy = _currentEquipment.Name
                     },
@@ -458,7 +459,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
                         Qty = 1,
                         ProcedureId = processRouteFirstProcedure.ProcedureId,
                         Operatetype = ManuSfcStepTypeEnum.InStock,
-                        CurrentStatus = SfcProduceStatusEnum.Activity,
+                        CurrentStatus = SfcStatusEnum.Activity,
                         CreatedBy = _currentEquipment.Name,
                         UpdatedBy = _currentEquipment.Name
                     }

@@ -275,7 +275,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         SFC = sfc,
                         Qty = qty,
                         IsUsed = YesOrNoEnum.No,
-                        Status = SfcStatusEnum.InProcess,
+                        Status = SfcStatusEnum.lineUp,
                         CreatedBy = bo.UserName,
                         UpdatedBy = bo.UserName
                     };
@@ -284,7 +284,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 else
                 {
                     manuSfcEntity.IsUsed = YesOrNoEnum.No;
-                    manuSfcEntity.Status = SfcStatusEnum.InProcess;
+                    manuSfcEntity.Status = SfcStatusEnum.lineUp;
                     manuSfcEntity.UpdatedBy = bo.UserName;
                     manuSfcEntity.UpdatedOn = HymsonClock.Now();
                     updateManuSfcList.Add(manuSfcEntity);
@@ -317,7 +317,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     Qty = qty,
                     ProcedureId = bo.ProcedureId,
-                    Status = SfcProduceStatusEnum.lineUp,
+                    Status = SfcStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = bo.UserName,
@@ -336,7 +336,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Qty = qty,
                     ProcedureId = bo.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Receive,
-                    CurrentStatus = SfcProduceStatusEnum.lineUp,
+                    CurrentStatus = SfcStatusEnum.lineUp,
                     CreatedBy = bo.UserName,
                     UpdatedBy = bo.UserName
                 });

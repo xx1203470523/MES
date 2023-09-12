@@ -79,7 +79,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }
@@ -123,7 +123,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
                 // 更改状态，将条码由"活动"改为"排队"
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.UpdatedBy = updatedBy;
                 sfcProduceEntity.UpdatedOn = updatedOn;
 

@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Qty = sfcProduceEntity.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.Repair,
-                CurrentStatus = SfcProduceStatusEnum.Activity,
+                CurrentStatus = SfcStatusEnum.Activity,
                 EquipmentId = sfcProduceEntity.EquipmentId,
                 ResourceId = sfcProduceEntity.ResourceId,
                 CreatedBy = _currentUser.UserName,
@@ -279,7 +279,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             // 更改状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+            sfcProduceEntity.Status = SfcStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
             _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
@@ -335,7 +335,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 productInfo = new ManuFacePlateRepairProductInfoDto
                 {
                     SFC = manuSfcProduceEntit.SFC,
-                    Status = manuSfcProduceEntit.Status == SfcProduceStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324)),// manuSfcProduceEntit.Status.ToString(),
+                    Status = manuSfcProduceEntit.Status == SfcStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324)),// manuSfcProduceEntit.Status.ToString(),
                     ProcedureCode = procProcedureEntity.Code,
                     OrderCode = planWorkOrderEntity.OrderCode,
                     MaterialCode = procMaterialEntity.MaterialCode,
@@ -434,7 +434,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfc = beginRepairDto.SFC
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            if (manuSfcProduceEntit.Status != SfcProduceStatusEnum.Activity)
+            if (manuSfcProduceEntit.Status != SfcStatusEnum.Activity)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17322));
             }
@@ -667,7 +667,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var updateProcedureCommand = new UpdateProcedureCommand
             {
                 Id = manuSfcProduceEntit.Id,
-                Status = SfcProduceStatusEnum.lineUp,
+                Status = SfcStatusEnum.lineUp,
                 ProcedureId = confirmSubmitDto.ReturnProcedureId,
                 ResourceId = null, //resourcesId, //资源这里 直接设置为null 为null生产不检测匹配工序
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId,
@@ -690,7 +690,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Qty = manuSfcProduceEntit.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.RepairReturn,
-                CurrentStatus = SfcProduceStatusEnum.lineUp,
+                CurrentStatus = SfcStatusEnum.lineUp,
                 EquipmentId = manuSfcProduceEntit.EquipmentId,
                 ResourceId = manuSfcProduceEntit.ResourceId,
                 CreatedBy = _currentUser.UserName,

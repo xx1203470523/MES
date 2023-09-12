@@ -75,9 +75,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public ManuSfcStepTypeEnum Operatetype { get; set; }
 
         /// <summary>
-        /// 当前状态;1：排队；2：激活；3：完工；
+        /// 当前状态
         /// </summary>
-        public SfcProduceStatusEnum CurrentStatus { get; set; }
+        public SfcStatusEnum CurrentStatus { get; set; }
 
         /// <summary>
         /// 复投次数

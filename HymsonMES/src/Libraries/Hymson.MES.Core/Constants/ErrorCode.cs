@@ -881,7 +881,7 @@
         public const string MES16503 = "工单{workorder}超过计划数量,下达条码失败。";
         public const string MES16504 = "条码已经存在。";
         public const string MES16505 = "条码不存在，无法复用。";
-        public const string MES16506 = "条码不为完成和在库状态，无法复用。";
+        public const string MES16506 = "条码不为已完成状态，无法复用。";
         public const string MES16507 = "资源和工序对应的资源类型不匹配。";
         public const string MES16508 = "下达数量不合法。";
         #endregion

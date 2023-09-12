@@ -126,7 +126,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
 
@@ -203,7 +203,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 // 插入 manu_sfc_step 状态为出站（默认值）
                 Operatetype = ManuSfcStepTypeEnum.OutStock,
-                CurrentStatus = SfcProduceStatusEnum.Complete,
+                CurrentStatus = SfcStatusEnum.Complete,
                 Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,

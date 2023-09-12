@@ -192,7 +192,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Qty = manuSfcEntity.Qty,
                                 WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
                                 ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
-                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcStatusEnum.Complete : manuSfcProduceEntity.Status
                             });
                         }
                     }
@@ -276,7 +276,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Qty = manuSfcEntity.Qty,
                                 WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
                                 ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
-                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcStatusEnum.Complete : manuSfcProduceEntity.Status
                             });
                         }
                     }

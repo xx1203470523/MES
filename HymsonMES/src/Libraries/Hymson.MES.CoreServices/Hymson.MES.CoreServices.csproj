@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <Folder Include="Services\Manufacture\ManuBarcodeReceive\" />
+    <Folder Include="Services\Manufacture\ManuSfcSummary\" />
   </ItemGroup>
 
 </Project>

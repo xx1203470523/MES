@@ -81,6 +81,37 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
+    }
+
+    /// <summary>
+    /// 条码状态更新
+    /// </summary>
+    public class ManuSfcUpdateStatusCommand
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 产品条码列表
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 操作人员
+        /// </summary>
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? Status { get; set; }
     }
 }

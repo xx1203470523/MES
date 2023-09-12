@@ -47,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 资源ID
@@ -63,6 +63,33 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// 复投次数;复投次数
         /// </summary>
         public int RepeatedCount { get; set; }
+    }
 
+    /// <summary>
+    /// 进站更新信息
+    /// </summary>
+    public class MultiUpdateProduceInStationSFCCommand : UpdateCommand
+    {
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序汇总表ID
+        /// </summary>
+        public long SfcSummaryId { get; set; }
     }
 }

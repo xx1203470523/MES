@@ -284,7 +284,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuDowngradingRepository, ManuDowngradingRepository>();
             services.AddSingleton<IManuDowngradingRecordRepository, ManuDowngradingRecordRepository>();
-
+            services.AddSingleton<IManuSfcSummaryRepository, ManuSfcSummaryRepository>();
             #endregion
 
             #region Warehouse 

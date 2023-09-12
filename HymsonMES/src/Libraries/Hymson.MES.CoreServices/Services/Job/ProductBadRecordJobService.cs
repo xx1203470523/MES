@@ -121,7 +121,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //判断条码锁定状态
-            var lockSfcs = sfcProduceEntities.Where(x => x.Status == SfcProduceStatusEnum.Locked).Select(x => x.SFC).ToArray();
+            var lockSfcs = sfcProduceEntities.Where(x => x.Status == SfcStatusEnum.Locked).Select(x => x.SFC).ToArray();
             if (lockSfcs.Any())
             {
                 var strs = string.Join("','", scrapSfcs);
@@ -298,7 +298,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProcessRouteId = bo.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = bo.UserName,
-                    Status = SfcProduceStatusEnum.lineUp,
+                    Status = SfcStatusEnum.lineUp,
                     Ids = manuSfcs.Select(x => x.Id).ToArray()
                 };
             }

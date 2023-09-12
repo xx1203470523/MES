@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.Localization.Services;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
@@ -13,20 +14,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param);
+        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param, ILocalizationService localizationService);
 
         /// <summary>
         /// 根据外部条码接收
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCBo param);
+        Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCBo param, ILocalizationService localizationService);
 
         /// <summary>
         /// 内部条码复用
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCBo param);
+        Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCBo param, ILocalizationService localizationService);
     }
 }

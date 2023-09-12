@@ -155,7 +155,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
 
             // 当前工序是否是排队状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
+            if (sfcProduceEntity.Status == SfcStatusEnum.Activity)
             {
                 // 如果状态已经为活动中，就直接返回成功
                 return new RepairStartResponseBo();

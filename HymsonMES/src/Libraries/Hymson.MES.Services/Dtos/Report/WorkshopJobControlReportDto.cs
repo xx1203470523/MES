@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 条码在制状态
         /// </summary>
-        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
+        public SfcStatusEnum? SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -150,7 +150,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 条码在制状态
         /// </summary>
-        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
+        public SfcStatusEnum? SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 工序Id

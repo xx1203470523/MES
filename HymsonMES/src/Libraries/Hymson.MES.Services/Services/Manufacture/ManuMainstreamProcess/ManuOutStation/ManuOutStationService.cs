@@ -283,7 +283,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             {
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = currentProcessRoute.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+                sfcStep.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
 
@@ -334,7 +334,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             else
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
                 // 不置空的话，可能进站时，可能校验不通过
                 sfcProduceEntity.ResourceId = null;
@@ -378,7 +378,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntity.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
                             .VerifyProcedure(bo.ProcedureId);
 
             // 出站

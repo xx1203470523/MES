@@ -348,10 +348,10 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>
         /// <param name="produceStatusDescription"></param>
-        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
+        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcStatusEnum produceStatus, string produceStatusDescription)
         {
             // 当前条码是否是被锁定
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
+            if (sfcProduceEntity.Status == SfcStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
 
             // 当前条码是否是已报废
             if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);

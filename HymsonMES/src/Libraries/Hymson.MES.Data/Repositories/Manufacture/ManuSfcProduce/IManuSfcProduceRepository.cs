@@ -111,6 +111,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> MultiUpdateRangeWithStatusCheckAsync(MultiUpdateProduceSFCCommand multiUpdateStatusCommand);
 
         /// <summary>
+        /// 批量更新（带状态检查）
+        /// </summary>
+        /// <param name="multiUpdateStatusCommand"></param>
+        /// <returns></returns>
+        Task<int> MultiUpdateProduceInStationSFCAsync(IEnumerable<MultiUpdateProduceInStationSFCCommand> multiUpdateProduceInStationSFCCommands);
+
+        /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>

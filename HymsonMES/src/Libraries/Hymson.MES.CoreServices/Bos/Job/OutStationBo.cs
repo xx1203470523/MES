@@ -5,6 +5,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -113,5 +114,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
 
+        /// <summary>
+        /// 汇总表更新对象
+        /// </summary>
+        public IEnumerable<MultiUpdateSummaryOutStationCommand>  multiUpdateSummaryOutStationCommands { get; set; }
     }
 }

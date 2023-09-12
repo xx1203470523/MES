@@ -128,7 +128,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
             var rows = 0;
 
             // 更新状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+            sfcProduceEntity.Status = SfcStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentEquipment.Name;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
 

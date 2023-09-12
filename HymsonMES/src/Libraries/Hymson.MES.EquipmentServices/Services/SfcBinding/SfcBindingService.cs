@@ -167,7 +167,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", sfcBindingDto.ResourceCode);
             }
             //验证子条码是否在当前工序活动
-            var sfcThisProcedure = manuSfcProduceEntitys.Where(it => it.ProcedureId != procedureEntity.Id || it.Status != SfcProduceStatusEnum.Activity);
+            var sfcThisProcedure = manuSfcProduceEntitys.Where(it => it.ProcedureId != procedureEntity.Id || it.Status != SfcStatusEnum.Activity);
             if (sfcThisProcedure != null && sfcThisProcedure.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19920)).WithData("SFC", string.Join(",", sfcThisProcedure.Select(it => it.SFC).ToArray()));
@@ -259,7 +259,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                     Qty = 1,
                     ProcedureId = item.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Change,
-                    CurrentStatus = SfcProduceStatusEnum.Complete,
+                    CurrentStatus = SfcStatusEnum.Complete,
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
                 });
@@ -289,7 +289,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 SFC = sfcBindingDto.SFC,
                 Qty = 1,
                 IsUsed = YesOrNoEnum.Yes,
-                Status = SfcStatusEnum.InProcess,
+                Status = SfcStatusEnum.lineUp,
                 CreatedBy = _currentEquipment.Name,
                 UpdatedBy = _currentEquipment.Name
             };
@@ -321,7 +321,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 ProductBOMId = planWorkOrderEntity.ProductBOMId,
                 Qty = 1,
                 ProcedureId = procedureEntity.Id,
-                Status = SfcProduceStatusEnum.Activity,
+                Status = SfcStatusEnum.Activity,
                 RepeatedCount = 0,
                 IsScrap = TrueOrFalseEnum.No,
                 CreatedBy = _currentEquipment.Name,
@@ -343,7 +343,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 Qty = 1,
                 ProcedureId = procedureEntity.Id,
                 Operatetype = ManuSfcStepTypeEnum.Change,
-                CurrentStatus = SfcProduceStatusEnum.Complete,
+                CurrentStatus = SfcStatusEnum.Complete,
                 CreatedBy = _currentEquipment.Name,
                 UpdatedBy = _currentEquipment.Name
             };
