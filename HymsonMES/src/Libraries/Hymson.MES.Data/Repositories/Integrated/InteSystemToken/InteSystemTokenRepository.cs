@@ -200,7 +200,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                                            FROM `inte_system_token` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_system_token`(  `Id`, `SystemCode`, `SystemName`, `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SystemCode, @SystemName, @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string UpdateSql = "UPDATE `inte_system_token` SET  SystemCode = @SystemCode, SystemName = @SystemName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_system_token` SET  SystemName = @SystemName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateTokenSql = "UPDATE `inte_system_token` SET Token = @Token, ExpirationTime = @ExpirationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_system_token` SET IsDeleted = Id WHERE Id = @Id ";

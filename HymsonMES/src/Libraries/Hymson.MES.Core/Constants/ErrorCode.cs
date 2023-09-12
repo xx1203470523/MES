@@ -1116,6 +1116,11 @@
 
         #region 系统Token MES18300
         public const string MES18300 = "系统编码{code}已经存在";
+        public const string MES18301 = "系统编码不存在";
+        public const string MES18302 = "系统编码不允许空格";
+        public const string MES18303 = "系统名称不能为空";
+        public const string MES18304 = "系统编码最大长度为50";
+        public const string MES18305 = "系统名称最大长度为50";
         #endregion
 
         #region 客户维护 18400
