@@ -386,7 +386,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 //throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
             }
 
-            if (material == null) throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+            if (material == null) throw new CustomerValidationException(nameof(ErrorCode.MES15505));
             entity.ProductId = material.Id;
 
             var rows = 0;

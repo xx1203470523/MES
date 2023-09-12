@@ -699,6 +699,7 @@
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
         // MES15502-MES15503 已被占用
         public const string MES15504 = "未找到资源关联的产线！";
+        public const string MES15505 = "未找到该条码相匹配的物料！";
         #endregion
 
         #region 工单 16000
