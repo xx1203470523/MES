@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             procSortingRuleCreateDto.Code = procSortingRuleCreateDto.Code.ToTrimSpace();
             procSortingRuleCreateDto.Name = procSortingRuleCreateDto.Name.Trim();
-            procSortingRuleCreateDto.Version = procSortingRuleCreateDto.Version.Trim();
+            procSortingRuleCreateDto.Version = procSortingRuleCreateDto.Version.ToTrimSpace();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procSortingRuleCreateDto);
 
