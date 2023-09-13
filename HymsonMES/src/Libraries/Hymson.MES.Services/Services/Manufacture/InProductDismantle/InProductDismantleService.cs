@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
@@ -9,6 +10,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
@@ -96,10 +98,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
-        /// 条码步骤表仓储 仓储
+        /// 事件总线
         /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
+        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -117,20 +118,20 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="circulationRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="eventBus"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
-         IProcBomRepository procBomRepository,
-        IProcBomDetailRepository procBomDetailRepository,
-        IProcBomDetailReplaceMaterialRepository replaceMaterialRepository,
-        IProcMaterialRepository procMaterialRepository,
-        IProcReplaceMaterialRepository procReplaceMaterialRepository,
-        IProcProcedureRepository procProcedureRepository,
-        IProcResourceRepository resourceRepository,
-        IManuCommonOldService manuCommonOldService,
-        IManuSfcCirculationRepository circulationRepository,
-        IManuSfcProduceRepository manuSfcProduceRepository,
-        IWhMaterialInventoryRepository whMaterialInventoryRepository,
-        IManuSfcStepRepository manuSfcStepRepository)
+            IProcBomRepository procBomRepository,
+            IProcBomDetailRepository procBomDetailRepository,
+            IProcBomDetailReplaceMaterialRepository replaceMaterialRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcResourceRepository resourceRepository,
+            IManuCommonOldService manuCommonOldService,
+            IManuSfcCirculationRepository circulationRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -146,7 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -407,7 +408,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //记录step信息
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
 
                 if (inventoryEntity != null)
                 {
@@ -637,7 +639,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //记录step信息
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
 
                 //添加组件信息
                 rows += await _circulationRepository.InsertAsync(sfcCirculationEntity);
@@ -904,7 +907,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //记录step信息
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
 
                 //旧件如果不是外部的需要去加库存
                 if (replaceOld != null)

@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -13,6 +14,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -26,8 +28,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuGenerateBarcodeDto;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -63,10 +63,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
-        /// <summary>
-        /// 条码步骤表仓储 仓储
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
         /// <summary>
         /// 仓储接口（条码信息）
         /// </summary>
@@ -81,7 +78,39 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
-        public ManuContainerBarcodeService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerBarcodeRepository manuContainerBarcodeRepository
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuContainerBarcodeRepository"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="ingiContainerRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuContainerPack"></param>
+        /// <param name="manuFacePlateRepository"></param>
+        /// <param name="manuFacePlateContainerPackRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="manuContainerPackRecordService"></param>
+        /// <param name="validationCreateManuContainerBarcodeRules"></param>
+        /// <param name="validationUpdateStatusRules"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="eventBus"></param>
+        public ManuContainerBarcodeService(ICurrentUser currentUser, 
+            ICurrentSite currentSite,
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository
             , AbstractValidator<ManuContainerBarcodeModifyDto> validationModifyRules
             , IManuContainerPackRepository manuContainerPackRepository
             , IInteContainerRepository ingiContainerRepository
@@ -100,7 +129,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             , IProcResourceRepository procResourceRepository
             , IManuSfcRepository manuSfcRepository,
            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-           IManuSfcStepRepository manuSfcStepRepository)
+           IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -122,8 +151,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -416,7 +445,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
                             {
                                 //记录step信息
-                                await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                                //await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
 
                                 await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
                                 {
@@ -696,7 +726,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (level == 1)
                     {
                         //记录step信息
-                        await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                        //await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                        _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
                     }
                     rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
 
@@ -756,7 +787,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                             if (level == 1)
                             {
                                 //记录step信息
-                                await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                                //await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
                             }
                             rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
 

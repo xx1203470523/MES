@@ -1,5 +1,6 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
@@ -10,6 +11,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -54,11 +56,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
-
-        /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 仓储接口（条码信息）
@@ -108,13 +105,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="masterDataService"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuFeedingRepository"></param>
@@ -124,11 +125,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        /// /// <param name="localizationService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="eventBus"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
             IMasterDataService masterDataService,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuFeedingRepository manuFeedingRepository,
@@ -137,13 +138,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             IProcMaterialRepository procMaterialRepository,
              IProcProcessRouteRepository procProcessRouteRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository, ILocalizationService localizationService)
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            ILocalizationService localizationService,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
             _masterDataService = masterDataService;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFeedingRepository = manuFeedingRepository;
@@ -154,6 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
+            _eventBus = eventBus;
         }
 
 
@@ -284,8 +287,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = currentProcessRoute.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
+
+                /*
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
+                */
+                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
 
                 // 只有"生产主工艺路线"，出站时才走下面流程
                 if (currentProcessRoute.Type == ProcessRouteTypeEnum.ProductionRoute)
@@ -338,32 +345,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
                 // 不置空的话，可能进站时，可能校验不通过
                 sfcProduceEntity.ResourceId = null;
+
                 var manuSfcProduceUpdateTask = _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
                 tasks.Add(manuSfcProduceUpdateTask);
 
+
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
+                /*
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
+                */
+                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
             }
 
             await Task.WhenAll(tasks);
             trans.Complete();
 
-            return rows;
-        }
-
-        /// <summary>
-        /// 出站（批量）
-        /// </summary>
-        /// <param name="bos"></param>
-        /// <returns></returns>
-        public async Task<int> OutStationAsync(IEnumerable<ManufactureBo> bos)
-        {
-            var rows = 0;
-
-            // TODO
-            await Task.CompletedTask;
             return rows;
         }
 

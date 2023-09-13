@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -11,6 +12,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -26,7 +28,6 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -57,11 +58,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
-        /// 条码步骤表仓储 仓储
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 产品不良录入 仓储
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
@@ -82,26 +78,40 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuProductBadRecordModifyDto> _validationModifyRules;
 
         /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
+        /// <param name="manuCommonOldService"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="eventBus"></param>
         public ManuProductBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
         IManuSfcProduceRepository manuSfcProduceRepository,
         IManuSfcRepository manuSfcRepository,
-        IManuSfcStepRepository manuSfcStepRepository,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
         IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
         IManuCommonOldService manuCommonOldService,
-        AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
+        AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules,
+        IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcRepository = manuSfcRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _manuCommonOldService = manuCommonOldService;
             _validationModifyRules = validationModifyRules;
+            _eventBus = eventBus;
         }
 
 
@@ -127,7 +137,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = manuProductBadRecordCreateDto.Sfcs, SiteId = _currentSite.SiteId ?? 0 };
             // 获取条码列表
             var manuSfcs = await _manuSfcProduceRepository.GetManuSfcProduceInfoEntitiesAsync(manuSfcProducePagedQuery);
-            if(manuSfcs == null|| !manuSfcs.Any())
+            if (manuSfcs == null || !manuSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15402));
             }
@@ -189,7 +199,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var strs = string.Join(",", sfcRepairs.Select(x => x.Sfc));
                     throw new CustomerValidationException(nameof(ErrorCode.MES15410)).WithData("sfcs", strs);
                 }
-               processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(manuProductBadRecordCreateDto.BadProcessRouteId ?? 0);
+                processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(manuProductBadRecordCreateDto.BadProcessRouteId ?? 0);
             }
             var sfcStepList = new List<ManuSfcStepEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceBusinessEntity>();
@@ -210,7 +220,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         continue;
                     }
-                 
+
                     manuProductBadRecords.Add(new ManuProductBadRecordEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
@@ -316,7 +326,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                     if (sfcStepList.Any())
                     {
-                        await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                        //await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                        _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = sfcStepList });
                     }
                     if (manuSfcProduceList.Any())
                     {
@@ -341,7 +352,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     if (sfcStepList.Any())
                     {
-                        await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                        //await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                        _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = sfcStepList });
                     }
                     if (manuSfcProduceList.Any())
                     {
@@ -491,7 +503,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //关闭不合格信息
                         await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
                         //记录step信息
-                        await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                        //await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                        _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
+
                         trans.Complete();
                     }
                 }
@@ -502,7 +516,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //关闭不合格信息
                         await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
                         //记录step信息
-                        await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                        //await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                        _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
                         trans.Complete();
                     }
                 }
@@ -556,7 +571,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 using (var trans = TransactionHelper.GetTransactionScope())
                 {
                     // 1.插入 manu_sfc_step，步骤为"维修"
-                    rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                    //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                    _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
 
                     // 2.插入 manu_sfc_produce_business
                     //添加维修业务
@@ -643,7 +659,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
 
                 //2.记录数据
-                rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                //rows += await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = sfcStepList });
 
                 trans.Complete();
             }

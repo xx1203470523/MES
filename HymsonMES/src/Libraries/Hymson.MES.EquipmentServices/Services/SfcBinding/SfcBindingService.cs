@@ -1,23 +1,20 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
+﻿using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -70,11 +67,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
-        /// 步骤
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 工序和资源半成品产品设置表仓储接口
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
@@ -83,6 +75,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// 仓储接口（公共方法）
         /// </summary>
         private readonly ICommonService _manuCommonOldService;
+
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -94,9 +92,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// <param name="currentEquipment"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="procProductSetRepository"></param>
         /// <param name="manuCommonOldService"></param>
+        /// <param name="eventBus"></param>
         public SfcBindingService(
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -106,9 +104,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             ICurrentEquipment currentEquipment,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IProcProductSetRepository procProductSetRepository,
-            ICommonService manuCommonOldService)
+            ICommonService manuCommonOldService,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
@@ -118,9 +116,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             _currentEquipment = currentEquipment;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _procProductSetRepository = procProductSetRepository;
             _manuCommonOldService = manuCommonOldService;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -353,7 +351,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
 
             await _manuSfcCirculationRepository.InsertRangeAsync(createManuSfcCirculationList);
 
-            await _manuSfcStepRepository.InsertRangeAsync(createManuSfcStepList);
+            //await _manuSfcStepRepository.InsertRangeAsync(createManuSfcStepList);
+            _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = createManuSfcStepList });
 
             await _manuSfcRepository.UpdateStatusAsync(updateManuSfcEntity);
 
@@ -365,7 +364,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
 
             await _manuSfcProduceRepository.InsertAsync(createManuSfcProduceEntity);
 
-            await _manuSfcStepRepository.InsertAsync(createManuMainSfcStepEntity);
+            //await _manuSfcStepRepository.InsertAsync(createManuMainSfcStepEntity);
+            _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = createManuMainSfcStepEntity });
 
             trans.Complete();
         }

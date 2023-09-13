@@ -4,7 +4,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -23,8 +22,6 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using IdGen;
-using System.Collections.Generic;
 using ErrorCode = Hymson.MES.Core.Constants.ErrorCode;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
@@ -54,11 +51,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-
-        /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 仓储接口（工单信息）
@@ -94,7 +86,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
@@ -103,24 +94,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             ILocalizationService localizationService,
-            IManuSfcSummaryRepository manuSfcSummaryRepository, IEventBus<EventBusInstance1> eventBus)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _localizationService = localizationService;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
-            _eventBus=eventBus;
+            _eventBus = eventBus;
         }
 
 
@@ -256,7 +246,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             List<ManuSfcStepEntity> sfcStepEntities = new();
             List<ManuSfcSummaryEntity> manuSfcSummaryEntities = new();
             MultiSfcUpdateIsUsedCommand sfcUpdateIsUsedCommand = new();
-            List< MultiUpdateProduceInStationSFCCommand > updateProduceInStationSFCCommands = new();
+            List<MultiUpdateProduceInStationSFCCommand> updateProduceInStationSFCCommands = new();
             entities.ForEach(sfcProduceEntity =>
             {
                 // 检查是否测试工序
@@ -317,10 +307,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 updateProduceInStationSFCCommands.Add(new MultiUpdateProduceInStationSFCCommand
                 {
-                    Id=sfcProduceEntity.Id,
+                    Id = sfcProduceEntity.Id,
                     ProcedureId = bo.ProcedureId,
                     ResourceId = bo.ResourceId,
-                    SfcSummaryId= manuSfcSummaryEntity.Id,
+                    SfcSummaryId = manuSfcSummaryEntity.Id,
                     Status = SfcStatusEnum.Activity,
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
@@ -364,7 +354,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SFCStepEntities = sfcStepEntities,
                 MultiSfcUpdateIsUsedCommand = sfcUpdateIsUsedCommand,
                 ManuSfcSummaryEntities = manuSfcSummaryEntities,
-                multiUpdateProduceInStationSFCCommands= updateProduceInStationSFCCommands
+                multiUpdateProduceInStationSFCCommands = updateProduceInStationSFCCommands
             };
         }
 
@@ -397,11 +387,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 插入 manu_sfc_step 状态为 进站
             //var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
             //tasks.Add(manuSfcStepTask);
-            ManuSfcStepsEvent @event = new ManuSfcStepsEvent()
-            {
-                manuSfcStepEntities = data.SFCStepEntities
-            };
-            _eventBus.Publish<ManuSfcStepsEvent>(@event);
+            _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SFCStepEntities });
 
             // 如果是首工序
             if (data.IsFirstProcedure)
@@ -414,7 +400,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新工单的 InputQty
             var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
             tasks.Add(updateInputQtyByWorkOrderIdTask);
-           
+
             //插入条码工序汇总表
             var manuSfcSummaryInsertTask = _manuSfcSummaryRepository.InsertRangeAsync(data.ManuSfcSummaryEntities);
             tasks.Add(manuSfcSummaryInsertTask);
