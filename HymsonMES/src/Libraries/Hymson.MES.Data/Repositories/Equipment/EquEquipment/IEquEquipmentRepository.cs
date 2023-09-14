@@ -103,6 +103,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="equipmentPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentEntity>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
+        Task<PagedInfo<EquEquipmentPageView>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
     }
 }

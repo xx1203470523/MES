@@ -177,7 +177,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentEntity>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery)
+        public async Task<PagedInfo<EquEquipmentPageView>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -186,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.Where("EE.IsDeleted = 0");
             sqlBuilder.Where("EE.SiteId = @SiteId");
             sqlBuilder.OrderBy("EE.UpdatedOn DESC");
-            sqlBuilder.Select("EE.*");
+            sqlBuilder.Select("EE.*,IWC.Name as WorkCenterShopName,IWC.Code as WorkCenterShopCode");
 
             if (pagedQuery.EquipmentType.HasValue)
             {
@@ -215,10 +215,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
                 sqlBuilder.Where("EE.EquipmentName LIKE @EquipmentName");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopName))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkCenterShopCode))
             {
-                pagedQuery.WorkCenterShopName = $"%{pagedQuery.WorkCenterShopName}%";
-                sqlBuilder.Where("IWC.Name LIKE @WorkCenterShopName");
+                pagedQuery.WorkCenterShopCode = $"%{pagedQuery.WorkCenterShopCode}%";
+                sqlBuilder.Where("IWC.Code LIKE @WorkCenterShopCode");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Location))
@@ -233,10 +233,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var entities = await conn.QueryAsync<EquEquipmentEntity>(templateData.RawSql, templateData.Parameters);
+            var entities = await conn.QueryAsync<EquEquipmentPageView>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
-            return new PagedInfo<EquEquipmentEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquEquipmentPageView>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
     }

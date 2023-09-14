@@ -156,7 +156,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 车间
         /// </summary>
-        public string? WorkCenterShopName { get; set; }
+        public string? WorkCenterShopCode { get; set; }
     }
 
     /// <summary>
@@ -305,6 +305,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
+
+        /// <summary>
+        /// 车间名称
+        /// </summary>
+        public string? WorkCenterShopCode { get; set; }
 
         /// <summary>
         /// 车间名称
