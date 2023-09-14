@@ -22,6 +22,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
+using Hymson.SqlActuator.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Org.BouncyCastle.Crypto;
@@ -76,10 +77,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         private readonly IProcProductSetRepository _procProductSetRepository;
 
         /// <summary>
-        /// 
+        /// 多语言服务
         /// </summary>
         private readonly ILocalizationService _localizationService;
-
+        /// <summary>
+        /// sql执行器
+        /// </summary>
+        private readonly ISqlExecuteTaskService _sqlExecuteTaskService;
         private readonly IManuProductParameterService _manuProductParameterService;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
@@ -100,7 +104,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IProcProductSetRepository procProductSetRepository,
             IManuProductParameterService manuProductParameterService,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
-            AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService)
+            AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService, ISqlExecuteTaskService sqlExecuteTaskService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -116,6 +120,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
+            _sqlExecuteTaskService = sqlExecuteTaskService;
         }
 
         /// <summary>
@@ -495,7 +500,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("MES10107"), validationFailures);
+                throw new ValidationException(_localizationService.GetResource(nameof(ErrorCode.MES10107)), validationFailures);
             }
 
             //productSet
@@ -515,7 +520,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     productSetList.Add(relationEntity);
                 }
             }
-
+            var createProductParameterProcedureCodeTableSql =   _manuProductParameterService.PrepareProductParameterProcedureCodeTableSql(siteId, procProcedureCreateDto.Procedure.Code);
             using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
             {
                 //入库
@@ -535,11 +540,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 {
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
-         
+                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER, createProductParameterProcedureCodeTableSql,userName);
                 //提交
                 ts.Complete();
             }
-            await _manuProductParameterService.CreateProductParameterProcedureCodeTableAsync(siteId, procProcedureCreateDto.Procedure.Code);
+            
         }
 
         /// <summary>
