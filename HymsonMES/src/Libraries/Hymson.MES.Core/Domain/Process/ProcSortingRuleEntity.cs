@@ -23,35 +23,40 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 规则编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 规则名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 版本
         /// </summary>
         public string Version { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
-       
+
     }
 }

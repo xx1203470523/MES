@@ -198,8 +198,8 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_sorting_rule_detail` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_sorting_rule_detail`(  `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId, @ProcedureId, @ParameterId, @MinValue, @MinContainingType, @MaxValue, @MaxContainingType, @ParameterValue, @Rating, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_sorting_rule_detail`(  `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId, @ProcedureId, @ParameterId, @MinValue, @MinContainingType, @MaxValue, @MaxContainingType, @ParameterValue, @Rating, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_sorting_rule_detail`(  `Id`, `SiteId`, `SortingRuleId`, `Serial`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId,@Serial, @ProcedureId, @ParameterId, @MinValue, @MinContainingType, @MaxValue, @MaxContainingType, @ParameterValue, @Rating, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_sorting_rule_detail`(  `Id`, `SiteId`, `SortingRuleId`, `Serial`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SortingRuleId,@Serial, @ProcedureId, @ParameterId, @MinValue, @MinContainingType, @MaxValue, @MaxContainingType, @ParameterValue, @Rating, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `proc_sorting_rule_detail` SET   SiteId = @SiteId, SortingRuleId = @SortingRuleId, ProcedureId = @ProcedureId, ParameterId = @ParameterId, MinValue = @MinValue, MinContainingType = @MinContainingType, MaxValue = @MaxValue, MaxContainingType = @MaxContainingType, ParameterValue = @ParameterValue, Rating = @Rating, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `proc_sorting_rule_detail` SET   SiteId = @SiteId, SortingRuleId = @SortingRuleId, ProcedureId = @ProcedureId, ParameterId = @ParameterId, MinValue = @MinValue, MinContainingType = @MinContainingType, MaxValue = @MaxValue, MaxContainingType = @MaxContainingType, ParameterValue = @ParameterValue, Rating = @Rating, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
@@ -208,14 +208,14 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeletesSql = "UPDATE `proc_sorting_rule_detail` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `SortingRuleId`, `Serial`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_detail`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `SortingRuleId`, `Serial`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule_detail`  WHERE Id IN @Ids ";
         const string GetBySortingRuleIdSql = @"SELECT 
-                                          `Id`, `SiteId`, `SortingRuleId`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_sorting_rule_detail`  WHERE  SortingRuleId = @SortingRuleId  AND IsDeleted=0";
+                                          `Id`, `SiteId`, `SortingRuleId`, `Serial`, `ProcedureId`, `ParameterId`, `MinValue`, `MinContainingType`, `MaxValue`, `MaxContainingType`, `ParameterValue`, `Rating`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule_detail`  WHERE  SortingRuleId = @SortingRuleId  AND IsDeleted=0  ORDER BY Serial ";
         const string DeleteBySortingRuleDetailIdSql = "DELETE FROM `proc_sorting_rule_detail` WHERE SortingRuleId = @SortingRuleId";
         #endregion
     }
