@@ -254,7 +254,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 SiteId = _currentEquipment.SiteId,
-                EquipmentId = _currentEquipment.Id,
+                //EquipmentId = _currentEquipment.Id,
+                ProcedureIds = new long[] { currentProcedureId },
                 SFCS = sfclist.Select(c => c.SFC).ToArray()
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
@@ -273,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
                 var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).First();
                 //汇总信息
-                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC ).FirstOrDefault();
                 // 更新时间
                 sfcProduceEntity.UpdatedBy = _currentEquipment.Name;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
