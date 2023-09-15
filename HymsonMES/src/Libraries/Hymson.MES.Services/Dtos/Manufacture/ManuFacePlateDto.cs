@@ -87,11 +87,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public record ManuFacePlateCreateDto : BaseEntityDto
     {
-        /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
        /// <summary>
         /// 编码
         /// </summary>
@@ -128,10 +123,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 编码
-        /// </summary>
-        public string Code { get; set; }
+       ///// <summary>
+       // /// 编码
+       // /// </summary>
+       // public string Code { get; set; }
 
        /// <summary>
         /// 名称
