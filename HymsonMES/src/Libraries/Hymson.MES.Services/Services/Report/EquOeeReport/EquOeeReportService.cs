@@ -170,17 +170,17 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 {
                     EquipmentCode = equOeeReport.EquipmentCode,
                     EquipmentName = equOeeReport.EquipmentName,
-                    PlanTimeDuration = equOeeReport.PlanTimeDuration,
-                    WorkTimeDuration = equOeeReport.WorkTimeDuration,
-                    LostTimeDuration = equOeeReport.LostTimeDuration,
-                    TheoryOutputQty = equOeeReport.TheoryOutputQty,
-                    OutputQty = equOeeReport.OutputQty,
-                    OutputSumQty = equOeeReport.OutputSumQty,
-                    QualifiedQty = equOeeReport.QualifiedQty,
-                    AvailableRatio = equOeeReport.AvailableRatio,
-                    WorkpieceRatio = equOeeReport.WorkpieceRatio,
-                    QualifiedRatio = equOeeReport.QualifiedRatio,
-                    Oee = equOeeReport.Oee
+                    PlanTimeDuration = equOeeReport.PlanTimeDuration??0,
+                    WorkTimeDuration = equOeeReport.WorkTimeDuration ?? 0,
+                    LostTimeDuration = equOeeReport.LostTimeDuration ?? 0,
+                    TheoryOutputQty = equOeeReport.TheoryOutputQty ?? 0,
+                    OutputQty = equOeeReport.OutputQty ?? 0,
+                    OutputSumQty = equOeeReport.OutputSumQty ?? 0,
+                    QualifiedQty = equOeeReport.QualifiedQty ?? 0,
+                    AvailableRatio = equOeeReport.AvailableRatio ?? 0,
+                    WorkpieceRatio = equOeeReport.WorkpieceRatio ?? 0,
+                    QualifiedRatio = equOeeReport.QualifiedRatio ?? 0,
+                    Oee = equOeeReport.Oee ?? 0
                 });
             }
             var filePath = await _excelService.ExportAsync(equOeeExports, fileName, fileName);

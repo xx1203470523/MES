@@ -378,6 +378,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetTraceReportPagedInfoCountSqlTemplate);
 
             sqlBuilder.Where("T2.IsDeleted=0 ");
+            sqlBuilder.Where("T2.IsDisassemble=0 "); //未拆解的， 是否拆解：0
             if (queryParam.TraceDirection)
             {
                 sqlBuilder.Where("T2.SFC=T3.CirculationBarCode "); //正向追溯
@@ -445,7 +446,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             (
              /*初始查询*/
               SELECT T1.id,T1.sfc,T1.CirculationBarCode,T1.IsDeleted,T1.IsDisassemble,T1.CirculationType,T1.CirculationQty,T1.ProcedureId,T1.ResourceId,T1.EquipmentId,T1.WorkOrderId,T1.ProductId,T1.Location,T1.CreatedOn,T1.CreatedBy
-		            FROM manu_sfc_circulation T1 WHERE T1.IsDeleted=0 AND T1.sfc = @SFC
+		            FROM manu_sfc_circulation T1 WHERE T1.IsDeleted=0 AND T1.sfc = @SFC  and T1.IsDisassemble=0
               UNION /*使用Union 而不是 Union ALL 避免数据存在循环引用导致死循环*/
 	            /*递归查询*/
               SELECT T2.id,  T2.SFC, T2.CirculationBarCode,T2.IsDeleted,T2.IsDisassemble,T2.CirculationType,T2.CirculationQty,T2.ProcedureId,T2.ResourceId,T2.EquipmentId,T2.WorkOrderId,T2.ProductId,T2.Location,T2.CreatedOn,T2.CreatedBy
@@ -459,7 +460,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             (
              /*初始查询*/
               SELECT T1.id,T1.sfc,T1.CirculationBarCode,T1.IsDeleted,T1.IsDisassemble,T1.CirculationType,T1.CirculationQty,T1.ProcedureId,T1.ResourceId,T1.EquipmentId,T1.WorkOrderId,T1.ProductId,T1.Location,T1.CreatedOn,T1.CreatedBy
-		            FROM manu_sfc_circulation T1 WHERE T1.IsDeleted=0 AND T1.sfc = @SFC
+		            FROM manu_sfc_circulation T1 WHERE T1.IsDeleted=0 AND T1.sfc = @SFC and T1.IsDisassemble=0
               UNION /*使用Union 而不是 Union ALL 避免数据存在循环引用导致死循环*/
 	            /*递归查询*/
               SELECT T2.id,  T2.SFC, T2.CirculationBarCode,T2.IsDeleted,T2.IsDisassemble,T2.CirculationType,T2.CirculationQty,T2.ProcedureId,T2.ResourceId,T2.EquipmentId,T2.WorkOrderId,T2.ProductId,T2.Location,T2.CreatedOn,T2.CreatedBy
