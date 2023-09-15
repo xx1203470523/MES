@@ -54,5 +54,13 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <param name="procedureCode"></param>
         /// <returns></returns>
         Task CreateProductParameterProcedureCodeTableAsync(long siteId, string procedureCode);
+
+        /// <summary>
+        /// 准备工序维度创建数据库表sql语句
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="procedureCode"></param>
+        /// <returns></returns>
+        string PrepareProductParameterProcedureCodeTableSql(long siteId, string procedureCode);
     }
 }
