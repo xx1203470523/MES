@@ -231,8 +231,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string InsertSql = "INSERT INTO `manu_face_plate`(  `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Type, @Status, @ConversationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `manu_face_plate`(  `Id`, `Code`, `Name`, `Type`, `Status`, `ConversationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Type, @Status, @ConversationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_face_plate` SET   Code = @Code, Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_face_plate` SET  Name = @Name, Type = @Type, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_face_plate` SET  Name = @Name, Type = @Type, Status = @Status, ConversationTime = @ConversationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_face_plate` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_face_plate` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
