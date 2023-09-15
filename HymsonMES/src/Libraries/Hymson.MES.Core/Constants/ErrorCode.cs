@@ -781,7 +781,7 @@
         public const string MES16126 = "工单和关联工单不能一致";
         public const string MES16127 = "条码工单和关联工单必须一致";
         public const string MES16128 = "条码{sfc}不存在";
-        public const string MES16129 = "条码物料和工单物料编码不一致";
+        public const string MES16129 = "条码物料和新工单物料编码不一致";
         public const string MES16130 = "已报废的条码，不允许删除";
         public const string MES16131 = "组件条码对应的批次大小未维护";
         public const string MES16132 = "条码{sfc}已经被装箱了";
