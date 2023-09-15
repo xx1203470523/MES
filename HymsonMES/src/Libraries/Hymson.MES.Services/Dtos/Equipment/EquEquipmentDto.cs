@@ -105,6 +105,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public int? TakeTime { get; set; }
 
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get;set; }
+
         #region 子
         /// <summary>
         /// 设备关联硬件设备
