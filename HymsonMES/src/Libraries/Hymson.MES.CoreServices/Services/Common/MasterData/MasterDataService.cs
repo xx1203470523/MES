@@ -718,7 +718,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 LinkPoint = param.LinkPoint,
                 IsUse = true
             });
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false)
             {
                 InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
@@ -727,7 +727,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     IsUse = true
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return null;
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return null;
 
             var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
             return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
