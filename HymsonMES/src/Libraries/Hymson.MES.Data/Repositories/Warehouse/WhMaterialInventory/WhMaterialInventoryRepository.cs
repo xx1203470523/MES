@@ -404,7 +404,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                             FROM `wh_material_inventory`  WHERE Id = @Id ";
 
         const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode AND QuantityResidue>0";
-        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
+        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
         const string GetByBarCodesOfHasQty = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
