@@ -112,6 +112,25 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryAsync<EquStatusStatisticsEntity>(template.RawSql, equStatusQuery);
         }
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="equTheoryQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentTheoryEntity>> GetEquipmentTheoryAsync(EquEquipmentTheoryQuery equTheoryQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEquipmentTheoryEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            //sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+            if (equTheoryQuery.EquipmentCodes != null && equTheoryQuery.EquipmentCodes.Length > 0)
+            {
+                sqlBuilder.Where("EquipmentCode IN @EquipmentCodes");
+            }
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquEquipmentTheoryEntity>(template.RawSql, equTheoryQuery);
+        }
     }
 
     /// <summary>
@@ -130,5 +149,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string UpdatesSql = "UPDATE `equ_status` SET SiteId = @SiteId, EquipmentId = @EquipmentId, EquipmentStatus = @EquipmentStatus, LossRemark = @LossRemark, BeginTime = @BeginTime, EndTime = @EndTime, LocalTime = @LocalTime, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string GetLastEntityByEquipmentIdSql = "SELECT * FROM equ_status WHERE EquipmentId = @equipmentId ORDER BY LocalTime DESC LIMIT 1";
+        
+        const string GetEquipmentTheoryEntitiesSqlTemplate = @"SELECT /**select**/ FROM `equ_equipment_theory` /**where**/  ";
     }
 }

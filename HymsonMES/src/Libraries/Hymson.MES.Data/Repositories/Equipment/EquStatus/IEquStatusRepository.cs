@@ -56,5 +56,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<IEnumerable<EquStatusStatisticsEntity>> GetEquStatusStatisticsEntitiesAsync(EquStatusStatisticsQuery equStatusQuery);
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="equTheoryQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentTheoryEntity>> GetEquipmentTheoryAsync(EquEquipmentTheoryQuery equTheoryQuery);
+
     }
 }

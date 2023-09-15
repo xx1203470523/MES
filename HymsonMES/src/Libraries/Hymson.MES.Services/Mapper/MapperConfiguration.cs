@@ -596,6 +596,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquAlarmReportView, EquAlarmReportExportDto>();
             #endregion
 
+            #region EquOeeReport
+            CreateMap<EquOeeReportPagedQueryDto, EquOeeReportPagedQuery>();
+            #endregion
+
             #region ManuProductParameterReport
             CreateMap<ManuProductParameterReportView, ManuProductParameterReportExportDto>();
             CreateMap<ManuProductParameterReportPagedQueryDto, ManuProductParameterReportPagedQuery>();

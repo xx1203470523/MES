@@ -25,4 +25,15 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         public DateTime? EndTime { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class EquEquipmentTheoryQuery
+    {
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public string[]? EquipmentCodes { get; set; }
+    }
 }

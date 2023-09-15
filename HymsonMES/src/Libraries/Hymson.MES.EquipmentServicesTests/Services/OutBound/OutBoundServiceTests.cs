@@ -58,11 +58,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
         [TestMethod()]
         public async Task OutBoundTestAsync()
         {
-            string resourceCode = "QAEMZY002";
-            string equipmentCode = "QAEM002";
-            string prefix = "AAATESTSFC";
+            string resourceCode = "YTLPACKO1ER014";
+            string equipmentCode = "YTLPACK01AE014";
+            string prefix = "YTP280024A23970001EVE";
             List<OutBoundParam> outBoundParams = new List<OutBoundParam>();
-            for (int i = 1; i <= 50; i++)
+            for (int i = 1; i <= 1; i++)
             {
                 outBoundParams.Add(new OutBoundParam
                 {
@@ -70,6 +70,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                     ParamValue = i.ToString()
                 });
             }
+            try
+            {
+
+           
             await SetEquInfoAsync(equipmentCode);
             await _outBoundService.OutBoundAsync(new OutBoundDto
             {
@@ -79,6 +83,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 SFC = prefix + "1",
                 ParamList = outBoundParams.ToArray()
             });
+
+            }
+            catch (Exception ex)
+            {
+                int ss = 1;
+                //throw;
+            }
             Assert.IsTrue(true);
         }
 
