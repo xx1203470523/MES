@@ -9,6 +9,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
+using Hymson.MES.Services.Dtos.Integrated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -208,6 +210,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 电芯批次码
+        /// </summary>
+        public IEnumerable<InteSFCBoxRView>? SFCBox { get; set; }
     }
 
     /// <summary>
@@ -289,6 +296,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 电芯批次码
+        /// </summary>
+        public IEnumerable<InteSFCBoxRView>? SFCBox { get; set; }
     }
 
     /// <summary>
@@ -481,6 +493,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工作中心代码
         /// </summary>
         public string WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 工单关联批次箱码
+        /// </summary>
+        public IEnumerable<PlanWorkOrderSFCBoxQuery>? SFCBox { get; set; }
     }
 
     /// <summary>

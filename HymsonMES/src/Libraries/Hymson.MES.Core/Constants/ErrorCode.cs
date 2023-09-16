@@ -685,6 +685,8 @@
         public const string MES16349 = "条码{0}出站完成！";
         public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
+
+        public const string MES16352 = "采集数据导入模板不正确!";
         #endregion
 
         #region 生产
@@ -1040,6 +1042,14 @@
 
 
         #endregion
+        #endregion
+
+        #region 电芯条码导入导出
+        public const string MES19301 = "档位Grade不能为空";
+        public const string MES19302 = "电芯条码SFC不能为空";
+        public const string MES19303 = "箱码BoxCode不能为空";
+        public const string MES19304 = "OCVB最大值最小值之差不能超过范围值{OCVBDiff}";
+        public const string MES19305 = "IMPB不能超过范围值{MaxIMPB}";
         #endregion
 
         #region 系统执行出错 业务逻辑出错

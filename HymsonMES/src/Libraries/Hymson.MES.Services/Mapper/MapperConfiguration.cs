@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteTray.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -234,6 +235,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteSystemTokenEntity, InteSystemTokenDto>();
             CreateMap<InteSystemTokenCreateDto, InteSystemTokenEntity>();
             CreateMap<InteSystemTokenModifyDto, InteSystemTokenEntity>();
+            #endregion
+
+            #region InteSFCBox
+            CreateMap<InteSFCBoxEntity, InteSFCBoxRView>();
+            CreateMap<InteSFCBoxEntity, InteSFCBoxDto>();
+            CreateMap<InteSFCBoxQueryDto, InteSFCBoxQueryRep>();
             #endregion
         }
 

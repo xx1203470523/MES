@@ -19,6 +19,7 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.MES.Services.Services.Integrated.InteSFCBox;
 using Hymson.MES.Services.Services.Job.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
@@ -112,6 +113,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteWorkCenterService, InteWorkCenterService>();
             services.AddSingleton<IInteSystemTokenService, InteSystemTokenService>();
             services.AddSingleton<IInteTrayService, InteTrayService>();
+            services.AddSingleton<IInteSFCBoxService, InteSFCBoxService>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesService, InteCodeRulesService>();
@@ -394,6 +396,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteSystemTokenCreateDto>, InteSystemTokenCreateValidator>();
             services.AddSingleton<AbstractValidator<InteSystemTokenModifyDto>, InteSystemTokenModifyValidator>();
             services.AddSingleton<AbstractValidator<InteTraySaveDto>, InteTraySaveValidator>();
+            services.AddSingleton<AbstractValidator<InteSFCBoxImportDto>, InteSFCBoxValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();

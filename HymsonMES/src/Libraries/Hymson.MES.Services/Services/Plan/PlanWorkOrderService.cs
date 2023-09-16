@@ -5,10 +5,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
@@ -45,6 +47,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IPlanWorkOrderActivationRecordRepository _planWorkOrderActivationRecordRepository;
 
         private readonly AbstractValidator<PlanWorkOrderChangeStatusDto> _validationChangeStatusRules;
+        private readonly IInteSFCBoxRepository _inteSFCBoxRepository;
 
         /// <summary>
         /// 
@@ -59,6 +62,10 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="planWorkOrderStatusRecordRepository"></param>
+        /// <param name="planWorkOrderActivationRecordRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="validationChangeStatusRules"></param>
+        /// <param name="inteSFCBoxRepository"></param>
         public PlanWorkOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanWorkOrderCreateDto> validationCreateRules,
             AbstractValidator<PlanWorkOrderModifyDto> validationModifyRules,
@@ -68,7 +75,8 @@ namespace Hymson.MES.Services.Services.Plan
             IProcProcessRouteRepository procProcessRouteRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IPlanWorkOrderStatusRecordRepository planWorkOrderStatusRecordRepository, IPlanWorkOrderActivationRecordRepository planWorkOrderActivationRecordRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules)
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, AbstractValidator<PlanWorkOrderChangeStatusDto> validationChangeStatusRules,
+            IInteSFCBoxRepository inteSFCBoxRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -84,6 +92,7 @@ namespace Hymson.MES.Services.Services.Plan
             _planWorkOrderActivationRecordRepository = planWorkOrderActivationRecordRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _validationChangeStatusRules = validationChangeStatusRules;
+            _inteSFCBoxRepository = inteSFCBoxRepository;
         }
 
 
@@ -121,6 +130,56 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
             planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 0;
 
+            //关联箱码
+            var boxCodeBindWorkOrder = new List<InteSFCBoxWorkOrderEntity>();
+            if (planWorkOrderCreateDto.SFCBox != null)
+            {
+                var boxCodes = planWorkOrderCreateDto.SFCBox.Select(x => x.BoxCode).ToArray();
+
+                if (boxCodes == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+                }
+                //批量查询
+                var getBoxCodes = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
+
+                foreach (var item in planWorkOrderCreateDto.SFCBox)
+                {
+                    if (item.BoxCode != null)
+                    {
+                        //校验最大与最小,暂时为8范围
+                        var currentboxCode = getBoxCodes.Where(x => x.BoxCode == item.BoxCode).FirstOrDefault();
+                        int ocvbrange = 8;
+                        double impbrange = 0.25;
+
+                        if (currentboxCode != null)
+                        {
+                            if (currentboxCode.OCVBDiff > ocvbrange)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
+                            }
+                            if (currentboxCode.MaxIMPB > (decimal)impbrange)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
+                            }
+                        }
+
+                        boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            Siteid = _currentSite.SiteId ?? 0,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                            CreatedOn = HymsonClock.Now(),
+                            CreatedBy = _currentUser.UserName,
+                            BoxCode = item.BoxCode,
+                            Grade = item.Grade ?? string.Empty,
+                            WorkOrderId = planWorkOrderEntity.Id,
+                        });
+                    }
+                }
+            }
+
             var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity()
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -148,11 +207,16 @@ namespace Hymson.MES.Services.Services.Plan
             using var ts = TransactionHelper.GetTransactionScope();
             var response = await _planWorkOrderRepository.InsertAsync(planWorkOrderEntity);
 
+            //工单关联SFCbox信息保存
+            response = await _inteSFCBoxRepository.InsertSFCBoxWorkOrderAsync(boxCodeBindWorkOrder);
+
+
             if (response == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16002));
             }
             await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
+
             ts.Complete();
         }
 
@@ -173,7 +237,7 @@ namespace Hymson.MES.Services.Services.Plan
             if (current != null)
             {
                 //判断当前状态  
-                if (current.Status != PlanWorkOrderStatusEnum.NotStarted) 
+                if (current.Status != PlanWorkOrderStatusEnum.NotStarted)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16046));
                 }
@@ -189,11 +253,71 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.UpdatedBy = _currentUser.UserName;
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
 
+
+            //关联箱码
+            var boxCodeBindWorkOrder = new List<InteSFCBoxWorkOrderEntity>();
+            if (planWorkOrderModifyDto.SFCBox != null)
+            {
+                var boxCodes = planWorkOrderModifyDto.SFCBox.Select(x => x.BoxCode).ToArray();
+
+                if (boxCodes == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+                }
+                //批量查询
+                var getBoxCodes = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
+
+                foreach (var item in planWorkOrderModifyDto.SFCBox)
+                {
+                    if (item.BoxCode != null)
+                    {
+                        //校验最大与最小,暂时为8范围
+                        var currentboxCode = getBoxCodes.Where(x => x.BoxCode == item.BoxCode).FirstOrDefault();
+                        int ocvbrange = 8;
+                        double impbrange = 0.25;
+
+                        if (currentboxCode != null)
+                        {
+                            if (currentboxCode.OCVBDiff > ocvbrange)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
+                            }
+                            if (currentboxCode.MaxIMPB > (decimal)impbrange)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
+                            }
+                        }
+
+                        boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            Siteid = _currentSite.SiteId ?? 0,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                            CreatedOn = HymsonClock.Now(),
+                            CreatedBy = _currentUser.UserName,
+                            BoxCode = item.BoxCode,
+                            Grade = item.Grade ?? string.Empty,
+                            WorkOrderId = planWorkOrderEntity.Id,
+                        });
+                    }
+                }
+            }
+
+
+            using var ts = TransactionHelper.GetTransactionScope();
             var response = await _planWorkOrderRepository.UpdateAsync(planWorkOrderEntity);
             if (response == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16004));
             }
+            //删除关联表数据
+            await _inteSFCBoxRepository.DeleteSFCBoxWorkOrderAsync(planWorkOrderEntity.Id);
+
+            //工单关联SFCbox信息保存
+            response = await _inteSFCBoxRepository.InsertSFCBoxWorkOrderAsync(boxCodeBindWorkOrder);
+
+            ts.Complete();
         }
 
         /// <summary>
@@ -591,6 +715,12 @@ namespace Hymson.MES.Services.Services.Plan
                 if (workCenter != null)
                 {
                     planWorkOrderDetailView.WorkCenterCode = workCenter.Code;
+                }
+
+                var sfcBox = await _inteSFCBoxRepository.GetByWorkOrderAsync(id);
+                if (sfcBox != null)
+                {
+                    planWorkOrderDetailView.SFCBox = sfcBox;
                 }
 
                 return planWorkOrderDetailView;

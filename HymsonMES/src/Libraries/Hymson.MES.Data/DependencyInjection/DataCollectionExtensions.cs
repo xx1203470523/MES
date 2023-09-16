@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteClass;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteJobClass;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
@@ -88,6 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
             services.AddSingleton<IInteTrayRepository, InteTrayRepository>();
+            services.AddSingleton<IInteSFCBoxRepository, InteSFCBoxRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
