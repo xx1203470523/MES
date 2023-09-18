@@ -321,7 +321,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
+        public async Task<long> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
             // 查询条码
             var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = saveDto.BarCode });
@@ -426,7 +426,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             rows += await _manuFeedingRecordRepository.InsertAsync(GetManuFeedingRecord(entity, FeedingDirectionTypeEnum.Load));
             trans.Complete();
 
-            return rows;
+            // 因为前端要展开这级表格，所以把ID返回去
+            return material.Id;
         }
 
         /// <summary>

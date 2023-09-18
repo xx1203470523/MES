@@ -1,5 +1,4 @@
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
@@ -42,7 +41,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(ManuFeedingMaterialSaveDto saveDto);
+        Task<long> CreateAsync(ManuFeedingMaterialSaveDto saveDto);
 
         /// <summary>
         /// 删除（物料加载）
