@@ -168,6 +168,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 获取生产工单（附带工单状态校验）
             _ = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdAsync, new WorkOrderIdBo { WorkOrderId = firstProduceEntity.WorkOrderId });
 
+            /*
+             * 2023.09.18 中越说产品说已经不需要校验BOM了
             // 验证BOM主物料数量
             await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
             {
@@ -176,6 +178,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = bo.ProcedureId,
                 BomId = firstProduceEntity.ProductBOMId
             });
+            */
         }
 
         /// <summary>
