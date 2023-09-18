@@ -626,6 +626,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 BarCode = addDto.CirculationBarCode,
                 QuantityResidue = circulationQty,
+                QuantityOriginal = whMaterialInventory.QuantityResidue,
                 UpdatedBy = _currentUser.UserName
             };
 
@@ -634,21 +635,28 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             var rows = 0;
-            using (var trans = TransactionHelper.GetTransactionScope())
+            using var trans = TransactionHelper.GetTransactionScope();
+            // 如果不是外部
+            if (serialNumber != MaterialSerialNumberEnum.Outside)
             {
-                //记录step信息
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+                // 回写库存数据
+                rows = await _whMaterialInventoryRepository.UpdateReduceQuantityResidueWithCheckAsync(quantityCommand);
 
-                //添加组件信息
-                rows += await _circulationRepository.InsertAsync(sfcCirculationEntity);
-
-                if (serialNumber != MaterialSerialNumberEnum.Outside)
+                // 未更新到数据，事务回滚
+                if (rows <= 0)
                 {
-                    //回写库存数据
-                    rows += await _whMaterialInventoryRepository.UpdateReduceQuantityResidueAsync(quantityCommand);
+                    trans.Dispose();
+                    return;
                 }
-                trans.Complete();
             }
+
+            //记录step信息
+            rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+
+            //添加组件信息
+            rows += await _circulationRepository.InsertAsync(sfcCirculationEntity);
+
+            trans.Complete();
         }
 
         /// <summary>

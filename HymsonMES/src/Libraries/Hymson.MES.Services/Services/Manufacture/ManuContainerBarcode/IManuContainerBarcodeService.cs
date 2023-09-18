@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 容器条码表    服务接口 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-04-12 02:29:23
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 

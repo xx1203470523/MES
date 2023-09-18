@@ -318,6 +318,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 更新库存数量(减少库存)-带库存检查
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateReduceQuantityResidueWithCheckAsync(UpdateQuantityCommand updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateReduceQuantityResidueWithCheckSql, updateQuantityCommand);
+        }
+
+        /// <summary>
         /// 批量更新库存数量(减少库存)
         /// </summary>
         /// <param name="updateQuantityCommand"></param>
@@ -415,7 +426,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string UpdateIncreaseQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 
-        const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateReduceQuantityResidueWithCheckSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode AND QuantityResidue = @QuantityOriginal; ";
 
         const string UpdateIncreaseQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
