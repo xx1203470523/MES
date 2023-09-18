@@ -96,6 +96,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityCommand updateQuantityCommand);
 
         /// <summary>
+        /// 更新库存数量(减少库存)-带库存检查
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        Task<int> UpdateReduceQuantityResidueWithCheckAsync(UpdateQuantityCommand updateQuantityCommand);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
