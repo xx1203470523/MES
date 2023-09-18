@@ -61,21 +61,21 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 设备可用率 = (设备运行时间/规定时间)×100%
         /// </summary>
-        public decimal? AvailableRatio { get; set; }
+        public decimal AvailableRatio { get; set; }
 
         /// <summary>
         /// 设备效率 = (实际产量/设备理论产量)×100%
         /// </summary>
-        public decimal? WorkpieceRatio { get; set; }
+        public decimal WorkpieceRatio { get; set; }
         /// <summary>
         /// 质量合格率 = (合格产品数量/总产量)×100%
         /// </summary>
-        public decimal? QualifiedRatio { get; set; }
+        public decimal QualifiedRatio { get; set; }
 
         /// <summary>
         /// OEE = 设备可用率×设备效率×质量合格率
         /// </summary>
-        public decimal? Oee { get; set; }
+        public decimal Oee { get; set; }
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Dtos.Report
         public string[]? EquipmentCodes { get; set; }
 
         /// <summary>
-        /// 1白班，0夜班
+        /// 0白班+夜班、1白班、2夜班
         /// </summary>
         public int DayShift { get; set; }
 

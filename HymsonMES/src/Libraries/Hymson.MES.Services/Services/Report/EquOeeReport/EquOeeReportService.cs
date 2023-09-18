@@ -81,12 +81,18 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
             var checkTime = pageQuery.QueryTime[0];
             var DayStartTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
             var DayEndTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 20, 30, 0); // 开始时间
-            if (pageQuery.DayShift == 1)
+            if (pageQuery.DayShift == 0) //白班
+            {
+                DayStartTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
+                checkTime = pageQuery.QueryTime[1].AddDays(1); //第二天早上8点30
+                DayEndTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
+            }
+            else if(pageQuery.DayShift == 1) //白班
             {
                 DayStartTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
                 DayEndTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 20, 30, 0); // 开始时间
             }
-            else if (pageQuery.DayShift == 0)
+            else if (pageQuery.DayShift == 2) //夜班
             {
                 DayStartTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 20, 30, 0); // 开始时间
                 checkTime = checkTime.AddDays(1); //第二天早上8点30
@@ -112,7 +118,7 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 var equTheoryEntity = equTheoryDtos.Where(c => c.EquipmentCode == equCode)?.FirstOrDefault();
                 var TheoryOutputQty = equTheoryEntity?.TheoryOutputQty;//理论ct(s)
                 var theory = equTheoryEntity?.OutputQty;//每小时产量
-                var workingHours = 12;//正常出勤时间/计划时间(小时)
+                var workingHours = Convert.ToInt32((DayEndTime- DayStartTime).TotalMinutes);//12;//正常出勤时间/计划时间(小时)
                 //获取当前设备异常时长
                 var equipmentStopTime = equipmentStopTimeDtos?.Where(c => c.EquipmentId == equEquipmentEntity?.Id)?.FirstOrDefault();
                 //获取当前设备生产数据
@@ -141,10 +147,32 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 };
 
                 equipmentUtilizationRateDto.AvailableRatio = operateTime / workingSeconds;
-                equipmentUtilizationRateDto.WorkpieceRatio = (equipmentYield?.Total ?? 0) / (theory ?? 1);
-                equipmentUtilizationRateDto.QualifiedRatio = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
+                if (theory==null || theory == 0)
+                {
+                    equipmentUtilizationRateDto.WorkpieceRatio = 0;
+                }
+                else
+                {
+                    if ((equipmentYield?.Total??0) > theory)
+                    {
+                        equipmentUtilizationRateDto.WorkpieceRatio = 1;
+                    }
+                    else
+                    {
+                        equipmentUtilizationRateDto.WorkpieceRatio = (equipmentYield?.Total ?? 0) / (theory ?? 1);
+                    }
+                }
 
-                equipmentUtilizationRateDto.Oee = decimal.Parse(((operateTime / workingSeconds) * ((equipmentYield?.Total ?? 0) / (theory ?? 1)) * ((equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1))).ToString("0.00") ?? "0");
+                if (equipmentYield == null || equipmentYield?.Total == 0)
+                {
+                    equipmentUtilizationRateDto.QualifiedRatio = 0;
+                }
+                else
+                {
+                    equipmentUtilizationRateDto.QualifiedRatio = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
+                }
+               
+                equipmentUtilizationRateDto.Oee = decimal.Parse((equipmentUtilizationRateDto.AvailableRatio * equipmentUtilizationRateDto.WorkpieceRatio * equipmentUtilizationRateDto.QualifiedRatio).ToString("0.00") ?? "0");
 
 
                 dtos.Add(equipmentUtilizationRateDto);
@@ -177,10 +205,10 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                     OutputQty = equOeeReport.OutputQty ?? 0,
                     OutputSumQty = equOeeReport.OutputSumQty ?? 0,
                     QualifiedQty = equOeeReport.QualifiedQty ?? 0,
-                    AvailableRatio = equOeeReport.AvailableRatio ?? 0,
-                    WorkpieceRatio = equOeeReport.WorkpieceRatio ?? 0,
-                    QualifiedRatio = equOeeReport.QualifiedRatio ?? 0,
-                    Oee = equOeeReport.Oee ?? 0
+                    AvailableRatio = equOeeReport.AvailableRatio,
+                    WorkpieceRatio = equOeeReport.WorkpieceRatio,
+                    QualifiedRatio = equOeeReport.QualifiedRatio,
+                    Oee = equOeeReport.Oee
                 });
             }
             var filePath = await _excelService.ExportAsync(equOeeExports, fileName, fileName);

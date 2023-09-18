@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace Hymson.MES.Core.Enums.Equipment
 {
@@ -7,6 +8,12 @@ namespace Hymson.MES.Core.Enums.Equipment
     /// </summary>
     public enum EquipmentShiftEnum : sbyte
     {
+        /// <summary>
+        /// 白班+夜班
+        /// </summary>
+        [Description("白班+夜班")]
+        WholeShift = 0,
+
         /// <summary>
         /// 白班
         /// </summary>

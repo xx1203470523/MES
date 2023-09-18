@@ -18,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         public string[]? EquipmentCodes { get; set; }
 
         /// <summary>
-        /// 1白班，0夜班
+        /// 0白班+夜班、1白班、2夜班
         /// </summary>
         public int DayShift { get; set; }
 
