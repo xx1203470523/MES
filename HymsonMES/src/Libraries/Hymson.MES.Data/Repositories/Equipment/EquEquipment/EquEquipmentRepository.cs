@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -174,6 +175,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             {
                 sqlBuilder.Where("EE.EquipmentCode IN @EquipmentCodes");
             }
+            sqlBuilder.OrderBy("EE.EquipmentCode");
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, equipmentQuery);
             return equipmentEntities;
@@ -192,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.LeftJoin("inte_work_center IWC ON IWC.Id = EE.WorkCenterShopId");
             sqlBuilder.Where("EE.IsDeleted = 0");
             sqlBuilder.Where("EE.SiteId = @SiteId");
-            sqlBuilder.OrderBy("EE.UpdatedOn DESC");
+            sqlBuilder.OrderBy("EE.EquipmentCode");
             sqlBuilder.Select("EE.*");
 
             if (pagedQuery.EquipmentType.HasValue)
@@ -214,6 +216,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             {
                 pagedQuery.EquipmentCode = $"%{pagedQuery.EquipmentCode}%";
                 sqlBuilder.Where("EE.EquipmentCode LIKE @EquipmentCode");
+            }
+
+            if (pagedQuery.EquipmentCodes != null && pagedQuery.EquipmentCodes.Length > 0)
+            {
+                sqlBuilder.Where("EE.EquipmentCode IN @EquipmentCodes");
             }
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.EquipmentName))

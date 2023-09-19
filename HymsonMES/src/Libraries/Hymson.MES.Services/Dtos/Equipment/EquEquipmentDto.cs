@@ -127,6 +127,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string? EquipmentCode { get; set; }
 
         /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string[]? EquipmentCodes { get; set; }
+
+        /// <summary>
         /// 名称（设备注册）
         /// </summary>
         public string? EquipmentName { get; set; }
