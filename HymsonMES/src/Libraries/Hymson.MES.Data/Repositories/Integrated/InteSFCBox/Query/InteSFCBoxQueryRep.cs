@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,16 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query
         /// 箱码
         /// </summary>
         public string? BoxCode { get; set; }
+
+        /// <summary>
+        /// 档位
+        /// </summary>
+        public string? Grade { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SFCBoxEnum? Status { get; set; }
 
         /// <summary>
         /// 站点

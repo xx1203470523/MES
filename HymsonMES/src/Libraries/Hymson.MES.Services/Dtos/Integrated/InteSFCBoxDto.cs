@@ -199,43 +199,43 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 自放电率X
         /// </summary>
-        [EpplusTableColumn(Header = "SelfDischargeRate", Order = 10)]
+        [EpplusTableColumn(Header = "自放电率X", Order = 10)]
         public decimal SelfDischargeRate { get; set; }
 
         /// <summary>
         /// 电芯宽度（包膜）C-D区域
         /// </summary>
-        [EpplusTableColumn(Header = "Width", Order = 11)]
+        [EpplusTableColumn(Header = "电芯宽度（包膜）C-D区域", Order = 11)]
         public decimal Width { get; set; }
 
         /// <summary>
         /// 电芯正极极柱高度
         /// </summary>
-        [EpplusTableColumn(Header = "HeightZ", Order = 12)]
+        [EpplusTableColumn(Header = "电芯正极极柱高度", Order = 12)]
         public decimal HeightZ { get; set; }
 
         /// <summary>
         /// 电芯负极极柱高度
         /// </summary>
-        [EpplusTableColumn(Header = "HeightF", Order = 13)]
+        [EpplusTableColumn(Header = "电芯负极极柱高度", Order = 13)]
         public decimal HeightF { get; set; }
 
         /// <summary>
         /// 电芯正极肩高
         /// </summary>
-        [EpplusTableColumn(Header = "ShoulderHeightZ", Order = 14)]
+        [EpplusTableColumn(Header = "电芯正极肩高", Order = 14)]
         public decimal ShoulderHeightZ { get; set; }
 
         /// <summary>
         /// 电芯负极肩高
         /// </summary>
-        [EpplusTableColumn(Header = "ShoulderHeightF", Order = 15)]
+        [EpplusTableColumn(Header = "电芯负极肩高", Order = 15)]
         public decimal ShoulderHeightF { get; set; }
 
         /// <summary>
         /// 电芯厚度（包膜）
         /// </summary>
-        [EpplusTableColumn(Header = "Thickness", Order = 16)]
+        [EpplusTableColumn(Header = "电芯厚度（包膜）", Order = 16)]
         public decimal Thickness { get; set; }
     }
 
@@ -260,6 +260,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 箱码
         /// </summary>
         public string? BoxCode { get; set; }
+
+        /// <summary>
+        /// 档位
+        /// </summary>
+        public string? Grade { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SFCBoxEnum? Status { get; set; }
 
         /// <summary>
         /// 站点

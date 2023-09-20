@@ -57,6 +57,18 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
             {
                 sqlBuilder.Where("BoxCode = @BoxCode");
             }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.SFC))
+            {
+                sqlBuilder.Where("SFC = @SFC");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Grade))
+            {
+                sqlBuilder.Where("Grade = @Grade");
+            }
+            if (pagedQuery.Status!=null && pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status = @Status");
+            }
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
