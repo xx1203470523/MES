@@ -88,6 +88,18 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             return sfcProduceEntities;
         }
 
+        /// <summary>
+        /// 检查条码的复投次数
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="repeatedCount"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCRepeatedCount(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, int repeatedCount)
+        {
+            // 复投次数验证
+            if (sfcProduceEntities.Any(a => a.RepeatedCount >= repeatedCount))
+                throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("Status", sfcProduceEntities.Where(a => a.RepeatedCount >= repeatedCount).Select(x => x.SFC));
+            return sfcProduceEntities;
+        }
 
         /// <summary>
         /// 工序活动状态校验

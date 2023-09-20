@@ -29,6 +29,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public DateTime UpdatedOn { get; set; }
     }
 
+    public class UpdateManuSfcProduceStatusByIdCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 条码在制品id列表
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 条码当前状态
+        /// </summary>
+        public SfcStatusEnum CurrentStatus { get; set; }
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -66,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     }
 
     /// <summary>
-    /// 进站更新信息
+    /// 更新信息
     /// </summary>
     public class MultiUpdateProduceInStationSFCCommand : UpdateCommand
     {
@@ -80,16 +98,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 资源ID
         /// </summary>
-        public long ResourceId { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
         /// 工序ID
         /// </summary>
-        public long ProcedureId { get; set; }
+        public long? ProcedureId { get; set; }
 
         /// <summary>
-        /// 工序汇总表ID
+        /// 循环次数
         /// </summary>
-        public long SfcSummaryId { get; set; }
+        public int RepeatedCount { get; set; }
     }
 }

@@ -115,5 +115,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 汇总表id
         /// </summary>
         public long? SfcSummaryId { get; set; }
+
+       /// <summary>
+       /// 是否维修
+       /// </summary>
+        public bool? IsRepair { get; set; }
     }
 }

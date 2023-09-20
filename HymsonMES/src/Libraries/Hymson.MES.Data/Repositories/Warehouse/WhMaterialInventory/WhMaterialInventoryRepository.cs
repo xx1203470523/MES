@@ -262,6 +262,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 批量更新更新状态
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePointByBarCodeRangeAsync( IEnumerable<UpdateStatusByBarCodeCommand>  commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpPointByBarCode, commands);
+        }
+
+        /// <summary>
         /// 更新状态（批量）
         /// </summary>
         /// <param name="command"></param>
@@ -281,6 +292,28 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWhMaterialInventoryEmptySql, command);
+        }
+
+        /// <summary>
+        /// 批量清空库存(根据id)
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateWhMaterialInventoryEmptyByIdRangeAync(IEnumerable<UpdateWhMaterialInventoryEmptyByIdCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWhMaterialInventoryEmptyByIdSql, commands);
+        }
+
+        /// <summary>
+        /// 清空库存(根据id)
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateWhMaterialInventoryEmptyByIdAync(UpdateWhMaterialInventoryEmptyByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWhMaterialInventoryEmptyByIdSql, command);
         }
 
         /// <summary>
@@ -397,14 +430,15 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdatesSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpPointByBarCode = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE MaterialBarCode IN @BarCodeList AND SiteId=@SiteId";
+        const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id in @ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_material_inventory`  WHERE Id = @Id ";
 
-        const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode";
-        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
+        const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode  AND QuantityResidue > 0";
+        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes  AND QuantityResidue > 0";
         const string GetByBarCodesOfHasQty = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`

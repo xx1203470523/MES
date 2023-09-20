@@ -167,6 +167,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command);
 
         /// <summary>
+        /// 根据清空复投次数
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> CleanRepeatedCountById(CleanRepeatedCountCommand command);
+
+        /// <summary>
+        /// 批量更新条码工艺路线和工序信息（条码独立更新）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateRouteByIdRangeAsync(IEnumerable<ManuSfcUpdateRouteByIdCommand> commands);
+
+        /// <summary>
+        /// 更新条码工艺路线和工序信息
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateRouteByIdAsync(ManuSfcUpdateRouteByIdCommand command);
+
+        /// <summary>
         /// 批量更新条码工艺路线和工序信息
         /// </summary>
         /// <param name="command"></param>
@@ -179,6 +200,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(UpdateStatusCommand command);
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusByIdRangeAsync(IEnumerable<UpdateManuSfcProduceStatusByIdCommand> commands);
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusByIdAsync(UpdateManuSfcProduceStatusByIdCommand command);
+
 
         /// <summary>
         /// 更新工序和工艺路线

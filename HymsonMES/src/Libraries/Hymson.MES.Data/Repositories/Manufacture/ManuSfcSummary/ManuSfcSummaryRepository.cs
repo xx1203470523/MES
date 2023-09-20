@@ -65,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 出站更新汇总表
+        /// 合格产出更新汇总表
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -74,6 +74,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSummaryOutStationSql, multiUpdateSummaryOutStationCommands);
         }
+
+        /// <summary>
+        /// 不合格产出更新汇总表
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSummaryUnqualifiedRangeAsync(IEnumerable<MultiUpdateSummaryUnqualifiedCommand> multiUpdateSummaryUnqualifiedCommand)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSummaryUnqualifiedSql, multiUpdateSummaryUnqualifiedCommand);
+        }
+
 
         /// <summary>
         /// 软删除
@@ -180,6 +192,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateSummaryOutStationSql = "UPDATE manu_sfc_summary SET EndOn = @EndOn, OutputQty = @OutputQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSummaryUnqualifiedSql = "UPDATE manu_sfc_summary SET EndOn = @EndOn, UnqualifiedQty = @UnqualifiedQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE manu_sfc_summary SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_sfc_summary SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 

@@ -83,9 +83,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
-        /// 事件总线
+        /// 工序仓储
         /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
+        private readonly IProcProcedureRepository _procProcedureRepository;
 
         /// <summary>
         /// 构造函数
@@ -108,7 +108,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
             ILocalizationService localizationService,
-            IManuSfcSummaryRepository manuSfcSummaryRepository, IEventBus<EventBusInstance1> eventBus)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            IProcProcedureRepository procProcedureRepository)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -120,7 +121,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _localizationService = localizationService;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
-            _eventBus=eventBus;
+            _procProcedureRepository = procProcedureRepository;
         }
 
 
@@ -138,6 +139,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var resourceIds = await bo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
             if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId);
+
+            if (procedureEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+            }
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
@@ -147,6 +154,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
+            //循环次数验证（复投次数）
+            sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
             sfcProduceBusinessEntities?.VerifyProcedureLock(bo.SFCs, bo.ProcedureId);
 
             // 验证条码是否被容器包装
@@ -256,7 +265,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             List<ManuSfcStepEntity> sfcStepEntities = new();
             List<ManuSfcSummaryEntity> manuSfcSummaryEntities = new();
             MultiSfcUpdateIsUsedCommand sfcUpdateIsUsedCommand = new();
-            List< MultiUpdateProduceInStationSFCCommand > updateProduceInStationSFCCommands = new();
+            List<MultiUpdateProduceInStationSFCCommand> updateProduceInStationSFCCommands = new();
             entities.ForEach(sfcProduceEntity =>
             {
                 // 检查是否测试工序
@@ -309,7 +318,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.SfcSummaryId = manuSfcSummaryEntity.Id;
                 sfcProduceEntity.ProcedureId = bo.ProcedureId;
                 sfcProduceEntity.ResourceId = bo.ResourceId;
-
+                sfcProduceEntity.RepeatedCount = sfcProduceEntity.RepeatedCount + 1;
                 // 更新状态，将条码由"排队"改为"活动"
                 sfcProduceEntity.Status = SfcStatusEnum.Activity;
                 sfcProduceEntity.UpdatedBy = bo.UserName;
@@ -317,11 +326,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 updateProduceInStationSFCCommands.Add(new MultiUpdateProduceInStationSFCCommand
                 {
-                    Id=sfcProduceEntity.Id,
+                    Id = sfcProduceEntity.Id,
                     ProcedureId = bo.ProcedureId,
                     ResourceId = bo.ResourceId,
-                    SfcSummaryId= manuSfcSummaryEntity.Id,
                     Status = SfcStatusEnum.Activity,
+                    RepeatedCount= sfcProduceEntity.RepeatedCount,
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
                 });
@@ -364,7 +373,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SFCStepEntities = sfcStepEntities,
                 MultiSfcUpdateIsUsedCommand = sfcUpdateIsUsedCommand,
                 ManuSfcSummaryEntities = manuSfcSummaryEntities,
-                multiUpdateProduceInStationSFCCommands= updateProduceInStationSFCCommands
+                multiUpdateProduceInStationSFCCommands = updateProduceInStationSFCCommands
             };
         }
 
@@ -395,13 +404,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             List<Task<int>> tasks = new();
 
             // 插入 manu_sfc_step 状态为 进站
-            //var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
-            //tasks.Add(manuSfcStepTask);
-            ManuSfcStepsEvent @event = new ManuSfcStepsEvent()
-            {
-                manuSfcStepEntities = data.SFCStepEntities
-            };
-            _eventBus.Publish<ManuSfcStepsEvent>(@event);
+            var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
+            tasks.Add(manuSfcStepTask);
 
             // 如果是首工序
             if (data.IsFirstProcedure)
@@ -414,7 +418,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新工单的 InputQty
             var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
             tasks.Add(updateInputQtyByWorkOrderIdTask);
-           
+
             //插入条码工序汇总表
             var manuSfcSummaryInsertTask = _manuSfcSummaryRepository.InsertRangeAsync(data.ManuSfcSummaryEntities);
             tasks.Add(manuSfcSummaryInsertTask);

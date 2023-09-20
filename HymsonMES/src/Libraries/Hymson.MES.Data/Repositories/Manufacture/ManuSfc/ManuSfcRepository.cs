@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.ComponentModel;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -420,6 +421,61 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量更新条码（更具Id 状态更新为一致）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> ManuSfcUpdateStatuByIdsAsync(ManuSfcUpdateStatusByIdsCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ManuSfcUpdateStatuByIdsSql, command);
+        }
+
+        /// <summary>
+        /// 批量更新条码状态（根据Id 更新状态 更新状态为不一致）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> ManuSfcUpdateStatuByIdRangeAsync(IEnumerable<ManuSfcUpdateStatusByIdCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ManuSfcUpdateStatuByIdSql, commands);
+        }
+
+        /// <summary>
+        ///更新条码状态（根据Id 更新状态 更新状态为不一致）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> ManuSfcUpdateStatuByIdAsync(ManuSfcUpdateStatusByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ManuSfcUpdateStatuByIdSql, command);
+        }
+
+        /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> ManuSfcScrapByIdsAsync(IEnumerable<ScrapManuSfcByIdCommand>  commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ManuSfcScrapByIdsSql, commands);
+        }
+
+        /// <summary>
+        ///取消条码报废
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> ManuSfcCancellScrapByIdsAsync(IEnumerable<CancelScrapManuSfcByIdCommand>  commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(ManuSfcCancellScrapByIdsSql, commands);
+        }
+
+        /// <summary>
         /// 获取SFC
         /// </summary>
         /// <param name="sfc"></param>
@@ -466,6 +522,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string MultiUpdateStatusSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SiteId = @SiteId AND SFC IN @SFCs; ";
         const string UpdateStatusAndIsUsedSql = "UPDATE `manu_sfc` SET Status = @Status,IsUsed = @IsUsed,  UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs ";
         const string ManuSfcUpdateStatusCommandSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Status= @Status AND SFC =@Sfc AND SiteId = @SiteId";
+        const string ManuSfcUpdateStatuByIdsSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  Id IN @Ids";
+        const string ManuSfcUpdateStatuByIdSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus";
+        const string ManuSfcScrapByIdsSql = "UPDATE `manu_sfc` SET StatusBack=Status,SfcScrapId=@SfcScrapId Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus ";
+        const string ManuSfcCancellScrapByIdsSql = "UPDATE `manu_sfc` SET Status=StatusBack,SfcScrapId=null, StatusBack = null, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  Id = @Id AND Status=@CurrentStatus";
         const string DeleteSql = "UPDATE `manu_sfc` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 

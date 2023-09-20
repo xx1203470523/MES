@@ -162,6 +162,40 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> ManuSfcUpdateStatusBySfcsAsync(IEnumerable<ManuSfcUpdateStatusCommand> commands);
 
+        /// <summary>
+        /// 批量更新条码（更具Id 状态更新为一致）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> ManuSfcUpdateStatuByIdsAsync(ManuSfcUpdateStatusByIdsCommand command);
+
+        /// <summary>
+        /// 批量更新条码（更具Id 状态更新为一致）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> ManuSfcUpdateStatuByIdRangeAsync(IEnumerable<ManuSfcUpdateStatusByIdCommand> commands);
+
+        /// <summary>
+        /// 批量更新条码（更具Id 状态更新为一致）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> ManuSfcUpdateStatuByIdAsync(ManuSfcUpdateStatusByIdCommand command);
+
+        /// <summary>
+        /// 条码报废
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> ManuSfcScrapByIdsAsync(IEnumerable<ScrapManuSfcByIdCommand> commands);
+
+        /// <summary>
+        /// 取消条码报废
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> ManuSfcCancellScrapByIdsAsync(IEnumerable<CancelScrapManuSfcByIdCommand> commands);
         #endregion
     }
 }

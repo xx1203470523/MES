@@ -103,11 +103,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonService"></param>
@@ -134,7 +129,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             ILocalizationService localizationService,
-            IManuSfcSummaryRepository manuSfcSummaryRepository, IEventBus<EventBusInstance1> eventBus)
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -149,7 +144,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
-            _eventBus=eventBus;
         }
 
         /// <summary>
@@ -559,12 +553,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 插入 manu_sfc_step
             if (data.SFCStepEntities.Any())
             {
-                //tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
-                ManuSfcStepsEvent @event = new ManuSfcStepsEvent()
-                {
-                    manuSfcStepEntities = data.SFCStepEntities
-                };
-                _eventBus.Publish<ManuSfcStepsEvent>(@event);
+                tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
             }
 
             var rowArray = await Task.WhenAll(tasks);

@@ -200,6 +200,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public ScrapOperateTypeEnum OperationType { get; set; }
 
         /// <summary>
+        /// 工序id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
         /// 条码列表
         /// </summary>
         public string[] Sfcs { get; set; }

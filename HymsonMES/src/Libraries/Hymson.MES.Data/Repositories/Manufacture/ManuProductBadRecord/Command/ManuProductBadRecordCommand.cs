@@ -35,9 +35,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command
         public ProductBadRecordStatusEnum? Status { get; set; }
 
         /// <summary>
+        /// 不合格记录开关;1、开启  2、关闭
+        /// </summary>
+        public ProductBadRecordStatusEnum? CurrentStatus { get; set; }
+
+        /// <summary>
         /// 处置结果
         /// </summary>
         public ProductBadDisposalResultEnum? DisposalResult { get; set; }
+
+        /// <summary>
+        /// 复判步骤id
+        /// </summary>
+        public long? ReJudgmentSfcStepId { get; set; }
 
         /// <summary>
         /// 操作人员

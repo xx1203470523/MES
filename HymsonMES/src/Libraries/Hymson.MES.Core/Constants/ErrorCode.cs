@@ -693,6 +693,18 @@
         public const string MES15412 = "条码{sfcs}已取消报废,不能重复取消!";
         public const string MES15413 = "条码{sfcs}已报废,不能重复报废!";
         public const string MES15414 = "条码{sfcs}标识已取消,不能重复取消!";
+        public const string MES15415 = "条码不存在";
+        public const string MES15416 = "条码已经被锁定";
+        public const string MES15417 = "条码已报废";
+        public const string MES15418 = "条码工单未激活,无法返修";
+        public const string MES15419 = "条码状态已经被更新，请刷新后再操作";
+        public const string MES15420 = "返工工艺路线与条码工艺路线不能一致";
+        public const string MES15421 = "条码无库存，无法返修";
+        public const string MES15422 = "条码库存锁定，无法返修";
+        public const string MES15423 = "无不合格信息，不需要复判";
+        public const string MES15424 = "正在返修中，不需要复判";
+        public const string MES15425 = "不合格信息最新状态,请刷新后再次操作";
+        public const string MES15426 = "条码状态不为最新新状态,请刷新后再次操作";
         #endregion
 
         #region 物料加载 15500
@@ -853,6 +865,8 @@
         public const string MES16349 = "条码{0}出站完成！";
         public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
+        public const string MES16352 = "工序不存在";
+        public const string MES16353 = "SFC条码{SFC}循环次数超过当前工序的循环次数，不允许操作。";
         #endregion
 
         #region 工单激活 MES16400

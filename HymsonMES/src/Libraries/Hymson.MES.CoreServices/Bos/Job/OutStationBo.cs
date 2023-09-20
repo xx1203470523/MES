@@ -11,7 +11,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
-    /// 
+    /// 出站job实体
     /// </summary>
     public class OutStationRequestBo : JobBaseBo
     {
@@ -27,6 +27,55 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 载具条码
+        /// </summary>
+        public string? VehicleCode { get; set; }
+
+        /// <summary>
+        /// 是否合格
+        /// </summary>
+        public bool? IsQualified { get; set; }
+
+        /// <summary>
+        /// 消耗
+        /// </summary>
+        public  IEnumerable<OutStationConsumeBo>? ConsumeList { get; set; }
+
+        /// <summary>
+        /// 出站不良信息
+        /// </summary>
+        public  IEnumerable<OutStationUnqualifiedBo>? OutStationUnqualifiedList { get; set; }
+      }
+
+    /// <summary>
+    /// 消耗
+    /// </summary>
+    public class OutStationConsumeBo
+    { 
+        /// <summary>
+        /// 消耗条码
+        /// </summary>
+       public long BarCode { get; set; }
+
+        /// <summary>
+        /// 消耗数量
+        /// </summary>
+        public decimal? ConsumeQty { get; set; }
+    }
+
+    public class OutStationUnqualifiedBo
+    {
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set;}
     }
 
     /// <summary>

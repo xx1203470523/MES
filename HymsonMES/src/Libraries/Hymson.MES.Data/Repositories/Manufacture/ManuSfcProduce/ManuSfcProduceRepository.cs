@@ -451,6 +451,39 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据清空复投次数
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> CleanRepeatedCountById(CleanRepeatedCountCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(CleanRepeatedCountSql, command);
+        }
+
+        /// <summary>
+        /// 批量更新条码工艺路线和工序信息并清空复投次数（条码独立更新）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateRouteByIdRangeAsync(IEnumerable<ManuSfcUpdateRouteByIdCommand> commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateRouteBIdSql, commands);
+        }
+
+        /// <summary>
+        /// 更新条码工艺路线和工序信息并清空复投次数
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateRouteByIdAsync(ManuSfcUpdateRouteByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateRouteBIdSql, command);
+        }
+
+        /// <summary>
         /// 更新条码Status
         /// </summary>
         /// <param name="manuSfcInfoEntity"></param>
@@ -459,6 +492,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
+        /// <summary>
+        /// 批量更新条码Status
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusByIdRangeAsync( IEnumerable<UpdateManuSfcProduceStatusByIdCommand>  commands)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusByIdSql, commands);
+        }
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusByIdAsync(UpdateManuSfcProduceStatusByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusByIdSql, command);
         }
 
         /// <summary>
@@ -690,7 +745,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE `manu_sfc_produce` SET Sfc = @Sfc, ProductId = @ProductId, WorkOrderId = @WorkOrderId, BarCodeInfoId = @BarCodeInfoId, ProcessRouteId = @ProcessRouteId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Status = @Status, `Lock` = @Lock, LockProductionId = @LockProductionId, IsSuspicious = @IsSuspicious, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdateWithStatusCheckSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
         const string UpdateWithStatusCheckUseInSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id IN @Ids; ";
-        const string UpdateProduceInStationSFCSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, SfcSummaryId = @SfcSummaryId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
+        const string UpdateProduceInStationSFCSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
         const string UpdateSfcProduceBusinessSql = "UPDATE `manu_sfc_produce_business` SET    BusinessType = @BusinessType, BusinessContent = @BusinessContent, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "delete from manu_sfc_produce where Id = @Id  ";
         const string DeleteRangeSql = "UPDATE `manu_sfc_produce` SET IsDeleted = Id ,UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids";
@@ -722,6 +777,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateStatusByIdSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id AND @Status=CurrentStatus ";
         const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureAndResourceSql = "UPDATE `manu_sfc_produce` SET   ProcedureId = @ProcedureId,ResourceId=@ResourceId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
@@ -729,7 +785,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //在制品步骤控制 
         const string UpdateProcedureAndStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId = @ProcedureId, ResourceId=@ResourceId,Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs AND SiteId=@SiteId ";
         //不良录入修改工艺路线和工序信息
+
+        const string CleanRepeatedCountSql = "UPDATE `manu_sfc_produce` SET RepeatedCount=0,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id =Id ";
         const string UpdateRouteSql = "UPDATE `manu_sfc_produce` SET ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId,Status=@Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id in @Ids ";
+        const string UpdateRouteBIdSql = "UPDATE `manu_sfc_produce` SET ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId,Status=@Status,IsRepair=@IsRepair,RepeatedCount=0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id= @Id ";
         const string LockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET  BeforeLockedStatus=Status,Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
         const string UnLockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET Status = BeforeLockedStatus, BeforeLockedStatus=null,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
 
