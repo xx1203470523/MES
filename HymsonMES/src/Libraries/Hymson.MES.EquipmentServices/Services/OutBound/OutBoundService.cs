@@ -254,8 +254,8 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 SiteId = _currentEquipment.SiteId,
-                //EquipmentId = _currentEquipment.Id,
-                ProcedureIds = new long[] { currentProcedureId },
+                EquipmentId = _currentEquipment.Id,
+                //ProcedureIds = new long[] { currentProcedureId },
                 SFCS = sfclist.Select(c => c.SFC).ToArray()
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
