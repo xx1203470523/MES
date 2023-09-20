@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -10,6 +11,7 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
@@ -50,11 +52,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 仓储接口（条码流转）
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
@@ -75,13 +72,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="masterDataService"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
@@ -90,21 +91,21 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _masterDataService = masterDataService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
+            _eventBus = eventBus;
         }
 
 
@@ -339,7 +340,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 插入 manu_sfc_step
             if (data.SFCStepEntities.Any())
             {
-                tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
+                //tasks.Add(_manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities));
+                _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SFCStepEntities });
             }
 
             var rowArray = await Task.WhenAll(tasks);

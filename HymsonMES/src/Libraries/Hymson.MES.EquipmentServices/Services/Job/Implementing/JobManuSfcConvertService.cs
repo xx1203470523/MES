@@ -1,12 +1,13 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.EventBus.Abstractions;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -35,9 +36,6 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
 
@@ -81,17 +79,19 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentEquipment"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="procResourceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procResourceEquipmentBindRepository"></param>
         /// <param name="procBomRepository"></param>
@@ -100,31 +100,28 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
         /// <param name="planWorkOrderBindRepository"></param>
         /// <param name="inStationService"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="localizationService"></param> 
+        /// <param name="localizationService"></param>
+        /// <param name="eventBus"></param>
         public JobManuSfcConvertService(ICurrentEquipment currentEquipment, IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
             IProcResourceRepository procResourceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository,
-            IInteWorkCenterRepository inteWorkCenterRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository, ICommonService manuCommonOldService,
             IPlanWorkOrderBindRepository planWorkOrderBindRepository, IInStationService inStationService,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository, ILocalizationService localizationService)
+            IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            ILocalizationService localizationService,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _currentEquipment = currentEquipment;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
             _procResourceRepository = procResourceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
-            _inteWorkCenterRepository = inteWorkCenterRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _procBomRepository = procBomRepository;
@@ -134,6 +131,7 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
             _inStationService = inStationService;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
+            _eventBus = eventBus;
         }
 
 
@@ -367,7 +365,8 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
 
                             await _manuSfcProduceRepository.InsertAsync(createManuSfcProduce);
 
-                            await _manuSfcStepRepository.InsertAsync(createManuSfcStep);
+                            //await _manuSfcStepRepository.InsertAsync(createManuSfcStep);
+                            _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = createManuSfcStep });
 
                             trans.Complete();
                         }
@@ -474,7 +473,8 @@ namespace Hymson.MES.EquipmentServices.Services.Job.Implementing
 
                 await _manuSfcProduceRepository.InsertAsync(createManuSfcProduce);
 
-                await _manuSfcStepRepository.InsertRangeAsync(createManuSfcStepList);
+                //await _manuSfcStepRepository.InsertRangeAsync(createManuSfcStepList);
+                _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = createManuSfcStepList });
 
                 ts.Complete();
             }

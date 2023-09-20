@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -12,6 +13,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
@@ -20,7 +22,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -54,24 +55,44 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 接口（操作面板按钮）
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuContainerBarcodeRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuContainerPackRecordRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuFacePlateButtonService"></param>
+        /// <param name="eventBus"></param>
         public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuContainerPackRecordRepository manuContainerPackRecordRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             AbstractValidator<ManuContainerPackCreateDto> validationCreateRules,
             AbstractValidator<ManuContainerPackModifyDto> validationModifyRules,
             IProcMaterialRepository procMaterialRepository,
-            IManuFacePlateButtonService manuFacePlateButtonService)
+            IManuFacePlateButtonService manuFacePlateButtonService, IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -82,11 +103,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
             _manuContainerPackRecordRepository = manuContainerPackRecordRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFacePlateButtonService = manuFacePlateButtonService;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -202,7 +223,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 if (manuSfcStepList != null && manuSfcStepList.Any())
                 {
-                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    //await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = manuSfcStepList });
                 }
                 await _manuContainerPackRecordRepository.InsertsAsync(lst);
                 await _manuContainerPackRepository.DeleteTrueAsync(new DeleteCommand { Ids = param.Ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
@@ -287,7 +309,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 if (manuSfcStepList != null && manuSfcStepList.Any())
                 {
-                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    //await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = manuSfcStepList });
                 }
                 await _manuContainerPackRecordRepository.InsertsAsync(lst);
                 await _manuContainerPackRepository.DeleteAllAsync(param.ContainerBarCodeId);

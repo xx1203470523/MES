@@ -38,7 +38,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IMasterDataService _masterDataService;
 
@@ -47,15 +46,26 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// </summary>
         private readonly IEventBus<EventBusInstance1> _eventBus;
 
-        public ManuCreateBarcodeService(
-                 IProcMaterialRepository procMaterialRepository,
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="inteCodeRulesMakeRepository"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="masterDataService"></param>
+        /// <param name="eventBus"></param>
+        public ManuCreateBarcodeService(IProcMaterialRepository procMaterialRepository,
                  IInteCodeRulesRepository inteCodeRulesRepository,
                  IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
                  IManuGenerateBarcodeService manuGenerateBarcodeService,
                  IManuSfcRepository manuSfcRepository,
                  IManuSfcInfoRepository manuSfcInfoRepository,
                  IManuSfcProduceRepository manuSfcProduceRepository,
-                 IManuSfcStepRepository manuSfcStepRepository,
                  IPlanWorkOrderRepository planWorkOrderRepository,
                  IMasterDataService masterDataService,
                  IEventBus<EventBusInstance1> eventBus)
@@ -67,7 +77,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _masterDataService = masterDataService;
             _eventBus = eventBus;
@@ -362,14 +371,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             await _manuSfcRepository.InsertRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
             await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
-            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
-            ManuSfcStepsEvent @event = new ManuSfcStepsEvent()
-            {
-                manuSfcStepEntities = manuSfcStepList
-            };
-            _eventBus.Publish<ManuSfcStepsEvent>(@event);
+            //await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+            _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = manuSfcStepList });
+
             ts.Complete();
-   
+
         }
 
         /// <summary>

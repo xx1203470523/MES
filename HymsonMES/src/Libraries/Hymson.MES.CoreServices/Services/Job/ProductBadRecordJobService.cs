@@ -1,11 +1,10 @@
 ﻿using Dapper;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -13,10 +12,9 @@ using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
@@ -25,11 +23,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -61,28 +54,29 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
-        /// 条码步骤表仓储 仓储
+        /// 事件总线
         /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="localizationService"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="eventBus"></param>
         public ProductBadRecordJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuSfcRepository manuSfcRepository,
-            IManuSfcStepRepository manuSfcStepRepository)
+            IEventBus<EventBusInstance1> eventBus)
         {
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuSfcRepository = manuSfcRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -366,7 +360,8 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (data.SfcStepList.Any())
                 {
-                    await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
+                    //await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
+                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SfcStepList });
                 }
                 if (data.ManuSfcProduceList.Any())
                 {
@@ -386,7 +381,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 if (data.SfcStepList.Any())
                 {
-                    await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
+                    //await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
+                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SfcStepList });
                 }
                 if (data.ManuSfcProduceList.Any())
                 {

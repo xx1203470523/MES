@@ -1,8 +1,10 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.EventBus.Abstractions;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -31,16 +33,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         private readonly ICommonService _manuCommonOldService;
 
         /// <summary>
-        /// 仓储接口（条码信息）
-        /// </summary>
-        private readonly IManuSfcRepository _manuSfcRepository;
-
-        /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
@@ -59,33 +51,37 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
         /// 仓储接口（资源维护）
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manuCommonOldService"></param>
-        /// <param name="manuSfcRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="currentEquipment"></param>
-        public InStationService(
-            ICommonService manuCommonOldService,
-            IManuSfcRepository manuSfcRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
+        /// <param name="eventBus"></param>
+        public InStationService(ICommonService manuCommonOldService,
             IManuSfcProduceRepository manuSfcProduceRepository,
-             IPlanWorkOrderRepository planWorkOrderRepository,
-            IProcProcedureRepository procProcedureRepository, IProcResourceRepository procResourceRepository, ICurrentEquipment currentEquipment)
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcResourceRepository procResourceRepository,
+            ICurrentEquipment currentEquipment,
+            IEventBus<EventBusInstance1> eventBus)
         {
             _manuCommonOldService = manuCommonOldService;
-            _manuSfcRepository = manuSfcRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _currentEquipment = currentEquipment;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -204,7 +200,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture.InStation
 
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.InStock;
-                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+                //rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
 
                 // 如果是首工序，更新工单的 InputQty
                 if (isFirstProcedure)
