@@ -30,6 +30,19 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<InteSFCBoxDto>> GetPagedListAsync(InteSFCBoxQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 工单新新查询弹出窗口
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
         Task<PagedInfo<InteSFCBoxRView>> GetBoxCodeListAsync(InteSFCBoxQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 箱码工单验证
+        /// </summary>
+        /// <param name="validate"></param>
+        /// <returns></returns>
+        Task<InteSFCBoxValidateResponse> SFCValidate(InteSFCBoxValidateQuery validate);
     }
 }

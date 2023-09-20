@@ -20,6 +20,8 @@ using Hymson.MES.Services.Dtos.Report;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
+using System.Collections;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan
@@ -483,14 +485,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);
 
-                //if (response == parms.Count)
-                //{
-                ts.Complete();
-                //}
-                //else
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES16005));
-                //}
+                ts.Complete(); 
             }
         }
 
@@ -726,6 +721,23 @@ namespace Hymson.MES.Services.Services.Plan
                 return planWorkOrderDetailView;
             }
             return null;
+        }
+
+        /// <summary>
+        /// 工单模糊查询
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderDto>> QueryPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
+        {
+            var query = new PlanWorkOrderQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                OrderCode = workOrderCode
+
+            };
+            var dtos = await _planWorkOrderRepository.GetByWorderOrderAsync(query);
+            return dtos.Select(s => s.ToModel<PlanWorkOrderDto>());
         }
 
         /// <summary>

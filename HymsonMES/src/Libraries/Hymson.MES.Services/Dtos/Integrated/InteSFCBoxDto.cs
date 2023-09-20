@@ -285,11 +285,30 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? Grade { get; set; }
     }
 
-    //public class InteSFCBoxAdd 
-    //{
-    //    public long? Id { get; set; }
-    //    //public string SFC { get; }
-    //    public string? BoxCode { get; set; }
-    //    public string? Grade { get; set; }
-    //}
+    /// <summary>
+    /// 箱码验证请求
+    /// </summary>
+    public class InteSFCBoxValidateQuery
+    {
+        /// <summary>
+        /// 箱码
+        /// </summary>
+        public string BoxCode { get; set; }
+        /// <summary>
+        /// 工单
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+    }
+
+    /// <summary>
+    /// 箱码验证返回
+    /// </summary>
+   public class InteSFCBoxValidateResponse
+    {
+        public int State { get; set;}
+
+        public string Msg {  get; set; }
+    }
+
+
 }

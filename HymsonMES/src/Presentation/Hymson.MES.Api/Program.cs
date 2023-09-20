@@ -79,7 +79,19 @@ namespace Hymson.MES.Api
                 app.UseHttpLogging();
                 app.UseSwagger();
                 app.UseSwaggerUI();
+
+                #region 开发和测试环境允许跨域设置，方便PDA开发和测试环境接口调试
+                app.UseCors(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod()
+                           .SetPreflightMaxAge(TimeSpan.FromHours(24));
+                });
+                #endregion
             }
+
+
             //#endif
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>

@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetByIdAsync(long id);
+        Task<PlanWorkOrderEntity> GetByIdAsync(long id);     
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -74,6 +74,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 按工单号模糊查询
+        /// </summary>
+        /// <param name="workorder"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetByWorderOrderAsync(PlanWorkOrderQuery query);
 
         /// <summary>
         /// 根据 workOrderId 获取数据

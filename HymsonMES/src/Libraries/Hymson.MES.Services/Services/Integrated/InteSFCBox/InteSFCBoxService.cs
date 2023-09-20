@@ -15,9 +15,13 @@ using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
+using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using IdGen;
 using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
@@ -30,13 +34,15 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
         private readonly IInteSFCBoxRepository _inteSFCBoxRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly AbstractValidator<InteSFCBoxImportDto> _inteSFCBoxImportValidator;
         public InteSFCBoxService(IExcelService excelService,
             ILocalizationService localizationService,
             ICurrentUser currentUser,
             ICurrentSite currentSite,
             AbstractValidator<InteSFCBoxImportDto> validationRules,
-            IInteSFCBoxRepository inteSFCBoxRepository)
+            IInteSFCBoxRepository inteSFCBoxRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _excelService = excelService;
             _localizationService = localizationService;
@@ -44,8 +50,37 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             _currentSite = currentSite;
             _inteSFCBoxImportValidator = validationRules;
             _inteSFCBoxRepository = inteSFCBoxRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
+        /// <summary>
+        /// 箱码验证
+        /// </summary>
+        /// <param name="validate"></param>
+        /// <returns></returns>
+        public async Task<InteSFCBoxValidateResponse> SFCValidate(InteSFCBoxValidateQuery validate)
+        {
+            if (string.IsNullOrWhiteSpace(validate.BoxCode)) throw new CustomerValidationException(nameof(ErrorCode.MES19306)).WithData("Code", "箱码");
+            if (string.IsNullOrWhiteSpace(validate.WorkOrderCode)) throw new CustomerValidationException(nameof(ErrorCode.MES19306)).WithData("Code", "工单");
+
+            var query = new PlanWorkOrderQuery
+            {
+                OrderCode = validate.WorkOrderCode,
+                SiteId = _currentSite.SiteId ?? 0
+            };
+            var workOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(query)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16003));
+
+            var rsp = new InteSFCBoxValidateResponse() { State = -1, Msg = $"验证失败！箱码{validate.BoxCode}不在工单{validate.WorkOrderCode}中" };
+            var sfcBox = await _inteSFCBoxRepository.GetByWorkOrderAsync(workOrderEntity.Id);
+            if (sfcBox.Any(x => x.BoxCode == validate.BoxCode) == true)
+            {
+                rsp.State = 0;
+                rsp.Msg = "验证成功";
+            }
+            return rsp;
+
+        }
 
         public async Task<int> ImportDataAsync(UploadSFCBoxDto uploadStockDetailDto)
         {
@@ -64,7 +99,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             }
 
             //验证导入数据
-            //var rows = 1;
             var validationFailures = new List<ValidationFailure>();
 
             foreach (var (item, i) in stockTakeDetailExcelImportDtos.Select((item, i) => (item, i)))
@@ -84,24 +118,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                 }
             }
 
-            //    foreach (var stockTakeDetailExcelImportDto in stockTakeDetailExcelImportDtos)
-            //{
-            //    var validationResult = await _inteSFCBoxImportValidator.ValidateAsync(stockTakeDetailExcelImportDto);
-            //    if (!validationResult.IsValid)
-            //    {
-            //        if (validationResult.Errors != null && validationResult.Errors.Any())
-            //        {
-            //            foreach (var validationFailure in validationResult.Errors)
-            //            {
-            //                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
-            //                validationFailures.Add(validationFailure);
-            //            }
-            //            break;
-            //        }
-            //    }
-            //    rows++;
-            //}
-
             if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
@@ -112,7 +128,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             foreach (var item in stockTakeDetailExcelImportDtos)
             {
                 //var Entity = item.ToEntity<InteSFCBoxEntity>();
-
                 insert.Add(new InteSFCBoxEntity
                 {
                     SFC = item.SFC,
@@ -174,6 +189,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             return new PagedInfo<InteSFCBoxDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 工单新新查询弹出窗口
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
         public async Task<PagedInfo<InteSFCBoxRView>> GetBoxCodeListAsync(InteSFCBoxQueryDto pagedQueryDto)
         {
             //var pagedQuery = pagedQueryDto.ToQuery<InteSFCBoxQueryRep>();
@@ -189,7 +209,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var pagedInfo = await _inteSFCBoxRepository.GetBoxCodeAsync(rep);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteSFCBoxRView>()); 
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteSFCBoxRView>());
 
             return new PagedInfo<InteSFCBoxRView>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }

@@ -46,15 +46,28 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
-        /// 查询详情（工单信息表）
+        /// 模糊查询工单
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<PlanWorkOrderDetailViewDto> QueryPlanWorkOrderByIdAsync(long id)
+        [HttpGet("fuzzy/{workOrderCode}")]
+        public async Task<IEnumerable<PlanWorkOrderDto>> QueryPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
         {
-            return await _planWorkOrderService.QueryPlanWorkOrderByIdAsync(id);
+            return await _planWorkOrderService.QueryPlanWorkOrderByWorkOrderCodeAsync(workOrderCode);
         }
+
+
+        /// <summary>
+        /// 获取资源id上已经绑定的工单
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        //[HttpGet]
+        //[Route("getHasBindWorkOrder/{resourceId}")]
+        //public async Task<List<HasBindWorkOrderInfoDto>> GetHasBindWorkOrder(long resourceId)
+        //{
+        //    return await _planWorkOrderBindService.GetHasBindWorkOrderAsync(resourceId);
+        //}
 
         /// <summary>
         /// 查询剩余可下单条码数量

@@ -24,6 +24,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
+        /// 箱码工单校验
+        /// </summary>
+        /// <param name="validate"></param>
+        /// <returns></returns>
+        [Route("pda/sfcboxvalidate")]
+        [HttpPost]       
+        public async Task<InteSFCBoxValidateResponse> SFCValidate([FromBody] InteSFCBoxValidateQuery validate)
+        {
+            return await _inteSFCBoxService.SFCValidate(validate);
+        }
+
+        /// <summary>
         /// 查询列表
         /// </summary>
         /// <param name="pagedQueryDto"></param>

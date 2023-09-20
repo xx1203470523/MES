@@ -539,7 +539,7 @@
         public const string MES16000 = "工单错误";
         public const string MES16001 = "此工单编码{orderCode}在系统已经存在！";
         public const string MES16002 = "添加生产工单失败！";
-        public const string MES16003 = "没有查找到该数据！请检查数据是否还存在";
+        public const string MES16003 = "工单没有查找到该数据！请检查数据是否还存在";
         public const string MES16004 = "修改生产工单失败！";
         public const string MES16005 = "修改生产工单状态失败！";
         public const string MES16006 = "修改生产工单状态失败：有工单不为未开始,不允许重复下达";
@@ -1050,6 +1050,7 @@
         public const string MES19303 = "箱码BoxCode不能为空";
         public const string MES19304 = "OCVB最大值最小值之差不能超过范围值{OCVBDiff}";
         public const string MES19305 = "IMPB不能超过范围值{MaxIMPB}";
+        public const string MES19306 = "{Code}为空";
         #endregion
 
         #region 系统执行出错 业务逻辑出错

@@ -164,6 +164,19 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 根据工单模糊查询
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetByWorderOrderAsync(PlanWorkOrderQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            string orderCode = $"{query.OrderCode}%";
+            return await conn.QueryAsync<PlanWorkOrderEntity>(GetByPreCodeSql, new { OrderCode = orderCode, SiteId = query.SiteId });
+        }
+
+        /// <summary>
         /// 根据IDs批量获取数据  含有物料信息
         /// </summary>
         /// <param name="ids"></param>
@@ -244,10 +257,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where("wo.Status = @Status");
             }
 
-            if (pageQuery.PlanStartTime != null && pageQuery.PlanStartTime.Length >=2)
+            if (pageQuery.PlanStartTime != null && pageQuery.PlanStartTime.Length >= 2)
             {
-                    sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1].AddDays(1) });
-                    sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = pageQuery.PlanStartTime[0], PlanStartTimeEnd = pageQuery.PlanStartTime[1].AddDays(1) });
+                sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
 
             if (pageQuery.Statuss != null && pageQuery.Statuss.Any())
@@ -523,7 +536,8 @@ namespace Hymson.MES.Data.Repositories.Plan
       `Id`, `OrderCode`, `ProductId`, `WorkCenterType`, `WorkCenterId`, `ProcessRouteId`, `ProductBOMId`, `Type`, `Qty`, `Status`, `OverScale`, `PlanStartTime`, `PlanEndTime`, `IsLocked`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId` ,LockedStatus
     FROM `plan_work_order`  WHERE Id IN @ids ";
         const string GetByWorkOrderIdSql = "SELECT * FROM plan_work_order_record WHERE IsDeleted = 0 AND WorkOrderId = @workOrderId ";
-        const string GetByCodeSql = @"SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND OrderCode = @OrderCode and SiteId=@SiteId ";
+        const string GetByCodeSql = @"SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND OrderCode = @OrderCode ";
+        const string GetByPreCodeSql = @"SELECT * FROM plan_work_order WHERE IsDeleted = 0 AND OrderCode like @OrderCode ";
         const string GetByIdsAboutMaterialInfoSql = @"SELECT
       wo.`Id`, wo.`OrderCode`, wo.`ProductId`, wo.`WorkCenterType`, wo.`WorkCenterId`, wo.`ProcessRouteId`, wo.`ProductBOMId`, wo.`Type`, wo.`Qty`, wo.`Status`, wo.`OverScale`, wo.`PlanStartTime`, wo.`PlanEndTime`, wo.`IsLocked`, wo.`Remark`, wo.`CreatedBy`, wo.`CreatedOn`, wo.`UpdatedBy`, wo.`UpdatedOn`, wo.`IsDeleted`, wo.`SiteId`,
          m.MaterialCode, m.MaterialName,m.Version as MaterialVersion 
