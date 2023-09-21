@@ -75,7 +75,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
-        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         /// <summary>
         /// 
@@ -107,8 +106,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            ILocalizationService localizationService,
-            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            ILocalizationService localizationService,  
             IProcProcedureRepository procProcedureRepository)
         {
             _manuCommonService = manuCommonService;
@@ -120,7 +118,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _localizationService = localizationService;
-            _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _procProcedureRepository = procProcedureRepository;
         }
 
@@ -266,6 +263,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             List<ManuSfcSummaryEntity> manuSfcSummaryEntities = new();
             MultiSfcUpdateIsUsedCommand sfcUpdateIsUsedCommand = new();
             List<MultiUpdateProduceInStationSFCCommand> updateProduceInStationSFCCommands = new();
+            List<InStationManuSfcByIdCommand> inStationManuSfcByIdCommands = new ();
             entities.ForEach(sfcProduceEntity =>
             {
                 // 检查是否测试工序
@@ -297,25 +295,27 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     UpdatedOn = updatedOn
                 });
 
-                var manuSfcSummaryEntity = new ManuSfcSummaryEntity
+                updateProduceInStationSFCCommands.Add(new MultiUpdateProduceInStationSFCCommand
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = bo.SiteId,
-                    SFC = sfcProduceEntity.SFC,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
+                    Id = sfcProduceEntity.Id,
                     ProcedureId = bo.ProcedureId,
-                    StartOn = HymsonClock.Now(),
-                    InvestQty = sfcProduceEntity.Qty,
-                    CreatedBy = updatedBy,
-                    CreatedOn = updatedOn,
+                    ResourceId = bo.ResourceId,
+                    Status = SfcStatusEnum.Activity,
+                    CurrentStatus= sfcProduceEntity.Status,
+                    RepeatedCount = sfcProduceEntity.RepeatedCount+1,
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
+                });
 
-                };
-                manuSfcSummaryEntities.Add(manuSfcSummaryEntity);
+                inStationManuSfcByIdCommands.Add(new InStationManuSfcByIdCommand
+                {
+                    Id= sfcProduceEntity.SFCId,
+                    Status = SfcStatusEnum.Activity,
+                    IsUsed = YesOrNoEnum.Yes,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
 
-                sfcProduceEntity.SfcSummaryId = manuSfcSummaryEntity.Id;
                 sfcProduceEntity.ProcedureId = bo.ProcedureId;
                 sfcProduceEntity.ResourceId = bo.ResourceId;
                 sfcProduceEntity.RepeatedCount = sfcProduceEntity.RepeatedCount + 1;
@@ -323,46 +323,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.Status = SfcStatusEnum.Activity;
                 sfcProduceEntity.UpdatedBy = bo.UserName;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
-                updateProduceInStationSFCCommands.Add(new MultiUpdateProduceInStationSFCCommand
-                {
-                    Id = sfcProduceEntity.Id,
-                    ProcedureId = bo.ProcedureId,
-                    ResourceId = bo.ResourceId,
-                    Status = SfcStatusEnum.Activity,
-                    RepeatedCount= sfcProduceEntity.RepeatedCount,
-                    UpdatedBy = updatedBy,
-                    UpdatedOn = updatedOn
-                });
             });
 
             if (isFirstProcedure)
             {
                 // 更新工单的 InputQty
                 updateQtyCommand.Qty = entities.Count;
-
-                // 修改条码使用状态为"已使用"
-                sfcUpdateIsUsedCommand = new MultiSfcUpdateIsUsedCommand
-                {
-                    SiteId = bo.SiteId,
-                    SFCs = entities.Select(s => s.SFC),
-                    UpdatedBy = updatedBy,
-                    UpdatedOn = updatedOn,
-                    IsUsed = YesOrNoEnum.Yes
-                };
             }
-
-            //  修改在制品状态
-            //var multiUpdateProduceSFCCommand = new MultiUpdateProduceSFCCommand
-            //{
-            //    Ids = entities.Select(s => s.Id),
-            //    ProcedureId = bo.ProcedureId,
-            //    ResourceId = bo.ResourceId,
-            //    Status = SfcStatusEnum.Activity,
-            //    RepeatedCount = firstSFCProduceEntity.RepeatedCount,
-            //    UpdatedBy = updatedBy,
-            //    UpdatedOn = updatedOn
-            //};
 
             return new InStationResponseBo
             {
@@ -371,9 +338,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ManuSfcProduceEntities = entities,
                 UpdateQtyCommand = updateQtyCommand,
                 SFCStepEntities = sfcStepEntities,
-                MultiSfcUpdateIsUsedCommand = sfcUpdateIsUsedCommand,
-                ManuSfcSummaryEntities = manuSfcSummaryEntities,
-                multiUpdateProduceInStationSFCCommands = updateProduceInStationSFCCommands
+                MultiUpdateProduceInStationSFCCommands = updateProduceInStationSFCCommands,
+                InStationManuSfcByIdCommands = inStationManuSfcByIdCommands
             };
         }
 
@@ -388,14 +354,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not InStationResponseBo data) return responseBo;
 
             // 更改状态
-            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.multiUpdateProduceInStationSFCCommands);
+            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.MultiUpdateProduceInStationSFCCommands);
 
             // 未更新到数据，事务回滚
-            if (responseBo.Rows <= 0)
+            if (responseBo.Rows != data?.MultiUpdateProduceInStationSFCCommands?.Count())
             {
                 // 这里在外层会回滚事务
                 responseBo.Rows = -1;
-
                 responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFC);
                 return responseBo;
             }
@@ -403,25 +368,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新数据
             List<Task<int>> tasks = new();
 
+            //更新条码表 状态为排队
+            var multiUpdateSfcIsUsedTask = _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands);
+            tasks.Add(multiUpdateSfcIsUsedTask);
+
             // 插入 manu_sfc_step 状态为 进站
             var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
             tasks.Add(manuSfcStepTask);
 
-            // 如果是首工序
-            if (data.IsFirstProcedure)
-            {
-                // 修改条码使用状态为"已使用"
-                var multiUpdateSfcIsUsedTask = _manuSfcRepository.MultiUpdateSfcIsUsedAsync(data.MultiSfcUpdateIsUsedCommand);
-                tasks.Add(multiUpdateSfcIsUsedTask);
-            }
-
             // 更新工单的 InputQty
             var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
             tasks.Add(updateInputQtyByWorkOrderIdTask);
-
-            //插入条码工序汇总表
-            var manuSfcSummaryInsertTask = _manuSfcSummaryRepository.InsertRangeAsync(data.ManuSfcSummaryEntities);
-            tasks.Add(manuSfcSummaryInsertTask);
 
             // 等待所有任务完成
             var rowArray = await Task.WhenAll(tasks);

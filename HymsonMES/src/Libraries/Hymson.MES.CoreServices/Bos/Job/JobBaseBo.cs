@@ -1,4 +1,5 @@
-﻿using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.Localization.Services;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -12,6 +13,8 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 
         /// </summary>
         public IJobContextProxy? Proxy { get; set; }
+
+        public ILocalizationService LocalizationService { get; set; }
     }
 
     /// <summary>

@@ -61,18 +61,13 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
 
         /// <summary>
-        /// 
+        /// 更新条码表
         /// </summary>
-        public MultiSfcUpdateIsUsedCommand MultiSfcUpdateIsUsedCommand { get; set; } = new();
+        public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; }= new List<InStationManuSfcByIdCommand>();
 
-        /// <summary>
-        /// 条码工序统计表
+        /// <summary>  
+        /// 更新在制品表
         /// </summary>
-        public IEnumerable<ManuSfcSummaryEntity> ManuSfcSummaryEntities { get; set; } = new List<ManuSfcSummaryEntity>();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<MultiUpdateProduceInStationSFCCommand> multiUpdateProduceInStationSFCCommands { get; set; } = new List<MultiUpdateProduceInStationSFCCommand>();
+        public IEnumerable<MultiUpdateProduceInStationSFCCommand> MultiUpdateProduceInStationSFCCommands { get; set; } = new List<MultiUpdateProduceInStationSFCCommand>();
     }
 }

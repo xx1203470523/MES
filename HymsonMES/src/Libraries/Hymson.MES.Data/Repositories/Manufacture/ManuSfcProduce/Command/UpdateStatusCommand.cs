@@ -96,6 +96,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public SfcStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 当前状态
+        /// </summary>
+        public SfcStatusEnum CurrentStatus { get; set; }
+
+        /// <summary>
         /// 资源ID
         /// </summary>
         public long? ResourceId { get; set; }
