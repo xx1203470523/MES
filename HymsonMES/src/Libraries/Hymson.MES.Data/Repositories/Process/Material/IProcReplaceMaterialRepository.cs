@@ -98,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="siteId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(long siteId);
+        Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewListAsync(long siteId);
 
         /// <summary>
         /// 

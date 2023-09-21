@@ -78,6 +78,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
+        /// 仓储接口（物料替代料）
+        /// </summary>
+        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
+
+        /// <summary>
         ///  仓储（工单）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -120,6 +125,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procReplaceMaterialRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="manuFeedingRepository"></param>
@@ -134,6 +140,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IProcBomDetailRepository procBomDetailRepository,
             IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
+            IProcReplaceMaterialRepository procReplaceMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IManuFeedingRepository manuFeedingRepository,
@@ -150,6 +157,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
+            _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _manuFeedingRepository = manuFeedingRepository;
@@ -363,6 +371,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             if (bomIds == null || !bomIds.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10612));
             #endregion
 
+            // 查询物料基础数据的替代料（批量）
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewListAsync(entity.SiteId);
+            var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
+
             ProcMaterialEntity? material = null;
             foreach (var item in materials)
             {
@@ -380,10 +392,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 if (bomDetailEntitiy == null) continue;
                 //?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
 
-                // 检查是否符合替代料
-                var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) continue;
-                //throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                // 填充主物料替代料
+                if (bomDetailEntitiy.IsEnableReplace)
+                {
+                    if (replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces) == false) continue;
+                    if (replaces.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) continue;
+                }
+                // 填充BOM替代料
+                else
+                {
+                    // 检查是否符合替代料
+                    var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
+                    if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) continue;
+                    //throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                }
 
                 material = item;
             }

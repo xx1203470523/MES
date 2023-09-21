@@ -819,7 +819,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
 
             // 查询物料基础数据的替代料
-            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(sfcProduceEntity.SiteId);
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewListAsync(sfcProduceEntity.SiteId);
             replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
             var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
 
@@ -860,7 +860,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                         });
                     }
                 }
-                // 填充物料替代料
+                // 填充主物料替代料
                 else
                 {
                     if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces))

@@ -14,7 +14,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -166,17 +165,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 
+        /// 查询所有主物料的替代料
         /// </summary>
         /// <param name="siteId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(long siteId)
+        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewListAsync(long siteId)
         {
             var key = $"proc_replace_material&proc_material";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 var sqlBuilder = new SqlBuilder();
-                var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
+                var template = sqlBuilder.AddTemplate(GetAllProcReplaceMaterialViewSql);
                 sqlBuilder.Where("r.IsDeleted = 0");
                 sqlBuilder.Where("r.SiteId = @SiteId");
 
@@ -273,6 +272,9 @@ namespace Hymson.MES.Data.Repositories.Process
                         LEFT JOIN proc_material m on r.ReplaceMaterialId = m.id AND m.IsDeleted = 0
                     /**where**/  
                 ";
+        const string GetAllProcReplaceMaterialViewSql = @"SELECT r.ReplaceMaterialId, r.MaterialId, m.MaterialName, m.MaterialCode, m.Version, m.SerialNumber, r.IsUse as IsEnabled
+                        FROM `proc_replace_material` r
+                        LEFT JOIN proc_material m on r.ReplaceMaterialId = m.id AND m.IsDeleted = 0 /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_replace_material`(  `Id`, `SiteId`, `MaterialId`, `ReplaceMaterialId`, `IsUse`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @MaterialId, @ReplaceMaterialId, @IsUse, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_replace_material` SET   SiteId = @SiteId, MaterialId = @MaterialId, ReplaceMaterialId = @ReplaceMaterialId, IsUse = @IsUse, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
