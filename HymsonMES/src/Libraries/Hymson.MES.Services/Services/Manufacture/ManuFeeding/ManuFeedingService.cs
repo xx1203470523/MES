@@ -396,7 +396,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 if (bomDetailEntitiy.IsEnableReplace)
                 {
                     if (replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces) == false) continue;
-                    if (replaces.Any(a => a.ReplaceMaterialId == inventory.MaterialId) == false) continue;
+                    if (replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == inventory.MaterialId) == false) continue;
                 }
                 // 填充BOM替代料
                 else
