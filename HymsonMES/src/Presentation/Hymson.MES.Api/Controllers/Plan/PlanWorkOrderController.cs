@@ -50,7 +50,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// </summary>
         /// <param name="workOrderCode"></param>
         /// <returns></returns>
-        [HttpGet("fuzzy/{workOrderCode}")]
+        [HttpGet("pda/fuzzy/{workOrderCode}")]
         public async Task<IEnumerable<PlanWorkOrderDto>> QueryPlanWorkOrderByWorkOrderCodeAsync(string workOrderCode)
         {
             return await _planWorkOrderService.QueryPlanWorkOrderByWorkOrderCodeAsync(workOrderCode);

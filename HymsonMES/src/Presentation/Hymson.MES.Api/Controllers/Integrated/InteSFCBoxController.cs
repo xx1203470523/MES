@@ -30,7 +30,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <returns></returns>
         [Route("pda/sfcboxvalidate")]
         [HttpPost]       
-        public async Task<InteSFCBoxValidateResponse> SFCValidate([FromBody] InteSFCBoxValidateQuery validate)
+        public async Task<InteSFCBoxValidateResponse> SFCValidate(InteSFCBoxValidateQuery validate)
         {
             return await _inteSFCBoxService.SFCValidate(validate);
         }
