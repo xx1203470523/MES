@@ -1,5 +1,4 @@
-﻿using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
