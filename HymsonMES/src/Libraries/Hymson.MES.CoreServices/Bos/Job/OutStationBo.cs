@@ -46,23 +46,23 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 消耗
         /// </summary>
-        public  IEnumerable<OutStationConsumeBo>? ConsumeList { get; set; }
+        public IEnumerable<OutStationConsumeBo>? ConsumeList { get; set; }
 
         /// <summary>
         /// 出站不良信息
         /// </summary>
-        public  IEnumerable<OutStationUnqualifiedBo>? OutStationUnqualifiedList { get; set; }
-      }
+        public IEnumerable<OutStationUnqualifiedBo>? OutStationUnqualifiedList { get; set; }
+    }
 
     /// <summary>
     /// 消耗
     /// </summary>
     public class OutStationConsumeBo
-    { 
+    {
         /// <summary>
         /// 消耗条码
         /// </summary>
-       public long BarCode { get; set; }
+        public long BarCode { get; set; }
 
         /// <summary>
         /// 消耗数量
@@ -75,7 +75,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 不合格代码
         /// </summary>
-        public string UnqualifiedCode { get; set;}
+        public string UnqualifiedCode { get; set; }
     }
 
     /// <summary>
@@ -166,6 +166,24 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 汇总表更新对象
         /// </summary>
-        public IEnumerable<MultiUpdateSummaryOutStationCommand>  multiUpdateSummaryOutStationCommands { get; set; }
+        public IEnumerable<MultiUpdateSummaryOutStationCommand> multiUpdateSummaryOutStationCommands { get; set; }
     }
+
+    /// <summary>
+    /// 出站消耗
+    /// </summary>
+    public class MaterialConsumptionBo
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<UpdateQtyByIdCommand> UpdateQtyByIdCommands { get; set; } = new List<UpdateQtyByIdCommand>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new List<ManuSfcCirculationEntity>();
+
+    }
+
 }

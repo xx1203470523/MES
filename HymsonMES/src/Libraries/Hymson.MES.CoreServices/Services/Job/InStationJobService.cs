@@ -82,7 +82,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
-        /// 工序仓储
+        /// 仓储接口（工序）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
@@ -136,12 +136,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var resourceIds = await bo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
             if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId);
-
-            if (procedureEntity == null)
-            {
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId) ??
                 throw new CustomerValidationException(nameof(ErrorCode.MES16352));
-            }
+
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
