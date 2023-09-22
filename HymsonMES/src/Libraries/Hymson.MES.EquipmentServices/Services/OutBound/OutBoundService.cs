@@ -650,9 +650,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 ProcedureIds = netxtProcessRouteDetailLinks.Select(s => s.ProcessRouteDetailId)
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
 
-            // 随机工序Key
-            var cacheKey = $"{procedureId}-{workOrderId}";
-            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey,9);
+            
 
             // 这个Key太长了
             //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
@@ -663,10 +661,13 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             // 有多工序分叉的情况
             if (procedureNodes.Count() > 1)
             {
+
                 // 检查是否有"空值"类型的工序
                 defaultNextProcedure = procedureNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
-
+                // 随机工序Key
+                var cacheKey = $"{procedureId}-{workOrderId}";
+                var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, 9);
                 // 如果不是第一次走该工序，count是从1开始，不包括0。
                 if (count > 1)
                 {
