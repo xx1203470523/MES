@@ -81,6 +81,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long MaterialId { get; set; }
 
         /// <summary>
+        /// 物料Code
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
         /// 用量
         /// </summary>
         public decimal Usages { get; set; }

@@ -62,7 +62,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 消耗条码
         /// </summary>
-        public long BarCode { get; set; }
+        public string BarCode { get; set; }
 
         /// <summary>
         /// 消耗数量

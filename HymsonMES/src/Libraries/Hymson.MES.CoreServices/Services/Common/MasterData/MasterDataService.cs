@@ -866,6 +866,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 var deduct = new MaterialDeductBo
                 {
                     MaterialId = item.MaterialId,
+                    MaterialCode = materialEntitiy.MaterialCode,
                     Usages = item.Usages,
                     Loss = item.Loss,
                     DataCollectionWay = item.DataCollectionWay,

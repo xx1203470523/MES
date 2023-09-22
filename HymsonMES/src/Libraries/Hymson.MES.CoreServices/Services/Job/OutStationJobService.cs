@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -389,7 +390,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
 
-        #region 内部方法
+        #region 内部方法（仅仅是为了逻辑清晰）
         /// <summary>
         /// 合格工序出站
         /// </summary>
@@ -425,8 +426,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var procMaterialEntity = await procMaterialEntityTask;
             var procProcessRouteEntity = await procProcessRouteEntityTask;
 
-            // 组合物料数据
-            var consumptionBo = await ExecutenMaterialConsumptionAsync(bo, sfcProduceEntities);
+            // 物料消耗明细数据
+            MaterialConsumptionBo consumptionBo = new();
+            // 指定消耗物料
+            if (bo.ConsumeList != null && bo.ConsumeList.Any())
+            {
+                consumptionBo = await ExecutenMaterialConsumptionWithBarCodeAsync(bo, sfcProduceEntities);
+            }
+            // 默认BOM清单
+            else
+            {
+                consumptionBo = await ExecutenMaterialConsumptionWithBOMAsync(bo, sfcProduceEntities);
+            }
             responseBo.UpdateQtyByIdCommands = consumptionBo.UpdateQtyByIdCommands;
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
@@ -657,8 +668,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var procMaterialEntity = await procMaterialEntityTask;
             var procProcessRouteEntity = await procProcessRouteEntityTask;
 
-            // 组合物料数据并消耗
-            var consumptionBo = await ExecutenMaterialConsumptionAsync(bo, sfcProduceEntities);
+            // 物料消耗明细数据
+            MaterialConsumptionBo consumptionBo = new();
+            // 指定消耗物料逻辑
+            if (bo.ConsumeList != null && bo.ConsumeList.Any())
+            {
+                consumptionBo = await ExecutenMaterialConsumptionWithBarCodeAsync(bo, sfcProduceEntities);
+            }
+            // 默认消耗逻辑
+            else
+            {
+                consumptionBo = await ExecutenMaterialConsumptionWithBOMAsync(bo, sfcProduceEntities);
+            }
             responseBo.UpdateQtyByIdCommands = consumptionBo.UpdateQtyByIdCommands;
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
@@ -791,12 +812,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
-        /// 执行物料消耗
+        /// 执行物料消耗（默认BOM清单）
         /// </summary>
         /// <param name="bo"></param>
         /// <param name="sfcProduceEntities"></param>
         /// <returns></returns>
-        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
+        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionWithBOMAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
         {
             // 物料消耗对象
             MaterialConsumptionBo responseBo = new();
@@ -811,6 +832,89 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 组合物料数据
             var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstSFCProduceEntity);
             if (initialMaterials == null) return responseBo;
+
+            // 物料ID集合
+            var materialIds = initialMaterials.Select(s => s.MaterialId);
+
+            // 读取物料加载数据（批量）
+            var allFeedingEntities = await bo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
+            {
+                ResourceId = firstSFCProduceEntity.ResourceId ?? 0,
+                MaterialIds = materialIds
+            });
+
+            // 通过物料分组
+            var manuFeedingsDictionary = allFeedingEntities?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+
+            // 过滤扣料集合
+            List<UpdateQtyByIdCommand> updates = new();
+            List<ManuSfcCirculationEntity> adds = new();
+            List<MultiUpdateSummaryOutStationCommand> updateSummaryOutStationCommands = new();
+            foreach (var materialBo in initialMaterials)
+            {
+                if (manuFeedingsDictionary == null) continue;
+
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100（因为存在多条码同时出站情况,所以直接消耗 * 条码数量）
+                materialBo.Usages *= sfcProduceEntities.Count();
+                decimal residue = materialBo.Usages;
+
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
+                if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
+
+                // 收集方式是批次
+                if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
+                {
+                    // 进行扣料
+                    _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstSFCProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+                    continue;
+                }
+
+                // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
+                if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+
+                // 进行扣料
+                _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, firstSFCProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
+            }
+
+            responseBo.UpdateQtyByIdCommands = updates;
+            responseBo.ManuSfcCirculationEntities = adds;
+            return responseBo;
+        }
+
+        /// <summary>
+        /// 执行物料消耗（指定物料）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="sfcProduceEntities"></param>
+        /// <returns></returns>
+        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionWithBarCodeAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
+        {
+            // 物料消耗对象
+            MaterialConsumptionBo responseBo = new();
+
+            if (bo == null) return responseBo;
+            if (bo.Proxy == null) return responseBo;
+            if (bo.ConsumeList == null) return responseBo;
+
+            // 说明：默认所有同时刻进站的条码，都是同一BOM
+            var firstSFCProduceEntity = sfcProduceEntities.FirstOrDefault();
+            if (firstSFCProduceEntity == null) return responseBo;
+
+            // 组合物料数据
+            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstSFCProduceEntity);
+            if (initialMaterials == null) return responseBo;
+
+            // 如果传过来的消耗编码不在BOM清单里面，直接返回异常
+            var hasBarCodeNotInBOM = bo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode)).Any();
+            if (hasBarCodeNotInBOM)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17105));
+            }
+
+            // 只保留传过来的消耗编码
+            initialMaterials = initialMaterials.Where(w => bo.ConsumeList.Select(s => s.BarCode).Contains(w.MaterialCode));
+
+            // TODO 需要替换物料的数量
 
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
