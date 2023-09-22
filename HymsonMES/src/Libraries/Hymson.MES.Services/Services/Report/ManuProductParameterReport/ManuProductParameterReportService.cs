@@ -66,10 +66,10 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
         /// <returns></returns>
         public async Task<ExportResultDto> ManuProductParameterReportExportAsync(ManuProductParameterReportPagedQueryDto pageQuery)
         {
-            if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10111));
-            }
+            //if ((pageQuery.SFCS == null || pageQuery.SFCS.Length <= 0) && string.IsNullOrEmpty(pageQuery.SFCStr))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES10111));
+            //}
             if (!string.IsNullOrEmpty(pageQuery.SFCStr))
             {
                 pageQuery.SFCStr = pageQuery.SFCStr.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");

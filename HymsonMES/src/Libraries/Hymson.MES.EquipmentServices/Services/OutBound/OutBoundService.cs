@@ -652,7 +652,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
 
             // 随机工序Key
             var cacheKey = $"{procedureId}-{workOrderId}";
-            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey);
+            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
 
             // 这个Key太长了
             //var cacheKey = $"{manuSfcProduce.ProcessRouteId}-{manuSfcProduce.ProcedureId}-{manuSfcProduce.ResourceId}-{manuSfcProduce.WorkOrderId}";
