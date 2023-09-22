@@ -90,14 +90,18 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 备注
         /// </summary>
-        public string? Remark { get; set; }
+        public string Remark { get; set; } = "";
 
 
         // 2023-09-21 10:00:00 add by Czhipu
         /// <summary>
+        /// 条码信息表ID
+        /// </summary>
+        public long SFCInfoId { get; set; }
+
+        /// <summary>
         /// 载具条码
         /// </summary>
         public string? VehicleCode { get; set; }
-
     }
 }

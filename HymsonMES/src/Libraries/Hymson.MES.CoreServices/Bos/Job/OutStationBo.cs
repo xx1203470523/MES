@@ -164,6 +164,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
 
         /// <summary>
+        /// 不良品录入对象
+        /// </summary>
+        public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
+
+        /// <summary>
         /// 汇总表更新对象
         /// </summary>
         public IEnumerable<MultiUpdateSummaryOutStationCommand> multiUpdateSummaryOutStationCommands { get; set; }
