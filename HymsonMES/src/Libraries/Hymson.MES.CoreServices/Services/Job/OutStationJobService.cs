@@ -912,9 +912,24 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 只保留传过来的消耗编码
-            initialMaterials = initialMaterials.Where(w => bo.ConsumeList.Select(s => s.BarCode).Contains(w.MaterialCode));
+            List<MaterialDeductBo> filterMaterials = new();
+            foreach (var item in initialMaterials)
+            {
+                var consume = bo.ConsumeList.FirstOrDefault(f => f.BarCode == item.MaterialCode);
+                if (consume == null) continue;
 
-            // TODO 需要替换物料的数量
+                if (consume.ConsumeQty.HasValue)
+                {
+                    item.Usages = consume.ConsumeQty.Value;
+                    //item.ConsumeRatio = 100;
+                    //item.Loss = 0;
+                }
+
+                filterMaterials.Add(item);
+            }
+
+            // 重新赋值
+            initialMaterials = filterMaterials;
 
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);

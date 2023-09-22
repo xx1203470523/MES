@@ -1,16 +1,14 @@
 ﻿using Dapper;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -23,9 +21,6 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using IdGen;
-using System.Collections.Generic;
-using ErrorCode = Hymson.MES.Core.Constants.ErrorCode;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -74,7 +69,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 仓储接口（工艺路线工序连线）
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
-
 
         /// <summary>
         /// 
