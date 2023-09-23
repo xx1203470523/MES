@@ -904,7 +904,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstSFCProduceEntity);
             if (initialMaterials == null) return responseBo;
 
-            // 如果传过来的消耗编码不在BOM清单里面，直接返回异常
+            // 如果存在传过来的消耗编码不在BOM清单里面的物料，直接返回异常
             var hasBarCodeNotInBOM = bo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode)).Any();
             if (hasBarCodeNotInBOM)
             {
@@ -924,6 +924,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     //item.ConsumeRatio = 100;
                     //item.Loss = 0;
                 }
+
+                // 如果不保留替代品（如果保留，就删除这句）
+                item.ReplaceMaterials = new List<MaterialDeductItemBo>();
 
                 filterMaterials.Add(item);
             }
