@@ -926,7 +926,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 }
 
                 // 如果不保留替代品（如果保留，就删除这句）
-                item.ReplaceMaterials = new List<MaterialDeductItemBo>();
+                item.ReplaceMaterials = Enumerable.Empty<MaterialDeductItemBo>();
 
                 filterMaterials.Add(item);
             }
