@@ -1,13 +1,17 @@
 ﻿using FluentValidation;
+using Hymson.Authentication;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -27,13 +31,42 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         private readonly IManuSfcBindRecordRepository _manuSfcBindRecordRepository;
         private readonly IManuSfcBindRepository _manuSfcBindRepository;
 
-        public BindSFCService(AbstractValidator<BindSFCDto> validationBindDtoRules, ICurrentEquipment currentEquipment, AbstractValidator<UnBindSFCDto> validationUnBindDtoRules, IManuSfcBindRecordRepository manuSfcBindRecordRepository, IManuSfcBindRepository manuSfcBindRepository)
+        /// <summary>
+        /// 当前对象（登录用户）
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
+
+        public BindSFCService(AbstractValidator<BindSFCDto> validationBindDtoRules, ICurrentEquipment currentEquipment,
+            AbstractValidator<UnBindSFCDto> validationUnBindDtoRules, 
+            IManuSfcBindRecordRepository manuSfcBindRecordRepository,
+            IManuSfcBindRepository manuSfcBindRepository,
+            ICurrentUser currentUser)
+
         {
             _validationBindDtoRules = validationBindDtoRules;
             _currentEquipment = currentEquipment;
             _validationUnBindDtoRules = validationUnBindDtoRules;
             _manuSfcBindRecordRepository = manuSfcBindRecordRepository;
             _manuSfcBindRepository = manuSfcBindRepository;
+            _currentUser = currentUser;
+        }
+
+
+        /// <summary>
+        /// 根据SFC或BindSFC查询绑定SFC
+        /// </summary>
+        /// <param name="bindSFCDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<ManuSfcBindEntity>> GetBindSFC(BindSFCDto bindSFCDto)
+        {
+            var bindSfcs = await _manuSfcBindRepository.GetBySFCAsync(bindSFCDto.SFC);
+            if (!bindSfcs.Any())
+            {
+                //不需要解绑
+                throw new CustomerValidationException(nameof(ErrorCode.MES19106));
+            }
+            return bindSfcs;
         }
 
         /// <summary>
@@ -161,5 +194,72 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
 
         }
+
+        /// <summary>
+        /// 换绑
+        /// </summary>
+        /// <param name="BindSFCDto"></param>
+        /// <returns></returns>
+        public async Task SwitchBindSFCAsync(SwitchBindSFCDto BindSFCDto)
+        {
+            string[] BindSFCs = { BindSFCDto.OldBindSFC };
+            //验证参数
+            //await _validationUnBindDtoRules.ValidateAndThrowAsync(BindSFCDto);
+            var existsBindSfc = await _manuSfcBindRepository.GetByBindSFCAsync(BindSFCDto.SFC, BindSFCs);
+            if (existsBindSfc.Any()==false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19120)).WithData("SFC", BindSFCDto.SFC);
+            }
+
+            var updateEntity = existsBindSfc.FirstOrDefault();
+
+            updateEntity.BindSFC = BindSFCDto.NewBindSFC;
+            updateEntity.UpdatedBy = _currentUser.UserName;
+            updateEntity.UpdatedOn = HymsonClock.Now();   
+
+            await _manuSfcBindRepository.UpdateAsync(updateEntity);
+
+        }
+
+        /// <summary>
+        /// 复投
+        /// </summary>
+        /// <param name="BindSFCDto"></param>
+        /// <returns></returns>
+        public async Task RepeatManuSFCAsync(UnBindSFCDto BindSFCDto)
+        {   
+            //解绑
+            await UnBindSFCAsync(BindSFCDto);
+
+
+            //在制
+            //var createManuSfcProduceEntity = new ManuSfcProduceEntity
+            //{
+            //    Id = IdGenProvider.Instance.CreateId(),
+            //    SiteId = _currentEquipment.SiteId,
+            //    SFC = sfcBindingDto.SFC,
+            //    ProductId = productId,
+            //    WorkOrderId = planWorkOrderEntity.Id,
+            //    BarCodeInfoId = createManuMainSfcInfoEntity.Id,
+            //    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+            //    WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+            //    ProductBOMId = planWorkOrderEntity.ProductBOMId,
+            //    Qty = 1,
+            //    ProcedureId = procedureEntity.Id,
+            //    Status = SfcProduceStatusEnum.lineUp,
+            //    RepeatedCount = 0,
+            //    IsScrap = TrueOrFalseEnum.No,
+            //    CreatedBy = _currentEquipment.Name,
+            //    UpdatedBy = _currentEquipment.Name
+            //};
+
+            //await _manuSfcProduceRepository.InsertAsync(createManuSfcProduceEntity);
+
+            //报废
+
+
+            //记录
+        }
+        
     }
 }

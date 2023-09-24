@@ -507,7 +507,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<NGDataDto> GetNGDataAsync([FromQuery] NGDataQueryDto param)
         {
             return await _ngDataService.GetNGDataAsync(param);
-        }
+        }     
 
         /// <summary>
         /// 条码流转绑定
@@ -643,6 +643,30 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<CirculationModuleCCSInfoDto> GetModuleCCSInfoAsync(string sfc)
         {
             return await _sfcCirculationService.GetCirculationModuleCCSInfoAsync(sfc);
+        }
+
+        /// <summary>
+        /// 获取需要补料的NG列表(永泰)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetReplenishNGData")]
+        public async Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync(string sfc)
+        {
+            return await _sfcCirculationService.GetReplenishNGDataAsync(sfc);
+        }
+
+        /// <summary>
+        /// 补料确认-该模组条码下的所有NG都确认
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ReplenishNGConfirm")]
+        public async Task ReplenishNGConfirmAsync(string sfc)
+        {
+            await _sfcCirculationService.ReplenishNGConfirmAsync(sfc);
         }
 
         /// <summary>

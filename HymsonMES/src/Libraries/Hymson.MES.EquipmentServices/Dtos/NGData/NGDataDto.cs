@@ -14,6 +14,15 @@ namespace Hymson.MES.EquipmentServices.Dtos.NGData
         public string SFC { get; set; }
         public string? ProcedureCode { get; set; }
     }
+
+    /// <summary>
+    /// 补料NG查询DTO
+    /// </summary>
+    public class ReplenishNGDataQueryDto
+    {
+        public string? SFC { get; set; }
+        
+    }
     /// <summary>
     /// NG数据Dto
     /// </summary>

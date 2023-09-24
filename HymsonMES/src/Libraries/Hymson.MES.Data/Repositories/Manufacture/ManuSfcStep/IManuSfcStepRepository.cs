@@ -106,6 +106,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SfcInOutStepQuery sfcQuery);
 
         /// <summary>
+        /// 取NG步骤信息(永泰)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetNgStepAsync(string sfc);
+
+        /// <summary>
         /// 分页查询 根据SFC
         /// </summary>
         /// <param name="queryParam"></param>

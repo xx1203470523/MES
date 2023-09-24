@@ -88,6 +88,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public bool? IsRepair { get; set; }
 
         /// <summary>
+        /// 是否补料
+        /// </summary>
+        public bool? IsReplenish { get; set; }
+
+        /// <summary>
         /// 是否合格
         ///  0不合格,1合格
         /// </summary>

@@ -201,6 +201,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 取NG步骤信息(永泰)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetNgStepAsync(string sfc)
+        {
+            //sfc预留
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetNGStepSql, sfc);
+            return manuSfcStepEntities;
+
+        }
+
+        /// <summary>
         /// 分页查询 根据SFC
         /// </summary>
         /// <param name="queryParam"></param>
@@ -245,7 +259,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                            FROM `manu_sfc_step` /**where**/  ";
         const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(  `Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertSql = "INSERT INTO manu_sfc_step(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, EquipmentId, ResourceId, ProcedureId, Operatetype, CurrentStatus,Remark,CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId, Passed, IsPassingStation) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @Passed, @IsPassingStation )  ";
-        const string UpdateSql = "UPDATE `manu_sfc_step` SET   SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId,  Passed = @Passed, IsPassingStation = @IsPassingStation  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_sfc_step` SET   SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId,  Passed = @Passed, IsPassingStation = @IsPassingStation,IsReplenish=@IsReplenish  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, `Passed`, `IsPassingStation`
@@ -264,6 +278,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         AND SiteId=@SiteId 
                         ORDER BY CreatedOn asc
                         ";
+
+        const string GetNGStepSql = @" select main.*  from manu_sfc_step_ng ng left join manu_sfc_step main on main.Id =ng.BarCodeStepId
+                                        where main.ProcedureId in(select PP.Id from proc_procedure pp where pp.Code in('OP17','OP18'))
+                                        and ng.IsReplenish=0";
+
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
     }

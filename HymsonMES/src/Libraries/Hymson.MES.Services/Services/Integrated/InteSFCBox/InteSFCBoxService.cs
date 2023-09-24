@@ -159,7 +159,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                     SiteId = _currentSite.SiteId ?? 0,
                     IsDeleted = 0
 
-                }); ;
+                }); 
             }
 
             return await _inteSFCBoxRepository.InsertsAsync(insert);

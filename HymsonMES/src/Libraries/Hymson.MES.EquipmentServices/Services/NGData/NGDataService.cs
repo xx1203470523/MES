@@ -108,5 +108,8 @@ namespace Hymson.MES.EquipmentServices.Services
             }
             return nGDataDto;
         }
+
+        
+        
     }
 }

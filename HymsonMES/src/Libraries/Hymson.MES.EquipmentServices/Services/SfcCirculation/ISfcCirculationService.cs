@@ -78,10 +78,25 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         Task<CirculationModuleCCSInfoDto> GetCirculationModuleCCSInfoAsync(string sfc);
 
         /// <summary>
+        /// 获取需要补料的NG清单
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync(string sfc);
+
+        /// <summary>
         /// CCS确认
         /// </summary>
         /// <param name="sfcCirculationCCSConfirmDto"></param>
         /// <returns></returns>
         Task SfcCirculationCCSConfirmAsync(SfcCirculationCCSConfirmDto sfcCirculationCCSConfirmDto);
+
+
+        /// <summary>
+        /// 补料确认
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task ReplenishNGConfirmAsync(string sfc);
     }
 }

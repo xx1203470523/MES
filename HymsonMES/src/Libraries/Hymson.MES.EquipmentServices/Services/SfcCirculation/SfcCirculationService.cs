@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
@@ -31,6 +32,10 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
     {
         #region Repository
         private readonly ICurrentEquipment _currentEquipment;
+        /// <summary>
+        /// 当前对象（站点）
+        /// </summary>
+        private readonly ICurrentSite _currentSite;
         private readonly AbstractValidator<SfcCirculationBindDto> _validationSfcCirculationBindDtoRules;
         private readonly AbstractValidator<SfcCirculationUnBindDto> _validationSfcCirculationUnBindDtoRules;
         private readonly IProcResourceRepository _procResourceRepository;
@@ -59,7 +64,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCcsNgRecordRepository manuSfcCcsNgRecordRepository,
-            IManuSfcSummaryRepository manuSfcSummaryRepository)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            ICurrentSite currentSite)
         {
             _currentEquipment = currentEquipment;
             _validationSfcCirculationBindDtoRules = validationSfcCirculationBindDtoRules;
@@ -75,6 +81,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCcsNgRecordRepository = manuSfcCcsNgRecordRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _currentSite = currentSite;
         }
         /// <summary>
         /// CCS绑定的Location
@@ -658,7 +665,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
             }
             CirculationModuleCCSInfoDto circulationModuleCCSInfo = new();
-            //查找当前已有的绑定记录
+            //获取位置 查找当前已有的绑定记录
             var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
             {
                 SiteId = _currentEquipment.SiteId,
@@ -667,7 +674,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 CirculationType = SfcCirculationTypeEnum.BindCCS
             });
 
-            //查找模组绑定时的录入的ModelCode，使用绑定时的
+            //获取模组型号 查找模组绑定时的录入的ModelCode，使用绑定时的
             var manuSfcCirculations = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
             {
                 SiteId = _currentEquipment.SiteId,
@@ -692,6 +699,84 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (manuSfcCirculations.Any())
             {
                 circulationModuleCCSInfo.ModelCode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+            }
+            return circulationModuleCCSInfo;
+        }
+
+        /// <summary>
+        /// 获取需要补料的Ng清单 从步骤表(永泰)
+        /// </summary>
+        /// <param name="sfcquery"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync(string sfcquery)
+        {
+
+            if (string.IsNullOrEmpty(sfcquery))
+            {
+
+            }
+            //获取NG数据 步骤NG表
+            var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync(sfcquery);
+
+            var sfcList = sfcSteps.Select(x => x.SFC).Distinct().ToArray();
+
+            List<CirculationModuleCCSInfoDto> circulationModuleCCSInfo = new();
+
+            if (sfcList.Any() == false)
+            {
+                return circulationModuleCCSInfo;
+            }
+
+            //批量获取位置 查找当前已有的绑定记录
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCodes = sfcList,
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationType = SfcCirculationTypeEnum.BindCCS
+            });
+
+            //获取模组型号 查找模组绑定时的录入的ModelCode，使用绑定时的
+            var manuSfcCirculations = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                CirculationBarCodes = sfcList,
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationType = SfcCirculationTypeEnum.Merge
+            });
+
+
+            //if (manuSfcCirculationEntities.Any())
+            //{
+            //    var manuSfcCirculation = manuSfcCirculationEntities.First();
+            //查询模组的NG记录
+            //var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
+            //{
+            //    SFCS = new string[] { sfc },
+            //    QualityStatus = 0,//0 不合格，代表NG状态
+            //    SiteId = _currentEquipment.SiteId
+            //});
+            //circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
+            //circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
+            //circulationModuleCCSInfo.IsNg = manuSfcSummaries.Any();
+            //}
+            //if (manuSfcCirculations.Any())
+            //{
+            //    circulationModuleCCSInfo.ModelCode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+            //}
+
+            foreach (var item in sfcSteps)
+            {
+                var location = manuSfcCirculationEntities.Where(x => x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location;
+                var modelcode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode) && x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+                circulationModuleCCSInfo.Add(new CirculationModuleCCSInfoDto
+                {
+                    SFC = item.SFC,
+                    Location = location,
+                    IsNg = true,
+                    ModelCode = modelcode
+                });
             }
             return circulationModuleCCSInfo;
         }
@@ -801,6 +886,28 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 manuSfcCcsNgRecord.UpdatedOn = HymsonClock.Now();
                 await _manuSfcCcsNgRecordRepository.UpdateAsync(manuSfcCcsNgRecord);
             }
+        }
+
+        /// <summary>
+        /// 补料确认
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task ReplenishNGConfirmAsync(string sfc)
+        {
+            if (string.IsNullOrEmpty(sfc))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
+            }
+            //查询条码步骤
+            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
+
+            foreach (var item in manuSfcStepEntities)
+            {
+                item.IsReplenish = true;
+            } 
+
+            await _manuSfcStepRepository.UpdateRangeAsync(manuSfcStepEntities);
         }
     }
 }
