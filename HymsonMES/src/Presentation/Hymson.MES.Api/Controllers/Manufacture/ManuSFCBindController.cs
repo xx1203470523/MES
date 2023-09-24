@@ -13,7 +13,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     [Route("api/v1/[controller]")]
     public class ManuSFCBindController : ControllerBase
     {
-        private readonly IBindSFCService _bindSFCService ;
+        private readonly IBindSFCService _bindSFCService;
         private readonly ILogger<ManuSfcProduceController> _logger;
 
         public ManuSFCBindController(IBindSFCService bindSFCService, ILogger<ManuSfcProduceController> logger)
@@ -41,7 +41,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("pda/UnBind")]
-        public async Task UnBindSFCAsync([FromQuery] UnBindSFCDto parm)
+        public async Task UnBindSFCAsync(UnBindSFCDto parm)
         {
             await _bindSFCService.UnBindSFCAsync(parm);
         }
@@ -53,7 +53,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("pda/switchBind")]
-        public async Task SwitchBindSFCAsync([FromQuery] SwitchBindSFCDto parm)
+        public async Task SwitchBindSFCAsync(SwitchBindSFCDto parm)
         {
             await _bindSFCService.SwitchBindSFCAsync(parm);
         }
@@ -65,7 +65,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("pda/repeatManu")]
-        public async Task RepeatManuSFCAsync([FromQuery] UnBindSFCDto parm)
+        public async Task RepeatManuSFCAsync(UnBindSFCDto parm)
         {
             await _bindSFCService.RepeatManuSFCAsync(parm);
         }

@@ -36,8 +36,18 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// </summary>
         private readonly ICurrentUser _currentUser;
 
-        public BindSFCService(AbstractValidator<BindSFCDto> validationBindDtoRules, ICurrentEquipment currentEquipment,
-            AbstractValidator<UnBindSFCDto> validationUnBindDtoRules, 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="validationBindDtoRules"></param>
+        /// <param name="currentEquipment"></param>
+        /// <param name="validationUnBindDtoRules"></param>
+        /// <param name="manuSfcBindRecordRepository"></param>
+        /// <param name="manuSfcBindRepository"></param>
+        /// <param name="currentUser"></param>
+        public BindSFCService(AbstractValidator<BindSFCDto> validationBindDtoRules,
+            ICurrentEquipment currentEquipment,
+            AbstractValidator<UnBindSFCDto> validationUnBindDtoRules,
             IManuSfcBindRecordRepository manuSfcBindRecordRepository,
             IManuSfcBindRepository manuSfcBindRepository,
             ICurrentUser currentUser)
