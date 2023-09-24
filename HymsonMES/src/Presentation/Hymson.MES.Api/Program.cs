@@ -57,6 +57,7 @@ namespace Hymson.MES.Api
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
+            builder.Services.AddEquipmentService(builder.Configuration);
             builder.Services.AddHttpClientService(builder.Configuration);
             builder.Services.AddLocalization();
             builder.Services.AddHealthChecks();

@@ -121,8 +121,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<BindSFCDto>, BindSFCValidator>();//条码绑定
-            services.AddSingleton<AbstractValidator<UnBindSFCDto>, UnBindSFCValidator>();//条码解绑
+            services.AddSingleton<AbstractValidator<BindSFCInputDto>, BindSFCValidator>();//条码绑定
+            services.AddSingleton<AbstractValidator<UnBindSFCInputDto>, UnBindSFCValidator>();//条码解绑
             services.AddSingleton<AbstractValidator<BindContainerDto>, BindContainerValidator>();//容器绑定
             services.AddSingleton<AbstractValidator<UnBindContainerDto>, UnBindContainerValidator>();//容器解绑
             services.AddSingleton<AbstractValidator<InBoundDto>, InBoundValidator>();//进站

@@ -13,34 +13,34 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// </summary>
         /// <param name="bindSFCDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcBindEntity>> GetBindSFC(BindSFCDto bindSFCDto);
+        Task<BindSFCOutputDto> GetBindSFC(BindSFCInputDto bindSFCDto);
 
         /// <summary>
         /// 绑定
         /// </summary>
         /// <param name="bindSFCDto"></param>
         /// <returns></returns>
-        Task BindSFCAsync(BindSFCDto bindSFCDto);
+        Task BindSFCAsync(UnBindSFCInputDto bindSFCDto);
 
         /// <summary>
         /// 解绑
         /// </summary>
         /// <param name="unBindSFCDto"></param>
         /// <returns></returns>
-        Task UnBindSFCAsync(UnBindSFCDto unBindSFCDto);
+        Task UnBindSFCAsync(UnBindSFCInputDto unBindSFCDto);
 
         /// <summary>
         /// 换绑
         /// </summary>
         /// <param name="unBindSFCDto"></param>
         /// <returns></returns>
-        Task SwitchBindSFCAsync(SwitchBindSFCDto unBindSFCDto);
+        Task SwitchBindSFCAsync(SwitchBindInputDto unBindSFCDto);
 
         /// <summary>
         /// 复投
         /// </summary>
         /// <param name="unBindSFCDto"></param>
         /// <returns></returns>
-        Task RepeatManuSFCAsync(UnBindSFCDto unBindSFCDto);
+        Task RepeatManuSFCAsync(BindSFCInputDto unBindSFCDto);
     }
 }
