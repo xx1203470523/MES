@@ -291,9 +291,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     CurrentStatus = sfcEntity.Status,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
-                    CreatedBy = _currentSite.Name,
+                    CreatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentSite.Name
+                    UpdatedBy = _currentUser.UserName,
                 };
                 sfcStepList.Add(manuSfcStepEntity);
 
@@ -319,15 +319,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Source = ProductBadRecordSourceEnum.BadManualEntry,
                         Remark = manuProductBadRecordCreateDto.Remark ?? "",
                         CreatedOn = HymsonClock.Now(),
-                        CreatedBy = _currentSite.Name,
+                        CreatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
+                        UpdatedBy = _currentUser.UserName,
                     };
 
                     if (isScrap || unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
                     {
                         manuProductBadRecordEntity.CloseOn = HymsonClock.Now();
-                        manuProductBadRecordEntity.CloseBy = _currentSite.Name;
+                        manuProductBadRecordEntity.CloseBy = _currentUser.UserName;
                         manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
                         manuProductBadRecordEntity.DisposalResult = isScrap ? ProductBadDisposalResultEnum.scrap : ProductBadDisposalResultEnum.repair;
                     }
@@ -353,9 +353,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                         IsCancel = false,
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
-                        CreatedBy = _currentSite.Name,
+                        CreatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
+                        UpdatedBy = _currentUser.UserName,
                     };
                     manuSfcScrapEntities.Add(manuSfcScrapEntity);
 
@@ -590,9 +590,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 RepeatedCount = 0,
                                 IsScrap = TrueOrFalseEnum.No,
                                 CreatedOn = HymsonClock.Now(),
-                                CreatedBy = _currentSite.Name,
+                                CreatedBy = _currentUser.UserName,
                                 UpdatedOn = HymsonClock.Now(),
-                                UpdatedBy = _currentSite.Name
+                                UpdatedBy = _currentUser.UserName,
                             };
                             manuSfcProduceList.Add(manuSfcProduceEntity);
 
@@ -676,8 +676,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //更新条码状态
                     if (manuSfcUpdateStatusByIdCommands != null && manuSfcUpdateStatusByIdCommands.Any())
                     {
+
                         var row = await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
-                        if (row != scrapByIdCommands.Count)
+                        if (row != manuSfcUpdateStatusByIdCommands.Count)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES15426));
                         }
@@ -815,9 +816,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 CurrentStatus = manuSfcEntity.Status,
                 SiteId = _currentSite.SiteId ?? 0,
                 CreatedOn = HymsonClock.Now(),
-                CreatedBy = _currentSite.Name,
+                CreatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
-                UpdatedBy = _currentSite.Name
+                UpdatedBy = _currentUser.UserName,
             };
 
             //判断是否关闭所有不合格信息
@@ -913,9 +914,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                         RepeatedCount = 0,
                         IsScrap = TrueOrFalseEnum.No,
                         CreatedOn = HymsonClock.Now(),
-                        CreatedBy = _currentSite.Name,
+                        CreatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
+                        UpdatedBy = _currentUser.UserName,
                     };
 
                     //插入在制品业务
@@ -931,9 +932,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
-                        CreatedBy = _currentSite.Name,
+                        CreatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
+                        UpdatedBy = _currentUser.UserName,
                     };
 
                     //修改条码状态 -排队 
@@ -942,7 +943,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Status = SfcStatusEnum.lineUp,
                         CurrentStatus = manuSfcEntity.Status,
                         UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
+                        UpdatedBy = _currentUser.UserName,
                     };
 
                     //扣除库存数量
@@ -984,9 +985,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
-                        CreatedBy = _currentSite.Name,
+                        CreatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
+                        UpdatedBy = _currentUser.UserName,
                     };
 
                     //修改条码状态 -排队 

@@ -897,7 +897,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<ManuSfcScrapEntity> manuSfcScrapEntities = new();
             List<ManuSfcStepEntity> manuSfcStepEntities = new();
             List<ScrapManuSfcByIdCommand> scrapByIdCommands = new();
-            List<string> sfcList = new();
+            var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
             var validationFailures = new List<ValidationFailure>();
             foreach (var sfc in parm.Sfcs)
             {
@@ -973,7 +973,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (manuSfcProduceInfoEntity != null)
                 {
-                    sfcList.Add(sfc);
+                    updateManuSfcProduceStatusByIdCommands.Add(new UpdateManuSfcProduceStatusByIdCommand
+                    {
+                        Id = manuSfcProduceInfoEntity.Id,
+                        Status = SfcStatusEnum.Scrapping,
+                        CurrentStatus = manuSfcProduceInfoEntity.Status,
+                        UpdatedOn = HymsonClock.Now(),
+                        UpdatedBy = _currentUser.UserName
+                    });
                 }
                 var stepEntity = new ManuSfcStepEntity
                 {
@@ -992,9 +999,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Remark = parm.Remark,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
-                    CreatedBy = _currentSite.Name,
+                    CreatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentSite.Name
+                    UpdatedBy = _currentUser.UserName
                 };
                 manuSfcStepEntities.Add(stepEntity);
 
@@ -1010,9 +1017,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Remark = parm.Remark,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
-                    CreatedBy = _currentSite.Name,
+                    CreatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentSite.Name
+                    UpdatedBy = _currentUser.UserName
                 };
 
                 manuSfcScrapEntities.Add(manuSfcScrapEntity);
@@ -1031,15 +1038,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
 
-            var isScrapCommand = new UpdateIsScrapCommand
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfcs = sfcList,
-                UserId = _currentUser.UserName,
-                UpdatedOn = HymsonClock.Now(),
-                IsScrap = TrueOrFalseEnum.Yes,
-                CurrentIsScrap = TrueOrFalseEnum.No
-            };
             #endregion
 
             var rows = 0;
@@ -1057,8 +1055,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //2.插入数据操作类型为报废
                 rows += await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
 
-                //3.修改在制品表,IsScrap
-                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                //3.更新在制品状态
+                if (updateManuSfcProduceStatusByIdCommands != null && updateManuSfcProduceStatusByIdCommands.Any())
+                {
+                    await _manuSfcProduceRepository.UpdateStatusByIdRangeAsync(updateManuSfcProduceStatusByIdCommands);
+                }
 
                 //4.插入报废表
                 rows += await _manuSfcScrapRepository.InsertRangeAsync(manuSfcScrapEntities);
@@ -1095,7 +1096,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<ManuSfcScrapCancelCommand> scrapCancelCommands = new();
             List<ManuSfcStepEntity> manuSfcStepEntities = new();
             List<CancelScrapManuSfcByIdCommand> manuSfcCancelScrapByIdCommands = new();
-            List<string> sfcProduceSfc = new();
+            var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
             foreach (var sfc in parm.Sfcs)
             {
                 var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == sfc);
@@ -1156,7 +1157,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //在制品需要还原在制品表   在制品还原需要验证工单是否已经关闭 
                 if (manuSfcProduceInfoEntity != null)
                 {
-                    if (activeOrders.Any(x => x.WorkOrderId == manuSfcProduceInfoEntity.WorkOrderId))
+                    if (!activeOrders.Any(x => x.WorkOrderId == manuSfcProduceInfoEntity.WorkOrderId))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -1173,7 +1174,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                    sfcProduceSfc.Add(sfc);
+                    updateManuSfcProduceStatusByIdCommands.Add(new UpdateManuSfcProduceStatusByIdCommand
+                    {
+                        Id = manuSfcProduceInfoEntity.Id,
+                        Status = sfcEntity.StatusBack,
+                        CurrentStatus = manuSfcProduceInfoEntity.Status,
+                        UpdatedOn = HymsonClock.Now(),
+                        UpdatedBy = _currentSite.Name
+                    });
                 }
                 var stepEntity = new ManuSfcStepEntity
                 {
@@ -1189,12 +1197,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.CancelDiscard,
                     CurrentStatus = sfcEntity.Status,
-                    Remark = parm.Remark,
+                    Remark = parm.Remark ?? "",
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
-                    CreatedBy = _currentSite.Name,
+                    CreatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentSite.Name
+                    UpdatedBy = _currentUser.UserName
                 };
                 manuSfcStepEntities.Add(stepEntity);
 
@@ -1214,26 +1222,13 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
-
-            var isScrapCommand = new UpdateIsScrapCommand
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfcs = sfcProduceSfc,
-                UserId = _currentUser.UserName,
-                UpdatedOn = HymsonClock.Now(),
-                IsScrap = TrueOrFalseEnum.No,
-                CurrentIsScrap = TrueOrFalseEnum.Yes
-            };
-
             #endregion
 
             //入库
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-
                 //1.条码信息表状态更改
-
                 rows += await _manuSfcRepository.ManuSfcCancellScrapByIdsAsync(manuSfcCancelScrapByIdCommands);
 
                 if (rows != parm.Sfcs.Length)
@@ -1241,13 +1236,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES15419));
                 }
 
-                //2.修改在制品表,IsScrap
-                rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(isScrapCommand);
+                //更新在制品状态
+                if (updateManuSfcProduceStatusByIdCommands != null && updateManuSfcProduceStatusByIdCommands.Any())
+                {
+                    await _manuSfcProduceRepository.UpdateStatusByIdRangeAsync(updateManuSfcProduceStatusByIdCommands);
+                }
 
                 //3.插入数据操作类型为取消报废
                 rows += await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
 
-                //4.插入报废表
+                //4.修改报废表
                 rows += await _manuSfcScrapRepository.ManuSfcScrapCancelAsync(scrapCancelCommands);
 
                 trans.Complete();
