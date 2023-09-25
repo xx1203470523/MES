@@ -71,6 +71,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 工单ID
         /// </summary>
         public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 数据源
+        /// </summary>
+        public int? Source { get; set; }
+
+        /// <summary>
+        /// 上料点ID
+        /// </summary>
+        public long? FeedingPointId { get; set; }
     }
 
     /// <summary>
