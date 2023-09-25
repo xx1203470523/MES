@@ -108,6 +108,17 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 获取所有工序-PDA
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>> GetAllAsync(long siteId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcedureEntity>(GetAllDataSql, new {SiteId = siteId });
+        }
+
+        /// <summary>
         /// 根据Code获取数据
         /// </summary>
         /// <param name="code"></param>
@@ -251,5 +262,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByCodesSql = @"SELECT * FROM `proc_procedure`  WHERE Code in @Codes and SiteId=@SiteId ";
 
         const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId  WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";
+
+        const string GetAllDataSql= @"select a.*,b.ResType ,b.ResTypeName  from proc_procedure a left join proc_resource_type b on a.ResourceTypeId=b.Id and b.IsDeleted=0 and SiteId=@SiteId";
     }
 }

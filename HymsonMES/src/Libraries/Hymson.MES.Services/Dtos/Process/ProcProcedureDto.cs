@@ -214,6 +214,27 @@ namespace Hymson.MES.Services.Dtos.Process
         public string ResTypeName { get; set; }
     }
 
+    /// <summary>
+    /// 工序查询-PDA
+    /// </summary>
+    public record ProcProcedureViewPDADto
+    {
+        // <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 工序代码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string Name { get; set; }
+    }
+
     public class QueryProcProcedureDto
     {
         /// <summary>

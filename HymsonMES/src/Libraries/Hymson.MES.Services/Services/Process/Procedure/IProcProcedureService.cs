@@ -17,6 +17,12 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         Task<PagedInfo<ProcProcedureViewDto>> GetPageListAsync(ProcProcedurePagedQueryDto procProcedurePagedQueryDto);
 
         /// <summary>
+        /// 获取所有工序-无参
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDAAsync();
+
+        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>

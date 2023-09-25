@@ -24,6 +24,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Minio.DataModel;
 using System.Transactions;
+using System.Xml.Linq;
 
 namespace Hymson.MES.Services.Services.Process.Procedure
 {
@@ -126,6 +127,27 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             //实体到DTO转换 装载数据
             List<ProcProcedureViewDto> procProcedureDtos = PrepareProcProcedureDtos(pagedInfo);
             return new PagedInfo<ProcProcedureViewDto>(procProcedureDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDAAsync()
+        {
+            long site = _currentSite.SiteId ?? 123456;
+            var list = await _procProcedureRepository.GetAllAsync(site);
+            var dto = new List<ProcProcedureViewPDADto>();
+            foreach (var item in list)
+            {
+                dto.Add(new ProcProcedureViewPDADto()
+                {
+                    Id= item.Id,
+                    Code= item.Code,
+                    Name= item.Name,
+                });
+            }
+            return dto;      
         }
 
         /// <summary>
