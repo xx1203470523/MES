@@ -540,7 +540,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 {
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
-                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER, createProductParameterProcedureCodeTableSql,userName);
+                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql,userName);
                 //提交
                 ts.Complete();
             }
