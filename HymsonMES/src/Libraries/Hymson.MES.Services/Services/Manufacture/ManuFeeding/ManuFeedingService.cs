@@ -264,16 +264,24 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 通过物料分组
             Dictionary<long, IGrouping<long, ManuFeedingEntity>>? manuFeedingsDictionary = new();
 
-            // 通过产线->工单->BOM->查询物料
-            bomMaterialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
+            if (queryDto.Source == ManuSFCFeedingSourceEnum.BOM)
+            {
+                // 通过产线->工单->BOM->查询物料
+                bomMaterialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
 
-            // BOM的物料ID
-            if (bomMaterialIds != null) materialIds.AddRange(bomMaterialIds);
+                // BOM的物料ID
+                if (bomMaterialIds != null) materialIds.AddRange(bomMaterialIds);
+            }
+            else
+            {
+                // TODO
+            }
 
             // 通过物料ID获取物料库存信息
             var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = queryDto.ResourceId,
+                FeedingPointId = queryDto.FeedingPointId
             });
 
             // 已加载的物料ID

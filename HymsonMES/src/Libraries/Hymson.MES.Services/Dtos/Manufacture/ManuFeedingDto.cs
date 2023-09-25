@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -73,9 +74,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? WorkOrderId { get; set; }
 
         /// <summary>
-        /// 数据源
+        /// 物料加载来源
         /// </summary>
-        public int? Source { get; set; }
+        public ManuSFCFeedingSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 上料点ID
