@@ -44,9 +44,8 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-#if DEBUG
             builder.Services.AddHostedService<HostedService>();
-#endif
+
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
@@ -73,9 +72,11 @@ namespace Hymson.MES.Equipment.Api
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+#if DEBUG
                 app.UseHttpLogging();
                 app.UseSwagger();
                 app.UseSwaggerUI();
+#endif
             }
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
