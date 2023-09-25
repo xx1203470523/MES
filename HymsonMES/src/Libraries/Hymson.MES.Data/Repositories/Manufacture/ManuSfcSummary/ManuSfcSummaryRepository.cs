@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
@@ -86,6 +87,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdateSummaryUnqualifiedSql, multiUpdateSummaryUnqualifiedCommand);
         }
 
+        /// <summary>
+        /// 复判不合格
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSummaryReJudgmentUnqualifiedRangeAsync(IEnumerable<MultiUpdateSummaryReJudgmentUnqualifiedCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSummaryUnqualifiedSql, commands);
+        }
+
+        /// <summary>
+        /// 复判合格
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> MultiUpdateSummaryReJudgmentQualifiedRangeAsync(IEnumerable<MultiUpdateSummaryReJudgmentQualifiedCommand> commands)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSummaryUnqualifiedSql, commands);
+        }
 
         /// <summary>
         /// 软删除
@@ -103,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -125,10 +147,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcSummaryEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuSfcSummaryEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcSummaryEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 获取条码最后数据
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcSummaryEntity>> GetyLastListBySfsAsync(LastManuSfcSummaryBySfcsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcSummaryEntity>(GetMaxTimeBySFCsSql, query);
+        }
+
+        /// <summary>
+        /// 获取条码最后数据
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcSummaryEntity> GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcSummaryEntity>(GetMaxTimeByProcedureIdsAndSfcsSql, query);
         }
 
         /// <summary>
@@ -171,7 +215,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuSfcSummaryEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
 
@@ -191,13 +234,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdateSummaryOutStationSql = "UPDATE manu_sfc_summary SET EndOn = @EndOn, OutputQty = @OutputQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSummaryOutStationSql = "UPDATE manu_sfc_summary SET EndOn = @EndOn, OutputQty = @OutputQty, IsJudgment = @IsJudgment, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdateSummaryUnqualifiedSql = "UPDATE manu_sfc_summary SET EndOn = @EndOn, UnqualifiedQty = @UnqualifiedQty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE manu_sfc_summary SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_sfc_summary SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM manu_sfc_summary WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_summary WHERE Id IN @Ids ";
-
+        const string GetMaxTimeBySFCsSql = @"SELECT T1.* FROM manu_sfc_summary T1 LEFT JOIN (
+			SELECT SFC, MAX(UpdatedOn) AS MaxUpdatedOn FROM manu_sfc_summary GROUP BY SFC
+	        ) T2 ON T1.SFC = T2.SFC AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs  AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
+        const string GetMaxTimeByProcedureIdsAndSfcsSql = @"SELECT T1.* FROM manu_sfc_summary T1 LEFT JOIN (
+			SELECT ProductId, SFC, MAX(UpdatedOn) AS MaxUpdatedOn FROM manu_sfc_summary GROUP BY SFC,ProductId
+	        ) T2 ON T1.SFC = T2.SFC ANDT1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC = @Sfc AND T1.ProductId = @ProductId  AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
     }
 }

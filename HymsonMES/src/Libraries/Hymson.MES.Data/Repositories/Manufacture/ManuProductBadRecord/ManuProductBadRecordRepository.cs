@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -79,6 +80,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+
+        /// <summary>
+        ///根据步骤Id获取数据
+        /// </summary>
+        /// <param name="stepIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long>  stepIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuProductBadRecordEntity>(GetBySfcStepIdsSql, new { StepIds = stepIds });
+        }
+
+        /// <summary>
+        ///根据步骤Id获取数据
+        /// </summary>
+        /// <param name="stepIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByReJudgmentSfcStepIdsAsync(IEnumerable<long> reJudgmentSfcStepIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByReJudgmentSfcStepIdsSql, new { ReJudgmentSfcStepIds = reJudgmentSfcStepIds });
         }
 
         /// <summary>
@@ -195,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 关闭条码不合格标识和缺陷
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="commands"></param>
         /// <returns></returns>
         public async Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands)
         {
@@ -437,8 +461,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
-        const string InsertSql = "INSERT INTO `manu_product_bad_record`(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`,`OutflowOperationId`, `UnqualifiedId`,`SFC`,`SfcInfoId`,`SfcStepId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FoundBadOperationId,@FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC,@SfcInfoId,@SfcStepId,@Qty, @Status, @Source, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `manu_product_bad_record` SET   FoundBadOperationId = @FoundBadOperationId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, Qty = @Qty, Status = @Status, Source = @Source, Remark = @Remark, DisposalResult = @DisposalResult, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn) ";
+        const string UpdateSql = "UPDATE manu_product_bad_record SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, FoundBadResourceId = @FoundBadResourceId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, SfcInfoId = @SfcInfoId, Qty = @Qty, Status = @Status, Source = @Source, DisposalResult = @DisposalResult, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SfcStepId = @SfcStepId, ReJudgmentSfcStepId = @ReJudgmentSfcStepId, ReJudgmentBy = @ReJudgmentBy, ReJudgmentOn = @ReJudgmentOn, ReJudgmentResult = @ReJudgmentResult, CloseBy = @CloseBy, CloseOn = @CloseOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_product_bad_record` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
@@ -447,7 +471,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_product_bad_record`  WHERE Id IN @ids ";
 
-        const string UpdateStatusSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,DisposalResult=@DisposalResult,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn ,ReJudgmentSfcStepId=@ReJudgmentSfcStepId WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status=@CurrentStatus ";
+        const string GetBySfcStepIdsSql = @"SELECT 
+                                          `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_product_bad_record`  WHERE SfcStepId IN @SfcStepIds ";
+        const string GetByReJudgmentSfcStepIdsSql = @"SELECT 
+                                          `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `manu_product_bad_record`  WHERE ReJudgmentSfcStepId IN @ReJudgmentSfcStepIds ";
+
+        const string UpdateStatusSql = @"UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,ReJudgmentSfcStepId=@ReJudgmentSfcStepId,ReJudgmentResult=@ReJudgmentResult,ReJudgmentOn=@ReJudgmentOn,ReJudgmentBy=@ReJudgmentBy,CloseOn=@CloseOn,CloseBy=@CloseBy,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn ,ReJudgmentSfcStepId=@ReJudgmentSfcStepId 
+                                                WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status=@CurrentStatus ";
 
         const string UpdateStatusByIdSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,DisposalResult=@DisposalResult,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE Id=@Id  AND  Status!=@Status ";
 

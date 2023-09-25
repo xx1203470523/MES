@@ -1203,6 +1203,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     Id = sfcEntity.SfcScrapId ?? 0,
                     IsCancel = true,
+                    CancelSfcStepId = sfcEntity.Id,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 }

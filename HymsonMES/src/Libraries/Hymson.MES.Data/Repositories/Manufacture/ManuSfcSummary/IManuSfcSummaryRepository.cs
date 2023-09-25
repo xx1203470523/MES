@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -17,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuSfcSummaryEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -31,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcSummaryEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -54,12 +55,26 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateSummaryUnqualifiedRangeAsync(IEnumerable<MultiUpdateSummaryUnqualifiedCommand> multiUpdateSummaryUnqualifiedCommand);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateSummaryReJudgmentUnqualifiedRangeAsync(IEnumerable<MultiUpdateSummaryReJudgmentUnqualifiedCommand> commands);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> MultiUpdateSummaryReJudgmentQualifiedRangeAsync(IEnumerable<MultiUpdateSummaryReJudgmentQualifiedCommand> commands);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -73,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuSfcSummaryEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -82,12 +97,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcSummaryEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 获取最大数据的
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcSummaryEntity>> GetyLastListBySfsAsync(LastManuSfcSummaryBySfcsQuery query);
+
+
+        /// <summary>
+        /// 获取条码最后数据
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<ManuSfcSummaryEntity> GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcSummaryEntity>> GetEntitiesAsync(ManuSfcSummaryQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

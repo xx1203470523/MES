@@ -21,5 +21,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcScrap.Command
         /// 是否取消
         /// </summary>
         public bool IsCancel { get; set; }
+
+        /// <summary>
+        /// 取消步骤表id
+        /// </summary>
+        public long CancelSfcStepId { get; set; }
     }
 }

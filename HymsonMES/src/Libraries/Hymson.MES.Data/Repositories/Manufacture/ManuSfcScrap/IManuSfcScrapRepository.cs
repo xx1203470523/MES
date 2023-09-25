@@ -75,6 +75,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcScrapEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据步骤Id获取数据（批量）
+        /// </summary>
+        /// <param name="stepIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcScrapEntity>> GetByStepIdsAsync(IEnumerable<long> stepIds);
+
+
+        /// <summary>
+        /// 根据步骤Id获取取消数据（批量）
+        /// </summary>
+        /// <param name="stepIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcScrapEntity>> GetByCancelSfcStepIdsAsync(IEnumerable<long> cancelSfcStepIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>

@@ -40,6 +40,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        ///根据步骤Id获取数据
+        /// </summary>
+        /// <param name="stepIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long>  stepIds);
+
+        /// <summary>
+        ///根据步骤Id获取数据
+        /// </summary>
+        /// <param name="stepIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordEntity>> GetByReJudgmentSfcStepIdsAsync(IEnumerable<long> reJudgmentSfcStepIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>

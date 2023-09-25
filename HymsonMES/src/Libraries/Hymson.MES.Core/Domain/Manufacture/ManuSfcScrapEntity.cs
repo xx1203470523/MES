@@ -49,5 +49,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 取消步骤表id
+        /// </summary>
+        public long CancelSfcStepId { get; set; }
     }
 }

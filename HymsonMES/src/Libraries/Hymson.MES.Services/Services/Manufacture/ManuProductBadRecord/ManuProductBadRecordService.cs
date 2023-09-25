@@ -204,6 +204,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcList = new List<string>();
             var updateStatusByBarCodeCommands = new List<UpdateStatusByBarCodeCommand>();
             var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
+            bool isScrap = qualUnqualifiedCodes.Any(x => x.UnqualifiedCode.ToUpperInvariant() == ManuProductBadRecord.ScrapCode);
             foreach (var sfc in manuProductBadRecordCreateDto.Sfcs)
             {
                 var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == sfc);
@@ -304,8 +305,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         continue;
                     }
 
-                    //不合格记录 - 自动处理
-                    manuProductBadRecords.Add(new ManuProductBadRecordEntity
+                    var manuProductBadRecordEntity = new ManuProductBadRecordEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -316,49 +316,38 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SFC = sfc,
                         SfcInfoId = sfcInfoEntity.Id,
                         Qty = sfcEntity.Qty,
-                        Status = ProductBadRecordStatusEnum.Open,
                         Source = ProductBadRecordSourceEnum.BadManualEntry,
                         Remark = manuProductBadRecordCreateDto.Remark ?? "",
-                        DisposalResult = unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect ? ProductBadDisposalResultEnum.AutoHandle : null,
-                        CreatedOn = HymsonClock.Now(),
-                        CreatedBy = _currentSite.Name,
-                        UpdatedOn = HymsonClock.Now(),
-                        UpdatedBy = _currentSite.Name
-                    });
-                }
-
-                //报废流程
-                if (qualUnqualifiedCodes.Any(x => x.UnqualifiedCode.ToUpperInvariant() == ManuProductBadRecord.ScrapCode))
-                {
-                    //步骤表 -报废
-                    var stepEntity = new ManuSfcStepEntity
-                    {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SFC = sfc,
-                        ProductId = sfcInfoEntity.ProductId,
-                        WorkOrderId = sfcInfoEntity.WorkOrderId,
-                        WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
-                        ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
-                        Qty = sfcEntity.Qty,
-                        EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,
-                        ResourceId = manuSfcProduceInfoEntity?.ResourceId,
-                        ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
-                        Operatetype = ManuSfcStepTypeEnum.Discard,
-                        CurrentStatus = sfcEntity.Status,
-                        SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
                         CreatedBy = _currentSite.Name,
                         UpdatedOn = HymsonClock.Now(),
                         UpdatedBy = _currentSite.Name
                     };
-                    sfcStepList.Add(stepEntity);
 
+                    if (isScrap || unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
+                    {
+                        manuProductBadRecordEntity.CloseOn = HymsonClock.Now();
+                        manuProductBadRecordEntity.CloseBy = _currentSite.Name;
+                        manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
+                        manuProductBadRecordEntity.DisposalResult = isScrap ? ProductBadDisposalResultEnum.scrap : ProductBadDisposalResultEnum.repair;
+                    }
+                    else
+                    {
+                        manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
+                    }
+
+                    manuProductBadRecords.Add(manuProductBadRecordEntity);
+                }
+
+                //报废流程
+                if (isScrap)
+                {
                     var manuSfcScrapEntity = new ManuSfcScrapEntity()
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SFC = sfc,
                         SfcinfoId = sfcInfoEntity?.Id ?? 0,
-                        SfcStepId = stepEntity.Id,
+                        SfcStepId = manuSfcStepEntity.Id,
                         ProcedureId = manuProductBadRecordCreateDto.FoundBadOperationId,
                         ScrapQty = sfcEntity.Qty,
                         IsCancel = false,
@@ -633,7 +622,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
 
-
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //插入不合格记录
@@ -810,7 +798,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15424));
             }
 
-            //步骤表-不良录入
+            //步骤表-复判
             var manuSfcStepEntity = new ManuSfcStepEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -841,17 +829,36 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             foreach (var unqualified in allunqualifiedIds)
             {
-                updateCommandList.Add(new ManuProductBadRecordCommand
+                var manuProductBadRecordCommand = new ManuProductBadRecordCommand
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     Sfc = badReJudgmentDto.Sfc,
                     UnqualifiedId = unqualified,
-                    DisposalResult = closeunqualifiedIds.Contains(unqualified) ? ProductBadDisposalResultEnum.ReJudgmentClosed : ProductBadDisposalResultEnum.ReJudgmentRepair,
+                    ReJudgmentSfcStepId = manuSfcStepEntity.Id,
                     Remark = badReJudgmentDto.Remark ?? "",
-                    Status = closeunqualifiedIds.Contains(unqualified) ? ProductBadRecordStatusEnum.Close : ProductBadRecordStatusEnum.Open,
+                    CurrentStatus = ProductBadRecordStatusEnum.Open,
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-                });
+                    ReJudgmentBy = _currentUser.UserName,
+                    ReJudgmentOn = HymsonClock.Now()
+                };
+
+                if (closeunqualifiedIds.Contains(unqualified))
+                {
+                    manuProductBadRecordCommand.ReJudgmentSfcStepId = manuSfcStepEntity.Id;
+                    manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Close;
+                    manuProductBadRecordCommand.CloseBy = _currentUser.UserName;
+                    manuProductBadRecordCommand.CloseOn = HymsonClock.Now();
+                    manuProductBadRecordCommand.ReJudgmentResult = ProductBadDisposalResultEnum.ReJudgmentClosed;
+                    manuProductBadRecordCommand.ReJudgmentBy = _currentUser.UserName;
+                    manuProductBadRecordCommand.ReJudgmentOn = HymsonClock.Now();
+                }
+                else
+                {
+                    manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Open;
+                    manuProductBadRecordCommand.ReJudgmentResult = ProductBadDisposalResultEnum.ReJudgmentRepair;
+                }
+                updateCommandList.Add(manuProductBadRecordCommand);
             }
 
             if (diffArr.Any())//为全部关闭不合格代码

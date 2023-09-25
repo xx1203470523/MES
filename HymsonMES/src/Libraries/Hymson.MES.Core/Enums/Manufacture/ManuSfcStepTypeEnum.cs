@@ -62,11 +62,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("不良复判")]
         BadRejudgment = 11,
-        ///// <summary>
-        ///// 合并
-        ///// </summary>
-        //[Description("合并")]
-        //Merge = 12,
+        /// <summary>
+        /// 返修
+        /// </summary>
+        [Description("返修")]
+        Maintenance = 12,
         /// <summary>
         /// 转换
         /// </summary>

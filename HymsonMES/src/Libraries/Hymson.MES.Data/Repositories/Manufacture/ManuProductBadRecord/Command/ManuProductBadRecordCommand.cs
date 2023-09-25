@@ -40,16 +40,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command
         public ProductBadRecordStatusEnum? CurrentStatus { get; set; }
 
         /// <summary>
-        /// 处置结果
-        /// </summary>
-        public ProductBadDisposalResultEnum? DisposalResult { get; set; }
-
-        /// <summary>
-        /// 复判步骤id
-        /// </summary>
-        public long? ReJudgmentSfcStepId { get; set; }
-
-        /// <summary>
         /// 操作人员
         /// </summary>
         public string UserId { get; set; }
@@ -58,6 +48,36 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 关闭人
+        /// </summary>
+        public string? CloseBy { get; set; }
+
+        /// <summary>
+        /// 关闭时间
+        /// </summary>
+        public DateTime? CloseOn { get; set; }
+
+        /// <summary>
+        /// 复判人
+        /// </summary>
+        public string? ReJudgmentBy { get; set; }
+
+        /// <summary>
+        /// 复判时间
+        /// </summary>
+        public DateTime? ReJudgmentOn { get; set; }
+
+        /// <summary>
+        /// 复判结果
+        /// </summary>
+        public ProductBadDisposalResultEnum? ReJudgmentResult { get; set; }
+
+        /// <summary>
+        /// 复判步骤表id
+        /// </summary>
+        public long? ReJudgmentSfcStepId { get; set; }
     }
 
     public class ManuProductBadRecordUpdateCommand
