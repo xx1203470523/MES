@@ -316,8 +316,11 @@ namespace Hymson.MES.Services.Services.Plan
             //删除关联表数据
             await _inteSFCBoxRepository.DeleteSFCBoxWorkOrderAsync(planWorkOrderEntity.Id);
 
-            //工单关联SFCbox信息保存
-            response = await _inteSFCBoxRepository.InsertSFCBoxWorkOrderAsync(boxCodeBindWorkOrder);
+            if (boxCodeBindWorkOrder != null && boxCodeBindWorkOrder.Count > 0)
+            {
+                //工单关联SFCbox信息保存
+                response = await _inteSFCBoxRepository.InsertSFCBoxWorkOrderAsync(boxCodeBindWorkOrder);
+            }
 
             ts.Complete();
         }
@@ -485,7 +488,7 @@ namespace Hymson.MES.Services.Services.Plan
 
                 await _planWorkOrderStatusRecordRepository.InsertsAsync(planWorkOrderStatusRecordEntities);
 
-                ts.Complete(); 
+                ts.Complete();
             }
         }
 

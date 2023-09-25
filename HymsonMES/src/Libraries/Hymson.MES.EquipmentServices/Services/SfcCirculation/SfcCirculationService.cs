@@ -768,7 +768,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 
             foreach (var item in sfcSteps)
             {
-                var location = manuSfcCirculationEntities.Where(x => x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location;
+                var location = manuSfcCirculationEntities.Where(x => x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location ?? string.Empty;
                 var modelcode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode) && x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
                 circulationModuleCCSInfo.Add(new CirculationModuleCCSInfoDto
                 {
@@ -905,7 +905,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             foreach (var item in manuSfcStepEntities)
             {
                 item.IsReplenish = true;
-            } 
+            }
 
             await _manuSfcStepRepository.UpdateRangeAsync(manuSfcStepEntities);
         }
