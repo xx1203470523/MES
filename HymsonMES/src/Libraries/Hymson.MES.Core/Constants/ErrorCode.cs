@@ -1004,6 +1004,7 @@
         public const string MES19143 = "条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系";
         public const string MES19144 = "Location不能为空";
         public const string MES19145 = "模组对应型号编码ModelCode不能为空";
+        public const string MES19146 = "{SFC}已经存在当前绑定的模组码中";
 
         #endregion
 

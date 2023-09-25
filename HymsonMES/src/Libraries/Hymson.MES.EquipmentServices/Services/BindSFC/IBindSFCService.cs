@@ -30,6 +30,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         Task UnBindSFCAsync(UnBindSFCInputDto unBindSFCDto);
 
         /// <summary>
+        /// PDA全部解绑
+        /// </summary>
+        /// <param name="unBindSFCDto"></param>
+        /// <returns></returns>
+        Task UnBindPDAAsync(UnBindSFCInput unBindSFCDto);
+
+        /// <summary>
         /// 换绑
         /// </summary>
         /// <param name="unBindSFCDto"></param>

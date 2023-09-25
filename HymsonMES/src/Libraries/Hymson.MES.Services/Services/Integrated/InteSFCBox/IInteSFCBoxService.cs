@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Services.Dtos.Integrated;
 using System;
 using System.Collections.Generic;
@@ -44,5 +45,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         /// <param name="validate"></param>
         /// <returns></returns>
         Task<InteSFCBoxValidateResponse> SFCValidate(InteSFCBoxValidateQuery validate);
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="idsArr"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsync(long[] idsArr);
+
+
     }
 }

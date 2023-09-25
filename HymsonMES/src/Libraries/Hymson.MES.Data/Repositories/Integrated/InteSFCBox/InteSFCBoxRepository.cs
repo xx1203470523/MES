@@ -2,6 +2,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 using Microsoft.Extensions.Options;
@@ -145,6 +146,29 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
             return await conn.ExecuteAsync(DeleteWorkOrderSql, new { WorkOrderId = id });
         }
 
+
+        /// <summary>
+        /// 按ID获取
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteSFCBoxEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<InteSFCBoxEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 批量删除（软删除）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesAsync(DeleteCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteSql, command);
+        }
+
     }
 
 
@@ -165,7 +189,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         const string GetBoxCodeCountSqlTemplate = @"SELECT COUNT(*) FROM (SELECT DISTINCT BoxCode FROM manu_sfc_box msb  /**where**/ ) as subquery";
 
         const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),4)*10000-ROUND(min(OCVB),4)*10000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BoxCode FROM `manu_sfc_box`  WHERE BoxCode IN @BoxCodes group  by BoxCode";
+
         const string GetWorkOrderIdSql = @"select  * from manu_sfc_box_workorder where WorkOrderId =@WorkOrderId";
+
+        const string GetByIdsSql = @"SELECT * FROM `manu_sfc_box`  WHERE Id IN @Ids ";
+
+        const string DeleteSql = "UPDATE manu_sfc_box SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
@@ -43,6 +44,20 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         /// <param name="workOrderId"></param>
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderSFCBoxQuery>> GetByWorkOrderAsync(long workOrderId);
+
+        /// <summary>
+        /// 按ID获取
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteSFCBoxEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 批量删除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeletesAsync(DeleteCommand command);
 
     }
 }

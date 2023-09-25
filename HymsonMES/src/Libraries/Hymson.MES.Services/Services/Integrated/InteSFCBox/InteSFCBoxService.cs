@@ -10,8 +10,10 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
@@ -82,6 +84,13 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
 
         }
 
+        /// <summary>
+        /// 导入数据
+        /// </summary>
+        /// <param name="uploadStockDetailDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        /// <exception cref="ValidationException"></exception>
         public async Task<int> ImportDataAsync(UploadSFCBoxDto uploadStockDetailDto)
         {
             IFormFile formFile = uploadStockDetailDto.File;
@@ -212,6 +221,27 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var dtos = pagedInfo.Data.Select(s => s.ToModel<InteSFCBoxRView>());
 
             return new PagedInfo<InteSFCBoxRView>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="idsArr"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<int> DeletesAsync(long[] idsArr)
+        {
+            //var list = await _inteSFCBoxRepository.GetByIdsAsync(idsArr);
+            //if (list != null && list.Any(x => x.Status != SysDataStatusEnum.Build))
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES12509));
+            //}
+            return await _inteSFCBoxRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = idsArr,
+                UserId = _currentUser.UserName,
+                DeleteOn = HymsonClock.Now()
+            });
         }
 
     }

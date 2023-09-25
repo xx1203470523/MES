@@ -18,8 +18,21 @@ public record BindSFCInputDto: BaseDto
 /// </summary>
 public record UnBindSFCInputDto : BindSFCInputDto
 {
+    
+    public string[] BindSFCs { get; set; } = Array.Empty<string>();
+}
+
+/// <summary>
+/// 解绑PDA-无需验证设备
+/// </summary>
+public record UnBindSFCInput 
+{
     /// <summary>
-    /// 解绑的电芯条码列表【我不知道这个前端怎么传，我的经验告诉我这应该是后台通过SFC获取的需要解绑的电芯条码 by hjh】
+    /// 模组码
+    /// </summary>
+    public string SFC { get; set; } = string.Empty;
+    /// <summary>
+    /// 电芯码
     /// </summary>
     public string[] BindSFCs { get; set; } = Array.Empty<string>();
 }

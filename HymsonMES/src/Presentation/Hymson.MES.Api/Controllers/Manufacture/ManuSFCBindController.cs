@@ -41,9 +41,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("pda/UnBind")]
-        public async Task UnBindSFCAsync(UnBindSFCInputDto parm)
+        public async Task UnBindSFCAsync(UnBindSFCInput parm)
         {
-            await _bindSFCService.UnBindSFCAsync(parm);
+            await _bindSFCService.UnBindPDAAsync(parm);
         }
 
         /// <summary>

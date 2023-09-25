@@ -59,7 +59,20 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             return await _inteSFCBoxService.GetBoxCodeListAsync(pagedQueryDto);
         }
-        
+
+
+        /// <summary>
+        /// 删除（电芯批次码维护）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [LogDescription("电芯批次码维护", BusinessType.DELETE)]
+        public async Task DeletesAsync(long[] ids)
+        {
+            await _inteSFCBoxService.DeletesAsync(ids);
+        }
+
 
         /// <summary>
         /// 电芯批次导入
