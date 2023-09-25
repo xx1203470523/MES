@@ -115,9 +115,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long Id { get; set; }
 
         /// <summary>
-        /// 物料ID
+        /// 主物料ID
         /// </summary>
-        public long MaterialId { get; set; }
+        public long ParentId { get; set; }
 
         /// <summary>
         /// 物料条码

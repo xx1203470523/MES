@@ -309,7 +309,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     material.Children.AddRange(feedingEntities.Select(s => new ManuFeedingMaterialItemDto
                     {
                         Id = s.Id,
-                        MaterialId = s.ProductId,
+                        ParentId = s.ProductId,
                         BarCode = s.BarCode,
                         InitQty = s.InitQty,
                         Qty = s.Qty,
