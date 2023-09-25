@@ -2,7 +2,6 @@
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
-using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 {
@@ -76,7 +75,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = TransactionHelper.GetTransactionScope();
 
-            foreach (var jobName in execJobBos.Select(job=>job.Name))
+            foreach (var jobName in execJobBos.Select(job => job.Name))
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == jobName);
                 if (service == null) continue;

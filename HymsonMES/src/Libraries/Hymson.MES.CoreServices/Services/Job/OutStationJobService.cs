@@ -251,7 +251,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 合格出站（为了逻辑清晰，跟上面的不合格出站区分开）
-            return OutStationForQualifiedProcedureAsync(bo, sfcProduceEntities);
+            return await OutStationForQualifiedProcedureAsync(bo, sfcProduceEntities);
         }
 
         /// <summary>
@@ -325,9 +325,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 汇总表
-            if (data.multiUpdateSummaryOutStationCommands.Any())
+            if (data.MultiUpdateSummaryOutStationCommands.Any())
             {
-                tasks.Add(_manuSfcSummaryRepository.UpdateSummaryOutStationRangeAsync(data.multiUpdateSummaryOutStationCommands));
+                tasks.Add(_manuSfcSummaryRepository.UpdateSummaryOutStationRangeAsync(data.MultiUpdateSummaryOutStationCommands));
             }
 
             // 添加流转记录
@@ -506,7 +506,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.SFCStepEntities.Add(stepEntity);
             });
 
-            responseBo.multiUpdateSummaryOutStationCommands = updateSummaryOutStationCommands;
+            responseBo.MultiUpdateSummaryOutStationCommands = updateSummaryOutStationCommands;
 
             // 已完工，且只有"生产主工艺路线"，出站时才走下面流程
             responseBo.ProcessRouteType = procProcessRouteEntity.Type;
