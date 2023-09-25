@@ -998,7 +998,7 @@
         public const string MES17102 = "获取条码{SFC}信息失败！";
         public const string MES17103 = "获取出站产品信息失败！";
         public const string MES17104 = "获取条码信息失败！";
-
+        public const string MES17105 = "存在不在BOM消耗清单里面的消耗条码！";
         #endregion
 
         #region 面板维护 MES17200

@@ -536,16 +536,16 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             processRouteDetailLinks = processRouteDetailLinks.Where(w => w.PreProcessRouteDetailId == routeProcedureWithWorkOrderBo.ProcedureId);
             processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
 
-            // 随机工序Key
-            var cacheKey = $"{routeProcedureWithWorkOrderBo.WorkOrderId}-{routeProcedureWithWorkOrderBo.ProcessRouteId}-{routeProcedureWithWorkOrderBo.ProcedureId}";
-            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
-
             // 默认下一工序
             ProcProcessRouteDetailNodeEntity? defaultNextProcedure = null;
 
             // 有多工序分叉的情况
             if (processRouteDetailNodes.Count() > 1)
             {
+                // 随机工序Key
+                var cacheKey = $"{routeProcedureWithWorkOrderBo.WorkOrderId}-{routeProcedureWithWorkOrderBo.ProcessRouteId}-{routeProcedureWithWorkOrderBo.ProcedureId}";
+                var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
+
                 // 检查是否有"空值"类型的工序
                 defaultNextProcedure = processRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
@@ -866,6 +866,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 var deduct = new MaterialDeductBo
                 {
                     MaterialId = item.MaterialId,
+                    MaterialCode = materialEntitiy.MaterialCode,
                     Usages = item.Usages,
                     Loss = item.Loss,
                     DataCollectionWay = item.DataCollectionWay,
