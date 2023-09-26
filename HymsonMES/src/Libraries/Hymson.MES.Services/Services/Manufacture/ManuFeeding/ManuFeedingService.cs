@@ -274,7 +274,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
             else
             {
-                // TODO 从上料点获取物料ID
+                // 通过资源->上料点->物料
+                var loadPointMaterials = await _procLoadPointLinkMaterialRepository.GetByResourceIdAsync(queryDto.ResourceId);
+                if (loadPointMaterials != null && loadPointMaterials.Any())
+                {
+                    if (queryDto.FeedingPointId.HasValue)
+                    {
+                        loadPointMaterials = loadPointMaterials.Where(w => w.LoadPointId == queryDto.FeedingPointId.Value);
+                    }
+
+                    materialIds.AddRange(loadPointMaterials.Select(s => s.MaterialId).Distinct());
+                }
             }
 
             // 通过物料ID获取物料库存信息
