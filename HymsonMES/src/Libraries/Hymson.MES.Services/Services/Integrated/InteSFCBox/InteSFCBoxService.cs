@@ -165,7 +165,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                     UpdatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     Localtime = HymsonClock.Now(),
-                    SiteId = _currentSite.SiteId ?? 0,
+                    SiteId = _currentSite.SiteId ?? 123456,
                     IsDeleted = 0
 
                 }); 
