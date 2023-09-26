@@ -172,7 +172,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? FeedingPointId { get; set; }
 
         /// <summary>
-        /// 物料ID/产品ID
+        /// 主物料ID/产品ID（选中的主物料）
         /// </summary>
         public long? ProductId { get; set; }
 
@@ -182,7 +182,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string BarCode { get; set; }
 
         /// <summary>
-        /// 全部物料ID集合
+        /// 全部主物料ID集合
         /// </summary>
         public IEnumerable<long> MaterialIds { get; set; }
 

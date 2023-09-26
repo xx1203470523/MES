@@ -274,7 +274,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
             else
             {
-                // TODO
+                // TODO 从上料点获取物料ID
             }
 
             // 通过物料ID获取物料库存信息
