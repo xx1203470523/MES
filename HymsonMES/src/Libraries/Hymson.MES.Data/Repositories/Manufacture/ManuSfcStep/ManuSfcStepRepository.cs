@@ -281,7 +281,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetNGStepSql = @" select main.*  from manu_sfc_step_ng ng left join manu_sfc_step main on main.Id =ng.BarCodeStepId
                                         where main.ProcedureId in(select PP.Id from proc_procedure pp where pp.Code in('OP17','OP18'))
-                                        and ng.IsReplenish=0";
+                                        and ng.IsReplenish=0 order by main.UpdatedOn desc";
 
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";

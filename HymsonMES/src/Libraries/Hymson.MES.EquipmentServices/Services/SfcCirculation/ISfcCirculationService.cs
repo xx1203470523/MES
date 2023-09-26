@@ -82,7 +82,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync();
+        Task<CirculationModuleCCSInfoDto> GetReplenishNGDataAsync();
 
         /// <summary>
         /// CCS确认
