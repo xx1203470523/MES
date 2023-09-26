@@ -213,6 +213,26 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntityWithNullCheckAsync(IEnumerable<long> materialIds)
+        {
+            // 读取产品基础信息
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
+
+            // 如果数量不一致
+            if (materialIds.Count() > procMaterialEntities.Count())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17106));
+            }
+
+            return procMaterialEntities;
+        }
+
+        /// <summary>
         /// 获取工序基础信息（带空检查）
         /// </summary>
         /// <param name="procedureId"></param>
@@ -238,6 +258,26 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18107));
 
             return processRouteEntity;
+        }
+
+        /// <summary>
+        /// 获取工艺路线基础信息（带空检查）
+        /// </summary>
+        /// <param name="processRouteIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteEntity>> GetProcProcessRouteEntityWithNullCheckAsync(IEnumerable<long> processRouteIds)
+        {
+            // 读取当前工艺路线信息
+            var processRouteEntities = await _procProcessRouteRepository.GetByIdsAsync(processRouteIds)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18107));
+
+            // 如果数量不一致
+            if (processRouteIds.Count() > processRouteEntities.Count())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17106));
+            }
+
+            return processRouteEntities;
         }
 
         /// <summary>

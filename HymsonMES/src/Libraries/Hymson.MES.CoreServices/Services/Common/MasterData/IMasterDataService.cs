@@ -26,6 +26,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId);
 
         /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntityWithNullCheckAsync(IEnumerable<long> materialIds);
+
+        /// <summary>
         /// 获取工序基础信息（带空检查）
         /// </summary>
         /// <param name="procedureId"></param>

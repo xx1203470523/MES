@@ -311,7 +311,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             else
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                var rows = await _manuSfcProduceRepository.MultiUpdateRangeWithStatusCheckAsync(data.MultiUpdateProduceSFCCommand);
+                var rows = await _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities);
 
                 // 未更新到数据，事务回滚
                 if (rows <= 0)
@@ -496,6 +496,21 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     stepEntity.Operatetype = procProcessRouteEntity.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                     stepEntity.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
                 }
+                // 未完工
+                else
+                {
+                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+                    sfcProduceEntity.UpdatedBy = updatedBy;
+                    sfcProduceEntity.UpdatedOn = updatedOn;
+
+                    // 更新时间
+                    if (nextProcedure != null)
+                    {
+                        sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                        // 不置空的话，进站时，可能校验不通过
+                        sfcProduceEntity.ResourceId = null;
+                    }
+                }
 
                 // 如果超过复投次数
                 if (sfcProduceEntity.RepeatedCount > cycle)
@@ -504,6 +519,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 }
 
                 responseBo.SFCStepEntities.Add(stepEntity);
+                responseBo.SFCProduceEntities.Add(sfcProduceEntity);
             });
 
             responseBo.MultiUpdateSummaryOutStationCommands = updateSummaryOutStationCommands;
@@ -606,31 +622,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.DowngradingEntities = await _manuDegradedProductExtendService.GetManuDownGradingsAsync(degradedProductExtendBo);
             }
 
-            // 未完工（这么写仅仅是为了减少if-else的缩进）
-            if (!responseBo.IsCompleted)
-            {
-                // TODO 这里不能这么写了，因为每个条码的复投次数不一定相同
-                var multiUpdateProduceSFCCommand = new MultiUpdateProduceSFCCommand
-                {
-                    Ids = entities.Select(s => s.Id),
-                    ProcedureId = bo.ProcedureId,
-                    ResourceId = bo.ResourceId,
-                    Status = SfcStatusEnum.lineUp,
-                    RepeatedCount = firstSFCProduceEntity.RepeatedCount,
-                    UpdatedBy = updatedBy,
-                    UpdatedOn = updatedOn
-                };
-
-                // 更新时间
-                if (nextProcedure != null)
-                {
-                    multiUpdateProduceSFCCommand.ProcedureId = nextProcedure.Id;
-                    // 不置空的话，进站时，可能校验不通过
-                    multiUpdateProduceSFCCommand.ResourceId = null;
-                }
-
-                responseBo.MultiUpdateProduceSFCCommand = multiUpdateProduceSFCCommand;
-            }
+            // TODO 不合格工艺路线完成后需要转到生产主工艺路线
 
             return responseBo;
         }
@@ -727,7 +719,22 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (responseBo.IsCompleted)
                 {
                     stepEntity.Operatetype = procProcessRouteEntity.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                    stepEntity.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
+                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
+                }
+                // 未完工
+                else
+                {
+                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+                    sfcProduceEntity.UpdatedBy = updatedBy;
+                    sfcProduceEntity.UpdatedOn = updatedOn;
+
+                    // 更新时间
+                    if (nextProcedure != null)
+                    {
+                        sfcProduceEntity.ProcedureId = nextProcedure.Id;
+                        // 不置空的话，进站时，可能校验不通过
+                        sfcProduceEntity.ResourceId = null;
+                    }
                 }
 
                 // 如果超过复投次数
@@ -741,33 +748,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 }
 
                 responseBo.SFCStepEntities.Add(stepEntity);
+                responseBo.SFCProduceEntities.Add(sfcProduceEntity);
             });
-
-            // 未完工（这么写仅仅是为了减少if-else的缩进）
-            if (!responseBo.IsCompleted)
-            {
-                // TODO 这里不能这么写了，因为每个条码的复投次数不一定相同
-                var multiUpdateProduceSFCCommand = new MultiUpdateProduceSFCCommand
-                {
-                    Ids = entities.Select(s => s.Id),
-                    ProcedureId = bo.ProcedureId,
-                    ResourceId = bo.ResourceId,
-                    Status = SfcStatusEnum.lineUp,
-                    RepeatedCount = firstSFCProduceEntity.RepeatedCount,
-                    UpdatedBy = updatedBy,
-                    UpdatedOn = updatedOn
-                };
-
-                // 更新时间
-                if (nextProcedure != null)
-                {
-                    multiUpdateProduceSFCCommand.ProcedureId = nextProcedure.Id;
-                    // 不置空的话，进站时，可能校验不通过
-                    multiUpdateProduceSFCCommand.ResourceId = null;
-                }
-
-                responseBo.MultiUpdateProduceSFCCommand = multiUpdateProduceSFCCommand;
-            }
 
             // 记录出站不良记录（如果有传不合格代码）
             if (bo.OutStationUnqualifiedList != null && bo.OutStationUnqualifiedList.Any())

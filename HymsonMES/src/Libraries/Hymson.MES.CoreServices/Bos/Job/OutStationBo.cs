@@ -131,7 +131,14 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
+        public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
+
+        /*
+        /// <summary>
+        /// 
+        /// </summary>
         public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
+        */
 
         /// <summary>
         /// 
