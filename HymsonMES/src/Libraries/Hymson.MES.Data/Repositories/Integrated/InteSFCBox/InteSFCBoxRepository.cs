@@ -188,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
             ) LIMIT @Offset,@Rows ";
         const string GetBoxCodeCountSqlTemplate = @"SELECT COUNT(*) FROM (SELECT DISTINCT BoxCode FROM manu_sfc_box msb  /**where**/ ) as subquery";
 
-        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),4)*10000-ROUND(min(OCVB),4)*10000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BoxCode FROM `manu_sfc_box`  WHERE BoxCode IN @BoxCodes group  by BoxCode";
+        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BoxCode FROM `manu_sfc_box`  WHERE BoxCode IN @BoxCodes group  by BoxCode";
 
         const string GetWorkOrderIdSql = @"select  * from manu_sfc_box_workorder where WorkOrderId =@WorkOrderId";
 

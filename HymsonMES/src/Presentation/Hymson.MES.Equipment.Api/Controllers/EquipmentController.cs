@@ -652,9 +652,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetReplenishNGData")]
-        public async Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync(string sfc)
+        [ProducesResponseType(typeof(CirculationModuleCCSInfoDto), 200)]
+        public async Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync()
         {
-            return await _sfcCirculationService.GetReplenishNGDataAsync(sfc);
+            return await _sfcCirculationService.GetReplenishNGDataAsync();
         }
 
         /// <summary>

@@ -110,7 +110,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GetNgStepAsync(string sfc);
+        Task<IEnumerable<ManuSfcStepEntity>> GetNgStepAsync();
 
         /// <summary>
         /// 分页查询 根据SFC

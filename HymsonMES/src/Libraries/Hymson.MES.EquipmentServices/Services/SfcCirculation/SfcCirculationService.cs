@@ -709,15 +709,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcquery"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync(string sfcquery)
+        public async Task<IEnumerable<CirculationModuleCCSInfoDto>> GetReplenishNGDataAsync()
         {
 
-            if (string.IsNullOrEmpty(sfcquery))
-            {
-
-            }
             //获取NG数据 步骤NG表
-            var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync(sfcquery);
+            var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync();
 
             var sfcList = sfcSteps.Select(x => x.SFC).Distinct().ToArray();
 

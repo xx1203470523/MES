@@ -39,7 +39,7 @@ namespace Hymson.MES.EquipmentServicesTests.Services.PDA
         public async Task GetReplenishNGDataTest()
         {
             string sfc = string.Empty;
-            await _sfcCirculationService.GetReplenishNGDataAsync(sfc);
+            await _sfcCirculationService.GetReplenishNGDataAsync();
             Assert.IsTrue(true);
         }
 

@@ -205,11 +205,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GetNgStepAsync(string sfc)
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetNgStepAsync()
         {
             //sfc预留
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetNGStepSql, sfc);
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetNGStepSql);
             return manuSfcStepEntities;
 
         }
