@@ -162,9 +162,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuFeedingMaterialSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 物料ID
+        /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 物料加载来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 上料点ID

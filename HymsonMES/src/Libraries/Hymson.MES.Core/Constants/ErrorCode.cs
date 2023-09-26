@@ -700,6 +700,7 @@
         // MES15502-MES15503 已被占用
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
+        public const string MES15506 = "该条码与选定的物料不匹配！";
         #endregion
 
         #region 工单 16000
