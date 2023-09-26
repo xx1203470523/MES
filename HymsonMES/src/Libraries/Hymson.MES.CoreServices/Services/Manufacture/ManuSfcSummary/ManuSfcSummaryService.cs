@@ -3,21 +3,21 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Hymson.WaterMark;
-using System.Collections.Generic;
-using System.Security.Policy;
+using IdGen;
+using Microsoft.VisualBasic;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
 {
     public class ManuSfcSummaryService : IManuSfcSummaryService
     {
-        public readonly IWaterMarkRepository _waterMarkRepository;
+        public readonly IWaterMarkService _waterMarkService;
         public readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
@@ -38,12 +38,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
         /// 生产统计表
         /// </summary>
         /// <param name="waterMarkRepository"></param>
-        public ManuSfcSummaryService(IWaterMarkRepository waterMarkRepository,
+        public ManuSfcSummaryService(IWaterMarkService waterMarkService,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository)
         {
-            _waterMarkRepository = waterMarkRepository;
+            _waterMarkService = waterMarkService;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
@@ -55,23 +55,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
         /// <returns></returns>
         public async Task ExecutStatisticAsync(string userId, long siteId)
         {
-            var waterMarkEntity = await _waterMarkRepository.GetByBusinessKeyAsync(BusinessKey.ManuSfcSummaryBusinessKey);
-            long startwaterMarkId = 0;
-            if (waterMarkEntity != null)
-            {
-                startwaterMarkId = waterMarkEntity.WaterLevel;
-            }
+            var startwaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.ManuSfcSummaryBusinessKey);
 
             //获取步骤表数据
             var manuSfcStepList = await _manuSfcStepRepository.GeListtByStartwaterMarkIdAsync(new ManuSfcStepStatisticQuery
             {
                 SiteId = siteId,
                 StartwaterMarkId = startwaterMarkId,
-                Rows = 1000
+                Rows = 500
             });
+
             if (manuSfcStepList != null && manuSfcStepList.Any())
             {
-                var manuSfcSummaryLastList = await _manuSfcSummaryRepository.GetyLastListBySfsAsync(new LastManuSfcSummaryBySfcsQuery
+                //条码工序统计最后一条数据
+                var manuSfcSummaryProcedureLastList = await _manuSfcSummaryRepository.GetyLastListByProcedureIdsAndSfcsAsync(new LastManuSfcSummaryByProcedureIdAndSfcsQuery
                 {
                     Sfcs = manuSfcStepList.Select(x => x.SFC),
                     SiteId = siteId
@@ -81,20 +78,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                 var manuProductBadRecordList = await _manuProductBadRecordRepository.GetBySfcStepIdsAsync(manuSfcStepList.Select(x => x.Id));
                 //复判列表
                 var reJudgmentSfcStepIdsProductBadRecordList = await _manuProductBadRecordRepository.GetByReJudgmentSfcStepIdsAsync(manuSfcStepList.Select(x => x.Id));
-               //报废列表
+                //报废列表
                 var manuSfcScrapList = await _manuSfcScrapRepository.GetByStepIdsAsync(manuSfcStepList.Select(x => x.Id));
+                //获取取消报废的列表
+                var cancelManuSfcScrapList = await _manuSfcScrapRepository.GetByCancelSfcStepIdsAsync(manuSfcStepList.Select(x => x.Id));
 
-                List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
-                List<MultiUpdateSummaryOutStationCommand> multiUpdateSummaryOutStationCommands = new();
-                List<MultiUpdateSummaryUnqualifiedCommand> multiUpdateSummaryUnqualifiedCommands = new();
-                List<MultiUpdateSummaryReJudgmentUnqualifiedCommand> updateSummaryReJudgmentUnqualifiedCommands = new();
-                List<MultiUpdateSummaryReJudgmentQualifiedCommand> updateSummaryReJudgmentQualifiedCommands = new();
+                List<ManuSfcSummaryEntity> addManuSfcSummaryList = new List<ManuSfcSummaryEntity>();
+                List<ManuSfcSummaryEntity> updateManuSfcSummaryList = new List<ManuSfcSummaryEntity>();
                 var groupManuSfcStepList = manuSfcStepList.GroupBy(x => x.SFC);
                 foreach (var groupItem in groupManuSfcStepList)
                 {
-                    var lastSfcSummary = manuSfcSummaryLastList.FirstOrDefault(x => x.SFC == groupItem.Key);
                     foreach (var item in groupItem)
                     {
+                        var lastmanuSfcSummary = addManuSfcSummaryList.OrderBy(x => x.StartOn).FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == item.ProcedureId);
+                        if (lastmanuSfcSummary != null)
+                        {
+                            lastmanuSfcSummary = manuSfcSummaryProcedureLastList.FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == item.ProcedureId);
+                        }
                         switch (item.Operatetype)
                         {
                             case ManuSfcStepTypeEnum.Create:
@@ -102,7 +102,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                             case ManuSfcStepTypeEnum.Receive:
                                 break;
                             case ManuSfcStepTypeEnum.InStock:
-                                lastSfcSummary = new ManuSfcSummaryEntity
+                                var sfcSummary = new ManuSfcSummaryEntity
                                 {
                                     SiteId = item.SiteId,
                                     SFC = item.SFC,
@@ -118,30 +118,26 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                                     UpdatedOn = HymsonClock.Now()
                                 };
                                 //进站新建统计表
-                                manuSfcSummaryList.Add(lastSfcSummary);
+                                addManuSfcSummaryList.Add(sfcSummary);
                                 break;
                             case ManuSfcStepTypeEnum.OutStock:
-                                if (lastSfcSummary != null)
+                                if (lastmanuSfcSummary != null)
                                 {
-                                    var multiUpdateSummaryOutStationCommand = new MultiUpdateSummaryOutStationCommand
-                                    {
-                                        Id = lastSfcSummary.Id,
-                                        OutputQty = item.Qty,
-                                        EndOn = item.CreatedOn,
-                                        UpdatedBy = userId
-                                    };
+                                    lastmanuSfcSummary.UpdatedBy = userId;
+                                    lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                    lastmanuSfcSummary.OutputQty = item.Qty;
+                                    lastmanuSfcSummary.EndOn = item.CreatedOn;
                                     var manusfcProductBadRecords = manuProductBadRecordList.Where(x => x.SfcStepId == item.Id);
                                     if (manusfcProductBadRecords != null && manusfcProductBadRecords.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.WaitingJudge))
                                     {
-                                        multiUpdateSummaryOutStationCommand.IsJudgment = true;
+                                        lastmanuSfcSummary.IsJudgment = true;
                                     }
-                                    multiUpdateSummaryOutStationCommands.Add(multiUpdateSummaryOutStationCommand);
+                                    updateManuSfcSummaryList.Add(lastmanuSfcSummary);
                                 }
                                 else
                                 {
                                     //步骤控制处理的暂不处理
                                 }
-                                lastSfcSummary = null;
                                 break;
                             case ManuSfcStepTypeEnum.FutureLock:
                                 break;
@@ -158,60 +154,53 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                                                                                                          x.DisposalResult == ProductBadDisposalResultEnum.scrap);
                                     if (manuProductBadRecord != null)
                                     {
-                                        long lastSfcSummaryId = 0;
-
-                                        if (item.ProcedureId != manuProductBadRecord.FoundBadOperationId && item.CurrentStatus == SfcStatusEnum.Activity)
+                                        if (item.ProcedureId == manuProductBadRecord.FoundBadOperationId && item.CurrentStatus == SfcStatusEnum.Activity)
                                         {
-                                            if (lastSfcSummary != null)
+                                            if (lastmanuSfcSummary != null)
                                             {
-                                                //完成当前工序
-                                                multiUpdateSummaryOutStationCommands.Add(new MultiUpdateSummaryOutStationCommand
-                                                {
-                                                    Id = lastSfcSummary.Id,
-                                                    OutputQty = item.Qty,
-                                                    IsJudgment = true,
-                                                    EndOn = item.CreatedOn,
-                                                    UpdatedBy = userId
-                                                });
+                                                lastmanuSfcSummary.UpdatedBy = userId;
+                                                lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                                lastmanuSfcSummary.OutputQty = item.Qty;
+                                                lastmanuSfcSummary.UnqualifiedQty = item.Qty;
+                                                lastmanuSfcSummary.EndOn = item.CreatedOn;
+                                                updateManuSfcSummaryList.Add(lastmanuSfcSummary);
                                             }
                                             else
                                             {
                                                 //步骤控制处理的暂不处理
                                             }
                                         }
-
-                                        if (item.ProcedureId == manuProductBadRecord.FoundBadOperationId && item.CurrentStatus == SfcStatusEnum.Activity)
-                                        {
-                                            if (lastSfcSummary != null)
-                                            {
-                                                lastSfcSummaryId = lastSfcSummary.Id;
-                                            }
-                                        }
                                         else
                                         {
-                                            //找到报废工序记录数据
-                                            var lastProcedureSfcSummary = await _manuSfcSummaryRepository.GetyLastListByProcedureIdsAndSfcsAsync(new LastManuSfcSummaryByProcedureIdAndSfcQuery
+                                            //条码状态为活动中，记录不良存在报废或者返修，即判定当前条码是不良的，当时报废工序和当前工序不一样， 即需要更新当前产出
+                                            if (item.ProcedureId != manuProductBadRecord.FoundBadOperationId && item.CurrentStatus == SfcStatusEnum.Activity)
                                             {
-                                                ProcedureId = manuProductBadRecord.FoundBadOperationId,
-                                                Sfc = item.SFC,
-                                                SiteId = item.SiteId
-                                            });
-
-                                            if (lastProcedureSfcSummary != null)
+                                                if (lastmanuSfcSummary != null)
+                                                {
+                                                    lastmanuSfcSummary.UpdatedBy = userId;
+                                                    lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                                    lastmanuSfcSummary.OutputQty = item.Qty;
+                                                    lastmanuSfcSummary.EndOn = item.CreatedOn;
+                                                    updateManuSfcSummaryList.Add(lastmanuSfcSummary);
+                                                }
+                                                else
+                                                {
+                                                    //步骤控制处理的暂不处理
+                                                }
+                                            }
+                                            var badEntryLastmanuSfcSummary = addManuSfcSummaryList.OrderBy(x => x.StartOn).FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == manuProductBadRecord.FoundBadOperationId);
+                                            if (badEntryLastmanuSfcSummary != null)
                                             {
-                                                lastSfcSummaryId = lastProcedureSfcSummary.Id;
+                                                badEntryLastmanuSfcSummary = manuSfcSummaryProcedureLastList.FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == manuProductBadRecord.FoundBadOperationId);
+                                            }
+                                            if (badEntryLastmanuSfcSummary != null)
+                                            {
+                                                badEntryLastmanuSfcSummary.UpdatedBy = userId;
+                                                badEntryLastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                                badEntryLastmanuSfcSummary.UnqualifiedQty = item.Qty;
+                                                updateManuSfcSummaryList.Add(badEntryLastmanuSfcSummary);
                                             }
                                         }
-
-                                        multiUpdateSummaryUnqualifiedCommands.Add(new MultiUpdateSummaryUnqualifiedCommand
-                                        {
-                                            Id = lastSfcSummaryId,
-                                            UnqualifiedQty = item.Qty,
-                                            EndOn = item.CreatedOn,
-                                            UpdatedBy = userId
-                                        });
-
-                                        lastSfcSummary = null;
                                     }
                                 }
                                 break;
@@ -219,63 +208,65 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                                 var manuSfcScrap = manuSfcScrapList.FirstOrDefault(x => x.SfcStepId == item.Id && x.SFC == item.SFC);
                                 if (manuSfcScrap != null)
                                 {
-                                    long lastSfcSummaryId = 0;
-
-                                    if (item.ProcedureId != manuSfcScrap.ProcedureId && item.CurrentStatus == SfcStatusEnum.Activity)
+                                    if (item.ProcedureId == manuSfcScrap.ProcedureId && item.CurrentStatus == SfcStatusEnum.Activity)
                                     {
-                                        if (lastSfcSummary != null)
+                                        if (lastmanuSfcSummary != null)
                                         {
-                                            //完成当前工序
-                                            multiUpdateSummaryOutStationCommands.Add(new MultiUpdateSummaryOutStationCommand
-                                            {
-                                                Id = lastSfcSummary.Id,
-                                                OutputQty = item.Qty,
-                                                IsJudgment = true,
-                                                EndOn = item.CreatedOn,
-                                                UpdatedBy = userId
-                                            });
+                                            lastmanuSfcSummary.UpdatedBy = userId;
+                                            lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                            lastmanuSfcSummary.OutputQty = item.Qty;
+                                            lastmanuSfcSummary.UnqualifiedQty = item.Qty;
+                                            updateManuSfcSummaryList.Add(lastmanuSfcSummary);
                                         }
                                         else
                                         {
                                             //步骤控制处理的暂不处理
                                         }
                                     }
-
-                                    if (item.ProcedureId == manuSfcScrap.ProcedureId && item.CurrentStatus == SfcStatusEnum.Activity)
-                                    {
-                                        if (lastSfcSummary != null)
-                                        {
-                                            lastSfcSummaryId = lastSfcSummary.Id;
-                                        }
-                                    }
                                     else
                                     {
-                                        //找到报废工序记录数据
-                                        var lastProcedureSfcSummary = await _manuSfcSummaryRepository.GetyLastListByProcedureIdsAndSfcsAsync(new LastManuSfcSummaryByProcedureIdAndSfcQuery
+                                        //条码状态为活动中，记录不良存在报废或者返修，即判定当前条码是不良的，当时报废工序和当前工序不一样， 即需要更新当前产出
+                                        if (item.ProcedureId != manuSfcScrap.ProcedureId && item.CurrentStatus == SfcStatusEnum.Activity)
                                         {
-                                            ProcedureId = manuSfcScrap.ProcedureId ?? 0,
-                                            Sfc = item.SFC,
-                                            SiteId = item.SiteId
-                                        });
-
-                                        if (lastProcedureSfcSummary != null)
+                                            if (lastmanuSfcSummary != null)
+                                            {
+                                                lastmanuSfcSummary.UpdatedBy = userId;
+                                                lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                                lastmanuSfcSummary.OutputQty = item.Qty;
+                                                lastmanuSfcSummary.EndOn = HymsonClock.Now();
+                                                updateManuSfcSummaryList.Add(lastmanuSfcSummary);
+                                            }
+                                            else
+                                            {
+                                                //步骤控制处理的暂不处理
+                                            }
+                                        }
+                                        var badEntryLastmanuSfcSummary = addManuSfcSummaryList.OrderBy(x => x.StartOn).FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == manuSfcScrap.ProcedureId);
+                                        if (badEntryLastmanuSfcSummary != null)
                                         {
-                                            lastSfcSummaryId = lastProcedureSfcSummary.Id;
+                                            badEntryLastmanuSfcSummary = manuSfcSummaryProcedureLastList.FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == manuSfcScrap.ProcedureId);
+                                        }
+                                        if (badEntryLastmanuSfcSummary != null)
+                                        {
+                                            badEntryLastmanuSfcSummary.UpdatedBy = userId;
+                                            badEntryLastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                            badEntryLastmanuSfcSummary.UnqualifiedQty = item.Qty;
+                                            updateManuSfcSummaryList.Add(badEntryLastmanuSfcSummary);
                                         }
                                     }
-
-                                    multiUpdateSummaryUnqualifiedCommands.Add(new MultiUpdateSummaryUnqualifiedCommand
-                                    {
-                                        Id = lastSfcSummaryId,
-                                        UnqualifiedQty = item.Qty,
-                                        EndOn = item.CreatedOn,
-                                        UpdatedBy = userId
-                                    });
-                                    lastSfcSummary = null;
                                 }
                                 break;
                             case ManuSfcStepTypeEnum.Stop:
-                                //汇总异常处理
+                                if (lastmanuSfcSummary != null)
+                                {
+                                    lastmanuSfcSummary.InvestQty = 0;
+                                    lastmanuSfcSummary.UnqualifiedQty = 0;
+                                    lastmanuSfcSummary.OutputQty = 0;
+                                    lastmanuSfcSummary.EndOn = item.CreatedOn;
+                                    lastmanuSfcSummary.UpdatedBy = userId;
+                                    lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                    updateManuSfcSummaryList.Add(lastmanuSfcSummary);
+                                }
                                 break;
                             case ManuSfcStepTypeEnum.BadRejudgment:
                                 //复判暂定一个工序的异常
@@ -283,33 +274,81 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                                 (x.ReJudgmentResult == ProductBadDisposalResultEnum.repair || x.ReJudgmentResult == ProductBadDisposalResultEnum.scrap));
                                 if (reJudgmentSfcStepIdsProductBadRecord != null)
                                 {
-                                    //找到工序统计记录数据
-                                    var lastProcedureSfcSummary = await _manuSfcSummaryRepository.GetyLastListByProcedureIdsAndSfcsAsync(new LastManuSfcSummaryByProcedureIdAndSfcQuery
+                                    var badRejudgmentLastmanuSfcSummary = addManuSfcSummaryList.OrderBy(x => x.StartOn).FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == reJudgmentSfcStepIdsProductBadRecord.FoundBadOperationId);
+                                    if (badRejudgmentLastmanuSfcSummary != null)
                                     {
-                                        ProcedureId = reJudgmentSfcStepIdsProductBadRecord.FoundBadOperationId,
-                                        Sfc = item.SFC,
-                                        SiteId = item.SiteId
-                                    });
+                                        badRejudgmentLastmanuSfcSummary = manuSfcSummaryProcedureLastList.FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == reJudgmentSfcStepIdsProductBadRecord.FoundBadOperationId);
+                                    }
+                                    if (badRejudgmentLastmanuSfcSummary != null)
+                                    {
+                                        badRejudgmentLastmanuSfcSummary.UnqualifiedQty = item.Qty;
+                                        badRejudgmentLastmanuSfcSummary.JudgmentOn = item.CreatedOn;
+                                        badRejudgmentLastmanuSfcSummary.UpdatedBy = userId;
+                                        badRejudgmentLastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                        updateManuSfcSummaryList.Add(badRejudgmentLastmanuSfcSummary);
+                                    }
+
                                 }
                                 else
                                 {
-
+                                    reJudgmentSfcStepIdsProductBadRecord = reJudgmentSfcStepIdsProductBadRecordList.FirstOrDefault();
+                                    if (reJudgmentSfcStepIdsProductBadRecord != null)
+                                    {
+                                        var badRejudgmentLastmanuSfcSummary = addManuSfcSummaryList.OrderBy(x => x.StartOn).FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == reJudgmentSfcStepIdsProductBadRecord.FoundBadOperationId);
+                                        if (badRejudgmentLastmanuSfcSummary != null)
+                                        {
+                                            badRejudgmentLastmanuSfcSummary = manuSfcSummaryProcedureLastList.FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == reJudgmentSfcStepIdsProductBadRecord.FoundBadOperationId);
+                                        }
+                                        if (badRejudgmentLastmanuSfcSummary != null)
+                                        {
+                                            badRejudgmentLastmanuSfcSummary.JudgmentOn = item.CreatedOn;
+                                            badRejudgmentLastmanuSfcSummary.UpdatedBy = userId;
+                                            badRejudgmentLastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                            updateManuSfcSummaryList.Add(badRejudgmentLastmanuSfcSummary);
+                                        }
+                                    }
                                 }
                                 break;
                             case ManuSfcStepTypeEnum.Change:
-                                if (lastSfcSummary != null)
+                                if (lastmanuSfcSummary != null)
                                 {
-                                    //这个怎么记录
-                                    multiUpdateSummaryOutStationCommands.Add(new MultiUpdateSummaryOutStationCommand
-                                    {
-                                        Id = lastSfcSummary.Id,
-                                        OutputQty = 0,
-                                        EndOn = item.CreatedOn,
-                                        UpdatedBy = userId
-                                    });
+                                    lastmanuSfcSummary.OutputQty = 0;
+                                    lastmanuSfcSummary.EndOn = item.CreatedOn;
+                                    lastmanuSfcSummary.UpdatedBy = userId;
+                                    lastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                    updateManuSfcSummaryList.Add(lastmanuSfcSummary);
                                 }
                                 break;
                             case ManuSfcStepTypeEnum.CancelDiscard:
+                                var cancelManuSfcScrap = cancelManuSfcScrapList.FirstOrDefault(x => x.CancelSfcStepId == item.Id);
+                                if (cancelManuSfcScrap != null)
+                                {
+                                    if (cancelManuSfcScrap.ProcedureId.HasValue)
+                                    {
+                                        var cancelDiscardLastmanuSfcSummary = addManuSfcSummaryList.OrderBy(x => x.StartOn).FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == cancelManuSfcScrap.ProcedureId);
+                                        if (cancelDiscardLastmanuSfcSummary != null)
+                                        {
+                                            cancelDiscardLastmanuSfcSummary = manuSfcSummaryProcedureLastList.FirstOrDefault(x => x.SFC == groupItem.Key && x.ProcedureId == cancelManuSfcScrap.ProcedureId);
+                                        }
+                                        if (cancelDiscardLastmanuSfcSummary != null)
+                                        {
+                                            var stepEntity = await _manuSfcStepRepository.GetByIdAsync(cancelManuSfcScrap.SfcStepId);
+                                            if (stepEntity.CurrentStatus == SfcStatusEnum.Activity)
+                                            {
+                                                cancelDiscardLastmanuSfcSummary.UnqualifiedQty = 0;
+                                                cancelDiscardLastmanuSfcSummary.EndOn = null;
+                                                cancelDiscardLastmanuSfcSummary.OutputQty = 0;
+                                            }
+                                            else
+                                            {
+                                                cancelDiscardLastmanuSfcSummary.UnqualifiedQty = 0;
+                                            }
+                                            cancelDiscardLastmanuSfcSummary.UpdatedBy = userId;
+                                            cancelDiscardLastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
+                                            updateManuSfcSummaryList.Add(cancelDiscardLastmanuSfcSummary);
+                                        }
+                                    }
+                                }
                                 break;
                             case ManuSfcStepTypeEnum.CloseIdentification:
                                 break;
@@ -344,6 +383,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                         }
                     }
                 }
+                using var trans = TransactionHelper.GetTransactionScope();
+                await _manuSfcSummaryRepository.InsertRangeAsync(addManuSfcSummaryList);
+                await _manuSfcSummaryRepository.UpdateRangeAsync(updateManuSfcSummaryList);
+                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.ManuSfcSummaryBusinessKey, manuSfcStepList.Max(x => x.Id));
+                trans.Complete();
             }
         }
     }

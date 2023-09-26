@@ -619,7 +619,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcList = await sfcListTask;
             var sfcProduceBusinesssList = await sfcProduceBusinesssListTask;
 
-            if (sfcListTask == null || !sfcList.Any())
+            if (sfcList == null || !sfcList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15309));
             }
@@ -674,6 +674,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var sfcStepList = new List<ManuSfcStepEntity>();
             var sfcProduceBusinessList = new List<ManuSfcProduceBusinessEntity>();
             var sfcStepBusinessList = new List<MaunSfcStepBusinessEntity>();
+            List<ManuSfcUpdateStatusByIdCommand> manuSfcUpdateStatusByIdCommands = new();
             foreach (var sfc in sfcList)
             {
                 SfcProduceLockBo sfcProduceLockBo = new SfcProduceLockBo()
@@ -722,6 +723,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     CreatedBy = sfc.CreatedBy,
                     UpdatedBy = sfc.UpdatedBy
                 });
+
+                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                {
+                    Id = sfc.SFCId,
+                    CurrentStatus = sfc.Status,
+                    Status = SfcStatusEnum.Locked,
+                    UpdatedBy = _currentUser.UserName
+                });
             }
             #endregion
 
@@ -732,13 +741,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //插入业务表
                     await _manuSfcProduceRepository.InsertOrUpdateSfcProduceBusinessRangeAsync(sfcProduceBusinessList);
                 }
-
+                //条码状态修改
+                var row = await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
+                if (row != manuSfcUpdateStatusByIdCommands.Count)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15426));
+                }
                 //插入操作数据
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
 
                 //插入步骤业务表
                 await _manuSfcStepRepository.InsertSfcStepBusinessRangeAsync(sfcStepBusinessList);
 
+                //修改在制品表状态
                 await _manuSfcProduceRepository.LockedSfcProcedureAsync(new LockedProcedureCommand
                 {
                     SiteId = _currentSite.SiteId ?? 0,
@@ -822,6 +837,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             3.取消锁定：产品条码已经是锁定状态：将条码更新到锁定前状态
            指定将来锁定工序，且条码还没流转到指定工序：关闭将来锁定的工序指定，即取消将来锁定*/
             var sfcStepList = new List<ManuSfcStepEntity>();
+            List<ManuSfcUpdateStatusByIdCommand> manuSfcUpdateStatusByIdCommands = new();
             var unLockList = new List<long>();
             #region  组装数据
             foreach (var sfc in sfcList)
@@ -846,6 +862,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 };
                 sfcStepList.Add(stepEntity);
                 unLockList.Add(sfc.Id);
+                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                {
+                    Id = sfc.SFCId,
+                    CurrentStatus = sfc.Status,
+                    Status = sfc.BeforeLockedStatus ?? sfc.Status,
+                    UpdatedBy = _currentUser.UserName
+                });
             }
             #endregion
 
@@ -859,6 +882,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     await _manuSfcProduceRepository.DeleteSfcProduceBusinesssAsync(new DeleteSfcProduceBusinesssCommand { SfcInfoIds = unLockList, BusinessType = ManuSfcProduceBusinessType.Lock });
                 }
 
+                //条码状态修改
+                var row = await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
+                if (row != manuSfcUpdateStatusByIdCommands.Count)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15426));
+                }
                 await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
                 {
                     SiteId = _currentSite.SiteId ?? 0,

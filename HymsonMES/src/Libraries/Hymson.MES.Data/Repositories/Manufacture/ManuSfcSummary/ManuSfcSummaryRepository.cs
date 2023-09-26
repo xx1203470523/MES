@@ -169,10 +169,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<ManuSfcSummaryEntity> GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcQuery query)
+        public async Task< IEnumerable<ManuSfcSummaryEntity> > GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcsQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcSummaryEntity>(GetMaxTimeByProcedureIdsAndSfcsSql, query);
+            return await conn.QueryAsync<ManuSfcSummaryEntity>(GetMaxTimeByProcedureIdsAndSfcsSql, query);
         }
 
         /// <summary>
@@ -246,6 +246,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 	        ) T2 ON T1.SFC = T2.SFC AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs  AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
         const string GetMaxTimeByProcedureIdsAndSfcsSql = @"SELECT T1.* FROM manu_sfc_summary T1 LEFT JOIN (
 			SELECT ProductId, SFC, MAX(UpdatedOn) AS MaxUpdatedOn FROM manu_sfc_summary GROUP BY SFC,ProductId
-	        ) T2 ON T1.SFC = T2.SFC ANDT1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC = @Sfc AND T1.ProductId = @ProductId  AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
+	        ) T2 ON T1.SFC = T2.SFC ANDT1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
     }
 }

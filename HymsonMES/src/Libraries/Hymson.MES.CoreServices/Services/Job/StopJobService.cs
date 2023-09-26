@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Hymson.EventBus.Abstractions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -8,11 +7,11 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -40,9 +39,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
-        /// 事件总线
+        /// 仓储接口（条码信息）
         /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 构造函数
@@ -53,13 +57,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="eventBus"></param>
         public StopJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            ILocalizationService localizationService,
-            IEventBus<EventBusInstance1> eventBus)
+            ILocalizationService localizationService, IManuSfcRepository manuSfcRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _localizationService = localizationService;
-            _eventBus = eventBus;
+            _manuSfcRepository= manuSfcRepository;
+            _manuSfcStepRepository= manuSfcStepRepository;
         }
 
 
@@ -120,7 +124,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新时间
             var updatedBy = bo.UserName;
             var updatedOn = HymsonClock.Now();
-
             responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
                 // 更改状态，将条码由"活动"改为"排队"
@@ -149,8 +152,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
                 });
+                responseBo.InStationManuSfcByIdCommands.Add(new InStationManuSfcByIdCommand
+                {
+                    Id = sfcProduceEntity.SFCId,
+                    Status = SfcStatusEnum.Activity,
+                    IsUsed = YesOrNoEnum.Yes,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
             });
-
             return responseBo;
         }
 
@@ -166,12 +176,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 更新数据
             List<Task<int>> tasks = new();
+            //更新条码表 状态为排队
+            var multiUpdateSfcIsUsedTask = _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands);
+            tasks.Add(multiUpdateSfcIsUsedTask);
 
-            /*
+
             var insertRangeTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
             tasks.Add(insertRangeTask);
-            */
-            _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SFCStepEntities });
 
             var updateRangeTask = _manuSfcProduceRepository.UpdateRangeAsync(data.SFCProduceEntities);
             tasks.Add(updateRangeTask);

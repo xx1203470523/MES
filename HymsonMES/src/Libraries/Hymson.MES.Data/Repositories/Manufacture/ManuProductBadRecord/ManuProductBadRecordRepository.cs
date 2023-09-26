@@ -478,7 +478,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_product_bad_record`  WHERE ReJudgmentSfcStepId IN @ReJudgmentSfcStepIds ";
 
-        const string UpdateStatusSql = @"UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,ReJudgmentSfcStepId=@ReJudgmentSfcStepId,ReJudgmentResult=@ReJudgmentResult,ReJudgmentOn=@ReJudgmentOn,ReJudgmentBy=@ReJudgmentBy,CloseOn=@CloseOn,CloseBy=@CloseBy,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn ,ReJudgmentSfcStepId=@ReJudgmentSfcStepId 
+        const string UpdateStatusSql = @"UPDATE `manu_product_bad_record` SET Remark=@Remark,Status=@Status,ReJudgmentSfcStepId=@ReJudgmentSfcStepId,ReJudgmentResult=@ReJudgmentResult,ReJudgmentRemark=@ReJudgmentRemark,ReJudgmentOn=@ReJudgmentOn,ReJudgmentBy=@ReJudgmentBy,CloseOn=@CloseOn,CloseBy=@CloseBy,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn ,ReJudgmentSfcStepId=@ReJudgmentSfcStepId 
                                                 WHERE SFC=@Sfc  AND UnqualifiedId=@UnqualifiedId  and  Status=@CurrentStatus ";
 
         const string UpdateStatusByIdSql = "UPDATE `manu_product_bad_record` SET Remark = @Remark,Status=@Status,DisposalResult=@DisposalResult,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn WHERE Id=@Id  AND  Status!=@Status ";

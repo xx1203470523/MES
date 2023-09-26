@@ -9,7 +9,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query
     /// <summary>
     /// 查询工序条码最后数据
     /// </summary>
-    public  class LastManuSfcSummaryByProcedureIdAndSfcQuery
+    public  class LastManuSfcSummaryByProcedureIdAndSfcsQuery
     {
         /// <summary>
         /// 站点Id
@@ -19,11 +19,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query
         /// <summary>
         /// 条码集合
         /// </summary>
-        public string Sfc { get; set; }
-
-        /// <summary>
-        /// 工序id
-        /// </summary>
-        public long ProcedureId { get; set; }
+        public  IEnumerable<string>  Sfcs { get; set; }
     }
 }

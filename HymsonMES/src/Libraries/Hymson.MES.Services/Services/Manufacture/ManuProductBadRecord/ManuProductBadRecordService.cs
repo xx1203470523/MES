@@ -751,7 +751,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
         {
             if (string.IsNullOrWhiteSpace(badReJudgmentDto.Sfc)) throw new CustomerValidationException(nameof(ErrorCode.MES15400));
-            if (!badReJudgmentDto.UnqualifiedLists.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15405));
+            //if (!badReJudgmentDto.UnqualifiedLists.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15405));
 
             var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery
             {
@@ -828,23 +828,24 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var updateCommandList = new List<ManuProductBadRecordCommand>();
 
-            foreach (var unqualified in allunqualifiedIds)
+            foreach (var unqualified in badReJudgmentDto.UnqualifiedLists)
             {
                 var manuProductBadRecordCommand = new ManuProductBadRecordCommand
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     Sfc = badReJudgmentDto.Sfc,
-                    UnqualifiedId = unqualified,
+                    UnqualifiedId = unqualified.UnqualifiedId,
                     ReJudgmentSfcStepId = manuSfcStepEntity.Id,
-                    Remark = badReJudgmentDto.Remark ?? "",
                     CurrentStatus = ProductBadRecordStatusEnum.Open,
+                    Remark= badReJudgmentDto.Remark??"",
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
                     ReJudgmentBy = _currentUser.UserName,
+                    ReJudgmentRemark = unqualified.Remark,
                     ReJudgmentOn = HymsonClock.Now()
                 };
 
-                if (closeunqualifiedIds.Contains(unqualified))
+                if (closeunqualifiedIds.Contains(unqualified.UnqualifiedId))
                 {
                     manuProductBadRecordCommand.ReJudgmentSfcStepId = manuSfcStepEntity.Id;
                     manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Close;
@@ -864,10 +865,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (diffArr.Any())//为全部关闭不合格代码
             {
-                if (!badReJudgmentDto.BadProcessRouteId.HasValue || badReJudgmentDto.BadProcessRouteId == 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15408));
-                }
+                //if (!badReJudgmentDto.BadProcessRouteId.HasValue || badReJudgmentDto.BadProcessRouteId == 0)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES15408));
+                //}
 
                 var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
 
@@ -993,6 +994,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //修改条码状态 -排队 
                     var manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
                     {
+                        Id = manuSfcEntity.Id,
                         Status = SfcStatusEnum.lineUp,
                         CurrentStatus = manuSfcEntity.Status,
                         UpdatedOn = HymsonClock.Now(),

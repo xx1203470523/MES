@@ -109,7 +109,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 锁定前状态
         /// </summary>
-        public TrueOrFalseEnum BeforeLockedStatus { get; set; }
+        public SfcStatusEnum? BeforeLockedStatus { get; set; }
 
         /// <summary>
         /// 汇总表id

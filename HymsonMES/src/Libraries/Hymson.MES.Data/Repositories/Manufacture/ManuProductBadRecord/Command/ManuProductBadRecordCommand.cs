@@ -75,6 +75,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command
         public ProductBadDisposalResultEnum? ReJudgmentResult { get; set; }
 
         /// <summary>
+        /// 复判备注
+        /// </summary>
+        public string? ReJudgmentRemark { get; set; }
+
+        /// <summary>
         /// 复判步骤表id
         /// </summary>
         public long? ReJudgmentSfcStepId { get; set; }

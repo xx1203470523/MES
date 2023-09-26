@@ -55,14 +55,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateSummaryUnqualifiedRangeAsync(IEnumerable<MultiUpdateSummaryUnqualifiedCommand> multiUpdateSummaryUnqualifiedCommand);
 
         /// <summary>
-        /// 
+        /// 复判不合格
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> UpdateSummaryReJudgmentUnqualifiedRangeAsync(IEnumerable<MultiUpdateSummaryReJudgmentUnqualifiedCommand> commands);
 
         /// <summary>
-        /// 
+        /// 复判合格
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
@@ -109,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<ManuSfcSummaryEntity> GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcQuery query);
+        Task<IEnumerable<ManuSfcSummaryEntity>> GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcsQuery query);
 
         /// <summary>
         /// 获取List
