@@ -76,12 +76,12 @@
         public string ReceiveTime { get; set; } = "";
 
         /// <summary>
-        /// 评价时间
+        /// 处理时间
         /// </summary>
         public string EvaluateOn { get; set; } = "";
 
         /// <summary>
-        /// 评价人
+        /// 处理人
         /// </summary>
         public string EvaluateBy { get; set; } = "";
     }
