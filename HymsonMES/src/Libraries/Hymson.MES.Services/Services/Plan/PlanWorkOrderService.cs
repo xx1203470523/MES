@@ -210,7 +210,10 @@ namespace Hymson.MES.Services.Services.Plan
             var response = await _planWorkOrderRepository.InsertAsync(planWorkOrderEntity);
 
             //工单关联SFCbox信息保存
-            response = await _inteSFCBoxRepository.InsertSFCBoxWorkOrderAsync(boxCodeBindWorkOrder);
+            if (boxCodeBindWorkOrder != null && boxCodeBindWorkOrder.Count > 0)
+            {
+                await _inteSFCBoxRepository.InsertSFCBoxWorkOrderAsync(boxCodeBindWorkOrder);
+            }
 
 
             if (response == 0)
