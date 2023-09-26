@@ -402,17 +402,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 material = await GetMatchMaterialsByPointAsync(materials, bo);
             }
 
-            if (material == null)
-            {
-                if (saveDto.ProductId.HasValue)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15506));
-                }
-                else
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15505));
-                }
-            }
+            if (material == null) throw new CustomerValidationException(saveDto.ProductId.HasValue ? nameof(ErrorCode.MES15506) : nameof(ErrorCode.MES15505));
             entity.ProductId = material.Id;
 
             var rows = 0;
