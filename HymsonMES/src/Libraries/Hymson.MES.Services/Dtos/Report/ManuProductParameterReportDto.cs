@@ -1,4 +1,7 @@
-﻿using Hymson.Infrastructure;
+﻿using Confluent.Kafka;
+using Hymson.Infrastructure;
+using Mysqlx.Crud;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -96,6 +99,12 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 参数编码
         /// </summary>
         public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+
         /// <summary>
         /// 参数单位
         /// </summary>

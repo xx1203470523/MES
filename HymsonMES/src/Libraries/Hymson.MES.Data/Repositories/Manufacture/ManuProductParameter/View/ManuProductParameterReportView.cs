@@ -49,6 +49,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public string ParameterUnit { get; set; }
         /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string ParameterName { get; set; }
+        /// <summary>
         /// 参数值
         /// </summary>
         public string Paramvalue { get; set; }

@@ -143,7 +143,7 @@ namespace Hymson.MES.Services.Services.Report
                 return new ComUsageExportResultDto
                 {
                     FileName = _localizationService.GetResource("ComUsageReport"),
-                    Path = uploadResultN.RelativeUrl,
+                    Path = uploadResultN.AbsoluteUrl,
                 };
             }
 
@@ -181,7 +181,7 @@ namespace Hymson.MES.Services.Services.Report
             return new ComUsageExportResultDto
             {
                 FileName = _localizationService.GetResource("ComUsageReport"),
-                Path = uploadResult.RelativeUrl,
+                Path = uploadResult.AbsoluteUrl,
             };
         }
 
