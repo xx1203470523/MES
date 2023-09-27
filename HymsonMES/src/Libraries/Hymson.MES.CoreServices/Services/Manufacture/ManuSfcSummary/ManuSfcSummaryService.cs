@@ -404,6 +404,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                     IsJudgment = lastmanuSfcSummary.IsJudgment,
                     JudgmentOn = lastmanuSfcSummary.JudgmentOn,
                     Remark = lastmanuSfcSummary.Remark,
+                    LastUpdatedOn = lastmanuSfcSummary.LastUpdatedOn,
                     CreatedBy = lastmanuSfcSummary.CreatedBy,
                     CreatedOn = lastmanuSfcSummary.CreatedOn,
                     UpdatedBy = lastmanuSfcSummary.UpdatedBy,
