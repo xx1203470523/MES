@@ -137,18 +137,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
 
-            //（前提：这些条码都是同一工单同一工序）
-            var firstProduceEntity = sfcProduceEntities.FirstOrDefault();
-            if (firstProduceEntity == null) return;
-
             // 验证条码对应的物料ID是否和工单物料ID一致
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(firstProduceEntity.WorkOrderId)
-             ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
-
-            if (firstProduceEntity.ProductId == planWorkOrderEntity.ProductId)
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.WorkOrderId));
+            foreach (var sfcProduceEntity in sfcProduceEntities)
             {
-                // 结束
-                throw new CustomerValidationException(nameof(ErrorCode.MES18219));
+                var planWorkOrderEntity = planWorkOrderEntities.FirstOrDefault(f => f.Id == sfcProduceEntity.WorkOrderId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+
+                if (sfcProduceEntity.ProductId == planWorkOrderEntity.ProductId)
+                {
+                    // 结束
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18219));
+                }
             }
 
             // 判断条码状态是否是"完成"
