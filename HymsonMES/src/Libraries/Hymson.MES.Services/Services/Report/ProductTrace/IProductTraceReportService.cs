@@ -47,5 +47,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="procSfcProcessRoutePagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcSfcProcessRouteViewDto>> GetSfcProcessRoutePagedListAsync(ProcSfcProcessRoutePagedQueryDto procSfcProcessRoutePagedQueryDto);
+
+        /// <summary>
+        /// NG判定
+        /// </summary>
+        /// <param name="updateNGJudgeDto"></param>
+        /// <returns></returns>
+        Task UpdateNGJudgeAsync(UpdateNGJudgeDto updateNGJudgeDto);
     }
 }

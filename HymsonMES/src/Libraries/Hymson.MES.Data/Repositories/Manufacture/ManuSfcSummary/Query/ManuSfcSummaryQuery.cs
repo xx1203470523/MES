@@ -62,4 +62,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public DateTime? EndTime { get; set; }
     }
+
+    /// <summary>
+    /// ManuSfcSummaryQueryDto
+    /// </summary>
+    public class ManuSfcSummaryQueryDto
+    {
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int? QualityStatus { get; set; }
+    }
 }

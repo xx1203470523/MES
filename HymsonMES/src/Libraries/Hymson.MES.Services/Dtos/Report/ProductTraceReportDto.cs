@@ -288,6 +288,11 @@ namespace Hymson.MES.Services.Dtos.Report
     public record ManuSfcStepViewDto : BaseEntityDto
     {
         /// <summary>
+        /// step Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -393,6 +398,22 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public DateTime CreatedOn { get; set; }
     }
+
+    /// <summary>
+    /// UpdateNGJudgeDto
+    /// </summary>
+    public class UpdateNGJudgeDto
+    {
+        /// <summary>
+        /// StepId
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// NGJudgeType
+        /// </summary>
+        public int NGJudgeType { get; set; }
+    }
+    
     #endregion
 
     #region 生产工艺

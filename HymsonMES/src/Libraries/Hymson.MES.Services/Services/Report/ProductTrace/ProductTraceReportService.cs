@@ -1,7 +1,9 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
+﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -16,7 +18,10 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Globalization;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -30,6 +35,10 @@ namespace Hymson.MES.Services.Services.Report
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+        /// <summary>
+        /// 当前对象（登录用户）
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
         /// <summary>
         /// 物料维护 仓储
         /// </summary>
@@ -63,6 +72,15 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         /// <summary>
+        /// 条码记录仓储
+        /// </summary>
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+        /// <summary>
+        /// IManuNgJudgeRepository
+        /// </summary>
+        private readonly IManuNgJudgeRepository _manuNgJudgeRepository;
+
+        /// <summary>
         /// 生产工艺路线节点
         /// </summary>
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
@@ -76,7 +94,8 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IManuSfcRepository _manuSfcRepository;
 
         public ProductTraceReportService(ICurrentSite currentSite,
-         IProcMaterialRepository procMaterialRepository,
+            ICurrentUser currentUser,
+        IProcMaterialRepository procMaterialRepository,
          IPlanWorkOrderRepository planWorkOrderRepository,
          IManuSfcCirculationRepository manuSfcCirculationRepository,
          IProcResourceRepository procResourceRepository,
@@ -86,9 +105,12 @@ namespace Hymson.MES.Services.Services.Report
          IManuSfcStepRepository manuSfcStepRepository,
          IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
          IManuSfcInfoRepository manuSfcInfoRepository,
-         IManuSfcRepository manuSfcRepository)
+         IManuSfcRepository manuSfcRepository,
+         IManuSfcSummaryRepository manuSfcSummaryRepository,
+          IManuNgJudgeRepository manuNgJudgeRepository)
         {
             _currentSite = currentSite;
+            _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
@@ -100,6 +122,8 @@ namespace Hymson.MES.Services.Services.Report
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _manuNgJudgeRepository = manuNgJudgeRepository;
         }
         #endregion
 
@@ -468,6 +492,42 @@ namespace Hymson.MES.Services.Services.Report
                 return s.ToModel<ProductTracePlanWorkOrderViewDto>();
             });
             return new PagedInfo<ProductTracePlanWorkOrderViewDto>(productTracePlanWorkOrderViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// NG判定
+        /// </summary>
+        /// <param name="updateNGJudgeDto"></param>
+        /// <returns></returns>
+        public async Task UpdateNGJudgeAsync(UpdateNGJudgeDto updateNGJudgeDto)
+        {
+            var sfcStepEntity = await _manuSfcStepRepository.GetByIdAsync(updateNGJudgeDto.StepId);
+            sfcStepEntity.Passed = 1;
+            
+            var SFC = sfcStepEntity.SFC;
+            var longEquipmentId = sfcStepEntity.EquipmentId;
+            var manuSfcSummaryQueryDto = new ManuSfcSummaryQueryDto()
+            {
+                SFC = sfcStepEntity.SFC,
+                EquipmentId = sfcStepEntity.EquipmentId,
+                QualityStatus = 1
+            };
+            var manuSfcNgJudgeEntity = new ManuSfcNgJudgeEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = sfcStepEntity.SFC,
+                StepId = updateNGJudgeDto.StepId,
+                NGJudgeType = updateNGJudgeDto.NGJudgeType,
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName
+            };
+
+            using var ts = TransactionHelper.GetTransactionScope();
+            await _manuSfcStepRepository.UpdateAsync(sfcStepEntity);
+            await _manuSfcSummaryRepository.UpdateNGAsync(manuSfcSummaryQueryDto);
+            await _manuNgJudgeRepository.InsertAsync(manuSfcNgJudgeEntity);
+            ts.Complete();
         }
     }
 }

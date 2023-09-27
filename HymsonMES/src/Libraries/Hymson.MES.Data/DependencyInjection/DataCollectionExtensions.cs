@@ -215,6 +215,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcStepMaterialRepository, ManuSfcStepMaterialRepository>();
             services.AddSingleton<IManuSfcSummaryRepository, ManuSfcSummaryRepository>();
             services.AddSingleton<IManuSfcCcsNgRecordRepository, ManuSfcCcsNgRecordRepository>();
+
+            services.AddSingleton<IManuNgJudgeRepository, ManuNgJudgeRepository>();
+            
             #endregion
 
             #region Warehouse 

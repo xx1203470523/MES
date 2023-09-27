@@ -46,6 +46,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdatesAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys);
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="manuSfcSummaryEntity"></param>
+        /// <returns></returns>
+        Task<int> UpdateNGAsync(ManuSfcSummaryQueryDto manuSfcSummaryEntity);
+
+        /// <summary>
         /// 删除  
         /// 最好使用批量删除，可以设置更新人和更新时间
         /// </summary>

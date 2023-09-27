@@ -199,6 +199,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="manuSfcSummaryEntity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateNGAsync(ManuSfcSummaryQueryDto manuSfcSummaryEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateNGSql, manuSfcSummaryEntity);
+        }
+
+        /// <summary>
         /// 存在更新，不存在新增
         /// </summary>
         /// <param name="manuSfcSummaryEntitys"></param>
@@ -229,6 +240,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE `manu_sfc_summary` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, BeginTime = @BeginTime, EndTime = @EndTime, RepeatedCount = @RepeatedCount, Qty = @Qty, NgNum = @NgNum, FirstQualityStatus = @FirstQualityStatus, QualityStatus = @QualityStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc_summary` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, BeginTime = @BeginTime, EndTime = @EndTime, RepeatedCount = @RepeatedCount, Qty = @Qty, NgNum = @NgNum, FirstQualityStatus = @FirstQualityStatus, QualityStatus = @QualityStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateNGSql = "UPDATE `manu_sfc_summary` SET QualityStatus = @QualityStatus WHERE SFC = @SFC and  EquipmentId = @EquipmentId and IsDeleted = 0  ";
 
         const string DeleteSql = "UPDATE `manu_sfc_summary` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_summary` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
