@@ -14,7 +14,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query
         /// <summary>
         /// 站点Id
         /// </summary>
-        public long SiteId { get; set; }
+        //public long SiteId { get; set; }
 
         /// <summary>
         /// 条码集合

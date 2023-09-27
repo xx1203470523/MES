@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
+namespace Hymson.MES.BackgroundServices.Manufacture.Productionstatistic
 {
-    public interface IManuSfcSummaryService
+    public interface IProductionstatisticService
     {
-
         /// <summary>
-        /// 执行生产统计
+        /// 执行统计
         /// </summary>
         /// <returns></returns>
-        Task ExecutStatisticAsync(string userId);
+        Task ExecuteAsync();
     }
 }

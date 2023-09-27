@@ -55,7 +55,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
         /// 执行生产统计
         /// </summary>
         /// <returns></returns>
-        public async Task ExecutStatisticAsync(string userId, long siteId)
+        public async Task ExecutStatisticAsync(string userId)
         {
             var startwaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.ManuSfcSummaryBusinessKey);
 
@@ -72,8 +72,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                 //条码工序统计最后一条数据
                 var manuSfcSummaryProcedureLastList = await _manuSfcSummaryRepository.GetyLastListByProcedureIdsAndSfcsAsync(new LastManuSfcSummaryByProcedureIdAndSfcsQuery
                 {
-                    Sfcs = manuSfcStepList.Select(x => x.SFC),
-                    SiteId = siteId
+                    Sfcs = manuSfcStepList.Select(x => x.SFC)
                 });
 
                 //录入不良列表
