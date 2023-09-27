@@ -91,7 +91,7 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
             return new ExportResultDto
             {
                 FileName = fileName,
-                Path = uploadResult.RelativeUrl,
+                Path = uploadResult.AbsoluteUrl,
             };
         }
     }
