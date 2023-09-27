@@ -296,7 +296,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 更新完工数量
                     tasks.Add(_planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(data.UpdateQtyCommand));
 
-                    // manu_sfc_info 修改为完成 且入库
+                    // manu_sfc 修改为完成 且入库
                     tasks.Add(_manuSfcRepository.MultiUpdateSfcStatusAsync(data.MultiSFCUpdateStatusCommand));
 
                     // 入库
@@ -524,9 +524,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             responseBo.MultiUpdateSummaryOutStationCommands = updateSummaryOutStationCommands;
 
-            // 已完工，且只有"生产主工艺路线"，出站时才走下面流程
+            // 下面是尾工序出站时才执行的代码
+            if (responseBo.IsCompleted == false) return responseBo;
+
+            // 读取工艺路线类型
             responseBo.ProcessRouteType = procProcessRouteEntity.Type;
-            if (responseBo.IsCompleted && responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
+
+            // 已完工，且是"生产主工艺路线"
+            if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
             {
                 // 删除 manu_sfc_produce_business
                 responseBo.DeleteSfcProduceBusinesssBySfcInfoIdsCommand = new DeleteSfcProduceBusinesssBySfcInfoIdsCommand
@@ -622,7 +627,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.DowngradingEntities = await _manuDegradedProductExtendService.GetManuDownGradingsAsync(degradedProductExtendBo);
             }
 
-            // TODO 不合格工艺路线完成后需要转到生产主工艺路线
+            // TODO 已完工，且是"不合格工艺路线"（完成后转到备份的生产主工艺路线工序继续进出站）
 
             return responseBo;
         }
