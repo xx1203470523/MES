@@ -227,7 +227,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByJobIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_job_business_relation`  WHERE JobId IN @jobIds ";
-        const string GetByJobBybusinessIdSql = @"SELECT * FROM `inte_job_business_relation` WHERE BusinessId = @BusinessId AND LinkPoint = @LinkPoint AND IsDeleted = 0;";
+        const string GetByJobBybusinessIdSql = @"SELECT * FROM `inte_job_business_relation` WHERE BusinessId = @BusinessId AND LinkPoint = @LinkPoint AND IsDeleted = 0 ORDER BY OrderNumber;";
     }
 
 }
