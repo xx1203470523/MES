@@ -62,6 +62,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo);
 
         /// <summary>
+        /// 获取生产工单（批量）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo);
+
+        /// <summary>
         /// 获取生产工单
         /// </summary>
         /// <param name="workOrderId"></param>

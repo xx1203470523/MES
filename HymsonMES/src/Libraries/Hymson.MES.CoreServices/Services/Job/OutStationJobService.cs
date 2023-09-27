@@ -192,12 +192,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
 
-            //（前提：这些条码都是同一工单同一工序）
-            var firstProduceEntity = sfcProduceEntities.FirstOrDefault();
-            if (firstProduceEntity == null) return;
-
             // 获取生产工单（附带工单状态校验）
-            _ = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdAsync, new WorkOrderIdBo { WorkOrderId = firstProduceEntity.WorkOrderId });
+            _ = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId) });
 
             /*
             // 验证BOM主物料数量
@@ -220,6 +216,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<OutStationRequestBo>();
             if (bo == null) return null;
+
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
                 ProcedureId = bo.ProcedureId,
@@ -382,6 +379,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<OutStationRequestBo>();
             if (bo == null) return null;
+
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
                 ProcedureId = bo.ProcedureId,

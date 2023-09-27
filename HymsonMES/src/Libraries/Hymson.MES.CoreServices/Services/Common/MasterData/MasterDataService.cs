@@ -336,6 +336,50 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 获取生产工单（批量）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo)
+        {
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds);
+            if (planWorkOrderEntities == null || bo.WorkOrderIds.Count() > planWorkOrderEntities.Count())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+            }
+
+            foreach (var planWorkOrderEntity in planWorkOrderEntities)
+            {
+                // 判断是否被锁定
+                if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+                }
+
+                if (bo.IsVerifyActivation)
+                {
+                    // 判断是否是激活的工单
+                    _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+                }
+
+                switch (planWorkOrderEntity.Status)
+                {
+                    case PlanWorkOrderStatusEnum.SendDown:
+                    case PlanWorkOrderStatusEnum.InProduction:
+                    case PlanWorkOrderStatusEnum.Finish:
+                        break;
+                    case PlanWorkOrderStatusEnum.NotStarted:
+                    case PlanWorkOrderStatusEnum.Closed:
+                    default:
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16303)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+                }
+            }
+
+            return planWorkOrderEntities;
+        }
+
+        /// <summary>
         /// 获取生产工单
         /// </summary>
         /// <param name="workOrderId"></param>
