@@ -44,6 +44,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 合并存在更新 不存在则新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> MergeRangeAsync(IEnumerable<ManuSfcSummaryEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(MergeSql, entities);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>
@@ -169,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task< IEnumerable<ManuSfcSummaryEntity> > GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcsQuery query)
+        public async Task<IEnumerable<ManuSfcSummaryEntity>> GetyLastListByProcedureIdsAndSfcsAsync(LastManuSfcSummaryByProcedureIdAndSfcsQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcSummaryEntity>(GetMaxTimeByProcedureIdsAndSfcsSql, query);
@@ -231,7 +242,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string InsertSql = "INSERT INTO manu_sfc_summary(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ProcedureId`, `StartOn`, `EndOn`, `InvestQty`, `OutputQty`, `UnqualifiedQty`, `RepeatedCount`, `IsJudgment`, `JudgmentOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ProcedureId, @StartOn, @EndOn,@InvestQty, @OutputQty, @UnqualifiedQty, @RepeatedCount, @IsJudgment, @JudgmentOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO manu_sfc_summary(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ProcedureId`, `StartOn`, `EndOn`, `InvestQty`, `OutputQty`, `UnqualifiedQty`, `RepeatedCount`, `IsJudgment`, `JudgmentOn`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ProcedureId, @StartOn, @EndOn,@InvestQty, @OutputQty, @UnqualifiedQty, @RepeatedCount, @IsJudgment, @JudgmentOn, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-
+        const string MergeSql = @"INSERT INTO manu_sfc_summary(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ProcedureId`, `StartOn`, `EndOn`, `InvestQty`, `OutputQty`, `UnqualifiedQty`, `RepeatedCount`, `IsJudgment`, `JudgmentOn`, `Remark`,`LastUpdatedOn`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ProcedureId, @StartOn, @EndOn,@InvestQty, @OutputQty, @UnqualifiedQty, @RepeatedCount, @IsJudgment, @JudgmentOn, @Remark, @LastUpdatedOn, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) 
+                           ON DUPLICATE KEY UPDATE SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark,LastUpdatedOn=@LastUpdatedOn, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted;";
         const string UpdateSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_sfc_summary SET   SiteId = @SiteId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcedureId = @ProcedureId, StartOn = @StartOn, EndOn = @EndOn, OutputQty = @OutputQty, UnqualifiedQty = @UnqualifiedQty, RepeatedCount = @RepeatedCount, IsJudgment = @IsJudgment, JudgmentOn = @JudgmentOn, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateSummaryOutStationSql = "UPDATE manu_sfc_summary SET EndOn = @EndOn, OutputQty = @OutputQty, IsJudgment = @IsJudgment, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
@@ -246,6 +258,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 	        ) T2 ON T1.SFC = T2.SFC AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs  AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
         const string GetMaxTimeByProcedureIdsAndSfcsSql = @"SELECT T1.* FROM manu_sfc_summary T1 LEFT JOIN (
 			SELECT ProductId, SFC, MAX(UpdatedOn) AS MaxUpdatedOn FROM manu_sfc_summary GROUP BY SFC,ProductId
-	        ) T2 ON T1.SFC = T2.SFC ANDT1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
+	        ) T2 ON T1.SFC = T2.SFC AND T1.ProductId = T2.ProductId AND T1.UpdatedOn = T2.MaxUpdatedOn WHERE T1.SFC IN @Sfcs AND T1.SiteId=@SiteId AND T1.IsDeleted=0   ";
     }
 }

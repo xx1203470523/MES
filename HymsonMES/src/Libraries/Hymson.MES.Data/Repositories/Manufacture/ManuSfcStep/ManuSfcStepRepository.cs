@@ -244,13 +244,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE `manu_sfc_step` SET   SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                               `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Operatetype`, `CurrentStatus`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                                          `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Operatetype`, `CurrentStatus`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step`  WHERE Id IN @ids ";
         const string GeListtByStartwaterMarkIdSql= @"SELECT 
-                                          `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Type`, `Status`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
+                                                                 `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step`  WHERE Id > @StartwaterMarkId  AND  SiteId=@SiteId     ORDER BY CreatedOn ASC  LIMIT @Rows";
         const string GetSFCInOutStepSql = @" 
                         SELECT 

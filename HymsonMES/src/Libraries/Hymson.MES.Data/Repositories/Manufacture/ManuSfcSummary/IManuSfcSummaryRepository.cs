@@ -27,6 +27,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertRangeAsync(IEnumerable<ManuSfcSummaryEntity> entities);
 
         /// <summary>
+        /// 合并存在更新 不存在则新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> MergeRangeAsync(IEnumerable<ManuSfcSummaryEntity> entities);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="entity"></param>

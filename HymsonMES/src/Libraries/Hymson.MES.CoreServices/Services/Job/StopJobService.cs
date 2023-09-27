@@ -130,7 +130,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.UpdatedBy = updatedBy;
                 sfcProduceEntity.UpdatedOn = updatedOn;
-
+                sfcProduceEntity.RepeatedCount = sfcProduceEntity.RepeatedCount - 1;
                 // 初始化步骤
                 responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
                 {

@@ -473,7 +473,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetBySfcStepIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_product_bad_record`  WHERE SfcStepId IN @SfcStepIds ";
+                            FROM `manu_product_bad_record`  WHERE SfcStepId IN @StepIds";
         const string GetByReJudgmentSfcStepIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_product_bad_record`  WHERE ReJudgmentSfcStepId IN @ReJudgmentSfcStepIds ";

@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> ManuSfcScrapCancelAsync(IEnumerable<ManuSfcScrapCancelCommand>  commands)
+        public async Task<int> ManuSfcScrapCancelAsync(IEnumerable<ManuSfcScrapCancelCommand> commands)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(ScrapCancelSql, commands);
@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -113,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcScrapEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuSfcScrapEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcScrapEntity>(GetByIdsSql, new { Ids = ids });
@@ -124,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="stepIds"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcScrapEntity>> GetByStepIdsAsync( IEnumerable<long>  stepIds)
+        public async Task<IEnumerable<ManuSfcScrapEntity>> GetByStepIdsAsync(IEnumerable<long> stepIds)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcScrapEntity>(GetByStepIdsSql, new { StepIds = stepIds });
@@ -201,13 +201,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE manu_sfc_scrap SET   SiteId = @SiteId, SFC = @SFC, SfcinfoId = @SfcinfoId, ProcedureId = @ProcedureId, ScrapQty = @ScrapQty, IsCancel = @IsCancel, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE manu_sfc_scrap SET   SiteId = @SiteId, SFC = @SFC, SfcinfoId = @SfcinfoId, ProcedureId = @ProcedureId, ScrapQty = @ScrapQty, IsCancel = @IsCancel, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string ScrapCancelSql = "UPDATE manu_sfc_scrap SET IsCancel = @IsCancel, IsCancel = @IsCancel, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-       
+
         const string DeleteSql = "UPDATE manu_sfc_scrap SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_sfc_scrap SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM manu_sfc_scrap WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_scrap WHERE Id IN @Ids ";
-        const string GetByStepIdsSql = @"SELECT * FROM manu_sfc_scrap WHERE SfcStepId IN @SfcStepIds ";
+        const string GetByStepIdsSql = @"SELECT * FROM manu_sfc_scrap WHERE SfcStepId IN @StepIds ";
         const string GetByCancelSfcStepIdsSql = @"SELECT * FROM manu_sfc_scrap WHERE CancelSfcStepId IN @CancelSfcStepIds ";
     }
 }

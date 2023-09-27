@@ -80,6 +80,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string Remark { get; set; }
 
-       
+        /// <summary>
+        /// 最后更新时间
+        /// </summary>
+        public DateTime? LastUpdatedOn { get; set; }
     }
 }

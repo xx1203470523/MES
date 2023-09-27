@@ -1040,7 +1040,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFC = sfc,
                     SfcinfoId = sfcInfoEntity?.Id ?? 0,
                     SfcStepId = stepEntity.Id,
-                    ProcedureId = parm.ProcedureId,
+                    ProcedureId =  parm.ProcedureId?? manuSfcProduceInfoEntity?.ProcedureId,
                     ScrapQty = sfcEntity.Qty,
                     IsCancel = false,
                     Remark = parm.Remark,
@@ -1773,7 +1773,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             return nodes = nodes.Where(it => it.ProcedureId != ProcessRoute.LastProcedureId).OrderBy(x => x.ManualSortNumber).Distinct();
         }
 
-
         /// <summary>
         /// 保存在制品步骤
         /// </summary>
@@ -1784,10 +1783,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (sfcProduceStepDto.ProcedureId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES18012));
             if (sfcProduceStepDto.Sfcs == null || !sfcProduceStepDto.Sfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES18014));
 
-
             var manuSfcs = sfcProduceStepDto.Sfcs.Select(it => it.Sfc).ToArray();
-
-
 
             long processRouteId = 0;
             //在制数据
@@ -1823,8 +1819,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFC", string.Join(",", manuContainerPacks.Select(it => it.LadeBarCode).ToList()));
             }
-
-
 
             // 更新数据集合
             var updateInventoryQuantityList = new List<UpdateQuantityRangeCommand>();
