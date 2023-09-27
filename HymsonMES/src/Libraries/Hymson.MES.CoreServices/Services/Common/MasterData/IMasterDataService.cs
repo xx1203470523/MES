@@ -26,6 +26,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId);
 
         /// <summary>
+        /// 获取物料基础信息（带空检查）
+        /// </summary>
+        /// <param name="materialIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntityWithNullCheckAsync(IEnumerable<long> materialIds);
+
+        /// <summary>
         /// 获取工序基础信息（带空检查）
         /// </summary>
         /// <param name="procedureId"></param>
@@ -53,6 +60,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="bo"></param>
         /// <returns></returns>
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo);
+
+        /// <summary>
+        /// 获取生产工单（批量）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo);
 
         /// <summary>
         /// 获取生产工单
@@ -158,7 +172,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+
+        /// <summary>
+        /// 获取即将扣料的物料数据
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo);
 
         /// <summary>
         /// 获取不合格代码列表
@@ -192,8 +213,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
              ref decimal residue,
              ManuSfcProduceEntity sfcProduceEntity,
              Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-             MaterialDeductBo mainMaterialBo,
-             MaterialDeductBo currentBo,
+             MaterialDeductResponseBo mainMaterialBo,
+             MaterialDeductResponseBo currentBo,
              bool isMain = true);
     }
 }
