@@ -1,6 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -60,9 +59,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
 
         /// <summary>
-        /// 
+        /// 条码信息
         /// </summary>
-        public MultiSFCUpdateStatusCommand MultiSFCUpdateStatusCommand { get; set; } = new();
+        public List<ManuSfcEntity> SFCEntities { get; set; } = new();
 
     }
 }
