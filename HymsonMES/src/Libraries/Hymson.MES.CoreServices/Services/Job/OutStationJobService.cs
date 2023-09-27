@@ -853,7 +853,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstSFCProduceEntity == null) return responseBo;
 
             // 组合物料数据
-            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstSFCProduceEntity);
+            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, new MaterialDeductRequestBo
+            {
+                SiteId = bo.SiteId,
+                ProcedureId = bo.ProcedureId,
+                ProductBOMId = firstSFCProduceEntity.ProductBOMId
+            });
             if (initialMaterials == null) return responseBo;
 
             // 物料ID集合
@@ -862,7 +867,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 读取物料加载数据（批量）
             var allFeedingEntities = await bo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
             {
-                ResourceId = firstSFCProduceEntity.ResourceId ?? 0,
+                ResourceId = bo.ResourceId,
                 MaterialIds = materialIds
             });
 
@@ -924,7 +929,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (firstSFCProduceEntity == null) return responseBo;
 
             // 组合物料数据
-            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, firstSFCProduceEntity);
+            var initialMaterials = await bo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, new MaterialDeductRequestBo
+            {
+                SiteId = bo.SiteId,
+                ProcedureId = bo.ProcedureId,
+                ProductBOMId = firstSFCProduceEntity.ProductBOMId
+            });
             if (initialMaterials == null) return responseBo;
 
             // 如果存在传过来的消耗编码不在BOM清单里面的物料，直接返回异常
@@ -935,7 +945,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 只保留传过来的消耗编码
-            List<MaterialDeductBo> filterMaterials = new();
+            List<MaterialDeductResponseBo> filterMaterials = new();
             foreach (var item in initialMaterials)
             {
                 var consume = bo.ConsumeList.FirstOrDefault(f => f.BarCode == item.MaterialCode);
@@ -963,7 +973,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 读取物料加载数据（批量）
             var allFeedingEntities = await bo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
             {
-                ResourceId = firstSFCProduceEntity.ResourceId ?? 0,
+                ResourceId = bo.ResourceId,
                 MaterialIds = materialIds
             });
 

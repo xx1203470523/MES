@@ -172,7 +172,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+
+        /// <summary>
+        /// 获取即将扣料的物料数据
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo);
 
         /// <summary>
         /// 获取不合格代码列表
@@ -206,8 +213,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
              ref decimal residue,
              ManuSfcProduceEntity sfcProduceEntity,
              Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-             MaterialDeductBo mainMaterialBo,
-             MaterialDeductBo currentBo,
+             MaterialDeductResponseBo mainMaterialBo,
+             MaterialDeductResponseBo currentBo,
              bool isMain = true);
     }
 }

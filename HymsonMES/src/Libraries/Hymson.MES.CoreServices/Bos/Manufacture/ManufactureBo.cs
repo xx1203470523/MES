@@ -50,7 +50,29 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 扣料
     /// </summary>
-    public class MaterialDeductBo : MaterialDeductItemBo
+    public class MaterialDeductRequestBo
+    {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// BOMId
+        /// </summary>
+        public long ProductBOMId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 扣料
+    /// </summary>
+    public class MaterialDeductResponseBo : MaterialDeductItemBo
     {
         /// <summary>
         /// 数据收集方式 

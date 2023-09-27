@@ -348,10 +348,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var replaceMaterialsDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
 
             // 获取初始扣料数据
-            var initialMaterials = new List<MaterialDeductBo> { };
+            var initialMaterials = new List<MaterialDeductResponseBo> { };
             foreach (var item in mainMaterials)
             {
-                var deduct = new MaterialDeductBo
+                var deduct = new MaterialDeductResponseBo
                 {
                     MaterialId = item.MaterialId,
                     Usages = item.Usages,

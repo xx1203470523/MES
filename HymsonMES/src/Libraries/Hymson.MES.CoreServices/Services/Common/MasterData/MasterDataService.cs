@@ -507,10 +507,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var replaceMaterialsDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
 
             // 获取初始扣料数据
-            var initialMaterials = new List<MaterialDeductBo> { };
+            var initialMaterials = new List<MaterialDeductResponseBo> { };
             foreach (var item in mainMaterials)
             {
-                var deduct = new MaterialDeductBo
+                var deduct = new MaterialDeductResponseBo
                 {
                     MaterialId = item.MaterialId,
                     Usages = item.Usages,
@@ -908,10 +908,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity)
+        public async Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity)
         {
             // 获取初始扣料数据
-            List<MaterialDeductBo> initialMaterials = new();
+            List<MaterialDeductResponseBo> initialMaterials = new();
 
             // 获取BOM绑定的物料
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(sfcProduceEntity.ProductBOMId);
@@ -947,7 +947,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
                 if (materialEntitiy == null) continue;
 
-                var deduct = new MaterialDeductBo
+                var deduct = new MaterialDeductResponseBo
                 {
                     MaterialId = item.MaterialId,
                     MaterialCode = materialEntitiy.MaterialCode,
@@ -995,6 +995,100 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             return initialMaterials;
         }
+
+        /// <summary>
+        /// 获取即将扣料的物料数据
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo)
+        {
+            // 获取初始扣料数据
+            List<MaterialDeductResponseBo> initialMaterials = new();
+
+            // 获取BOM绑定的物料
+            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(requestBo.ProductBOMId);
+
+            // 未设置物料（克明说化成和返工的是没有投料的）
+            if (mainMaterials == null || !mainMaterials.Any())
+            {
+                return initialMaterials;
+            }
+
+            // 取得特定工序的物料
+            mainMaterials = mainMaterials.Where(w => w.ProcedureId == requestBo.ProcedureId);
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
+
+            // 查询BOM替代料
+            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(requestBo.ProductBOMId);
+            var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
+
+            // 查询物料基础数据的替代料
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(requestBo.SiteId);
+            replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
+            var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
+
+            // 组合主物料ID和替代料ID
+            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
+            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
+            var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(requestBo.SiteId);
+            materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
+
+            foreach (var item in mainMaterials)
+            {
+                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+                if (materialEntitiy == null) continue;
+
+                var deduct = new MaterialDeductResponseBo
+                {
+                    MaterialId = item.MaterialId,
+                    MaterialCode = materialEntitiy.MaterialCode,
+                    Usages = item.Usages,
+                    Loss = item.Loss,
+                    DataCollectionWay = item.DataCollectionWay,
+                    SerialNumber = materialEntitiy.SerialNumber
+                };
+                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
+
+                // 填充BOM替代料
+                if (!item.IsEnableReplace)
+                {
+                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
+                    {
+                        // 启用的替代物料（BOM）
+                        deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.ReplaceMaterialId,
+                            Usages = s.Usages,
+                            Loss = s.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
+                        });
+                    }
+                }
+                // 填充物料替代料
+                else
+                {
+                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces))
+                    {
+                        // 启用的替代物料（物料维护）
+                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.MaterialId,
+                            Usages = item.Usages,
+                            Loss = item.Loss,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
+                        });
+                    }
+                }
+
+                // 添加到初始扣料集合
+                initialMaterials.Add(deduct);
+            }
+
+            return initialMaterials;
+        }
+
 
         /// <summary>
         /// 获取不合格代码列表
@@ -1072,8 +1166,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             ref decimal residue,
             ManuSfcProduceEntity sfcProduceEntity,
             Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-            MaterialDeductBo mainMaterialBo,
-            MaterialDeductBo currentBo,
+            MaterialDeductResponseBo mainMaterialBo,
+            MaterialDeductResponseBo currentBo,
             bool isMain = true)
         {
             // 没有剩余需要抵扣时，直接返回
@@ -1165,7 +1259,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 // 递归扣除替代料库存
                 DeductMaterialQty(ref updates, ref adds, ref residue,
                     sfcProduceEntity, manuFeedingsDictionary, mainMaterialBo,
-                    new MaterialDeductBo
+                    new MaterialDeductResponseBo
                     {
                         MaterialId = replaceFeeding.MaterialId,
                         Usages = replaceFeeding.Usages,
