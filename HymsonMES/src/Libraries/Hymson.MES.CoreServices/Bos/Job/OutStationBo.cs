@@ -3,7 +3,6 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -129,27 +128,20 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
 
         /// <summary>
-        /// 
+        /// 条码信息
+        /// </summary>
+        public List<ManuSfcEntity> SFCEntities { get; set; } = new();
+
+        /// <summary>
+        /// 在制品信息
         /// </summary>
         public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
-
-        /*
-        /// <summary>
-        /// 
-        /// </summary>
-        public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
-        */
 
         /// <summary>
         /// 
         /// </summary>
         public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public MultiSFCUpdateStatusCommand MultiSFCUpdateStatusCommand { get; set; } = new();
-
+        
         /// <summary>
         /// 
         /// </summary>

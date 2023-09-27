@@ -8,7 +8,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.ComponentModel;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -72,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ManuSfcEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuSfcEntity>(GetByIdsSql, new { Ids = ids });
@@ -343,6 +342,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量更新（带状态检查）
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcEntity> entities)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateWithStatusCheckSql, entities);
+        }
+
+        /// <summary>
         /// 查询条码信息
         /// </summary>
         /// <param name="param"></param>
@@ -528,6 +538,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Status <> @Status AND SFC IN @Sfcs ";
+        const string UpdateWithStatusCheckSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
 
         const string MultiUpdateSfcIsUsedSql = "UPDATE manu_sfc SET IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND IsUsed <> @IsUsed AND SFC IN @SFCs ";
         const string MultiUpdateStatusSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SiteId = @SiteId AND SFC IN @SFCs; ";
