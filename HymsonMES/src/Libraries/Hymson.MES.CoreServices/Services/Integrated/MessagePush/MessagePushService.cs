@@ -205,9 +205,12 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             if (eventTypeUpgrades == null || !eventTypeUpgrades.Any()) return;
 
             // 当前匹配的等级（这个一定有数据，因为前面已经做了Any()验证
-            InteEventTypeUpgradeEntity firstLevelEntity = eventTypeUpgrades.OrderBy(o => o.Level).First();
-            @event.Level = firstLevelEntity.Level;
-            _eventBus.PublishDelay(@event, firstLevelEntity.Duration * 60);
+            InteEventTypeUpgradeEntity? firstLevelEntity = eventTypeUpgrades.OrderBy(o => o.Level).FirstOrDefault();
+            if (firstLevelEntity != null)
+            {
+                @event.Level = firstLevelEntity.Level;
+                _eventBus.PublishDelay(@event, firstLevelEntity.Duration * 60);
+            }
         }
 
         /// <summary>
