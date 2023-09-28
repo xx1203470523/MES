@@ -322,40 +322,40 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         });
                     }
                     //条码生产信息
-                    var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC).FirstOrDefault();
-                    if (manuSfcProduceEntity == null)
-                    {
-                        manuSfcProduceList.Add(new ManuSfcProduceEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = _currentEquipment.SiteId,
-                            SFCId = sfcEntity.Id,
-                            SFC = sfc,
-                            ProductId = planWorkOrderEntity.ProductId,
-                            WorkOrderId = planWorkOrderEntity.Id,
-                            BarCodeInfoId = sfcEntity.Id,
-                            ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
-                            WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
-                            ProductBOMId = planWorkOrderEntity.ProductBOMId,
-                            EquipmentId = _currentEquipment.Id ?? 0,
-                            ResourceId = procResource.Id,
-                            Qty = 1,//电芯进站默认都是1个
-                            ProcedureId = processRouteFirstProcedure.ProcedureId,
-                            Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
-                            RepeatedCount = 0,
-                            IsScrap = TrueOrFalseEnum.No,
-                            CreatedBy = _currentEquipment.Name,
-                            UpdatedBy = _currentEquipment.Name
-                        });
-                    }
+                    //var manuSfcProduceEntity = sfcProduceList.Where(c => c.SFC == sfcEntity.SFC && c.WorkOrderId != planWorkOrderEntity.Id).FirstOrDefault();
+                    //if (manuSfcProduceEntity == null)
+                    //{
+                    //    manuSfcProduceList.Add(new ManuSfcProduceEntity
+                    //    {
+                    //        Id = IdGenProvider.Instance.CreateId(),
+                    //        SiteId = _currentEquipment.SiteId,
+                    //        SFCId = sfcEntity.Id,
+                    //        SFC = sfc,
+                    //        ProductId = planWorkOrderEntity.ProductId,
+                    //        WorkOrderId = planWorkOrderEntity.Id,
+                    //        BarCodeInfoId = sfcEntity.Id,
+                    //        ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    //        WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
+                    //        ProductBOMId = planWorkOrderEntity.ProductBOMId,
+                    //        EquipmentId = _currentEquipment.Id ?? 0,
+                    //        ResourceId = procResource.Id,
+                    //        Qty = 1,//电芯进站默认都是1个
+                    //        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    //        Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
+                    //        RepeatedCount = 0,
+                    //        IsScrap = TrueOrFalseEnum.No,
+                    //        CreatedBy = _currentEquipment.Name,
+                    //        UpdatedBy = _currentEquipment.Name
+                    //    });
+                    //}
                     //允许任意工单条码进站
-                    if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id))
-                    {
-                        manuSfcProduceEntity.WorkOrderId = planWorkOrderEntity.Id;
-                        manuSfcProduceEntity.UpdatedOn = HymsonClock.Now();
-                        manuSfcProduceEntity.UpdatedBy = _currentEquipment.Name;
-                        updateManuSfcProduceList.Add(manuSfcProduceEntity);
-                    }
+                    //if ((manuSfcProduceEntity != null && manuSfcProduceEntity.WorkOrderId != planWorkOrderEntity.Id))
+                    //{
+                    //    manuSfcProduceEntity.WorkOrderId = planWorkOrderEntity.Id;
+                    //    manuSfcProduceEntity.UpdatedOn = HymsonClock.Now();
+                    //    manuSfcProduceEntity.UpdatedBy = _currentEquipment.Name;
+                    //    updateManuSfcProduceList.Add(manuSfcProduceEntity);
+                    //}
                     continue;
                 }
                 //条码表
