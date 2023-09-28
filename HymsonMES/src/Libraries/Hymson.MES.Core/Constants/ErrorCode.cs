@@ -1005,7 +1005,7 @@
         public const string MES19144 = "Location不能为空";
         public const string MES19145 = "模组对应型号编码ModelCode不能为空";
         public const string MES19146 = "{SFC}已经存在当前绑定的模组码中";
-
+        public const string MES19147 = "通过SFC:{SFC}和工单{OrderCode}没有找到在制信息";
         #endregion
 
         #region 系统对接 MES19201

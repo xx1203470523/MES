@@ -248,7 +248,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
             //保存条码当前所在工序,出站条码去一个即可
-            var currentProcedureId = sfcProduceList.First().ProcedureId;
+            var currentProcedureId = sfcProduceList.OrderByDescending(x=>x.CreatedOn).First().ProcedureId;
 
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
@@ -272,7 +272,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
-                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).First();
+                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).FirstOrDefault();
+                if (sfcProduceEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19147)).WithData("SFC", outBoundSFCDto.SFC).WithData("OrderCode", planWorkOrderEntity.OrderCode);
+                }
                 //汇总信息
                 var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC ).FirstOrDefault();
                 // 更新时间
