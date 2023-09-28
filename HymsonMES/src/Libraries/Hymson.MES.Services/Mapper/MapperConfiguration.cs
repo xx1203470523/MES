@@ -630,6 +630,12 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            CreateMap<ProductTracePagedQueryDto, PlanWorkOrderPagedQuery>();
+            CreateMap<ProductTracePagedQueryDto, ProcProcessRouteDetailNodePagedQuery>();
+            CreateMap<ProductTracePagedQueryDto, ManuProductParameterPagedQuery>();
+            CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
+            CreateMap<ProductTracePagedQueryDto, ManuSfcStepPagedQuery>();
+            CreateMap<PlanWorkOrderListDetailView, ProductTracePlanWorkOrderReportExportDto>();
         }
 
         /// <summary>

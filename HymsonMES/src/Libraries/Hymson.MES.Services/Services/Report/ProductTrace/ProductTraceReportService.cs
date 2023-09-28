@@ -80,10 +80,7 @@ namespace Hymson.MES.Services.Services.Report
         /// 条码记录仓储
         /// </summary>
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
-        /// <summary>
-        /// IManuNgJudgeRepository
-        /// </summary>
-        private readonly IManuNgJudgeRepository _manuNgJudgeRepository;
+      
 
         /// <summary>
         /// 生产工艺路线节点
@@ -111,8 +108,8 @@ namespace Hymson.MES.Services.Services.Report
          IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
          IManuSfcInfoRepository manuSfcInfoRepository,
          IManuSfcRepository manuSfcRepository,
-         IManuSfcSummaryRepository manuSfcSummaryRepository,
-          IManuNgJudgeRepository manuNgJudgeRepository)
+         IManuSfcSummaryRepository manuSfcSummaryRepository
+          )
         {
             _minioService = minioService;
             _excelService = excelService;
@@ -130,7 +127,6 @@ namespace Hymson.MES.Services.Services.Report
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
-            _manuNgJudgeRepository = manuNgJudgeRepository;
         }
         #endregion
 
@@ -502,47 +498,10 @@ namespace Hymson.MES.Services.Services.Report
         }
 
         /// <summary>
-        /// NG判定
-        /// </summary>
-        /// <param name="updateNGJudgeDto"></param>
-        /// <returns></returns>
-        public async Task UpdateNGJudgeAsync(UpdateNGJudgeDto updateNGJudgeDto)
-        {
-            var sfcStepEntity = await _manuSfcStepRepository.GetByIdAsync(updateNGJudgeDto.StepId);
-            sfcStepEntity.Passed = 1;
-            
-            var SFC = sfcStepEntity.SFC;
-            var longEquipmentId = sfcStepEntity.EquipmentId;
-            var manuSfcSummaryQueryDto = new ManuSfcSummaryQueryDto()
-            {
-                SFC = sfcStepEntity.SFC,
-                EquipmentId = sfcStepEntity.EquipmentId,
-                QualityStatus = 1
-            };
-            var manuSfcNgJudgeEntity = new ManuSfcNgJudgeEntity
-            {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = _currentSite.SiteId ?? 0,
-                SFC = sfcStepEntity.SFC,
-                StepId = updateNGJudgeDto.StepId,
-                NGJudgeType = updateNGJudgeDto.NGJudgeType,
-                CreatedBy = _currentUser.UserName,
-                UpdatedBy = _currentUser.UserName
-            };
-
-            using var ts = TransactionHelper.GetTransactionScope();
-            await _manuSfcStepRepository.UpdateAsync(sfcStepEntity);
-            await _manuSfcSummaryRepository.UpdateNGAsync(manuSfcSummaryQueryDto);
-            await _manuNgJudgeRepository.InsertAsync(manuSfcNgJudgeEntity);
-            ts.Complete();
-        }
-
-        /// <summary>
         /// 产品追溯报表导出
         /// </summary>
         /// <param name="planWorkOrderPagedQueryDto"></param>
         /// <returns></returns>
-
         public async Task<ExportResultDto> ProductTracingReportExportAsync(ProductTracePagedQueryDto planWorkOrderPagedQueryDto)
         {
             string fileName = string.Format("({0})产品追朔", planWorkOrderPagedQueryDto.SFC);
