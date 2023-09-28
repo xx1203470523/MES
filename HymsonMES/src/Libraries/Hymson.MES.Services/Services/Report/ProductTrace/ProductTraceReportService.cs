@@ -555,12 +555,12 @@ namespace Hymson.MES.Services.Services.Report
             var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = planWorkOrderPagedQueryDto.SFC, SiteId = _currentSite.SiteId });
             if (manuSfcEntity == null)
             {
-                return new ExportResultDto();
+                manuSfcEntity = new ManuSfcEntity();
             }
             var sfcinfo = await _manuSfcInfoRepository.GetBySFCNoCheckUsedAsync(manuSfcEntity?.Id ?? 0);
             if (sfcinfo == null)
             {
-                return new ExportResultDto();
+                sfcinfo = new ManuSfcInfoEntity();
             }
             planWorkOrderPagedQuery.WorkOrderId = sfcinfo.WorkOrderId;
             planWorkOrderPagedQuery.SiteId = _currentSite.SiteId;
@@ -579,7 +579,8 @@ namespace Hymson.MES.Services.Services.Report
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcinfo.WorkOrderId);
             if (planWorkOrderEntity == null)
             {
-                return new ExportResultDto();
+
+                planWorkOrderEntity = new PlanWorkOrderEntity();
             }
             //工艺路线明细
             var procProcessRouteDetailNodeQuery = planWorkOrderPagedQueryDto.ToQuery<ProcProcessRouteDetailNodePagedQuery>();
