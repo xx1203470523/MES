@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
@@ -76,5 +77,17 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _productTraceReportService.GetSfcProcessRoutePagedListAsync(param);
         }
+
+        /// <summary>
+        /// 产品追朔导出
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet("export")]
+        public async Task<ExportResultDto> ManuProductParameterReportExportAsync([FromQuery] ProductTracePagedQueryDto param)
+        {
+            return await _productTraceReportService.ProductTracingReportExportAsync(param);
+        }
+
     }
 }
