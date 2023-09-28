@@ -795,7 +795,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
+        public async Task<IEnumerable<JobBo>> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
@@ -810,12 +810,22 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     LinkPoint = param.LinkPoint
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return null;
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return Enumerable.Empty<JobBo>();
 
+            // 读取作业实体
             var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
-            return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
-        }
 
+            List<JobBo> hasSortedJobs = new();
+            foreach (var item in InteJobBusinessRelations)
+            {
+                var jobEntity = jobEntities.FirstOrDefault(f => f.Id == item.JobId);
+                if (jobEntity == null) continue;
+
+                hasSortedJobs.Add(new JobBo { Name = jobEntity.ClassProgram });
+            }
+
+            return hasSortedJobs;
+        }
 
         /// <summary>
         /// 组装工艺路线
