@@ -9,6 +9,7 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Equipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
@@ -102,6 +103,7 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquEquipmentEntity, EquEquipmentDto>();
             CreateMap<EquEquipmentEntity, EquEquipmentListDto>();
+            CreateMap<EquEquipmentPageView, EquEquipmentListDto>();
             #endregion
 
             #region EquEquipmentGroup

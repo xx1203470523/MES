@@ -251,7 +251,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             FROM `manu_sfc_step`  WHERE Id IN @ids ";
         const string GeListtByStartwaterMarkIdSql= @"SELECT 
                                                                  `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `manu_sfc_step`  WHERE Id > @StartwaterMarkId  AND  SiteId=@SiteId     ORDER BY CreatedOn ASC  LIMIT @Rows";
+                            FROM `manu_sfc_step`  WHERE Id > @StartwaterMarkId    ORDER BY CreatedOn ASC  LIMIT @Rows";
         const string GetSFCInOutStepSql = @" 
                         SELECT 
                            `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`

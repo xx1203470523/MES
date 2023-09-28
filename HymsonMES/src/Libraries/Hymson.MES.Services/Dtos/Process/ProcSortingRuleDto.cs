@@ -68,6 +68,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
@@ -119,13 +124,14 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Version { get; set; }
 
         /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
-
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
 
         /// <summary>
         /// 备注
@@ -158,10 +164,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 备注
@@ -200,6 +206,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? Version { get; set; }
 
         /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
@@ -231,6 +242,11 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class SortingParamDto
     {
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int? Serial { get; set; }
+
         /// <summary>
         /// proc_procedure 工序id
         /// </summary>

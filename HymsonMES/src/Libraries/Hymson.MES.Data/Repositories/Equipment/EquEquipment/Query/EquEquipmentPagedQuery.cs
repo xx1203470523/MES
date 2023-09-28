@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query
         /// <summary>
         /// 车间
         /// </summary>
-        public string? WorkCenterShopName { get; set; }
+        public string? WorkCenterShopCode { get; set; }
 
         /// <summary>
         /// 存放位置

@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<IEnumerable<WhMaterialInventoryEntity>> GetByBarCodesAsync(WhMaterialInventoryBarCodesQuery param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodes, param);
+            return await conn.QueryAsync<WhMaterialInventoryEntity>(GetByBarCodesSql, param);
         }
 
         /// <summary>
@@ -351,6 +351,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 更新库存数量(减少库存)-带库存检查
+        /// </summary>
+        /// <param name="updateQuantityCommand"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateReduceQuantityResidueWithCheckAsync(UpdateQuantityCommand updateQuantityCommand)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateReduceQuantityResidueWithCheckSql, updateQuantityCommand);
+        }
+
+        /// <summary>
         /// 批量更新库存数量(减少库存)
         /// </summary>
         /// <param name="updateQuantityCommand"></param>
@@ -433,16 +444,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `wh_material_inventory` SET IsDeleted = '1' WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `wh_material_inventory`  WHERE Id = @Id ";
+        const string GetByIdSql = @"SELECT * FROM `wh_material_inventory`  WHERE Id = @Id ";
 
-        const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode  AND QuantityResidue > 0";
-        const string GetByBarCodes = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes  AND QuantityResidue > 0";
+        const string GetByBarCodeSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode = @BarCode";
+        const string GetByBarCodesSql = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes";
         const string GetByBarCodesOfHasQty = "SELECT * FROM wh_material_inventory WHERE IsDeleted = 0 AND SiteId = @SiteId AND MaterialBarCode IN @BarCodes AND QuantityResidue > 0";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `wh_material_inventory`  WHERE Id IN @ids ";
+        const string GetByIdsSql = @"SELECT * FROM `wh_material_inventory` WHERE Id IN @ids ";
 
 
         const string GetMaterialByMaterialCodeSql = @"SELECT   
@@ -453,7 +460,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
         const string UpdateIncreaseQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 
-        const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateReduceQuantityResidueSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
+        const string UpdateReduceQuantityResidueWithCheckSql = "UPDATE wh_material_inventory SET QuantityResidue = QuantityResidue - @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode AND QuantityResidue = @QuantityOriginal; ";
 
         const string UpdateIncreaseQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue =QuantityResidue+ @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";

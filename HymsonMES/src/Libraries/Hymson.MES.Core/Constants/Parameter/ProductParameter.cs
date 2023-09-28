@@ -22,8 +22,8 @@ namespace Hymson.MES.Core.Constants.Parameter
         public const string ProductProcedureParameterPrefix = "manu_product_procedure_parameter_";
 
         /// <summary>
-        /// 条码产品参数表  
+        /// 条码产品参数模板表  
         /// </summary>
-        public const string ProductProcedureParameterTemplateNmae = "manu_product_parameter_template";
+        public const string ProductProcedureParameterTemplateName = "manu_product_parameter_template";
     }
 }

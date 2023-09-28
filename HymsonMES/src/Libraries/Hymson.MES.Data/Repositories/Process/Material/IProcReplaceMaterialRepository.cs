@@ -93,12 +93,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(ProcReplaceMaterialQuery procReplaceMaterialQuery);
 
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="siteId"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(long siteId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewListAsync(long siteId);
 
         /// <summary>
         /// 

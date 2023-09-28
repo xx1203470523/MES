@@ -26,7 +26,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         /// </summary>
         /// <param name="eventBus"></param>
         /// <param name="clearCacheService"></param>
-        public SubHostedService(IEventBus<EventBusInstance1> eventBus, IClearCacheService clearCacheService)
+        public SubHostedService(IEventBus<EventBusInstance1> eventBus,IClearCacheService clearCacheService)
         {
             _eventBus = eventBus;
             _clearCacheService = clearCacheService;

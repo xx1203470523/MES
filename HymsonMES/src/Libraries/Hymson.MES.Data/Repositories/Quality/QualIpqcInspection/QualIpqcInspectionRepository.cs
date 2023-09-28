@@ -265,7 +265,7 @@ namespace Hymson.MES.Data.Repositories.Quality
 	        INNER JOIN qual_inspection_parameter_group qipg ON qii.InspectionParameterGroupId = qipg.Id
 	        LEFT JOIN proc_material pm ON qipg.MaterialId = pm.Id
 	        LEFT JOIN proc_procedure pp ON qipg.ProcedureId = pp.Id 
-            /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+            /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM qual_ipqc_inspection T /**where**/  ";

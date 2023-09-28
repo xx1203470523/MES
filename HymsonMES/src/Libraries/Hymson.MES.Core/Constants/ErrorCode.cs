@@ -711,6 +711,8 @@
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
         // MES15502-MES15503 已被占用
         public const string MES15504 = "未找到资源关联的产线！";
+        public const string MES15505 = "未找到该条码相匹配的物料！";
+        public const string MES15506 = "该条码与选定的物料不匹配！";
         #endregion
 
         #region 工单 16000
@@ -792,7 +794,7 @@
         public const string MES16126 = "工单和关联工单不能一致";
         public const string MES16127 = "条码工单和关联工单必须一致";
         public const string MES16128 = "条码{sfc}不存在";
-        public const string MES16129 = "条码物料和工单物料编码不一致";
+        public const string MES16129 = "条码物料和新工单物料编码不一致";
         public const string MES16130 = "已报废的条码，不允许删除";
         public const string MES16131 = "组件条码对应的批次大小未维护";
         public const string MES16132 = "条码{sfc}已经被装箱了";
@@ -1131,6 +1133,11 @@
 
         #region 系统Token MES18300
         public const string MES18300 = "系统编码{code}已经存在";
+        public const string MES18301 = "系统编码不存在";
+        public const string MES18302 = "系统编码不允许空格";
+        public const string MES18303 = "系统名称不能为空";
+        public const string MES18304 = "系统编码最大长度为50";
+        public const string MES18305 = "系统名称最大长度为50";
         #endregion
 
         #region 客户维护 18400

@@ -379,36 +379,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return planWorkOrderEntities;
         }
 
-        /// <summary>
-        /// 获取生产工单
-        /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <returns></returns>
-        public async Task<PlanWorkOrderEntity> GetWorkOrderByIdAsync(long workOrderId)
-        {
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
-
-            // 判断是否被锁定
-            if (planWorkOrderEntity.IsLocked == YesOrNoEnum.Yes)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
-            }
-
-            switch (planWorkOrderEntity.Status)
-            {
-                case PlanWorkOrderStatusEnum.SendDown:
-                case PlanWorkOrderStatusEnum.InProduction:
-                    break;
-                case PlanWorkOrderStatusEnum.NotStarted:
-                case PlanWorkOrderStatusEnum.Closed:
-                case PlanWorkOrderStatusEnum.Finish:
-                default:
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16303)).WithData("ordercode", planWorkOrderEntity.OrderCode);
-            }
-
-            return planWorkOrderEntity;
-        }
+       
 
         /// <summary>
         /// 获取生产条码信息

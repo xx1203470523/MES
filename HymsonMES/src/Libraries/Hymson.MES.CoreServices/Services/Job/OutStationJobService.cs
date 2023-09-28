@@ -193,6 +193,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyResource(bo.ResourceId);
 
             // 获取生产工单（附带工单状态校验）
+  
             _ = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId) });
 
             /*

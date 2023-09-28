@@ -87,10 +87,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 系统编码
-        /// </summary>
-        public string SystemCode { get; set; }
+       ///// <summary>
+       // /// 系统编码
+       // /// </summary>
+       // public string SystemCode { get; set; }
 
        /// <summary>
         /// 设备名称

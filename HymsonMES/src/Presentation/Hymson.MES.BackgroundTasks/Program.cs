@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
-using System;
 using System.Reflection;
 
 try
@@ -45,7 +44,7 @@ Host.CreateDefaultBuilder(args)
            #region jobs
 
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
-
+           q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
            #endregion
 
            #region 生产
@@ -67,7 +66,7 @@ Host.CreateDefaultBuilder(args)
 
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
        services.AddHostedService<SubHostedService>();
-
+       services.AddSqlExecuteTaskService(hostContext.Configuration);
        services.AddNLog(hostContext.Configuration);
        services.AddEventBusRabbitMQService(hostContext.Configuration);
 

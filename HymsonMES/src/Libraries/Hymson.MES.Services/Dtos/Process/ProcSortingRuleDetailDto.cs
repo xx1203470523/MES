@@ -22,7 +22,13 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int? Serial { get; set; }
+
+        /// <summary>
         /// proc_procedure 工序id
         /// </summary>
         public long ProcedureId { get; set; }

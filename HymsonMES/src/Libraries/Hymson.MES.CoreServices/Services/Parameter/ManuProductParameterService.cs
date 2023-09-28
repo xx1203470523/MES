@@ -225,8 +225,8 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <returns></returns>
         public async Task CreateProductParameterTableAsync(string tabname)
         {
-            var sql = await _manuProductParameterRepository.ShowCreateTableAsync(ProductParameter.ProductProcedureParameterTemplateNmae);
-            sql= sql?.Replace(ProductParameter.ProductProcedureParameterTemplateNmae, tabname);
+            var sql = await _manuProductParameterRepository.ShowCreateTableAsync(ProductParameter.ProductProcedureParameterTemplateName);
+            sql= sql?.Replace(ProductParameter.ProductProcedureParameterTemplateName, tabname);
             sql= sql?.Replace($"CREATE TABLE", $"CREATE TABLE  IF NOT EXISTS");
             await _manuProductParameterRepository.CreateProductParameterTableAsync(sql ?? "");
         }
@@ -243,7 +243,19 @@ namespace Hymson.MES.CoreServices.Services.Parameter
 
             await CreateProductParameterTableAsync(tabname);
         }
-
+        /// <summary>
+        /// 准备工序维度创建数据库表sql语句
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="procedureCode"></param>
+        /// <returns></returns>
+        public string PrepareProductParameterProcedureCodeTableSql(long siteId, string procedureCode)
+        {
+            //获取目标表名
+            var destinationTableName = GetTableNameByProcedureCode(siteId, procedureCode);
+            string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{ProductParameter.ProductProcedureParameterTemplateName}`;";
+            return createTableSql;
+        }
         #region 内部方法
         /// <summary>
         /// 更具SFC获取表名

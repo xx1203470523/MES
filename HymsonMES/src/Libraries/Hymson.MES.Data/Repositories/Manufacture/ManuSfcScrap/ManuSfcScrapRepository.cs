@@ -181,7 +181,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuSfcScrapEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
-
     }
 
     /// <summary>

@@ -62,7 +62,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
             //获取步骤表数据
             var manuSfcStepList = await _manuSfcStepRepository.GeListtByStartwaterMarkIdAsync(new ManuSfcStepStatisticQuery
             {
-                SiteId = siteId,
                 StartwaterMarkId = startwaterMarkId,
                 Rows = 500
             });

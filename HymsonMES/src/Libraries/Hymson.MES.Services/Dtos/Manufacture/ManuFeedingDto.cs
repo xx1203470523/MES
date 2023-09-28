@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -71,6 +72,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 工单ID
         /// </summary>
         public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 物料加载来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum? Source { get; set; }
+
+        /// <summary>
+        /// 上料点ID
+        /// </summary>
+        public long? FeedingPointId { get; set; }
     }
 
     /// <summary>
@@ -115,9 +126,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long Id { get; set; }
 
         /// <summary>
-        /// 物料ID
+        /// 主物料ID
         /// </summary>
-        public long MaterialId { get; set; }
+        public long ParentId { get; set; }
 
         /// <summary>
         /// 物料条码
@@ -151,9 +162,14 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuFeedingMaterialSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 物料ID
+        /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 物料加载来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum? Source { get; set; }
 
         /// <summary>
         /// 上料点ID
@@ -161,13 +177,19 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? FeedingPointId { get; set; }
 
         /// <summary>
-        /// 物料ID/产品ID
+        /// 主物料ID/产品ID（选中的主物料）
         /// </summary>
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
 
         /// <summary>
         /// 物料条码
         /// </summary>
         public string BarCode { get; set; }
+
+        /// <summary>
+        /// 全部主物料ID集合
+        /// </summary>
+        public IEnumerable<long> MaterialIds { get; set; }
+
     }
 }

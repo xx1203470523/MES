@@ -233,6 +233,18 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByCodeAndMaterialIdSql, param);
         }
+
+        /// <summary>
+        ///更具编码获取当前版本的分选规则
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        public async Task<ProcSortingRuleEntity> GetByDefaultVersion(ProcSortingRuleByDefaultVersionQuery param)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcSortingRuleEntity>(GetByGetByDefaultVersionSql, param);
+        }
+
         #endregion
 
         /// <summary>
@@ -256,27 +268,31 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_sorting_rule` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `proc_sorting_rule`(  `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Version, @MaterialId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `proc_sorting_rule`(  `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Version, @MaterialId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `proc_sorting_rule`(  `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Version, @IsDefaultVersion, @MaterialId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_sorting_rule`(  `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`,`MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Version,  @IsDefaultVersion,@MaterialId, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version, MaterialId = @MaterialId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version, MaterialId = @MaterialId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version,IsDefaultVersion = @IsDefaultVersion, MaterialId = @MaterialId, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_sorting_rule` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Version = @Version,IsDefaultVersion = @IsDefaultVersion, MaterialId = @MaterialId, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_sorting_rule` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_sorting_rule` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`  WHERE Id IN @Ids ";
         public string GetByCodeAndVersionSql = @"SELECT 
-                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`  WHERE Code = @Code AND  Version=@Version AND SiteId=@SiteId AND  IsDeleted = 0";
         public string GetByCodeAndMaterialIdSql = @"SELECT 
-                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`   WHERE  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
+
+        public string GetByGetByDefaultVersionSql = @"SELECT 
+                                          `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                            FROM `proc_sorting_rule`   WHERE  IsDefaultVersion=1 AND Code=@Code  AND SiteId=@SiteId  AND  IsDeleted = 0 ";
         #endregion
 
         const string UpdateStatusSql = "UPDATE `proc_sorting_rule` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";

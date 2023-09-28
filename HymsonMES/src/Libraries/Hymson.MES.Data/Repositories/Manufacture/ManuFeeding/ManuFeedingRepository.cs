@@ -117,6 +117,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             var sqlBuilder = new StringBuilder();
             sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId ");
 
+            if (query.FeedingPointId.HasValue) sqlBuilder.Append("AND FeedingPointId = @FeedingPointId ");
             if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);

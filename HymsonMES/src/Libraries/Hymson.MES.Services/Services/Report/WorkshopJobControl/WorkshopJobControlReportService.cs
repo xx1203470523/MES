@@ -282,8 +282,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
                 var procedure = procedures != null && procedures.Any() ? procedures.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
-                var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
-
+                var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
 
                 listDto.Add(new ManuSfcStepBySfcViewDto()
                 {

@@ -65,6 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddAppService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSqlExecuteTaskService(configuration);
             services.AddWebFrameworkService(configuration);
             services.AddExcelService();
             services.AddMinioService(configuration);

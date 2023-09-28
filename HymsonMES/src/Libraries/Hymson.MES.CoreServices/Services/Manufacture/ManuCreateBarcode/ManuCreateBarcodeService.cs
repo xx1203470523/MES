@@ -256,7 +256,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <returns></returns>
         public async Task CreateBarcodeByExternalSFCAsync(CreateBarcodeByExternalSFCBo param, ILocalizationService localizationService)
         {
-            var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
+            {
+                WorkOrderId = param.WorkOrderId,
+                IsVerifyActivation = false
+            });
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.ExternalSFCs.Select(x => x.SFC));
 
             var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
@@ -385,7 +389,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <returns></returns>
         public async Task CreateBarcodeByOldMESSFCAsync(CreateBarcodeByOldMesSFCBo param, ILocalizationService localizationService)
         {
-            var planWorkOrderEntity = await _masterDataService.GetWorkOrderByIdAsync(param.WorkOrderId);
+            var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
+            {
+                WorkOrderId = param.WorkOrderId,
+                IsVerifyActivation = false
+            });
             var sfclist = await _manuSfcRepository.GetBySFCsAsync(param.OldSFCs.Select(x => x.SFC));
             var sfcInfoList = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(x => x.Id));
             var processRouteFirstProcedure = await _masterDataService.GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);

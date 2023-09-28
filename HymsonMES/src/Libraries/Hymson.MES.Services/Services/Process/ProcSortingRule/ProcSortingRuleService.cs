@@ -90,15 +90,15 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto)
         {
-            procSortingRuleCreateDto.Code = procSortingRuleCreateDto.Code.Trim();
+            procSortingRuleCreateDto.Code = procSortingRuleCreateDto.Code.ToTrimSpace();
             procSortingRuleCreateDto.Name = procSortingRuleCreateDto.Name.Trim();
-            procSortingRuleCreateDto.Version = procSortingRuleCreateDto.Version.Trim();
+            procSortingRuleCreateDto.Version = procSortingRuleCreateDto.Version.ToTrimSpace();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procSortingRuleCreateDto);
 
             //DTO转换实体
             var procSortingRuleEntity = procSortingRuleCreateDto.ToEntity<ProcSortingRuleEntity>();
-         
+
             procSortingRuleEntity.Id = IdGenProvider.Instance.CreateId();
             procSortingRuleEntity.CreatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
@@ -107,6 +107,22 @@ namespace Hymson.MES.Services.Services.Process
             procSortingRuleEntity.SiteId = _currentSite.SiteId ?? 0;
 
             procSortingRuleEntity.Status = SysDataStatusEnum.Build;
+
+            ProcSortingRuleEntity? procSortingRuleDefaultEntity = null;
+            if (procSortingRuleEntity.IsDefaultVersion ?? false)
+            {
+                procSortingRuleDefaultEntity = await _procSortingRuleRepository.GetByDefaultVersion(new Data.Repositories.Process.ProcSortingRule.Query.ProcSortingRuleByDefaultVersionQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Code = procSortingRuleCreateDto.Code
+                });
+                if (procSortingRuleDefaultEntity != null)
+                {
+                    procSortingRuleDefaultEntity.IsDefaultVersion = false;
+                    procSortingRuleDefaultEntity.UpdatedOn = HymsonClock.Now();
+                    procSortingRuleDefaultEntity.UpdatedBy = _currentUser.UserName;
+                }
+            }
 
             List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntities = new();
             List<ProcSortingRuleGradeEntity> procSortingRuleGradeEntities = new();
@@ -129,6 +145,7 @@ namespace Hymson.MES.Services.Services.Process
                         MaxContainingType = item.MaxContainingType,
                         ParameterValue = item.ParameterValue,
                         Rating = item.Rating,
+                        Serial = item.Serial,
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now(),
@@ -177,6 +194,10 @@ namespace Hymson.MES.Services.Services.Process
 
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
             //入库
+            if (procSortingRuleDefaultEntity != null)
+            {
+                await _procSortingRuleRepository.UpdateAsync(procSortingRuleDefaultEntity);
+            }
             await _procSortingRuleRepository.InsertAsync(procSortingRuleEntity);
             await _sortingRuleDetailRepository.InsertsAsync(procSortingRuleDetailEntities);
             await _sortingRuleGradeRepository.InsertsAsync(procSortingRuleGradeEntities);
@@ -224,9 +245,9 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcSortingRuleDto>> GetPagedListAsync(ProcSortingRulePagedQueryDto procSortingRulePagedQueryDto)
         {
             var procMaterials = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _currentSite.SiteId ?? 0, MaterialCode = procSortingRulePagedQueryDto.MaterialCode, Version = procSortingRulePagedQueryDto.MaterialVersion });
-            if ((procMaterials == null|| !procMaterials.Any())&&(!string.IsNullOrEmpty(procSortingRulePagedQueryDto.MaterialCode) || !string.IsNullOrEmpty(procSortingRulePagedQueryDto.MaterialVersion)))
+            if ((procMaterials == null || !procMaterials.Any()) && (!string.IsNullOrEmpty(procSortingRulePagedQueryDto.MaterialCode) || !string.IsNullOrEmpty(procSortingRulePagedQueryDto.MaterialVersion)))
             {
-                return new PagedInfo<ProcSortingRuleDto>(new List<ProcSortingRuleDto> { } ,1,0, 0);
+                return new PagedInfo<ProcSortingRuleDto>(new List<ProcSortingRuleDto> { }, 1, 0, 0);
             }
             var procSortingRulePagedQuery = procSortingRulePagedQueryDto.ToQuery<ProcSortingRulePagedQuery>();
             procSortingRulePagedQuery.SiteId = _currentSite.SiteId ?? 0;
@@ -292,7 +313,21 @@ namespace Hymson.MES.Services.Services.Process
             procSortingRuleEntity.Remark = procSortingRuleModifyDto.Remark;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
-
+            ProcSortingRuleEntity? procSortingRuleDefaultEntity = null;
+            if (procSortingRuleEntity.IsDefaultVersion ?? false)
+            {
+                procSortingRuleDefaultEntity = await _procSortingRuleRepository.GetByDefaultVersion(new Data.Repositories.Process.ProcSortingRule.Query.ProcSortingRuleByDefaultVersionQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Code = procSortingRuleEntity.Code
+                });
+                if (procSortingRuleDefaultEntity != null)
+                {
+                    procSortingRuleDefaultEntity.IsDefaultVersion = false;
+                    procSortingRuleDefaultEntity.UpdatedOn = HymsonClock.Now();
+                    procSortingRuleDefaultEntity.UpdatedBy = _currentUser.UserName;
+                }
+            }
 
             List<ProcSortingRuleDetailEntity> procSortingRuleDetailEntities = new();
             List<ProcSortingRuleGradeEntity> procSortingRuleGradeEntities = new();
@@ -306,6 +341,7 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
+                        Serial = item.Serial,
                         SortingRuleId = procSortingRuleEntity.Id,
                         ProcedureId = item.ProcedureId,
                         ParameterId = item.ParameterId,
@@ -362,7 +398,10 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
-
+            if (procSortingRuleDefaultEntity != null)
+            {
+                await _procSortingRuleRepository.UpdateAsync(procSortingRuleDefaultEntity);
+            }
             await _sortingRuleDetailRepository.DeleteSortingRuleDetailByIdAsync(procSortingRuleModifyDto.Id);
             await _sortingRuleGradeRepository.DeleteSortingRuleGradeByIdAsync(procSortingRuleModifyDto.Id);
             await _ruleGradeDetailsRepository.DeleteSortingRuleGradeByIdAsync(procSortingRuleModifyDto.Id);
@@ -436,6 +475,9 @@ namespace Hymson.MES.Services.Services.Process
                             MaxContainingType = entity.MaxContainingType,
                             ParameterValue = entity.ParameterValue,
                             Rating = entity.Rating,
+                            Serial=entity.Serial,
+                            SortingRuleId = entity.SortingRuleId
+
                         });
                     }
                 }

@@ -22,7 +22,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? FeedingPointId { get; set; }
 
         /// <summary>
-        /// 上料产品Id
+        /// 上料产品Id（主物料ID）
         /// </summary>
         public long ProductId { get; set; }
 

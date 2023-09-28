@@ -109,12 +109,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcessRouteEntity> GetByIdAsync(long id)
         {
-            var key = $"proc_process_route&{id}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(GetByIdSql, new { Id = id });
-            });
+            //var key = $"proc_process_route&{id}";
+            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            //{
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(GetByIdSql, new { Id = id });
+            //});
         }
 
         /// <summary>

@@ -211,13 +211,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 switch (ruleEntity.MatchWay)
                 {
                     case MatchModeEnum.Start:
-                        pattern = $"{rule}.+";
+                        pattern = $"^{rule}.+";
                         break;
                     case MatchModeEnum.Middle:
                         pattern = $".+{rule}.+";
                         break;
                     case MatchModeEnum.End:
-                        pattern = $".+{rule}";
+                        pattern = $".+{rule}$";
                         break;
                     case MatchModeEnum.Whole:
                         pattern = $"^{pattern}$";

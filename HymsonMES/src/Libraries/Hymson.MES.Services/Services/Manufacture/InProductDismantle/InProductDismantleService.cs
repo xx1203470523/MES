@@ -98,6 +98,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
+        /// 条码
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
         /// 事件总线
         /// </summary>
         private readonly IEventBus<EventBusInstance1> _eventBus;
@@ -118,6 +123,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="circulationRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         /// <param name="eventBus"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcBomRepository procBomRepository,
@@ -131,6 +137,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcCirculationRepository circulationRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
             IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
@@ -147,6 +154,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _manuSfcStepRepository=manuSfcStepRepository;
             _eventBus = eventBus;
         }
 
@@ -639,8 +647,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 //记录step信息
-                //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
+              
 
                 //添加组件信息
                 rows += await _circulationRepository.InsertAsync(sfcCirculationEntity);
