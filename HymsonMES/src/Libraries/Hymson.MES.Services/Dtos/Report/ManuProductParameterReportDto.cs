@@ -105,6 +105,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public string Paramvalue { get; set; }
         /// <summary>
+        /// 参数值
+        /// </summary>
+        public string ParameterName { get; set; }
+        /// <summary>
         /// 上限
         /// </summary>
         public string StandardUpperLimit { get; set; }
