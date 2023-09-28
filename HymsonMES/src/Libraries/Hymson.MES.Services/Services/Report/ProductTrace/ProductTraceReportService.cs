@@ -1,7 +1,10 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
+﻿using Hymson.Authentication;
+using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
@@ -15,8 +18,13 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Globalization;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -26,10 +34,16 @@ namespace Hymson.MES.Services.Services.Report
     public class ProductTraceReportService : IProductTraceReportService
     {
         #region 依赖注入
+        private readonly IMinioService _minioService;
+        private readonly IExcelService _excelService;
         /// <summary>
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+        /// <summary>
+        /// 当前对象（登录用户）
+        /// </summary>
+        private readonly ICurrentUser _currentUser;
         /// <summary>
         /// 物料维护 仓储
         /// </summary>
@@ -63,6 +77,15 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         /// <summary>
+        /// 条码记录仓储
+        /// </summary>
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+        /// <summary>
+        /// IManuNgJudgeRepository
+        /// </summary>
+        private readonly IManuNgJudgeRepository _manuNgJudgeRepository;
+
+        /// <summary>
         /// 生产工艺路线节点
         /// </summary>
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
@@ -75,8 +98,9 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
-        public ProductTraceReportService(ICurrentSite currentSite,
-         IProcMaterialRepository procMaterialRepository,
+        public ProductTraceReportService(IMinioService minioService, IExcelService excelService, ICurrentSite currentSite,
+            ICurrentUser currentUser,
+        IProcMaterialRepository procMaterialRepository,
          IPlanWorkOrderRepository planWorkOrderRepository,
          IManuSfcCirculationRepository manuSfcCirculationRepository,
          IProcResourceRepository procResourceRepository,
@@ -86,9 +110,14 @@ namespace Hymson.MES.Services.Services.Report
          IManuSfcStepRepository manuSfcStepRepository,
          IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
          IManuSfcInfoRepository manuSfcInfoRepository,
-         IManuSfcRepository manuSfcRepository)
+         IManuSfcRepository manuSfcRepository,
+         IManuSfcSummaryRepository manuSfcSummaryRepository,
+          IManuNgJudgeRepository manuNgJudgeRepository)
         {
+            _minioService = minioService;
+            _excelService = excelService;
             _currentSite = currentSite;
+            _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
@@ -100,6 +129,8 @@ namespace Hymson.MES.Services.Services.Report
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _manuNgJudgeRepository = manuNgJudgeRepository;
         }
         #endregion
 
@@ -469,5 +500,374 @@ namespace Hymson.MES.Services.Services.Report
             });
             return new PagedInfo<ProductTracePlanWorkOrderViewDto>(productTracePlanWorkOrderViewDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+        /// <summary>
+        /// NG判定
+        /// </summary>
+        /// <param name="updateNGJudgeDto"></param>
+        /// <returns></returns>
+        public async Task UpdateNGJudgeAsync(UpdateNGJudgeDto updateNGJudgeDto)
+        {
+            var sfcStepEntity = await _manuSfcStepRepository.GetByIdAsync(updateNGJudgeDto.StepId);
+            sfcStepEntity.Passed = 1;
+            
+            var SFC = sfcStepEntity.SFC;
+            var longEquipmentId = sfcStepEntity.EquipmentId;
+            var manuSfcSummaryQueryDto = new ManuSfcSummaryQueryDto()
+            {
+                SFC = sfcStepEntity.SFC,
+                EquipmentId = sfcStepEntity.EquipmentId,
+                QualityStatus = 1
+            };
+            var manuSfcNgJudgeEntity = new ManuSfcNgJudgeEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = sfcStepEntity.SFC,
+                StepId = updateNGJudgeDto.StepId,
+                NGJudgeType = updateNGJudgeDto.NGJudgeType,
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName
+            };
+
+            using var ts = TransactionHelper.GetTransactionScope();
+            await _manuSfcStepRepository.UpdateAsync(sfcStepEntity);
+            await _manuSfcSummaryRepository.UpdateNGAsync(manuSfcSummaryQueryDto);
+            await _manuNgJudgeRepository.InsertAsync(manuSfcNgJudgeEntity);
+            ts.Complete();
+        }
+
+        /// <summary>
+        /// 产品追溯报表导出
+        /// </summary>
+        /// <param name="planWorkOrderPagedQueryDto"></param>
+        /// <returns></returns>
+
+        public async Task<ExportResultDto> ProductTracingReportExportAsync(ProductTracePagedQueryDto planWorkOrderPagedQueryDto)
+        {
+            string fileName = string.Format("({0})产品追朔", planWorkOrderPagedQueryDto.SFC);
+            planWorkOrderPagedQueryDto.PageSize = 10000;
+
+            #region 工单信息
+            var planWorkOrderPagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
+            IEnumerable<ProductTracePlanWorkOrderViewDto> productTracePlanWorkOrderViews = new List<ProductTracePlanWorkOrderViewDto>();
+            //查询条码信息
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = planWorkOrderPagedQueryDto.SFC, SiteId = _currentSite.SiteId });
+            if (manuSfcEntity == null)
+            {
+                manuSfcEntity = new ManuSfcEntity();
+            }
+            var sfcinfo = await _manuSfcInfoRepository.GetBySFCNoCheckUsedAsync(manuSfcEntity?.Id ?? 0);
+            if (sfcinfo == null)
+            {
+                sfcinfo = new ManuSfcInfoEntity();
+            }
+            planWorkOrderPagedQuery.WorkOrderId = sfcinfo.WorkOrderId;
+            planWorkOrderPagedQuery.SiteId = _currentSite.SiteId;
+            var pagedInfo = await _planWorkOrderRepository.GetPagedInfoAsync(planWorkOrderPagedQuery);
+            var planWorkOrderLists = pagedInfo.Data;
+            var planWorkOrderReportExportDtos = new List<ProductTracePlanWorkOrderReportExportDto>();
+            foreach (var manuProductParameterReport in planWorkOrderLists)
+            {
+                planWorkOrderReportExportDtos.Add(manuProductParameterReport.ToExcelModel<ProductTracePlanWorkOrderReportExportDto>());
+            }
+            #endregion
+
+            #region 生产工艺
+
+            //条码对应工单信息
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcinfo.WorkOrderId);
+            if (planWorkOrderEntity == null)
+            {
+
+                planWorkOrderEntity = new PlanWorkOrderEntity();
+            }
+            //工艺路线明细
+            var procProcessRouteDetailNodeQuery = planWorkOrderPagedQueryDto.ToQuery<ProcProcessRouteDetailNodePagedQuery>();
+            procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
+            var processroutePagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
+            //查询条码步骤
+            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity?.SFC??"", SiteId = _currentSite.SiteId ?? 0 });
+            var procSfcProcessRouteReports = new List<ProcSfcProcessRouteReportExportDto>();
+            var processRouteLists = processroutePagedInfo.Data;
+            foreach (var procProcess in processRouteLists)
+            {
+                ProcSfcProcessRouteReportExportDto procSfcProcessRouteReportExportDto = new ProcSfcProcessRouteReportExportDto();
+                var sfcProcessRouteViewDto = GetProcessRouteDetailStep(procProcess, manuSfcStepEntities);
+                //处理结束工序编码为空的显示
+                if (string.IsNullOrEmpty(sfcProcessRouteViewDto.ProcedureCode))
+                {
+                    procSfcProcessRouteReportExportDto.ProcedureName = "结束";
+                    sfcProcessRouteViewDto.CurrentStatus = SfcProduceStatusEnum.Complete;
+                }
+                else
+                {
+                    procSfcProcessRouteReportExportDto.ProcedureCode = sfcProcessRouteViewDto.ProcedureCode;
+                    procSfcProcessRouteReportExportDto.ProcedureName = sfcProcessRouteViewDto.ProcedureName;
+                }
+                if (sfcProcessRouteViewDto.CurrentStatus == null)
+                {
+                    procSfcProcessRouteReportExportDto.CurrentStatusStr = "未开始";
+                }
+                if (sfcProcessRouteViewDto.CurrentStatus == SfcProduceStatusEnum.lineUp)
+                {
+                    procSfcProcessRouteReportExportDto.CurrentStatusStr = "排队中";
+                }
+                if (sfcProcessRouteViewDto.CurrentStatus == SfcProduceStatusEnum.Activity)
+                {
+                    procSfcProcessRouteReportExportDto.CurrentStatusStr = "进行中";
+                }
+                if (sfcProcessRouteViewDto.CurrentStatus == SfcProduceStatusEnum.Complete)
+                {
+                    procSfcProcessRouteReportExportDto.CurrentStatusStr = "完成";
+                }
+                if (sfcProcessRouteViewDto.CurrentStatus == SfcProduceStatusEnum.Locked)
+                {
+                    procSfcProcessRouteReportExportDto.CurrentStatusStr = "锁定";
+                }
+
+                procSfcProcessRouteReportExportDto.Qty = sfcProcessRouteViewDto.Qty;
+                if (sfcProcessRouteViewDto.Passed == 0)
+                {
+                    procSfcProcessRouteReportExportDto.Passed = "不合格";
+                }
+                if (sfcProcessRouteViewDto.Passed == 1)
+                {
+                    procSfcProcessRouteReportExportDto.Passed = "合格";
+                }
+                procSfcProcessRouteReportExportDto.CreatedOn = sfcProcessRouteViewDto.CreatedOn;
+                procSfcProcessRouteReportExportDto.CreatedBy = sfcProcessRouteViewDto.CreatedBy;
+                procSfcProcessRouteReports.Add(procSfcProcessRouteReportExportDto);
+            }
+
+            #endregion
+
+            #region 设备参数
+            var equProductprameterQuery = planWorkOrderPagedQueryDto.ToQuery<ManuProductParameterPagedQuery>();
+            equProductprameterQuery.SiteId = _currentSite.SiteId ?? 123456;
+            equProductprameterQuery.ParameterType = ParameterTypeEnum.Equipment;
+            var equProductprameterpagedInfo = await _manuProductParameterRepository.GetManuProductParameterPagedInfoAsync(equProductprameterQuery);
+
+            IEnumerable<ProcResourceEntity> equProcResources = new List<ProcResourceEntity>();
+            var equprocResourcesIds = equProductprameterpagedInfo.Data.Select(c => c.ResourceId).ToArray();
+            if (equprocResourcesIds.Any())
+            {
+                equProcResources = await _procResourceRepository.GetListByIdsAsync(equprocResourcesIds);
+            }
+            //工序信息
+            IEnumerable<ProcProcedureEntity> equProcProcedures = new List<ProcProcedureEntity>();
+            var equProcProcedureIds = equProductprameterpagedInfo.Data.Select(c => c.ProcedureId).ToArray();
+            if (equProcProcedureIds.Any())
+            {
+                equProcProcedures = await _procProcedureRepository.GetByIdsAsync(equProcProcedureIds);
+            }
+            //设备信息
+            IEnumerable<EquEquipmentEntity> equEquipmentsList = new List<EquEquipmentEntity>();
+            var equEquipmentListIds = equProductprameterpagedInfo.Data.Select(c => c.EquipmentId).ToArray();
+            if (equEquipmentListIds.Any())
+            {
+                equEquipmentsList = await _equipmentRepository.GetByIdsAsync(equEquipmentListIds);
+            }
+
+
+            var equManuProductsList = equProductprameterpagedInfo.Data;
+            var equipmentPrameterReportExportDtos = new List<EquipmentPrameterReportExportDto>();
+            foreach (var equmanuProduct in equManuProductsList)
+            {
+                EquipmentPrameterReportExportDto returnView = new EquipmentPrameterReportExportDto();
+                //资源信息
+                var procResource = equProcResources.Where(c => c.Id == equmanuProduct.ResourceId).FirstOrDefault();
+                if (procResource != null)
+                {
+                    returnView.ResourceCode = procResource.ResCode;
+                    returnView.ResourceName = procResource.ResName;
+                }
+                //工序信息
+                var procProcedure = equProcProcedures.Where(c => c.Id == equmanuProduct.ProcedureId).FirstOrDefault();
+                if (procProcedure != null)
+                {
+                    returnView.ProcedureCode = procProcedure.Code;
+                    returnView.ProcedureName = procProcedure.Name;
+                }
+                //设备信息
+                var equEquipment = equEquipmentsList.Where(c => c.Id == equmanuProduct.EquipmentId).FirstOrDefault();
+                if (equEquipment != null)
+                {
+                    returnView.EquipmentCode = equEquipment.EquipmentCode;
+                    returnView.EquipmentName = equEquipment.EquipmentName;
+                }
+                returnView.ParameterCode = equmanuProduct.ParameterCode;
+                returnView.ParameterName = equmanuProduct.ParameterName;
+                returnView.ParameterValue = equmanuProduct.ParameterValue;
+                returnView.CreatedOn = equmanuProduct.CreatedOn;
+
+                equipmentPrameterReportExportDtos.Add(returnView);
+            }
+            #endregion
+
+            #region 产品参数
+            var productprameterQuery = planWorkOrderPagedQueryDto.ToQuery<ManuProductParameterPagedQuery>();
+            productprameterQuery.SiteId = _currentSite.SiteId ?? 123456;
+            productprameterQuery.ParameterType = ParameterTypeEnum.Product;
+            var productprameterpagedInfo = await _manuProductParameterRepository.GetManuProductParameterPagedInfoAsync(productprameterQuery);
+
+            IEnumerable<ProcResourceEntity> procResources = new List<ProcResourceEntity>();
+            var procResourcesIds = productprameterpagedInfo.Data.Select(c => c.ResourceId).ToArray();
+            if (procResourcesIds.Any())
+            {
+                procResources = await _procResourceRepository.GetListByIdsAsync(procResourcesIds);
+            }
+            //工序信息
+            IEnumerable<ProcProcedureEntity> procProcedures = new List<ProcProcedureEntity>();
+            var procProcedureIds = productprameterpagedInfo.Data.Select(c => c.ProcedureId).ToArray();
+            if (procProcedureIds.Any())
+            {
+                procProcedures = await _procProcedureRepository.GetByIdsAsync(procProcedureIds);
+            }
+            var productManuProductsList = productprameterpagedInfo.Data;
+            var productPrameterReportExportDtos = new List<ProductPrameterReportExportDto>();
+            foreach (var equmanuProduct in productManuProductsList)
+            {
+                ProductPrameterReportExportDto returnView = new ProductPrameterReportExportDto();
+                //资源信息
+                var procResource = procResources.Where(c => c.Id == equmanuProduct.ResourceId).FirstOrDefault();
+                if (procResource != null)
+                {
+                    returnView.ResourceCode = procResource.ResCode;
+                }
+                //工序信息
+                var procProcedure = procProcedures.Where(c => c.Id == equmanuProduct.ProcedureId).FirstOrDefault();
+                if (procProcedure != null)
+                {
+                    returnView.ProcedureCode = procProcedure.Code;
+                    returnView.ProcedureName = procProcedure.Name;
+                }
+
+                returnView.ParameterCode = equmanuProduct.ParameterCode;
+                returnView.ParameterName = equmanuProduct.ParameterName;
+                returnView.ParameterValue = equmanuProduct.ParameterValue;
+                returnView.CreatedOn = equmanuProduct.CreatedOn;
+                returnView.CreatedBy = equmanuProduct.CreatedBy;
+                productPrameterReportExportDtos.Add(returnView);
+            }
+            #endregion
+
+            #region 产品追朔
+            var productTraceReportPagedQuery = planWorkOrderPagedQueryDto.ToQuery<ProductTraceReportPagedQuery>();
+            productTraceReportPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
+            //追溯分页查询
+            var manuSfcCirculationPagedInfo = await _manuSfcCirculationRepository.GetProductTraceReportPagedInfoAsync(productTraceReportPagedQuery);
+            //工序信息
+            IEnumerable<ProcProcedureEntity> manuSfcprocProcedures = new List<ProcProcedureEntity>();
+            var manuSfcprocProcedureIds = manuSfcCirculationPagedInfo.Data.Select(c => c.ProcedureId).ToArray();
+            if (manuSfcprocProcedureIds.Any())
+            {
+                manuSfcprocProcedures = await _procProcedureRepository.GetByIdsAsync(manuSfcprocProcedureIds);
+            }
+            var manuSfcCirculationReportExportDtos = new List<ManuSfcCirculationReportExportDto>();
+            foreach (var productParameterView in manuSfcCirculationPagedInfo.Data)
+            {
+                ManuSfcCirculationReportExportDto returnView = new ManuSfcCirculationReportExportDto();
+                //工序信息
+                var procProcedure = manuSfcprocProcedures.Where(c => c.Id == productParameterView.ProcedureId).FirstOrDefault();
+                if (procProcedure != null)
+                {
+                    returnView.ProcedureCode = procProcedure.Code;
+                    returnView.ProcedureName = procProcedure.Name;
+                }
+                returnView.SFC = productParameterView.SFC;
+                returnView.CirculationBarCode = productParameterView.CirculationBarCode;
+                returnView.CreatedBy = productParameterView.CreatedBy;
+                returnView.CreatedOn = productParameterView.CreatedOn;
+                manuSfcCirculationReportExportDtos.Add(returnView);
+            }
+            #endregion
+
+            #region 条码履历
+            //查询条码所有步骤数据
+            var manuSfcStepPagedQuery = planWorkOrderPagedQueryDto.ToQuery<ManuSfcStepPagedQuery>();
+            manuSfcStepPagedQuery.SiteId = _currentSite.SiteId ?? 123456;
+            var manuSfcStepPagedInfo = await _manuSfcStepRepository.GetPagedInfoAsync(manuSfcStepPagedQuery);
+            //资源信息
+            IEnumerable<ProcResourceEntity> manuSfcStepProcResources = new List<ProcResourceEntity>();
+            var manuSfcStepProcResourcesIds = manuSfcStepPagedInfo.Data.Select(c => c.ResourceId ?? -1).ToArray();
+            if (procResourcesIds.Any())
+            {
+                manuSfcStepProcResources = await _procResourceRepository.GetListByIdsAsync(manuSfcStepProcResourcesIds);
+            }
+            //工序信息
+            IEnumerable<ProcProcedureEntity> manuSfcStepProcProcedures = new List<ProcProcedureEntity>();
+            var manuSfcStepProcProcedureIds = manuSfcStepPagedInfo.Data.Select(c => c.ProcedureId ?? -1).ToArray();
+            if (manuSfcStepProcProcedureIds.Any())
+            {
+                manuSfcStepProcProcedures = await _procProcedureRepository.GetByIdsAsync(manuSfcStepProcProcedureIds);
+            }
+            //设备信息
+            IEnumerable<EquEquipmentEntity> manuSfcStepEquEquipments = new List<EquEquipmentEntity>();
+            var manuSfcStepEquEquipmentIds = manuSfcStepPagedInfo.Data.Select(c => c.EquipmentId ?? -1).ToArray();
+            if (manuSfcStepEquEquipmentIds.Any())
+            {
+                manuSfcStepEquEquipments = await _equipmentRepository.GetByIdsAsync(manuSfcStepEquEquipmentIds);
+            }
+            var productTracePagedReportExportDtos = new List<ProductTracePagedReportExportDto>();
+            foreach (var manuSfcStep in manuSfcStepPagedInfo.Data)
+            {
+                ProductTracePagedReportExportDto returnView = new ProductTracePagedReportExportDto();
+                var procProcedure = manuSfcStepProcProcedures.Where(c => c.Id == manuSfcStep.ProcedureId).FirstOrDefault();
+                if (procProcedure != null)
+                {
+                    returnView.ProcedureCode = procProcedure.Code;
+                    returnView.ProcedureName = procProcedure.Name;
+                }
+                //设备信息
+                var equEquipment = manuSfcStepEquEquipments.Where(c => c.Id == manuSfcStep.EquipmentId).FirstOrDefault();
+                if (equEquipment != null)
+                {
+                    returnView.EquipmentCode = equEquipment.EquipmentCode;
+                    returnView.EquipmentName = equEquipment.EquipmentName;
+                }
+                //资源信息
+                var procResource = manuSfcStepProcResources.Where(c => c.Id == manuSfcStep.ResourceId).FirstOrDefault();
+                if (procResource != null)
+                {
+                    returnView.ResourceCode = procResource.ResCode;
+                    returnView.ResourceName = procResource.ResName;
+                }
+                returnView.SFC = manuSfcStep.SFC;
+                switch (manuSfcStep.Operatetype)
+                {
+                    case ManuSfcStepTypeEnum.InStock:
+                        returnView.OperatetypeStr = "进站";
+                        break;
+                    case ManuSfcStepTypeEnum.OutStock:
+                        returnView.OperatetypeStr = "出站";
+                        break;
+                    case ManuSfcStepTypeEnum.Change:
+                        returnView.OperatetypeStr = "转换";
+                        break;
+                    case ManuSfcStepTypeEnum.Add:
+                        returnView.OperatetypeStr = "组件添加";
+                        break;
+                    case ManuSfcStepTypeEnum.Assemble:
+                        returnView.OperatetypeStr = "组装";
+                        break;
+                    default:
+                        break;
+                }
+                returnView.CreatedOn = manuSfcStep.CreatedOn;
+                productTracePagedReportExportDtos.Add(returnView);
+            }
+            #endregion
+
+            var filePath = await _excelService.ExportAsync(planWorkOrderReportExportDtos, procSfcProcessRouteReports, equipmentPrameterReportExportDtos, productPrameterReportExportDtos, manuSfcCirculationReportExportDtos, productTracePagedReportExportDtos, fileName);
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ExportResultDto
+            {
+                FileName = fileName,
+                Path = uploadResult.AbsoluteUrl,
+            };
+        }
+
     }
 }
