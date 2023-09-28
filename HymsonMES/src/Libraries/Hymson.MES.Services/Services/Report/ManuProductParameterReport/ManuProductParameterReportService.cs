@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Services.Report.ManuProductParameterReport
                 pageQuery.SFCStr = pageQuery.SFCStr.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
             }
             string fileName = "产品参数";
-            pageQuery.PageSize = 10000;
+            pageQuery.PageSize = 1000000;
             var pagedQuery = pageQuery.ToQuery<ManuProductParameterReportPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _manuProductParameterRepository.GetManuProductParameterReportPagedInfoAsync(pagedQuery);
