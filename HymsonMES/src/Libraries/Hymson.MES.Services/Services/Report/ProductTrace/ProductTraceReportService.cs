@@ -546,7 +546,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<ExportResultDto> ProductTracingReportExportAsync(ProductTracePagedQueryDto planWorkOrderPagedQueryDto)
         {
             string fileName = string.Format("({0})产品追朔", planWorkOrderPagedQueryDto.SFC);
-            planWorkOrderPagedQueryDto.PageSize = 10000;
+            planWorkOrderPagedQueryDto.PageSize = 1000000;
 
             #region 工单信息
             var planWorkOrderPagedQuery = planWorkOrderPagedQueryDto.ToQuery<PlanWorkOrderPagedQuery>();
