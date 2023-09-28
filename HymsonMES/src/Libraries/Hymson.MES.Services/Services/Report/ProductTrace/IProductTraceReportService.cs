@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using System;
 using System.Collections.Generic;
@@ -54,5 +55,12 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="updateNGJudgeDto"></param>
         /// <returns></returns>
         Task UpdateNGJudgeAsync(UpdateNGJudgeDto updateNGJudgeDto);
+
+        /// <summary>
+        /// 产品追朔表导出
+        /// </summary>
+        /// <param name="planWorkOrderPagedQueryDto"></param>
+        /// <returns></returns>
+        Task<ExportResultDto> ProductTracingReportExportAsync(ProductTracePagedQueryDto planWorkOrderPagedQueryDto);
     }
 }
