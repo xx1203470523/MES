@@ -46,6 +46,17 @@ namespace Hymson.MES.Api.Controllers.Plan
         }
 
         /// <summary>
+        /// 查询详情（工单信息表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<PlanWorkOrderDetailViewDto> QueryPlanWorkOrderByIdAsync(long id)
+        {
+            return await _planWorkOrderService.QueryPlanWorkOrderByIdAsync(id);
+        }
+
+        /// <summary>
         /// 模糊查询工单
         /// </summary>
         /// <param name="workOrderCode"></param>
