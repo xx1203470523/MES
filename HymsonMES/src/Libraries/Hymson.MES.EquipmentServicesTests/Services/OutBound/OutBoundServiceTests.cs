@@ -58,8 +58,10 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
         [TestMethod()]
         public async Task OutBoundTestAsync()
         {
-            string resourceCode = "YTLPACKO1ER014";
-            string equipmentCode = "YTLPACK01AE014";
+
+            string request = "{\"SFC\":\"ES01B20020048202309220052\",\"Passed\":1,\"ParamList\":null,\"BindFeedingCodes\":null,\"NG\":null,\"IsPassingStation\":true,\"ResourceCode\":\"YTLPACK01ER025\",\"EquipmentCode\":\"YTLPACK01AE025\",\"LocalTime\":\"2023-09-27T08:37:47\"}";
+            string resourceCode = "YTLPACK01ER025";
+            string equipmentCode = "YTLPACK01AE025";
             string prefix = "YTP280024A23970001EVE";
             List<OutBoundParam> outBoundParams = new List<OutBoundParam>();
             for (int i = 1; i <= 1; i++)
@@ -80,7 +82,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 ResourceCode = resourceCode,
                 Passed = 1,
                 LocalTime = HymsonClock.Now(),
-                SFC = prefix + "1",
+                SFC = "ES01B20020048202309220052",
                 ParamList = outBoundParams.ToArray()
             });
 
