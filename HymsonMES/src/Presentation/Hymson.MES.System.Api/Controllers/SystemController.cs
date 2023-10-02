@@ -132,6 +132,7 @@ namespace Hymson.MES.System.Api.Controllers
                     ProcedureName = ManuSfcCirculationViewDto.ProcedureName,
                     LocalTime = ManuSfcCirculationViewDto.LocalTime,
                     EquipmentName = ManuSfcCirculationViewDto.EquipmentName,
+                    JudgmentResult = ManuSfcCirculationViewDto.JudgmentResult
                 };
                 manuSfcPrameterDtoList.Add(manuSfcTracedDto);
             }

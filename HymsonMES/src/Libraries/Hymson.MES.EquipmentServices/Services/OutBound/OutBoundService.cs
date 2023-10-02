@@ -229,9 +229,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //排队中的条码没进站不允许出站
             if (sfcProduceList.Any())
             {
-                //必须进站再出站
+                //必须进站再出站  添加工单条件
                 var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
-                                            sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.lineUp)
+                                            sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.lineUp && c.WorkOrderId == planWorkOrder.Id)
                                             .Select(s => s.SFC)
                                             .Contains(w.SFC) && w.IsPassingStation != true);
                 if (outBoundMoreSfcs.Any())

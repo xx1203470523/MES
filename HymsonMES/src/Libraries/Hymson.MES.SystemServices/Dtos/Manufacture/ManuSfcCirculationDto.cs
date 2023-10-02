@@ -283,6 +283,11 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         public string StandardLowerLimit { get; set; }
 
         /// <summary>
+        /// 判定结果
+        /// </summary>
+        public string JudgmentResult { get; set; }
+
+        /// <summary>
         /// 检测工序编码
         /// </summary>
         public string ProcedureCode { get; set; }
