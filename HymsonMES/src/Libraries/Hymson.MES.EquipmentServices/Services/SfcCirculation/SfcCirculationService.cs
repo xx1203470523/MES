@@ -843,10 +843,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     return sfcCirculationCCSNgSetDto.BindSFCs != null && sfcCirculationCCSNgSetDto.BindSFCs.Contains(c.SFC)
                         || sfcCirculationCCSNgSetDto.Locations != null && sfcCirculationCCSNgSetDto.Locations.Contains(c.Location);
                 });
-                if (!delEntities.Any())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19143));//条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系
-                }
+                //临时注释取消
+                //if (!delEntities.Any())
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES19143));//条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系
+                //}
             }
             //记录CCS的NG记录
             List<ManuSfcCcsNgRecordEntity> manuSfcCcsNgRecords = new();

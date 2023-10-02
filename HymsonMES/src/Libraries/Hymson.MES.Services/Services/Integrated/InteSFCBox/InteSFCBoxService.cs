@@ -134,11 +134,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
 
             //组装数据
             var insert = new List<InteSFCBoxEntity>();
+            var batchNo=DateTime.Now.ToString("yyMMddHHmmss");
+
             foreach (var item in stockTakeDetailExcelImportDtos)
             {
                 //var Entity = item.ToEntity<InteSFCBoxEntity>();
                 insert.Add(new InteSFCBoxEntity
                 {
+                    BatchNo = batchNo,
                     SFC = item.SFC,
                     Grade = item.Grade,
                     Status = SFCBoxEnum.Start,

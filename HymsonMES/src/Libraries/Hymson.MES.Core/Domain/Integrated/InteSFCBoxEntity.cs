@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Domain.Integrated
         public string SFC { get; set; }
 
         /// <summary>
+        /// 批次号
+        /// </summary>
+        public string BatchNo { get; set; }
+
+        /// <summary>
         /// 箱码
         /// </summary>
         public string BoxCode { get; set; }

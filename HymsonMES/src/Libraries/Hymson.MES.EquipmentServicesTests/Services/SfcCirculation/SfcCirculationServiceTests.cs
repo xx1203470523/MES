@@ -70,7 +70,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
             {
                 SFC = "2121AsakiA4A4",
-                ModelCode="12S",  //ModelCode
+                ModelCode = "12S",  //ModelCode
                 //IsVirtualSFC=false,
                 BindSFCs = new CirculationBindDto[] {
                     new CirculationBindDto{
@@ -79,9 +79,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
                         //Name="CCS01"
                     }
                 },
-                EquipmentCode= "YTLPACK01AE014",
-                ResourceCode= "YTLPACK01ER014",
-                LocalTime=DateTime.Now
+                EquipmentCode = "YTLPACK01AE014",
+                ResourceCode = "YTLPACK01ER014",
+                LocalTime = DateTime.Now
             };
             await _sfcCirculationService.SfcCirculationBindAsync(sfcCirculationCCS);
             Assert.IsTrue(true);
@@ -164,22 +164,22 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             await SetEquInfoAsync(equipmentCode);
             try
             {
-SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto = new SfcCirculationCCSNgSetDto
-            {
-                ResourceCode = "YTLPACK01AE018",
-                SFC = "YTP280024A23960001EVE",
-                //Locations = new string[] { "A" }
-                //BindSFCs = new string[] { "CCS0002" }
-            };
-            await _sfcCirculationService.SfcCirculationCCSNgSetAsync(sfcCirculationCCSNgSetDto);
-           
+                SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto = new SfcCirculationCCSNgSetDto
+                {
+                    ResourceCode = "YTLPACK01ER018",
+                    SFC = "YTLSM202309270168A",
+                    Locations = new string[] { "C" }
+                    //BindSFCs = new string[] { "CCS0002" }
+                };
+                await _sfcCirculationService.SfcCirculationCCSNgSetAsync(sfcCirculationCCSNgSetDto);
+
             }
             catch (Exception ex)
             {
                 int ss = 1;
                 throw;
             }
-             Assert.IsTrue(true);
+            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -248,9 +248,9 @@ SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto = new SfcCirculationCCSNgSet
                 int s = 1;
                 throw;
             }
-           
+
         }
-        
+
         /// <summary>
         /// 测试模组条码查询信息
         /// </summary>
@@ -271,7 +271,7 @@ SfcCirculationCCSNgSetDto sfcCirculationCCSNgSetDto = new SfcCirculationCCSNgSet
                 int s = 1;
                 throw;
             }
-           
+
         }
     }
 }

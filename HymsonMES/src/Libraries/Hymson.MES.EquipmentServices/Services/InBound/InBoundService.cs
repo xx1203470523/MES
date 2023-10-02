@@ -361,6 +361,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 //条码表
                 var manuSfcEntity = new ManuSfcEntity
                 {
+                    //Id = 24216009787551750,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
                     SFC = sfc,
@@ -523,7 +524,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             }
             await _manuSfcRepository.InsertRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
-            await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
+           if(await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList) == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", string.Join(',', manuSfcProduceList)).WithData("action","插入在制信息");
+            }
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();
         }
