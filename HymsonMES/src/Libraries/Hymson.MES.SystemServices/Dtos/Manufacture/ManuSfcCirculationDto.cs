@@ -288,6 +288,11 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         public string JudgmentResult { get; set; }
 
         /// <summary>
+        /// 参数值
+        /// </summary>
+        public string ParameterValue { get; set; }
+
+        /// <summary>
         /// 检测工序编码
         /// </summary>
         public string ProcedureCode { get; set; }

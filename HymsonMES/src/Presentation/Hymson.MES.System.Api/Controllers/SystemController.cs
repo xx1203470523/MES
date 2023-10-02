@@ -8,6 +8,7 @@ using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -132,7 +133,9 @@ namespace Hymson.MES.System.Api.Controllers
                     ProcedureName = ManuSfcCirculationViewDto.ProcedureName,
                     LocalTime = ManuSfcCirculationViewDto.LocalTime,
                     EquipmentName = ManuSfcCirculationViewDto.EquipmentName,
-                    JudgmentResult = ManuSfcCirculationViewDto.JudgmentResult
+                    JudgmentResult = ManuSfcCirculationViewDto.JudgmentResult,
+                    ParameterValue = ManuSfcCirculationViewDto.ParameterValue
+
                 };
                 manuSfcPrameterDtoList.Add(manuSfcTracedDto);
             }
