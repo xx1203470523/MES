@@ -8,11 +8,7 @@ using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using static Mysqlx.Notice.Warning.Types;
 
 namespace Hymson.MES.System.Api.Controllers
 {
