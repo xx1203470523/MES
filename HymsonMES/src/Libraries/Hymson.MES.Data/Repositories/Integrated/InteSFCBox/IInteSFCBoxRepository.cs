@@ -29,7 +29,14 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         /// </summary>
         /// <param name="boxCodes"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteSFCAllView>> GetByBoxCodesAsync(string[] boxCodes);
+        Task<IEnumerable<InteSFCAllView>> GetByBoxCodesAsync(string[] batchNos);
+
+        /// <summary>
+        /// 获取批次码相关信息
+        /// </summary>
+        /// <param name="boxCodes"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteSFCBoxEntity>> GetManuSFCBoxAsync(InteSFCBoxEntityQuery query);
 
         /// <summary>
         /// 删除关联表数据，按工单

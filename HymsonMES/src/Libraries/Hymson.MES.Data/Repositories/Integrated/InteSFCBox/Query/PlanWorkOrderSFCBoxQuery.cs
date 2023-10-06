@@ -10,7 +10,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query
     public class PlanWorkOrderSFCBoxQuery
     {
         public long? Id { get; set; }
-        public string? BoxCode { get; set; }
+        public string? BatchNo { get; set; }
         public string? Grade { get; set; }
 
     }

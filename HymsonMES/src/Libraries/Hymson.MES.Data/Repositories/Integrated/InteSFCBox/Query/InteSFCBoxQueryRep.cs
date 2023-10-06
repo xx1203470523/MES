@@ -35,4 +35,18 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query
         /// </summary>
         public long? SiteId { get; set; }
     }
+
+    public class InteSFCBoxEntityQuery
+    {
+        /// <summary>
+        /// 电芯码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 箱码
+        /// </summary>
+        public string? BoxCode { get; set; }
+
+    }
 }

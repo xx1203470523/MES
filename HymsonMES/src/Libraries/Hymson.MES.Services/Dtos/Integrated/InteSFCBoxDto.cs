@@ -30,6 +30,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string Sfc { get; set; }
 
         /// <summary>
+        /// 批次号
+        /// </summary>
+        public string BatchNo { get; set; }
+
+        /// <summary>
         /// 箱码
         /// </summary>
         public string BoxCode { get; set; }
@@ -280,8 +285,15 @@ namespace Hymson.MES.Services.Dtos.Integrated
     public record InteSFCBoxRView : BaseEntityDto
     {
         public long? Id { get; set; }
-        //public? string SFC { get; }
-        public string? BoxCode { get; set; }
+
+        /// <summary>
+        /// 批次号
+        /// </summary>
+        public string? BatchNo { get; set; }
+
+        /// <summary>
+        /// 级别
+        /// </summary>
         public string? Grade { get; set; }
     }
 

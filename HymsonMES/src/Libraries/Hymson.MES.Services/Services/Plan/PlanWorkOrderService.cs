@@ -21,6 +21,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using IdGen;
+using Minio.DataModel;
 using System.Collections;
 using System.Transactions;
 
@@ -136,50 +137,84 @@ namespace Hymson.MES.Services.Services.Plan
             var boxCodeBindWorkOrder = new List<InteSFCBoxWorkOrderEntity>();
             if (planWorkOrderCreateDto.SFCBox != null)
             {
-                var boxCodes = planWorkOrderCreateDto.SFCBox.Select(x => x.BoxCode).ToArray();
+                var batchno = planWorkOrderCreateDto.SFCBox.Select(x => x.BatchNo).ToArray();
 
-                if (boxCodes == null)
+                if (batchno == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES19303));
                 }
-                //批量查询
-                var getBoxCodes = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
 
-                foreach (var item in planWorkOrderCreateDto.SFCBox)
+                if (batchno.Count() > 2)
                 {
-                    if (item.BoxCode != null)
-                    {
-                        //校验最大与最小,暂时为8范围
-                        var currentboxCode = getBoxCodes.Where(x => x.BoxCode == item.BoxCode).FirstOrDefault();
-                        int ocvbrange = 8;
-                        double impbrange = 0.25;
-
-                        if (currentboxCode != null)
-                        {
-                            if (currentboxCode.OCVBDiff > ocvbrange)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
-                            }
-                            if (currentboxCode.MaxIMPB > (decimal)impbrange)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
-                            }
-                        }
-
-                        boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            Siteid = _currentSite.SiteId ?? 0,
-                            UpdatedBy = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now(),
-                            CreatedOn = HymsonClock.Now(),
-                            CreatedBy = _currentUser.UserName,
-                            BoxCode = item.BoxCode,
-                            Grade = item.Grade ?? string.Empty,
-                            WorkOrderId = planWorkOrderEntity.Id,
-                        });
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19307));
                 }
+                //批量查询
+                var getBatchNo = await _inteSFCBoxRepository.GetByBoxCodesAsync(batchno);
+
+                if (getBatchNo != null)
+                {
+                    var current = getBatchNo.FirstOrDefault();
+                    int ocvbrange = 8;
+                    double impbrange = 0.25;
+
+                    if (current.OCVBDiff > ocvbrange)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
+                    }
+                    if (current.MaxIMPB > (decimal)impbrange)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
+                    }
+
+                    boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        Siteid = _currentSite.SiteId ?? 0,
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now(),
+                        CreatedOn = HymsonClock.Now(),
+                        CreatedBy = _currentUser.UserName,
+                        BoxCode = current.BatchNo,
+                        Grade = current.Grade ?? string.Empty,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                    });
+                }
+
+                //foreach (var item in planWorkOrderCreateDto.SFCBox)
+                //{
+                //    if (item.BatchNo != null)
+                //    {
+                //        //校验最大与最小,暂时为8范围
+                //        var currentboxCode = getBatchNo.Where(x => x.BoxCode == item.BoxCode).FirstOrDefault();
+                //        int ocvbrange = 8;
+                //        double impbrange = 0.25;
+
+                //        if (currentboxCode != null)
+                //        {
+                //            if (currentboxCode.OCVBDiff > ocvbrange)
+                //            {
+                //                throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
+                //            }
+                //            if (currentboxCode.MaxIMPB > (decimal)impbrange)
+                //            {
+                //                throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
+                //            }
+                //        }
+
+                //        boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
+                //        {
+                //            Id = IdGenProvider.Instance.CreateId(),
+                //            Siteid = _currentSite.SiteId ?? 0,
+                //            UpdatedBy = _currentUser.UserName,
+                //            UpdatedOn = HymsonClock.Now(),
+                //            CreatedOn = HymsonClock.Now(),
+                //            CreatedBy = _currentUser.UserName,
+                //            BoxCode = item.BoxCode,
+                //            Grade = item.Grade ?? string.Empty,
+                //            WorkOrderId = planWorkOrderEntity.Id,
+                //        });
+                //    }
+                //}
             }
 
             var planWorkOrderRecordEntity = new PlanWorkOrderRecordEntity()
@@ -263,50 +298,93 @@ namespace Hymson.MES.Services.Services.Plan
             var boxCodeBindWorkOrder = new List<InteSFCBoxWorkOrderEntity>();
             if (planWorkOrderModifyDto.SFCBox != null)
             {
-                var boxCodes = planWorkOrderModifyDto.SFCBox.Select(x => x.BoxCode).ToArray();
+                var batchno = planWorkOrderModifyDto.SFCBox.Select(x => x.BatchNo).ToArray();
 
-                if (boxCodes == null)
+                if (batchno == null)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES19303));
                 }
-                //批量查询
-                var getBoxCodes = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
 
-                foreach (var item in planWorkOrderModifyDto.SFCBox)
+                if (batchno.Count() > 2)
                 {
-                    if (item.BoxCode != null)
-                    {
-                        //校验最大与最小,暂时为8范围
-                        var currentboxCode = getBoxCodes.Where(x => x.BoxCode == item.BoxCode).FirstOrDefault();
-                        int ocvbrange = 8;
-                        double impbrange = 0.25;
-
-                        if (currentboxCode != null)
-                        {
-                            if (currentboxCode.OCVBDiff > ocvbrange)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
-                            }
-                            if (currentboxCode.MaxIMPB > (decimal)impbrange)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
-                            }
-                        }
-
-                        boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            Siteid = _currentSite.SiteId ?? 0,
-                            UpdatedBy = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now(),
-                            CreatedOn = HymsonClock.Now(),
-                            CreatedBy = _currentUser.UserName,
-                            BoxCode = item.BoxCode,
-                            Grade = item.Grade ?? string.Empty,
-                            WorkOrderId = planWorkOrderEntity.Id,
-                        });
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19307));
                 }
+                //批量查询
+                var getBatchNo = await _inteSFCBoxRepository.GetByBoxCodesAsync(batchno);
+
+                if (getBatchNo != null)
+                {
+                    var getBatchNoCurrent = getBatchNo.FirstOrDefault();
+                    int ocvbrange = 8;
+                    double impbrange = 0.25;
+
+                    if (getBatchNoCurrent.OCVBDiff > ocvbrange)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
+                    }
+                    if (getBatchNoCurrent.MaxIMPB > (decimal)impbrange)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
+                    }
+
+                    boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        Siteid = _currentSite.SiteId ?? 0,
+                        UpdatedBy = _currentUser.UserName,
+                        UpdatedOn = HymsonClock.Now(),
+                        CreatedOn = HymsonClock.Now(),
+                        CreatedBy = _currentUser.UserName,
+                        BoxCode = getBatchNoCurrent.BatchNo,
+                        Grade = getBatchNoCurrent.Grade ?? string.Empty,
+                        WorkOrderId = planWorkOrderEntity.Id,
+                    });
+                }
+
+                //    var boxCodes = planWorkOrderModifyDto.SFCBox.Select(x => x.BoxCode).ToArray();
+
+                //    if (boxCodes == null)
+                //    {
+                //        throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+                //    }
+                //    //批量查询
+                //    var getBoxCodes = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
+
+                //    foreach (var item in planWorkOrderModifyDto.SFCBox)
+                //    {
+                //        if (item.BoxCode != null)
+                //        {
+                //            //校验最大与最小,暂时为8范围
+                //            var currentboxCode = getBoxCodes.Where(x => x.BoxCode == item.BoxCode).FirstOrDefault();
+                //            int ocvbrange = 8;
+                //            double impbrange = 0.25;
+
+                //            if (currentboxCode != null)
+                //            {
+                //                if (currentboxCode.OCVBDiff > ocvbrange)
+                //                {
+                //                    throw new CustomerValidationException(nameof(ErrorCode.MES19304)).WithData("OCVBDiff", ocvbrange);
+                //                }
+                //                if (currentboxCode.MaxIMPB > (decimal)impbrange)
+                //                {
+                //                    throw new CustomerValidationException(nameof(ErrorCode.MES19305)).WithData("MaxIMPB", impbrange);
+                //                }
+                //            }
+
+                //            boxCodeBindWorkOrder.Add(new InteSFCBoxWorkOrderEntity()
+                //            {
+                //                Id = IdGenProvider.Instance.CreateId(),
+                //                Siteid = _currentSite.SiteId ?? 0,
+                //                UpdatedBy = _currentUser.UserName,
+                //                UpdatedOn = HymsonClock.Now(),
+                //                CreatedOn = HymsonClock.Now(),
+                //                CreatedBy = _currentUser.UserName,
+                //                BoxCode = item.BoxCode,
+                //                Grade = item.Grade ?? string.Empty,
+                //                WorkOrderId = planWorkOrderEntity.Id,
+                //            });
+                //        }
+                //    }
             }
 
 

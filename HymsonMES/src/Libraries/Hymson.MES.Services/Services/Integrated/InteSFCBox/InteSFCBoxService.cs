@@ -25,6 +25,8 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using IdGen;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
+using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
 {
@@ -74,8 +76,20 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16003));
 
             var rsp = new InteSFCBoxValidateResponse() { State = -1, Msg = $"验证失败！箱码{validate.BoxCode}不在工单{validate.WorkOrderCode}中" };
-            var sfcBox = await _inteSFCBoxRepository.GetByWorkOrderAsync(workOrderEntity.Id);
-            if (sfcBox.Any(x => x.BoxCode == validate.BoxCode) == true)
+            var bindsfcBox = await _inteSFCBoxRepository.GetByWorkOrderAsync(workOrderEntity.Id);
+
+            var sfcBoxQuery = new InteSFCBoxEntityQuery
+            {
+                BoxCode = validate.BoxCode
+            };
+            var sfcBoxinfo = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcBoxQuery);
+
+            var infoFirst = sfcBoxinfo.FirstOrDefault();
+            if (infoFirst == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19308)).WithData("Code", "箱码");
+            }
+            if (bindsfcBox.Any(x => x.BatchNo == infoFirst.BatchNo) == true)
             {
                 rsp.State = 0;
                 rsp.Msg = "验证成功";
@@ -125,6 +139,15 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                         break;
                     }
                 }
+                string[] boxCodes = { item.BoxCode };
+                var boxCodesAny = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
+                if (boxCodesAny != null)
+                {
+                    var validatetion = new ValidationFailure();
+                    validatetion.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                    validatetion.ErrorMessage = $"{item.BoxCode}已存在";
+                    validationFailures.Add(validatetion);
+                }
             }
 
             if (validationFailures.Any())
@@ -134,14 +157,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
 
             //组装数据
             var insert = new List<InteSFCBoxEntity>();
-            var batchNo=DateTime.Now.ToString("yyMMddHHmmss");
+            var batchNo = DateTime.Now.ToString("yyMMddHHmmss");
 
             foreach (var item in stockTakeDetailExcelImportDtos)
             {
                 //var Entity = item.ToEntity<InteSFCBoxEntity>();
                 insert.Add(new InteSFCBoxEntity
                 {
-                    BatchNo = batchNo,
+                    BatchNo = "P" + batchNo,
                     SFC = item.SFC,
                     Grade = item.Grade,
                     Status = SFCBoxEnum.Start,
@@ -171,7 +194,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                     SiteId = _currentSite.SiteId ?? 123456,
                     IsDeleted = 0
 
-                }); 
+                });
             }
 
             return await _inteSFCBoxRepository.InsertsAsync(insert);
@@ -213,7 +236,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             {
                 BoxCode = pagedQueryDto.BoxCode,
                 SFC = pagedQueryDto.SFC,
-                SiteId = pagedQueryDto.SiteId ?? 0,
+                SiteId = pagedQueryDto.SiteId ?? 123456,
                 Sorting = pagedQueryDto.Sorting,
                 PageIndex = pagedQueryDto.PageIndex,
                 PageSize = pagedQueryDto.PageSize,

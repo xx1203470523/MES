@@ -1050,10 +1050,12 @@
         #region 电芯条码导入导出
         public const string MES19301 = "档位Grade不能为空";
         public const string MES19302 = "电芯条码SFC不能为空";
-        public const string MES19303 = "箱码BoxCode不能为空";
+        public const string MES19303 = "批次码不能为空";
         public const string MES19304 = "OCVB最大值最小值之差不能超过范围值{OCVBDiff}";
         public const string MES19305 = "IMPB不能超过范围值{MaxIMPB}";
-        public const string MES19306 = "{Code}为空";
+        public const string MES19306 = "{Code}为空";        
+        public const string MES19307 = "只能选择一个批次码";
+        public const string MES19308 = "系统中无{Code}数据，请检查是否导入";
         #endregion
 
         #region 系统执行出错 业务逻辑出错

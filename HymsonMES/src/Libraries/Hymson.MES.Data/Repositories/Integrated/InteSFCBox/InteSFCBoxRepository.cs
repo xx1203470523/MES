@@ -90,11 +90,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
             sqlBuilder.Where("msb.IsDeleted = 0");
             sqlBuilder.Where("msb.SiteId = @SiteId");
             //sqlBuilder.OrderBy("msb.CreateOn DESC");
-
-            //sqlBuilder.Select("IC.Id, IC.Remark, IC.Status, IC.DefinitionMethod, IC.Level, IC.Maximum, IC.Minimum, IC.UpdatedBy, IC.UpdatedOn");
-            //sqlBuilder.Select("(CASE IC.DefinitionMethod WHEN 1 THEN M.MaterialCode WHEN 2 THEN MG.GroupCode ELSE '' END) AS Name, M.Version");
-            //sqlBuilder.LeftJoin("proc_material M ON IC.MaterialId = M.Id");
-            //sqlBuilder.LeftJoin("proc_material_group MG ON IC.MaterialGroupId = MG.Id");
+ 
             if (!string.IsNullOrWhiteSpace(pagedQuery.BoxCode))                
             {
                 sqlBuilder.Where("msb.BoxCode = @BoxCode");
@@ -113,14 +109,39 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         }
 
         /// <summary>
-        /// 批量查询BoxCode
+        /// 取同批次的所有箱码
+        /// </summary>
+        /// <param name="batchNos"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteSFCAllView>> GetByBoxCodesAsync(string[] batchNos)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteSFCAllView>(GetByBoxCodesSql, new { BatchNos = batchNos });
+        }
+
+        /// <summary>
+        /// 获取批次码相关信息
         /// </summary>
         /// <param name="boxCodes"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteSFCAllView>> GetByBoxCodesAsync(string[] boxCodes)
+        public async Task<IEnumerable<InteSFCBoxEntity>> GetManuSFCBoxAsync(InteSFCBoxEntityQuery query)
         {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetManuSFCBoxSql);
+            if (!string.IsNullOrWhiteSpace(query.BoxCode))
+            {
+                sqlBuilder.Where("BoxCode = @BoxCode");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SFC))
+            {
+                sqlBuilder.Where("SFC = @SFC");
+            }
+
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteSFCAllView>(GetByBoxCodesSql, new { BoxCodes = boxCodes });
+            var entities = await conn.QueryAsync<InteSFCBoxEntity>(templateData.RawSql, templateData.Parameters);
+            return entities;
+            //return await conn.QueryAsync<InteSFCBoxEntity>(GetManuSFCBoxSql, new { BoxCodes = boxCodes });
         }
 
         /// <summary>
@@ -179,22 +200,24 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         const string InsertsWorkOrderSql = "INSERT INTO `manu_sfc_box_workorder`( `Id`,`SiteId`,`BoxCode`,`WorkOrderId`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`) VALUES (   @Id,@SiteId,@BoxCode,@WorkOrderId,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted)  ";
         const string DeleteWorkOrderSql = "delete FROM manu_sfc_box_workorder where WorkOrderId=@WorkOrderId";
 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT `Id`, `SiteId`, `SFC`, `BoxCode`, `Grade`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `OCVB`, `OCVBDate`, `Weight`, `DC`, `DCDate`, `IMPB`, `SelfDischargeRate`, `Width`, `HeightZ`, `HeightF`, `ShoulderHeightZ`, `ShoulderHeightF`, `Thickness` FROM manu_sfc_box /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT `Id`, `SiteId`,`BatchNo`, `SFC`, `BoxCode`, `Grade`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `OCVB`, `OCVBDate`, `Weight`, `DC`, `DCDate`, `IMPB`, `SelfDischargeRate`, `Width`, `HeightZ`, `HeightF`, `ShoulderHeightZ`, `ShoulderHeightF`, `Thickness` FROM manu_sfc_box /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
        
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc_box /**where**/";
 
         const string GetBoxCodeSqlTemplate = @"SELECT `Id`, `SiteId`, `SFC`, `BoxCode`, `Grade`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `OCVB`, `OCVBDate`, `Weight`, `DC`, `DCDate`, `IMPB`, `SelfDischargeRate`, `Width`, `HeightZ`, `HeightF`, `ShoulderHeightZ`, `ShoulderHeightF`, `Thickness` FROM manu_sfc_box WHERE id in(
-            SELECT MIN(id) FROM manu_sfc_box msb  /**where**/  GROUP BY BoxCode HAVING COUNT(1)>1
+            SELECT MIN(id) FROM manu_sfc_box msb  /**where**/  GROUP BY BatchNo HAVING COUNT(1)>1
             ) LIMIT @Offset,@Rows ";
         const string GetBoxCodeCountSqlTemplate = @"SELECT COUNT(*) FROM (SELECT DISTINCT BoxCode FROM manu_sfc_box msb  /**where**/ ) as subquery";
 
-        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BoxCode FROM `manu_sfc_box`  WHERE BoxCode IN @BoxCodes group  by BoxCode";
+        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BatchNo FROM `manu_sfc_box`  WHERE BatchNo IN @BatchNos group  by BatchNo";
 
         const string GetWorkOrderIdSql = @"select  * from manu_sfc_box_workorder where WorkOrderId =@WorkOrderId";
 
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc_box`  WHERE Id IN @Ids ";
 
         const string DeleteSql = "UPDATE manu_sfc_box SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
+
+        const string GetManuSFCBoxSql = @"SELECT * FROM `manu_sfc_box`  /**where**/ ";
     }
 
 }

@@ -9,9 +9,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query
     public class InteSFCAllView
     {
         /// <summary>
-        /// 箱码
+        /// 批次码
         /// </summary>
-        public string BoxCode { get; set; }
+        public string BatchNo { get; set; }
+        public string Grade { get; set; }
         /// <summary>
         /// OCVB最小值
         /// </summary>
