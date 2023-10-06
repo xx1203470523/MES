@@ -686,7 +686,8 @@
         public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
 
-        public const string MES16352 = "采集数据导入模板不正确!";
+        public const string MES16352 = "数据导入模板不正确!";
+        public const string MES16353 = "导入文件名未正常获取，检查导入的文件名是否规范!";
         #endregion
 
         #region 生产

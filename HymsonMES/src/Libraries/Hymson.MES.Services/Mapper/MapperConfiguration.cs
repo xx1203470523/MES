@@ -238,7 +238,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteSFCBox
-            CreateMap<InteSFCBoxEntity, InteSFCBoxRView>();
+            CreateMap<InteSFCBoxEntity, InteSFCBoxRView>();    
             CreateMap<InteSFCBoxEntity, InteSFCBoxDto>();
             CreateMap<InteSFCBoxQueryDto, InteSFCBoxQueryRep>();
             #endregion

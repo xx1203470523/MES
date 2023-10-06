@@ -21,6 +21,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query
         public string? BoxCode { get; set; }
 
         /// <summary>
+        /// 批次号
+        /// </summary>
+        public string? BatchNo { get; set; }
+
+        /// <summary>
         /// 档位
         /// </summary>
         public string? Grade { get; set; }

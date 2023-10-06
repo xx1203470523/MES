@@ -1,5 +1,7 @@
 ﻿using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.SfcCirculation;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Services.Integrated.InteSFCBox;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -9,9 +11,11 @@ namespace Hymson.MES.EquipmentServicesTests.Services.PDA
     public class NGCopeWithTest : BaseTest
     {
         private readonly ISfcCirculationService _sfcCirculationService;
+        private readonly IInteSFCBoxService inteSFCBoxService;
         public NGCopeWithTest()
         {
             _sfcCirculationService = ServiceProvider.GetRequiredService<ISfcCirculationService>();
+            inteSFCBoxService = ServiceProvider.GetRequiredService<IInteSFCBoxService>();
         }
 
         [TestCleanup]
@@ -54,5 +58,30 @@ namespace Hymson.MES.EquipmentServicesTests.Services.PDA
             await _sfcCirculationService.ReplenishNGConfirmAsync(sfc);
             Assert.IsTrue(true);
         }
+
+        /// <summary>
+        /// PDA批次校验
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task SFCValidate()
+        {
+            var quer = new InteSFCBoxValidateQuery()
+            {
+                //BoxCode = "20100000109623073103100317",
+                BoxCode = "20400000171823090903100040",
+                WorkOrderCode = "TEST006"
+            };
+            try
+            {
+                await inteSFCBoxService.SFCValidate(quer);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            Assert.IsTrue(true);
+        }
+
     }
 }

@@ -111,10 +111,9 @@ namespace Hymson.MES.Core.Domain.Integrated
         public decimal Thickness { get; set; }
     }
 
-    //public class InteSFCBoxQueryView: BaseEntity
-    //{
-    //    public string? SFC { get; }
-    //    public string? BoxCode { get; set; }
-    //    public string? Grade { get; set; }
-    //}
+    public class InteSFCBoxBatch
+    {
+        public string BatchNo { get; set; }
+        public DateTime CreatedOn { get; set; }
+    }
 }

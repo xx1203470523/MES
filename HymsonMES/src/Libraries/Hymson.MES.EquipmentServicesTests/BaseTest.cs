@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel;
+using Hymson.Excel.Abstractions;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Hymson.MES.Data.Options;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
@@ -13,10 +15,16 @@ using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Validators.InBound;
 using Hymson.MES.EquipmentServices.Validators.OutBound;
 using Hymson.MES.EquipmentServices.Validators.SfcCirculation;
+
+
 using Hymson.MES.EquipmentServicesTests.Dtos;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
+using Hymson.MES.Services.Services.Integrated.InteSFCBox;
 using Hymson.MES.Services.Validators.Process;
+using Hymson.MES.Services.Validators.Integrated;
+
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 using Microsoft.Extensions.Configuration;
@@ -70,6 +78,9 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSingleton<IEquEquipmentService, EquEquipmentService>()//注入使用到的其他服务
                 .AddSingleton<AbstractValidator<EquEquipmentSaveDto>, EquEquipmentValidator>()
                 .AddSingleton<ISfcCirculationService, SfcCirculationService>()
+                .AddSingleton<IInteSFCBoxService, InteSFCBoxService>()
+                .AddSingleton<IExcelService, ExcelService>()
+                 .AddSingleton<AbstractValidator<InteSFCBoxImportDto>, InteSFCBoxValidator>()
                 .AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>()//条码流转绑定
                 .AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>()//条码流转解绑
                 .BuildServiceProvider();

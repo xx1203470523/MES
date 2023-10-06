@@ -108,6 +108,19 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
         public async Task<int> ImportDataAsync(UploadSFCBoxDto uploadStockDetailDto)
         {
             IFormFile formFile = uploadStockDetailDto.File;
+
+            string namestr = uploadStockDetailDto.File.FileName;
+            int filenameindex = namestr.IndexOf('.');
+            var batchNo = string.Empty;
+            if (filenameindex >= 0)
+            {
+                batchNo = namestr.Substring(0, filenameindex);
+            }
+            if (string.IsNullOrEmpty(batchNo))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16353));
+            }
+
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             IEnumerable<InteSFCBoxImportDto> stockTakeDetailExcelImportDtos;
@@ -141,7 +154,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                 }
                 string[] boxCodes = { item.BoxCode };
                 var boxCodesAny = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
-                if (boxCodesAny != null)
+                if (boxCodesAny.Any())
                 {
                     var validatetion = new ValidationFailure();
                     validatetion.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
@@ -157,14 +170,14 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
 
             //组装数据
             var insert = new List<InteSFCBoxEntity>();
-            var batchNo = DateTime.Now.ToString("yyMMddHHmmss");
+
 
             foreach (var item in stockTakeDetailExcelImportDtos)
             {
                 //var Entity = item.ToEntity<InteSFCBoxEntity>();
                 insert.Add(new InteSFCBoxEntity
                 {
-                    BatchNo = "P" + batchNo,
+                    BatchNo = batchNo,
                     SFC = item.SFC,
                     Grade = item.Grade,
                     Status = SFCBoxEnum.Start,
@@ -235,6 +248,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var rep = new InteSFCBoxQueryRep()
             {
                 BoxCode = pagedQueryDto.BoxCode,
+                BatchNo= pagedQueryDto.BatchNo,
                 SFC = pagedQueryDto.SFC,
                 SiteId = pagedQueryDto.SiteId ?? 123456,
                 Sorting = pagedQueryDto.Sorting,
@@ -244,7 +258,8 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var pagedInfo = await _inteSFCBoxRepository.GetBoxCodeAsync(rep);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<InteSFCBoxRView>());
+            var dtos = pagedInfo.Data.Select(x => new InteSFCBoxRView { BatchNo = x.BatchNo, CreatedOn = x.CreatedOn });
+            //var dtos = pagedInfo.Data.Select(s => s.ToModel<InteSFCBoxRView>());
 
             return new PagedInfo<InteSFCBoxRView>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }

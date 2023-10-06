@@ -15,9 +15,14 @@ namespace Hymson.MES.Core.Domain.Integrated
         public long? Siteid { get; set; }
 
         /// <summary>
-        /// 箱码
+        /// 箱码(弃用)
         /// </summary>
         public string BoxCode { get; set; }
+
+        /// <summary>
+        /// 批次码
+        /// </summary>
+        public string BatchNo { get; set; }
 
         /// <summary>
         /// 档位

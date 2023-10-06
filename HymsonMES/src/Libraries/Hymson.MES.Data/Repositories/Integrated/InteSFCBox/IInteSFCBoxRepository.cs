@@ -22,7 +22,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         /// <returns></returns>
         Task<PagedInfo<InteSFCBoxEntity>> GetPagedInfoAsync(InteSFCBoxQueryRep pagedQuery);
 
-        Task<PagedInfo<InteSFCBoxEntity>> GetBoxCodeAsync(InteSFCBoxQueryRep pagedQuery);
+        /// <summary>
+        /// 工单新增时查询
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<InteSFCBoxBatch>> GetBoxCodeAsync(InteSFCBoxQueryRep pagedQuery);
 
         /// <summary>
         /// 批量查询BoxCode 带OCVB差值计算

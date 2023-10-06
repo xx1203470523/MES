@@ -3,7 +3,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Integrated;
 namespace Hymson.MES.Services.Validators.Integrated
 {
-    internal class InteSFCBoxValidator : AbstractValidator<InteSFCBoxImportDto>
+    public class InteSFCBoxValidator : AbstractValidator<InteSFCBoxImportDto>
     {
         public InteSFCBoxValidator()
         {

@@ -267,6 +267,11 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public string? BoxCode { get; set; }
 
         /// <summary>
+        /// 批次码
+        /// </summary>
+        public string? BatchNo { get; set; }
+
+        /// <summary>
         /// 档位
         /// </summary>
         public string? Grade { get; set; }
@@ -284,7 +289,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
 
     public record InteSFCBoxRView : BaseEntityDto
     {
-        public long? Id { get; set; }
+        //public long? Id { get; set; }
 
         /// <summary>
         /// 批次号
@@ -294,7 +299,10 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 级别
         /// </summary>
-        public string? Grade { get; set; }
+        //public string? Grade { get; set; }
+ 
+        public DateTime CreatedOn { get; set; }
+
     }
 
     /// <summary>

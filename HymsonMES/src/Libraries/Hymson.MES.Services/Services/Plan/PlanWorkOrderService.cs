@@ -175,6 +175,7 @@ namespace Hymson.MES.Services.Services.Plan
                         CreatedOn = HymsonClock.Now(),
                         CreatedBy = _currentUser.UserName,
                         BoxCode = current.BatchNo,
+                        BatchNo = current.BatchNo,
                         Grade = current.Grade ?? string.Empty,
                         WorkOrderId = planWorkOrderEntity.Id,
                     });
@@ -305,7 +306,7 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES19303));
                 }
 
-                if (batchno.Count() > 2)
+                if (batchno.Count() > 1)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES19307));
                 }
@@ -336,6 +337,7 @@ namespace Hymson.MES.Services.Services.Plan
                         CreatedOn = HymsonClock.Now(),
                         CreatedBy = _currentUser.UserName,
                         BoxCode = getBatchNoCurrent.BatchNo,
+                        BatchNo = getBatchNoCurrent.BatchNo,
                         Grade = getBatchNoCurrent.Grade ?? string.Empty,
                         WorkOrderId = planWorkOrderEntity.Id,
                     });
@@ -797,7 +799,7 @@ namespace Hymson.MES.Services.Services.Plan
                 }
 
                 var sfcBox = await _inteSFCBoxRepository.GetByWorkOrderAsync(id);
-                if (sfcBox != null)
+                if (sfcBox.Any())
                 {
                     planWorkOrderDetailView.SFCBox = sfcBox;
                 }

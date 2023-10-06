@@ -138,7 +138,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         public async Task<PlanWorkOrderEntity> GetByCodeAsync(PlanWorkOrderQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByCodeSql, new { OrderCode = query.OrderCode, SiteId = query.SiteId });
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByCodeSql, new { OrderCode = query.OrderCode });
+
         }
 
         /// <summary>
