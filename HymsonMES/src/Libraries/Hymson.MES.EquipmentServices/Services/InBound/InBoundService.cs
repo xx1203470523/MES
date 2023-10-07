@@ -213,7 +213,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             procedureEntityList = procProcedures.ToList();
 
             //复投次数限制，对于测试类型工序，条码复投数量大于等于工序循环次数限制进站
-            var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && (p.Cycle ?? 1) <= c.RepeatedCount)
+            var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && c.RepeatedCount > (p.Cycle ?? 1))
                                                          .Select(p => p.Id).Contains(c.ProcedureId)).Select(p => p.SFC);
             if (noNeedRepeat.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19130)).WithData("SFCS", string.Join(',', noNeedRepeat));
@@ -274,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     if (currenWorkBatch != null)
                     {
                         var sfcBatch = sfcBoxInfo.Where(x => x.SFC == sfc).FirstOrDefault();
-                        if(sfcBatch != null)
+                        if (sfcBatch != null)
                         {
                             if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
                             {
