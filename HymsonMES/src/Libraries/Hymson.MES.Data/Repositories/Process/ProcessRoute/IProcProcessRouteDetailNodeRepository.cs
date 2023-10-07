@@ -68,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetListAsync(ProcProcessRouteDetailNodeQuery query);
 
         /// <summary>
-        /// 查询List
+        /// 查询List（已缓存）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>

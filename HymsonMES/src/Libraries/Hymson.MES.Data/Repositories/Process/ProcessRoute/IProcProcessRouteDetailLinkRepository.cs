@@ -45,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 查询List
+        /// 查询List（已缓存）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>

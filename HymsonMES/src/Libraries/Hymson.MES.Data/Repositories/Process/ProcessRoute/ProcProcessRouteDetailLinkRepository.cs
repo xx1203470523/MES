@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -124,22 +125,26 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 查询List
+        /// 查询List（已缓存）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(EntityBySiteIdQuery query)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.AddParameters(query);
+            var key = $"proc_process_route_detail_link&SiteId={query.SiteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
+                sqlBuilder.Where("IsDeleted = 0");
+                sqlBuilder.Select("*");
+                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
-            return procProcessRouteDetailLinkEntities;
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
+                return procProcessRouteDetailLinkEntities;
+            });
         }
 
         /// <summary>

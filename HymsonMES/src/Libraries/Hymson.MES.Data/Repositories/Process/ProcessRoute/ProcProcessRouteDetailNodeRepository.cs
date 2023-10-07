@@ -49,22 +49,26 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 查询List
+        /// 查询List（已缓存）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetListAsync(EntityBySiteIdQuery query)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetListSqlTemplate1);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.AddParameters(query);
+            var key = $"proc_process_route_detail_node&SiteId={query.SiteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetListSqlTemplate1);
+                sqlBuilder.Where("IsDeleted = 0");
+                sqlBuilder.Select("*");
+                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailNodeEntity>(template.RawSql, template.Parameters);
-            return procProcessRouteDetailLinkEntities;
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailNodeEntity>(template.RawSql, template.Parameters);
+                return procProcessRouteDetailLinkEntities;
+            });
         }
 
         /// <summary>
@@ -92,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
- 
+
             sqlBuilder.Select("PP.*");
             sqlBuilder.LeftJoin("proc_procedure PP ON proc_process_route_detail_node.ProcedureId = PP.Id");
             sqlBuilder.Where("proc_process_route_detail_node.IsDeleted = 0");
