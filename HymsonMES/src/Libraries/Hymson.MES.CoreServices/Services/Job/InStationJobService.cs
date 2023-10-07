@@ -100,7 +100,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            ILocalizationService localizationService,  
+            ILocalizationService localizationService,
             IProcProcedureRepository procProcedureRepository)
         {
             _manuCommonService = manuCommonService;
@@ -254,7 +254,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             List<ManuSfcSummaryEntity> manuSfcSummaryEntities = new();
             MultiSfcUpdateIsUsedCommand sfcUpdateIsUsedCommand = new();
             List<MultiUpdateProduceInStationSFCCommand> updateProduceInStationSFCCommands = new();
-            List<InStationManuSfcByIdCommand> inStationManuSfcByIdCommands = new ();
+            List<InStationManuSfcByIdCommand> inStationManuSfcByIdCommands = new();
             entities.ForEach(sfcProduceEntity =>
             {
                 // 检查是否测试工序
@@ -262,8 +262,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     // 超过复投次数，标识为NG
                     if (firstSFCProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
-                    firstSFCProduceEntity.RepeatedCount++;
                 }
+
+                // 每次进站都将复投次数+1
+                sfcProduceEntity.RepeatedCount++;
 
                 // 初始化步骤
                 sfcStepEntities.Add(new ManuSfcStepEntity
@@ -292,15 +294,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ProcedureId = bo.ProcedureId,
                     ResourceId = bo.ResourceId,
                     Status = SfcStatusEnum.Activity,
-                    CurrentStatus= sfcProduceEntity.Status,
-                    RepeatedCount = sfcProduceEntity.RepeatedCount+1,
+                    CurrentStatus = sfcProduceEntity.Status,
+                    RepeatedCount = sfcProduceEntity.RepeatedCount,
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
                 });
 
                 inStationManuSfcByIdCommands.Add(new InStationManuSfcByIdCommand
                 {
-                    Id= sfcProduceEntity.SFCId,
+                    Id = sfcProduceEntity.SFCId,
                     Status = SfcStatusEnum.Activity,
                     IsUsed = YesOrNoEnum.Yes,
                     UpdatedBy = updatedBy,
@@ -309,7 +311,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 sfcProduceEntity.ProcedureId = bo.ProcedureId;
                 sfcProduceEntity.ResourceId = bo.ResourceId;
-                sfcProduceEntity.RepeatedCount = sfcProduceEntity.RepeatedCount + 1;
+
                 // 更新状态，将条码由"排队"改为"活动"
                 sfcProduceEntity.Status = SfcStatusEnum.Activity;
                 sfcProduceEntity.UpdatedBy = bo.UserName;
