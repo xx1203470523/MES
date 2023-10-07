@@ -379,7 +379,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return planWorkOrderEntities;
         }
 
-       
+
 
         /// <summary>
         /// 获取生产条码信息
@@ -397,11 +397,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 Sfcs = sfcBos.SFCs
             });
 
-            // 不存在在制表的话，就去库存查找
             if (!sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16306));
             }
+
+            // 不存在在制表的话，就去库存查找？？
+
             return sfcProduceEntities;
         }
 

@@ -132,9 +132,9 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
+            sqlBuilder.Where("ProcessRouteId = @ProcessRouteId");
             sqlBuilder.AddParameters(procProcessRouteDetailLinkQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);

@@ -130,9 +130,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var resourceIds = await bo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
             if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId) ??
-                throw new CustomerValidationException(nameof(ErrorCode.MES16352));
-
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
@@ -142,52 +139,50 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
-            //循环次数验证（复投次数）
+
+            // 进站工序信息
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId) ??
+                throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+
+            // 循环次数验证（复投次数）
             sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
             sfcProduceBusinessEntities?.VerifyProcedureLock(bo.SFCs, bo.ProcedureId);
 
             // 验证条码是否被容器包装
             await _manuCommonService.VerifyContainerAsync(bo);
 
-            //（前提：这些条码都是同一工单同一工序）
-            var firstProduceEntity = sfcProduceEntities.FirstOrDefault();
-            if (firstProduceEntity == null) return;
-
             // 获取生产工单（附带工单状态校验）
-            var planWorkOrderEntity = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdAsync, new WorkOrderIdBo { WorkOrderId = firstProduceEntity.WorkOrderId });
-
-            // 当工单已激活且完工状态，且条码处于工艺路线的首工序，进站时，提示“工单状态为完工，不允许再对工单投入”
-            if (planWorkOrderEntity?.Status == PlanWorkOrderStatusEnum.Finish)
+            var planWorkOrderEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities!.Select(s => s.WorkOrderId) });
+            if (planWorkOrderEntities!.Any(a => a.Status == PlanWorkOrderStatusEnum.Finish))
             {
-                // 检查是否首工序
-                var isFirstProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
-                {
-                    ProcessRouteId = firstProduceEntity.ProcessRouteId,
-                    ProcedureId = firstProduceEntity.ProcedureId
-                });
-
-                // 因为获取工单方法已经对激活状态做了校验，这里不需要再校验
-                if (isFirstProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16350));
+                // 完工的工单，不允许再投入（不管哪个工序都不允许再投入，之前逻辑是会读取工艺路线，只对首工序进行校验）
+                throw new CustomerValidationException(nameof(ErrorCode.MES16350));
             }
 
             // 如果工序对应不上
-            if (firstProduceEntity.ProcedureId != bo.ProcedureId)
+            var sfcProduceEntitiesOfNoMatchProcedure = sfcProduceEntities!.Where(a => a.ProcedureId != bo.ProcedureId);
+            if (sfcProduceEntitiesOfNoMatchProcedure != null && sfcProduceEntitiesOfNoMatchProcedure.Any())
             {
-                var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(firstProduceEntity.ProcessRouteId)
+                var processRouteIds = sfcProduceEntitiesOfNoMatchProcedure.Select(s => s.ProcessRouteId).Distinct();
+                foreach (var processRouteId in processRouteIds)
+                {
+                    // TODO 这里待优化。提到循环外层
+                    var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(processRouteId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
 
-                var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(firstProduceEntity.ProcessRouteId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
+                    var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
-                // 判断上一个工序是否是随机工序
-                var IsRandomPreProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsRandomPreProcedureAsync, new ManuRouteProcedureWithInfoBo
-                {
-                    ProcessRouteDetailLinks = processRouteDetailLinks,
-                    ProcessRouteDetailNodes = processRouteDetailNodes,
-                    ProcessRouteId = firstProduceEntity.ProcessRouteId,
-                    ProcedureId = bo.ProcedureId
-                });
-                if (!IsRandomPreProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                    // 判断上一个工序是否是随机工序
+                    var IsRandomPreProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsRandomPreProcedureAsync, new ManuRouteProcedureWithInfoBo
+                    {
+                        ProcessRouteDetailLinks = processRouteDetailLinks,
+                        ProcessRouteDetailNodes = processRouteDetailNodes,
+                        ProcessRouteId = processRouteId,
+                        ProcedureId = bo.ProcedureId
+                    });
+                    if (!IsRandomPreProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                }
             }
         }
 

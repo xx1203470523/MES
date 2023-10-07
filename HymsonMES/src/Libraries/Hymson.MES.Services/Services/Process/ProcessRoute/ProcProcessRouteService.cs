@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 return nodeViewDto;
             });
 
-            var links = await _procProcessRouteLinkRepository.GetListAsync(new ProcProcessRouteDetailLinkQuery { ProcessRouteId = id });
+            var links = await _procProcessRouteLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(id);
             model.Links = links.Select(s => s.ToModel<ProcProcessRouteDetailLinkDto>());
 
             return model;
