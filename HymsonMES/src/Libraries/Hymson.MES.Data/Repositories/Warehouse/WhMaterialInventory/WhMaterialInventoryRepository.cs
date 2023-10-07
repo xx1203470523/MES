@@ -74,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query)
         {
-            // 因为测试环境容易出现存问题，所以暂时不使用缓存
+            // 因为测试环境容易出缓存问题，所以暂时不使用缓存
             //var key = $"wh_material_inventory&{query.SiteId}&{query.BarCode}";
             //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             //{
@@ -266,7 +266,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdatePointByBarCodeRangeAsync( IEnumerable<UpdateStatusByBarCodeCommand>  commands)
+        public async Task<int> UpdatePointByBarCodeRangeAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpPointByBarCode, commands);
