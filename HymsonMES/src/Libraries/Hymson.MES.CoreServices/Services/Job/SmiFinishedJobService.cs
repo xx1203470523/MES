@@ -262,6 +262,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     MaterialId = sfcProduceEntity.ProductId,
                     MaterialBarCode = sfcProduceEntity.SFC,
                     Batch = "",//自制品 没有
+                    WorkOrderId = sfcProduceEntity.WorkOrderId,
                     MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                     QuantityResidue = procMaterialEntity.Batch,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,

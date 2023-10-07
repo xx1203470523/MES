@@ -380,6 +380,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             entity.MaterialId = inventory.MaterialId;
             entity.SupplierId = inventory.SupplierId;
             entity.MaterialType = inventory.MaterialType;
+            entity.WorkOrderId = inventory.WorkOrderId;
+
             // 一次性上完料
             entity.InitQty = inventory.QuantityResidue;
             entity.Qty += entity.InitQty;
@@ -566,6 +568,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 UpdatedOn = entity.UpdatedOn,
                 IsDeleted = entity.IsDeleted,
                 SiteId = entity.SiteId,
+                MaterialType = entity.MaterialType,
+                WorkOrderId = entity.WorkOrderId
             };
         }
 

@@ -428,17 +428,18 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class WhMaterialInventoryRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` wmi /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `wh_material_inventory` wmi /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/";
-        const string GetWhMaterialInventoryEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `wh_material_inventory` /**where**/  ";
+        const string GetWhMaterialInventoryEntitiesSqlTemplate = @"SELECT /**select**/ FROM `wh_material_inventory` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `wh_material_inventory`(  `Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `MaterialType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @QuantityResidue, @QuantityResidue, @Status, @DueDate, @Source,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId ) ON DUPLICATE KEY UPDATE UpdatedOn=NOW()  ";
-        const string UpdateSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `wh_material_inventory` SET   SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `wh_material_inventory`(`Id`, `SupplierId`, `MaterialId`, `MaterialBarCode`, `Batch`, `QuantityResidue`, `ReceivedQty`, `Status`, `DueDate`, `Source`, `MaterialType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId) VALUES (@Id, @SupplierId, @MaterialId, @MaterialBarCode, @Batch, @QuantityResidue, @QuantityResidue, @Status, @DueDate, @Source,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId) ON DUPLICATE KEY UPDATE UpdatedOn = NOW()  ";
+        const string UpdateSql = "UPDATE `wh_material_inventory` SET SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `wh_material_inventory` SET SupplierId = @SupplierId, MaterialId = @MaterialId, MaterialBarCode = @MaterialBarCode, Batch = @Batch, QuantityResidue = @QuantityResidue, Status = @Status, DueDate = @DueDate, Source = @Source, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string UpPointByBarCode = "UPDATE wh_material_inventory SET Status = @Status, QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
         const string UpdateWhMaterialInventoryEmptySql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE MaterialBarCode IN @BarCodeList AND SiteId=@SiteId";
         const string UpdateWhMaterialInventoryEmptyByIdSql = "UPDATE wh_material_inventory SET  QuantityResidue =0, UpdatedBy = @UserName, UpdatedOn = @UpdateTime WHERE Id = @Id ";
