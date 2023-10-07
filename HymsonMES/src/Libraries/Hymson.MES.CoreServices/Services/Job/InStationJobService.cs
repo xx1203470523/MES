@@ -261,7 +261,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (procedureEntity.Type == ProcedureTypeEnum.Test)
                 {
                     // 超过复投次数，标识为NG
-                    if (firstSFCProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
+                    if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                 }
 
                 // 每次进站都将复投次数+1
