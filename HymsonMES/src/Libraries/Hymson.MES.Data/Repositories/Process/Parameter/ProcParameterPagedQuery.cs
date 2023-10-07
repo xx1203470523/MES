@@ -1,16 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表 分页查询类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
 using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -19,14 +8,9 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcParameterPagedQuery : PagerInfo
     {
-        ///// <summary>
-        ///// 所属站点代码
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-        //
-        // 摘要:
-        //     站点id
+        /// <summary>
+        /// 站点id
+        /// </summary>
         public long? SiteId { get; set; }
 
         /// <summary>
@@ -38,6 +22,16 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 名称（标准参数）
         /// </summary>
         public string? ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位（字典定义）
+        /// </summary>
+        public string? ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum? DataType { get; set; }
 
         /// <summary>
         /// 描述（标准参数）

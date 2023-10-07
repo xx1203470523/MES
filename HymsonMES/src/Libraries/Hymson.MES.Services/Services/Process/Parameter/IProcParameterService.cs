@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -30,14 +18,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterCreateDto"></param>
         /// <returns></returns>
         Task<int> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto);
 

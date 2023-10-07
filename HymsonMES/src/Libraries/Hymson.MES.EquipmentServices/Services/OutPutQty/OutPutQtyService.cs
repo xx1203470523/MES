@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Parameter.Query;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
@@ -198,9 +199,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutPutQty
         private async Task<List<ManuProductParameterEntity>> ParameterListAsync(OutPutQtyDto outPutQtyDto, long resourceId)
         {
             var paramCodeArray = outPutQtyDto.ParamList.Select(c => c.ParamCode).ToArray();
-            var codesQuery = new EntityByCodesQuery
+            var codesQuery = new ProcParametersByCodeQuery
             {
-                Site = _currentEquipment.SiteId,
+                SiteId = _currentEquipment.SiteId,
                 Codes = paramCodeArray
             };
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);

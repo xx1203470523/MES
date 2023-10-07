@@ -23,6 +23,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteTray.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
+using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -33,6 +34,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.View;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
@@ -396,7 +398,38 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLabelTemplatePagedQueryDto, ProcLabelTemplatePagedQuery>();
             #endregion
 
+            #region EquipmentGroupParam
+            CreateMap<ProcEquipmentGroupParamEntity, ProcEquipmentGroupParamDto>();
+            CreateMap<ProcEquipmentGroupParamDto, ProcEquipmentGroupParamEntity>();
+            CreateMap<ProcEquipmentGroupParamModifyDto, ProcEquipmentGroupParamEntity>();
+            CreateMap<ProcEquipmentGroupParamCreateDto, ProcEquipmentGroupParamEntity>();
 
+            CreateMap<ProcEquipmentGroupParamPagedQueryDto, ProcEquipmentGroupParamPagedQuery>();
+            CreateMap<ProcEquipmentGroupParamEntity, ProcEquipmentGroupParamViewDto>();
+            CreateMap<ProcEquipmentGroupParamView, ProcEquipmentGroupParamViewDto>();
+
+            CreateMap<ProcEquipmentGroupParamDetailEntity, ProcEquipmentGroupParamDetailDto>();
+            CreateMap<ProcEquipmentGroupParamDetailCreateDto, ProcEquipmentGroupParamDetailEntity>();
+            #endregion
+
+            #region ProcProcessEquipmentGroup
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupDto>();
+            CreateMap<ProcProcessEquipmentGroupRelationEntity, ProcProcessEquipmentGroupRelationDto>();
+
+            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupEntity>();
+            CreateMap<ProcProcessEquipmentGroupPagedQueryDto, ProcProcessEquipmentGroupPagedQuery>();
+            CreateMap<ProcProcessEquipmentGroupRelationSaveDto, ProcProcessEquipmentGroupRelationEntity>();
+            CreateMap<ProcProcessEquipmentGroupRelationPagedQueryDto, ProcProcessEquipmentGroupRelationPagedQuery>();
+
+            CreateMap<ProcProcessEquipmentGroupSaveDto, ProcProcessEquipmentGroupRelations>();
+            CreateMap<ProcProcessEquipmentGroupEntity, ProcProcessEquipmentGroupListDto>();
+            #endregion
+
+            #region InteUnit
+            CreateMap<InteUnitSaveDto, InteUnitEntity>();
+            CreateMap<InteUnitPagedQueryDto, InteUnitPagedQuery>();
+            CreateMap<InteUnitEntity, InteUnitDto>();
+            #endregion
         }
 
         /// <summary>

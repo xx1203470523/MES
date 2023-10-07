@@ -1,18 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表    Dto | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
-
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -21,62 +8,46 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcParameterDto : BaseEntityDto
     {
-        //
-        // 摘要:
-        //     站点id
-        public long? SiteId { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数代码
         /// </summary>
         public string ParameterCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数名称
         /// </summary>
         public string ParameterName { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public ParameterUnitEnum ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum DataType { get; set; }
+
+        /// <summary>
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string? UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
-       
     }
 
     /// <summary>
@@ -87,7 +58,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 类型   1 设备  2 产品  3 设备+产品  4 环境  等等
         /// </summary>
-        public ParameterTypeShowEnum Type { get; set; }
+        public ParameterTypeEnum[] Type { get; set; }
     }
 
 
@@ -96,30 +67,25 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcParameterCreateDto : BaseEntityDto
     {
-        //
-        // 摘要:
-        //     站点id
-        public long? SiteId { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
-
         /// <summary>
         /// 参数代码
         /// </summary>
         public string ParameterCode { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 参数名称
         /// </summary>
         public string ParameterName { get; set; } = "";
 
         /// <summary>
-        /// 参数单位（字典定义）
+        /// 参数单位
         /// </summary>
-        public ParameterUnitEnum ParameterUnit { get; set; }
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum DataType { get; set; }
 
         /// <summary>
         /// 说明
@@ -133,30 +99,20 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record ProcParameterModifyDto : BaseEntityDto
     {
-        //
-        // 摘要:
-        //     站点id
-        public long? SiteId { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
         public long Id { get; set; }
 
         /// <summary>
-        /// 参数代码
+        /// 参数单位
         /// </summary>
-        public string ParameterCode { get; set; } = "";
-
-       /// <summary>
-        /// 参数名称
-        /// </summary>
-        public string ParameterName { get; set; } = "";
+        public string ParameterUnit { get; set; }
 
         /// <summary>
-        /// 参数单位（字典定义）
+        /// 数据类型（字典定义） 
         /// </summary>
-        public ParameterUnitEnum ParameterUnit { get; set; }
+        public DataTypeEnum DataType { get; set; }
 
         /// <summary>
         /// 说明
@@ -170,16 +126,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcParameterPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 所属站点代码
-        ///// </summary>
-        //public long SiteId { get; set; }
-
-        //
-        // 摘要:
-        //     站点id
-        public long? SiteId { get; set; }
-
         /// <summary>
         /// 编码（标准参数）
         /// </summary>
@@ -191,8 +137,14 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ParameterName { get; set; } = "";
 
         /// <summary>
-        /// 描述（标准参数）
+        /// 参数单位（字典定义）
         /// </summary>
-        public string? Remark { get; set; } = "";
+        public string? ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        public DataTypeEnum? DataType { get; set; }
+
     }
 }

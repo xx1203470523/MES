@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Parameter.Query;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.EquipmentServices.Bos;
@@ -399,9 +400,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
 
             // 找出不在数据库里面的Code，自动新增标准参数，应对设备不合理需求
             List<ProcParameterEntity> procParameterEntities = new List<ProcParameterEntity>();
-            var codesQuery = new EntityByCodesQuery
+            var codesQuery = new ProcParametersByCodeQuery
             {
-                Site = _currentEquipment.SiteId,
+                SiteId = _currentEquipment.SiteId,
                 Codes = paramCodes.ToArray()
             };
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(codesQuery);
@@ -513,7 +514,7 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
             using var trans = TransactionHelper.GetTransactionScope();
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepEntities);
             await _manuSfcStepNgRepository.InsertsAsync(manuSfcStepNgs);
-            await _procParameterRepository.InsertsAsync(procParameterEntities);
+            await _procParameterRepository.InsertRangeAsync(procParameterEntities);
             await _manuProductParameterRepository.InsertsAsync(entities);
             await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryList);
             trans.Complete();

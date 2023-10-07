@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Parameter.Query;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
@@ -505,7 +506,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //标准参数
             if (procParameterEntities.Any())
             {
-                rows += await _procParameterRepository.InsertsAsync(procParameterEntities);
+                rows += await _procParameterRepository.InsertRangeAsync(procParameterEntities);
             }
             //产品参数信息
             if (manuProductParameterEntities.Any())
@@ -740,9 +741,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             {
                 return (manuProductParameterEntities, procParameterEntities);
             }
-            var codesQuery = new EntityByCodesQuery
+            var codesQuery = new ProcParametersByCodeQuery
             {
-                Site = _currentEquipment.SiteId,
+                SiteId = _currentEquipment.SiteId,
                 Codes = paramCodeList.ToArray()
             };
             var procParameter = await _procParameterRepository.GetByCodesAsync(codesQuery);

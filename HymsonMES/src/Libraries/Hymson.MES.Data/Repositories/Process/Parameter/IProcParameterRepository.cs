@@ -1,19 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 标准参数表仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-13 02:50:20
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Data.Repositories.Process.Parameter.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -30,11 +18,11 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> InsertAsync(ProcParameterEntity procParameterEntity);
 
         /// <summary>
-        /// 批量新增
+        /// 新增
         /// </summary>
-        /// <param name="procParameterEntitys"></param>
+        /// <param name="procParameterEntities"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcParameterEntity> procParameterEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ProcParameterEntity> procParameterEntities);
 
         /// <summary>
         /// 更新
@@ -42,13 +30,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcParameterEntity procParameterEntity);
-
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="procParameterEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcParameterEntity> procParameterEntitys);
 
         /// <summary>
         /// 删除
@@ -72,25 +53,18 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcParameterEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 更具编码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterEntity>> GetByCodesAsync(ProcParametersByCodeQuery param);
+
+        /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(long[] ids);
-
-        /// <summary>
-        /// 根据Code查询对象
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcParameterEntity>> GetByCodesAsync(EntityByCodesQuery query);
-
-        /// <summary>
-        /// 查询对象
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcParameterEntity>> GetAllAsync(long siteId);
+        Task<IEnumerable<ProcParameterEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -104,6 +78,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procParameterPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcParameterEntity>> GetPagedInfoAsync(ProcParameterPagedQuery procParameterPagedQuery);
+        Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery procParameterPagedQuery);
+
+        /// <summary>
+        /// 查询对象
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcParameterEntity>> GetAllAsync(long siteId);
     }
 }

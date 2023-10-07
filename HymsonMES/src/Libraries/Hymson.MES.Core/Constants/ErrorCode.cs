@@ -19,6 +19,23 @@
         public const string MES10110 = "名称最大长度为50";
         public const string MES10111 = "参数不能为空";
         public const string MES10112 = "站点不能为空";
+        public const string MES10113 = "编码不能为空";
+        public const string MES10114 = "编码不允许有空格";
+        public const string MES10115 = "编码最大长度为100";
+        public const string MES10116 = "名称不能为空";
+        public const string MES10117 = "名称最大长度为100";
+        public const string MES10118 = "版本不能为空";
+        public const string MES10119 = "版本最大长度为100";
+        public const string MES10120 = "状态不合法";
+        public const string MES10121 = "描述最大长度为255";
+        public const string MES10122 = "版本不允许有空格";
+        public const string MES10123 = "启用状态不允许修改";
+        public const string MES10124 = "启用状态只能修改为保留或废除";
+        public const string MES10125 = "变更状态的ID不能为空";
+        public const string MES10126 = "变更状态的状态不合法";
+        public const string MES10127 = "状态已经是[{status}],无法重复设置";
+        public const string MES10128 = "变更状态的状态不能为新建";
+        public const string MES10129 = "只有新建或者保留才能编辑";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -192,6 +209,8 @@
         public const string MES10513 = "参数类型不合法，请检查！";
         public const string MES10514 = "参数ID不能为空";
         public const string MES10515 = "标准参数名称最大长度为50";
+        public const string MES10521 = "此编码{Code}已存在，请重新输入！";
+        public const string MES10527 = "数据类型不合法";
 
         #endregion
 
@@ -941,9 +960,50 @@
         public const string MES18215 = "条码{0}设置为活动状态成功！";
         #endregion
 
+        #region 工艺设备组 18900
+        public const string MES18900 = "此编码{Code}在系统已经存在!";
+        public const string MES18901 = "工艺设备组编码不允许有空格";
+        public const string MES18902 = "工艺设备组名称不能为空";
+        public const string MES18903 = "请求实体不能为空！";
+        public const string MES18904 = "工序与设备组对应关系不唯一";
+        #endregion
 
         #region 系统Token MES18300
         public const string MES18300 = "系统编码{code}已经存在";
+        #endregion
+
+        #region Recipe参数 18700
+        public const string MES18700 = "Recipe参数错误";
+        public const string MES18701 = "对应Recipe参数不存在";
+        public const string MES18702 = "Recipe参数编码已存在";
+        public const string MES18704 = "Recipe参数编码不能为空";
+        public const string MES18703 = "Recipe参数编码不允许空格";
+        public const string MES18705 = "Recipe参数名称不能为空";
+        public const string MES18706 = "Recipe参数编码最大长度为100";
+        public const string MES18707 = "Recipe参数名称最大长度为100";
+        public const string MES18709 = "Recipe参数状态不合法";
+        public const string MES18710 = "Recipe参数功能类型不合法";
+
+        public const string MES18712 = "Recipe参数Id不能为空";
+        public const string MES18713 = "无法将其他状态修改成新建状态!";
+        public const string MES18714 = "无法删除非新建状态数据";
+        public const string MES18715 = "Recipe参数版本不能为空";
+        public const string MES18716 = "Recipe参数版本最大长度为100";
+        public const string MES18717 = "Recipe参数版本不允许有空格";
+        public const string MES18718 = "Recipe参数产品不能为空";
+        public const string MES18719 = "Recipe参数工序不能为空";
+        public const string MES18720 = "Recipe参数工艺组不能为空";
+
+        public const string MES18721 = "Recipe参数项目参数不能为空";
+        public const string MES18722 = "Recipe参数项目小数位应该为0到9的整数";
+        public const string MES18723 = "Recipe参数项目最大值应该大于或等于最小值";
+
+        public const string MES18724 = "Recipe参数已存在同一的产品、工序、工艺组数据";
+        #endregion
+
+        #region 单位维护 18800
+        public const string MES18800 = "单位编码不能含有空格";
+        public const string MES18801 = "单位名称不能为空";
         #endregion
 
         #region 设备对接错误 MES19101
