@@ -13,6 +13,7 @@ using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
@@ -163,14 +164,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceEntitiesOfNoMatchProcedure = sfcProduceEntities!.Where(a => a.ProcedureId != bo.ProcedureId);
             if (sfcProduceEntitiesOfNoMatchProcedure != null && sfcProduceEntitiesOfNoMatchProcedure.Any())
             {
+                var query = new EntityBySiteIdQuery { SiteId = bo.SiteId };
+                var allProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetListAsync(query);
+                var allProcessRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetListAsync(query);
+
                 var processRouteIds = sfcProduceEntitiesOfNoMatchProcedure.Select(s => s.ProcessRouteId).Distinct();
                 foreach (var processRouteId in processRouteIds)
                 {
-                    // TODO 这里待优化。提到循环外层
-                    var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(processRouteId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
+                    var processRouteDetailLinks = allProcessRouteDetailLinks.Where(w => w.ProcessRouteId == processRouteId)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
 
-                    var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId)
+                    var processRouteDetailNodes = allProcessRouteDetailNodes.Where(w => w.ProcessRouteId == processRouteId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                     // 判断上一个工序是否是随机工序

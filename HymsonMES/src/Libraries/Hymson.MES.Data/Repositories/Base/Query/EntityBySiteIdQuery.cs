@@ -1,7 +1,7 @@
 ﻿namespace Hymson.MES.Data.Repositories.Common.Query
 {
     /// <summary>
-    /// code查询实体
+    /// 查询实体
     /// </summary>
     public class EntityBySiteIdQuery
     {
