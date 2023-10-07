@@ -7,6 +7,8 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox;
+using Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -19,6 +21,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using IdGen;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -46,6 +49,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
         /// <summary>
+        /// 工单关联批次
+        /// </summary>
+        private readonly IInteSFCBoxRepository _inteSFCBoxRepository;
+        /// <summary>
         /// 物料维护 仓储
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
@@ -67,7 +74,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
-            IProcMaterialRepository procMaterialRepository)
+            IProcMaterialRepository procMaterialRepository,
+            IInteSFCBoxRepository inteSFCBoxRepository)
         {
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
@@ -87,6 +95,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _procMaterialRepository = procMaterialRepository;
+            _inteSFCBoxRepository = inteSFCBoxRepository;
         }
         #endregion
 
@@ -142,6 +151,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// <exception cref="ValidationException"></exception>
         public async Task SFCInBoundAsync(InBoundMoreDto inBoundMoreDto)
         {
+            bool validateBatch = false;
+            //校验电芯批次, 扫码&OCVR测试机,稍候增加配置管理功能
+            if (_currentEquipment.Code.Equals("YTLPACK01AE004"))
+            {
+                validateBatch = true;
+            }
+;
             //已经验证过资源是否存在直接使用
             var procResource = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery { Site = _currentEquipment.SiteId, Code = inBoundMoreDto.ResourceCode });
 
@@ -197,7 +213,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             procedureEntityList = procProcedures.ToList();
 
             //复投次数限制，对于测试类型工序，条码复投数量大于等于工序循环次数限制进站
-            var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && (p.Cycle ?? 1) <= c.RepeatedCount)
+            var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && c.RepeatedCount > (p.Cycle ?? 1))
                                                          .Select(p => p.Id).Contains(c.ProcedureId)).Select(p => p.SFC);
             if (noNeedRepeat.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19130)).WithData("SFCS", string.Join(',', noNeedRepeat));
@@ -239,9 +255,43 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             List<ManuSfcEntity> updateManuSfcList = new List<ManuSfcEntity>();
             List<ManuSfcSummaryEntity> updateManuSfcSummaryList = new List<ManuSfcSummaryEntity>();
 
+            //工单绑定的批次信息
+            var bindSFCbox = await _inteSFCBoxRepository.GetByWorkOrderAsync(planWorkOrder.Id);
+            var sfcboxQuery = new InteSFCBoxEntityQuery
+            {
+                SFCs = inBoundMoreDto.SFCs
+            };
+            //条码查询的批次信息
+            var sfcBoxInfo = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcboxQuery);
+
             decimal firstProcedureQty = 0;//首工序进站数量
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
+                //电芯校验同属批次
+                if (validateBatch)
+                {
+                    var currenWorkBatch = bindSFCbox.FirstOrDefault()?.BatchNo;
+                    if (currenWorkBatch != null)
+                    {
+                        var sfcBatch = sfcBoxInfo.Where(x => x.SFC == sfc).FirstOrDefault();
+                        if (sfcBatch != null)
+                        {
+                            if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
+                            }
+                        }
+                        else
+                        {
+                            //未查到条码{sfc}批次信息,无法正常校验电芯批次
+                        }
+                    }
+                    else
+                    {
+                        //未查到当前工单{planWorkOrder.code}批次信息,无法正常校验电芯批次
+                    }
+                }
+
                 //汇总信息
                 var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == sfc).FirstOrDefault();
                 //当前条码
@@ -361,7 +411,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 //条码表
                 var manuSfcEntity = new ManuSfcEntity
                 {
-                    //Id = 24216009787551750,
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
                     SFC = sfc,
@@ -524,9 +573,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             }
             await _manuSfcRepository.InsertRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
-           if(await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList) == 0)
+            if (await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList) == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", string.Join(',', manuSfcProduceList)).WithData("action","插入在制信息");
+                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", string.Join(',', manuSfcProduceList)).WithData("action", "插入在制信息");
             }
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();

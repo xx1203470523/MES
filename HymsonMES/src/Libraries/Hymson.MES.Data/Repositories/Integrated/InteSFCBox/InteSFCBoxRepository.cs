@@ -15,10 +15,10 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
 {
-    public partial class InteSFCBoxRepository: BaseRepository, IInteSFCBoxRepository
+    public partial class InteSFCBoxRepository : BaseRepository, IInteSFCBoxRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-        public InteSFCBoxRepository (IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public InteSFCBoxRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
         }
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
             {
                 sqlBuilder.Where("Grade = @Grade");
             }
-            if (pagedQuery.Status!=null && pagedQuery.Status.HasValue)
+            if (pagedQuery.Status != null && pagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status = @Status");
             }
@@ -87,11 +87,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetBatchNoSql);
             var templateCount = sqlBuilder.AddTemplate(GetBoxCodeCountSqlTemplate);
-             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("IsDeleted = 0");
             //sqlBuilder.Where("SiteId = @SiteId");
             //sqlBuilder.OrderBy("msb.CreateOn DESC");
- 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.BatchNo))                
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.BatchNo))
             {
                 sqlBuilder.Where("BatchNo = @BatchNo");
             }
@@ -138,12 +138,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
                 sqlBuilder.Where(" SFC = @SFC");
             }
 
+            if (query.SFCs != null && query.SFCs.Any())
+            {
+                sqlBuilder.Where(" SFC in @SFCs");
+            }
+
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
-            var entities = await conn.QueryAsync<InteSFCBoxEntity>(templateData.RawSql, templateData.Parameters);
-            return entities;
-            //return await conn.QueryAsync<InteSFCBoxEntity>(GetManuSFCBoxSql, new { BoxCodes = boxCodes });
+            return await conn.QueryAsync<InteSFCBoxEntity>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -203,7 +206,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         const string DeleteWorkOrderSql = "delete FROM manu_sfc_box_workorder where WorkOrderId=@WorkOrderId";
 
         const string GetPagedInfoDataSqlTemplate = @"SELECT `Id`, `SiteId`,`BatchNo`, `SFC`, `BoxCode`, `Grade`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `OCVB`, `OCVBDate`, `Weight`, `DC`, `DCDate`, `IMPB`, `SelfDischargeRate`, `Width`, `HeightZ`, `HeightF`, `ShoulderHeightZ`, `ShoulderHeightF`, `Thickness` FROM manu_sfc_box /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-       
+
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc_box /**where**/";
 
         const string GetBoxCodeSqlTemplate = @"SELECT `Id`, `SiteId`, `SFC`, `BoxCode`, `Grade`, `Status`, `LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `OCVB`, `OCVBDate`, `Weight`, `DC`, `DCDate`, `IMPB`, `SelfDischargeRate`, `Width`, `HeightZ`, `HeightF`, `ShoulderHeightZ`, `ShoulderHeightF`, `Thickness` FROM manu_sfc_box WHERE id in(
