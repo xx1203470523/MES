@@ -444,7 +444,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstSFCProduceEntity);
+            // 获取下一个工序（如果没有了，就表示完工）
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, new ManuRouteProcedureWithWorkOrderBo
+            {
+                WorkOrderId = firstSFCProduceEntity.WorkOrderId,
+                ProcessRouteId = firstSFCProduceEntity.ProcessRouteId,
+                ProcedureId = bo.ProcedureId,
+            });
             if (nextProcedure != null)
             {
                 responseBo.IsCompleted = false;
@@ -709,7 +715,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstSFCProduceEntity);
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, new ManuRouteProcedureWithWorkOrderBo
+            {
+                WorkOrderId = firstSFCProduceEntity.WorkOrderId,
+                ProcessRouteId = firstSFCProduceEntity.ProcessRouteId,
+                ProcedureId = bo.ProcedureId,
+            });
             if (nextProcedure != null)
             {
                 responseBo.IsCompleted = false;

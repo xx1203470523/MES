@@ -563,24 +563,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="manuSfcProduce"></param>
-        /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
-        {
-            return await GetNextProcedureAsync(new ManuRouteProcedureWithWorkOrderBo
-            {
-                ProcessRouteId = manuSfcProduce.ProcessRouteId,
-                ProcedureId = manuSfcProduce.ProcedureId,
-                WorkOrderId = manuSfcProduce.WorkOrderId
-            });
-        }
-
-        /// <summary>
-        /// 获当前工序对应的下一工序
-        /// </summary>
         /// <param name="routeProcedureWithWorkOrderBo"></param>
         /// <returns></returns>
-        private async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuRouteProcedureWithWorkOrderBo routeProcedureWithWorkOrderBo)
+        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuRouteProcedureWithWorkOrderBo routeProcedureWithWorkOrderBo)
         {
             // 因为可能有分叉，所以返回的下一步工序是集合
             var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(routeProcedureWithWorkOrderBo.ProcessRouteId)
