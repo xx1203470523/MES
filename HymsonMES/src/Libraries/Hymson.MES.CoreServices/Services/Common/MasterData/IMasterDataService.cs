@@ -108,9 +108,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="manuSfcProduce"></param>
+        /// <param name="routeProcedureWithWorkOrderBo"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuRouteProcedureWithWorkOrderBo routeProcedureWithWorkOrderBo);
 
         /// <summary>
         /// 判断上一工序是否随机工序
@@ -125,6 +125,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
         Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
+
+        /// <summary>
+        /// 比较两个工序之间是否均是随机工序
+        /// </summary>
+        /// <param name="routeProcedureRandomCompareBo"></param>
+        /// <returns></returns>
+        Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo);
 
         /// <summary>
         /// 判断是否首工序

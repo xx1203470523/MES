@@ -69,7 +69,39 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 当前工序Id
         /// </summary>
-        public long CurrentProcedureId { get; set; }
+        public long CurrentProcedureId { get; set; } = 0;
+
+    }
+
+    /// <summary>
+    /// 工序
+    /// </summary>
+    public class ManuRouteProcedureRandomCompareBo
+    {
+        /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 工序Id（起始）
+        /// </summary>
+        public long BeginProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序Id（截止）
+        /// </summary>
+        public long EndProcedureId { get; set; }
+
+        /// <summary>
+        /// 连线
+        /// </summary>
+        public IEnumerable<ProcProcessRouteDetailLinkEntity> ProcessRouteDetailLinks { get; set; }
+
+        /// <summary>
+        /// 节点
+        /// </summary>
+        public IEnumerable<ProcProcessRouteDetailNodeEntity> ProcessRouteDetailNodes { get; set; }
 
     }
 

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -44,11 +45,11 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
-        /// 查询List
+        /// 查询List（已缓存）
         /// </summary>
-        /// <param name="procProcessRouteDetailLinkQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery procProcessRouteDetailLinkQuery);
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(EntityBySiteIdQuery query);
 
         /// <summary>
         /// 分页查询

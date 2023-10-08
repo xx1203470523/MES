@@ -193,7 +193,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyResource(bo.ResourceId);
 
             // 获取生产工单（附带工单状态校验）
-  
+
             _ = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId) });
 
             /*
@@ -444,7 +444,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstSFCProduceEntity);
+            // 获取下一个工序（如果没有了，就表示完工）
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, new ManuRouteProcedureWithWorkOrderBo
+            {
+                WorkOrderId = firstSFCProduceEntity.WorkOrderId,
+                ProcessRouteId = firstSFCProduceEntity.ProcessRouteId,
+                ProcedureId = bo.ProcedureId,
+            });
             if (nextProcedure != null)
             {
                 responseBo.IsCompleted = false;
@@ -461,6 +467,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SiteId = bo.SiteId,
                 UserName = bo.UserName
             };
+
+            // 读取工艺路线类型
+            responseBo.ProcessRouteType = procProcessRouteEntity.Type;
 
             // 组装（出站步骤数据）
             List<MultiUpdateSummaryOutStationCommand> updateSummaryOutStationCommands = new();
@@ -581,16 +590,22 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     if (nextProcedure != null)
                     {
                         sfcProduceEntity.ProcedureId = nextProcedure.Id;
+
+                        // 一旦切换工序，复投次数重置
+                        sfcProduceEntity.RepeatedCount = 0;
+
                         // 不置空的话，进站时，可能校验不通过
                         sfcProduceEntity.ResourceId = null;
                     }
                 }
 
+                /*
                 // 如果超过复投次数
                 if (sfcProduceEntity.RepeatedCount > cycle)
                 {
                     stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
                 }
+                */
 
                 responseBo.SFCStepEntities.Add(stepEntity);
                 responseBo.SFCProduceEntities.Add(sfcProduceEntity);
@@ -604,9 +619,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 注意：下面是尾工序出站时才执行来的代码
             if (responseBo.IsCompleted == false) return responseBo;
-
-            // 读取工艺路线类型
-            responseBo.ProcessRouteType = procProcessRouteEntity.Type;
 
             // 已完工，且是"生产主工艺路线"
             if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
@@ -703,7 +715,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
             // 获取下一个工序（如果没有了，就表示完工）
-            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, firstSFCProduceEntity);
+            var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, new ManuRouteProcedureWithWorkOrderBo
+            {
+                WorkOrderId = firstSFCProduceEntity.WorkOrderId,
+                ProcessRouteId = firstSFCProduceEntity.ProcessRouteId,
+                ProcedureId = bo.ProcedureId,
+            });
             if (nextProcedure != null)
             {
                 responseBo.IsCompleted = false;
@@ -769,23 +786,28 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     // 条码状态跟在制品状态一致
                     manuSfcEntity.Status = sfcProduceEntity.Status;
 
-                    // 更新时间
-                    if (nextProcedure != null)
+                    // 如果超过复投次数
+                    if (sfcProduceEntity.RepeatedCount > cycle)
                     {
-                        sfcProduceEntity.ProcedureId = nextProcedure.Id;
-                        // 不置空的话，进站时，可能校验不通过
-                        sfcProduceEntity.ResourceId = null;
+                        // 清空复投次数
+                        sfcProduceEntity.RepeatedCount = 0;
+
+                        // 标记条码为"在制-完成"
+                        //responseBo.IsCompleted = true;
+                        manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
+                        sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
+                        stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
                     }
-                }
-
-                // 如果超过复投次数
-                if (sfcProduceEntity.RepeatedCount > cycle)
-                {
-                    // 清空复投次数
-                    sfcProduceEntity.RepeatedCount = 0;
-
-                    // 标记条码为"在制-完成"
-                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
+                    else
+                    {
+                        // 更新时间
+                        if (nextProcedure != null)
+                        {
+                            // 不合格复投的话，应该是当前工序，当前资源继续进站？
+                            sfcProduceEntity.ProcedureId = bo.ProcedureId;
+                            sfcProduceEntity.ResourceId = bo.ResourceId;
+                        }
+                    }
                 }
 
                 responseBo.SFCStepEntities.Add(stepEntity);
