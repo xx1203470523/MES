@@ -168,24 +168,25 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var allProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetListAsync(query);
                 var allProcessRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetListAsync(query);
 
-                var processRouteIds = sfcProduceEntitiesOfNoMatchProcedure.Select(s => s.ProcessRouteId).Distinct();
-                foreach (var processRouteId in processRouteIds)
+                foreach (var sfcProduce in sfcProduceEntitiesOfNoMatchProcedure)
                 {
-                    var processRouteDetailLinks = allProcessRouteDetailLinks.Where(w => w.ProcessRouteId == processRouteId)
+                    // 如果有性能问题，可以考虑将这个两个集合先分组，然后再进行判断
+                    var processRouteDetailLinks = allProcessRouteDetailLinks.Where(w => w.ProcessRouteId == sfcProduce.ProcessRouteId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
 
-                    var processRouteDetailNodes = allProcessRouteDetailNodes.Where(w => w.ProcessRouteId == processRouteId)
+                    var processRouteDetailNodes = allProcessRouteDetailNodes.Where(w => w.ProcessRouteId == sfcProduce.ProcessRouteId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
-                    // 判断上一个工序是否是随机工序
-                    var IsRandomPreProcedure = await bo.Proxy.GetValueAsync(_masterDataService.IsRandomPreProcedureAsync, new ManuRouteProcedureWithInfoBo
+                    // 判断条码应进站工序和实际进站工序之间是否全部都是随机工序（因为随机工序可以跳过）
+                    var IsAllRandomProcedureBetween = await bo.Proxy.GetValueAsync(_masterDataService.IsAllRandomProcedureBetweenAsync, new ManuRouteProcedureRandomCompareBo
                     {
                         ProcessRouteDetailLinks = processRouteDetailLinks,
                         ProcessRouteDetailNodes = processRouteDetailNodes,
-                        ProcessRouteId = processRouteId,
-                        ProcedureId = bo.ProcedureId
+                        ProcessRouteId = sfcProduce.ProcessRouteId,
+                        BeginProcedureId = sfcProduce.ProcedureId,
+                        EndProcedureId = bo.ProcedureId
                     });
-                    if (!IsRandomPreProcedure) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                    if (!IsAllRandomProcedureBetween) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
                 }
             }
         }

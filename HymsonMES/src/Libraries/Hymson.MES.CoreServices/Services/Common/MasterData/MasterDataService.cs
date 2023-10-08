@@ -727,6 +727,31 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 比较两个工序之间是否均是随机工序
+        /// </summary>
+        /// <param name="routeProcedureRandomCompareBo"></param>
+        /// <returns></returns>
+        public async Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
+        {
+            // TODO 目前只支持单线路的工艺路线
+            //routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.ManualSortNumber);
+
+            var beginNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.BeginProcedureId);
+            if (beginNode == null) return false;
+
+            var endNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.EndProcedureId);
+            if (endNode == null) return false;
+
+            var nodesOfOrdered = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
+                .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() <= endNode.SerialNo.ParseToInt());
+
+            // 如果中间的工序存在不是随机工序的话，就返回false
+            if (nodesOfOrdered.Any(a => a.CheckType != ProcessRouteInspectTypeEnum.RandomInspection)) return false;
+
+            return await Task.FromResult(true);
+        }
+
+        /// <summary>
         /// 判断是否首工序
         /// </summary>
         /// <param name="routeProcedureBo"></param>

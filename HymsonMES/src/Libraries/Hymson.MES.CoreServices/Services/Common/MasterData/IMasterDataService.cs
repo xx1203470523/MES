@@ -127,6 +127,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
 
         /// <summary>
+        /// 比较两个工序之间是否均是随机工序
+        /// </summary>
+        /// <param name="routeProcedureRandomCompareBo"></param>
+        /// <returns></returns>
+        Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo);
+
+        /// <summary>
         /// 判断是否首工序
         /// </summary>
         /// <param name="routeProcedureBo"></param>
