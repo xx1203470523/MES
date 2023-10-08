@@ -152,16 +152,22 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                         break;
                     }
                 }
-                string[] boxCodes = { item.BoxCode };
-                var boxCodesAny = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
-                if (boxCodesAny.Any())
-                {
-                    var validatetion = new ValidationFailure();
-                    validatetion.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
-                    validatetion.ErrorMessage = $"{item.BoxCode}已存在";
-                    validationFailures.Add(validatetion);
-                }
+                //string[] boxCodes = { item.BoxCode };
+                //var boxCodesAny = await _inteSFCBoxRepository.GetByBoxCodesAsync(boxCodes);
+                //if (boxCodesAny.Any())
+                //{
+                //    var validatetion = new ValidationFailure();
+                //    validatetion.FormattedMessagePlaceholderValues.Add("CollectionIndex", i);
+                //    validatetion.ErrorMessage = $"{item.BoxCode}已存在";
+                //    validationFailures.Add(validatetion);
+                //}
             }
+
+            //校验电芯唯一
+
+            //校验箱码 在其它批次中是否存在
+
+
 
             if (validationFailures.Any())
             {

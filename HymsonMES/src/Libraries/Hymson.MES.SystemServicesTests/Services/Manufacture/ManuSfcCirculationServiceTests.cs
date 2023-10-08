@@ -2,6 +2,7 @@
 using Hymson.MES.Services.Services.Report;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServicesTests;
+using Hymson.Minio;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,6 +17,7 @@ namespace Hymson.MES.SystemServices.Services.Manufacture.Tests
         public ManuSfcCirculationServiceTests()
         {
             _manuSfcCirculationService = ServiceProvider.GetRequiredService<IManuSfcCirculationService>();
+            //var _iMinioService = ServiceProvider.GetRequiredService<IMinioService>();
             _productTraceReportService = ServiceProvider.GetRequiredService<IProductTraceReportService>();
         }
         [TestCleanup]
@@ -46,7 +48,7 @@ namespace Hymson.MES.SystemServices.Services.Manufacture.Tests
             var manuSfcCirculation = await _manuSfcCirculationService.GetRelationShipByPackAsync("P2308140001");
             Assert.IsTrue(manuSfcCirculation != null);
         }
-/// <summary>
+        /// <summary>
         /// 测试追溯层级查询
         /// </summary>
         /// <returns></returns>

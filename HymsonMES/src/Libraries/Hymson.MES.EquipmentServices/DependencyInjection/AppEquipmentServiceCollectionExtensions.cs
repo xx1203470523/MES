@@ -29,6 +29,7 @@ using Hymson.MES.EquipmentServices.Services.Job.Implementing;
 using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
 using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.OutPutQty;
+using Hymson.MES.EquipmentServices.Services.Process;
 using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Services.SfcCirculation;
@@ -48,6 +49,8 @@ using Hymson.MES.EquipmentServices.Validators.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Validators.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.SfcCirculation;
 using Hymson.MES.EquipmentServices.Validators.SingleBarCodeLoadingVerification;
+using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Validators.Process;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -100,6 +103,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IJobManufactureService, JobManuSfcConvertService>();
             services.AddSingleton<ISfcBindingService, SfcBindingService>();
 
+            services.AddSingleton<IProcBootuprecipeService, ProcBootuprecipeService>(); //开机参数
+            services.AddSingleton<IProcBootupparamService, ProcBootupparamService>();
+            services.AddSingleton<IProcBootupparamrecordService, ProcBootupparamrecordService>();
+
         }
 
         /// <summary>
@@ -144,6 +151,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<QueryContainerBindSfcDto>, QueryContainerBindSfcValidator>();//容器绑定条码查询
             services.AddSingleton<AbstractValidator<InStationDto>, InStationValidator>();
             services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
+
+
+            services.AddSingleton<AbstractValidator<ProcBootuprecipeCreateDto>, ProcBootuprecipeCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcBootuprecipeModifyDto>, ProcBootuprecipeModifyValidator>();
+            services.AddSingleton<AbstractValidator<ProcBootupparamCreateDto>, ProcBootupparamCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcBootupparamModifyDto>, ProcBootupparamModifyValidator>();
+            services.AddSingleton<AbstractValidator<ProcBootupparamrecordCreateDto>, ProcBootupparamrecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcBootupparamrecordModifyDto>, ProcBootupparamrecordModifyValidator>();
         }
 
     }
