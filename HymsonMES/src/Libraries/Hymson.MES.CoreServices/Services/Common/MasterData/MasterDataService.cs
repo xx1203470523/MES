@@ -743,7 +743,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (endNode == null) return false;
 
             var nodesOfOrdered = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
-                .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() <= endNode.SerialNo.ParseToInt());
+                .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
 
             // 如果中间的工序存在不是随机工序的话，就返回false
             if (nodesOfOrdered.Any(a => a.CheckType != ProcessRouteInspectTypeEnum.RandomInspection)) return false;
