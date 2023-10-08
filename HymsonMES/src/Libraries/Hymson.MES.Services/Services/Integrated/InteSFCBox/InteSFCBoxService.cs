@@ -25,7 +25,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using IdGen;
 using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
+using ValidationException = FluentValidation.ValidationException;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
@@ -114,7 +114,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var batchNo = string.Empty;
             if (filenameindex >= 0)
             {
-                batchNo = namestr.Substring(0, filenameindex);
+                batchNo = namestr.Substring(0, filenameindex).Trim();
             }
             if (string.IsNullOrEmpty(batchNo))
             {
@@ -163,16 +163,50 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
                 //}
             }
 
-            //校验电芯唯一
-
-            //校验箱码 在其它批次中是否存在
-
-
-
             if (validationFailures.Any())
             {
                 throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
             }
+
+            //校验电芯唯一
+            string[] sfcs = stockTakeDetailExcelImportDtos.Select(s => s.SFC).ToArray();
+
+            if (sfcs.Any())
+            {
+                var sfcsQuery = new InteSFCBoxEntityQuery
+                {
+                    SFCs = sfcs
+                };
+
+                var sfcAny = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcsQuery);
+
+                if (sfcAny.Any())
+                {
+                    var sfchas = sfcAny.Select(s => s.SFC).ToArray();
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("SFC", string.Join(",", sfchas));
+                }
+            }
+
+            //校验箱码只能存在一个批次中
+            string[] boxcodes = stockTakeDetailExcelImportDtos.Select(s => s.BoxCode).Distinct().ToArray();
+
+            if (boxcodes.Any())
+            {
+                var sfcsQuery = new InteSFCBoxEntityQuery
+                {
+                    BoxCodes = boxcodes,
+                    NotInBatch = batchNo
+                };
+
+                var boxAny = await _inteSFCBoxRepository.GetManuSFCBoxAsync(sfcsQuery);
+
+                if (boxAny.Any())
+                {
+                    var boxhas = boxAny.Select(s => s.BoxCode).Distinct().ToArray();
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("BoxCode", string.Join(",", boxhas));
+                }
+            }
+
 
             //组装数据
             var insert = new List<InteSFCBoxEntity>();
@@ -254,7 +288,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteSFCBox
             var rep = new InteSFCBoxQueryRep()
             {
                 BoxCode = pagedQueryDto.BoxCode,
-                BatchNo= pagedQueryDto.BatchNo,
+                BatchNo = pagedQueryDto.BatchNo,
                 SFC = pagedQueryDto.SFC,
                 SiteId = pagedQueryDto.SiteId ?? 123456,
                 Sorting = pagedQueryDto.Sorting,

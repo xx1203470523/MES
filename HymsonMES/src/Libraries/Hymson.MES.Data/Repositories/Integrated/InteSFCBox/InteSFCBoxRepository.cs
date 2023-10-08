@@ -128,6 +128,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetManuSFCBoxSql);
+            sqlBuilder.Where("IsDeleted = 0");
             if (!string.IsNullOrWhiteSpace(query.BoxCode))
             {
                 sqlBuilder.Where(" BoxCode = @BoxCode");
@@ -143,10 +144,22 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
                 sqlBuilder.Where(" SFC in @SFCs");
             }
 
+            if (query.BoxCodes != null && query.BoxCodes.Any())
+            {
+                sqlBuilder.Where(" BoxCode in @BoxCodes");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.NotInBatch))
+            {
+                sqlBuilder.Where(" BatchNo != @NotInBatch");
+            }
+
+
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteSFCBoxEntity>(templateData.RawSql, templateData.Parameters);
+       
         }
 
         /// <summary>
