@@ -462,6 +462,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 UserName = bo.UserName
             };
 
+            // 读取工艺路线类型
+            responseBo.ProcessRouteType = procProcessRouteEntity.Type;
+
             // 组装（出站步骤数据）
             List<MultiUpdateSummaryOutStationCommand> updateSummaryOutStationCommands = new();
             foreach (var sfcProduceEntity in sfcProduceEntities)
@@ -610,9 +613,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 注意：下面是尾工序出站时才执行来的代码
             if (responseBo.IsCompleted == false) return responseBo;
-
-            // 读取工艺路线类型
-            responseBo.ProcessRouteType = procProcessRouteEntity.Type;
 
             // 已完工，且是"生产主工艺路线"
             if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
