@@ -67,5 +67,32 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect
         /// <returns></returns>
         Task EquipmentProductNgAsync(EquipmentProductNgDto request);
 
+
+
+        /// <summary>
+        /// 获取开机配方列表
+        /// </summary>
+        /// <param name="ProductCode"></param>
+        /// <returns></returns>
+        Task<List<BootupParam>> GetEquipmentBootupRecipeSetAsync(GetEquipmentBootupRecipeSetDto dto);
+        /// <summary>
+        /// 获取指定配方的开机参数
+        /// </summary>
+        /// <param name="RecipeCode"></param>
+        /// <returns></returns>
+        Task<BootupParamDetail> GetEquipmentBootupRecipeDetailAsync(GetEquipmentBootupParamDetailDto dto);
+        /// <summary>
+        /// 开机配方参数采集
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquipmentBootupParamCollectAsync(BootupParamCollectDto dto);
+        /// <summary>
+        /// 开机参数版本校验
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task EquipmentBootupParamVersonCheckAsync(EquipmentBootupParamVersonCheckDto dto);
+
     }
 }

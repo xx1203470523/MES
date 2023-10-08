@@ -54,6 +54,7 @@ using Hymson.MES.Services.Validators.Plan;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
+using Hymson.Minio;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -269,6 +270,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region ProductTraceReport
             services.AddSingleton<IProductTraceReportService, ProductTraceReportService>();
+            services.AddSingleton<IMinioService, MinioService>();
             #endregion
 
             #region ProductionManagePanel

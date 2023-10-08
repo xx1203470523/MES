@@ -30,6 +30,7 @@ using Hymson.Web.Framework.WorkContext;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Hymson.Minio;
 
 namespace Hymson.MES.EquipmentServicesTests
 {
@@ -80,6 +81,7 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSingleton<ISfcCirculationService, SfcCirculationService>()
                 .AddSingleton<IInteSFCBoxService, InteSFCBoxService>()
                 .AddSingleton<IExcelService, ExcelService>()
+                .AddSingleton<IMinioService, MinioService>()
                  .AddSingleton<AbstractValidator<InteSFCBoxImportDto>, InteSFCBoxValidator>()
                 .AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>()//条码流转绑定
                 .AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>()//条码流转解绑

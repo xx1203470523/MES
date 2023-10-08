@@ -216,7 +216,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         const string GetBatchNoSql = @"SELECT DISTINCT BatchNo, MAX(CreatedOn) AS CreatedOn FROM manu_sfc_box /**where**/ GROUP BY BatchNo ORDER BY CreatedOn DESC";
         const string GetBoxCodeCountSqlTemplate = @"SELECT COUNT(*) FROM (SELECT DISTINCT BatchNo FROM manu_sfc_box msb  /**where**/ ) as subquery";
 
-        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BatchNo FROM `manu_sfc_box`  WHERE BatchNo IN @BatchNos group  by BatchNo";
+        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BatchNo FROM `manu_sfc_box`  WHERE IsDeleted = 0 AND BatchNo IN @BatchNos group  by BatchNo";
 
         const string GetWorkOrderIdSql = @"select  * from manu_sfc_box_workorder where WorkOrderId =@WorkOrderId";
 

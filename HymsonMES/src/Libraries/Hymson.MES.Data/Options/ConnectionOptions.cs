@@ -10,6 +10,10 @@
         /// </summary>
         public string MESConnectionString { get; set; } = "";
 
+        /// <summary>
+        /// MES参数数据库连接
+        /// </summary>
+        public string MESParamterConnectionString { get; set; } = "";
 
     }
 }
