@@ -167,6 +167,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 移除降级
         /// </summary>
         [Description("移除降级")]
-        RemoveDowngrading = 32
+        RemoveDowngrading = 32,
+        /// <summary>
+        /// 产出上报
+        /// </summary>
+        [Description("产出上报")]
+        OutputReport = 33
     }
 }

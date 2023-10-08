@@ -210,6 +210,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> ManuSfcCancellScrapByIdsAsync(IEnumerable<CancelScrapManuSfcByIdCommand> commands);
+
+        /// <summary>
+        /// 更新条码数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateManuSfcQtyByIdRangeAsync(IEnumerable<UpdateManuSfcQtyByIdCommand> commands);
         #endregion
     }
 }

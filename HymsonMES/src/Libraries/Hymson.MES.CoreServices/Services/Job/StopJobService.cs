@@ -180,7 +180,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var multiUpdateSfcIsUsedTask = _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands);
             tasks.Add(multiUpdateSfcIsUsedTask);
 
-
             var insertRangeTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
             tasks.Add(insertRangeTask);
 

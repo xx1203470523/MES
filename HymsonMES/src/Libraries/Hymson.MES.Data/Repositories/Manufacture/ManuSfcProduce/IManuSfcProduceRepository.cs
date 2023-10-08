@@ -125,6 +125,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys);
 
         /// <summary>
+        /// 批量更新数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyRangeAsync(IEnumerable<UpdateSfcProcedureQtyByIdCommand> commands);
+
+        /// <summary>
         /// 删除
         /// </summary>
         /// <param name="id"></param>
