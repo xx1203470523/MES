@@ -69,7 +69,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 当前工序Id
         /// </summary>
-        public long CurrentProcedureId { get; set; }
+        public long CurrentProcedureId { get; set; } = 0;
 
     }
 
