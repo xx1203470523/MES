@@ -1,4 +1,6 @@
-﻿using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.SystemServices.Dtos.Manufacture;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
 using Hymson.MES.SystemServices.Services.ProductTrace;
 using Hymson.MES.SystemServicesTests;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,7 +45,7 @@ namespace Hymson.MES.SystemServices.Services.Manufacture.Tests
         [TestMethod()]
         public async Task GetRelationShipByPackAsyncTest()
         {
-            var manuSfcCirculation = await _manuSfcCirculationService.GetRelationShipByPackAsync("P2308140001");
+            var manuSfcCirculation = await _manuSfcCirculationService.GetRelationShipByPackAsync("YTLSM202309130001A");
             Assert.IsTrue(manuSfcCirculation != null);
         }
         /// <summary>
@@ -55,12 +57,48 @@ namespace Hymson.MES.SystemServices.Services.Manufacture.Tests
         {
             ManuSfcStepPagedQueryDto param = new ManuSfcStepPagedQueryDto()
             {
-                SFC = "121AsakiA4A4",
+                SFC = "YTLSM202309130001A",
                 PageSize = 2000,
                 PageIndex = 1
             };
             var manuSfcCirculation = await _productTraceReportService.GetSfcStepPagedListAsync(param);
             Assert.IsTrue(manuSfcCirculation != null);
+        }
+
+        /// <summary>
+        /// 按成品条码/模组条码查询参数信息
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task GetProductPrameterPagedListAsyncTest()
+        {
+            ManuProductPrameterPagedQueryDto param = new ManuProductPrameterPagedQueryDto()
+            {
+                SFC = "YTLSM202309130001A",
+                ParameterType = ParameterTypeEnum.Product,
+                PageSize = 2000,
+                PageIndex = 1
+            };
+            var result = await _productTraceReportService.GetProductPrameterPagedListAsync(param);
+            Assert.IsTrue(result != null);
+        }
+
+        /// <summary>
+        /// 按成品条码/模组条码反查层级信息
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task GetProductTracePagedListAsyncTest()
+        {
+            ProductTracePagedQueryDto param = new ProductTracePagedQueryDto()
+            {
+                SFC = "YTLSM202309130001A",
+                TraceDirection = false,
+                PageSize = 2000,
+                PageIndex = 1
+            };
+            var result = await _productTraceReportService.GetProductTracePagedListAsync(param);
+            Assert.IsTrue(result != null);
         }
     }
 }

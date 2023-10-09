@@ -2,8 +2,12 @@
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
 
 namespace Hymson.MES.SystemServices.Mapper
 {
@@ -22,6 +26,7 @@ namespace Hymson.MES.SystemServices.Mapper
         /// </summary>
         public MapperConfiguration()
         {
+            CreateReportMaps();
             CreatePlanMaps();
             CreateManufactureMaps();
         }
@@ -40,6 +45,18 @@ namespace Hymson.MES.SystemServices.Mapper
         protected virtual void CreateManufactureMaps()
         {
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
+        }
+
+        /// <summary>
+        /// 报表模块
+        /// </summary>
+        protected virtual void CreateReportMaps()
+        {
+            CreateMap<ManuSfcStepPagedQueryDto, ManuSfcStepPagedQuery>();
+            CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>();
+            CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
+            CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();
+            CreateMap<ManuProductParameterView, ManuProductParameterViewDto>();
         }
     }
 }

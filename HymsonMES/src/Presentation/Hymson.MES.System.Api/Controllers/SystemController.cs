@@ -1,4 +1,3 @@
-using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
