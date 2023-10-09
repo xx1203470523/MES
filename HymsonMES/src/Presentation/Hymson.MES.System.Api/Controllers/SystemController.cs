@@ -2,12 +2,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Report;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
+using Hymson.MES.SystemServices.Services.ProductTrace;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.System.Api.Controllers

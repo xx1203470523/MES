@@ -1,8 +1,6 @@
-﻿using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Report;
-using Hymson.MES.SystemServices.Dtos.Manufacture;
+﻿using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+using Hymson.MES.SystemServices.Services.ProductTrace;
 using Hymson.MES.SystemServicesTests;
-using Hymson.Minio;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

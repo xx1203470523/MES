@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
-using Hymson.MES.Services.Services.Report;
+
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
+using Hymson.MES.SystemServices.Services.ProductTrace;
 using Hymson.MES.SystemServices.Validators.Manufacture;
 using Hymson.MES.SystemServices.Validators.Plan;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,7 @@ namespace Hymson.MES.SystemServices.DependencyInjection
         public static IServiceCollection AddSystemService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddWebFrameworkService(configuration);
+            //services.AddMinioService(configuration);
             services.AddData(configuration);
             AddConfig(services, configuration);
             AddServices(services);

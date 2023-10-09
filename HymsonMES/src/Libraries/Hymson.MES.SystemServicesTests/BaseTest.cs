@@ -17,10 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using AutoMapper;
-using Hymson.MES.Services.Services.Report;
-using Hymson.Minio;
-using Hymson.Excel.Abstractions;
-using Hymson.Excel;
+using Hymson.MES.SystemServices.Services.ProductTrace;
 
 namespace Hymson.MES.SystemServicesTests
 {
@@ -56,8 +53,6 @@ namespace Hymson.MES.SystemServicesTests
                 .AddSequenceService(Configuration)
                 .AddLocalization()
                 .AddSingleton<ICurrentSystem, TestCurrentSystem>()
-                 .AddSingleton<IMinioService, MinioService>()
-                    .AddSingleton<IExcelService, ExcelService>()
                 .AddSingleton<ICurrentUser, TestCurrentUser>()//测试所用CurrentUser服务
                 .AddSingleton<ICurrentSite, TestCurrentSite>()//测试所用CurrentSite服务
                 .AddSingleton<IManuSfcCirculationService, ManuSfcCirculationService>()//条码流转服务

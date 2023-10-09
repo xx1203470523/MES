@@ -272,8 +272,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region ProductTraceReport
             services.AddSingleton<IProductTraceReportService, ProductTraceReportService>();
-            services.AddSingleton<IMinioService, MinioService>();
-            services.AddSingleton<IExcelService, ExcelService>();
             #endregion
 
             #region ProductionManagePanel
