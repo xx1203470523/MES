@@ -11,7 +11,6 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -38,18 +37,13 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
-        private readonly ILocalizationService _localizationService;
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IMasterDataService _masterDataService;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
         private readonly IPlanWorkOrderBindRepository _planWorkOrderBindRepository;
         private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 构造函数
@@ -57,7 +51,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="localizationService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcInfoRepository"></param>
@@ -67,26 +60,25 @@ namespace Hymson.MES.CoreServices.Services.Job
         public BarcodeReceiveService(IPlanWorkOrderRepository planWorkOrderRepository,
            IManuSfcRepository manuSfcRepository,
            IWhMaterialInventoryRepository whMaterialInventoryRepository,
-           ILocalizationService localizationService,
            IProcMaterialRepository procMaterialRepository,
            IMasterDataService masterDataService,
            IManuSfcInfoRepository manuSfcInfoRepository,
            IManuSfcProduceRepository manuSfcProduceRepository,
            IPlanWorkOrderBindRepository planWorkOrderBindRepository,
            IManuCommonService manuCommonService,
-           IEventBus<EventBusInstance1> eventBus)
+           IManuSfcStepRepository manuSfcStepRepository
+           )
         {
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _localizationService = localizationService;
             _procMaterialRepository = procMaterialRepository;
             _masterDataService = masterDataService;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderBindRepository = planWorkOrderBindRepository;
             _manuCommonService = manuCommonService;
-            _eventBus = eventBus;
+            _manuSfcStepRepository= manuSfcStepRepository;
         }
 
         /// <summary>
@@ -114,7 +106,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ResourceId = bo.ResourceId,
             });
         }
-
 
         /// <summary>
         /// 数据组装
@@ -366,7 +357,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException(bo.LocalizationService.GetResource("SFCError"), validationFailures);
             }
 
             return new BarcodeSfcReceiveResponseBo
@@ -434,8 +425,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             if (data.ManuSfcStepList != null && data.ManuSfcStepList.Any())
             {
-                //await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
-                _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.ManuSfcStepList });
+                await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
             }
 
             return await Task.FromResult(new JobResponseBo { });
