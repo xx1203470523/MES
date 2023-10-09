@@ -44,6 +44,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 参数名称
         /// </summary>
         public string? ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数名称
+        /// </summary>
+        public string[]? ParameterNameStr { get; set; }
         /// <summary>
         /// 条码字符，多个使用分号;分割
         /// </summary>
