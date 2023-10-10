@@ -701,7 +701,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("GetEquipmentBootupParamSet")]
+        [Route("GetRecipeList")]
         [ProducesResponseType(typeof(List<BootupParam>), 200)]
         public async Task<List<BootupParam>> GetEquipmentBootupParamSetAsync(GetEquipmentBootupRecipeSetDto dto)
         {
@@ -713,7 +713,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("GetEquipmentBootupParamDetail")]
+        [Route("GetRecipeDetail")]
         [ProducesResponseType(typeof(BootupParamDetail), 200)]
         public async Task<BootupParamDetail> GetEquipmentBootupParamDetailAsync(GetEquipmentBootupParamDetailDto dto)
         {
@@ -725,7 +725,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("EquipmentBootupParamCollect")]
+        [Route("Recipe")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         public async Task EquipmentBootupParamCollectAsync(BootupParamCollectDto dto)
         {
@@ -738,7 +738,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         [HttpPost]
-        [Route("EquipmentBootupParamVersonCheck")]
+        [Route("RecipeVersionExamine")]
         [ProducesResponseType(typeof(ResultDto), 200)]
         public async Task EquipmentBootupParamVersonCheckAsync(EquipmentBootupParamVersonCheckDto dto)
         {

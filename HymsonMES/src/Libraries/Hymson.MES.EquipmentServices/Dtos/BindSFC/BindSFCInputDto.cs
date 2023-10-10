@@ -71,7 +71,7 @@ public record ResumptionInputDto: BindSFCInputDto
     /// <summary>
     /// 复投位置
     /// </summary>
-    public long? RepeatLocationId { get; set; }
+    public long RepeatLocationId { get; set; }
 }
 
 /// <summary>

@@ -420,6 +420,64 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             }
         }
 
+
+        /// <summary>
+        /// 流转表解绑，并返回流转信息
+        /// </summary>
+        /// <param name="sfcCirculationUnBindDto"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum)
+        {
+            await _validationSfcCirculationUnBindDtoRules.ValidateAndThrowAsync(sfcCirculationUnBindDto);
+            if (sfcCirculationUnBindDto == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            }
+            if (sfcCirculationUnBindDto.IsVirtualSFC == true && !string.IsNullOrEmpty(sfcCirculationUnBindDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19133));
+            }
+            //如果为虚拟条码
+            if (sfcCirculationUnBindDto.IsVirtualSFC == true)
+            {
+                sfcCirculationUnBindDto.SFC = ManuProductParameter.DefaultSFC;
+            }
+            var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
+            {
+                CirculationType = sfcCirculationTypeEnum,
+                IsDisassemble = TrueOrFalseEnum.No,
+                CirculationBarCode = sfcCirculationUnBindDto.SFC,
+                SiteId = _currentEquipment.SiteId
+            };
+            //如果有传递解绑条码列表,否则解绑该SFC绑定的所有条码记录
+            if (sfcCirculationUnBindDto.UnBindSFCs != null && sfcCirculationUnBindDto.UnBindSFCs.Length > 0)
+            {
+                manuSfcCirculationBarCodequery.Sfcs = sfcCirculationUnBindDto.UnBindSFCs;
+            }
+            //查询流转条码绑定记录
+            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodequery);
+            List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
+            if (circulationBarCodeEntities.Any())
+            {
+                foreach (var entity in circulationBarCodeEntities)
+                {
+                    entity.IsDisassemble = TrueOrFalseEnum.Yes;
+                    entity.DisassembledBy = _currentEquipment.Name;
+                    entity.DisassembledOn = HymsonClock.Now();
+                    entity.UpdatedBy = _currentEquipment.Name;
+                    entity.UpdatedOn = HymsonClock.Now();
+                    manuSfcCirculationEntities.Add(entity);
+                }
+                await _manuSfcCirculationRepository.UpdateRangeAsync(manuSfcCirculationEntities);
+            }
+
+            return circulationBarCodeEntities;
+        }
+
+
+        
+
         /// <summary>
         /// 组件添加
         /// </summary>

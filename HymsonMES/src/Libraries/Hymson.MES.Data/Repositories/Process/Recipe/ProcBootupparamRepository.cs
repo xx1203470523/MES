@@ -111,6 +111,7 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBootupparamEntitiesSqlTemplate);
+
             using var conn = GetMESParamterDbConnection();
             var procBootupparamEntities = await conn.QueryAsync<ProcBootupparamEntity>(template.RawSql, procBootupparamQuery);
             return procBootupparamEntities;

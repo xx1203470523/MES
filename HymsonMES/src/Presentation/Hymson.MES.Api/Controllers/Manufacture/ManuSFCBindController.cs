@@ -21,8 +21,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 获取SFC绑定数据(永泰维修)
-        /// <para>PS：这里没法获取当前位置吧，我看原型的意思应该是当前SFC的工序吧</para>
+        /// 获取SFC绑定数据(永泰维修)       
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -34,8 +33,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 全部解绑
-        /// <para>PS：我没传BindSFCs，这个应该是你通过SFC（SFC是产线编码的意思不？）在后台查，不应该让我来传，不然我传些非本SFC下的设备不会出问题么</para>
+        /// 全部解绑      
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -47,8 +45,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 换绑
-        /// <para>PS：对接完成了，但是有BUG，我感觉应该传旧的设备绑定ID，而不是旧的SFC，如果即将换绑的新SFC设备码和旧SFC设备码相同，就会出BUG</para>
+        /// 换绑   
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
@@ -60,8 +57,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 复投
-        /// <para>PS；传参我改变了一下，按原型来看，我应该是只需要传条码、NG位置、复投位置就可以了</para>
+        /// 复投        
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
