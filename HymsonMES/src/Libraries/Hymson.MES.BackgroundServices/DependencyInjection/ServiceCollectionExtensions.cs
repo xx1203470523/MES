@@ -1,5 +1,6 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.CoreServices.Options;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddCoreService(configuration);
             AddEventBusServices(services);
             AddConfig(services, configuration);
+            AddServices(services);
             return services;
         }
 
@@ -47,6 +49,15 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IIntegrationEventHandler<MessageHandleUpgradeIntegrationEvent>, MessageHandleUpgradeIntegrationEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeIntegrationEvent>, MessageReceiveUpgradeIntegrationEventHandler>();
             services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeIntegrationEvent>, MessageTriggerUpgradeIntegrationEventHandler>();
+        }
+
+        /// <summary>
+        /// 注入服务
+        /// </summary>
+        /// <param name="services"></param>
+        static void AddServices(IServiceCollection services)
+        {
+            services.AddSingleton<IProductionstatisticService, ProductionstatisticService>();
         }
     }
 }
