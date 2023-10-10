@@ -120,7 +120,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcStepEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntitys)
         {
             if (manuSfcStepEntitys == null || manuSfcStepEntitys.Any() == false) return 0;
 

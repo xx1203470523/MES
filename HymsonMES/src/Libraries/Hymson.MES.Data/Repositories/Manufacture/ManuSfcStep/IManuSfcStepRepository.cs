@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcStepEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntitys);
 
         /// <summary>
         /// 更新

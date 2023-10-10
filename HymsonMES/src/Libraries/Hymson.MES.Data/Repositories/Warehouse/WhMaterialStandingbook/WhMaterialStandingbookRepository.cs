@@ -159,7 +159,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialStandingbookEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity>? whMaterialStandingbookEntitys)
         {
             if (whMaterialStandingbookEntitys == null || whMaterialStandingbookEntitys.Any() == false) return 0;
 

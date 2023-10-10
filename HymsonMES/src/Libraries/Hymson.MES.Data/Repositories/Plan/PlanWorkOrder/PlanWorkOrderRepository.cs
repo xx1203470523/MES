@@ -369,7 +369,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyCommand> commands)
+        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyCommand>? commands)
         {
             if (commands == null || commands.Any() == false) return 0;
 

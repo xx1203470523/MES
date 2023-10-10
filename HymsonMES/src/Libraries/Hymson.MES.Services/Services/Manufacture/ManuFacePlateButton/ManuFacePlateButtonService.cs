@@ -329,7 +329,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UserName = _currentUser.UserName,
                 ProcedureId = dto.Param!["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
-                SFCs = new string[] { dto.Param["SFC"] }
+                InStationRequestBos = new List<InStationRequestBo> { new InStationRequestBo { SFC = dto.Param["SFC"] } },
+                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = dto.Param["SFC"] } }
             });
 
             foreach (var item in jobResponses)

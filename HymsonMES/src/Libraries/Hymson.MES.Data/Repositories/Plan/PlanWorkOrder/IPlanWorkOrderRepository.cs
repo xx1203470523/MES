@@ -172,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyCommand> commands);
+        Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyCommand>? commands);
 
         /// <summary>
         /// 新增工单记录表

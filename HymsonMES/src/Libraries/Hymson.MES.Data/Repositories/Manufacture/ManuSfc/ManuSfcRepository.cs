@@ -346,7 +346,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcEntity> entities)
+        public async Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcEntity>? entities)
         {
             if (entities == null || entities.Any() == false) return 0;
 
