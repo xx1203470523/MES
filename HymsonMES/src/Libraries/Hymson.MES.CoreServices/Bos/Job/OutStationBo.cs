@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
@@ -71,6 +72,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 是否完工（ 如果没有尾工序，就表示已完工）
         /// </summary>
         public bool IsCompleted { get; set; } = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ProcessRouteTypeEnum ProcessRouteType { get; set; }
 
         /// <summary>
         /// 
