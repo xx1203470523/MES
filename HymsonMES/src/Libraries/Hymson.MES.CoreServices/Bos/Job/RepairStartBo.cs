@@ -27,7 +27,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class RepairStartResponseBo : JobResultBo
+    public class RepairStartResponseBo
     {
         /// <summary>
         /// 在制

@@ -25,12 +25,4 @@ namespace Hymson.MES.CoreServices.Bos.Job
 
     }
 
-    /// <summary>
-    ///  
-    /// </summary>
-    public class RepairEndResponseBo : JobResultBo
-    {
-
-    }
-
 }

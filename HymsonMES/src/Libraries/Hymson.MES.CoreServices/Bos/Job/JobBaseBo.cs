@@ -17,8 +17,4 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public ILocalizationService LocalizationService { get; set; }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class JobResultBo { }
 }

@@ -41,11 +41,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// Job返回实体
     /// </summary>
-    public class ProductBadRecordResponseBo: JobResultBo
+    public class ProductBadRecordResponseBo
     {
 
         public bool IsScrapCode { get; set; }
-        public List<ManuProductBadRecordEntity> ManuProductBadRecords { get; set; }=new List<ManuProductBadRecordEntity>();
+        public List<ManuProductBadRecordEntity> ManuProductBadRecords { get; set; } = new List<ManuProductBadRecordEntity>();
         public List<ManuSfcStepEntity> SfcStepList { get; set; } = new List<ManuSfcStepEntity>();
         public List<ManuSfcProduceBusinessEntity> ManuSfcProduceList { get; set; } = new List<ManuSfcProduceBusinessEntity>();
         public ManuSfcUpdateRouteCommand UpdateRouteCommand { get; set; } = new ManuSfcUpdateRouteCommand();

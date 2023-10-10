@@ -25,18 +25,8 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class InStationResponseBo : JobResultBo
+    public class InStationResponseSummaryBo
     {
-        /// <summary>
-        /// 是否首工序
-        /// </summary>
-        public bool IsFirstProcedure { get; set; }
-
-        /// <summary>
-        /// 条码（首个）
-        /// </summary>
-        public string FirstSFC { get; set; } = "";
-
         /// <summary>
         /// 
         /// </summary>
