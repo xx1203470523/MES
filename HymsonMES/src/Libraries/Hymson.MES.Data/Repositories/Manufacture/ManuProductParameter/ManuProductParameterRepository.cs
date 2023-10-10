@@ -249,8 +249,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (!string.IsNullOrEmpty(pageQuery.ParameterName))
             {
-                pageQuery.ParameterName = $"%{pageQuery.ParameterName}%";
-                sqlBuilder.Where("pp2.ParameterName like @ParameterName ");
+                pageQuery.ParameterNameStr = pageQuery.ParameterName.Split(",");
+                sqlBuilder.Where("pp2.ParameterName IN @ParameterNameStr ");
             }
             if (pageQuery.SFCS != null && pageQuery.SFCS.Length > 0 && string.IsNullOrEmpty(pageQuery.SFCStr))
             {
