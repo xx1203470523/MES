@@ -1040,7 +1040,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFC = sfc,
                     SfcinfoId = sfcInfoEntity?.Id ?? 0,
                     SfcStepId = stepEntity.Id,
-                    ProcedureId =  parm.ProcedureId?? manuSfcProduceInfoEntity?.ProcedureId,
+                    ProcedureId = parm.ProcedureId ?? manuSfcProduceInfoEntity?.ProcedureId,
                     ScrapQty = sfcEntity.Qty,
                     IsCancel = false,
                     Remark = parm.Remark,
@@ -2072,14 +2072,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                             });
 
                             // 状态和是否再用一起改
-                            await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
-                            {
-                                Sfcs = manuSfcs,
-                                Status = SfcStatusEnum.Complete,
-                                IsUsed = YesOrNoEnum.Yes,
-                                UserId = _currentUser.UserName,
-                                UpdatedOn = HymsonClock.Now()
-                            });
+                            //await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
+                            //{
+                            //    Sfcs = manuSfcs,
+                            //    Status = SfcStatusEnum.Complete,
+                            //    IsUsed = YesOrNoEnum.Yes,
+                            //    UserId = _currentUser.UserName,
+                            //    UpdatedOn = HymsonClock.Now()
+                            //});
 
                             // 库存增加
                             if (updateInventoryQuantityList.Any()) await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueRangeAsync(updateInventoryQuantityList);
@@ -2123,17 +2123,18 @@ namespace Hymson.MES.Services.Services.Manufacture
                             UserId = _currentUser.UserName
                         });
 
-                        // 更新条码状态 
-                        if (notManuSfcs != null && notManuSfcs.Any()) await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
-                        {
-                            Sfcs = notManuSfcs.ToArray(),
-                            Status = sfcProduceStepDto.Type,
-                            IsUsed = YesOrNoEnum.Yes,
-                            UserId = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now()
-                        });
+                        //// 更新条码状态 
+                        //if (notManuSfcs != null && notManuSfcs.Any()) await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
+                        //{
+                        //    Sfcs = notManuSfcs.ToArray(),
+                        //    Status = sfcProduceStepDto.Type,
+                        //    IsUsed = YesOrNoEnum.Yes,
+                        //    UserId = _currentUser.UserName,
+                        //    UpdatedOn = HymsonClock.Now()
+                        //});
 
                         // 库存减少
+
                         if (updateInventoryQuantityList.Any()) await _whMaterialInventoryRepository.UpdateReduceQuantityResidueRangeAsync(updateInventoryQuantityList);
 
                         // 台账
@@ -2142,12 +2143,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     default:
                         break;
                 }
-                await _manuSfcRepository.MultiUpdateSfcIsUsedAsync(new MultiSfcUpdateIsUsedCommand
+
+                //大佬说 条码状态与在制状态保持一致
+                await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
                 {
-                    SFCs = manuSfcs,
+                    Sfcs = manuSfcs,
+                    Status = sfcProduceStepDto.Type,
                     IsUsed = YesOrNoEnum.Yes,
-                    SiteId = _currentSite.SiteId ?? 0,
-                    UpdatedBy = _currentUser.UserName,
+                    UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 });
                 trans.Complete();
