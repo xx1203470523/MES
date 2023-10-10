@@ -20,7 +20,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialStandingbookEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys);
+        Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity>? whMaterialStandingbookEntitys);
 
         /// <summary>
         /// 更新

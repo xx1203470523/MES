@@ -205,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcCirculationEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculationEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcCirculationEntity>? manuSfcCirculationEntitys)
         {
             if (manuSfcCirculationEntitys == null || manuSfcCirculationEntitys.Any() == false) return 0;
 

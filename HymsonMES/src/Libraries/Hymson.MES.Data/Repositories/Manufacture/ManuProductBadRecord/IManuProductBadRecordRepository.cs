@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuProductBadRecordEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys);
 
         /// <summary>
         /// 更新

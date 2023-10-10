@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuDowngradingRecordEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<ManuDowngradingRecordEntity> manuDowngradingRecordEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ManuDowngradingRecordEntity>? manuDowngradingRecordEntitys)
         {
             if (manuDowngradingRecordEntitys == null || manuDowngradingRecordEntitys.Any() == false) return 0;
 
