@@ -50,5 +50,12 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcLabelTemplateDto> QueryProcLabelTemplateByIdAsync(long id);
+
+        /// <summary>
+        /// 查询标签模板对应的打印设计信息
+        /// </summary>
+        /// <param name="labelTemplateId"></param>
+        /// <returns></returns>
+        Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long labelTemplateId);
     }
 }
