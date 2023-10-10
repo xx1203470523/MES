@@ -153,7 +153,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         {
             bool validateBatch = false;
             //校验电芯批次, 扫码&OCVR测试机,稍候增加配置管理功能
-            if (_currentEquipment.Code.Equals("YTLPACK01AE004"))
+            if (_currentEquipment.Code.Equals("YTLPACK01AE004-false"))
             {
                 validateBatch = true;
             }
@@ -573,10 +573,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             }
             await _manuSfcRepository.InsertRangeAsync(manuSfcList);
             await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoList);
-            if (await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList) == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", string.Join(',', manuSfcProduceList)).WithData("action", "插入在制信息");
-            }
+            await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList);
+            //if (await _manuSfcProduceRepository.InsertRangeAsync(manuSfcProduceList) == 0)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19148)).WithData("SFC", string.Join(',', manuSfcProduceList)).WithData("action", "插入在制信息");
+            //}
             await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
             ts.Complete();
         }
