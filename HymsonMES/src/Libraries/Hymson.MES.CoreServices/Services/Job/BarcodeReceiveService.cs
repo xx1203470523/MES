@@ -98,7 +98,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<InStationRequestBo>();
+            var bo = param.ToBo<BarcodeSfcReceiveBo>();
             if (bo == null) return null;
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {

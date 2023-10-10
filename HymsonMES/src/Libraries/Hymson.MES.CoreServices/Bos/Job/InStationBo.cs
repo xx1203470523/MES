@@ -8,20 +8,18 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class InStationRequestBo : JobBaseBo
+    public class InStationRequestBo
     {
         /// <summary>
-        /// 用户名
+        /// 条码
         /// </summary>
-        public string UserName { get; set; } = "";
+        public string SFC { get; set; }
+
         /// <summary>
-        /// 工序ID
+        /// 载具条码
         /// </summary>
-        public long ProcedureId { get; set; }
-        /// <summary>
-        /// 资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
+        public string? VehicleCode { get; set; }
+
     }
 
     /// <summary>
@@ -62,7 +60,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 更新条码表
         /// </summary>
-        public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; }= new List<InStationManuSfcByIdCommand>();
+        public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; } = new List<InStationManuSfcByIdCommand>();
 
         /// <summary>  
         /// 更新在制品表

@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
@@ -170,6 +171,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
 
+
         /// <summary>
         /// 参数校验
         /// </summary>
@@ -177,15 +179,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<OutStationRequestBo>();
+            if (param is not JobRequestBo bo) return;
             if (bo == null) return;
+            if (bo.OutStationRequestBos == null || bo.OutStationRequestBos.Any() == false) return;
+
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = bo.SiteId, SFCs = bo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 判断条码锁状态
-            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
@@ -215,8 +221,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<OutStationRequestBo>();
-            if (bo == null) return null;
+            if (param is not JobRequestBo bo) return default;
+            if (bo == null) return default;
 
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
@@ -233,15 +239,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<OutStationRequestBo>();
+            if (param is not JobRequestBo bo) return default;
             if (bo == null) return default;
+            if (bo.OutStationRequestBos == null || bo.OutStationRequestBos.Any() == false) return default;
 
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
 
             // 如果是不合格出站
-            if (bo.IsQualified.HasValue && bo.IsQualified.Value == false)
+            if (bo.OutStationRequestBos.Any(a => a.IsQualified.HasValue && a.IsQualified.Value == false))
             {
                 return await OutStationForUnQualifiedProcedureAsync(bo, sfcProduceEntities);
             }
@@ -378,8 +385,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<OutStationRequestBo>();
-            if (bo == null) return null;
+            if (param is not JobRequestBo bo) return default;
+            if (bo == null) return default;
 
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
@@ -397,10 +404,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="bo"></param>
         /// <param name="sfcProduceEntities"></param>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForQualifiedProcedureAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
+        private async Task<OutStationResponseBo?> OutStationForQualifiedProcedureAsync(JobRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
         {
             if (bo == null) return default;
             if (bo.Proxy == null) return default;
+            if (bo.OutStationRequestBos == null || bo.OutStationRequestBos.Any() == false) return default;
 
             // 待执行的命令
             OutStationResponseBo responseBo = new();
@@ -431,7 +439,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 物料消耗明细数据
             MaterialConsumptionBo consumptionBo = new();
             // 指定消耗物料
-            if (bo.ConsumeList != null && bo.ConsumeList.Any())
+            if (bo.OutStationRequestBos.Any(a => a.ConsumeList != null && a.ConsumeList.Any()))
             {
                 consumptionBo = await ExecutenMaterialConsumptionWithBarCodeAsync(bo, sfcProduceEntities);
             }
@@ -443,7 +451,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.UpdateQtyByIdCommands = consumptionBo.UpdateQtyByIdCommands;
             responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
 
-            // 获取下一个工序（如果没有了，就表示完工）
             // 获取下一个工序（如果没有了，就表示完工）
             var nextProcedure = await bo.Proxy.GetValueAsync(_masterDataService.GetNextProcedureAsync, new ManuRouteProcedureWithWorkOrderBo
             {
@@ -491,7 +498,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ResourceId = sfcProduceEntity.ResourceId,
                     Qty = sfcProduceEntity.Qty,
                     EquipmentId = bo.EquipmentId,
-                    VehicleCode = bo.VehicleCode,
+                    //VehicleCode = bo.VehicleCode,
                     SiteId = bo.SiteId,
                     CreatedBy = updatedBy,
                     CreatedOn = updatedOn,
@@ -668,10 +675,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 不合格工序出站
         /// </summary>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
+        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureAsync(JobRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
         {
             if (bo == null) return default;
             if (bo.Proxy == null) return default;
+            if (bo.OutStationRequestBos == null || bo.OutStationRequestBos.Any() == false) return default;
 
             // 待执行的命令
             OutStationResponseBo responseBo = new();
@@ -701,8 +709,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 物料消耗明细数据
             MaterialConsumptionBo consumptionBo = new();
-            // 指定消耗物料逻辑
-            if (bo.ConsumeList != null && bo.ConsumeList.Any())
+            // 指定消耗物料
+            if (bo.OutStationRequestBos.Any(a => a.ConsumeList != null && a.ConsumeList.Any()))
             {
                 consumptionBo = await ExecutenMaterialConsumptionWithBarCodeAsync(bo, sfcProduceEntities);
             }
@@ -750,7 +758,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ResourceId = sfcProduceEntity.ResourceId,
                     Qty = sfcProduceEntity.Qty,
                     EquipmentId = bo.EquipmentId,
-                    VehicleCode = bo.VehicleCode,
+                    ///VehicleCode = bo.VehicleCode,
                     SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                     SiteId = bo.SiteId,
                     CreatedBy = updatedBy,
@@ -815,6 +823,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseBo.SFCEntities.Add(manuSfcEntity);
             }
 
+            /*
             // 记录出站不良记录（如果有传不合格代码）
             if (bo.OutStationUnqualifiedList != null && bo.OutStationUnqualifiedList.Any())
             {
@@ -853,7 +862,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 responseBo.ProductBadRecordEntities = productBadRecordEntities;
             }
-
+            */
             return responseBo;
         }
 
@@ -863,13 +872,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="bo"></param>
         /// <param name="sfcProduceEntities"></param>
         /// <returns></returns>
-        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionWithBOMAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
+        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionWithBOMAsync(JobRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
         {
             // 物料消耗对象
             MaterialConsumptionBo responseBo = new();
 
             if (bo == null) return responseBo;
             if (bo.Proxy == null) return responseBo;
+            if (bo.OutStationRequestBos == null || bo.OutStationRequestBos.Any() == false) return responseBo;
 
             // 说明：默认所有同时刻进站的条码，都是同一BOM
             var firstSFCProduceEntity = sfcProduceEntities.FirstOrDefault();
@@ -938,14 +948,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="bo"></param>
         /// <param name="sfcProduceEntities"></param>
         /// <returns></returns>
-        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionWithBarCodeAsync(OutStationRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
+        private async Task<MaterialConsumptionBo> ExecutenMaterialConsumptionWithBarCodeAsync(JobRequestBo bo, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities)
         {
             // 物料消耗对象
             MaterialConsumptionBo responseBo = new();
 
             if (bo == null) return responseBo;
             if (bo.Proxy == null) return responseBo;
-            if (bo.ConsumeList == null) return responseBo;
+            if (bo.OutStationRequestBos == null || bo.OutStationRequestBos.Any() == false) return responseBo;
+            if (bo.OutStationRequestBos.Any(a => a.ConsumeList != null && a.ConsumeList.Any())) return responseBo;
 
             // 说明：默认所有同时刻进站的条码，都是同一BOM
             var firstSFCProduceEntity = sfcProduceEntities.FirstOrDefault();
@@ -960,17 +971,20 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             });
             if (initialMaterials == null) return responseBo;
 
+            /*
             // 如果存在传过来的消耗编码不在BOM清单里面的物料，直接返回异常
             var hasBarCodeNotInBOM = bo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode)).Any();
             if (hasBarCodeNotInBOM)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17105));
             }
+            */
 
             // 只保留传过来的消耗编码
             List<MaterialDeductResponseBo> filterMaterials = new();
             foreach (var item in initialMaterials)
             {
+                /*
                 var consume = bo.ConsumeList.FirstOrDefault(f => f.BarCode == item.MaterialCode);
                 if (consume == null) continue;
 
@@ -980,7 +994,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     //item.ConsumeRatio = 100;
                     //item.Loss = 0;
                 }
-
+                */
                 // 如果不保留替代品（如果保留，就删除这句）
                 item.ReplaceMaterials = Enumerable.Empty<MaterialDeductItemBo>();
 

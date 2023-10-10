@@ -12,25 +12,12 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 出站job实体
     /// </summary>
-    public class OutStationRequestBo : JobBaseBo
+    public class OutStationRequestBo
     {
         /// <summary>
-        /// 用户名
+        /// 条码
         /// </summary>
-        public string UserName { get; set; } = "";
-        /// <summary>
-        /// 工序ID
-        /// </summary>
-        public long ProcedureId { get; set; }
-        /// <summary>
-        /// 资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
-
-        /// <summary>
-        /// 设备ID
-        /// </summary>
-        public long? EquipmentId { get; set; }
+        public string SFC { get; set; }
 
         /// <summary>
         /// 载具条码
@@ -141,7 +128,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 
         /// </summary>
         public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
-        
+
         /// <summary>
         /// 
         /// </summary>
