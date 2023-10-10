@@ -35,6 +35,22 @@
     /// <summary>
     /// 删除 (物料删除)
     /// </summary>
+    public class DeletePhysicalByProduceIdCommand
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 删除条码id
+        /// </summary>
+        public long Id { get; set; }
+    }
+
+    /// <summary>
+    /// 删除 (物料删除)
+    /// </summary>
     public class DeletePhysicalByProduceIdsCommand
     {
         /// <summary>

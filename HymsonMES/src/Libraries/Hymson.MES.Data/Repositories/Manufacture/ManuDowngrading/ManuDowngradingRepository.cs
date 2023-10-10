@@ -9,6 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
@@ -128,6 +129,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<ManuDowngradingEntity> manuDowngradingEntitys)
         {
+            if (manuDowngradingEntitys == null || manuDowngradingEntitys.Any() == false) return 0;
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, manuDowngradingEntitys);
         }

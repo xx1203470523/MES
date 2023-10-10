@@ -348,6 +348,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcEntity> entities)
         {
+            if (entities == null || entities.Any() == false) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWithStatusCheckSql, entities);
         }

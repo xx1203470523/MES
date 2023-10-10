@@ -57,6 +57,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public long? EquipmentId { get; set; }
 
         /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
+        /// <summary>
         /// 进站对象
         /// </summary>
         public IEnumerable<InStationRequestBo>? InStationRequestBos { get; set; }

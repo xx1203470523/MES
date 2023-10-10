@@ -1,7 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
@@ -70,14 +68,39 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class OutStationResponseBo
     {
         /// <summary>
-        /// 是否完工
+        /// 是否完工（ 如果没有尾工序，就表示已完工）
         /// </summary>
         public bool IsCompleted { get; set; } = true;
 
         /// <summary>
-        /// 条码（首个）
+        /// 
         /// </summary>
-        public string FirstSFC { get; set; } = "";
+        public ManuSfcEntity SFCEntity { get; set; }
+
+        /// <summary>
+        /// 在制品信息
+        /// </summary>
+        public ManuSfcProduceEntity SFCProduceEntitiy { get; set; }
+
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public ManuSfcStepEntity SFCStepEntity { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public WhMaterialInventoryEntity MaterialInventoryEntity { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public WhMaterialStandingbookEntity MaterialStandingbookEntity { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MultiUpdateSummaryOutStationCommand UpdateSummaryOutStationCommand { get; set; }
 
         /// <summary>
         /// 
@@ -90,39 +113,87 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new List<ManuSfcCirculationEntity>();
 
         /// <summary>
-        /// 
+        /// 降级品录入对象
         /// </summary>
-        public List<ManuSfcStepEntity> SFCStepEntities { get; set; } = new();
+        public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
 
         /// <summary>
-        /// 
+        /// 降级品录入记录对象
         /// </summary>
-        public List<WhMaterialInventoryEntity> WhMaterialInventoryEntities { get; set; } = new();
+        public IEnumerable<ManuDowngradingRecordEntity> DowngradingRecordEntities { get; set; }
 
         /// <summary>
-        /// 
+        /// 不良品录入对象
         /// </summary>
-        public List<WhMaterialStandingbookEntity> WhMaterialStandingbookEntities { get; set; } = new();
+        public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
 
+
+        // 额外给面板用来显示的参数
         /// <summary>
-        /// 
+        /// 下一工序编码
         /// </summary>
-        public DeletePhysicalByProduceIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
+        public string NextProcedureCode { get; set; } = "";
+    }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
-
+    /// <summary>
+    /// 
+    /// </summary>
+    public class OutStationResponseSummaryBo
+    {
         /// <summary>
         /// 条码信息
         /// </summary>
-        public List<ManuSfcEntity> SFCEntities { get; set; } = new();
+        public IEnumerable<ManuSfcEntity> SFCEntities { get; set; }
 
         /// <summary>
         /// 在制品信息
         /// </summary>
-        public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
+        public IEnumerable<ManuSfcProduceEntity> SFCProduceEntities { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<WhMaterialInventoryEntity> WhMaterialInventoryEntities { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<WhMaterialStandingbookEntity> WhMaterialStandingbookEntities { get; set; }
+
+        /// <summary>
+        /// 汇总表更新对象
+        /// </summary>
+        public IEnumerable<MultiUpdateSummaryOutStationCommand> MultiUpdateSummaryOutStationCommands { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<UpdateQtyByIdCommand> UpdateQtyByIdCommands { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; }
+
+        /// <summary>
+        /// 降级品录入对象
+        /// </summary>
+        public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
+
+        /// <summary>
+        /// 降级品录入记录对象
+        /// </summary>
+        public IEnumerable<ManuDowngradingRecordEntity> DowngradingRecordEntities { get; set; }
+
+        /// <summary>
+        /// 不良品录入对象
+        /// </summary>
+        public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
 
         /// <summary>
         /// 
@@ -132,32 +203,23 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public ProcessRouteTypeEnum ProcessRouteType { get; set; }
+        public DeletePhysicalByProduceIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<UpdateQtyCommand> UpdateQtyCommands { get; set; }
+
+
+        // 额外给面板用来显示的参数
+        /// <summary>
+        /// 是否尾工序
+        /// </summary>
+        public bool IsCompleted { get; set; } = true;
         /// <summary>
         /// 下一工序编码
         /// </summary>
         public string NextProcedureCode { get; set; } = "";
-
-        /// <summary>
-        /// 降级品录入对象
-        /// </summary>
-        public DegradedProductExtendBo DegradedProductExtendBo { get; set; }
-
-        /// <summary>
-        /// 降级品录入对象
-        /// </summary>
-        public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
-
-        /// <summary>
-        /// 不良品录入对象
-        /// </summary>
-        public List<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; } = new();
-
-        /// <summary>
-        /// 汇总表更新对象
-        /// </summary>
-        public IEnumerable<MultiUpdateSummaryOutStationCommand> MultiUpdateSummaryOutStationCommands { get; set; }
     }
 
     /// <summary>

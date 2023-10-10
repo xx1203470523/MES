@@ -364,6 +364,19 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
         }
 
+        /// <summary>
+        /// 更新数量（完工数量）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyCommand> commands)
+        {
+            if (commands == null || commands.Any() == false) return 0;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, commands);
+        }
+
         #region 工单记录表
         /// <summary>
         /// 新增工单记录表
@@ -458,7 +471,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
             "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
+            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
 
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
