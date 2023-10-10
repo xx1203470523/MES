@@ -231,19 +231,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceEntities = await commonBo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
 
-            // 组装（进站数据）
-            List<ManuSfcStepEntity> sfcStepEntities = new();
-            List<ManuSfcSummaryEntity> manuSfcSummaryEntities = new();
-            MultiSfcUpdateIsUsedCommand sfcUpdateIsUsedCommand = new();
-            List<MultiUpdateProduceInStationSFCCommand> updateProduceInStationSFCCommands = new();
-            List<InStationManuSfcByIdCommand> inStationManuSfcByIdCommands = new();
+            // 遍历所有条码
+            var singleSFCResponseBos = new List<InStationResponseBo>();
+            var responseBo = new InStationResponseSummaryBo();
             foreach (var requestBo in commonBo.InStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
 
+                var singleSFCResponseBo = new InStationResponseBo();
+
                 // 检查是否首工序
-                var isFirstProcedure = await commonBo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
+                singleSFCResponseBo.IsFirstProcedure = await commonBo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
                 {
                     ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                     ProcedureId = commonBo.ProcedureId
@@ -271,7 +270,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.RepeatedCount++;
 
                 // 初始化步骤
-                sfcStepEntities.Add(new ManuSfcStepEntity
+                singleSFCResponseBo.SFCStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.InStock,  // 状态为 进站
                     Id = IdGenProvider.Instance.CreateId(),
@@ -281,17 +280,29 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     WorkCenterId = sfcProduceEntity.WorkCenterId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
-                    Qty = sfcProduceEntity.Qty,
-                    EquipmentId = sfcProduceEntity.EquipmentId,
                     ResourceId = sfcProduceEntity.ResourceId,
+                    Qty = sfcProduceEntity.Qty,
+                    VehicleCode = requestBo.VehicleCode,
+                    EquipmentId = commonBo.EquipmentId,
                     SiteId = commonBo.SiteId,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,
                     UpdatedBy = commonBo.UserName,
                     UpdatedOn = commonBo.Time
-                });
+                };
 
-                updateProduceInStationSFCCommands.Add(new MultiUpdateProduceInStationSFCCommand
+                // 更新条码表
+                singleSFCResponseBo.InStationManuSfcByIdCommand = new InStationManuSfcByIdCommand
+                {
+                    Id = sfcProduceEntity.SFCId,
+                    Status = SfcStatusEnum.Activity,
+                    IsUsed = YesOrNoEnum.Yes,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
+                };
+
+                // 更新实体（带状态检查）
+                singleSFCResponseBo.MultiUpdateProduceInStationSFCCommand = new MultiUpdateProduceInStationSFCCommand
                 {
                     Id = sfcProduceEntity.Id,
                     ProcedureId = commonBo.ProcedureId,
@@ -301,16 +312,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     RepeatedCount = sfcProduceEntity.RepeatedCount,
                     UpdatedBy = commonBo.UserName,
                     UpdatedOn = commonBo.Time
-                });
-
-                inStationManuSfcByIdCommands.Add(new InStationManuSfcByIdCommand
-                {
-                    Id = sfcProduceEntity.SFCId,
-                    Status = SfcStatusEnum.Activity,
-                    IsUsed = YesOrNoEnum.Yes,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
-                });
+                };
 
                 sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
                 sfcProduceEntity.ResourceId = commonBo.ResourceId;
@@ -319,24 +321,35 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.Status = SfcStatusEnum.Activity;
                 sfcProduceEntity.UpdatedBy = commonBo.UserName;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
+
+                singleSFCResponseBo.SFCProduceEntitiy = sfcProduceEntity;
+                singleSFCResponseBos.Add(singleSFCResponseBo);
             }
 
-            /*
-            if (isFirstProcedure)
-            {
-                // 更新工单的 InputQty
-                updateQtyCommand.Qty = entities.Count;
-            }
-            */
+            // 归集每个条码的出站结果
+            if (singleSFCResponseBos.Any() == false) return responseBo;
+            responseBo.SFCProduceEntities = singleSFCResponseBos.Select(s => s.SFCProduceEntitiy);
+            responseBo.SFCStepEntities = singleSFCResponseBos.Select(s => s.SFCStepEntity);
+            responseBo.InStationManuSfcByIdCommands = singleSFCResponseBos.Select(s => s.InStationManuSfcByIdCommand);
+            responseBo.MultiUpdateProduceInStationSFCCommands = singleSFCResponseBos.Select(s => s.MultiUpdateProduceInStationSFCCommand);
 
-            return new InStationResponseSummaryBo
+            var singleSFCResponseBosByWorkOrderId = singleSFCResponseBos
+                .Where(w => w.IsFirstProcedure)
+                .Select(s => s.SFCProduceEntitiy)
+                .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
+            foreach (var item in singleSFCResponseBosByWorkOrderId)
             {
-                ManuSfcProduceEntities = entities,
-                UpdateQtyCommand = updateQtyCommand,
-                SFCStepEntities = sfcStepEntities,
-                MultiUpdateProduceInStationSFCCommands = updateProduceInStationSFCCommands,
-                InStationManuSfcByIdCommands = inStationManuSfcByIdCommands
-            };
+                // 更新工单的InputQty
+                responseBo.UpdateQtyCommands.Add(new UpdateQtyCommand
+                {
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    WorkOrderId = item.Key,
+                    Qty = item.Value.Count()
+                });
+            }
+
+            return responseBo;
         }
 
         /// <summary>
@@ -348,45 +361,53 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             JobResponseBo responseBo = new();
             if (obj is not InStationResponseSummaryBo data) return responseBo;
+            if (data.SFCProduceEntities == null || data.SFCProduceEntities.Any() == false) return responseBo;
 
-            // 更改状态
+            // 更改状态（在制品）
             responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.MultiUpdateProduceInStationSFCCommands);
 
             // 未更新到数据，事务回滚
-            if (responseBo.Rows != data?.MultiUpdateProduceInStationSFCCommands?.Count())
+            if (responseBo.Rows != data.MultiUpdateProduceInStationSFCCommands.Count())
             {
                 // 这里在外层会回滚事务
                 responseBo.Rows = -1;
-                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), data.FirstSFC);
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), string.Join(',', data.SFCProduceEntities.Select(s => s.SFC)));
                 return responseBo;
             }
 
             // 更新数据
-            List<Task<int>> tasks = new();
+            List<Task<int>> tasks = new()
+            {
+                // 更新条码表 状态为排队
+                 _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands),
 
-            //更新条码表 状态为排队
-            var multiUpdateSfcIsUsedTask = _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands);
-            tasks.Add(multiUpdateSfcIsUsedTask);
+                // 插入 manu_sfc_step 状态为 进站
+                _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities),
 
-            // 插入 manu_sfc_step 状态为 进站
-            var manuSfcStepTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
-            tasks.Add(manuSfcStepTask);
-
-            // 更新工单的 InputQty
-            var updateInputQtyByWorkOrderIdTask = _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdAsync(data.UpdateQtyCommand);
-            tasks.Add(updateInputQtyByWorkOrderIdTask);
+                // 更新工单的 InputQty
+                _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdsAsync(data.UpdateQtyCommands)
+            };
 
             // 等待所有任务完成
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
 
-            // 面板需要的数据
-            responseBo.Content = new Dictionary<string, string> {
-                { "PackageCom", "False" },
-                { "BadEntryCom", "False" },
-            };
+            // 单条码过站时（面板过站）
+            if (data.SFCProduceEntities.Count() == 1)
+            {
+                var SFCProduceEntity = data.SFCProduceEntities.FirstOrDefault();
+                if (SFCProduceEntity != null)
+                {
+                    // 面板需要的数据
+                    responseBo.Content = new Dictionary<string, string> {
+                        { "PackageCom", "False" },
+                        { "BadEntryCom", "False" },
+                    };
 
-            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), data.FirstSFC);
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), SFCProduceEntity.SFC);
+                }
+            }
+
             return responseBo;
         }
 

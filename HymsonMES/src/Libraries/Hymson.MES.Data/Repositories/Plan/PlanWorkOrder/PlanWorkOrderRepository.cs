@@ -347,8 +347,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInputQtyByWorkOrderIdAsync(IEnumerable<UpdateQtyCommand> commands)
+        public async Task<int> UpdateInputQtyByWorkOrderIdsAsync(IEnumerable<UpdateQtyCommand>? commands)
         {
+            if (commands == null || commands.Any() == false) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateInputQtySql, commands);
         }
@@ -468,7 +470,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateInputQtySql = "UPDATE plan_work_order_record SET " +
             "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + @Qty, " +
             "RealStart = (CASE WHEN RealStart IS NULL THEN @UpdatedOn ELSE RealStart END), " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
+            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
             "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
             "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";

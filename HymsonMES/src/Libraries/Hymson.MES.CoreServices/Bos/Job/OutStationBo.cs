@@ -149,57 +149,57 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 条码信息
         /// </summary>
-        public IEnumerable<ManuSfcEntity> SFCEntities { get; set; }
+        public IEnumerable<ManuSfcEntity>? SFCEntities { get; set; }
 
         /// <summary>
         /// 在制品信息
         /// </summary>
-        public IEnumerable<ManuSfcProduceEntity> SFCProduceEntities { get; set; }
+        public IEnumerable<ManuSfcProduceEntity>? SFCProduceEntities { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; }
+        public IEnumerable<ManuSfcStepEntity>? SFCStepEntities { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<WhMaterialInventoryEntity> WhMaterialInventoryEntities { get; set; }
+        public IEnumerable<WhMaterialInventoryEntity>? WhMaterialInventoryEntities { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<WhMaterialStandingbookEntity> WhMaterialStandingbookEntities { get; set; }
+        public IEnumerable<WhMaterialStandingbookEntity>? WhMaterialStandingbookEntities { get; set; }
 
         /// <summary>
         /// 汇总表更新对象
         /// </summary>
-        public IEnumerable<MultiUpdateSummaryOutStationCommand> MultiUpdateSummaryOutStationCommands { get; set; }
+        public IEnumerable<MultiUpdateSummaryOutStationCommand>? MultiUpdateSummaryOutStationCommands { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<UpdateQtyByIdCommand> UpdateQtyByIdCommands { get; set; }
+        public IEnumerable<UpdateQtyByIdCommand>? UpdateQtyByIdCommands { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; }
+        public IEnumerable<ManuSfcCirculationEntity>? ManuSfcCirculationEntities { get; set; }
 
         /// <summary>
         /// 降级品录入对象
         /// </summary>
-        public IEnumerable<ManuDowngradingEntity> DowngradingEntities { get; set; }
+        public IEnumerable<ManuDowngradingEntity>? DowngradingEntities { get; set; }
 
         /// <summary>
         /// 降级品录入记录对象
         /// </summary>
-        public IEnumerable<ManuDowngradingRecordEntity> DowngradingRecordEntities { get; set; }
+        public IEnumerable<ManuDowngradingRecordEntity>? DowngradingRecordEntities { get; set; }
 
         /// <summary>
         /// 不良品录入对象
         /// </summary>
-        public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
+        public IEnumerable<ManuProductBadRecordEntity>? ProductBadRecordEntities { get; set; }
 
         /// <summary>
         /// 
@@ -214,7 +214,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public List<UpdateQtyCommand> UpdateQtyCommands { get; set; }
+        public List<UpdateQtyCommand> UpdateQtyCommands { get; set; } = new();
 
 
         // 额外给面板用来显示的参数

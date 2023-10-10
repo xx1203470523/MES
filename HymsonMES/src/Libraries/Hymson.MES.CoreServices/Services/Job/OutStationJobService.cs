@@ -386,7 +386,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SfcInfoIds = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.SFCProduceEntitiy.Id)
             };
 
-            var singleSFCResponseBosByWorkOrderId = singleSFCResponseBos.Select(s => s.SFCProduceEntitiy).ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
+            var singleSFCResponseBosByWorkOrderId = singleSFCResponseBos
+                .Where(w => w.IsCompleted)
+                .Select(s => s.SFCProduceEntitiy)
+                .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
             foreach (var item in singleSFCResponseBosByWorkOrderId)
             {
                 // 更新完工数量
@@ -424,7 +427,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not OutStationResponseSummaryBo data) return responseBo;
 
             // 更新物料库存
-            if (data.UpdateQtyByIdCommands.Any())
+            if (data.UpdateQtyByIdCommands != null && data.UpdateQtyByIdCommands.Any())
             {
                 responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
 
@@ -432,7 +435,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (data.UpdateQtyByIdCommands.Count() > responseBo.Rows)
                 {
                     responseBo.Rows = -1;
-                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18218), string.Join(',', data.SFCProduceEntities.Select(s => s.SFC)));
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18218), string.Join(',', data.SFCProduceEntities!.Select(s => s.SFC)));
                     return responseBo;
                 }
             }
@@ -480,9 +483,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.Rows += rowArray.Sum();
 
             // 单条码过站时（面板过站）
-            if (data.SFCEntities.Count() == 1)
+            if (data.SFCEntities!.Count() == 1)
             {
-                var SFCProduceEntity = data.SFCProduceEntities.FirstOrDefault();
+                var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                 if (SFCProduceEntity != null)
                 {
                     // 面板需要的参数
@@ -579,8 +582,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = sfcProduceEntity.ProcedureId,
                 ResourceId = sfcProduceEntity.ResourceId,
                 Qty = sfcProduceEntity.Qty,
-                EquipmentId = commonBo.EquipmentId,
                 VehicleCode = requestBo.VehicleCode,
+                EquipmentId = commonBo.EquipmentId,
                 SiteId = commonBo.SiteId,
                 CreatedBy = commonBo.UserName,
                 CreatedOn = commonBo.Time,

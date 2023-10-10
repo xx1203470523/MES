@@ -25,27 +25,59 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
+    public class InStationResponseBo
+    {
+        /// <summary>
+        /// 是否首工序
+        /// </summary>
+        public bool IsFirstProcedure { get; set; }
+
+        /// <summary>
+        /// 在制品信息
+        /// </summary>
+        public ManuSfcProduceEntity SFCProduceEntitiy { get; set; }
+
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public ManuSfcStepEntity SFCStepEntity { get; set; }
+
+        /// <summary>
+        /// 更新条码表
+        /// </summary>
+        public InStationManuSfcByIdCommand InStationManuSfcByIdCommand { get; set; }
+
+        /// <summary>  
+        /// 更新在制品表
+        /// </summary>
+        public MultiUpdateProduceInStationSFCCommand MultiUpdateProduceInStationSFCCommand { get; set; }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class InStationResponseSummaryBo
     {
         /// <summary>
-        /// 
+        /// 在制品信息
         /// </summary>
-        public IEnumerable<ManuSfcProduceEntity> ManuSfcProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
+        public IEnumerable<ManuSfcProduceEntity>? SFCProduceEntities { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
+        public IEnumerable<ManuSfcStepEntity>? SFCStepEntities { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<UpdateQtyCommand> UpdateQtyCommands { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
         public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
 
         /// <summary>
         /// 更新条码表
