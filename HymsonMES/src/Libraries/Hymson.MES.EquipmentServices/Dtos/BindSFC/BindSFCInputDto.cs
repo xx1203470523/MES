@@ -48,12 +48,12 @@ public record SwitchBindInputDto: BindSFCInputDto
     public long OldBindId { get; set; }
 
     /// <summary>
-    /// 旧绑定的SFC
+    /// 旧绑定的电芯SFC
     /// </summary>
     public string OldBindSFC { get; set; } = string.Empty;
 
     /// <summary>
-    /// 新绑定的SFC
+    /// 新绑定的电芯SFC
     /// </summary>
     public string NewBindSFC { get; set; } = string.Empty;
 }
