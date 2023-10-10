@@ -10,6 +10,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.SystemServices.Services.Manufacture

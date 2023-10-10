@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Hymson.Excel.Abstractions;
+using Hymson.Excel;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
@@ -54,6 +56,7 @@ using Hymson.MES.Services.Validators.Plan;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
+using Hymson.Minio;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection

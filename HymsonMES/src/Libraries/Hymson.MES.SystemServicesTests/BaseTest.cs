@@ -17,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using AutoMapper;
-using Hymson.MES.Services.Services.Report;
+using Hymson.MES.SystemServices.Services.ProductTrace;
 
 namespace Hymson.MES.SystemServicesTests
 {

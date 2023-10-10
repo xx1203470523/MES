@@ -58,5 +58,15 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox.Query
         /// </summary>
         public string? BoxCode { get; set; }
 
+        /// <summary>
+        /// 箱码集合
+        /// </summary>
+        public string[]? BoxCodes { get; set; }
+
+        /// <summary>
+        /// 非当前批次号 not in
+        /// </summary>
+        public string? NotInBatch { get; set; }
+
     }
 }

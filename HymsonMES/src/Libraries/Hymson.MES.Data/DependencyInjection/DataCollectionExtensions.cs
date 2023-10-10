@@ -111,6 +111,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcEquipmentGroupParamDetailRepository, ProcEquipmentGroupParamDetailRepository>();
             services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
 
+            //开机参数
+            services.AddSingleton<IProcBootupparamrecordRepository, ProcBootupparamrecordRepository>();
+            services.AddSingleton<IProcBootupparamRepository, ProcBootupparamRepository>();
+            services.AddSingleton<IProcBootuprecipeRepository, ProcBootuprecipeRepository>();
+
+
             #region Material
             services.AddSingleton<IProcMaterialRepository, ProcMaterialRepository>();
             services.AddSingleton<IProcReplaceMaterialRepository, ProcReplaceMaterialRepository>();

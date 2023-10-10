@@ -60,17 +60,16 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         [TestMethod()]
         public async Task InBoundTestAsync()
         {
-            string resourceCode = "YTLPACK01ER022";
-            string equipmentCode = "YTLPACK01AE022";
-            string prefix = "AAATESTSFC230809";
-
+            string resourceCode = "YTLPACK01ER018";
+            string equipmentCode = "YTLPACK01AE018";
+           
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto
             {
                 IsVerifyVirtualSFC = false,
                 LocalTime = HymsonClock.Now(),
                 ResourceCode = resourceCode,
-                SFC = "6101010700949239E0085CZHC"
+                SFC = "YTLSM202310060088A"
             });
             Assert.IsTrue(true);
         }

@@ -707,6 +707,8 @@
 
         public const string MES16352 = "数据导入模板不正确!";
         public const string MES16353 = "导入文件名未正常获取，检查导入的文件名是否规范!";
+        public const string MES16354 = "电芯条码{SFC}已经存在！不允许重复导入！";
+        public const string MES16355 = "箱码{BoxCode}已经存在于其它批次！不允许导入当前批次！";
         #endregion
 
         #region 生产

@@ -128,6 +128,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetManuSFCBoxSql);
+            sqlBuilder.Where("IsDeleted = 0");
             if (!string.IsNullOrWhiteSpace(query.BoxCode))
             {
                 sqlBuilder.Where(" BoxCode = @BoxCode");
@@ -143,10 +144,22 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
                 sqlBuilder.Where(" SFC in @SFCs");
             }
 
+            if (query.BoxCodes != null && query.BoxCodes.Any())
+            {
+                sqlBuilder.Where(" BoxCode in @BoxCodes");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.NotInBatch))
+            {
+                sqlBuilder.Where(" BatchNo != @NotInBatch");
+            }
+
+
             sqlBuilder.AddParameters(query);
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteSFCBoxEntity>(templateData.RawSql, templateData.Parameters);
+       
         }
 
         /// <summary>
@@ -216,7 +229,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteSFCBox
         const string GetBatchNoSql = @"SELECT DISTINCT BatchNo, MAX(CreatedOn) AS CreatedOn FROM manu_sfc_box /**where**/ GROUP BY BatchNo ORDER BY CreatedOn DESC";
         const string GetBoxCodeCountSqlTemplate = @"SELECT COUNT(*) FROM (SELECT DISTINCT BatchNo FROM manu_sfc_box msb  /**where**/ ) as subquery";
 
-        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BatchNo FROM `manu_sfc_box`  WHERE BatchNo IN @BatchNos group  by BatchNo";
+        const string GetByBoxCodesSql = @"SELECT ROUND(max(OCVB),3)*1000-ROUND(min(OCVB),3)*1000 as OCVBDiff,round(max(IMPB),2) as MaxIMPB,BatchNo FROM `manu_sfc_box`  WHERE IsDeleted = 0 AND BatchNo IN @BatchNos group  by BatchNo";
 
         const string GetWorkOrderIdSql = @"select  * from manu_sfc_box_workorder where WorkOrderId =@WorkOrderId";
 

@@ -27,6 +27,7 @@ using Hymson.MES.EquipmentServices.Services.QueryContainerBindSfc;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.SingleBarCodeLoadingVerification;
+using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -691,6 +692,57 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task EquipmentProductNgAsync(EquipmentProductNgDto request)
         {
             await _equipmentService.EquipmentProductNgAsync(request);
+        }
+
+
+        /// <summary>
+        /// 获取开机配方集合
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetEquipmentBootupParamSet")]
+        [ProducesResponseType(typeof(List<BootupParam>), 200)]
+        public async Task<List<BootupParam>> GetEquipmentBootupParamSetAsync(GetEquipmentBootupRecipeSetDto dto)
+        {
+            return await _equipmentService.GetEquipmentBootupRecipeSetAsync(dto);
+        }
+        /// <summary>
+        /// 获取指定配方明细
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetEquipmentBootupParamDetail")]
+        [ProducesResponseType(typeof(BootupParamDetail), 200)]
+        public async Task<BootupParamDetail> GetEquipmentBootupParamDetailAsync(GetEquipmentBootupParamDetailDto dto)
+        {
+            return await _equipmentService.GetEquipmentBootupRecipeDetailAsync(dto);
+        }
+        /// <summary>
+        /// 开机参数采集
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("EquipmentBootupParamCollect")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        public async Task EquipmentBootupParamCollectAsync(BootupParamCollectDto dto)
+        {
+            await _equipmentService.EquipmentBootupParamCollectAsync(dto);
+        }
+        /// <summary>
+        /// 开机参数版本校验
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpPost]
+        [Route("EquipmentBootupParamVersonCheck")]
+        [ProducesResponseType(typeof(ResultDto), 200)]
+        public async Task EquipmentBootupParamVersonCheckAsync(EquipmentBootupParamVersonCheckDto dto)
+        {
+            await _equipmentService.EquipmentBootupParamVersonCheckAsync(dto);
         }
     }
 }

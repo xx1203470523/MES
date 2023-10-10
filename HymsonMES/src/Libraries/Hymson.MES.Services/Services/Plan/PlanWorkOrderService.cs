@@ -133,7 +133,7 @@ namespace Hymson.MES.Services.Services.Plan
             planWorkOrderEntity.UpdatedOn = HymsonClock.Now();
             planWorkOrderEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            //关联箱码
+            //关联批次箱码
             var boxCodeBindWorkOrder = new List<InteSFCBoxWorkOrderEntity>();
             if (planWorkOrderCreateDto.SFCBox != null)
             {
@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES19307));
                 }
-                //批量查询
+                //按批次取OCVB IMPB
                 var getBatchNo = await _inteSFCBoxRepository.GetByBoxCodesAsync(batchno);
 
                 if (getBatchNo != null)

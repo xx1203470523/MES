@@ -82,7 +82,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                 ResourceCode = resourceCode,
                 Passed = 1,
                 LocalTime = HymsonClock.Now(),
-                SFC = "ES01B20020048202309220052",
+                SFC = "ES01B20020048202310040042",
                 ParamList = outBoundParams.ToArray()
             });
 

@@ -80,7 +80,7 @@ namespace Hymson.MES.Services.Services.Report
         /// 条码记录仓储
         /// </summary>
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
-      
+
 
         /// <summary>
         /// 生产工艺路线节点
@@ -546,7 +546,7 @@ namespace Hymson.MES.Services.Services.Report
             procProcessRouteDetailNodeQuery.ProcessRouteId = planWorkOrderEntity.ProcessRouteId;
             var processroutePagedInfo = await _procProcessRouteDetailNodeRepository.GetPagedInfoAsync(procProcessRouteDetailNodeQuery);
             //查询条码步骤
-            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity?.SFC??"", SiteId = _currentSite.SiteId ?? 0 });
+            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = manuSfcEntity?.SFC ?? "", SiteId = _currentSite.SiteId ?? 0 });
             var procSfcProcessRouteReports = new List<ProcSfcProcessRouteReportExportDto>();
             var processRouteLists = processroutePagedInfo.Data;
             foreach (var procProcess in processRouteLists)
