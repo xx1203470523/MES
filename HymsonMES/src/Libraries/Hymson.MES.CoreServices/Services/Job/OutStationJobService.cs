@@ -363,14 +363,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.SFCEntities = singleSFCResponseBos.Select(s => s.SFCEntity);
             responseBo.SFCProduceEntities = singleSFCResponseBos.Select(s => s.SFCProduceEntitiy);
             responseBo.SFCStepEntities = singleSFCResponseBos.Select(s => s.SFCStepEntity);
-            responseBo.WhMaterialInventoryEntities = singleSFCResponseBos.Select(s => s.MaterialInventoryEntity);
-            responseBo.WhMaterialStandingbookEntities = singleSFCResponseBos.Select(s => s.MaterialStandingbookEntity);
+            responseBo.WhMaterialInventoryEntities = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.MaterialInventoryEntity);
+            responseBo.WhMaterialStandingbookEntities = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.MaterialStandingbookEntity);
             responseBo.MultiUpdateSummaryOutStationCommands = singleSFCResponseBos.Select(s => s.UpdateSummaryOutStationCommand);
             responseBo.UpdateQtyByIdCommands = singleSFCResponseBos.SelectMany(s => s.UpdateQtyByIdCommands);
             responseBo.ManuSfcCirculationEntities = singleSFCResponseBos.SelectMany(s => s.ManuSfcCirculationEntities);
-            responseBo.DowngradingEntities = singleSFCResponseBos.SelectMany(s => s.DowngradingEntities);
-            responseBo.DowngradingRecordEntities = singleSFCResponseBos.SelectMany(s => s.DowngradingRecordEntities);
-            responseBo.ProductBadRecordEntities = singleSFCResponseBos.SelectMany(s => s.ProductBadRecordEntities);
+            responseBo.DowngradingEntities = singleSFCResponseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
+            responseBo.DowngradingRecordEntities = singleSFCResponseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
+            responseBo.ProductBadRecordEntities = singleSFCResponseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
 
             // 删除 manu_sfc_produce
             responseBo.DeletePhysicalByProduceIdsCommand = new DeletePhysicalByProduceIdsCommand
