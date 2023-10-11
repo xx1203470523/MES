@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +28,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpGet]
         [Route("pda/pagelist")]
-        public async Task<IEnumerable<ManuSfcCirculationEntity>> QuerySFCBindAsync([FromQuery] BindSFCInputDto parm)
+        public async Task<BindSFCOutputDto> QuerySFCBindAsync([FromQuery] BindSFCInputDto parm)
         {
+            return await _bindSFCService.GetBindSFC(parm);
+        }
+
+        [HttpGet]
+        [Route("pda/RepairOK")]
+        public async Task<BindSFCOutputDto> RepairSFCAsync([FromQuery] BindSFCInputDto parm)
+        {
+            parm.OperateType = RepairOperateTypeEnum.OK;
             return await _bindSFCService.GetBindSFC(parm);
         }
 

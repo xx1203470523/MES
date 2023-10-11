@@ -13,7 +13,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// </summary>
         /// <param name="bindSFCDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcCirculationEntity>> GetBindSFC(BindSFCInputDto bindSFCDto);
+        Task<BindSFCOutputDto> GetBindSFC(BindSFCInputDto bindSFCDto);
 
         /// <summary>
         /// 绑定

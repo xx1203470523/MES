@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.EquipmentServices.Dtos.BindSFC;
 
@@ -11,6 +12,11 @@ public record BindSFCInputDto: BaseDto
     /// 条码
     /// </summary>
     public string SFC { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 操作类型
+    /// </summary>
+    public RepairOperateTypeEnum OperateType { get; set; }
 }
 
 /// <summary>
@@ -82,10 +88,10 @@ public record BindSFCOutputDto
     /// <summary>
     /// 数据集
     /// </summary>
-    public IEnumerable<ManuSfcBindEntity>? Data { get; set; }
+    public IEnumerable<ManuSfcCirculationSummaryEntity>? Data { get; set; }
 
     /// <summary>
     /// NG位置
     /// </summary>
-    public long? NGLocationId { get; set; }
+    public string? NGState { get; set; }
 }

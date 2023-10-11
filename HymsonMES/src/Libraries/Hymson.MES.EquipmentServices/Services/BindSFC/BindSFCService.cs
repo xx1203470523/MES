@@ -3,24 +3,19 @@ using Hymson.Authentication;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.EquipmentServices.Dtos.BindContainer;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
-using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
-using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.BindSFC
@@ -57,15 +52,9 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="validationBindDtoRules"></param>
-        /// <param name="currentEquipment"></param>
-        /// <param name="validationUnBindDtoRules"></param>
-        /// <param name="manuSfcBindRecordRepository"></param>
-        /// <param name="manuSfcBindRepository"></param>
-        /// <param name="currentUser"></param>
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+
+
         public BindSFCService(
             ICurrentUser currentUser,
             ICurrentEquipment currentEquipment,
@@ -76,7 +65,8 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             ISfcCirculationService sfcCirculationService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcResourceRepository procResourceRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository)
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuSfcSummaryRepository manuSfcSummaryRepository)
 
         {
             _validationBindDtoRules = validationBindDtoRules;
@@ -89,6 +79,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procResourceRepository = procResourceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
+            _manuSfcSummaryRepository = manuSfcSummaryRepository;
         }
 
 
@@ -98,7 +89,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <param name="bindSFCDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetBindSFC(BindSFCInputDto bindSFCDto)
+        public async Task<BindSFCOutputDto> GetBindSFC(BindSFCInputDto bindSFCDto)
         {
 
             var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
@@ -118,7 +109,63 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 throw new CustomerValidationException(nameof(ErrorCode.MES19106));
             }
 
-            return circulationBarCodeEntities;
+            var circulateFirst = circulationBarCodeEntities.FirstOrDefault();
+
+            //汇总表找出NG状态
+            //查询已有汇总信息
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
+                ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
+                WorkOrderId = circulateFirst.WorkOrderId, //当前工单
+                QualityStatus = (int)TrueOrFalseEnum.No, //NG的
+            };
+
+            //获取汇总表信息
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
+            string NG = "OK";
+            List<ManuSfcCirculationSummaryEntity> circulateSummary = new();
+
+            if (manuSfcSummaryEntities.Any())
+            {
+                //OK确认处理
+                if (bindSFCDto.OperateType == RepairOperateTypeEnum.OK)
+                {
+                    //汇总表处理
+                    foreach (var item in manuSfcSummaryEntities)
+                    {
+                        item.QualityStatus = 1;
+                    }
+                    //步骤NG表处理
+
+                    //更新汇总表
+                   await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
+
+                }
+                else
+                {
+                    NG = "NG";
+
+                    foreach (var item in circulationBarCodeEntities)
+                    {
+                        circulateSummary.Add(new ManuSfcCirculationSummaryEntity
+                        {
+                            manuSfcCirculationEntity = item,
+                            NGState = manuSfcSummaryEntities.Any(x => x.SFC == item.SFC) ? "NG" : "OK",//单个NG状态
+                        });
+                    }
+                }
+            }
+
+            var result = new BindSFCOutputDto
+            {
+                Data = circulateSummary,
+                NGState = NG, //总的NG状态
+            };
+
+            return result;
         }
 
         /// <summary>
@@ -362,10 +409,38 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             //}
 
             var update = circulationBarCodeEntities.FirstOrDefault();
+            int row = 0;
             if (update != null)
             {
+                //换绑
                 update.SFC = BindSFCDto.NewBindSFC;
-                await _manuSfcCirculationRepository.UpdateAsync(update);
+                update.UpdatedBy = _currentUser.UserName;
+                update.UpdatedOn = HymsonClock.Now();
+
+                List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
+                //换绑记录
+                sfcBindRecordList.Add(new ManuSfcBindRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentEquipment.SiteId,
+                    SFC = BindSFCDto.SFC,
+                    BindSFC = BindSFCDto.NewBindSFC,
+                    Type = 2,//预留字段
+                    Location = 0,//预留
+                    OperationType = ManuSfcBindStatusEnum.Bind,
+                    CreatedBy = _currentEquipment.Name,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentEquipment.Name,
+                    UpdatedOn = HymsonClock.Now(),
+                });
+
+
+                row += await _manuSfcCirculationRepository.UpdateAsync(update);
+                await _manuSfcBindRecordRepository.InsertsAsync(sfcBindRecordList);
+            }
+            if (row == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19151));
             }
 
             //string[] BindSFCs = { BindSFCDto.OldBindSFC };
@@ -454,7 +529,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             await _manuSfcProduceRepository.UpdateRangeAsync(sfcProduceEntities);
 
 
-            //报废
+            //报废 暂时不废
         }
 
     }

@@ -1073,6 +1073,7 @@
         public const string MES19148 = "进站失败,{SFC}执行{action}时失败!";
         public const string MES19149 = "进站异常不属于同一批次,{SFC}的批次为{sfcBatchNo},当前工单批次为{workBatchNo}";
         public const string MES19150 = "模组{module}与{sfc}不存在任何绑定关系,电芯无法换绑";
+        public const string MES19151 = "换绑失败,执行换绑更新时失败";
         #endregion
 
         #region 系统对接 MES19201

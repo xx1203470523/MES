@@ -121,4 +121,17 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public string ModelCode { get; set; }
     }
+
+    /// <summary>
+    /// 流转与汇总表输出
+    /// </summary>
+    public class ManuSfcCirculationSummaryEntity
+    {
+
+        public ManuSfcCirculationEntity manuSfcCirculationEntity { get; set; }
+        /// <summary>
+        /// NG状态
+        /// </summary>
+        public string? NGState { get; set; }
+    }
 }
