@@ -136,7 +136,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     //汇总表处理
                     foreach (var item in manuSfcSummaryEntities)
                     {
-                        item.QualityStatus = 1;
+                        item.QualityStatus = 0;
                     }
                     //步骤NG表处理
 
@@ -144,6 +144,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                    await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
 
                 }
+                //查询逻辑
                 else
                 {
                     NG = "NG";

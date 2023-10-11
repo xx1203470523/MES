@@ -1,5 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Microsoft.AspNetCore.Mvc;
