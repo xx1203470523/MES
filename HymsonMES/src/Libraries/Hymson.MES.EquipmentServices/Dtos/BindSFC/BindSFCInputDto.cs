@@ -93,5 +93,5 @@ public record BindSFCOutputDto
     /// <summary>
     /// NG位置
     /// </summary>
-    public string? NGState { get; set; }
+    public RepairOutTypeEnum? NGState { get; set; }
 }

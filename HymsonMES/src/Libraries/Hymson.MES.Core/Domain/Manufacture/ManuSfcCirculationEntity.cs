@@ -132,6 +132,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// NG状态
         /// </summary>
-        public string? NGState { get; set; }
+        public RepairOutTypeEnum? NGState { get; set; }
     }
 }

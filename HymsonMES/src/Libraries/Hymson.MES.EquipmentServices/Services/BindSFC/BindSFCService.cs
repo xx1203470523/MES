@@ -132,7 +132,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             //获取汇总表信息
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
 
-            string NG = Enum.GetName(RepairOutTypeEnum.OK);  
+            var NG = RepairOutTypeEnum.OK;  
             List<ManuSfcCirculationSummaryEntity> circulateSummary = new();
 
             if (manuSfcSummaryEntities.Any())
@@ -154,14 +154,14 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 //查询逻辑
                 else
                 {
-                    NG = Enum.GetName(RepairOutTypeEnum.NG);
+                    NG = RepairOutTypeEnum.NG;
 
                     foreach (var item in circulationBarCodeEntities)
                     {
                         circulateSummary.Add(new ManuSfcCirculationSummaryEntity
                         {
                             manuSfcCirculationEntity = item,
-                            NGState = manuSfcSummaryEntities.Any(x => x.SFC == item.SFC) ? "NG" : "OK",//单个NG状态
+                            NGState = manuSfcSummaryEntities.Any(x => x.SFC == item.SFC) ? RepairOutTypeEnum.NG : RepairOutTypeEnum.OK,//单个NG状态
                         });
                     }
                 }
