@@ -2,11 +2,14 @@
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.EquipmentServices.Dtos.EquipmentCollect;
+using Hymson.MES.EquipmentServices.Dtos.OutPutQty;
 using Hymson.MES.EquipmentServicesTests;
 using Hymson.MES.EquipmentServicesTests.Dtos;
 using Hymson.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using System;
 
 namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
 {
@@ -133,48 +136,60 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
         [TestMethod()]
         public async Task EquipmentProductProcessParamAsyncTest()
         {
-            string resourceCode = "QAEMZY002";
+            string resourceCode = "YTLPACK01ER018";
             long siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();
             var equEquipmentEntities = await _equEquipmentRepository.GetEntitiesAsync(new EquEquipmentQuery
             {
                 SiteId = siteId,
-                EquipmentCodes = new[] { "QAEM002" }
+                EquipmentCodes = new[] { "YTLPACK01AE018" }
             });
             var equEquipmentEntitie = equEquipmentEntities.First();
             //设置当前模拟设备名称
             SetEquInfoAsync(new EquipmentInfoDto { Id = equEquipmentEntitie.Id, FactoryId = equEquipmentEntitie.WorkCenterFactoryId, Code = equEquipmentEntitie.EquipmentCode, Name = equEquipmentEntitie.EquipmentName });
-            await _equipmentCollectService.EquipmentProductProcessParamAsync(new EquipmentProductProcessParamDto
-            {
-                EquipmentCode = equEquipmentEntitie.EquipmentCode,
-                LocalTime = HymsonClock.Now(),
-                ResourceCode = resourceCode,
-                SFCParams = new EquipmentProductProcessParamSFCDto[] {
-                    new EquipmentProductProcessParamSFCDto(){
-                        SFC="AAATEST01",
-                        NgList = new Ng[] {
-                            new Ng{NGCode="NGCODE1" }
-                        },
-                        ParamList=new  EquipmentProcessParamInfoDto[]{
-                            new EquipmentProcessParamInfoDto{
-                                ParamCode="TEST001",
-                                ParamValue="TEST00001"
-                            }
-                        }
-                    },
-                    new EquipmentProductProcessParamSFCDto(){
-                        SFC="AAATEST02",
-                        NgList = new Ng[] {
-                            new Ng{NGCode="NGCODE2" }
-                        },
-                        ParamList=new  EquipmentProcessParamInfoDto[]{
-                            new EquipmentProcessParamInfoDto{
-                                ParamCode="TEST002",
-                                ParamValue="TEST00002"
-                            }
-                        }
-                    }
-                }
-            });
+            //await _equipmentCollectService.EquipmentProductProcessParamAsync(new EquipmentProductProcessParamDto
+            //{
+            //    EquipmentCode = equEquipmentEntitie.EquipmentCode,
+            //    LocalTime = HymsonClock.Now(),
+            //    ResourceCode = resourceCode,
+            //    SFCParams = new EquipmentProductProcessParamSFCDto[] {
+            //        new EquipmentProductProcessParamSFCDto(){
+            //            SFC=" cv ",
+            //            NgList=null,
+            //            //NgList = new Ng[] {
+         
+            //            //    new Ng{NGCode="NGCODE1" }
+            //            //},
+            //            ParamList=new  EquipmentProcessParamInfoDto[]{
+            //                new EquipmentProcessParamInfoDto{
+            //                    ParamCode="内阻",
+            //                    ParamValue="9999000",
+            //                    StandardUpperLimit="3.4",
+            //                    JudgmentResult="FAIL",
+            //        TestDuration="0.69",
+            //        TestTime="2023-10-11 10:05:17",
+            //        TestResult=null,
+            //        Timestamp=Convert.ToDateTime("2023-10-11T10:05:17")
+            //                }
+            //            }
+            //        },
+            //        //new EquipmentProductProcessParamSFCDto(){
+            //        //    SFC="AAATEST02",
+            //        //    NgList = new Ng[] {
+            //        //        new Ng{NGCode="NGCODE2" }
+            //        //    },
+            //        //    ParamList=new  EquipmentProcessParamInfoDto[]{
+            //        //        new EquipmentProcessParamInfoDto{
+            //        //            ParamCode="TEST002",
+            //        //            ParamValue="TEST00002"
+            //        //        }
+            //        //    }
+            //        //}
+            //    }
+            //});
+            string json = "{\"EquipmentCode\":\"YTLPACK01AE018\",\"ResourceCode\":\"YTLPACK01ER018\",\"localTime\":\"2023-10-11T10:05:17\",\"SFCParams\":[{\"sfc\":\"test123\",\"paramList\":[{\"paramCode\":\"内阻\",\"paramValue\":\"9999000\",\"standardUpperLimit\":\"3.4\",\"standardLowerLimit\":\"0\",\"judgmentResult\":\"FAIL\",\"testDuration\":\"0.69\",\"testTime\":\"2023-10-11 10:05:17\",\"testResult\":null,\"timestamp\":\"2023-10-11T10:05:17\"},{\"paramCode\":\"电压\",\"paramValue\":\"9999\",\"standardUpperLimit\":\"39.36\",\"standardLowerLimit\":\"39.264\",\"judgmentResult\":\"FAIL\",\"testDuration\":\"0.69\",\"testTime\":\"2023-10-11 10:05:17\",\"testResult\":null,\"timestamp\":\"2023-10-11T10:05:17\"}],\"ngList\":null}]}";
+            EquipmentProductProcessParamDto para = JsonConvert.DeserializeObject<EquipmentProductProcessParamDto>(json);
+
+            await _equipmentCollectService.EquipmentProductProcessParamAsync(para);
 
             Assert.IsTrue(true);
         }
@@ -198,9 +213,9 @@ namespace Hymson.MES.EquipmentServices.Services.EquipmentCollect.Tests
                 LocalTime = HymsonClock.Now(),
                 ResourceCode = resourceCode,
                 SFCParams = new EquipmentProductNgSFCDto[] {
-                    new EquipmentProductNgSFCDto{ 
+                    new EquipmentProductNgSFCDto{
                         SFC="AAA2103841XCE12A060",
-                        NgList =new Ng[]{ 
+                        NgList =new Ng[]{
                             new Ng{ NGCode="NGCODE1" }
                         }
                     }

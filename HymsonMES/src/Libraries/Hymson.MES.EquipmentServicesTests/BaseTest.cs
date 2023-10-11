@@ -31,6 +31,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Hymson.Minio;
+using Hymson.MES.EquipmentServices.Services.Process;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.EquipmentServicesTests
 {
@@ -85,6 +87,19 @@ namespace Hymson.MES.EquipmentServicesTests
                  .AddSingleton<AbstractValidator<InteSFCBoxImportDto>, InteSFCBoxValidator>()
                 .AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>()//条码流转绑定
                 .AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>()//条码流转解绑
+
+                  .AddSingleton<IProcBootuprecipeService, ProcBootuprecipeService>() //开机参数
+            .AddSingleton<IProcBootupparamService, ProcBootupparamService>()
+            .AddSingleton<IProcBootupparamrecordService, ProcBootupparamrecordService>()
+
+
+                        .AddSingleton<AbstractValidator<ProcBootuprecipeCreateDto>, ProcBootuprecipeCreateValidator>()
+            .AddSingleton<AbstractValidator<ProcBootuprecipeModifyDto>, ProcBootuprecipeModifyValidator>()
+            .AddSingleton<AbstractValidator<ProcBootupparamCreateDto>, ProcBootupparamCreateValidator>()
+            .AddSingleton<AbstractValidator<ProcBootupparamModifyDto>, ProcBootupparamModifyValidator>()
+            .AddSingleton<AbstractValidator<ProcBootupparamrecordCreateDto>, ProcBootupparamrecordCreateValidator>()
+            .AddSingleton<AbstractValidator<ProcBootupparamrecordModifyDto>, ProcBootupparamrecordModifyValidator>()
+
                 .BuildServiceProvider();
 
             ConnectionOptions = ServiceProvider.GetRequiredService<IOptions<ConnectionOptions>>().Value;
@@ -94,7 +109,7 @@ namespace Hymson.MES.EquipmentServicesTests
         /// 设置当前测试设备信息
         /// </summary>
         /// <param name="equipmentInfoDto"></param>
-        public static void SetEquInfoAsync(EquipmentInfoDto  equipmentInfoDto)
+        public static void SetEquInfoAsync(EquipmentInfoDto equipmentInfoDto)
         {
             //所以必须先设置站点Id
             var siteId = CurrentEquipmentInfo.EquipmentInfoDic.Value["SiteId"].ParseToLong();

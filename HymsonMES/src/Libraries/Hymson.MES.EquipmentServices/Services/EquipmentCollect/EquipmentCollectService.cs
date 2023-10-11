@@ -400,7 +400,13 @@ public class EquipmentCollectService : IEquipmentCollectService
                 SFC = item.SFC,
                 ParamCode = s.ParamCode,
                 ParamValue = s.ParamValue,
-                Timestamp = s.Timestamp
+                Timestamp = s.Timestamp,
+                StandardLowerLimit = s.StandardLowerLimit,
+                StandardUpperLimit = s.StandardUpperLimit,
+                TestDuration = s.TestDuration,
+                TestResult = s.TestResult,
+                TestTime = s.TestTime,
+                JudgmentResult = s.JudgmentResult,
             }));
         }
 

@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 开机参数表 更新 验证
     /// </summary>
-    internal class ProcBootupparamCreateValidator: AbstractValidator<ProcBootupparamCreateDto>
+    public class ProcBootupparamCreateValidator: AbstractValidator<ProcBootupparamCreateDto>
     {
         public ProcBootupparamCreateValidator()
         {
@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 开机参数表 修改 验证
     /// </summary>
-    internal class ProcBootupparamModifyValidator : AbstractValidator<ProcBootupparamModifyDto>
+    public class ProcBootupparamModifyValidator : AbstractValidator<ProcBootupparamModifyDto>
     {
         public ProcBootupparamModifyValidator()
         {

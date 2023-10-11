@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 开机配方表 更新 验证
     /// </summary>
-    internal class ProcBootuprecipeCreateValidator: AbstractValidator<ProcBootuprecipeCreateDto>
+    public class ProcBootuprecipeCreateValidator: AbstractValidator<ProcBootuprecipeCreateDto>
     {
         public ProcBootuprecipeCreateValidator()
         {
@@ -25,7 +25,7 @@ namespace Hymson.MES.Services.Validators.Process
     /// <summary>
     /// 开机配方表 修改 验证
     /// </summary>
-    internal class ProcBootuprecipeModifyValidator : AbstractValidator<ProcBootuprecipeModifyDto>
+    public class ProcBootuprecipeModifyValidator : AbstractValidator<ProcBootuprecipeModifyDto>
     {
         public ProcBootuprecipeModifyValidator()
         {
