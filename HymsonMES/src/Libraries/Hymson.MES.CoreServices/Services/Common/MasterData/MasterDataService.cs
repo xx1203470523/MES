@@ -807,36 +807,27 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<JobBo>> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
+        public async Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
                 BusinessId = param.ResourceId,
-                LinkPoint = param.LinkPoint
+                LinkPoint = param.LinkPoint,
+                IsUse = true
             });
             if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false)
             {
                 InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
                     BusinessId = param.ProcedureId,
-                    LinkPoint = param.LinkPoint
+                    LinkPoint = param.LinkPoint,
+                    IsUse = true
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return Enumerable.Empty<JobBo>();
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return null;
 
-            // 读取作业实体
             var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
-
-            List<JobBo> hasSortedJobs = new();
-            foreach (var item in InteJobBusinessRelations)
-            {
-                var jobEntity = jobEntities.FirstOrDefault(f => f.Id == item.JobId);
-                if (jobEntity == null) continue;
-
-                hasSortedJobs.Add(new JobBo { Name = jobEntity.ClassProgram });
-            }
-
-            return hasSortedJobs;
+            return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
         }
 
         /// <summary>
