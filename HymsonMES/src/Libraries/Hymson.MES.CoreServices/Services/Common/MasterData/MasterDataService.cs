@@ -1145,7 +1145,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">替代料BO对象</param>
         /// <param name="isMain">是否主物料</param>
-        public void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
+        public void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
             ref List<ManuSfcCirculationEntity> adds,
             ref decimal residue,
             ManuSfcProduceEntity sfcProduceEntity,
@@ -1206,7 +1206,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
 
                 // 添加到扣减物料库存
-                updates.Add(new UpdateQtyByIdCommand
+                updates.Add(new UpdateFeedingQtyByIdCommand
                 {
                     UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,

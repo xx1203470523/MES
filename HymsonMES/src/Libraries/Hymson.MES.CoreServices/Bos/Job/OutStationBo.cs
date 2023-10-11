@@ -114,7 +114,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<UpdateQtyByIdCommand> UpdateQtyByIdCommands { get; set; } = new List<UpdateQtyByIdCommand>();
+        public IEnumerable<UpdateFeedingQtyByIdCommand> UpdateFeedingQtyByIdCommands { get; set; } = new List<UpdateFeedingQtyByIdCommand>();
 
         /// <summary>
         /// 
@@ -177,12 +177,12 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 汇总表更新对象
         /// </summary>
-        public IEnumerable<UpdateOutputQtySummaryCommand>? MultiUpdateSummaryOutStationCommands { get; set; }
+        public IEnumerable<UpdateOutputQtySummaryCommand>? UpdateOutputQtySummaryCommands { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<UpdateQtyByIdCommand>? UpdateQtyByIdCommands { get; set; }
+        public IEnumerable<UpdateFeedingQtyByIdCommand>? UpdateFeedingQtyByIdCommands { get; set; }
 
         /// <summary>
         /// 
@@ -224,7 +224,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 是否尾工序
         /// </summary>
-        public bool IsCompleted { get; set; } = true;
+        public bool IsLastProcedure { get; set; } = true;
         /// <summary>
         /// 下一工序编码
         /// </summary>
@@ -239,7 +239,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<UpdateQtyByIdCommand> UpdateQtyByIdCommands { get; set; } = new List<UpdateQtyByIdCommand>();
+        public IEnumerable<UpdateFeedingQtyByIdCommand> UpdateFeedingQtyByIdCommands { get; set; } = new List<UpdateFeedingQtyByIdCommand>();
 
         /// <summary>
         /// 

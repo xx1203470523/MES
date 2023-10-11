@@ -328,7 +328,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     consumptionBo = ExecutenMaterialConsumptionWithBOM(ref allFeedingEntities, initialMaterials, commonBo, sfcProduceEntity);
                 }
-                responseBo.UpdateQtyByIdCommands = consumptionBo.UpdateQtyByIdCommands;
+                responseBo.UpdateFeedingQtyByIdCommands = consumptionBo.UpdateFeedingQtyByIdCommands;
                 responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
                 #endregion
 
@@ -370,8 +370,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
             responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.IsLastProcedure).Select(s => s.MaterialInventoryEntity);
             responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.IsLastProcedure).Select(s => s.MaterialStandingbookEntity);
-            responseSummaryBo.MultiUpdateSummaryOutStationCommands = responseBos.Select(s => s.UpdateOutputQtySummaryCommand);
-            responseSummaryBo.UpdateQtyByIdCommands = responseBos.SelectMany(s => s.UpdateQtyByIdCommands);
+            responseSummaryBo.UpdateOutputQtySummaryCommands = responseBos.Select(s => s.UpdateOutputQtySummaryCommand);
+            responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
             responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
             responseSummaryBo.DowngradingRecordEntities = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
@@ -408,12 +408,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 额外给面板用来显示的参数
-            if (responseBos.Count() == 1)
+            if (responseBos.Count == 1)
             {
                 var singleSFCResponse = responseBos.FirstOrDefault();
                 if (singleSFCResponse != null)
                 {
-                    responseSummaryBo.IsCompleted = singleSFCResponse.IsLastProcedure;
+                    responseSummaryBo.IsLastProcedure = singleSFCResponse.IsLastProcedure;
                     responseSummaryBo.NextProcedureCode = singleSFCResponse.NextProcedureCode;
                 }
             }
@@ -432,12 +432,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not OutStationResponseSummaryBo data) return responseBo;
 
             // 更新物料库存
-            if (data.UpdateQtyByIdCommands != null && data.UpdateQtyByIdCommands.Any())
+            if (data.UpdateFeedingQtyByIdCommands != null && data.UpdateFeedingQtyByIdCommands.Any())
             {
-                responseBo.Rows += await _manuFeedingRepository.UpdateQtyByIdAsync(data.UpdateQtyByIdCommands);
+                responseBo.Rows += await _manuFeedingRepository.UpdateFeedingQtyByIdAsync(data.UpdateFeedingQtyByIdCommands);
 
                 // 未更新到全部需更新的数据，事务回滚
-                if (data.UpdateQtyByIdCommands.Count() > responseBo.Rows)
+                if (data.UpdateFeedingQtyByIdCommands.Count() > responseBo.Rows)
                 {
                     responseBo.Rows = -1;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18218), string.Join(',', data.SFCProduceEntities!.Select(s => s.SFC)));
@@ -472,7 +472,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _manuSfcRepository.UpdateRangeWithStatusCheckAsync(data.SFCEntities),
 
                 // 汇总表
-                _manuSfcSummaryRepository.UpdateSummaryOutStationRangeAsync(data.MultiUpdateSummaryOutStationCommands),
+                _manuSfcSummaryRepository.UpdateSummaryOutStationRangeAsync(data.UpdateOutputQtySummaryCommands),
 
                 // 添加流转记录
                 _manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities),
@@ -498,7 +498,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         { "PackageCom", "False" },
                         { "BadEntryCom", "False" },
                         { "Qty", "1" },
-                        { "IsLastProcedure", $"{data.IsCompleted}" },
+                        { "IsLastProcedure", $"{data.IsLastProcedure}" },
                         { "NextProcedureCode", $"{data.NextProcedureCode}" }
                     };
 
@@ -874,7 +874,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 过滤扣料集合
-            List<UpdateQtyByIdCommand> updates = new();
+            List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
             List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
@@ -902,7 +902,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
 
-            responseBo.UpdateQtyByIdCommands = updates;
+            responseBo.UpdateFeedingQtyByIdCommands = updates;
             responseBo.ManuSfcCirculationEntities = adds;
 
             // 回改外层的上料数据集合数据
@@ -977,7 +977,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 过滤扣料集合
-            List<UpdateQtyByIdCommand> updates = new();
+            List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
             List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
@@ -1005,7 +1005,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
             }
 
-            responseBo.UpdateQtyByIdCommands = updates;
+            responseBo.UpdateFeedingQtyByIdCommands = updates;
             responseBo.ManuSfcCirculationEntities = adds;
 
             // 回改外层的上料数据集合数据
