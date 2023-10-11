@@ -161,8 +161,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 获取库存数据
             var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
             {
-                SiteId = commonBo.SiteId,
-                BarCodes = commonBo.SFCs
+                SiteId = multiSFCBo.SiteId,
+                BarCodes = multiSFCBo.SFCs
             });
             var validationFailures = new List<ValidationFailure>();
             List<ManuSfcEntity> manuSfcList = new List<ManuSfcEntity>();
@@ -173,10 +173,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             ManuSfcInfoUpdateIsUsedBo manuSfcInfoUpdateIsUsedBo = new ManuSfcInfoUpdateIsUsedBo()
             {
                 UserId = commonBo.UserName,
-                UpdatedOn = HymsonClock.Now(),
+                UpdatedOn = commonBo.Time,
                 SfcIds = new List<long>()
             };
-            foreach (var sfc in commonBo.SFCs)
+            foreach (var sfc in multiSFCBo.SFCs)
             {
                 if (sfcProduceEntities != null && sfcProduceEntities.Any(x => x.SFC == sfc)) continue;
 
@@ -368,6 +368,14 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 throw new ValidationException(commonBo.LocalizationService.GetResource("SFCError"), validationFailures);
             }
+
+            /*
+            // 手动写进缓存
+            var func = _masterDataService.GetProduceEntitiesBySFCsWithCheckAsync;
+            var paramString = multiSFCBo.ToSerialize();
+            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{paramString}".GetHashCode();
+            commonBo.Proxy.Set(cacheKey, manuSfcProduceList);
+            */
 
             return new BarcodeSfcReceiveResponseBo
             {
