@@ -71,14 +71,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly ILocalizationService _localizationService;
-
-        /// <summary>
         /// 仓储接口（工序）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -91,6 +91,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="procProcedureRepository"></param>
         /// <param name="localizationService"></param>
         public InStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
@@ -100,8 +101,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            ILocalizationService localizationService,
-            IProcProcedureRepository procProcedureRepository)
+            IProcProcedureRepository procProcedureRepository,
+            ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -111,8 +112,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _planWorkOrderRepository = planWorkOrderRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
-            _localizationService = localizationService;
             _procProcedureRepository = procProcedureRepository;
+            _localizationService = localizationService;
         }
 
 

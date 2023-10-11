@@ -1,5 +1,4 @@
-﻿using Hymson.EventBus.Abstractions;
-using Hymson.Infrastructure.Exceptions;
+﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -54,11 +53,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 仓储接口（条码流转）
-        /// </summary>
-        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
-
-        /// <summary>
         /// 仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
@@ -73,10 +67,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
-        /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -96,22 +86,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            ILocalizationService localizationService,
-            IEventBus<EventBusInstance1> eventBus)
+            ILocalizationService localizationService)
         {
             _masterDataService = masterDataService;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
-            _eventBus = eventBus;
         }
 
 

@@ -27,10 +27,8 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
-using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -123,12 +121,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 
         /// </summary>
-        private readonly ILocalizationService _localizationService;
+        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
         /// <summary>
         /// 
         /// </summary>
-        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+        private readonly ILocalizationService _localizationService;
 
         /// <summary>
         /// 构造函数
@@ -149,8 +147,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        /// <param name="localizationService"></param>
         /// <param name="manuSfcSummaryRepository"></param>
+        /// <param name="localizationService"></param>
         public OutStationJobService(IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuDegradedProductExtendService manuDegradedProductExtendService,
@@ -167,8 +165,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            ILocalizationService localizationService,
-            IManuSfcSummaryRepository manuSfcSummaryRepository)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            ILocalizationService localizationService)
         {
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
@@ -186,8 +184,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
-            _localizationService = localizationService;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _localizationService = localizationService;
         }
 
 
