@@ -101,7 +101,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 CirculationType = SfcCirculationTypeEnum.Merge,
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationBarCode = bindSFCDto.SFC,
-                SiteId = _currentEquipment.SiteId
+                SiteId = 123456
             };
 
             //查询流转条码绑定记录
@@ -119,7 +119,8 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
-                SiteId = _currentEquipment.SiteId,
+                //SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
                 SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
                 ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
                 WorkOrderId = circulateFirst.WorkOrderId, //当前工单
@@ -145,7 +146,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     //步骤NG表处理
 
                     //更新汇总表
-                   await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
+                    await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
 
                 }
                 //查询逻辑
@@ -198,7 +199,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 sfcBindList.Add(new ManuSfcBindEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
+                    SiteId = 123456,
                     SFC = bindSFCDto.SFC,
                     BindSFC = item,
                     Type = 0,//预留字段
@@ -213,7 +214,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 sfcBindRecordList.Add(new ManuSfcBindRecordEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
+                    SiteId = 123456,
                     SFC = bindSFCDto.SFC,
                     BindSFC = item,
                     Type = 0,//预留字段
@@ -267,7 +268,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 sfcBindRecordList.Add(new ManuSfcBindRecordEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
+                    SiteId = 123456,
                     SFC = unBindSFCDto.SFC,
                     BindSFC = item.BindSFC,
                     Type = 0,//预留字段
@@ -396,7 +397,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 CirculationType = SfcCirculationTypeEnum.Merge,
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationBarCode = BindSFCDto.SFC,
-                SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
                 Sfcs = new string[] { BindSFCDto.OldBindSFC }
             };
 
@@ -427,7 +428,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 sfcBindRecordList.Add(new ManuSfcBindRecordEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
+                    SiteId = 123456,
                     SFC = BindSFCDto.SFC,
                     BindSFC = BindSFCDto.NewBindSFC,
                     Type = 2,//预留字段
@@ -512,7 +513,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             // 条码在制表
             var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
             {
-                SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
                 Sfcs = SFCs
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", SFCs);
 
