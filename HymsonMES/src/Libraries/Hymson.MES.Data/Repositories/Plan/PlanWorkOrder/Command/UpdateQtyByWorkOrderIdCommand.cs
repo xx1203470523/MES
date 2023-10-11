@@ -5,7 +5,7 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command
     /// <summary>
     /// 修改工单数量（投入/完工）
     /// </summary>
-    public class UpdateQtyCommand : UpdateCommand
+    public class UpdateQtyByWorkOrderIdCommand : UpdateCommand
     {
         /// <summary>
         /// 工单id

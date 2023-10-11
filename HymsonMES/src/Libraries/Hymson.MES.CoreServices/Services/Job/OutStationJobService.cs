@@ -281,8 +281,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var allFeedingEntities = allFeedingEntitiesByResourceId.AsList();
 
             // 遍历所有条码
-            var singleSFCResponseBos = new List<OutStationResponseBo>();
-            var responseBo = new OutStationResponseSummaryBo();
+            var responseBos = new List<OutStationResponseBo>();
+            var responseSummaryBo = new OutStationResponseSummaryBo();
             foreach (var requestBo in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
@@ -291,20 +291,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var manuSfcEntity = manuSFCEntities.FirstOrDefault(s => s.Id == sfcProduceEntity.SFCId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
 
-                var singleSFCResponseBo = new OutStationResponseBo();
+                // 单条码返回值
+                var responseBo = new OutStationResponseBo();
+
+                // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && requestBo.IsQualified.Value == false)
                 {
                     // 不合格出站
-                    singleSFCResponseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, sfcProduceEntity, manuSfcEntity);
+                    responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, sfcProduceEntity, manuSfcEntity);
                 }
                 else
                 {
                     // 合格出站（为了逻辑清晰，跟上面的不合格出站区分开）
-                    singleSFCResponseBo = await OutStationForQualifiedProcedureAsync(commonBo, requestBo, sfcProduceEntity, manuSfcEntity);
+                    responseBo = await OutStationForQualifiedProcedureAsync(commonBo, requestBo, sfcProduceEntity, manuSfcEntity);
                 }
 
                 // 保存单个条码的出站结果
-                if (singleSFCResponseBo == null) continue;
+                if (responseBo == null) continue;
 
                 #region 物料消耗明细数据
                 // 组合物料数据（放缓存）
@@ -326,15 +329,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 {
                     consumptionBo = ExecutenMaterialConsumptionWithBOM(ref allFeedingEntities, initialMaterials, commonBo, sfcProduceEntity);
                 }
-                singleSFCResponseBo.UpdateQtyByIdCommands = consumptionBo.UpdateQtyByIdCommands;
-                singleSFCResponseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
+                responseBo.UpdateQtyByIdCommands = consumptionBo.UpdateQtyByIdCommands;
+                responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
                 #endregion
 
                 #region 降级品信息
-                if (singleSFCResponseBo.IsCompleted
-                    && singleSFCResponseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute
-                    && responseBo.ManuSfcCirculationEntities != null
-                    && responseBo.ManuSfcCirculationEntities.Any())
+                if (responseBo.IsLastProcedure
+                    && responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute
+                    && responseSummaryBo.ManuSfcCirculationEntities != null
+                    && responseSummaryBo.ManuSfcCirculationEntities.Any())
                 {
                     var degradedProductExtendBo = new DegradedProductExtendBo
                     {
@@ -343,7 +346,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     };
 
                     // 添加降级品记录
-                    degradedProductExtendBo.KeyValues.AddRange(responseBo.ManuSfcCirculationEntities.Select(s => new DegradedProductExtendKeyValueBo
+                    degradedProductExtendBo.KeyValues.AddRange(responseSummaryBo.ManuSfcCirculationEntities.Select(s => new DegradedProductExtendKeyValueBo
                     {
                         BarCode = s.CirculationBarCode,
                         SFC = sfcProduceEntity.SFC
@@ -353,50 +356,50 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     var downgradingEntities = await _manuDegradedProductExtendService.GetManuDownGradingsAsync(degradedProductExtendBo);
                     var (manuDowngradingEntities, manuDowngradingRecordEntities) = await _manuDegradedProductExtendService.GetManuDowngradingsByConsumesAsync(degradedProductExtendBo, downgradingEntities);
 
-                    singleSFCResponseBo.DowngradingEntities = manuDowngradingEntities;
-                    singleSFCResponseBo.DowngradingRecordEntities = manuDowngradingRecordEntities;
+                    responseBo.DowngradingEntities = manuDowngradingEntities;
+                    responseBo.DowngradingRecordEntities = manuDowngradingRecordEntities;
                 }
                 #endregion
 
-                singleSFCResponseBos.Add(singleSFCResponseBo);
+                responseBos.Add(responseBo);
             }
 
             // 归集每个条码的出站结果
-            if (singleSFCResponseBos.Any() == false) return responseBo;
-            responseBo.SFCEntities = singleSFCResponseBos.Select(s => s.SFCEntity);
-            responseBo.SFCProduceEntities = singleSFCResponseBos.Select(s => s.SFCProduceEntitiy);
-            responseBo.SFCStepEntities = singleSFCResponseBos.Select(s => s.SFCStepEntity);
-            responseBo.WhMaterialInventoryEntities = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.MaterialInventoryEntity);
-            responseBo.WhMaterialStandingbookEntities = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.MaterialStandingbookEntity);
-            responseBo.MultiUpdateSummaryOutStationCommands = singleSFCResponseBos.Select(s => s.UpdateSummaryOutStationCommand);
-            responseBo.UpdateQtyByIdCommands = singleSFCResponseBos.SelectMany(s => s.UpdateQtyByIdCommands);
-            responseBo.ManuSfcCirculationEntities = singleSFCResponseBos.SelectMany(s => s.ManuSfcCirculationEntities);
-            responseBo.DowngradingEntities = singleSFCResponseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
-            responseBo.DowngradingRecordEntities = singleSFCResponseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
-            responseBo.ProductBadRecordEntities = singleSFCResponseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
+            if (responseBos.Any() == false) return responseSummaryBo;
+            responseSummaryBo.SFCEntities = responseBos.Select(s => s.SFCEntity);
+            responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
+            responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
+            responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.IsLastProcedure).Select(s => s.MaterialInventoryEntity);
+            responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.IsLastProcedure).Select(s => s.MaterialStandingbookEntity);
+            responseSummaryBo.MultiUpdateSummaryOutStationCommands = responseBos.Select(s => s.UpdateOutputQtySummaryCommand);
+            responseSummaryBo.UpdateQtyByIdCommands = responseBos.SelectMany(s => s.UpdateQtyByIdCommands);
+            responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
+            responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
+            responseSummaryBo.DowngradingRecordEntities = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
+            responseSummaryBo.ProductBadRecordEntities = responseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
 
             // 删除 manu_sfc_produce
-            responseBo.DeletePhysicalByProduceIdsCommand = new DeletePhysicalByProduceIdsCommand
+            responseSummaryBo.DeletePhysicalByProduceIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
             {
                 SiteId = commonBo.SiteId,
-                Ids = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.SFCProduceEntitiy.Id)
+                Ids = responseBos.Where(w => w.IsLastProcedure).Select(s => s.SFCProduceEntitiy.Id)
             };
 
             // 删除 manu_sfc_produce_business
-            responseBo.DeleteSfcProduceBusinesssBySfcInfoIdsCommand = new DeleteSfcProduceBusinesssBySfcInfoIdsCommand
+            responseSummaryBo.DeleteSfcProduceBusinesssBySfcInfoIdsCommand = new DeleteSFCProduceBusinesssByIdsCommand
             {
                 SiteId = commonBo.SiteId,
-                SfcInfoIds = singleSFCResponseBos.Where(w => w.IsCompleted).Select(s => s.SFCProduceEntitiy.Id)
+                SfcInfoIds = responseBos.Where(w => w.IsLastProcedure).Select(s => s.SFCProduceEntitiy.Id)
             };
 
-            var singleSFCResponseBosByWorkOrderId = singleSFCResponseBos
-                .Where(w => w.IsCompleted)
+            var singleSFCResponseBosByWorkOrderId = responseBos
+                .Where(w => w.IsLastProcedure)
                 .Select(s => s.SFCProduceEntitiy)
                 .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
             foreach (var item in singleSFCResponseBosByWorkOrderId)
             {
                 // 更新完工数量
-                responseBo.UpdateQtyCommands.Add(new UpdateQtyCommand
+                responseSummaryBo.UpdateQtyByWorkOrderIdCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     UpdatedBy = commonBo.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -406,17 +409,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 额外给面板用来显示的参数
-            if (singleSFCResponseBos.Count() == 1)
+            if (responseBos.Count() == 1)
             {
-                var singleSFCResponse = singleSFCResponseBos.FirstOrDefault();
+                var singleSFCResponse = responseBos.FirstOrDefault();
                 if (singleSFCResponse != null)
                 {
-                    responseBo.IsCompleted = singleSFCResponse.IsCompleted;
-                    responseBo.NextProcedureCode = singleSFCResponse.NextProcedureCode;
+                    responseSummaryBo.IsCompleted = singleSFCResponse.IsLastProcedure;
+                    responseSummaryBo.NextProcedureCode = singleSFCResponse.NextProcedureCode;
                 }
             }
 
-            return responseBo;
+            return responseSummaryBo;
         }
 
         /// <summary>
@@ -456,7 +459,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand),
 
                 // 更新完工数量
-                _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdsAsync(data.UpdateQtyCommands),
+                _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdsAsync(data.UpdateQtyByWorkOrderIdCommands),
 
                 // 入库 / 台账
                 _whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities),
@@ -596,7 +599,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             };
 
             // 合格产出更新
-            responseBo.UpdateSummaryOutStationCommand = new MultiUpdateSummaryOutStationCommand
+            responseBo.UpdateOutputQtySummaryCommand = new UpdateOutputQtySummaryCommand
             {
                 Id = sfcProduceEntity.SfcSummaryId ?? 0,
                 OutputQty = sfcProduceEntity.Qty,
@@ -666,7 +669,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 未完工
             else
             {
-                responseBo.IsCompleted = false;
+                responseBo.IsLastProcedure = false;
                 responseBo.NextProcedureCode = nextProcedure.Code;
 
                 sfcProduceEntity.Status = SfcStatusEnum.lineUp;
@@ -874,7 +877,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            List<MultiUpdateSummaryOutStationCommand> updateSummaryOutStationCommands = new();
+            List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
@@ -977,7 +980,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            List<MultiUpdateSummaryOutStationCommand> updateSummaryOutStationCommands = new();
+            List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;

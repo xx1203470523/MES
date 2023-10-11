@@ -72,7 +72,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public List<UpdateQtyCommand> UpdateQtyCommands { get; set; } = new();
+        public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyCommands { get; set; } = new();
 
         /// <summary>
         /// 

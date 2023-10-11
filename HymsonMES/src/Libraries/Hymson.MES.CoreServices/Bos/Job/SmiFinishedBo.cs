@@ -48,17 +48,12 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public DeletePhysicalByProduceIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
+        public PhysicalDeleteSFCProduceByIdsCommand PhysicalDeleteSFCProduceByIdsCommand { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new();
+        public DeleteSFCProduceBusinesssByIdsCommand DeleteSFCProduceBusinesssByIdsCommand { get; set; } = new();
 
     }
 }

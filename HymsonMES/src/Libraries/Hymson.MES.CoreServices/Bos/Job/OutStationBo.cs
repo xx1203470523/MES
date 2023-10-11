@@ -72,9 +72,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class OutStationResponseBo
     {
         /// <summary>
-        /// 是否完工（ 如果没有尾工序，就表示已完工）
+        /// 是否尾工序（ 如果已经是尾工序，就表示已完工）
         /// </summary>
-        public bool IsCompleted { get; set; } = true;
+        public bool IsLastProcedure { get; set; } = true;
 
         /// <summary>
         /// 
@@ -109,7 +109,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public MultiUpdateSummaryOutStationCommand UpdateSummaryOutStationCommand { get; set; }
+        public UpdateOutputQtySummaryCommand UpdateOutputQtySummaryCommand { get; set; }
 
         /// <summary>
         /// 
@@ -177,7 +177,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 汇总表更新对象
         /// </summary>
-        public IEnumerable<MultiUpdateSummaryOutStationCommand>? MultiUpdateSummaryOutStationCommands { get; set; }
+        public IEnumerable<UpdateOutputQtySummaryCommand>? MultiUpdateSummaryOutStationCommands { get; set; }
 
         /// <summary>
         /// 
@@ -207,17 +207,17 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 
         /// </summary>
-        public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
+        public DeleteSFCProduceBusinesssByIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public DeletePhysicalByProduceIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
+        public PhysicalDeleteSFCProduceByIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public List<UpdateQtyCommand> UpdateQtyCommands { get; set; } = new();
+        public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyByWorkOrderIdCommands { get; set; } = new();
 
 
         // 额外给面板用来显示的参数

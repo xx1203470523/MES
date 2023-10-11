@@ -51,7 +51,7 @@
     /// <summary>
     /// 删除 (物料删除)
     /// </summary>
-    public class DeletePhysicalByProduceIdsCommand
+    public class PhysicalDeleteSFCProduceByIdsCommand
     {
         /// <summary>
         /// 站点编码 

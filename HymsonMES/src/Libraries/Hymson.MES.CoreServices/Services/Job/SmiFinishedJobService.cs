@@ -206,7 +206,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
 
             // 待执行的命令
-            SmiFinisheResponseSummaryBo responseBo = new();
+            SmiFinisheResponseSummaryBo responseSummaryBo = new();
 
             // 遍历所有条码
             foreach (var requestBo in commonBo.SmiFinishedRequestBos)
@@ -224,10 +224,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 更新条码信息
                 manuSfcEntity.UpdatedBy = commonBo.UserName;
                 manuSfcEntity.UpdatedOn = commonBo.Time;
-                responseBo.SFCEntities.Add(manuSfcEntity);
+                responseSummaryBo.SFCEntities.Add(manuSfcEntity);
 
                 // 组装（出站步骤数据）
-                responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
+                responseSummaryBo.SFCStepEntities.Add(new ManuSfcStepEntity
                 {
                     // 插入 manu_sfc_step 状态为出站（默认值）
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
@@ -252,7 +252,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 });
 
                 // 新增 wh_material_inventory
-                responseBo.WhMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
+                responseSummaryBo.WhMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SupplierId = 0,//自制品 没有
@@ -272,7 +272,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 });
 
                 // 新增 wh_material_standingbook
-                responseBo.WhMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                responseSummaryBo.WhMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     MaterialCode = procMaterialEntity.MaterialCode,
@@ -293,20 +293,20 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 删除 manu_sfc_produce_business
-            responseBo.DeleteSfcProduceBusinesssBySfcInfoIdsCommand = new DeleteSfcProduceBusinesssBySfcInfoIdsCommand
+            responseSummaryBo.DeleteSFCProduceBusinesssByIdsCommand = new DeleteSFCProduceBusinesssByIdsCommand
             {
                 SiteId = commonBo.SiteId,
                 SfcInfoIds = sfcProduceEntities.Select(s => s.Id) //manuSfcEntities.Select(s => s.Id)
             };
 
-            // 删除 manu_sfc_produce
-            responseBo.DeletePhysicalByProduceIdsCommand = new DeletePhysicalByProduceIdsCommand
+            // 物理删除 manu_sfc_produce
+            responseSummaryBo.PhysicalDeleteSFCProduceByIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
             {
                 SiteId = commonBo.SiteId,
                 Ids = sfcProduceEntities.Select(s => s.Id)
             };
 
-            return responseBo;
+            return responseSummaryBo;
         }
 
         /// <summary>
@@ -338,10 +338,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             List<Task<int>> tasks = new()
             {
                 // 删除 manu_sfc_produce
-                _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.DeletePhysicalByProduceIdsCommand),
+                _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.PhysicalDeleteSFCProduceByIdsCommand),
 
                 // 删除 manu_sfc_produce_business
-                _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand),
+                _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSFCProduceBusinesssByIdsCommand),
 
                 // 插入 manu_sfc_step
                 _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities),

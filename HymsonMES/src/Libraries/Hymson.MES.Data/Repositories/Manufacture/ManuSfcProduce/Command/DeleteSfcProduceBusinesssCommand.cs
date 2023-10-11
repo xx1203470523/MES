@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// <summary>
     /// 删除在制品业务实体类
     /// </summary>
-    public class DeleteSfcProduceBusinesssBySfcInfoIdsCommand
+    public class DeleteSFCProduceBusinesssByIdsCommand
     {
         /// <summary>
         /// 站点编码 
