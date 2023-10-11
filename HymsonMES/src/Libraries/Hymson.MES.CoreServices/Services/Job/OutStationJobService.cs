@@ -391,11 +391,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SfcInfoIds = responseBos.Where(w => w.IsLastProcedure).Select(s => s.SFCProduceEntitiy.Id)
             };
 
-            var singleSFCResponseBosByWorkOrderId = responseBos
+            var responseBosByWorkOrderId = responseBos
                 .Where(w => w.IsLastProcedure)
                 .Select(s => s.SFCProduceEntitiy)
                 .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in singleSFCResponseBosByWorkOrderId)
+            foreach (var item in responseBosByWorkOrderId)
             {
                 // 更新完工数量
                 responseSummaryBo.UpdateQtyByWorkOrderIdCommands.Add(new UpdateQtyByWorkOrderIdCommand
@@ -410,11 +410,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 额外给面板用来显示的参数
             if (responseBos.Count == 1)
             {
-                var singleSFCResponse = responseBos.FirstOrDefault();
-                if (singleSFCResponse != null)
+                var firstResponseBo = responseBos.FirstOrDefault();
+                if (firstResponseBo != null)
                 {
-                    responseSummaryBo.IsLastProcedure = singleSFCResponse.IsLastProcedure;
-                    responseSummaryBo.NextProcedureCode = singleSFCResponse.NextProcedureCode;
+                    responseSummaryBo.IsLastProcedure = firstResponseBo.IsLastProcedure;
+                    responseSummaryBo.NextProcedureCode = firstResponseBo.NextProcedureCode;
                 }
             }
 

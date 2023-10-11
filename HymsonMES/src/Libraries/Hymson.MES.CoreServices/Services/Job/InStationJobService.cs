@@ -326,11 +326,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.InStationManuSfcByIdCommands = responseBos.Select(s => s.InStationManuSfcByIdCommand);
             responseSummaryBo.MultiUpdateProduceInStationSFCCommands = responseBos.Select(s => s.MultiUpdateProduceInStationSFCCommand);
 
-            var singleSFCResponseBosByWorkOrderId = responseBos
+            var responseBosByWorkOrderId = responseBos
                 .Where(w => w.IsFirstProcedure)
                 .Select(s => s.SFCProduceEntitiy)
                 .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in singleSFCResponseBosByWorkOrderId)
+            foreach (var item in responseBosByWorkOrderId)
             {
                 // 更新工单的InputQty
                 responseSummaryBo.UpdateQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
