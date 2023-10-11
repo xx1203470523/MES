@@ -34,6 +34,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
+        /// <summary>
+        /// 仓储接口（资源维护）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
         private readonly IMasterDataService _masterDataService;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
@@ -48,27 +52,30 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="manuSfcRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procMaterialRepository"></param>
+        /// <param name="procResourceRepository"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderBindRepository"></param>
         /// <param name="manuCommonService"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public BarcodeReceiveService(IPlanWorkOrderRepository planWorkOrderRepository,
            IManuSfcRepository manuSfcRepository,
            IWhMaterialInventoryRepository whMaterialInventoryRepository,
            IProcMaterialRepository procMaterialRepository,
+           IProcResourceRepository procResourceRepository,
            IMasterDataService masterDataService,
            IManuSfcInfoRepository manuSfcInfoRepository,
            IManuSfcProduceRepository manuSfcProduceRepository,
            IPlanWorkOrderBindRepository planWorkOrderBindRepository,
            IManuCommonService manuCommonService,
-           IManuSfcStepRepository manuSfcStepRepository
-           )
+           IManuSfcStepRepository manuSfcStepRepository)
         {
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procMaterialRepository = procMaterialRepository;
+            _procResourceRepository = procResourceRepository;
             _masterDataService = masterDataService;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -119,21 +126,25 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
 
-            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
+            // 条码在制表
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            {
+                SiteId = multiSFCBo.SiteId,
+                Sfcs = multiSFCBo.SFCs
+            });
+            //var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
 
-            var sfcEntitys = await commonBo.Proxy.GetDataBaseValueAsync(_manuSfcRepository.GetManuSfcEntitiesAsync, new ManuSfcQuery { SiteId = param.SiteId, SFCs = param.SFCs });
+            var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetManuSfcEntitiesAsync, new ManuSfcQuery { SiteId = multiSFCBo.SiteId, SFCs = multiSFCBo.SFCs });
 
-            //获取绑定工单
+            var resourceEntity = await _procResourceRepository.GetByIdAsync(commonBo.ResourceId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16337));
+
+            // 获取绑定工单
             var planWorkOrderBindEntity = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery
             {
                 SiteId = commonBo.SiteId,
                 ResourceId = commonBo.ResourceId
-            });
-
-            if (planWorkOrderBindEntity == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19928)).WithData("ResCode", resourceEntity.ResCode);
 
             var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
             {
