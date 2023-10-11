@@ -7,36 +7,33 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 半成品完工
     /// </summary>
-    public class SmiFinishedRequestBo : JobBaseBo
+    public class SmiFinishedRequestBo
     {
         /// <summary>
-        /// 用户名
+        /// 条码
         /// </summary>
-        public string UserName { get; set; } = "";
+        public string SFC { get; set; }
+
         /// <summary>
-        /// 工序ID
+        /// 载具条码
         /// </summary>
-        public long ProcedureId { get; set; }
-        /// <summary>
-        /// 资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
+        public string? VehicleCode { get; set; }
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class SmiFinisheResponseBo
+    public class SmiFinisheResponseSummaryBo
     {
         /// <summary>
-        /// 
+        /// 条码信息
         /// </summary>
-        public IEnumerable<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new List<ManuSfcCirculationEntity>();
+        public List<ManuSfcEntity> SFCEntities { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
+        public List<ManuSfcStepEntity> SFCStepEntities { get; set; } = new();
 
         /// <summary>
         /// 
@@ -59,9 +56,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public DeleteSfcProduceBusinesssBySfcInfoIdsCommand DeleteSfcProduceBusinesssBySfcInfoIdsCommand { get; set; } = new();
 
         /// <summary>
-        /// 条码信息
+        /// 
         /// </summary>
-        public List<ManuSfcEntity> SFCEntities { get; set; } = new();
+        public List<ManuSfcCirculationEntity> ManuSfcCirculationEntities { get; set; } = new();
 
     }
 }

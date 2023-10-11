@@ -55,6 +55,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public decimal? ConsumeQty { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class OutStationUnqualifiedBo
     {
         /// <summary>

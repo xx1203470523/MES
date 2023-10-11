@@ -124,40 +124,40 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo bo) return;
-            if (bo == null) return;
-            if (bo.InStationRequestBos == null || bo.InStationRequestBos.Any() == false) return;
+            if (param is not JobRequestBo commonBo) return;
+            if (commonBo == null) return;
+            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return;
 
             // 校验工序和资源是否对应
-            var resourceIds = await bo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
-            if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            var resourceIds = await commonBo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, commonBo.ProcedureId);
+            if (resourceIds == null || !resourceIds.Any(a => a == commonBo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
             // 临时中转变量
-            var multiSFCBo = new MultiSFCBo { SiteId = bo.SiteId, SFCs = bo.InStationRequestBos.Select(s => s.SFC) };
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
+            var sfcProduceEntities = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 判断条码锁状态
-            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
+            var sfcProduceBusinessEntities = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
 
             // 进站工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId) ??
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId) ??
                 throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 循环次数验证（复投次数）
             sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
-            sfcProduceBusinessEntities?.VerifyProcedureLock(multiSFCBo.SFCs, bo.ProcedureId);
+            sfcProduceBusinessEntities?.VerifyProcedureLock(multiSFCBo.SFCs, commonBo.ProcedureId);
 
             // 验证条码是否被容器包装
             await _manuCommonService.VerifyContainerAsync(multiSFCBo);
 
             // 获取生产工单（附带工单状态校验）
-            var planWorkOrderEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities!.Select(s => s.WorkOrderId) });
+            var planWorkOrderEntities = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities!.Select(s => s.WorkOrderId) });
             if (planWorkOrderEntities!.Any(a => a.Status == PlanWorkOrderStatusEnum.Finish))
             {
                 // 完工的工单，不允许再投入（不管哪个工序都不允许再投入，之前逻辑是会读取工艺路线，只对首工序进行校验）
@@ -165,10 +165,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 如果工序对应不上
-            var sfcProduceEntitiesOfNoMatchProcedure = sfcProduceEntities!.Where(a => a.ProcedureId != bo.ProcedureId);
+            var sfcProduceEntitiesOfNoMatchProcedure = sfcProduceEntities!.Where(a => a.ProcedureId != commonBo.ProcedureId);
             if (sfcProduceEntitiesOfNoMatchProcedure != null && sfcProduceEntitiesOfNoMatchProcedure.Any())
             {
-                var query = new EntityBySiteIdQuery { SiteId = bo.SiteId };
+                var query = new EntityBySiteIdQuery { SiteId = commonBo.SiteId };
                 var allProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetListAsync(query);
                 var allProcessRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetListAsync(query);
 
@@ -182,13 +182,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                     // 判断条码应进站工序和实际进站工序之间是否全部都是随机工序（因为随机工序可以跳过）
-                    var IsAllRandomProcedureBetween = await bo.Proxy.GetValueAsync(_masterDataService.IsAllRandomProcedureBetweenAsync, new ManuRouteProcedureRandomCompareBo
+                    var IsAllRandomProcedureBetween = await commonBo.Proxy.GetValueAsync(_masterDataService.IsAllRandomProcedureBetweenAsync, new ManuRouteProcedureRandomCompareBo
                     {
                         ProcessRouteDetailLinks = processRouteDetailLinks,
                         ProcessRouteDetailNodes = processRouteDetailNodes,
                         ProcessRouteId = sfcProduce.ProcessRouteId,
                         BeginProcedureId = sfcProduce.ProcedureId,
-                        EndProcedureId = bo.ProcedureId
+                        EndProcedureId = commonBo.ProcedureId
                     });
                     if (!IsAllRandomProcedureBetween) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
                 }
@@ -202,13 +202,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo bo) return default;
-            if (bo == null) return default;
+            if (param is not JobRequestBo commonBo) return default;
+            if (commonBo == null) return default;
 
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
-                ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId,
+                ProcedureId = commonBo.ProcedureId,
+                ResourceId = commonBo.ResourceId,
                 LinkPoint = ResourceJobLinkPointEnum.BeforeStart
             });
         }
@@ -281,6 +281,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
                     ProcedureId = sfcProduceEntity.ProcedureId,
                     ResourceId = sfcProduceEntity.ResourceId,
+                    SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                     Qty = sfcProduceEntity.Qty,
                     VehicleCode = requestBo.VehicleCode,
                     EquipmentId = commonBo.EquipmentId,
@@ -418,13 +419,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo bo) return default;
-            if (bo == null) return default;
+            if (param is not JobRequestBo commonBo) return default;
+            if (commonBo == null) return default;
 
             return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
             {
-                ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId,
+                ProcedureId = commonBo.ProcedureId,
+                ResourceId = commonBo.ResourceId,
                 LinkPoint = ResourceJobLinkPointEnum.AfterStart
             });
         }

@@ -262,8 +262,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (commonBo == null) return default;
             if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return default;
 
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
+
             // 获取生产条码信息
-            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, commonBo);
+            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
 
             // 条码信息
@@ -581,6 +584,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
                 ProcedureId = sfcProduceEntity.ProcedureId,
                 ResourceId = sfcProduceEntity.ResourceId,
+                SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                 Qty = sfcProduceEntity.Qty,
                 VehicleCode = requestBo.VehicleCode,
                 EquipmentId = commonBo.EquipmentId,
@@ -751,10 +755,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
                 ProcedureId = sfcProduceEntity.ProcedureId,
                 ResourceId = sfcProduceEntity.ResourceId,
-                Qty = sfcProduceEntity.Qty,
-                EquipmentId = commonBo.EquipmentId,
-                VehicleCode = requestBo.VehicleCode,
                 SFCInfoId = sfcProduceEntity.BarCodeInfoId,
+                Qty = sfcProduceEntity.Qty,
+                VehicleCode = requestBo.VehicleCode,
+                EquipmentId = commonBo.EquipmentId,
                 SiteId = commonBo.SiteId,
                 CreatedBy = commonBo.UserName,
                 CreatedOn = commonBo.Time,
