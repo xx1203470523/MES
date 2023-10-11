@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.EquipmentServices.Validators.BindSFC
 {
-    internal class BindSFCValidator : AbstractValidator<BindSFCInputDto>
+    public class BindSFCValidator : AbstractValidator<BindSFCInputDto>
     {
         /// <summary>
         /// 条码绑定验证

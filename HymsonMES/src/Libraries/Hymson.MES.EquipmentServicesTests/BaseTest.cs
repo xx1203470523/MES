@@ -33,6 +33,10 @@ using Microsoft.Extensions.Options;
 using Hymson.Minio;
 using Hymson.MES.EquipmentServices.Services.Process;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.EquipmentServices.Services.BindSFC;
+using Hymson.MES.EquipmentServices.Dtos.BindSFC;
+
+using Hymson.MES.EquipmentServices.Validators.BindSFC;
 
 namespace Hymson.MES.EquipmentServicesTests
 {
@@ -84,6 +88,7 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSingleton<IInteSFCBoxService, InteSFCBoxService>()
                 .AddSingleton<IExcelService, ExcelService>()
                 .AddSingleton<IMinioService, MinioService>()
+                .AddSingleton<IBindSFCService, BindSFCService>()
                  .AddSingleton<AbstractValidator<InteSFCBoxImportDto>, InteSFCBoxValidator>()
                 .AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>()//条码流转绑定
                 .AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>()//条码流转解绑
@@ -99,6 +104,9 @@ namespace Hymson.MES.EquipmentServicesTests
             .AddSingleton<AbstractValidator<ProcBootupparamModifyDto>, ProcBootupparamModifyValidator>()
             .AddSingleton<AbstractValidator<ProcBootupparamrecordCreateDto>, ProcBootupparamrecordCreateValidator>()
             .AddSingleton<AbstractValidator<ProcBootupparamrecordModifyDto>, ProcBootupparamrecordModifyValidator>()
+
+               .AddSingleton<AbstractValidator<BindSFCInputDto>, BindSFCValidator>()//条码绑定
+            .AddSingleton<AbstractValidator<UnBindSFCInputDto>, UnBindSFCValidator>()//条码解绑
 
                 .BuildServiceProvider();
 

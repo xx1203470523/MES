@@ -1,17 +1,8 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
-using Hymson.MES.EquipmentServices.Services.SfcCirculation;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Services.Integrated.InteSFCBox;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Minio.DataModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Hymson.MES.EquipmentServicesTests.Services.PDA;
 
@@ -22,10 +13,11 @@ namespace Hymson.MES.EquipmentServicesTests.Services.PDA;
 public class RepairAndRepeatTest : BaseTest
 {
     private readonly IBindSFCService _bindSFCService;
-    public RepairAndRepeatTest(IBindSFCService bindSFCService)
+    public RepairAndRepeatTest()
     {
         _bindSFCService = ServiceProvider.GetRequiredService<IBindSFCService>();
     }
+
 
     [TestCleanup]
     public void TestCleanup()
@@ -51,8 +43,6 @@ public class RepairAndRepeatTest : BaseTest
     [TestMethod()]
     public async Task RepeatManuSFCAsyncTest()
     {
-
-
         var query = new ResumptionInputDto
         {
             SFC = "",
@@ -76,11 +66,12 @@ public class RepairAndRepeatTest : BaseTest
     /// </summary>
     /// <returns></returns>
     [TestMethod()]
-    public async Task getbindsfcTest()
+    public async Task GetbindsfcTest()
     {
         var query = new BindSFCInputDto
         {
-            SFC = "",
+            //SFC = "YTLSM202309110004A",
+            SFC = "YTP280024A239B0001EVE",
         };
         var result = await _bindSFCService.GetBindSFC(query);
         Assert.IsTrue(true);
