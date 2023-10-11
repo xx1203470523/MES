@@ -205,6 +205,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class InteJobBusinessRelationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -227,8 +230,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByJobIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `BusinessType`, `BusinessId`, `OrderNumber`, `JobId`, `IsUse`, `Parameter`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_job_business_relation`  WHERE JobId IN @jobIds ";
-    
-        const string GetByJobBybusinessIdSql = @"SELECT * FROM `inte_job_business_relation` WHERE BusinessId = @BusinessId AND LinkPoint = @LinkPoint AND IsDeleted = 0 ORDER BY OrderNumber;";
+        const string GetByJobBybusinessIdSql = @"SELECT * FROM `inte_job_business_relation` WHERE IsUse = @IsUse AND BusinessId = @BusinessId AND LinkPoint = @LinkPoint AND IsDeleted = 0;";
     }
 
 }
