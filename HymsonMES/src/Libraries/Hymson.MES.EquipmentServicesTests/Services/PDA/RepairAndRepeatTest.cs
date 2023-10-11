@@ -1,7 +1,9 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.BindSFC;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.EquipmentServices.Dtos.BindSFC;
 using Hymson.MES.EquipmentServices.Services.BindSFC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Reflection.Emit;
 
 
 namespace Hymson.MES.EquipmentServicesTests.Services.PDA;
@@ -72,6 +74,7 @@ public class RepairAndRepeatTest : BaseTest
         {
             //SFC = "YTLSM202309110004A",
             SFC = "YTP280024A239B0001EVE",
+            OperateType= RepairOperateTypeEnum.OK,
         };
         var result = await _bindSFCService.GetBindSFC(query);
         Assert.IsTrue(true);
