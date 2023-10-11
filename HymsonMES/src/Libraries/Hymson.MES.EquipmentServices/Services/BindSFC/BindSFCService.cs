@@ -16,6 +16,8 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using Mysqlx;
+using System.Drawing;
 using System.Transactions;
 
 namespace Hymson.MES.EquipmentServices.Services.BindSFC
@@ -130,7 +132,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             //获取汇总表信息
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
 
-            string NG = "OK";
+            string NG = Enum.GetName(RepairOutTypeEnum.OK);  
             List<ManuSfcCirculationSummaryEntity> circulateSummary = new();
 
             if (manuSfcSummaryEntities.Any())
@@ -152,7 +154,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 //查询逻辑
                 else
                 {
-                    NG = "NG";
+                    NG = Enum.GetName(RepairOutTypeEnum.NG);
 
                     foreach (var item in circulationBarCodeEntities)
                     {
