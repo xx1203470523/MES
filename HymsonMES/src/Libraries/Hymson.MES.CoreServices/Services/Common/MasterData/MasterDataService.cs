@@ -814,7 +814,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 BusinessId = param.ResourceId,
                 LinkPoint = param.LinkPoint
             });
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false)
             {
                 InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
@@ -822,7 +822,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     LinkPoint = param.LinkPoint
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return Enumerable.Empty<JobBo>();
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return Enumerable.Empty<JobBo>();
 
             // 读取作业实体
             var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
