@@ -502,8 +502,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         { "NextProcedureCode", $"{data.NextProcedureCode}" }
                     };
 
-                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), SFCProduceEntity.SFC);
-                    //responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), data.FirstSFC, data.NextProcedureCode);
+                    if (data.IsLastProcedure)
+                    {
+                        responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), SFCProduceEntity.SFC);
+                    }
+                    else
+                    {
+                        responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), SFCProduceEntity.SFC, data.NextProcedureCode);
+                    }
                 }
             }
 
