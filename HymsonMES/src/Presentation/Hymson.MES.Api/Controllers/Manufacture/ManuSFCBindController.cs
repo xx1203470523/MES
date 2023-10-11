@@ -33,8 +33,13 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _bindSFCService.GetBindSFC(parm);
         }
 
+        /// <summary>
+        /// 永泰维修-状态确认
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("pda/RepairOK")]
+        [Route("pda/repairok")]
         public async Task<BindSFCOutputDto> RepairSFCAsync([FromQuery] BindSFCInputDto parm)
         {
             parm.OperateType = RepairOperateTypeEnum.OK;
@@ -74,7 +79,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("pda/repeatManu")]
         public async Task RepeatManuSFCAsync(ResumptionInputDto parm)
         {
-            //await _bindSFCService.RepeatManuSFCAsync(parm);
+            await _bindSFCService.RepeatManuSFCAsync(parm);
         }
 
 
