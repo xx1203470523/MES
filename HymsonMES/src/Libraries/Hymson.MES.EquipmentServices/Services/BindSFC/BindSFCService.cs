@@ -91,6 +91,10 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <exception cref="CustomerValidationException"></exception>
         public async Task<BindSFCOutputDto> GetBindSFC(BindSFCInputDto bindSFCDto)
         {
+            if (string.IsNullOrEmpty(bindSFCDto.SFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19101));
+            }
 
             var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
             {
