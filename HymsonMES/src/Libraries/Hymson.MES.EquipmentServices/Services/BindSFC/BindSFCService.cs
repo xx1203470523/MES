@@ -143,7 +143,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     //汇总表处理
                     foreach (var item in manuSfcSummaryEntities)
                     {
-                        item.QualityStatus = 0;
+                        item.QualityStatus =1;
                     }
                     //步骤NG表处理
 
