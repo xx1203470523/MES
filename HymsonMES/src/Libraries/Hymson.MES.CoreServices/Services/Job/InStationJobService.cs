@@ -21,7 +21,6 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
-using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -252,14 +251,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 获取当前工序信息
                 var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheckAsync(commonBo.ProcedureId);
 
-                // 更新工单信息
-                var updateQtyCommand = new UpdateQtyByWorkOrderIdCommand
-                {
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId
-                };
-
                 // 检查是否测试工序
                 if (procedureEntity.Type == ProcedureTypeEnum.Test)
                 {
@@ -269,6 +260,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // 每次进站都将复投次数+1
                 sfcProduceEntity.RepeatedCount++;
+
+                // 更新状态，将条码由"排队"改为"活动"
+                sfcProduceEntity.Status = SfcStatusEnum.Activity;
+                sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
+                sfcProduceEntity.ResourceId = commonBo.ResourceId;
+                sfcProduceEntity.UpdatedBy = commonBo.UserName;
+                sfcProduceEntity.UpdatedOn = commonBo.Time;
+                responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
                 // 初始化步骤
                 responseBo.SFCStepEntity = new ManuSfcStepEntity
@@ -316,15 +315,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     UpdatedOn = commonBo.Time
                 };
 
-                sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
-                sfcProduceEntity.ResourceId = commonBo.ResourceId;
-
-                // 更新状态，将条码由"排队"改为"活动"
-                sfcProduceEntity.Status = SfcStatusEnum.Activity;
-                sfcProduceEntity.UpdatedBy = commonBo.UserName;
-                sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-
-                responseBo.SFCProduceEntitiy = sfcProduceEntity;
                 responseBos.Add(responseBo);
             }
 
@@ -345,7 +335,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseSummaryBo.UpdateQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     UpdatedBy = commonBo.UserName,
-                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedOn = commonBo.Time,
                     WorkOrderId = item.Key,
                     Qty = item.Value.Count()
                 });

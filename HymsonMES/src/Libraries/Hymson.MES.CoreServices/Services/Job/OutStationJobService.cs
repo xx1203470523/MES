@@ -402,7 +402,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 responseSummaryBo.UpdateQtyByWorkOrderIdCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     UpdatedBy = commonBo.UserName,
-                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedOn = commonBo.Time,
                     WorkOrderId = item.Key,
                     Qty = item.Value.Count()
                 });
