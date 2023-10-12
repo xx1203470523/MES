@@ -240,7 +240,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             try
             {
                 await SetEquInfoAsync(equipmentCode);
-                var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("21AsakiA4A4");
+                var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("YTLSM202309270168A");
                 Assert.IsTrue(moduleCCSInfoDto != null);
             }
             catch (Exception ex)

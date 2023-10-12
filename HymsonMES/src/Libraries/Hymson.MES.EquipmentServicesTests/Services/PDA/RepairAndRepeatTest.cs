@@ -74,7 +74,7 @@ public class RepairAndRepeatTest : BaseTest
         {
             //SFC = "YTLSM202309110004A",
             SFC = "YTP280024A239B0001EVE",
-            OperateType= RepairOperateTypeEnum.OK,
+            //OperateType= RepairOperateTypeEnum.OK,
         };
         var result = await _bindSFCService.GetBindSFC(query);
         Assert.IsTrue(true);

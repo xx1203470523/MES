@@ -476,7 +476,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         }
 
 
-        
+
 
         /// <summary>
         /// 组件添加
@@ -769,13 +769,26 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <exception cref="CustomerValidationException"></exception>
         public async Task<CirculationModuleCCSInfoDto> GetReplenishNGDataAsync()
         {
-            //获取NG数据 步骤NG表
-            var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync();
 
-            var first = sfcSteps.FirstOrDefault();
+            //指定工序
 
-            CirculationModuleCCSInfoDto circulationModuleCCSInfo = new();
-            if (first == null)
+
+            //汇总表找出NG数据
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                //SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
+                //SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
+                ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
+                //WorkOrderId = circulateFirst.WorkOrderId, //当前工单
+                QualityStatus = (int)TrueOrFalseEnum.No, //NG的
+            };
+
+            //获取汇总表信息
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            var lastsfc = manuSfcSummaryEntities.OrderByDescending(x => x.UpdatedOn).FirstOrDefault();
+
+            if (lastsfc == null)
             {
                 return new CirculationModuleCCSInfoDto()
                 {
@@ -786,73 +799,94 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 };
             }
 
-            //var sfcList = sfcSteps.Select(x => x.SFC).Distinct().ToArray();
 
+            //获取模组CSS信息
+            var result = await GetCirculationModuleCCSInfoAsync(lastsfc.SFC);
 
-            //if (sfcList.Any() == false)
+            ////获取NG数据 步骤NG表
+            //var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync();
+
+            //var first = sfcSteps.FirstOrDefault();
+
+            //CirculationModuleCCSInfoDto circulationModuleCCSInfo = new();
+            //if (first == null)
             //{
-            //    return circulationModuleCCSInfo;
-            //}
-
-            //批量获取位置 查找当前已有的绑定记录
-            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                CirculationBarCode = first.SFC,
-                IsDisassemble = TrueOrFalseEnum.No,
-                CirculationType = SfcCirculationTypeEnum.BindCCS
-            });
-
-            //获取模组型号 查找模组绑定时的录入的ModelCode，使用绑定时的
-            var manuSfcCirculations = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                CirculationBarCode = first.SFC,
-                IsDisassemble = TrueOrFalseEnum.No,
-                CirculationType = SfcCirculationTypeEnum.Merge
-            });
-
-
-            //if (manuSfcCirculationEntities.Any())
-            //{
-            //    var manuSfcCirculation = manuSfcCirculationEntities.First();
-            //查询模组的NG记录
-            //var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
-            //{
-            //    SFCS = new string[] { sfc },
-            //    QualityStatus = 0,//0 不合格，代表NG状态
-            //    SiteId = _currentEquipment.SiteId
-            //});
-            //circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
-            //circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
-            //circulationModuleCCSInfo.IsNg = manuSfcSummaries.Any();
-            //}
-            //if (manuSfcCirculations.Any())
-            //{
-            //    circulationModuleCCSInfo.ModelCode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
-            //}
-
-            //foreach (var item in sfcSteps)
-            //{
-            //    //var location = manuSfcCirculationEntities.Where(x => x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location ?? string.Empty;
-            //    //var modelcode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode) && x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
-            //    circulationModuleCCSInfo.Add(new CirculationModuleCCSInfoDto
+            //    return new CirculationModuleCCSInfoDto()
             //    {
-            //        SFC = item.SFC,
-            //        Location = location,
-            //        IsNg = true,
-            //        ModelCode = modelcode
-            //    });
+            //        IsNg = false,
+            //        SFC = string.Empty,
+            //        Location = string.Empty,
+            //        ModelCode = string.Empty,
+            //    };
             //}
 
-            var manuSfcCirculation = manuSfcCirculationEntities.FirstOrDefault();
-            //var location = manuSfcCirculationEntities.Where(x => x.SFC == first.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location ?? string.Empty;
-            var modelcode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+            ////var sfcList = sfcSteps.Select(x => x.SFC).Distinct().ToArray();
 
-            circulationModuleCCSInfo.SFC = manuSfcCirculation?.SFC ?? first.SFC;
-            circulationModuleCCSInfo.Location = manuSfcCirculation?.Location ?? string.Empty;
-            circulationModuleCCSInfo.ModelCode = modelcode;
-            circulationModuleCCSInfo.IsNg = true;
+
+            ////if (sfcList.Any() == false)
+            ////{
+            ////    return circulationModuleCCSInfo;
+            ////}
+
+            ////批量获取位置 查找当前已有的绑定记录
+            //var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            //{
+            //    SiteId = _currentEquipment.SiteId,
+            //    CirculationBarCode = first.SFC,
+            //    IsDisassemble = TrueOrFalseEnum.No,
+            //    CirculationType = SfcCirculationTypeEnum.BindCCS
+            //});
+
+            ////获取模组型号 查找模组绑定时的录入的ModelCode，使用绑定时的
+            //var manuSfcCirculations = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            //{
+            //    SiteId = _currentEquipment.SiteId,
+            //    CirculationBarCode = first.SFC,
+            //    IsDisassemble = TrueOrFalseEnum.No,
+            //    CirculationType = SfcCirculationTypeEnum.Merge
+            //});
+
+
+            ////if (manuSfcCirculationEntities.Any())
+            ////{
+            ////    var manuSfcCirculation = manuSfcCirculationEntities.First();
+            ////查询模组的NG记录
+            ////var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
+            ////{
+            ////    SFCS = new string[] { sfc },
+            ////    QualityStatus = 0,//0 不合格，代表NG状态
+            ////    SiteId = _currentEquipment.SiteId
+            ////});
+            ////circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
+            ////circulationModuleCCSInfo.Location = manuSfcCirculation.Location;
+            ////circulationModuleCCSInfo.IsNg = manuSfcSummaries.Any();
+            ////}
+            ////if (manuSfcCirculations.Any())
+            ////{
+            ////    circulationModuleCCSInfo.ModelCode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+            ////}
+
+            ////foreach (var item in sfcSteps)
+            ////{
+            ////    //var location = manuSfcCirculationEntities.Where(x => x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location ?? string.Empty;
+            ////    //var modelcode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode) && x.SFC == item.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+            ////    circulationModuleCCSInfo.Add(new CirculationModuleCCSInfoDto
+            ////    {
+            ////        SFC = item.SFC,
+            ////        Location = location,
+            ////        IsNg = true,
+            ////        ModelCode = modelcode
+            ////    });
+            ////}
+
+            //var manuSfcCirculation = manuSfcCirculationEntities.FirstOrDefault();
+            ////var location = manuSfcCirculationEntities.Where(x => x.SFC == first.SFC).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.Location ?? string.Empty;
+            //var modelcode = manuSfcCirculations.Where(x => !string.IsNullOrEmpty(x.ModelCode)).OrderByDescending(x => x.UpdatedOn).FirstOrDefault()?.ModelCode ?? string.Empty;
+
+            //circulationModuleCCSInfo.SFC = manuSfcCirculation?.SFC ?? first.SFC;
+            //circulationModuleCCSInfo.Location = manuSfcCirculation?.Location ?? string.Empty;
+            //circulationModuleCCSInfo.ModelCode = modelcode;
+            //circulationModuleCCSInfo.IsNg = true;
 
             return circulationModuleCCSInfo;
         }
