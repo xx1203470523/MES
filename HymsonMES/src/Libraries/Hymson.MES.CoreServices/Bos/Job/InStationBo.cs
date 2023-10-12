@@ -50,7 +50,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>  
         /// 更新在制品表
         /// </summary>
-        public MultiUpdateProduceInStationSFCCommand MultiUpdateProduceInStationSFCCommand { get; set; }
+        public UpdateProduceInStationSFCCommand UpdateProduceInStationSFCCommand { get; set; }
 
     }
 
@@ -75,11 +75,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyCommands { get; set; } = new();
 
         /// <summary>
-        /// 
-        /// </summary>
-        public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
-
-        /// <summary>
         /// 更新条码表
         /// </summary>
         public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; } = new List<InStationManuSfcByIdCommand>();
@@ -87,6 +82,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>  
         /// 更新在制品表
         /// </summary>
-        public IEnumerable<MultiUpdateProduceInStationSFCCommand> MultiUpdateProduceInStationSFCCommands { get; set; } = new List<MultiUpdateProduceInStationSFCCommand>();
+        public IEnumerable<UpdateProduceInStationSFCCommand> UpdateProduceInStationSFCCommands { get; set; } = new List<UpdateProduceInStationSFCCommand>();
     }
 }

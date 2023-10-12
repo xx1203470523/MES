@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -30,6 +31,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("进站", JobTypeEnum.Standard)]
     public class InStationJobService : IJobService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<InStationJobService> _logger;
+
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
@@ -83,6 +89,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcRepository"></param>
@@ -93,7 +100,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="localizationService"></param>
-        public InStationJobService(IManuCommonService manuCommonService,
+        public InStationJobService(ILogger<InStationJobService> logger,
+            IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -104,6 +112,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IProcProcedureRepository procProcedureRepository,
             ILocalizationService localizationService)
         {
+            _logger = logger;
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;
@@ -146,8 +155,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
 
             // 进站工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId) ??
-                throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 循环次数验证（复投次数）
             sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
@@ -259,6 +268,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                 }
 
+                // 条码状态（当前状态）
+                var currentStatus = sfcProduceEntity.Status;
+
                 // 每次进站都将复投次数+1
                 sfcProduceEntity.RepeatedCount++;
 
@@ -304,18 +316,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 };
 
                 // 更新实体（带状态检查）
-                responseBo.MultiUpdateProduceInStationSFCCommand = new MultiUpdateProduceInStationSFCCommand
+                responseBo.UpdateProduceInStationSFCCommand = new UpdateProduceInStationSFCCommand
                 {
                     Id = sfcProduceEntity.Id,
-                    ProcedureId = commonBo.ProcedureId,
-                    ResourceId = commonBo.ResourceId,
-                    Status = SfcStatusEnum.Activity,
-                    CurrentStatus = sfcProduceEntity.Status,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
+                    Status = sfcProduceEntity.Status,
+                    CurrentStatus = currentStatus,
                     RepeatedCount = sfcProduceEntity.RepeatedCount,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn
                 };
-
                 responseBos.Add(responseBo);
             }
 
@@ -324,7 +335,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
             responseSummaryBo.InStationManuSfcByIdCommands = responseBos.Select(s => s.InStationManuSfcByIdCommand);
-            responseSummaryBo.MultiUpdateProduceInStationSFCCommands = responseBos.Select(s => s.MultiUpdateProduceInStationSFCCommand);
+            responseSummaryBo.UpdateProduceInStationSFCCommands = responseBos.Select(s => s.UpdateProduceInStationSFCCommand);
 
             var responseBosByWorkOrderId = responseBos
                 .Where(w => w.IsFirstProcedure)
@@ -356,11 +367,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not InStationResponseSummaryBo data) return responseBo;
             if (data.SFCProduceEntities == null || data.SFCProduceEntities.Any() == false) return responseBo;
 
-            // 更改状态（在制品）
-            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.MultiUpdateProduceInStationSFCCommands);
+            // 更改状态（在制品），如果状态一致，这里会直接返回0
+            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.UpdateProduceInStationSFCCommands);
 
             // 未更新到数据，事务回滚
-            if (responseBo.Rows != data.MultiUpdateProduceInStationSFCCommands.Count())
+            if (responseBo.Rows != data.UpdateProduceInStationSFCCommands.Count())
             {
                 // 这里在外层会回滚事务
                 responseBo.Rows = -1;
@@ -418,7 +429,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.AfterStart
+                LinkPoint = ResourceJobLinkPointEnum.AfterFinish
             });
         }
 

@@ -46,6 +46,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         Task<int> DeleteByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 根据Code和物料ID查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetByBarCodeAndMaterialIdAsync(GetByBarCodeAndMaterialIdQuery query);
+
+        /// <summary>
         /// 获取加载数据列表
         /// </summary>
         /// <param name="ids"></param>
@@ -65,6 +72,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsAsync(GetByResourceIdAndMaterialIdsQuery query);
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndMaterialIdsAsync(GetByFeedingPointIdAndMaterialIdsQuery query);
 
         /// <summary>
         /// 获取加载数据列表（只读取剩余数量大于0的）

@@ -75,17 +75,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     public class MaterialDeductResponseBo : MaterialDeductItemBo
     {
         /// <summary>
-        /// 数据收集方式 
-        /// </summary>
-        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
-
-        /// <summary>
-        /// 描述 :数据收集方式
-        /// 空值 : true  
-        /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
-
-        /// <summary>
         /// 替代料集合
         /// </summary>
         public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();
@@ -121,6 +110,16 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 消耗系数
         /// </summary>
         public decimal ConsumeRatio { get; set; } = 100;
+
+        /// <summary>
+        /// 数据收集方式（用之前要确认是否有赋值）
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 数据收集方式（用之前要确认是否有赋值）
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
 

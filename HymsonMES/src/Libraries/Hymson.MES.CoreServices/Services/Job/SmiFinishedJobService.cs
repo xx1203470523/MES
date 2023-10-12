@@ -76,11 +76,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="localizationService"></param>
-        /// <param name="eventBus"></param>
         public SmiFinishedJobService(IMasterDataService masterDataService,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcRepository manuSfcRepository,
@@ -159,15 +157,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = commonBo.ProcedureId,
-                ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.BeforeStart
-            });
+            await Task.CompletedTask;
+            return null;
         }
 
         /// <summary>
@@ -350,15 +341,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = commonBo.ProcedureId,
-                ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.AfterFinish
-            });
+            await Task.CompletedTask;
+            return null;
         }
 
     }

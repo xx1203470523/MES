@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Dapper;
+using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
@@ -101,15 +102,8 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = commonBo.ProcedureId,
-                ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.BeforeStart
-            });
+            await Task.CompletedTask;
+            return null;
         }
 
         /// <summary>
@@ -152,11 +146,20 @@ namespace Hymson.MES.CoreServices.Services.Job
                 IsVerifyActivation = false
             });
 
-            //获取首工序
+            // 获取首工序
             var productId = await _masterDataService.GetProductSetIdAsync(new Bos.Common.MasterData.ProductSetBo { SiteId = commonBo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = commonBo.ProcedureId, ResourceId = commonBo.ResourceId }) ?? planWorkOrderEntity.ProductId;
 
-            var boms = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(planWorkOrderEntity.ProductBOMId, commonBo.ProcedureId);
-            var bomMaterials = GetBomMaterials(boms);
+            // 组合物料数据（放缓存）
+            var initialMaterials = await commonBo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, new MaterialDeductRequestBo
+            {
+                SiteId = commonBo.SiteId,
+                ProcedureId = commonBo.ProcedureId,
+                ProductBOMId = planWorkOrderEntity.ProductBOMId
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16133));
+
+            // 平铺物料数据
+            var bomMaterials = initialMaterials.Select(s => new MaterialDeductItemBo { MaterialId = s.MaterialId, DataCollectionWay = s.DataCollectionWay }).AsList();
+            bomMaterials.AddRange(initialMaterials.SelectMany(s => s.ReplaceMaterials).Select(s => new MaterialDeductItemBo { MaterialId = s.MaterialId, DataCollectionWay = s.DataCollectionWay }));
 
             // 获取库存数据
             var whMaterialInventorys = await _whMaterialInventoryRepository.GetByBarCodesAsync(new WhMaterialInventoryBarCodesQuery
@@ -182,7 +185,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 var whMaterialInventory = whMaterialInventorys.FirstOrDefault(x => x.MaterialBarCode == sfc);
 
-                BomMaterial? material = null;
+                MaterialDeductItemBo? material = null;
                 decimal qty = 0;
                 //不存在库存中 则使用bom清单试探
                 if (whMaterialInventory == null)
@@ -205,9 +208,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", sfc}
-                            };
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
                             }
                             else
                             {
@@ -228,13 +229,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                         if (whMaterial.DataCollectionWay == MaterialSerialNumberEnum.Inside)
                         {
                             // 报错 内部条码  bom属性为外部
-
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", sfc}
-                            };
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
                             }
                             else
                             {
@@ -251,9 +249,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                             var validationFailure = new ValidationFailure();
                             if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                             {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", sfc}
-                            };
+                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
                             }
                             else
                             {
@@ -272,9 +268,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var validationFailure = new ValidationFailure();
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                     {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", sfc}
-                            };
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
                     }
                     else
                     {
@@ -308,7 +302,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     manuSfcEntity.IsUsed = YesOrNoEnum.No;
                     manuSfcEntity.Status = SfcStatusEnum.lineUp;
                     manuSfcEntity.UpdatedBy = commonBo.UserName;
-                    manuSfcEntity.UpdatedOn = HymsonClock.Now();
+                    manuSfcEntity.UpdatedOn = commonBo.Time;
                     updateManuSfcList.Add(manuSfcEntity);
                     manuSfcInfoUpdateIsUsedBo.SfcIds.Add(manuSfcEntity.Id);
                 }
@@ -449,56 +443,14 @@ namespace Hymson.MES.CoreServices.Services.Job
         }
 
         /// <summary>
-        /// 解析boms
-        /// </summary>
-        /// <param name="boms"></param>
-        /// <returns></returns>
-        private IEnumerable<BomMaterial> GetBomMaterials(IEnumerable<BomMaterialBo> boms)
-        {
-            List<BomMaterial> list = new List<BomMaterial>();
-            foreach (var bom in boms)
-            {
-                list.Add(new BomMaterial
-                {
-                    MaterialId = bom.MaterialId,
-                    DataCollectionWay = bom.DataCollectionWay,
-                });
-                foreach (var bomMaterial in bom.BomMaterials)
-                {
-                    list.Add(new BomMaterial
-                    {
-                        MaterialId = bomMaterial.MaterialId,
-                        DataCollectionWay = bomMaterial.DataCollectionWay,
-                    });
-                }
-                foreach (var procMaterial in bom.ProcMaterials)
-                {
-                    list.Add(new BomMaterial
-                    {
-                        MaterialId = procMaterial.MaterialId,
-                        DataCollectionWay = procMaterial.DataCollectionWay,
-                    });
-                }
-            }
-            return list;
-        }
-
-        /// <summary>
         /// 执行后节点
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = commonBo.ProcedureId,
-                ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.AfterStart
-            });
+            await Task.CompletedTask;
+            return null;
         }
     }
 }

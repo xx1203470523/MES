@@ -25,6 +25,7 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
@@ -33,6 +34,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
     /// </summary>
     public class ManuFeedingService : IManuFeedingService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<ManuFeedingService> _logger;
+
         /// <summary>
         /// 当前对象（登录用户）
         /// </summary>
@@ -117,6 +123,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <summary>
         /// 构造函数（物料加载）
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="inteWorkCenterRepository"></param>
@@ -133,7 +140,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="manuFeedingRecordRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        public ManuFeedingService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public ManuFeedingService(ILogger<ManuFeedingService> logger,
+            ICurrentUser currentUser, ICurrentSite currentSite,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcResourceRepository procResourceRepository,
             IProcLoadPointRepository procLoadPointRepository,
@@ -149,6 +157,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository)
         {
+            _logger = logger;
             _currentUser = currentUser;
             _currentSite = currentSite;
             _inteWorkCenterRepository = inteWorkCenterRepository;
@@ -262,6 +271,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 全部需展示的物料ID
             List<long> materialIds = new();
+            var loadSource = 1; // 1:资源;2:上料点
+
             // 通过物料分组
             Dictionary<long, IGrouping<long, ManuFeedingEntity>>? manuFeedingsDictionary = new();
 
@@ -281,6 +292,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 {
                     if (queryDto.FeedingPointId.HasValue)
                     {
+                        loadSource = 2;
                         loadPointMaterials = loadPointMaterials.Where(w => w.LoadPointId == queryDto.FeedingPointId.Value);
                     }
 
@@ -288,12 +300,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 }
             }
 
-            // 通过物料ID获取物料库存信息
-            var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
+            IEnumerable<ManuFeedingEntity> manuFeedings;
+            if (loadSource == 1)
             {
-                ResourceId = queryDto.ResourceId,
-                FeedingPointId = queryDto.FeedingPointId
-            });
+                // 通过资源ID获取物料库存信息
+                manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
+                {
+                    ResourceId = queryDto.ResourceId,
+                    FeedingPointId = queryDto.FeedingPointId
+                });
+            }
+            else
+            {
+                // 通过上料点ID获取物料库存信息
+                manuFeedings = await _manuFeedingRepository.GetByFeedingPointIdAndMaterialIdsAsync(new GetByFeedingPointIdAndMaterialIdsQuery { FeedingPointId = queryDto.FeedingPointId!.Value });
+            }
 
             // 已加载的物料ID
             if (manuFeedings != null)
@@ -406,6 +427,23 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             if (material == null) throw new CustomerValidationException(saveDto.ProductId.HasValue ? nameof(ErrorCode.MES15506) : nameof(ErrorCode.MES15505));
             entity.ProductId = material.Id;
+
+            // 当有上料点值时，判断物料条码是否已上到该上料点
+            if (entity.FeedingPointId.HasValue)
+            {
+                var feedingEntity = await _manuFeedingRepository.GetByBarCodeAndMaterialIdAsync(new GetByBarCodeAndMaterialIdQuery
+                {
+                    FeedingPointId = entity.FeedingPointId.Value,
+                    ProductId = entity.ProductId,
+                    BarCode = entity.BarCode
+                });
+
+                if (feedingEntity != null)
+                {
+                    _logger.LogError($"MES15507 -> FeedingPointId:{entity.FeedingPointId.Value},ProductId:{entity.ProductId},BarCode:{entity.BarCode}");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15507)).WithData("BarCode", entity.BarCode);
+                }
+            }
 
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();

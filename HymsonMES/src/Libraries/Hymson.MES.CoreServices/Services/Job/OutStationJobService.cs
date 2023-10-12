@@ -30,6 +30,7 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -39,6 +40,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("出站", JobTypeEnum.Standard)]
     public class OutStationJobService : IJobService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<OutStationJobService> _logger;
+
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
@@ -61,7 +67,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
         /// <summary>
         /// 仓储接口（生产工单）
-        /// </summary>
+        /// </summary>  
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
@@ -132,6 +138,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuDegradedProductExtendService"></param>
@@ -150,7 +157,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="manuSfcSummaryRepository"></param>
         /// <param name="localizationService"></param>
-        public OutStationJobService(IManuCommonService manuCommonService,
+        public OutStationJobService(ILogger<OutStationJobService> logger,
+            IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuDegradedProductExtendService manuDegradedProductExtendService,
             IProcProcedureRepository procProcedureRepository,
@@ -169,6 +177,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             ILocalizationService localizationService)
         {
+            _logger = logger;
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuDegradedProductExtendService = manuDegradedProductExtendService;

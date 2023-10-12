@@ -91,14 +91,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
-        /// 通过BomId获取物料集合（包含替代料）
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<BomMaterialBo>> GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(long bomId, long procedureId);
-
-        /// <summary>
         /// 获取首工序
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -167,13 +159,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
-
-        /// <summary>
-        /// 获取即将扣料的物料数据
-        /// </summary>
-        /// <param name="sfcProduceEntity"></param>
-        /// <returns></returns>
-        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
 
         /// <summary>
         /// 获取即将扣料的物料数据
