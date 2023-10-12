@@ -201,7 +201,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var nextProcedure = await _manuCommonOldService.GetNextProcedureAsync(sfcProduceEntity);
 
             // 扣料
-            var initialMaterials = await _masterDataService.GetInitialMaterialsAsync(sfcProduceEntity);
+            var initialMaterials = await _masterDataService.GetInitialMaterialsAsync(new MaterialDeductRequestBo
+            {
+                SiteId = sfcProduceEntity.SiteId,
+                ProcedureId = sfcProduceEntity.ProcedureId,
+                ProductBOMId = sfcProduceEntity.ProductBOMId
+            });
 
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
