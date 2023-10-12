@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
 
         /// <summary>
-        /// PDA获取所有工序
+        /// PDA获取指定工序
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDAAsync()
