@@ -186,6 +186,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             return result;
         }
+  
 
         /// <summary>
         /// 绑定
