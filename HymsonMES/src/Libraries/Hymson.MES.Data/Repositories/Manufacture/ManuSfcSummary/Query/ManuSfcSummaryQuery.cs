@@ -47,6 +47,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public int? QualityStatus { get; set; }
 
         /// <summary>
+        /// 是否补料
+        /// </summary>
+        public int? IsReplenish { get; set; }
+
+        /// <summary>
         /// 第一次合格状态
         /// </summary>
         public int? FirstQualityStatus { get; set; }

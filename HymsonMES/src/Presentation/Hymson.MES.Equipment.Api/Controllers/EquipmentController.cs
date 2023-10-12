@@ -653,8 +653,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetReplenishNGData")]
-        [ProducesResponseType(typeof(CirculationModuleCCSInfoDto), 200)]
-        public async Task<CirculationModuleCCSInfoDto> GetReplenishNGDataAsync()
+        [ProducesResponseType(typeof(NgCirculationModuleCCSInfoDto), 200)]
+        public async Task<NgCirculationModuleCCSInfoDto> GetReplenishNGDataAsync()
         {
             return await _sfcCirculationService.GetReplenishNGDataAsync();
         }
@@ -666,9 +666,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("ReplenishNGConfirm")]
-        public async Task ReplenishNGConfirmAsync(string sfc)
+        public async Task ReplenishNGConfirmAsync(ReplenishInputDto param)
         {
-            await _sfcCirculationService.ReplenishNGConfirmAsync(sfc);
+            await _sfcCirculationService.ReplenishNGConfirmAsync(param);
         }
 
         /// <summary>

@@ -141,6 +141,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("QualityStatus = @QualityStatus");
             }
+
+            if (manuSfcSummaryQuery.IsReplenish.HasValue)
+            {
+                sqlBuilder.Where("IsReplenish = @IsReplenish");
+            } 
             if (manuSfcSummaryQuery.StartTime.HasValue)
             {
                 sqlBuilder.Where("CreatedOn >= @StartTime");

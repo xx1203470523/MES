@@ -445,7 +445,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     SiteId = 123456,
                     SFC = BindSFCDto.SFC,
                     BindSFC = BindSFCDto.NewBindSFC,
-                    Type = 2,//预留字段
+                    Type = 1,//预留字段
                     Location = 0,//预留
                     OperationType = ManuSfcBindStatusEnum.Bind,
                     CreatedBy = _currentEquipment.Name,

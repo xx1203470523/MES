@@ -91,7 +91,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<CirculationModuleCCSInfoDto> GetReplenishNGDataAsync();
+        Task<NgCirculationModuleCCSInfoDto> GetReplenishNGDataAsync();
 
         /// <summary>
         /// CCS确认
@@ -104,8 +104,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <summary>
         /// 补料确认
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="para"></param>
         /// <returns></returns>
-        Task ReplenishNGConfirmAsync(string sfc);
+        Task ReplenishNGConfirmAsync(ReplenishInputDto para);
     }
 }

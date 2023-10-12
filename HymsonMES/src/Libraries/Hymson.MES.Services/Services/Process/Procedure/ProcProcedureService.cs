@@ -142,13 +142,37 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             {
                 dto.Add(new ProcProcedureViewPDADto()
                 {
-                    Id= item.Id,
-                    Code= item.Code,
-                    Name= item.Name,
+                    Id = item.Id,
+                    Code = item.Code,
+                    Name = item.Name,
                 });
             }
-            return dto;      
+            return dto;
         }
+
+        /// <summary>
+        /// 按编码取工序信息
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedureByCodeAsync(string[] code)
+        {
+            long site = _currentSite.SiteId ?? 123456;
+            var lst = await _procProcedureRepository.GetByCodesAsync(code, site);
+            var dto = new List<ProcProcedureViewPDADto>();
+            foreach (var item in lst)
+            {
+                dto.Add(new ProcProcedureViewPDADto()
+                {
+                    Id = item.Id,
+                    Code = item.Code,
+                    Name = item.Name,
+                });
+            }
+            return dto;
+        }
+
+
 
         /// <summary>
         /// 分页实体转换

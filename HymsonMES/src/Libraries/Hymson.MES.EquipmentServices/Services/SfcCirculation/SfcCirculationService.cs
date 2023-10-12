@@ -49,6 +49,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuSfcCcsNgRecordRepository _manuSfcCcsNgRecordRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+        private readonly IProcProcedureRepository _procProcedureRepository;
 
         public SfcCirculationService(
             ICurrentEquipment currentEquipment,
@@ -65,7 +66,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCcsNgRecordRepository manuSfcCcsNgRecordRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
-            ICurrentSite currentSite)
+            ICurrentSite currentSite,
+            IProcProcedureRepository procProcedureRepository)
         {
             _currentEquipment = currentEquipment;
             _validationSfcCirculationBindDtoRules = validationSfcCirculationBindDtoRules;
@@ -82,6 +84,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             _manuSfcCcsNgRecordRepository = manuSfcCcsNgRecordRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _currentSite = currentSite;
+            _procProcedureRepository = procProcedureRepository;
         }
         /// <summary>
         /// CCS绑定的Location
@@ -767,43 +770,51 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <param name="sfcquery"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<CirculationModuleCCSInfoDto> GetReplenishNGDataAsync()
+        public async Task<NgCirculationModuleCCSInfoDto> GetReplenishNGDataAsync()
         {
-
-            //指定工序
-
-
+            //获取指定工序  
+            string[] procedureCodes = new string[] { "OP17", "OP18" };
+            var procedureInfo = await _procProcedureRepository.GetByCodesAsync(procedureCodes, 123456);
             //汇总表找出NG数据
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 //SiteId = _currentEquipment.SiteId,
                 SiteId = 123456,
                 //SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
-                //ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
+                ProcedureIds = procedureInfo.Select(x => x.Id).ToArray(), //当前工序 
                 //WorkOrderId = circulateFirst.WorkOrderId, //当前工单
                 QualityStatus = (int)TrueOrFalseEnum.No, //NG的
+                IsReplenish = 0,//未补料的
             };
 
-            //获取汇总表信息
+            //获取汇总表信息 需要补料的NG
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            //每次获取一条
             var lastsfc = manuSfcSummaryEntities.OrderByDescending(x => x.UpdatedOn).FirstOrDefault();
-
+            var resulte = new NgCirculationModuleCCSInfoDto();
             if (lastsfc == null)
             {
-                return new CirculationModuleCCSInfoDto()
-                {
-                    IsNg = false,
-                    SFC = string.Empty,
-                    Location = string.Empty,
-                    ModelCode = string.Empty,
-                };
+                return resulte;
+                //return new NgCirculationModuleCCSInfoDto()
+                //{
+                //    IsNg = false,
+                //    SFC = string.Empty,
+                //    Location = string.Empty,
+                //    ModelCode = string.Empty,
+                //    ProcedureId = 0,
+                //};
             }
-
 
             //获取模组CSS信息
             var result = await GetCirculationModuleCCSInfoAsync(lastsfc.SFC);
+            //模组SFC
+            resulte.SFC = lastsfc.SFC;
+            resulte.Location = result.Location;
+            resulte.ModelCode = result.ModelCode;
+            resulte.IsNg = result.IsNg;
+            resulte.ProcedureId = lastsfc.ProductId;
 
-            return result;
+            return resulte;
 
             ////获取NG数据 步骤NG表
             //var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync();
@@ -1004,23 +1015,39 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <summary>
         /// 补料确认
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public async Task ReplenishNGConfirmAsync(string sfc)
+        public async Task ReplenishNGConfirmAsync(ReplenishInputDto param)
         {
-            if (string.IsNullOrEmpty(sfc))
+            if (string.IsNullOrEmpty(param.SFC) || param.ProcedureId == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
             }
-            //查询条码步骤
-            var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new ManuSfcStepQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
 
-            foreach (var item in manuSfcStepEntities)
+            var procedureInfo = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
+            //汇总表找出NG数据
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
-                item.IsReplenish = true;
-            }
+                //SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
+                SFCS = new string[] { param.SFC },
+                //SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
+                ProcedureIds = new long[] { procedureInfo.Id }, // 工序 
+                //WorkOrderId = circulateFirst.WorkOrderId, //当前工单
+                QualityStatus = (int)TrueOrFalseEnum.No, //NG的
+                IsReplenish = 0,//未补料的
+            };
 
-            await _manuSfcStepRepository.UpdateRangeAsync(manuSfcStepEntities);
+            //获取汇总表信息 需要补料的NG
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19003));
+
+            foreach (var item in manuSfcSummaryEntities)
+            {
+                item.IsReplenish = 1;
+            }
+            await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
+ 
         }
     }
 }

@@ -86,5 +86,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 最终品质状态;1 合格，0 不合格
         /// </summary>
         public int? QualityStatus { get; set; }
+
+        /// <summary>
+        /// 是否补料
+        /// </summary>
+        public int? IsReplenish { get; set; }
     }
 }

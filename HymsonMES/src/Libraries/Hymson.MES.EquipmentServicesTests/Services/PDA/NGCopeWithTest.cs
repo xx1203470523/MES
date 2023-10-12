@@ -1,9 +1,11 @@
-﻿using Hymson.MES.EquipmentServices.Services.OutBound;
+﻿using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
+using Hymson.MES.EquipmentServices.Services.OutBound;
 using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteSFCBox;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Minio.DataModel;
 
 namespace Hymson.MES.EquipmentServicesTests.Services.PDA
 {
@@ -54,8 +56,12 @@ namespace Hymson.MES.EquipmentServicesTests.Services.PDA
         [TestMethod()]
         public async Task ReplenishNGConfirmTest()
         {
-            string sfc = "AAA2308071851001";
-            await _sfcCirculationService.ReplenishNGConfirmAsync(sfc);
+
+            var para = new ReplenishInputDto
+            {
+                SFC = "AAA2308071851001"
+            };
+            await _sfcCirculationService.ReplenishNGConfirmAsync(para);
             Assert.IsTrue(true);
         }
 

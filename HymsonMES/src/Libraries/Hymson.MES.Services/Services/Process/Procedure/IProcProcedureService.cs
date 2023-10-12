@@ -21,6 +21,13 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDAAsync();
+        
+        /// <summary>
+        /// 按编码获取工序信息
+        /// </summary>
+        /// <param name="procedureCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedureByCodeAsync(string[] procedureCode);
 
         /// <summary>
         /// 根据ID查询

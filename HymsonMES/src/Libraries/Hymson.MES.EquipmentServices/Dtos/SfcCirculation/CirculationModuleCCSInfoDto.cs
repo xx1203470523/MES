@@ -11,7 +11,7 @@
         public string? ModelCode { get; set; }
 
         /// <summary>
-        /// CCS条码
+        /// 模组条码
         /// </summary>
         public string? SFC { get; set; }
         /// <summary>
@@ -22,5 +22,32 @@
         /// 模组是否存在NG
         /// </summary>
         public bool IsNg { get; set; } = false;
+    }
+
+    /// <summary>
+    /// 获取NG
+    /// </summary>
+    public class NgCirculationModuleCCSInfoDto: CirculationModuleCCSInfoDto
+    {
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId {  get; set; }
+    }
+
+    /// <summary>
+    /// 补料确认输入
+    /// </summary>
+    public class ReplenishInputDto
+    {
+        /// <summary>
+        /// 模组条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
     }
 }
