@@ -2,6 +2,7 @@
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -59,6 +60,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class InStationResponseSummaryBo
     {
+        /// <summary>
+        /// 时间（不要删除，很重要）
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
         /// <summary>
         /// 在制品信息
         /// </summary>

@@ -274,7 +274,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
                     }
-                    validationFailure.FormattedMessagePlaceholderValues.Add("WorkOrder", sfc);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("WorkOrder", planWorkOrderEntity.OrderCode);
                     validationFailure.ErrorCode = nameof(ErrorCode.MES16135);
                     validationFailures.Add(validationFailure);
                     continue;
@@ -316,7 +316,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProductId = productId,
                     IsUsed = true,
                     CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
                 });
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
@@ -332,12 +334,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     Qty = qty,
+                    ResourceId = commonBo.ResourceId,
+                    EquipmentId = commonBo.EquipmentId,
                     ProcedureId = commonBo.ProcedureId,
                     Status = SfcStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
                 });
 
                 manuSfcStepList.Add(new ManuSfcStepEntity
@@ -354,7 +360,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcStatusEnum.lineUp,
                     CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
                 });
             }
 
@@ -396,7 +404,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             JobResponseBo responseBo = new();
             if (obj is not BarcodeSfcReceiveResponseBo data) return responseBo;
 
-            var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+            var rows = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
             {
                 WorkOrderId = data.WorkOrderId,
                 PlanQuantity = data.PlanQuantity,
@@ -405,21 +413,21 @@ namespace Hymson.MES.CoreServices.Services.Job
                 UpdateDate = HymsonClock.Now()
             });
 
-            if (row == 0)
+            if (rows == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.OrderCode);
             }
             if (data.ManuSfcList != null && data.ManuSfcList.Any())
             {
-                await _manuSfcRepository.InsertRangeAsync(data.ManuSfcList);
+                rows += await _manuSfcRepository.InsertRangeAsync(data.ManuSfcList);
             }
             if (data.UpdateManuSfcList != null && data.UpdateManuSfcList.Any())
             {
-                await _manuSfcRepository.UpdateRangeAsync(data.UpdateManuSfcList);
+                rows += await _manuSfcRepository.UpdateRangeAsync(data.UpdateManuSfcList);
             }
             if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
             {
-                await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
+                rows += await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
                 {
                     UpdatedOn = data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
                     SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
@@ -428,18 +436,18 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             if (data.ManuSfcInfoList != null && data.ManuSfcInfoList.Any())
             {
-                await _manuSfcInfoRepository.InsertsAsync(data.ManuSfcInfoList);
+                rows += await _manuSfcInfoRepository.InsertsAsync(data.ManuSfcInfoList);
             }
             if (data.ManuSfcProduceList != null && data.ManuSfcProduceList.Any())
             {
-                await _manuSfcProduceRepository.InsertRangeAsync(data.ManuSfcProduceList);
+                rows += await _manuSfcProduceRepository.InsertRangeAsync(data.ManuSfcProduceList);
             }
             if (data.ManuSfcStepList != null && data.ManuSfcStepList.Any())
             {
-                await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
+                rows += await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
             }
 
-            return await Task.FromResult(new JobResponseBo { });
+            return await Task.FromResult(new JobResponseBo { Rows = rows });
         }
 
         /// <summary>

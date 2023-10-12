@@ -88,6 +88,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// </summary>
     public class UpdateProduceInStationSFCCommand : UpdateCommand
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public long Id { get; set; }
 
         /// <summary>
