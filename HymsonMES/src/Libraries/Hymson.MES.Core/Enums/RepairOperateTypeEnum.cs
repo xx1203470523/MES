@@ -9,6 +9,8 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("OK确认")]
         OK = 1,
+        [Description("查询")]
+        query = 0,
     }
 
     public enum RepairOutTypeEnum

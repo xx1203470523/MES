@@ -27,7 +27,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpGet]
         [Route("pda/pagelist")]
-        public async Task<BindSFCOutputDto> QuerySFCBindAsync([FromQuery] BindSFCInputDto parm)
+        public async Task<BindSFCOutputDto> QuerySFCBindAsync(BindSFCInputDto parm)
         {
             return await _bindSFCService.GetBindSFC(parm);
         }
@@ -39,7 +39,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpGet]
         [Route("pda/repairok")]
-        public async Task<BindSFCOutputDto> RepairSFCAsync([FromQuery] BindSFCInputDto parm)
+        public async Task<BindSFCOutputDto> RepairSFCAsync(BindSFCInputDto parm)
         {
             parm.OperateType = RepairOperateTypeEnum.OK;
             return await _bindSFCService.GetBindSFC(parm);

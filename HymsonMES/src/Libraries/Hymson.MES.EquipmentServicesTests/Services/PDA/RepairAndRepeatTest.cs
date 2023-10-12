@@ -73,8 +73,8 @@ public class RepairAndRepeatTest : BaseTest
         var query = new BindSFCInputDto
         {
             //SFC = "YTLSM202309110004A",
-            SFC = "YTP280024A239B0001EVE",
-            OperateType= RepairOperateTypeEnum.OK,
+            SFC = "YTLSM202309130003A",
+            OperateType= RepairOperateTypeEnum.query,
         };
         var result = await _bindSFCService.GetBindSFC(query);
         Assert.IsTrue(true);

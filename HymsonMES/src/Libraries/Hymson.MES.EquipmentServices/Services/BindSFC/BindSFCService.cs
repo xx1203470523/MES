@@ -166,6 +166,17 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     }
                 }
             }
+            else
+            {
+                foreach (var item in circulationBarCodeEntities)
+                {
+                    circulateSummary.Add(new ManuSfcCirculationSummaryEntity
+                    {
+                        manuSfcCirculationEntity = item,
+                        NGState = RepairOutTypeEnum.OK,//单个NG状态
+                    });
+                }
+            }
 
             var result = new BindSFCOutputDto
             {
@@ -175,6 +186,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             return result;
         }
+  
 
         /// <summary>
         /// 绑定
