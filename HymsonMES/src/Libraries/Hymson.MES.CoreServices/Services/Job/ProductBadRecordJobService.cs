@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -12,7 +11,6 @@ using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -54,9 +52,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
-        /// 事件总线
+        /// 仓储接口（条码步骤）
         /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
 
         /// <summary>
         /// 构造函数
@@ -65,18 +64,18 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="manuSfcRepository"></param>
-        /// <param name="eventBus"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public ProductBadRecordJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuSfcRepository manuSfcRepository,
-            IEventBus<EventBusInstance1> eventBus)
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuSfcRepository = manuSfcRepository;
-            _eventBus = eventBus;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -243,7 +242,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         FoundBadResourceId = bo.ResourceId,
                         OutflowOperationId = bo.ProcedureId,
                         UnqualifiedId = unqualified.Id,
-                        SfcStepId= sfcStepEntity.Id,
+                        SfcStepId = sfcStepEntity.Id,
                         SFC = item.SFC,
                         SfcInfoId = item.SfcInfoId,
                         Qty = item.Qty,
@@ -360,8 +359,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (data.SfcStepList.Any())
                 {
-                    //await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
-                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SfcStepList });
+                    await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
                 }
                 if (data.ManuSfcProduceList.Any())
                 {
@@ -381,8 +379,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 if (data.SfcStepList.Any())
                 {
-                    //await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
-                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = data.SfcStepList });
+                    await _manuSfcStepRepository.InsertRangeAsync(data.SfcStepList);
                 }
                 if (data.ManuSfcProduceList.Any())
                 {

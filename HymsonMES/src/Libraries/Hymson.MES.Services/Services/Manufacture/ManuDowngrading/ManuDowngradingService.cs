@@ -1,14 +1,12 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -46,9 +44,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
-        /// 事件总线
+        /// 仓储接口（条码步骤）
         /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 构造函数
@@ -60,7 +58,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuDowngradingRuleRepository"></param>
-        /// <param name="eventBus"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public ManuDowngradingService(ICurrentUser currentUser,
             ICurrentSite currentSite,
             IManuDowngradingRepository manuDowngradingRepository,
@@ -68,7 +66,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuDowngradingRuleRepository manuDowngradingRuleRepository,
-            IEventBus<EventBusInstance1> eventBus)
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -77,7 +75,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuDowngradingRuleRepository = manuDowngradingRuleRepository;
-            _eventBus = eventBus;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -275,8 +273,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 if (manuSfcStepList.Any())
                 {
-                    //await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
-                    _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = manuSfcStepList });
+                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
                 }
 
                 ts.Complete();
@@ -454,8 +451,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                         if (manuSfcStepList.Any())
                         {
-                            //await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
-                            _eventBus.Publish(new ManuSfcStepsEvent { manuSfcStepEntities = manuSfcStepList });
+                            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
                         }
                     }
                     else
