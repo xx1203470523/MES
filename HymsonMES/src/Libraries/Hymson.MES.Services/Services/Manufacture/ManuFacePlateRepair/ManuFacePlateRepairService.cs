@@ -205,10 +205,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService))
                         list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService);
                 }
-                else
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17321)).WithData("key", item.Key);
-                }
+                //else
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES17321)).WithData("key", item.Key);
+                //}
             }
 
             return list;
@@ -398,14 +398,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(procProcessRouteNodeList.Select(s => s.ProcedureId).ToArray());
             foreach (var itemNode in procProcessRouteNodeList)
             {
-                procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Id == itemNode.ProcedureId);
-                if (procProcedureEntity == null) continue;
-                if (procProcedureEntity.IsRepairReturn != 1) continue;
+                var procedureEntity = procProcedureEntities.FirstOrDefault(f => f.Id == itemNode.ProcedureId);
+                if (procedureEntity == null) continue;
+                if (procedureEntity.IsRepairReturn != 1) continue;
 
                 manuFacePlateRepairReturnProcedureList.Add(new ManuFacePlateRepairReturnProcedureDto
                 {
                     ProcedureId = itemNode.ProcedureId,
-                    ProcedureCode = procProcedureEntity.Code
+                    ProcedureCode = procedureEntity.Code
                 });
             }
 
