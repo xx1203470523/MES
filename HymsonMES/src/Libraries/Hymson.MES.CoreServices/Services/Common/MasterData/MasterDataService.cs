@@ -794,10 +794,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (productSetEntity == null)
             {
                 productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery { ProductId = param.ProductId, SetPointId = param.ProcedureId, SiteId = param.SiteId });
-                if (productSetEntity == null)
-                {
-                    return null;
-                }
+                if (productSetEntity == null) return null;
             }
             return productSetEntity.SemiProductId;
         }

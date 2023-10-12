@@ -101,15 +101,8 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = commonBo.ProcedureId,
-                ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.BeforeStart
-            });
+            await Task.CompletedTask;
+            return null;
         }
 
         /// <summary>
@@ -490,15 +483,8 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = commonBo.ProcedureId,
-                ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.AfterStart
-            });
+            await Task.CompletedTask;
+            return null;
         }
     }
 }
