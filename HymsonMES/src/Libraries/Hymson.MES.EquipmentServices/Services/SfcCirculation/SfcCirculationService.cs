@@ -779,7 +779,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 //SiteId = _currentEquipment.SiteId,
                 SiteId = 123456,
                 //SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
-                ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
+                //ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
                 //WorkOrderId = circulateFirst.WorkOrderId, //当前工单
                 QualityStatus = (int)TrueOrFalseEnum.No, //NG的
             };
@@ -802,6 +802,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 
             //获取模组CSS信息
             var result = await GetCirculationModuleCCSInfoAsync(lastsfc.SFC);
+
+            return result;
 
             ////获取NG数据 步骤NG表
             //var sfcSteps = await _manuSfcStepRepository.GetNgStepAsync();
@@ -888,7 +890,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //circulationModuleCCSInfo.ModelCode = modelcode;
             //circulationModuleCCSInfo.IsNg = true;
 
-            return circulationModuleCCSInfo;
+            //return circulationModuleCCSInfo;
         }
 
         /// <summary>
