@@ -67,7 +67,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
         /// <summary>
         /// 仓储接口（生产工单）
-        /// </summary>
+        /// </summary>  
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>

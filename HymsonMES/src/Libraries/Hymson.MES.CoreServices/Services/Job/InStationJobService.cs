@@ -155,8 +155,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
 
             // 进站工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId) ??
-                throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 循环次数验证（复投次数）
             sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
@@ -268,6 +268,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
                 }
 
+                // 条码状态（当前状态）
+                var currentStatus = sfcProduceEntity.Status;
+
                 // 每次进站都将复投次数+1
                 sfcProduceEntity.RepeatedCount++;
 
@@ -318,13 +321,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     Id = sfcProduceEntity.Id,
                     ProcedureId = commonBo.ProcedureId,
                     ResourceId = commonBo.ResourceId,
-                    Status = SfcStatusEnum.Activity,
-                    CurrentStatus = sfcProduceEntity.Status,
+                    Status = sfcProduceEntity.Status,
+                    CurrentStatus = currentStatus,
                     RepeatedCount = sfcProduceEntity.RepeatedCount,
                     UpdatedBy = commonBo.UserName,
                     UpdatedOn = commonBo.Time
                 };
-
                 responseBos.Add(responseBo);
             }
 
@@ -365,7 +367,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not InStationResponseSummaryBo data) return responseBo;
             if (data.SFCProduceEntities == null || data.SFCProduceEntities.Any() == false) return responseBo;
 
-            // 更改状态（在制品）
+            // 更改状态（在制品），如果状态一致，这里会直接返回0
             responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.MultiUpdateProduceInStationSFCCommands);
 
             // 未更新到数据，事务回滚
