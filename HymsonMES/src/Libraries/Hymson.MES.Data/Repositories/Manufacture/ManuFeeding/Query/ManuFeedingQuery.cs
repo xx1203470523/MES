@@ -52,4 +52,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
         /// </summary>
         public IEnumerable<long>? MaterialIds { get; set; }
     }
+
+    /// <summary>
+    /// 查询参数
+    /// </summary>
+    public class GetByBarCodeAndMaterialIdQuery
+    {
+        /// <summary>
+        /// 上料点ID
+        /// </summary>
+        public long FeedingPointId { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 物料条码编码
+        /// </summary>
+        public string BarCode { get; set; }
+    }
 }

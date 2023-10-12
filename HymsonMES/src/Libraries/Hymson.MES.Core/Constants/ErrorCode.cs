@@ -713,6 +713,7 @@
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
+        public const string MES15507 = "该条码{BarCode}已存在于当前上料点！";
         #endregion
 
         #region 工单 16000
@@ -1081,7 +1082,7 @@
         public const string MES17416 = "绑定条码不是完成进入线边仓，具体请查看【物料库存】。";
         public const string MES17417 = "绑定条码【{SFCs}】工单不一致，具体请查看【物料库存】。";
         public const string MES17418 = "绑定条码【{SFCs}】物料不一致，具体请查看【物料库存】。";
-        public const string MES17419= "条码【{SFC}】与绑定条码工单不一致，具体请查看【产品序列码报告】。";
+        public const string MES17419 = "条码【{SFC}】与绑定条码工单不一致，具体请查看【产品序列码报告】。";
         public const string MES17420 = "绑定条码【SFCs】不是完成进入线边仓，具体请查看【物料库存】。";
         public const string MES17421 = "与【{SFC}】无绑定关系，无法进行解绑，具体请查看【原建汇总】。";
         public const string MES17422 = "条码【{SFC}】无绑定条码，无法进行解绑，具体请查看【原建汇总】。";
