@@ -302,7 +302,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     manuSfcEntity.IsUsed = YesOrNoEnum.No;
                     manuSfcEntity.Status = SfcStatusEnum.lineUp;
                     manuSfcEntity.UpdatedBy = commonBo.UserName;
-                    manuSfcEntity.UpdatedOn = HymsonClock.Now();
+                    manuSfcEntity.UpdatedOn = commonBo.Time;
                     updateManuSfcList.Add(manuSfcEntity);
                     manuSfcInfoUpdateIsUsedBo.SfcIds.Add(manuSfcEntity.Id);
                 }
