@@ -37,6 +37,6 @@ namespace Hymson.MES.Core.Enums
         /// 拆解
         /// </summary>
         [Description("拆解")]
-        Disassembly = 6
+        Disassembly = 7
     }
 }
