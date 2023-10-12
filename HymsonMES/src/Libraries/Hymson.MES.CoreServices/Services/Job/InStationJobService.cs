@@ -316,16 +316,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 };
 
                 // 更新实体（带状态检查）
-                responseBo.MultiUpdateProduceInStationSFCCommand = new MultiUpdateProduceInStationSFCCommand
+                responseBo.UpdateProduceInStationSFCCommand = new UpdateProduceInStationSFCCommand
                 {
                     Id = sfcProduceEntity.Id,
-                    ProcedureId = commonBo.ProcedureId,
-                    ResourceId = commonBo.ResourceId,
+                    ProcedureId = sfcProduceEntity.ProcedureId,
+                    ResourceId = sfcProduceEntity.ResourceId,
                     Status = sfcProduceEntity.Status,
                     CurrentStatus = currentStatus,
                     RepeatedCount = sfcProduceEntity.RepeatedCount,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
+                    UpdatedBy = sfcProduceEntity.UpdatedBy,
+                    UpdatedOn = sfcProduceEntity.UpdatedOn
                 };
                 responseBos.Add(responseBo);
             }
@@ -335,7 +335,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
             responseSummaryBo.InStationManuSfcByIdCommands = responseBos.Select(s => s.InStationManuSfcByIdCommand);
-            responseSummaryBo.MultiUpdateProduceInStationSFCCommands = responseBos.Select(s => s.MultiUpdateProduceInStationSFCCommand);
+            responseSummaryBo.UpdateProduceInStationSFCCommands = responseBos.Select(s => s.UpdateProduceInStationSFCCommand);
 
             var responseBosByWorkOrderId = responseBos
                 .Where(w => w.IsFirstProcedure)
@@ -368,10 +368,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (data.SFCProduceEntities == null || data.SFCProduceEntities.Any() == false) return responseBo;
 
             // 更改状态（在制品），如果状态一致，这里会直接返回0
-            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.MultiUpdateProduceInStationSFCCommands);
+            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.UpdateProduceInStationSFCCommands);
 
             // 未更新到数据，事务回滚
-            if (responseBo.Rows != data.MultiUpdateProduceInStationSFCCommands.Count())
+            if (responseBo.Rows != data.UpdateProduceInStationSFCCommands.Count())
             {
                 // 这里在外层会回滚事务
                 responseBo.Rows = -1;
