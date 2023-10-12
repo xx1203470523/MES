@@ -662,7 +662,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 补料确认-该模组条码下的所有NG都确认
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("ReplenishNGConfirm")]

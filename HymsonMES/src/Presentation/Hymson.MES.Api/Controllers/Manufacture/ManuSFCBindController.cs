@@ -80,8 +80,5 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _bindSFCService.RepeatManuSFCAsync(parm);
         }
-
-
-
     }
 }

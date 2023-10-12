@@ -49,5 +49,6 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// <param name="unBindSFCDto"></param>
         /// <returns></returns>
         Task RepeatManuSFCAsync(ResumptionInputDto unBindSFCDto);
+
     }
 }

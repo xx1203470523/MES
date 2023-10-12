@@ -130,13 +130,19 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
 
         /// <summary>
-        /// 获取所有工序
+        /// PDA获取所有工序
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDAAsync()
         {
             long site = _currentSite.SiteId ?? 123456;
-            var list = await _procProcedureRepository.GetAllAsync(site);
+            //OP13 模组上线
+            //OP17 CCS焊接&焊中检测
+            //OP23 模组入箱
+            //OP12 模组挤压 
+            //OP04 电芯扫码&OCVR测试
+            string[] query=  { "OP13", "OP17", "OP23", "OP12", "OP04" };
+            var list = await _procProcedureRepository.GetByCodesAsync(query,site);
             var dto = new List<ProcProcedureViewPDADto>();
             foreach (var item in list)
             {
