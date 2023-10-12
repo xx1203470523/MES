@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -30,6 +31,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("进站", JobTypeEnum.Standard)]
     public class InStationJobService : IJobService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<InStationJobService> _logger;
+
         /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
@@ -83,6 +89,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcRepository"></param>
@@ -93,7 +100,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="localizationService"></param>
-        public InStationJobService(IManuCommonService manuCommonService,
+        public InStationJobService(ILogger<InStationJobService> logger,
+            IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -104,6 +112,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IProcProcedureRepository procProcedureRepository,
             ILocalizationService localizationService)
         {
+            _logger = logger;
             _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;

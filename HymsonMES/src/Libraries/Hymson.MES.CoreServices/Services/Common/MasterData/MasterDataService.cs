@@ -14,6 +14,7 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
@@ -29,6 +30,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -39,6 +41,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
     /// </summary>
     public class MasterDataService : IMasterDataService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<MasterDataService> _logger;
+
         /// <summary>
         /// 序列号服务
         /// </summary>
@@ -137,6 +144,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
@@ -156,7 +164,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="inteJobRepository"></param>
         /// <param name="inteJobBusinessRelationRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
-        public MasterDataService(ISequenceService sequenceService,
+        public MasterDataService(ILogger<MasterDataService> logger,
+            ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -176,6 +185,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
+            _logger = logger;
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -652,6 +662,16 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             var nodesOfOrdered = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
                 .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
+
+            // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
+            if (nodesOfOrdered.Any() == false)
+            {
+                var beginNodeEntity = await _procProcedureRepository.GetByIdAsync(beginNode.ProcedureId);
+                var endNodeEntity = await _procProcedureRepository.GetByIdAsync(endNode.ProcedureId);
+
+                _logger.LogError($"工艺路线工序节点数据异常，工艺路线ID：{routeProcedureRandomCompareBo.ProcessRouteId}，工序ID：{routeProcedureRandomCompareBo.BeginProcedureId}，工序ID：{routeProcedureRandomCompareBo.EndProcedureId}");
+                throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("Begin", beginNodeEntity!.Code).WithData("End", endNodeEntity!.Code);
+            }
 
             // 如果中间的工序存在不是随机工序的话，就返回false
             if (nodesOfOrdered.Any(a => a.CheckType != ProcessRouteInspectTypeEnum.RandomInspection)) return false;
