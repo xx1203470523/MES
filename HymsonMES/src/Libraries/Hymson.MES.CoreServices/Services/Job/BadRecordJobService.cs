@@ -52,7 +52,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _localizationService = localizationService;
         }
 
-
         /// <summary>
         /// 参数校验
         /// </summary>
@@ -148,6 +147,5 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
-
     }
 }

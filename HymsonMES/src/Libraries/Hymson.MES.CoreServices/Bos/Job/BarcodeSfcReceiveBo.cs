@@ -41,6 +41,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 数据收集方式 
         /// </summary>
         public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal? Qty { get; set; }
     }
 
     public class BarcodeSfcReceiveResponseBo

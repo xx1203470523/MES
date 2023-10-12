@@ -137,16 +137,16 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("替换")]
         Replace = 26,
-        ///// <summary>
-        ///// 条码绑定
-        ///// </summary>
-        //[Description("条码绑定")]
-        //BarcodeBinding = 27,
-        ///// <summary>
-        ///// 条码解绑
-        ///// </summary>
-        //[Description("条码解绑")]
-        //BarcodeUnbinding = 28,
+        /// <summary>
+        /// 条码绑定
+        /// </summary>
+        [Description("条码绑定")]
+        BarcodeBinding = 27,
+        /// <summary>
+        /// 条码解绑
+        /// </summary>
+        [Description("条码解绑")]
+        BarcodeUnbinding = 28,
         /// <summary>
         /// 包装
         /// </summary>

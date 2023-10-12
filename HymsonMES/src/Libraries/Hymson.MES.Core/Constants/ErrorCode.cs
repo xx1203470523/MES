@@ -1061,6 +1061,35 @@
 
         #endregion
 
+        #region 在制维修 MES17400
+        public const string MES17400 = "条码绑定异常";
+        public const string MES17401 = "绑定条码【{SFCs}】不存在";
+        public const string MES17402 = "绑定条码已经不是在制品，具体请查看【产品序列码报告】。";
+        public const string MES17403 = "绑定条码已经不为活动状态，具体请查看【产品序列码报告】。";
+        public const string MES17404 = "绑定条码已经不为活动状态，具体请查看【产品序列码报告】。";
+        public const string MES17405 = "条码工单为【{WorkOrder}】工单不一致，具体请查看【产品序列码报告】。";
+        public const string MES17406 = "条码所在工序为【{ProcedureName}】与操作工序不一致，具体请查看【产品序列码报告】。";
+        public const string MES17407 = "条码物料【{MaterialName}】不是工单【{WorkOrder}】的Bom【{BomName}】在工序【{ProcedureName}】使用物料，具体请查看【BOM维护】。";
+        public const string MES17408 = "绑定条码【{SFCs}】与将绑定条码工单不一致，具体请查看【产品序列码报告】。";
+        public const string MES17409 = "条码【{SFCs}】已经被绑定，具体请查看【原建汇总】。";
+        public const string MES17410 = "条码绑定位置【{Location}】已被其他条码绑定，具体请查看【原建汇总】。";
+        public const string MES17411 = "条码【{SFC}】已绑定数量【{BindQty}】，现需绑定【{TreatQty}】超过所需绑定【{NeedQty}】，具体请查看【原建汇总】。";
+        public const string MES17412 = "绑定条码【{SFCs}】工单不一致，具体请查看【产品序列码报告】。";
+        public const string MES17413 = "绑定条码【{SFCs}】物料不一致，具体请查看【产品序列码报告】。";
+        public const string MES17414 = "工单【{WorkOrder}】在工序【{ProcedureName}】无物料清单信息，具体请查看【BOM维护】。";
+        public const string MES17415 = "条码【{SFC}】不存在或者已不是在制品，具体请查看【产品序列码报告】。";
+        public const string MES17416 = "绑定条码不是完成进入线边仓，具体请查看【物料库存】。";
+        public const string MES17417 = "绑定条码【{SFCs}】工单不一致，具体请查看【物料库存】。";
+        public const string MES17418 = "绑定条码【{SFCs}】物料不一致，具体请查看【物料库存】。";
+        public const string MES17419= "条码【{SFC}】与绑定条码工单不一致，具体请查看【产品序列码报告】。";
+        public const string MES17420 = "绑定条码【SFCs】不是完成进入线边仓，具体请查看【物料库存】。";
+        public const string MES17421 = "与【{SFC}】无绑定关系，无法进行解绑，具体请查看【原建汇总】。";
+        public const string MES17422 = "条码【{SFC}】无绑定条码，无法进行解绑，具体请查看【原建汇总】。";
+
+        public const string MES17423 = "条码【{SFC}】不存在，无法进行解绑，具体请查看【产品序列码报告】。";
+        public const string MES17424 = "条码无法识别，无法绑定，具体请查看【BOM维护】【掩码维护】。";
+        #endregion
+
         #region 在制品步骤控制 MES18000
 
         public const string MES18001 = "条码信息不存在";

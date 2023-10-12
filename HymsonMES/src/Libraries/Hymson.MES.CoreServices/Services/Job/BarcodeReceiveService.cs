@@ -143,7 +143,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 IsVerifyActivation = false
             });
 
-            //获取首工序
+            //获取产出设置
             var productId = await _masterDataService.GetProductSetIdAsync(new ProductSetBo { SiteId = bo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = bo.ProcedureId, ResourceId = bo.ResourceId }) ?? planWorkOrderEntity.ProductId;
 
             var boms = await _masterDataService.GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(planWorkOrderEntity.ProductBOMId, bo.ProcedureId);

@@ -64,7 +64,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 设备Id
         /// </summary>
-        public long EquipmentId { get; set; }
+        public long? EquipmentId { get; set; }
 
         /// <summary>
         /// 资源id
