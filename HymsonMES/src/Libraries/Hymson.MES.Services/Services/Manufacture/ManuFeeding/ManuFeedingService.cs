@@ -262,6 +262,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             // 全部需展示的物料ID
             List<long> materialIds = new();
+            var loadSource = 1; // 1:资源;2:上料点
+
             // 通过物料分组
             Dictionary<long, IGrouping<long, ManuFeedingEntity>>? manuFeedingsDictionary = new();
 
@@ -281,6 +283,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 {
                     if (queryDto.FeedingPointId.HasValue)
                     {
+                        //loadSource = 2;
                         loadPointMaterials = loadPointMaterials.Where(w => w.LoadPointId == queryDto.FeedingPointId.Value);
                     }
 
@@ -288,12 +291,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 }
             }
 
-            // 通过物料ID获取物料库存信息
-            var manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
+            IEnumerable<ManuFeedingEntity> manuFeedings;
+            if (loadSource == 1)
             {
-                ResourceId = queryDto.ResourceId,
-                FeedingPointId = queryDto.FeedingPointId
-            });
+                // 通过资源ID获取物料库存信息
+                manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
+                {
+                    ResourceId = queryDto.ResourceId,
+                    FeedingPointId = queryDto.FeedingPointId
+                });
+            }
+            else
+            {
+                // 通过上料点ID获取物料库存信息
+                manuFeedings = await _manuFeedingRepository.GetByFeedingPointIdAndMaterialIdsAsync(new GetByFeedingPointIdAndMaterialIdsQuery { FeedingPointId = queryDto.FeedingPointId!.Value });
+            }
 
             // 已加载的物料ID
             if (manuFeedings != null)
