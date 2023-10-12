@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateQtyByIdAsync(UpdateQtyByIdCommand command)
+        public async Task<int> UpdateQtyByIdAsync(UpdateFeedingQtyByIdCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
+        public async Task<int> UpdateFeedingQtyByIdAsync(IEnumerable<UpdateFeedingQtyByIdCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);

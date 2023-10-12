@@ -166,7 +166,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobBo>> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
+        Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
 
         /// <summary>
         /// 获取即将扣料的物料数据
@@ -209,7 +209,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">替代料BO对象</param>
         /// <param name="isMain">是否主物料</param>
-        void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
+        void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
              ref List<ManuSfcCirculationEntity> adds,
              ref decimal residue,
              ManuSfcProduceEntity sfcProduceEntity,

@@ -217,7 +217,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var manuFeedingsDictionary = allFeedingEntities.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 过滤扣料集合
-            List<UpdateQtyByIdCommand> updates = new();
+            List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in initialMaterials)
             {
@@ -264,7 +264,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 更新物料库存
             if (updates.Any())
             {
-                rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
+                rows += await _manuFeedingRepository.UpdateFeedingQtyByIdAsync(updates);
 
                 // 未更新到全部需更新的数据，事务回滚
                 if (updates.Count > rows)
@@ -314,7 +314,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     tasks.Add(manuSfcProduceDeleteSfcProduceBusinessBySfcInfoIdTask);
 
                     // 更新完工数量
-                    var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyCommand
+                    var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
                     {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,

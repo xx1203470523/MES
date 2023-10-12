@@ -459,7 +459,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 throw new ValidationException(localizationService.GetResource("SFCError"), validationFailures);
             }
 
-            DeletePhysicalByProduceIdsCommand deletePhysicalByProduceIdsCommand = new DeletePhysicalByProduceIdsCommand
+            PhysicalDeleteSFCProduceByIdsCommand deletePhysicalByProduceIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
             {
                 SiteId = param.SiteId,
                 Ids = deleteIds

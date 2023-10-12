@@ -1,11 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -61,7 +56,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class OutputModifyResponseBo : JobResultBo
+    public class OutputModifyResponseBo
     {
         /// <summary>
         /// 条码信息

@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity> entities);
+        Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity>? entities);
 
         /// <summary>
         /// 批量更新（带状态检查）
@@ -164,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeByIdsSqlAsync(DeletePhysicalByProduceIdsCommand idsCommand);
+        Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
 
         /// <summary>
         /// 批量更新条码IsScrap
@@ -334,7 +334,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSfcProduceBusinesssBySfcInfoIdsCommand command);
+        Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSFCProduceBusinesssByIdsCommand command);
 
         /// <summary>
         /// 批量删除（物理删除）

@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateSummaryOutStationRangeAsync(IEnumerable<MultiUpdateSummaryOutStationCommand> multiUpdateSummaryOutStationCommands);
+        Task<int> UpdateSummaryOutStationRangeAsync(IEnumerable<UpdateOutputQtySummaryCommand>? multiUpdateSummaryOutStationCommands);
 
         /// <summary>
         /// 不合格产出更新汇总表

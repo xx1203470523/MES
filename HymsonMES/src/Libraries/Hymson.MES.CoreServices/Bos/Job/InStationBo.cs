@@ -8,26 +8,24 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class InStationRequestBo : JobBaseBo
+    public class InStationRequestBo
     {
         /// <summary>
-        /// 用户名
+        /// 条码
         /// </summary>
-        public string UserName { get; set; } = "";
+        public string SFC { get; set; }
+
         /// <summary>
-        /// 工序ID
+        /// 载具条码
         /// </summary>
-        public long ProcedureId { get; set; }
-        /// <summary>
-        /// 资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
+        public string? VehicleCode { get; set; }
+
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public class InStationResponseBo : JobResultBo
+    public class InStationResponseBo
     {
         /// <summary>
         /// 是否首工序
@@ -35,19 +33,46 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public bool IsFirstProcedure { get; set; }
 
         /// <summary>
-        /// 条码（首个）
+        /// 在制品信息
         /// </summary>
-        public string FirstSFC { get; set; } = "";
+        public ManuSfcProduceEntity SFCProduceEntitiy { get; set; }
+
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public ManuSfcStepEntity SFCStepEntity { get; set; }
+
+        /// <summary>
+        /// 更新条码表
+        /// </summary>
+        public InStationManuSfcByIdCommand InStationManuSfcByIdCommand { get; set; }
+
+        /// <summary>  
+        /// 更新在制品表
+        /// </summary>
+        public MultiUpdateProduceInStationSFCCommand MultiUpdateProduceInStationSFCCommand { get; set; }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class InStationResponseSummaryBo
+    {
+        /// <summary>
+        /// 在制品信息
+        /// </summary>
+        public IEnumerable<ManuSfcProduceEntity>? SFCProduceEntities { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<ManuSfcProduceEntity> ManuSfcProduceEntities { get; set; } = new List<ManuSfcProduceEntity>();
+        public IEnumerable<ManuSfcStepEntity>? SFCStepEntities { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public UpdateQtyCommand UpdateQtyCommand { get; set; } = new();
+        public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyCommands { get; set; } = new();
 
         /// <summary>
         /// 
@@ -55,14 +80,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public MultiUpdateProduceSFCCommand MultiUpdateProduceSFCCommand { get; set; } = new();
 
         /// <summary>
-        /// 
-        /// </summary>
-        public IEnumerable<ManuSfcStepEntity> SFCStepEntities { get; set; } = new List<ManuSfcStepEntity>();
-
-        /// <summary>
         /// 更新条码表
         /// </summary>
-        public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; }= new List<InStationManuSfcByIdCommand>();
+        public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; } = new List<InStationManuSfcByIdCommand>();
 
         /// <summary>  
         /// 更新在制品表

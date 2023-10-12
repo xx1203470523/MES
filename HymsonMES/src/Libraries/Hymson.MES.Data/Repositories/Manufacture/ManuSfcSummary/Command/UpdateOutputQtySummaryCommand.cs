@@ -5,7 +5,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command
     /// <summary>
     /// 合格产出更新
     /// </summary>
-    public class MultiUpdateSummaryOutStationCommand : UpdateCommand
+    public class UpdateOutputQtySummaryCommand : UpdateCommand
     {
         /// <summary>
         /// Id

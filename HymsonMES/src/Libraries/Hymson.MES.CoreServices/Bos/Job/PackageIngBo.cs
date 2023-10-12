@@ -29,7 +29,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     ///  
     /// </summary>
-    public class PackageIngResponseBo : JobResultBo
+    public class PackageIngResponseBo
     {
         /// <summary>
         /// 内容

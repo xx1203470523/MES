@@ -222,8 +222,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity>? whMaterialInventoryEntitys)
         {
+            if (whMaterialInventoryEntitys == null || whMaterialInventoryEntitys.Any() == false) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, whMaterialInventoryEntitys);
         }

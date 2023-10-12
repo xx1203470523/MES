@@ -29,7 +29,8 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 资源ID
         /// </summary>
-        public long ResourceId { get; set; } 
+        public long ResourceId { get; set; }
+
         /// <summary>
         ///  容器ID
         /// </summary>
@@ -49,6 +50,32 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
+        /// <summary>
+        /// 进站对象
+        /// </summary>
+        public IEnumerable<InStationRequestBo>? InStationRequestBos { get; set; }
+
+        /// <summary>
+        /// 出站对象
+        /// </summary>
+        public IEnumerable<OutStationRequestBo>? OutStationRequestBos { get; set; }
+
+        /// <summary>
+        /// 出站对象（半成品）
+        /// </summary>
+        public IEnumerable<SmiFinishedRequestBo>? SmiFinishedRequestBos { get; set; }
+
     }
 
     /// <summary>

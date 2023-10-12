@@ -177,8 +177,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuProductBadRecordEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys)
         {
+            if (manuProductBadRecordEntitys == null || manuProductBadRecordEntitys.Any() == false) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, manuProductBadRecordEntitys);
         }

@@ -807,36 +807,27 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<JobBo>> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
+        public async Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
             var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
                 BusinessId = param.ResourceId,
-                LinkPoint = param.LinkPoint
+                LinkPoint = param.LinkPoint,
+                IsUse = true
             });
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any())
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false)
             {
                 InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
                     BusinessId = param.ProcedureId,
-                    LinkPoint = param.LinkPoint
+                    LinkPoint = param.LinkPoint,
+                    IsUse = true
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any()) return Enumerable.Empty<JobBo>();
+            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return null;
 
-            // 读取作业实体
             var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
-
-            List<JobBo> hasSortedJobs = new();
-            foreach (var item in InteJobBusinessRelations)
-            {
-                var jobEntity = jobEntities.FirstOrDefault(f => f.Id == item.JobId);
-                if (jobEntity == null) continue;
-
-                hasSortedJobs.Add(new JobBo { Name = jobEntity.ClassProgram });
-            }
-
-            return hasSortedJobs;
+            return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
         }
 
         /// <summary>
@@ -1154,7 +1145,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">替代料BO对象</param>
         /// <param name="isMain">是否主物料</param>
-        public void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
+        public void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
             ref List<ManuSfcCirculationEntity> adds,
             ref decimal residue,
             ManuSfcProduceEntity sfcProduceEntity,
@@ -1215,7 +1206,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
 
                 // 添加到扣减物料库存
-                updates.Add(new UpdateQtyByIdCommand
+                updates.Add(new UpdateFeedingQtyByIdCommand
                 {
                     UpdatedBy = sfcProduceEntity.UpdatedBy ?? sfcProduceEntity.CreatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn,

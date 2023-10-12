@@ -14,11 +14,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public IJobContextProxy? Proxy { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ILocalizationService LocalizationService { get; set; }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class JobResultBo { }
 }

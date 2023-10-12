@@ -1,7 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-
-namespace Hymson.MES.CoreServices.Bos.Job
+﻿namespace Hymson.MES.CoreServices.Bos.Job
 {
     /// <summary>
     /// 
@@ -24,14 +21,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 用户名
         /// </summary>
         public string UserName { get; set; } = "";
-    }
-
-    /// <summary>
-    ///  
-    /// </summary>
-    public class SfcConvertResponseBo : JobResultBo
-    {
-
     }
 
 }

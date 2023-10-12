@@ -87,7 +87,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                                 }
                                 else
                                 {
-                                    newCacheValuelist.Add((BaseEntity)value);
+                                    newCacheValuelist.Add(valueItem);
                                 }
                             }
                             Set(cacheKey, newCacheValuelist);
@@ -360,7 +360,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             }
             finally
             {
-                
+
             }
         }
 
@@ -429,7 +429,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        protected object Set(uint key, object value)
+        public object Set(uint key, object value)
         {
 
             return dictionary.AddOrUpdate(key, value, (k, v) => value);

@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
+        Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity>? whMaterialInventoryEntitys);
 
         /// <summary>
         /// 更新

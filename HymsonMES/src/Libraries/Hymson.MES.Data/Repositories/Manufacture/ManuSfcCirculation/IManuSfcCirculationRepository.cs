@@ -65,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcCirculationEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculationEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ManuSfcCirculationEntity>? manuSfcCirculationEntitys);
 
         /// <summary>
         /// 更新
