@@ -337,10 +337,18 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 if (cacheObj == null) return default;
                 var cacheResult = (IEnumerable<TResult>)cacheObj;
 
+                if (cacheResult == null || cacheResult.Any() == false)
+                {
+                    try
+                    {
+                        cacheResult = await GetValueAsync(func, parameters);
+                        cacheResult ??= (IEnumerable<TResult>)cacheObj;
+                    }
+                    finally { }
+                }
                 if (expectCount != 0 && cacheResult.Count() < expectCount)
                 {
                     var obj = await GetValueAsync(func, parameters);
-
                     if (obj != null)
                     {
                         IncompleteDatabaseMerge(cacheKey, obj);
@@ -348,17 +356,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         _ = cacheResult.Concat(obj.Where(x => !cacheResult.Any(o => o.Id == x.Id)));
                         Set(cacheKey, cacheResult);
                     }
-                }
-                else
-                {
-                    try
-                    {
-                        var obj = await GetValueAsync(func, parameters);
-                        if (obj == null) return default;
-                        Set(cacheKey, obj);
-                        return obj;
-                    }
-                    finally { }
                 }
                 return cacheResult;
             }

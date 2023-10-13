@@ -351,6 +351,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo)
         {
+            bo.WorkOrderIds = bo.WorkOrderIds.Distinct();
+
             var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds);
             if (planWorkOrderEntities == null || bo.WorkOrderIds.Count() > planWorkOrderEntities.Count())
             {

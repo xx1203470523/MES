@@ -229,8 +229,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                               .VerifyResource(commonBo.ResourceId);
 
             // 获取生产工单（附带工单状态校验）
-
-            _ = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo { WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId) });
+            _ = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo
+            {
+                WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId)
+            });
 
             /*
             // 验证BOM主物料数量
