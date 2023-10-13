@@ -871,7 +871,7 @@
         public const string MES16352 = "工序不存在";
         public const string MES16353 = "SFC条码{SFC}循环次数超过当前工序的循环次数，不允许操作。";
         public const string MES16354 = "当前实际进站的工序{Begin}，处于条码记录的应进站工序{End}前面，不允许操作。";
-
+        public const string MES16355 = "未找到工序{ProcedureCode}关联的资源";
         #endregion
 
         #region 工单激活 MES16400

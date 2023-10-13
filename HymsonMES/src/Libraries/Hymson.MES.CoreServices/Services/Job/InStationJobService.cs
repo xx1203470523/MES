@@ -137,9 +137,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (commonBo == null) return;
             if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return;
 
-            // 校验工序和资源是否对应
+            // 进站工序信息
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+
+            // 读取工序关联的资源
             var resourceIds = await commonBo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, commonBo.ProcedureId);
-            if (resourceIds == null || !resourceIds.Any(a => a == commonBo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            if (resourceIds == null || resourceIds.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("ProcedureCode", procedureEntity.Code);
+            }
+
+            // 校验工序和资源是否对应
+            if (resourceIds.Any(a => a == commonBo.ResourceId) == false)
+            {
+                _logger.LogWarning($"工序{commonBo.ProcedureId}和资源{commonBo.ResourceId}不对应");
+                throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            }
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
@@ -153,10 +167,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
-
-            // 进站工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
 
             // 循环次数验证（复投次数）
             sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
@@ -201,7 +211,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     });
                     if (isAllRandomProcedureBetween == false)
                     {
-
+                        _logger.LogWarning($"条码{sfcProduce.SFC}，工艺路线:{sfcProduce.ProcessRouteId}，应进站工序{sfcProduce.ProcedureId}和实际进站工序{commonBo.ProcedureId}之间不是全部都是随机工序");
                         throw new CustomerValidationException(nameof(ErrorCode.MES16308));
                     }
                 }
