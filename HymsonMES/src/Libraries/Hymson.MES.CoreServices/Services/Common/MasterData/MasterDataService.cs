@@ -388,7 +388,24 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return planWorkOrderEntities;
         }
 
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos)
+        {
+            if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
+            // 条码在制表
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            {
+                SiteId = sfcBos.SiteId,
+                Sfcs = sfcBos.SFCs
+            });
+
+            return sfcProduceEntities;
+        }
 
         /// <summary>
         /// 获取生产条码信息

@@ -214,8 +214,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
-            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
-            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
+            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', multiSFCBo.SFCs));
+            }
 
             // 判断条码锁状态
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
@@ -274,8 +277,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
-            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return default;
+            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', multiSFCBo.SFCs));
+            }
 
             // 条码信息
             var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));

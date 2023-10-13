@@ -68,6 +68,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo);
 
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 获取生产条码信息
