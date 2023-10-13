@@ -220,7 +220,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             foreach (var circulationBindSFC in sfcCirculationBindDto.BindSFCs)
             {
                 var sfcEntity = sfclist.Where(c => c.SFC == circulationBindSFC.SFC).First();
-                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == circulationBindSFC.SFC).First();
+                var sfcProduceInfoEntity = sfcProduceList.Where(c => c.SFC == circulationBindSFC.SFC).First();
                 //更新为使用
                 sfcEntity.IsUsed = YesOrNoEnum.Yes;
                 sfcEntity.UpdatedBy = _currentEquipment.Name;
@@ -231,16 +231,16 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentEquipment.SiteId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    ResourceId = sfcProduceEntity.ResourceId,
+                    ProcedureId = sfcProduceInfoEntity.ProcedureId,
+                    ResourceId = sfcProduceInfoEntity.ResourceId,
                     SFC = circulationBindSFC.SFC,
                     Name = circulationBindSFC.Name ?? string.Empty,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
+                    WorkOrderId = sfcProduceInfoEntity.WorkOrderId,
+                    ProductId = sfcProduceInfoEntity.ProductId,
                     EquipmentId = _currentEquipment.Id,
                     CirculationBarCode = sfcCirculationBindDto.SFC,
-                    CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
-                    CirculationMainProductId = sfcProduceEntity.ProductId,
+                    CirculationProductId = sfcProduceInfoEntity.ProductId,//暂时使用原有产品ID
+                    CirculationMainProductId = sfcProduceInfoEntity.ProductId,
                     Location = circulationBindSFC.Location.ToString(),
                     CirculationQty = 1,
                     ModelCode = sfcCirculationBindDto.ModelCode ?? string.Empty,
@@ -252,10 +252,32 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     UpdatedOn = HymsonClock.Now()
                 });
             }
+            var sfcProduceEntity = sfcProduceList.First();
+            manuSfcCirculation = new ManuSfcCirculationEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = _currentEquipment.SiteId,
+                ProcedureId = sfcProduceEntity.ProcedureId,
+                ResourceId = sfcProduceEntity.ResourceId,
+                SFC = sfcCirculationBindDto.SFC,
+                Name = string.Empty,
+                WorkOrderId = sfcProduceEntity.WorkOrderId,
+                ProductId = sfcProduceEntity.ProductId,
+                EquipmentId = _currentEquipment.Id,
+                CirculationBarCode = string.Empty,
+                CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
+                CirculationMainProductId = sfcProduceEntity.ProductId,
+                CirculationQty = 1,
+                ModelCode = sfcCirculationBindDto?.ModelCode ?? string.Empty,
+                CirculationType = SfcCirculationTypeEnum.Merge,
+                CreatedBy = _currentEquipment.Name,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = _currentEquipment.Name,
+                UpdatedOn = HymsonClock.Now()
+            };
             //绑定条码信息
             if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
             {
-                var sfcProduceEntity = sfcProduceList.First();
                 manuSfc = new ManuSfcEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -345,28 +367,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 //    UpdatedBy = _currentEquipment.Name,
                 //    UpdatedOn = HymsonClock.Now()
                 //});
-                manuSfcCirculation = new ManuSfcCirculationEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    SFC = sfcCirculationBindDto.SFC,
-                    Name = string.Empty,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
-                    EquipmentId = _currentEquipment.Id,
-                    CirculationBarCode = string.Empty,
-                    CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
-                    CirculationMainProductId = sfcProduceEntity.ProductId,
-                    CirculationQty = 1,
-                    ModelCode = sfcCirculationBindDto?.ModelCode ?? string.Empty,
-                    CirculationType = SfcCirculationTypeEnum.Merge,
-                    CreatedBy = _currentEquipment.Name,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentEquipment.Name,
-                    UpdatedOn = HymsonClock.Now()
-                };
+                
             }
 
             //数据提交
