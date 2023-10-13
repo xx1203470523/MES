@@ -75,7 +75,7 @@ public class RepairAndRepeatTest : BaseTest
         var query = new ResumptionInputDto
         {
             SFC = "YTLSM202309110005A",
-            RepeatLocationId = 123456,
+            RepeatLocationId = 20033299167047680,
             NGLocationId = 0
         };
 
@@ -105,5 +105,26 @@ public class RepairAndRepeatTest : BaseTest
         };
         var result = await _bindSFCService.GetBindSFC(query);
         Assert.IsTrue(true);
-    }    
+    }
+
+
+    /// <summary>
+    /// 全部解绑测试
+    /// </summary>
+    /// <returns></returns>
+    [TestMethod()]
+    public async Task UnBindPDAAsyncTest()
+    {
+        var query = new UnBindSFCInput
+        {
+            //SFC = "YTLSM202309110004A",
+            SFC = "YTLSM202309110005A",
+
+        
+        };
+     await _bindSFCService.UnBindPDAAsync(query);
+        Assert.IsTrue(true);
+    }
+
+    
 }

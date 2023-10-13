@@ -25,6 +25,14 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         Task SfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum);
         
         /// <summary>
+        /// 临时用于PDA
+        /// </summary>
+        /// <param name="sfcCirculationUnBindDto"></param>
+        /// <param name="sfcCirculationTypeEnum"></param>
+        /// <returns></returns>
+        Task PDASfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum);
+        
+        /// <summary>
         /// 解绑并返回流转列表
         /// </summary>
         /// <param name="sfcCirculationUnBindDto"></param>

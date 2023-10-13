@@ -338,7 +338,16 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 SFC = unBindSFCDto.SFC,
                 IsVirtualSFC = false,
             };
-            await _sfcCirculationService.SfcCirculationUnBindAsync(request, SfcCirculationTypeEnum.Merge);
+
+            //设置测试Site信息
+            Dictionary<string, object> siteInfo = new()
+            {
+                { "SiteId", 123456 },
+                {"SiteName","单元测试站点"}
+            };
+            
+
+            await _sfcCirculationService.PDASfcCirculationUnBindAsync(request, SfcCirculationTypeEnum.Merge);
 
             //var bindSfcs = await _manuSfcBindRepository.GetBySFCAsync(unBindSFCDto.SFC);
             //if (!bindSfcs.Any())
@@ -417,7 +426,10 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             {
                 SiteId = 123456,
                 Sfcs = SFCs
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", SFCs);
+            });
+            
+            if(!sfcProduceEntities.Any())
+                throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", SFCs);
 
             //加工中,未出站
             if (sfcProduceEntities.Any(x => x.Status == SfcProduceStatusEnum.Activity))
@@ -506,10 +518,13 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 IsVirtualSFC = false,
             };
 
-            var sfcEntity = await _sfcCirculationService.GetSfcCirculationUnBindAsync(unbound, SfcCirculationTypeEnum.Merge)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19106));
+            var sfcEntity = await _sfcCirculationService.GetSfcCirculationUnBindAsync(unbound, SfcCirculationTypeEnum.Merge);
+   
 
-
+            if(!sfcEntity.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19106));
+            }
             var SFCs = sfcEntity.Select(x => x.SFC).ToArray();
             // 条码在制表
             var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
@@ -525,7 +540,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             foreach (var item in sfcProduceEntities)
             {
-                item.UpdatedBy = _currentEquipment.Name;
+                item.UpdatedBy = "PDA";
                 item.UpdatedOn = HymsonClock.Now();
 
                 item.Status = SfcProduceStatusEnum.lineUp;
