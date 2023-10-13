@@ -213,7 +213,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             var manuSfcInfo = new ManuSfcInfoEntity();
             var manuSfcProduce = new ManuSfcProduceEntity();
             var manuSfcStep = new ManuSfcStepEntity();
-            var manuSfcCirculation = new ManuSfcCirculationEntity();
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
@@ -253,7 +252,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 });
             }
             var sfcProduceEntity = sfcProduceList.First();
-            manuSfcCirculation = new ManuSfcCirculationEntity
+            //记录流转信息
+            manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentEquipment.SiteId,
@@ -274,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 CreatedOn = HymsonClock.Now(),
                 UpdatedBy = _currentEquipment.Name,
                 UpdatedOn = HymsonClock.Now()
-            };
+            });
             //绑定条码信息
             if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
             {
@@ -388,8 +388,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             // 添加流转记录
             if (manuSfcCirculationEntities.Any())
             {
-                _logger.LogInformation("流转表绑定-条码流转表实体：SfcCirculationBind,msg:{request}", manuSfcCirculation);
-                await _manuSfcCirculationRepository.InsertAsync(manuSfcCirculation);
                 rows += await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntities);
             }
             trans.Complete();
