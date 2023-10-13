@@ -1294,16 +1294,13 @@
         public const string MES19008 = "资源不匹配";
         #endregion
 
-        #region  产品参数采集
-        public const string MES19100 = "产品参数采集异常";
-        public const string MES19101 = "未找到资源{ResCode}对应工序";
-        public const string MES19102 = "参数{ResCode}不存在";
-
-
-        // 这几个是从其他项目迁移过来的
-        public const string MES19109 = "资源编码{Code}不存在";
-        public const string MES19136 = "资源：{ResourceCode}未找到激活的工单信息";
-        public const string MES14030 = "条码生成失败,半成品记录未找到！";
+        #region 产品参数采集
+        public const string MES19600 = "产品参数采集异常";
+        public const string MES19601 = "未找到资源{ResCode}对应工序";
+        public const string MES19602 = "参数{ResCode}不存在";
+        public const string MES19603 = "资源编码{Code}不存在";
+        public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
+        public const string MES19605 = "条码生成失败,半成品记录未找到！";
 
         #endregion
 
