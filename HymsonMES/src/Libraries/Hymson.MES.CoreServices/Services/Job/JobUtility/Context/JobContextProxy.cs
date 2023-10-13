@@ -349,8 +349,20 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         Set(cacheKey, cacheResult);
                     }
                 }
+                else
+                {
+                    try
+                    {
+                        var obj = await GetValueAsync(func, parameters);
+                        if (obj == null) return default;
+                        Set(cacheKey, obj);
+                        return obj;
+                    }
+                    finally { }
+                }
                 return cacheResult;
             }
+
             try
             {
                 var obj = await GetValueAsync(func, parameters);
@@ -358,10 +370,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 Set(cacheKey, obj);
                 return obj;
             }
-            finally
-            {
-
-            }
+            finally { }
         }
 
 

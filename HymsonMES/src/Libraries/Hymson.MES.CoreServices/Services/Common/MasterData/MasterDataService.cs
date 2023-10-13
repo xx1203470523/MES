@@ -14,7 +14,6 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
@@ -407,10 +406,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 Sfcs = sfcBos.SFCs
             });
 
-            if (!sfcProduceEntities.Any())
+            if (sfcProduceEntities.Any() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
+                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', sfcBos.SFCs));
+            };
 
             // 不存在在制表的话，就去库存查找？？
 

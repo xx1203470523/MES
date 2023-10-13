@@ -6,7 +6,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -87,8 +86,10 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             AbstractValidator<ProcProcessRouteModifyDto> validationModifyRules,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository, AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules, AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules, ILocalizationService localizationService
-)
+            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository,
+            AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules,
+            AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -207,7 +208,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procProcessRouteDto);
 
-            //验证工序集合
+            // 验证工序集合
             if (procProcessRouteDto.DynamicData != null)
             {
                 if (procProcessRouteDto.DynamicData.Links != null && procProcessRouteDto.DynamicData.Links.Any())
@@ -381,7 +382,8 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 判断是否存在
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(procProcessRouteDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10438));
-            //验证某些状态是不能编辑的
+
+            // 验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == processRoute.Status))
             {
@@ -391,6 +393,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // DTO转换实体
             var procProcessRouteEntity = procProcessRouteDto.ToEntity<ProcProcessRouteEntity>();
             procProcessRouteEntity.UpdatedBy = _currentUser.UserName;
+            procProcessRouteEntity.SiteId = processRoute.SiteId;
 
             var links = ConvertProcessRouteLinkList(procProcessRouteDto.DynamicData.Links, procProcessRouteEntity);
             var nodes = ConvertProcessRouteNodeList(procProcessRouteDto.DynamicData.Nodes, links, procProcessRouteEntity);
