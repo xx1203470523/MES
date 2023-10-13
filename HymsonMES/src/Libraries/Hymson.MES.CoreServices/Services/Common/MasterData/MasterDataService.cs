@@ -85,7 +85,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
 
-        /// <summary>sss
+        /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;

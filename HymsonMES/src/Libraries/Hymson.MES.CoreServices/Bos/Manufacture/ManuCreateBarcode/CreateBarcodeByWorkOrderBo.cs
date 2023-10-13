@@ -1,16 +1,11 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
 {
     /// <summary>
     /// 根据工单下达条码
     /// </summary>
-    public class CreateBarcodeByWorkOrderBo: CoreBaseBo
+    public class CreateBarcodeByWorkOrderBo : CoreBaseBo
     {
         /// <summary>
         /// 工单Id
@@ -22,4 +17,17 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// </summary>
         public decimal Qty { set; get; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class CreateBarcodeBySemiProductId : CoreBaseBo
+    {
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public string ResourceCode { set; get; }
+
+    }
+
 }
