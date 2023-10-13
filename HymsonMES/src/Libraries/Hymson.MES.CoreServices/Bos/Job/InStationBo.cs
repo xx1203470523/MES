@@ -61,11 +61,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class InStationResponseSummaryBo
     {
         /// <summary>
-        /// 时间（不要删除，很重要）
-        /// </summary>
-        public DateTime Time { get; set; } = HymsonClock.Now();
-
-        /// <summary>
         /// 在制品信息
         /// </summary>
         public IEnumerable<ManuSfcProduceEntity>? SFCProduceEntities { get; set; }

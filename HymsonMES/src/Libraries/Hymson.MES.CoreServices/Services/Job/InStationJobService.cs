@@ -246,7 +246,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 遍历所有条码
             var responseBos = new List<InStationResponseBo>();
-            var responseSummaryBo = new InStationResponseSummaryBo { Time = commonBo.Time };
+            var responseSummaryBo = new InStationResponseSummaryBo();
             foreach (var requestBo in commonBo.InStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
