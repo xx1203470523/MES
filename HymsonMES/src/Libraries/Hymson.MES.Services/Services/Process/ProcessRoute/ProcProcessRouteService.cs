@@ -600,16 +600,16 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// 对节点进行排序
         /// </summary>
         /// <param name="nodesOfSorted"></param>
-        /// <param name="childNodes"></param>
         /// <param name="allNodes"></param>
         /// <param name="allLinks"></param>
+        /// <param name="childNodes"></param>
         public static void SortNodes(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSorted,
             IEnumerable<ProcProcessRouteDetailNodeEntity> allNodes,
             IEnumerable<ProcProcessRouteDetailLinkEntity> allLinks,
             IEnumerable<ProcProcessRouteDetailNodeEntity> childNodes)
         {
             var targetNodes = childNodes;
-            if (!nodesOfSorted.Any())
+            if (nodesOfSorted.Any() == false)
             {
                 // 首工序
                 var firstNode = allNodes.FirstOrDefault(f => f.IsFirstProcess == 1);
@@ -618,53 +618,28 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 targetNodes = new List<ProcProcessRouteDetailNodeEntity> { firstNode };
             }
 
-            childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
-            if (!childNodes.Any()) return;
-            if (nodesOfSorted.Count >= allNodes.Count()) return;
-
-            SortNodes(ref nodesOfSorted, allNodes, allLinks, childNodes);
-        }
-
-        /// <summary>
-        /// 更新节点排序号并获取子节点
-        /// </summary>
-        /// <param name="nodesOfSorted"></param>
-        /// <param name="nodes"></param>
-        /// <param name="allNodes"></param>
-        /// <param name="allLinks"></param>
-        public static IEnumerable<ProcProcessRouteDetailNodeEntity> UpdateNodesSortAndGetChildNodes(ref List<ProcProcessRouteDetailNodeEntity> nodesOfSorted,
-            IEnumerable<ProcProcessRouteDetailNodeEntity> allNodes,
-            IEnumerable<ProcProcessRouteDetailLinkEntity> allLinks,
-            IEnumerable<ProcProcessRouteDetailNodeEntity> nodes)
-        {
-            List<ProcProcessRouteDetailNodeEntity> childNodes = new();
-            foreach (var node in nodes)
+            List<ProcProcessRouteDetailNodeEntity> nextNodes = new();
+            foreach (var node in targetNodes)
             {
                 node.SerialNo = $"{nodesOfSorted.Count + 1}";
 
                 nodesOfSorted.RemoveAll(f => f.ProcedureId == node.ProcedureId);
                 nodesOfSorted.Add(node);
 
-                // 当前节点的所有下级节点
-                childNodes.AddRange(GetChildNodes(node, allNodes, allLinks));
+                // 当前节点的直属下级连线
+                var linksTemp = allLinks.Where(w => w.PreProcessRouteDetailId == node.ProcedureId);
+                foreach (var link in linksTemp)
+                {
+                    var nodeTemp = allNodes.FirstOrDefault(f => f.ProcedureId == link.ProcessRouteDetailId);
+                    if (nodeTemp != null) nextNodes.Add(nodeTemp);
+                }
             }
-            return childNodes;
-        }
 
-        /// <summary>
-        /// 获取某节点的子节点
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="nodes"></param>
-        /// <param name="links"></param>
-        /// <returns></returns>
-        public static IEnumerable<ProcProcessRouteDetailNodeEntity> GetChildNodes(ProcProcessRouteDetailNodeEntity node,
-            IEnumerable<ProcProcessRouteDetailNodeEntity> nodes,
-            IEnumerable<ProcProcessRouteDetailLinkEntity> links)
-        {
-            // 当前节点的直属下级连线
-            links = links.Where(w => w.PreProcessRouteDetailId == node.ProcedureId);
-            return nodes.Where(w => links.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
+            //childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
+            if (nextNodes.Any() == false) return;
+            if (nodesOfSorted.Count >= allNodes.Count()) return;
+
+            SortNodes(ref nodesOfSorted, allNodes, allLinks, nextNodes);
         }
         #endregion
 
