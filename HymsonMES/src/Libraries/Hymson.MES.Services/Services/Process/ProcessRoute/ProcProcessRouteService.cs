@@ -87,8 +87,10 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             AbstractValidator<ProcProcessRouteModifyDto> validationModifyRules,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository, AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules, AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules, ILocalizationService localizationService
-)
+            IProcProcessRouteDetailLinkRepository procProcessRouteLinkRepository,
+            AbstractValidator<FlowDynamicLinkDto> validationFlowDynamicLinkRules,
+            AbstractValidator<FlowDynamicNodeDto> validationFlowDynamicNodeRules,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -207,7 +209,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procProcessRouteDto);
 
-            //验证工序集合
+            // 验证工序集合
             if (procProcessRouteDto.DynamicData != null)
             {
                 if (procProcessRouteDto.DynamicData.Links != null && procProcessRouteDto.DynamicData.Links.Any())
