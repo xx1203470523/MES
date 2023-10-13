@@ -73,9 +73,17 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 工单号
         /// </summary>
-        public string OrderCode { get; set; }= "";
+        public string OrderCode { get; set; } = "";
 
-        public ManuSfcInfoUpdateIsUsedBo ManuSfcInfoUpdateIsUsed { get; set; }=new ManuSfcInfoUpdateIsUsedBo();
+        /// <summary>
+        /// 是否产品一致
+        /// </summary>
+        public bool IsProductSame { get; set; } = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ManuSfcInfoUpdateIsUsedBo ManuSfcInfoUpdateIsUsed { get; set; } = new ManuSfcInfoUpdateIsUsedBo();
 
         /// <summary>
         /// 
@@ -121,7 +129,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 产品条码ID列表 
         /// </summary>
-        public IList<long> SfcIds { get; set; }= new List<long>();
+        public IList<long> SfcIds { get; set; } = new List<long>();
     }
 
 }
