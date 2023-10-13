@@ -812,7 +812,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             resulte.Location = result.Location;
             resulte.ModelCode = result.ModelCode;
             resulte.IsNg = result.IsNg;
-            resulte.ProcedureId = lastsfc.ProductId;
+            resulte.ProcedureId = lastsfc.ProcedureId;
 
             return resulte;
 
@@ -1024,7 +1024,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
             }
 
-            var procedureInfo = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
+            var procedureInfo = await _procProcedureRepository.GetByIdAsync(param.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
+        
             //汇总表找出NG数据
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {

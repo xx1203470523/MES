@@ -78,5 +78,5 @@ public class RepairAndRepeatTest : BaseTest
         };
         var result = await _bindSFCService.GetBindSFC(query);
         Assert.IsTrue(true);
-    }
+    }    
 }

@@ -59,7 +59,8 @@ namespace Hymson.MES.EquipmentServicesTests.Services.PDA
 
             var para = new ReplenishInputDto
             {
-                SFC = "AAA2308071851001"
+                SFC = "YTLSM202309270168A",
+                ProcedureId=(long)20033533111693312,
             };
             await _sfcCirculationService.ReplenishNGConfirmAsync(para);
             Assert.IsTrue(true);
