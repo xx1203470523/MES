@@ -95,6 +95,10 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public CodeRuleCodeModeEnum CodeMode { get; set; }
 
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
     }
 
     /// <summary>

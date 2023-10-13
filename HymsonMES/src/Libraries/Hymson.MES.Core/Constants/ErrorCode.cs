@@ -815,6 +815,7 @@
         public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
         public const string MES16207 = "生成的序列号{BarCode}超过规则限制";
+        public const string MES16208 = "统配失败-统配编码{code},类型{type}查询不到值";
         #endregion
 
         #region 生产通用 MES16300

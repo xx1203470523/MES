@@ -1,7 +1,9 @@
 ﻿using AutoMapper.Internal;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
@@ -25,6 +27,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
         private readonly IInteCodeRulesMakeRepository _inteCodeRulesMakeRepository;
 
+        private readonly IInteTimeWildcardRepository _inteTimeWildcardRepository;
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -33,11 +38,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         public ManuGenerateBarcodeService(
             IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
-            ISequenceService sequenceService)
+            ISequenceService sequenceService,
+            IInteTimeWildcardRepository inteTimeWildcardRepository,ILocalizationService localizationService)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
             _sequenceService = sequenceService;
+            _inteTimeWildcardRepository = inteTimeWildcardRepository;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -77,6 +85,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 ResetType = codeRule.ResetType,
                 StartNumber = codeRule.StartNumber,
                 CodeMode = codeRule.CodeMode,
+                SiteId = param.SiteId,
             });
             var list = new List<string>();
             foreach (var barcode in barcodes)
@@ -113,6 +122,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 ResetType = param.ResetType,
                 StartNumber = param.StartNumber,
                 CodeMode = param.CodeMode,
+                SiteId=param.SiteId,
             });
             var list = new List<string>();
             foreach (var barcode in barcodes)
@@ -138,6 +148,41 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16203));
             }
+
+            var ymdWildcard = "";
+            #region 查询年月日的通配
+            if (bo.CodeRulesMakeBos.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue == GenerateBarcodeWildcard.YMDWildcard))
+            {
+
+                var currentTime = HymsonClock.Now();
+                var timeWildcards = await _inteTimeWildcardRepository.GetAllAsync(bo.SiteId);
+
+                var yearWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Year + "" && x.Type == TimeWildcardTypeEnum.Year);
+                if (yearWildcard == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Year + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Year)}"));
+                }
+                else
+                    ymdWildcard += yearWildcard.Value;
+
+                var monthWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Month + "" && x.Type == TimeWildcardTypeEnum.Month);
+                if (monthWildcard == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Month + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Month)}"));
+                }
+                else
+                    ymdWildcard += monthWildcard.Value;
+
+                var dayWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Day + "" && x.Type == TimeWildcardTypeEnum.Day);
+                if (dayWildcard == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Day + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Day)}"));
+                }
+                else
+                    ymdWildcard += dayWildcard.Value;
+            }
+            #endregion
+
 
             #region 组合数据生成条码
             foreach (var serialStr in serialStrings)
@@ -170,6 +215,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                                 var customValueArray = item.CustomValue.Split(';');
                                 rules.Add(customValueArray.ToList());
                             }
+                            break;
+                        case GenerateBarcodeWildcard.YMDWildcard:
+                            rules.Add(new List<string> { ymdWildcard });
                             break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);

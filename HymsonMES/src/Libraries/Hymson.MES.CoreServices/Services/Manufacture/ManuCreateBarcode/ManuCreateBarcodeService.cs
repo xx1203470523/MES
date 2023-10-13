@@ -182,6 +182,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 ResetType = inteCodeRulesEntity.ResetType,
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
+                SiteId = param.SiteId,
             });
 
             List<ManuSfcEntity> manuSfcList = new();
@@ -669,6 +670,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 ResetType = inteCodeRulesEntity.ResetType,
                 StartNumber = inteCodeRulesEntity.StartNumber,
                 CodeMode = inteCodeRulesEntity.CodeMode,
+                SiteId = param.SiteId,
             });
 
             // 开启事务
