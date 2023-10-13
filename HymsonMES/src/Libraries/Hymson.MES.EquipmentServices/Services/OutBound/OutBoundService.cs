@@ -236,15 +236,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                                             .Select(s => s.SFC)
                                             .Contains(w.SFC) && w.IsPassingStation != true);
                 if (outBoundMoreSfcs.Any())
+                    //非过站,排队中，激活的工单与在制工单相同，且标识为进站
                     throw new CustomerValidationException(nameof(ErrorCode.MES19127)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
             //已经进站条码不允许过站
             if (sfcProduceList.Any())
             {
+                
                 var outBoundMoreSfcs = outBoundMoreDto.SFCs.Where(w =>
                                             sfcProduceList.Where(c => c.Status == SfcProduceStatusEnum.Activity)
                                             .Select(s => s.SFC)
                                             .Contains(w.SFC) && w.IsPassingStation == true);
+                //标识为过站,同时在制又是加工中，抛出错误提示
                 if (outBoundMoreSfcs.Any())
                     throw new CustomerValidationException(nameof(ErrorCode.MES19128)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
