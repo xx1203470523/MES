@@ -430,7 +430,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     WorkOrderId = data.WorkOrderId,
                     PlanQuantity = data.PlanQuantity,
-                    PassDownQuantity = data.PlanQuantity,
+                    PassDownQuantity = data.PassDownQuantity,
                     UserName = data.UserName,
                     UpdateDate = HymsonClock.Now()
                 });
