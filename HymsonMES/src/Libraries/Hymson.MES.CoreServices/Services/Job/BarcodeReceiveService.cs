@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -28,6 +29,11 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// </summary>
     public class BarcodeReceiveService : IJobService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<BarcodeReceiveService> _logger;
+
         /// <summary>
         /// 条码接收 仓储
         /// </summary>
@@ -49,6 +55,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
@@ -60,7 +67,8 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="planWorkOrderBindRepository"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcStepRepository"></param>
-        public BarcodeReceiveService(IPlanWorkOrderRepository planWorkOrderRepository,
+        public BarcodeReceiveService(ILogger<BarcodeReceiveService> logger,
+            IPlanWorkOrderRepository planWorkOrderRepository,
            IManuSfcRepository manuSfcRepository,
            IWhMaterialInventoryRepository whMaterialInventoryRepository,
            IProcMaterialRepository procMaterialRepository,
@@ -72,6 +80,7 @@ namespace Hymson.MES.CoreServices.Services.Job
            IManuCommonService manuCommonService,
            IManuSfcStepRepository manuSfcStepRepository)
         {
+            _logger = logger;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
@@ -146,8 +155,17 @@ namespace Hymson.MES.CoreServices.Services.Job
                 IsVerifyActivation = false
             });
 
-            // 获取首工序
-            var productId = await _masterDataService.GetProductSetIdAsync(new Bos.Common.MasterData.ProductSetBo { SiteId = commonBo.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = commonBo.ProcedureId, ResourceId = commonBo.ResourceId }) ?? planWorkOrderEntity.ProductId;
+            // 获取产出设置的产品ID
+            var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new Bos.Common.MasterData.ProductSetBo
+            {
+                SiteId = commonBo.SiteId,
+                ProductId = planWorkOrderEntity.ProductId,
+                ProcedureId = commonBo.ProcedureId,
+                ResourceId = commonBo.ResourceId
+            });
+
+            // 产品ID
+            var productId = productIdOfSet ?? planWorkOrderEntity.ProductId;
 
             // 组合物料数据（放缓存）
             var initialMaterials = await commonBo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, new MaterialDeductRequestBo
@@ -274,7 +292,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
                     }
-                    validationFailure.FormattedMessagePlaceholderValues.Add("WorkOrder", sfc);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("WorkOrder", planWorkOrderEntity.OrderCode);
                     validationFailure.ErrorCode = nameof(ErrorCode.MES16135);
                     validationFailures.Add(validationFailure);
                     continue;
@@ -316,7 +334,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProductId = productId,
                     IsUsed = true,
                     CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
                 });
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
@@ -332,12 +352,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     Qty = qty,
+                    ResourceId = commonBo.ResourceId,
+                    EquipmentId = commonBo.EquipmentId,
                     ProcedureId = commonBo.ProcedureId,
                     Status = SfcStatusEnum.lineUp,
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
                 });
 
                 manuSfcStepList.Add(new ManuSfcStepEntity
@@ -354,7 +378,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Operatetype = ManuSfcStepTypeEnum.Receive,
                     CurrentStatus = SfcStatusEnum.lineUp,
                     CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
                 });
             }
 
@@ -377,6 +403,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
                 PassDownQuantity = manuSfcProduceList.Sum(x => x.Qty),
                 UserName = commonBo.UserName,
+                IsProductSame = productIdOfSet.HasValue && productIdOfSet.Value == planWorkOrderEntity.ProductId,
                 ManuSfcInfoUpdateIsUsed = manuSfcInfoUpdateIsUsedBo,
                 ManuSfcList = manuSfcList,
                 UpdateManuSfcList = updateManuSfcList,
@@ -396,50 +423,46 @@ namespace Hymson.MES.CoreServices.Services.Job
             JobResponseBo responseBo = new();
             if (obj is not BarcodeSfcReceiveResponseBo data) return responseBo;
 
-            var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+            // 当产出设置的产品和工单对应的产品一致时，才更新工单的下达数量
+            if (data.IsProductSame)
             {
-                WorkOrderId = data.WorkOrderId,
-                PlanQuantity = data.PlanQuantity,
-                PassDownQuantity = data.PlanQuantity,
-                UserName = data.UserName,
-                UpdateDate = HymsonClock.Now()
-            });
+                responseBo.Rows += await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                {
+                    WorkOrderId = data.WorkOrderId,
+                    PlanQuantity = data.PlanQuantity,
+                    PassDownQuantity = data.PlanQuantity,
+                    UserName = data.UserName,
+                    UpdateDate = HymsonClock.Now()
+                });
 
-            if (row == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.OrderCode);
+                if (responseBo.Rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.OrderCode);
             }
-            if (data.ManuSfcList != null && data.ManuSfcList.Any())
+
+            // 更新数据
+            List<Task<int>> tasks = new()
             {
-                await _manuSfcRepository.InsertRangeAsync(data.ManuSfcList);
-            }
-            if (data.UpdateManuSfcList != null && data.UpdateManuSfcList.Any())
-            {
-                await _manuSfcRepository.UpdateRangeAsync(data.UpdateManuSfcList);
-            }
+                _manuSfcRepository.InsertRangeAsync(data.ManuSfcList),
+                _manuSfcRepository.UpdateRangeAsync(data.UpdateManuSfcList),
+                _manuSfcInfoRepository.InsertsAsync(data.ManuSfcInfoList),
+                _manuSfcProduceRepository.InsertRangeAsync(data.ManuSfcProduceList),
+                _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList)
+            };
+
+            // 等待所有任务完成
+            var rowArray = await Task.WhenAll(tasks);
+            responseBo.Rows += rowArray.Sum();
+
             if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
             {
-                await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
+                responseBo.Rows += await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
                 {
                     UpdatedOn = data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
                     SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
                     UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
                 });
             }
-            if (data.ManuSfcInfoList != null && data.ManuSfcInfoList.Any())
-            {
-                await _manuSfcInfoRepository.InsertsAsync(data.ManuSfcInfoList);
-            }
-            if (data.ManuSfcProduceList != null && data.ManuSfcProduceList.Any())
-            {
-                await _manuSfcProduceRepository.InsertRangeAsync(data.ManuSfcProduceList);
-            }
-            if (data.ManuSfcStepList != null && data.ManuSfcStepList.Any())
-            {
-                await _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList);
-            }
 
-            return await Task.FromResult(new JobResponseBo { });
+            return responseBo;
         }
 
         /// <summary>

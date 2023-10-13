@@ -191,7 +191,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                     // 判断条码应进站工序和实际进站工序之间是否全部都是随机工序（因为随机工序可以跳过）
-                    var IsAllRandomProcedureBetween = await commonBo.Proxy.GetValueAsync(_masterDataService.IsAllRandomProcedureBetweenAsync, new ManuRouteProcedureRandomCompareBo
+                    var isAllRandomProcedureBetween = await commonBo.Proxy.GetValueAsync(_masterDataService.IsAllRandomProcedureBetweenAsync, new ManuRouteProcedureRandomCompareBo
                     {
                         ProcessRouteDetailLinks = processRouteDetailLinks,
                         ProcessRouteDetailNodes = processRouteDetailNodes,
@@ -199,7 +199,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         BeginProcedureId = sfcProduce.ProcedureId,
                         EndProcedureId = commonBo.ProcedureId
                     });
-                    if (!IsAllRandomProcedureBetween) throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                    if (isAllRandomProcedureBetween == false)
+                    {
+
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                    }
                 }
             }
         }
@@ -368,7 +372,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (data.SFCProduceEntities == null || data.SFCProduceEntities.Any() == false) return responseBo;
 
             // 更改状态（在制品），如果状态一致，这里会直接返回0
-            responseBo.Rows += await _manuSfcProduceRepository.MultiUpdateProduceInStationSFCAsync(data.UpdateProduceInStationSFCCommands);
+            responseBo.Rows += await _manuSfcProduceRepository.UpdateProduceInStationSFCAsync(data.UpdateProduceInStationSFCCommands);
 
             // 未更新到数据，事务回滚
             if (responseBo.Rows != data.UpdateProduceInStationSFCCommands.Count())

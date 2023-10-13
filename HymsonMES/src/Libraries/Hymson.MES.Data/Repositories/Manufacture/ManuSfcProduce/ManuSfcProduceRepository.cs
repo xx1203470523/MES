@@ -288,12 +288,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcProduceEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> entities)
         {
+            if (entities == null || entities.Any() == false) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, manuSfcProduceEntitys);
+            return await conn.ExecuteAsync(InsertSql, entities);
         }
 
         /// <summary>
@@ -358,7 +360,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="multiUpdateStatusCommand"></param>
         /// <returns></returns>
-        public async Task<int> MultiUpdateProduceInStationSFCAsync(IEnumerable<UpdateProduceInStationSFCCommand> multiUpdateProduceInStationSFCCommands)
+        public async Task<int> UpdateProduceInStationSFCAsync(IEnumerable<UpdateProduceInStationSFCCommand> multiUpdateProduceInStationSFCCommands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateProduceInStationSFCSql, multiUpdateProduceInStationSFCCommands);
@@ -762,7 +764,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE `manu_sfc_produce` SET Sfc = @Sfc, ProductId = @ProductId, WorkOrderId = @WorkOrderId, BarCodeInfoId = @BarCodeInfoId, ProcessRouteId = @ProcessRouteId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Status = @Status, `Lock` = @Lock, LockProductionId = @LockProductionId, IsSuspicious = @IsSuspicious, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdateWithStatusCheckSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
         const string UpdateWithStatusCheckUseInSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id IN @Ids; ";
-        const string UpdateProduceInStationSFCSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status = @CurrentStatus AND Id = @Id; ";
+        const string UpdateProduceInStationSFCSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id AND (Status = @CurrentStatus OR CreatedOn = UpdatedOn); ";
         const string UpdateSfcProduceBusinessSql = "UPDATE `manu_sfc_produce_business` SET    BusinessType = @BusinessType, BusinessContent = @BusinessContent, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdateQtySql = "UPDATE `manu_sfc_produce` SET    Qty = @Qty,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = 0  WHERE Id = @Id ";
         const string DeleteSql = "delete from manu_sfc_produce where Id = @Id  ";
