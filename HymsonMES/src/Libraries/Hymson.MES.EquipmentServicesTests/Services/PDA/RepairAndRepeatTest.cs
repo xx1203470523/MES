@@ -39,6 +39,33 @@ public class RepairAndRepeatTest : BaseTest
     }
 
     /// <summary>
+    /// 换绑
+    /// </summary>
+    /// <returns></returns>
+    [TestMethod()]
+    public async Task SwitchBindSFCAsyncTest()
+    {
+        var query = new SwitchBindInputDto
+        {
+            SFC = "YTLSM202309110004A",
+            OldBindSFC = "0IJCBA05011111D7E0002162",
+            NewBindSFC = "0IJCBA05011111D7E0005097"
+        };
+
+        try
+        {
+            await _bindSFCService.SwitchBindSFCAsync(query);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+        Assert.IsTrue(true);
+    }
+
+    
+
+    /// <summary>
     /// 复投
     /// </summary>
     /// <returns></returns>
@@ -47,7 +74,7 @@ public class RepairAndRepeatTest : BaseTest
     {
         var query = new ResumptionInputDto
         {
-            SFC = "",
+            SFC = "YTLSM202309110005A",
             RepeatLocationId = 123456,
             NGLocationId = 0
         };
@@ -73,7 +100,7 @@ public class RepairAndRepeatTest : BaseTest
         var query = new BindSFCInputDto
         {
             //SFC = "YTLSM202309110004A",
-            SFC = "YTLSM202309130003A",
+            SFC = "YTLSM202309110005A",
             OperateType= RepairOperateTypeEnum.query,
         };
         var result = await _bindSFCService.GetBindSFC(query);

@@ -119,11 +119,15 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             //汇总表找出NG状态
             //查询已有汇总信息
+            //var sfcQuery = new List<string>();
+            //sfcQuery.AddRange(circulationBarCodeEntities.Select(x => x.SFC));
+            //sfcQuery.Add(bindSFCDto.SFC);
+
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
                 //SiteId = _currentEquipment.SiteId,
                 SiteId = 123456,
-                SFCS = circulationBarCodeEntities.Select(x => x.SFC).ToArray(),
+                SFCS = new string[] { bindSFCDto.SFC },
                 ProcedureIds = new long[] { circulateFirst.ProcedureId }, //当前工序 
                 WorkOrderId = circulateFirst.WorkOrderId, //当前工单
                 QualityStatus = (int)TrueOrFalseEnum.No, //NG的
@@ -132,10 +136,10 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             //获取汇总表信息
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
 
-            var NG = RepairOutTypeEnum.OK;  
+            var NG = RepairOutTypeEnum.OK;
             List<ManuSfcCirculationSummaryEntity> circulateSummary = new();
 
-            if (manuSfcSummaryEntities.Any())
+            if (manuSfcSummaryEntities.Any(x => x.SFC == bindSFCDto.SFC))
             {
                 //OK确认处理
                 if (bindSFCDto.OperateType == RepairOperateTypeEnum.OK)
@@ -143,7 +147,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     //汇总表处理
                     foreach (var item in manuSfcSummaryEntities)
                     {
-                        item.QualityStatus =1;
+                        item.QualityStatus = 1;
                     }
                     //步骤NG表处理
 
@@ -186,7 +190,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             return result;
         }
-  
+
 
         /// <summary>
         /// 绑定
@@ -406,103 +410,86 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 throw new CustomerValidationException(nameof(ErrorCode.MES19117)).WithData("SFC", "被换绑定的条码");
             }
 
-            var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
+            //校验是否加工中
+            var SFCs = new string[] { BindSFCDto.SFC };
+            //条码在制表
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
             {
-                CirculationType = SfcCirculationTypeEnum.Merge,
-                IsDisassemble = TrueOrFalseEnum.No,
-                CirculationBarCode = BindSFCDto.SFC,
                 SiteId = 123456,
-                Sfcs = new string[] { BindSFCDto.OldBindSFC }
+                Sfcs = SFCs
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", SFCs);
+
+            //加工中,未出站
+            if (sfcProduceEntities.Any(x => x.Status == SfcProduceStatusEnum.Activity))
+                throw new CustomerValidationException(nameof(ErrorCode.MES19152)).WithData("SFC", SFCs);
+
+
+            // 流转信息（多条码）
+            var sfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
+            {
+                SiteId = 123456,
+                Sfc = new string[] { BindSFCDto.OldBindSFC, BindSFCDto.NewBindSFC },
+                CirculationTypes = new SfcCirculationTypeEnum[] { SfcCirculationTypeEnum.Merge },
+                IsDisassemble = TrueOrFalseEnum.No
+            });
+
+            //新条码有绑定记录
+            if (sfcCirculationEntities.Any(x => x.SFC == BindSFCDto.NewBindSFC))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19138)).WithData("SFCS", BindSFCDto.NewBindSFC);
+            }
+
+
+            //var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
+            //{
+            //    CirculationType = SfcCirculationTypeEnum.Merge,
+            //    IsDisassemble = TrueOrFalseEnum.No,
+            //    CirculationBarCode = BindSFCDto.SFC,
+            //    SiteId = 123456,
+            //    Sfcs = new string[] { BindSFCDto.OldBindSFC, BindSFCDto.NewBindSFC }
+            //};
+
+            ////查询流转条码绑定记录
+            //var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodequery)
+            //    ?? throw new CustomerValidationException(nameof(ErrorCode.MES19150)).WithData("module", BindSFCDto.SFC).WithData("sfc", BindSFCDto.OldBindSFC);
+
+
+            var update = sfcCirculationEntities.FirstOrDefault(x => x.SFC == BindSFCDto.OldBindSFC && x.CirculationBarCode == BindSFCDto.SFC)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19153)).WithData("SFC", BindSFCDto.OldBindSFC); ;
+            int row = 0;
+
+            //if (update != null)
+            //{
+            //换绑
+            update.SFC = BindSFCDto.NewBindSFC;
+            update.UpdatedBy = _currentUser.UserName;
+            update.UpdatedOn = HymsonClock.Now();
+
+
+            //换绑记录
+            var sfcBindRecord = new ManuSfcBindRecordEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = 123456,
+                SFC = BindSFCDto.SFC,
+                BindSFC = BindSFCDto.OldBindSFC,
+                Type = 1,//预留字段
+                Location = 0,//预留
+                OperationType = ManuSfcBindStatusEnum.Bind,
+                CreatedBy = "PDA",
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = "PDA",
+                UpdatedOn = HymsonClock.Now(),
             };
 
-            //string[] sfc = { BindSFCDto.OldBindSFC };
-            //manuSfcCirculationBarCodequery.Sfcs = sfc;
 
-
-            //查询流转条码绑定记录
-            var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodequery)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19150)).WithData("module", BindSFCDto.SFC).WithData("sfc", BindSFCDto.OldBindSFC);
-
-            //if (!circulationBarCodeEntities.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES19106));
+            row += await _manuSfcCirculationRepository.UpdateAsync(update);
+            await _manuSfcBindRecordRepository.InsertAsync(sfcBindRecord);
             //}
-
-            var update = circulationBarCodeEntities.FirstOrDefault();
-            int row = 0;
-            if (update != null)
-            {
-                //换绑
-                update.SFC = BindSFCDto.NewBindSFC;
-                update.UpdatedBy = _currentUser.UserName;
-                update.UpdatedOn = HymsonClock.Now();
-
-                List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
-                //换绑记录
-                sfcBindRecordList.Add(new ManuSfcBindRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = 123456,
-                    SFC = BindSFCDto.SFC,
-                    BindSFC = BindSFCDto.NewBindSFC,
-                    Type = 1,//预留字段
-                    Location = 0,//预留
-                    OperationType = ManuSfcBindStatusEnum.Bind,
-                    CreatedBy = _currentEquipment.Name,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentEquipment.Name,
-                    UpdatedOn = HymsonClock.Now(),
-                });
-
-
-                row += await _manuSfcCirculationRepository.UpdateAsync(update);
-                await _manuSfcBindRecordRepository.InsertsAsync(sfcBindRecordList);
-            }
             if (row == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19151));
             }
-
-            //string[] BindSFCs = { BindSFCDto.OldBindSFC };
-            ////验证参数
-            ////await _validationUnBindDtoRules.ValidateAndThrowAsync(BindSFCDto);
-            //var existsBindSfc = await _manuSfcBindRepository.GetByBindSFCAsync(BindSFCDto.SFC, BindSFCs);
-            //if (!existsBindSfc.Any())
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES19120)).WithData("SFC", BindSFCDto.SFC);
-            //}
-
-            //if (existsBindSfc.Any(x => x.BindSFC == BindSFCDto.OldBindSFC))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES19146)).WithData("SFC", BindSFCDto.SFC);
-            //}
-
-            //var updateEntity = existsBindSfc.FirstOrDefault();
-
-            //updateEntity.BindSFC = BindSFCDto.NewBindSFC;
-            //updateEntity.UpdatedBy = _currentUser.UserName;
-            //updateEntity.UpdatedOn = HymsonClock.Now();
-
-            //List<ManuSfcBindRecordEntity> sfcBindRecordList = new();
-            ////换绑记录
-            //sfcBindRecordList.Add(new ManuSfcBindRecordEntity
-            //{
-            //    Id = IdGenProvider.Instance.CreateId(),
-            //    SiteId = _currentEquipment.SiteId,
-            //    SFC = BindSFCDto.SFC,
-            //    BindSFC = BindSFCDto.NewBindSFC,
-            //    Type = 2,//预留字段
-            //    Location = 0,//预留
-            //    OperationType = ManuSfcBindStatusEnum.Bind,
-            //    CreatedBy = _currentEquipment.Name,
-            //    CreatedOn = HymsonClock.Now(),
-            //    UpdatedBy = _currentEquipment.Name,
-            //    UpdatedOn = HymsonClock.Now(),
-            //});
-
-            //await _manuSfcBindRepository.UpdateAsync(updateEntity);
-            //await _manuSfcBindRecordRepository.InsertsAsync(sfcBindRecordList);
-
         }
 
         /// <summary>
