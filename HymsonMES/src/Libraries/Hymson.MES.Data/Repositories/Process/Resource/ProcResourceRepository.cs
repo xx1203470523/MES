@@ -59,6 +59,21 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            var key = $"proc_resource&{query.Site}&{query.Code}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
+            });
+        }
+
+        /// <summary>
         /// 查询某些资源类型下关联的资源列表
         /// </summary>
         /// <param name="query"></param>
@@ -100,21 +115,6 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResourceByResourceCode, query);
-        }
-
-        /// <summary>
-        /// 根据Code查询对象
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
-        {
-            var key = $"proc_resource&{query.Site}&{query.Code}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
-            });
         }
 
         /// <summary>
@@ -474,7 +474,6 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(ClearResourceTypeIds, command);
         }
-
 
         /// <summary>
         /// 批量删除
