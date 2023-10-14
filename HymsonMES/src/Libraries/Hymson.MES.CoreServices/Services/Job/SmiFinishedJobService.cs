@@ -108,10 +108,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.SmiFinishedRequestBos == null || commonBo.SmiFinishedRequestBos.Any() == false) return;
+            if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return;
 
             // 临时中转变量
-            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.SmiFinishedRequestBos.Select(s => s.SFC) };
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
             var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
@@ -143,7 +143,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             // 判断条码状态是否是"完成"
-            var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(commonBo.SmiFinishedRequestBos.Select(s => s.SFC))
+            var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(commonBo.OutStationRequestBos.Select(s => s.SFC))
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
 
             if (sfcEntities.Any(a => a.Status == SfcStatusEnum.Complete))
@@ -173,10 +173,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.SmiFinishedRequestBos == null || commonBo.SmiFinishedRequestBos.Any() == false) return default;
+            if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return default;
 
             // 临时中转变量
-            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.SmiFinishedRequestBos.Select(s => s.SFC) };
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
             var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
@@ -192,7 +192,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             SmiFinisheResponseSummaryBo responseSummaryBo = new();
 
             // 遍历所有条码
-            foreach (var requestBo in commonBo.SmiFinishedRequestBos)
+            foreach (var requestBo in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
