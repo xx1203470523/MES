@@ -289,14 +289,20 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 });
 
                 // 获取当前工序信息
-                var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId) 
+                var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
                 // 检查是否测试工序
                 if (procedureEntity.Type == ProcedureTypeEnum.Test)
                 {
                     // 超过复投次数，标识为NG
-                    if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle) throw new CustomerValidationException(nameof(ErrorCode.MES16036));
+                    if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16047))
+                            .WithData("SFC", sfcProduceEntity.SFC)
+                            .WithData("Cycle", procedureEntity.Cycle)
+                            .WithData("RepeatedCount", sfcProduceEntity.RepeatedCount);
+                    }
                 }
 
                 // 条码状态（当前状态）
