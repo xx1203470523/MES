@@ -643,7 +643,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 stepEntity.Operatetype = responseBo.ProcessRouteType == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 stepEntity.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
 
-                // 生产主工艺路线
+                // 生产主工艺路线才进行入库
                 if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
                 {
                     // 新增 wh_material_inventory
@@ -685,8 +685,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         UpdatedOn = commonBo.Time
                     };
                 }
-
-                // TODO 非生产主工艺路线呢？？
             }
             // 未完工
             else
