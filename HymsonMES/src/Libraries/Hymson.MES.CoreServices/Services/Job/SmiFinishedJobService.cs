@@ -123,10 +123,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 判断条码锁状态
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
+            /*
             // 合法性校验
-            //sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
             sfcProduceEntities.VerifyProcedure(commonBo.ProcedureId)
                               .VerifyResource(commonBo.ResourceId);
+            */
 
             // 验证条码对应的物料ID是否和工单物料ID一致
             var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.WorkOrderId));
