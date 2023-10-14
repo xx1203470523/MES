@@ -959,10 +959,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (initialMaterials == null) return responseBo;
 
             // 如果存在传过来的消耗编码不在BOM清单里面的物料，直接返回异常
-            var hasBarCodeNotInBOM = requestBo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode)).Any();
-            if (hasBarCodeNotInBOM)
+            var barCodeNotInBOM = requestBo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode));
+            if (barCodeNotInBOM.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17105));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17107)).WithData("BarCodes", string.Join(',', barCodeNotInBOM));
             }
 
             // 只保留传过来的消耗编码
