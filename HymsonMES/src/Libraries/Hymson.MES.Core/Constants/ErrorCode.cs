@@ -874,6 +874,8 @@
         public const string MES16354 = "当前实际进站的工序{Begin}，处于条码记录的应进站工序{End}前面，不允许操作。";
         public const string MES16355 = "未找到工序{ProcedureCode}关联的资源";
         public const string MES16356 = "条码{SFCs}不存在或不是在制品";
+        public const string MES16357 = "当前工序是{Current}，条码{SFC}应在工序{Procedure}处排队进站，请检查。";
+        public const string MES16358 = "指定的工序{Procedure}不存在";
         #endregion
 
         #region 工单激活 MES16400

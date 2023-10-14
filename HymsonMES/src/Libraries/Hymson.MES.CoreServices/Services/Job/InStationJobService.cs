@@ -139,7 +139,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 进站工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
             // 读取工序关联的资源
             var resourceIds = await commonBo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, commonBo.ProcedureId);
@@ -218,7 +218,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     if (isAllRandomProcedureBetween == false)
                     {
                         _logger.LogWarning($"条码{sfcProduce.SFC}，工艺路线:{sfcProduce.ProcessRouteId}，应进站工序{sfcProduce.ProcedureId}和实际进站工序{commonBo.ProcedureId}之间不是全部都是随机工序");
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+
+                        var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
+                            ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduce.ProcedureId);
+
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16357))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Current", procedureEntity.Code)
+                            .WithData("Procedure", currentProcedureEntity.Code);
                     }
                 }
             }
@@ -282,7 +289,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 });
 
                 // 获取当前工序信息
-                var procedureEntity = await _masterDataService.GetProcProcedureEntityWithNullCheckAsync(commonBo.ProcedureId);
+                var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId) 
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
                 // 检查是否测试工序
                 if (procedureEntity.Type == ProcedureTypeEnum.Test)

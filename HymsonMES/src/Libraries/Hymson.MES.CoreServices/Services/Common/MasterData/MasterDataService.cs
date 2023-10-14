@@ -242,20 +242,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
-        /// 获取工序基础信息（带空检查）
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId)
-        {
-            // 获取工序信息
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
-
-            return procProcedureEntity;
-        }
-
-        /// <summary>
         /// 获取工艺路线基础信息（带空检查）
         /// </summary>
         /// <param name="processRouteId"></param>
