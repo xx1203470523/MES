@@ -75,22 +75,41 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         }
                         else
                         {
-                            var newCacheValue = cacheValue as IEnumerable<BaseEntity> ?? throw new Exception();
-                            var newCacheValuelist = newCacheValue.ToList();
-
-                            foreach (var valueItem in (IEnumerable<BaseEntity>)value)
+                            Type listTypeDefinition = typeof(List<>);
+                            Type listType = listTypeDefinition.MakeGenericType(iEnumerableType.UnderlyingSystemType);
+                            dynamic list = Activator.CreateInstance(listType);
+                            if (list != null)
                             {
-                                var index = newCacheValuelist.FindIndex(x => x.Id == valueItem.Id);
-                                if (index > -1)
+                                var newCacheValue = cacheValue as IEnumerable<BaseEntity> ?? throw new Exception();
+
+                                foreach (object valueItem in (IEnumerable<object>)value)
                                 {
-                                    newCacheValuelist[index] = valueItem;
+                                    if (valueItem != null)
+                                    {
+                                        var newValueItem = valueItem as BaseEntity;
+                                        var index = ((IEnumerable<BaseEntity>)newCacheValue).ToList().FindLastIndex(x => x.Id == newValueItem?.Id);
+                                        if (index > -1)
+                                        {
+                                            var type = cacheValue.GetType();
+                                            if (type != null)
+                                            {
+                                                // 获取集合类型的 get_Item 方法
+                                                MethodInfo getItemMethod = type.GetMethod("get_Item");
+                                                object item = getItemMethod?.Invoke(cacheValue, new object[] { index });
+
+                                                var addMethod = list.GetType().GetMethod("Add");
+                                                addMethod?.Invoke(list, new[] { item });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var addMethod = list.GetType().GetMethod("Add");
+                                            addMethod?.Invoke(list, new[] { valueItem });
+                                        }
+                                    }
                                 }
-                                else
-                                {
-                                    newCacheValuelist.Add(valueItem);
-                                }
+                                Set(cacheKey, list);
                             }
-                            Set(cacheKey, newCacheValuelist);
                         }
                     }
                     else
