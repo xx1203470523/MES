@@ -100,7 +100,7 @@ public class RepairAndRepeatTest : BaseTest
         var query = new BindSFCInputDto
         {
             //SFC = "YTLSM202309110004A",
-            SFC = "YTLSM202309110005A",
+            SFC = "YTLSM202309110004A",
             OperateType= RepairOperateTypeEnum.query,
         };
         var result = await _bindSFCService.GetBindSFC(query);

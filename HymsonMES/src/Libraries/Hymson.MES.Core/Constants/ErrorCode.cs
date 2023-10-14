@@ -1046,7 +1046,7 @@
         public const string MES19122 = "容器：{ContainerCode}和SFC：{SFC}绑定关系已经存在";
         public const string MES19123 = "资源：{ResourceCode}未找到关联的产线信息";
         public const string MES19124 = "产线：{WorkCenterCode}未找到激活的工单信息";
-        public const string MES19125 = "条码：{SFCS}未找到条码信息,请先执行进站操作";
+        public const string MES19125 = "条码：{SFCS}未找到条码信息,扫码错误、重复或扫描不完整，请先执行进站操作，以及确认条码信息正确";
         public const string MES19126 = "条码：{SFCS}未找到生产信息,或已完工";
         public const string MES19127 = "条码：{SFCS}未进站不能操作出站";
         public const string MES19128 = "条码：{SFCS}已进站不能操作过站";

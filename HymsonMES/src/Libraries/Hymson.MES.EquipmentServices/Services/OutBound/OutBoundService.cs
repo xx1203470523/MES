@@ -236,7 +236,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                                             .Select(s => s.SFC)
                                             .Contains(w.SFC) && w.IsPassingStation != true);
                 if (outBoundMoreSfcs.Any())
-                    //非过站,排队中，激活的工单与在制工单相同，且标识为进站
+                    //非过站,在制条码为排队中，激活的工单与在制工单相同，且标识为进站
                     throw new CustomerValidationException(nameof(ErrorCode.MES19127)).WithData("SFCS", string.Join(',', outBoundMoreSfcs.Select(c => c.SFC)));
             }
             //已经进站条码不允许过站
