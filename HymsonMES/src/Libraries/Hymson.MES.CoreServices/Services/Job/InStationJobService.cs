@@ -162,7 +162,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', multiSFCBo.SFCs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
             // 判断条码锁状态
@@ -267,7 +267,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', multiSFCBo.SFCs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
             // 遍历所有条码

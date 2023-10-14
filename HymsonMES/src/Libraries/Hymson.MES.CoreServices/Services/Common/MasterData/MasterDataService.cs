@@ -413,7 +413,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             if (sfcProduceEntities.Any() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', sfcBos.SFCs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', sfcBos.SFCs));
             };
 
             // 不存在在制表的话，就去库存查找？？
