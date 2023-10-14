@@ -114,8 +114,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.SmiFinishedRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
-            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
-            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
+            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16356)).WithData("SFCs", string.Join(',', multiSFCBo.SFCs));
+            }
 
             // 判断条码锁状态
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
@@ -201,6 +204,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 更新条码信息
                 manuSfcEntity.UpdatedBy = commonBo.UserName;
                 manuSfcEntity.UpdatedOn = commonBo.Time;
+                manuSfcEntity.Status = SfcStatusEnum.Complete;
                 responseSummaryBo.SFCEntities.Add(manuSfcEntity);
 
                 // 组装（出站步骤数据）
