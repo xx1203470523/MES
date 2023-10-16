@@ -878,7 +878,7 @@
         public const string MES16357 = "当前工序是{Current}，条码{SFC}应在工序{Procedure}处排队进站，请检查。";
         public const string MES16358 = "指定的工序{Procedure}不存在";
         public const string MES16359 = "条码{SFC}由工序{InProcedure}进站，与当前出站工序{OutProcedure}不一致，不允许出站操作。";
-        public const string MES16360 = "条码【{SFC}】当前循环次数{Current}超过当前工序的循环次数{Cycle}，不允许操作。";
+        public const string MES16360 = "条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
         #endregion
 
         #region 工单激活 MES16400
