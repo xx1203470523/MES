@@ -872,7 +872,7 @@
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
         public const string MES16352 = "工序不存在";
         public const string MES16353 = "SFC条码{SFC}循环次数超过当前工序的循环次数，不允许操作。";
-        public const string MES16354 = "当前进站工序{Begin}，在应进站工序{End}前面，不允许操作。";
+        public const string MES16354 = "当前进站工序{Begin}属于应进站工序{End}的前工序，不允许操作。";
         public const string MES16355 = "未找到工序{ProcedureCode}关联的资源";
         //public const string MES16356 = "条码{SFCs}不存在或不是在制品";
         public const string MES16357 = "当前工序是{Current}，条码{SFC}应在工序{Procedure}处排队进站，请检查。";
