@@ -1,4 +1,4 @@
-namespace Hymson.MES.Data.Repositories.Process
+namespace Hymson.MES.Data.Repositories.Process.Parameter.Query
 {
     /// <summary>
     /// 标准参数表 查询参数
