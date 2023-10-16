@@ -169,7 +169,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     };
                     manuSfcList.Add(manuSfcEntity);
 
-                    manuSfcInfoList.Add(new ManuSfcInfoEntity
+                    var manuSfcInfoEntity = new ManuSfcInfoEntity
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = param.SiteId,
@@ -179,7 +179,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         IsUsed = true,
                         CreatedBy = param.UserName!,
                         UpdatedBy = param.UserName
-                    });
+                    };
+                    manuSfcInfoList.Add(manuSfcInfoEntity);
 
                     manuSfcProduceList.Add(new ManuSfcProduceEntity
                     {
@@ -189,7 +190,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         SFCId = manuSfcEntity.Id,
                         ProductId = planWorkOrderEntity.ProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
-                        BarCodeInfoId = manuSfcEntity.Id,
+                        BarCodeInfoId = manuSfcInfoEntity.Id,
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
@@ -304,7 +305,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 };
                 manuSfcList.Add(manuSfcEntity);
 
-                manuSfcInfoList.Add(new ManuSfcInfoEntity
+                var manuSfcInfoEntity = new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = param.SiteId,
@@ -314,7 +315,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     IsUsed = true,
                     CreatedBy = param.UserName!,
                     UpdatedBy = param.UserName
-                });
+                };
+                manuSfcInfoList.Add(manuSfcInfoEntity);
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                 {
@@ -324,7 +326,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     SFCId = manuSfcEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
-                    BarCodeInfoId = manuSfcEntity.Id,
+                    BarCodeInfoId = manuSfcInfoEntity.Id,
                     ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
@@ -455,7 +457,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     sfcInfo.UpdatedOn = HymsonClock.Now();
                     updateManuSfcInfoList.Add(sfcInfo);
                 }
-                manuSfcInfoList.Add(new ManuSfcInfoEntity
+
+                var manuSfcInfoEntity = new ManuSfcInfoEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = param.SiteId,
@@ -465,7 +468,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     IsUsed = true,
                     CreatedBy = param.UserName!,
                     UpdatedBy = param.UserName
-                });
+                };
+                manuSfcInfoList.Add(manuSfcInfoEntity);
 
                 manuSfcProduceList.Add(new ManuSfcProduceEntity
                 {
@@ -475,7 +479,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     SFCId = sfcEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
                     WorkOrderId = planWorkOrderEntity.Id,
-                    BarCodeInfoId = sfcEntity.Id,
+                    BarCodeInfoId = manuSfcInfoEntity.Id,
                     ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
