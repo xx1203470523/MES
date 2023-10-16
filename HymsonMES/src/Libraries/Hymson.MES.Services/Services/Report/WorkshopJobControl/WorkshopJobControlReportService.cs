@@ -234,6 +234,7 @@ namespace Hymson.MES.Services.Services.Report
 
                     responseDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto()
                     {
+                        Id = currentStep.Id,
                         WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
                         ProcedureCode = procedures.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
                         Status = nextStep != null || outStep != null ? SfcInOutStatusEnum.Finished : SfcInOutStatusEnum.Activity,
