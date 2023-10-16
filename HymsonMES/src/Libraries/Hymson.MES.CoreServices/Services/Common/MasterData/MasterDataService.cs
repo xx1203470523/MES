@@ -670,11 +670,15 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
             if (nodesOfOrdered.Any() == false)
             {
-                var beginNodeEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.BeginProcedureId);
-                var endNodeEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
+                // 当前工序
+                var currentEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
+                // 条码对应工序
+                var procedureEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.BeginProcedureId);
 
                 _logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{routeProcedureRandomCompareBo.ProcessRouteId}，条码工序ID：{routeProcedureRandomCompareBo.BeginProcedureId}，进站工序ID：{routeProcedureRandomCompareBo.EndProcedureId}");
-                throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("Begin", endNodeEntity!.Code).WithData("End", beginNodeEntity!.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16354))
+                    .WithData("Current", currentEntity!.Code)
+                    .WithData("Procedure", procedureEntity!.Code);
             }
 
             // 如果中间的工序存在不是随机工序的话，就返回false
