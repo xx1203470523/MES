@@ -825,6 +825,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 未完工
             else
             {
+                responseBo.IsLastProcedure = false;
+                responseBo.NextProcedureCode = nextProcedure.Code;
+
                 sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.UpdatedBy = commonBo.UserName;
                 sfcProduceEntity.UpdatedOn = commonBo.Time;
