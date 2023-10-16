@@ -102,7 +102,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             foreach (var entity in moreThanEntities)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16360))
-                    .WithData("RepeatedCount", entity.RepeatedCount)
+                    .WithData("Current", entity.RepeatedCount)
                     .WithData("Cycle", cycle)
                     .WithData("SFC", entity.SFC);
             }
