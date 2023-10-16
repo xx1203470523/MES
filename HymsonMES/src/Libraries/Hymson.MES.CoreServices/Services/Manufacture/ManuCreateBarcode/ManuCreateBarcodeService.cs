@@ -717,7 +717,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = param.SiteId,
                         SFC = sfc,
-                        SFCId = manuSfcEntity.Id,
+                        SFCId = sfcId,
                         ProductId = psr1.SemiProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
                         BarCodeInfoId = sfcInfoId,
