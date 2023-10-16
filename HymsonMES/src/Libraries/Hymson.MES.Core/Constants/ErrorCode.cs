@@ -1005,6 +1005,7 @@
         public const string MES17104 = "获取条码信息失败！";
         public const string MES17105 = "存在不在BOM消耗清单里面的消耗条码！";
         public const string MES17106 = "部分产品信息读取失败！";
+        public const string MES17108 = "条码【{SFCs}】存在未关闭的不合格信息，请去【不合格报告】查看详细信息";
         #endregion
 
         #region 面板维护 MES17200

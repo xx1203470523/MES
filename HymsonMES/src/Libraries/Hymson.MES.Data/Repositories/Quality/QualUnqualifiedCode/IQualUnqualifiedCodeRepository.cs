@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 新增

@@ -9,9 +9,11 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
+using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -22,6 +24,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
@@ -116,23 +119,27 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuSfcScrapRepository _manuSfcScrapRepository;
 
+        private readonly IProcMaterialRepository _procMaterialRepository;
+
+
         /// <summary>
         /// 构造函数
         /// </summary>
         public ManuProductBadRecordService(ICurrentUser currentUser, ICurrentSite currentSite,
-        IManuSfcProduceRepository manuSfcProduceRepository,
-        IManuSfcRepository manuSfcRepository,
-        IManuSfcStepRepository manuSfcStepRepository,
-        IManuProductBadRecordRepository manuProductBadRecordRepository,
-        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-        IManuSfcInfoRepository manuSfcInfoRepository,
-        ILocalizationService localizationService,
-        IManuCommonOldService manuCommonOldService,
-        IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
-        IPlanWorkOrderRepository planWorkOrderRepository,
-        IWhMaterialInventoryRepository whMaterialInventoryRepository,
-        IManuSfcScrapRepository manuSfcScrapRepository,
-        AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
+                IManuSfcProduceRepository manuSfcProduceRepository,
+                IManuSfcRepository manuSfcRepository,
+                IManuSfcStepRepository manuSfcStepRepository,
+                IManuProductBadRecordRepository manuProductBadRecordRepository,
+                IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+                IManuSfcInfoRepository manuSfcInfoRepository,
+                ILocalizationService localizationService,
+                IManuCommonOldService manuCommonOldService,
+                IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
+                IPlanWorkOrderRepository planWorkOrderRepository,
+                IWhMaterialInventoryRepository whMaterialInventoryRepository,
+                IManuSfcScrapRepository manuSfcScrapRepository,
+                IProcMaterialRepository procMaterialRepository,
+                AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -148,6 +155,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _procMaterialRepository = procMaterialRepository;
             _manuSfcScrapRepository = manuSfcScrapRepository;
         }
 
@@ -837,7 +845,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UnqualifiedId = unqualified.UnqualifiedId,
                     ReJudgmentSfcStepId = manuSfcStepEntity.Id,
                     CurrentStatus = ProductBadRecordStatusEnum.Open,
-                    Remark= badReJudgmentDto.Remark??"",
+                    Remark = badReJudgmentDto.Remark ?? "",
                     UserId = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
                     ReJudgmentBy = _currentUser.UserName,
@@ -1063,6 +1071,25 @@ namespace Hymson.MES.Services.Services.Manufacture
                             CurrentStatus = manuSfcProduceEntity.Status
                         };
 
+                        var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
+                        var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcProduceEntity.WorkOrderId);
+                        var whMaterialInventoryEntity = new WhMaterialInventoryEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SupplierId = 0,//自制品 没有
+                            MaterialId = manuSfcProduceEntity.ProductId,
+                            MaterialBarCode = procMaterialEntity.MaterialCode,
+                            Batch = "",//自制品 没有
+                            MaterialType = planWorkOrderEntity.ProductId == procMaterialEntity.Id ? MaterialInventoryMaterialTypeEnum.FinishedParts : MaterialInventoryMaterialTypeEnum.SelfMadeParts,
+                            QuantityResidue = manuSfcProduceEntity.Qty,
+                            Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                            Source = MaterialInventorySourceEnum.Disassembly,
+                            SiteId = manuSfcProduceEntity.SiteId,
+                            CreatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                        };
                         using (var trans = TransactionHelper.GetTransactionScope())
                         {
                             //处理不合格信息
@@ -1083,6 +1110,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             //记录step信息
                             await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
 
+                            await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
                             trans.Complete();
                         }
                     }
