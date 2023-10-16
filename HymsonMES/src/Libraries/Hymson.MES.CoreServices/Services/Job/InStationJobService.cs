@@ -169,7 +169,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var sfcProduceBusinessEntities = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService);
             sfcProduceBusinessEntities?.VerifyProcedureLock(multiSFCBo.SFCs, commonBo.ProcedureId);
 
             // 验证条码是否被容器包装

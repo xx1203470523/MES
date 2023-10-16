@@ -658,6 +658,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             manuSfcEntity.UpdatedBy = commonBo.UserName;
             manuSfcEntity.UpdatedOn = commonBo.Time;
 
+            // 更新在制条码信息
+            sfcProduceEntity.UpdatedBy = commonBo.UserName;
+            sfcProduceEntity.UpdatedOn = commonBo.Time;
+
             // 已完工（ 如果没有尾工序，就表示已完工）
             if (nextProcedure == null)
             {
@@ -710,18 +714,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     };
                 }
             }
-            // 未完工
+            // 未完工（下一工序排队）
             else
             {
                 responseBo.IsLastProcedure = false;
                 responseBo.NextProcedureCode = nextProcedure.Code;
 
-                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
-                sfcProduceEntity.UpdatedBy = commonBo.UserName;
-                sfcProduceEntity.UpdatedOn = commonBo.Time;
-
                 // 条码状态跟在制品状态一致
-                manuSfcEntity.Status = sfcProduceEntity.Status;
+                manuSfcEntity.Status = SfcStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
 
                 // 更新下一工序
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
@@ -806,36 +807,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             manuSfcEntity.UpdatedBy = commonBo.UserName;
             manuSfcEntity.UpdatedOn = commonBo.Time;
 
-            // 已完工（ 如果没有尾工序，就表示已完工）
-            if (nextProcedure == null)
+            // 更新在制条码信息
+            sfcProduceEntity.UpdatedBy = commonBo.UserName;
+            sfcProduceEntity.UpdatedOn = commonBo.Time;
+
+            // 如果超过复投次数
+            if (sfcProduceEntity.RepeatedCount >= cycle)
             {
-                // 条码状态为"完成-在制"
-                manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
-
-                stepEntity.Operatetype = responseBo.ProcessRouteType == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
-            }
-            // 未完工
-            else
-            {
-                responseBo.IsLastProcedure = false;
-                responseBo.NextProcedureCode = nextProcedure.Code;
-
-                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
-                sfcProduceEntity.UpdatedBy = commonBo.UserName;
-                sfcProduceEntity.UpdatedOn = commonBo.Time;
-
-                // 条码状态跟在制品状态一致
-                manuSfcEntity.Status = sfcProduceEntity.Status;
-                manuSfcEntity.UpdatedBy = commonBo.UserName;
-                manuSfcEntity.UpdatedOn = commonBo.Time;
-
-                // 不合格复投的话，默认当前工序，当前资源继续进站
-                sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
-                sfcProduceEntity.ResourceId = commonBo.ResourceId;
-
-                // 如果超过复投次数
-                if (sfcProduceEntity.RepeatedCount >= cycle)
+                // 已完工（ 如果没有尾工序，就表示已完工）
+                if (nextProcedure == null)
                 {
                     // 清空复投次数
                     sfcProduceEntity.RepeatedCount = 0;
@@ -846,6 +826,36 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
                     stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
                 }
+                // 未完工（下一工序排队）
+                else
+                {
+                    responseBo.IsLastProcedure = false;
+                    responseBo.NextProcedureCode = nextProcedure.Code;
+
+                    // 条码状态跟在制品状态一致
+                    manuSfcEntity.Status = SfcStatusEnum.lineUp;
+                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+
+                    // 更新下一工序
+                    sfcProduceEntity.ProcedureId = nextProcedure.Id;
+
+                    // 一旦切换工序，复投次数重置
+                    sfcProduceEntity.RepeatedCount = 0;
+
+                    // 不置空的话，进站时，可能校验不通过
+                    sfcProduceEntity.ResourceId = null;
+                }
+            }
+            // 未超过复投次数（当前工序排队）
+            else
+            {
+                // 条码状态跟在制品状态一致
+                manuSfcEntity.Status = SfcStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+
+                // 更新下一工序
+                sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
+                sfcProduceEntity.ResourceId = commonBo.ResourceId;
             }
 
             responseBo.SFCEntity = manuSfcEntity;
