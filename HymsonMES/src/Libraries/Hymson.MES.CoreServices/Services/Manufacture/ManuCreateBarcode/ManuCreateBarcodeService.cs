@@ -685,9 +685,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             {
                 foreach (var sfc in item.BarCodes)
                 {
-                    var manuSfcEntity = new ManuSfcEntity
+                    var sfcId = IdGenProvider.Instance.CreateId();
+                    var sfcInfoId = IdGenProvider.Instance.CreateId();
+
+                    manuSfcList.Add(new ManuSfcEntity
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
+                        Id = sfcId,
                         SiteId = param.SiteId,
                         SFC = sfc,
                         Qty = mo.Batch,
@@ -695,14 +698,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         Status = SfcStatusEnum.lineUp,
                         CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
-                    };
-                    manuSfcList.Add(manuSfcEntity);
+                    });
 
                     manuSfcInfoList.Add(new ManuSfcInfoEntity
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
+                        Id = sfcInfoId,
                         SiteId = param.SiteId,
-                        SfcId = manuSfcEntity.Id,
+                        SfcId = sfcId,
                         WorkOrderId = planWorkOrderEntity.Id,
                         ProductId = psr1.SemiProductId,
                         IsUsed = true,
@@ -718,7 +720,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         SFCId = manuSfcEntity.Id,
                         ProductId = psr1.SemiProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
-                        BarCodeInfoId = manuSfcEntity.Id,
+                        BarCodeInfoId = sfcInfoId,
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
