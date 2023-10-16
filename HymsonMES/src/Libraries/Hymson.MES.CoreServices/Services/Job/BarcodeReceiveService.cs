@@ -298,7 +298,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     continue;
                 }
 
-                //准备接收数据
+                // 准备接收数据
                 var manuSfcEntity = sfcEntitys?.FirstOrDefault(x => x.SFC == sfc);
                 if (manuSfcEntity == null)
                 {
@@ -325,9 +325,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                     manuSfcInfoUpdateIsUsedBo.SfcIds.Add(manuSfcEntity.Id);
                 }
 
+                var sfcInfoId = IdGenProvider.Instance.CreateId();
+
                 manuSfcInfoList.Add(new ManuSfcInfoEntity
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
+                    Id = sfcInfoId,
                     SiteId = commonBo.SiteId,
                     SfcId = manuSfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
@@ -347,7 +349,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     SFCId = manuSfcEntity.Id,
                     ProductId = productId,
                     WorkOrderId = planWorkOrderEntity.Id,
-                    BarCodeInfoId = manuSfcEntity.Id,
+                    BarCodeInfoId = sfcInfoId,
                     ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
