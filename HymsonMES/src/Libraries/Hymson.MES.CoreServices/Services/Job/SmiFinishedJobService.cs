@@ -10,12 +10,12 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 
@@ -31,6 +31,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 服务接口（主数据）
         /// </summary>
         private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
+        /// 仓储接口（工序）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
 
         /// <summary>
         /// 仓储接口（生产工单）
@@ -72,6 +77,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 构造函数
         /// </summary>
         /// <param name="masterDataService"></param>
+        /// <param name="procProcedureRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
@@ -80,6 +86,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="localizationService"></param>
         public SmiFinishedJobService(IMasterDataService masterDataService,
+            IProcProcedureRepository procProcedureRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -89,6 +96,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             ILocalizationService localizationService)
         {
             _masterDataService = masterDataService;
+            _procProcedureRepository = procProcedureRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
@@ -187,6 +195,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
+            // 查询工序信息
+            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId);
+            var cycle = procProcedureEntity.Cycle ?? 1;
+
             // 读取条码信息
             var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
 
@@ -194,6 +206,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             SmiFinisheResponseSummaryBo responseSummaryBo = new();
 
             // 遍历所有条码
+            List<long> deleteProduceIds = new();
             foreach (var requestBo in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
@@ -207,13 +220,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (manuSfcEntity == null) continue;
 
                 // 更新条码信息
+                sfcProduceEntity.Status = SfcStatusEnum.Complete;
+                sfcProduceEntity.UpdatedBy = commonBo.UserName;
+                sfcProduceEntity.UpdatedOn = commonBo.Time;
+
+                // 条码状态跟在制品状态一致
+                manuSfcEntity.Status = sfcProduceEntity.Status;
                 manuSfcEntity.UpdatedBy = commonBo.UserName;
                 manuSfcEntity.UpdatedOn = commonBo.Time;
-                manuSfcEntity.Status = SfcStatusEnum.Complete;
-                responseSummaryBo.SFCEntities.Add(manuSfcEntity);
 
                 // 组装（出站步骤数据）
-                responseSummaryBo.SFCStepEntities.Add(new ManuSfcStepEntity
+                var stepEntity = new ManuSfcStepEntity
                 {
                     // 插入 manu_sfc_step 状态为出站（默认值）
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
@@ -235,61 +252,82 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     CreatedOn = commonBo.Time,
                     UpdatedBy = commonBo.UserName,
                     UpdatedOn = commonBo.Time
-                });
+                };
 
-                // 新增 wh_material_inventory
-                responseSummaryBo.WhMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
+                // 如果超过复投次数
+                if (sfcProduceEntity.RepeatedCount > cycle)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SupplierId = 0,//自制品 没有
-                    MaterialId = sfcProduceEntity.ProductId,
-                    MaterialBarCode = sfcProduceEntity.SFC,
-                    Batch = "",//自制品 没有
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
-                    QuantityResidue = procMaterialEntity.Batch,
-                    Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                    Source = MaterialInventorySourceEnum.ManuComplete,
-                    SiteId = commonBo.SiteId,
-                    CreatedBy = commonBo.UserName,
-                    CreatedOn = commonBo.Time,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
-                });
+                    // 不合格复投的话，改工序未当前工序
+                    sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
+                    sfcProduceEntity.ResourceId = commonBo.ResourceId;
 
-                // 新增 wh_material_standingbook
-                responseSummaryBo.WhMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                    // 清空复投次数
+                    sfcProduceEntity.RepeatedCount = 0;
+
+                    // 标记条码为"在制-完成"
+                    //responseBo.IsCompleted = true;
+                    manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
+                    sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
+                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
+                }
+                else
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    MaterialCode = procMaterialEntity.MaterialCode,
-                    MaterialName = procMaterialEntity.MaterialName,
-                    MaterialVersion = procMaterialEntity.Version ?? "",
-                    MaterialBarCode = sfcProduceEntity.SFC,
-                    Batch = "",//自制品 没有
-                    Quantity = procMaterialEntity.Batch,
-                    Unit = procMaterialEntity.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.ManuComplete,
-                    Source = MaterialInventorySourceEnum.ManuComplete,
-                    SiteId = commonBo.SiteId,
-                    CreatedBy = commonBo.UserName,
-                    CreatedOn = commonBo.Time,
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time
-                });
+                    deleteProduceIds.Add(sfcProduceEntity.Id);
+
+                    // 新增 wh_material_inventory
+                    responseSummaryBo.WhMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SupplierId = 0,//自制品 没有
+                        MaterialId = sfcProduceEntity.ProductId,
+                        MaterialBarCode = sfcProduceEntity.SFC,
+                        Batch = "",//自制品 没有
+                        WorkOrderId = sfcProduceEntity.WorkOrderId,
+                        MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
+                        QuantityResidue = procMaterialEntity.Batch,
+                        Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                        Source = MaterialInventorySourceEnum.ManuComplete,
+                        SiteId = commonBo.SiteId,
+                        CreatedBy = commonBo.UserName,
+                        CreatedOn = commonBo.Time,
+                        UpdatedBy = commonBo.UserName,
+                        UpdatedOn = commonBo.Time
+                    });
+
+                    // 新增 wh_material_standingbook
+                    responseSummaryBo.WhMaterialStandingbookEntities.Add(new WhMaterialStandingbookEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        MaterialCode = procMaterialEntity.MaterialCode,
+                        MaterialName = procMaterialEntity.MaterialName,
+                        MaterialVersion = procMaterialEntity.Version ?? "",
+                        MaterialBarCode = sfcProduceEntity.SFC,
+                        Batch = "",//自制品 没有
+                        Quantity = procMaterialEntity.Batch,
+                        Unit = procMaterialEntity.Unit ?? "",
+                        Type = WhMaterialInventoryTypeEnum.ManuComplete,
+                        Source = MaterialInventorySourceEnum.ManuComplete,
+                        SiteId = commonBo.SiteId,
+                        CreatedBy = commonBo.UserName,
+                        CreatedOn = commonBo.Time,
+                        UpdatedBy = commonBo.UserName,
+                        UpdatedOn = commonBo.Time
+                    });
+                }
             }
 
             // 删除 manu_sfc_produce_business
             responseSummaryBo.DeleteSFCProduceBusinesssByIdsCommand = new DeleteSFCProduceBusinesssByIdsCommand
             {
                 SiteId = commonBo.SiteId,
-                SfcInfoIds = sfcProduceEntities.Select(s => s.Id) //manuSfcEntities.Select(s => s.Id)
+                SfcInfoIds = deleteProduceIds
             };
 
             // 物理删除 manu_sfc_produce
             responseSummaryBo.PhysicalDeleteSFCProduceByIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
             {
                 SiteId = commonBo.SiteId,
-                Ids = sfcProduceEntities.Select(s => s.Id)
+                Ids = deleteProduceIds
             };
 
             return responseSummaryBo;

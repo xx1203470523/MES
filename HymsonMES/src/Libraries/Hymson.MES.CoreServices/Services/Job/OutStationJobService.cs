@@ -834,6 +834,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // 条码状态跟在制品状态一致
                 manuSfcEntity.Status = sfcProduceEntity.Status;
+                manuSfcEntity.UpdatedBy = commonBo.UserName;
+                manuSfcEntity.UpdatedOn = commonBo.Time;
 
                 // 不合格复投的话，默认当前工序，当前资源继续进站
                 sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
