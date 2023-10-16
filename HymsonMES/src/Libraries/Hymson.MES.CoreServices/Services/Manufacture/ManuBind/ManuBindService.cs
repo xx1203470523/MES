@@ -163,7 +163,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     SfcId = manuSfc.Id,
                     WorkOrderId = workOrderId,
                     ProductId = outputProductId,
-                    IsUsed = false,
+                    IsUsed = true,
                     CreatedBy = param.UserName,
                     UpdatedBy = param.UserName
                 };
