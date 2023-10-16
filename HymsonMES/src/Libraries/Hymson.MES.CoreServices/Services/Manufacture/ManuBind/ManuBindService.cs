@@ -184,7 +184,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     Qty = qty,
                     ProcedureId = param.ProcedureId,
                     Status = SfcStatusEnum.Activity,
-                    RepeatedCount = 0,
+                    RepeatedCount = 1,
                     IsScrap = TrueOrFalseEnum.No,
                     CreatedBy = param.UserName,
                     UpdatedBy = param.UserName
