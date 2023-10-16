@@ -92,14 +92,22 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// 检查条码的复投次数
         /// </summary>
         /// <param name="sfcProduceEntities"></param>
-        /// <param name="repeatedCount"></param>
-        public static IEnumerable<ManuSfcProduceEntity> VerifySFCRepeatedCount(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, int repeatedCount)
+        /// <param name="cycle"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCRepeatedCount(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, int cycle)
         {
             // 复投次数验证
-            if (sfcProduceEntities.Any(a => a.RepeatedCount >= repeatedCount))
+            var moreThanEntities = sfcProduceEntities.Where(a => a.RepeatedCount >= cycle);
+            if (moreThanEntities.Any() == false) return sfcProduceEntities;
+
+            foreach (var entity in moreThanEntities)
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16360))
-                    .WithData("SFC", string.Join(',', sfcProduceEntities.Where(a => a.RepeatedCount >= repeatedCount).Select(x => x.SFC)));
-            return sfcProduceEntities;
+                    .WithData("RepeatedCount", entity.RepeatedCount)
+                    .WithData("Cycle", cycle)
+                    .WithData("SFC", entity.SFC);
+            }
+
+            return moreThanEntities;
         }
 
         /// <summary>

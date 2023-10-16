@@ -199,7 +199,7 @@ namespace Hymson.MES.Services.Services.Plan
                 work = await _planWorkOrderRepository.GetByCodeAsync(new Data.Repositories.Plan.PlanWorkOrder.Query.PlanWorkOrderQuery()
                 {
                     OrderCode = createDto.OrderCode,
-                    SiteId = _currentSite.SiteId ?? 123456
+                    SiteId = _currentSite.SiteId ?? 0
                 });
             }
             else
@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Services.Plan
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
                 Version = material?.Version ?? "",
-                SiteId = _currentSite.SiteId ?? 123456
+                SiteId = _currentSite.SiteId ?? 0
 
             });
             PrintRequest printEntity = new PrintRequest();
@@ -250,8 +250,6 @@ namespace Hymson.MES.Services.Services.Plan
             var result = await _labelPrintRequest.PrintAsync(printEntity);
             if (!result.result)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-
-
         }
 
         /// <summary>

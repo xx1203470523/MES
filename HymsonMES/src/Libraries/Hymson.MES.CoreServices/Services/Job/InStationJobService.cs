@@ -170,9 +170,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"));
-
-            // 循环次数验证（复投次数）
-            sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
             sfcProduceBusinessEntities?.VerifyProcedureLock(multiSFCBo.SFCs, commonBo.ProcedureId);
 
             // 验证条码是否被容器包装
@@ -229,6 +226,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     }
                 }
             }
+
+            // 循环次数验证（复投次数）
+            sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
         }
 
         /// <summary>
