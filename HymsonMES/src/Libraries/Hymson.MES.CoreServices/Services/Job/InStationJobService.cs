@@ -466,7 +466,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.AfterFinish
+                LinkPoint = ResourceJobLinkPointEnum.BeforeFinish
             });
         }
 
