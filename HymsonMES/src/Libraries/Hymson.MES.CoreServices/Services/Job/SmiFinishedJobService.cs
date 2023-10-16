@@ -206,7 +206,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             SmiFinisheResponseSummaryBo responseSummaryBo = new();
 
             // 遍历所有条码
-            List<long> deleteProduceIds = new();
+            List<long> deleteSFCProduceIds = new();
             foreach (var requestBo in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
@@ -272,7 +272,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 }
                 else
                 {
-                    deleteProduceIds.Add(sfcProduceEntity.Id);
+                    deleteSFCProduceIds.Add(sfcProduceEntity.Id);
 
                     // 新增 wh_material_inventory
                     responseSummaryBo.WhMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
@@ -320,14 +320,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.DeleteSFCProduceBusinesssByIdsCommand = new DeleteSFCProduceBusinesssByIdsCommand
             {
                 SiteId = commonBo.SiteId,
-                SfcInfoIds = deleteProduceIds
+                SfcInfoIds = deleteSFCProduceIds
             };
 
             // 物理删除 manu_sfc_produce
             responseSummaryBo.PhysicalDeleteSFCProduceByIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
             {
                 SiteId = commonBo.SiteId,
-                Ids = deleteProduceIds
+                Ids = deleteSFCProduceIds
             };
 
             return responseSummaryBo;
