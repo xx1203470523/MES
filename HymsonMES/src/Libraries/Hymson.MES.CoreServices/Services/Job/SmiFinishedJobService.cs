@@ -255,7 +255,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 };
 
                 // 如果超过复投次数
-                if (sfcProduceEntity.RepeatedCount > cycle)
+                if (sfcProduceEntity.RepeatedCount >= cycle)
                 {
                     // 不合格复投的话，改工序未当前工序
                     sfcProduceEntity.ProcedureId = commonBo.ProcedureId;

@@ -316,6 +316,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             });
             var allFeedingEntities = allFeedingEntitiesByResourceId.AsList();
 
+            // 查询工序信息
+            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId);
+            var cycle = procProcedureEntity.Cycle ?? 1;
+
             // 遍历所有条码
             var responseBos = new List<OutStationResponseBo>();
             var responseSummaryBo = new OutStationResponseSummaryBo();
@@ -334,12 +338,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (requestBo.IsQualified.HasValue && requestBo.IsQualified.Value == false)
                 {
                     // 不合格出站
-                    responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, sfcProduceEntity, manuSfcEntity);
+                    responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, cycle);
                 }
                 else
                 {
                     // 合格出站（为了逻辑清晰，跟上面的不合格出站区分开）
-                    responseBo = await OutStationForQualifiedProcedureAsync(commonBo, requestBo, sfcProduceEntity, manuSfcEntity);
+                    responseBo = await OutStationForQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity);
                 }
 
                 // 保存单个条码的出站结果
@@ -578,10 +582,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="commonBo"></param>
         /// <param name="requestBo"></param>
-        /// <param name="sfcProduceEntity"></param>
         /// <param name="manuSfcEntity"></param>
+        /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForQualifiedProcedureAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity, ManuSfcEntity manuSfcEntity)
+        private async Task<OutStationResponseBo?> OutStationForQualifiedProcedureAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcEntity manuSfcEntity, ManuSfcProduceEntity sfcProduceEntity)
         {
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
@@ -729,14 +733,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.ResourceId = null;
             }
 
-            /*
-            // 如果超过复投次数
-            if (sfcProduceEntity.RepeatedCount > cycle)
-            {
-                stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
-            }
-            */
-
             responseBo.SFCEntity = manuSfcEntity;
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
@@ -749,10 +745,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="commonBo"></param>
         /// <param name="requestBo"></param>
-        /// <param name="sfcProduceEntity"></param>
         /// <param name="manuSfcEntity"></param>
+        /// <param name="sfcProduceEntity"></param>
+        /// <param name="cycle"></param>
         /// <returns></returns>
-        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity, ManuSfcEntity manuSfcEntity)
+        private async Task<OutStationResponseBo?> OutStationForUnQualifiedProcedureAsync(JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcEntity manuSfcEntity, ManuSfcProduceEntity sfcProduceEntity, int cycle)
         {
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
@@ -779,10 +776,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcessRouteId = sfcProduceEntity.ProcessRouteId,
                 ProcedureId = commonBo.ProcedureId,
             });
-
-            // 查询工序信息
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId);
-            var cycle = procProcedureEntity.Cycle ?? 1;
 
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
@@ -842,7 +835,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.ResourceId = commonBo.ResourceId;
 
                 // 如果超过复投次数
-                if (sfcProduceEntity.RepeatedCount > cycle)
+                if (sfcProduceEntity.RepeatedCount >= cycle)
                 {
                     // 清空复投次数
                     sfcProduceEntity.RepeatedCount = 0;
