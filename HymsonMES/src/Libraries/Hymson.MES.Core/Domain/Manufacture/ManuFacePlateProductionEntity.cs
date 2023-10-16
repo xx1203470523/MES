@@ -6,6 +6,7 @@
  *build datetime: 2023-04-01 02:44:26
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -112,6 +113,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public bool IsShowLog { get; set; }
 
-       
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
     }
 }
