@@ -1,3 +1,4 @@
+using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -146,7 +147,7 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<WorkshopJobControlStepReportDto> GetSfcInOutInfoAsync(string sfc)
         {
-            var workshopJobControlStepReportDto = new WorkshopJobControlStepReportDto() { SFC = sfc };
+            var responseDto = new WorkshopJobControlStepReportDto() { SFC = sfc };
 
             var sfcInfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(sfc);
             if (sfcInfo == null)
@@ -167,7 +168,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.OrderCode = workOrder.OrderCode;
+            responseDto.OrderCode = workOrder.OrderCode;
 
             //查询物料信息
             var material = await _procMaterialRepository.GetByIdAsync(sfcInfo.ProductId);
@@ -175,7 +176,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.MaterialCodrNameVersion = material.MaterialCode + "/" + material.MaterialName + "/" + material.Version;
+            responseDto.MaterialCodrNameVersion = material.MaterialCode + "/" + material.MaterialName + "/" + material.Version;
 
             //查询工艺路线
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(workOrder.ProcessRouteId);
@@ -183,7 +184,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.ProcessRouteCodeNameVersion = processRoute.Code + "/" + processRoute.Name + "/" + processRoute.Version;
+            responseDto.ProcessRouteCodeNameVersion = processRoute.Code + "/" + processRoute.Name + "/" + processRoute.Version;
 
             //查询Bom
             var bom = await _procBomRepository.GetByIdAsync(workOrder.ProductBOMId);
@@ -191,7 +192,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18105)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.ProcBomCodeNameVersion = bom.BomCode + "/" + bom.BomName + "/" + bom.Version;
+            responseDto.ProcBomCodeNameVersion = bom.BomCode + "/" + bom.BomName + "/" + bom.Version;
 
             #endregion
 
@@ -231,7 +232,7 @@ namespace Hymson.MES.Services.Services.Report
                         outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
                     }
 
-                    workshopJobControlStepReportDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto()
+                    responseDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto()
                     {
                         WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
                         ProcedureCode = procedures.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
@@ -242,7 +243,10 @@ namespace Hymson.MES.Services.Services.Report
                 }
             }
 
-            return workshopJobControlStepReportDto;
+            // 对 workshopJobControlInOutSteptDtos 进行排序
+            responseDto.WorkshopJobControlInOutSteptDtos = responseDto.WorkshopJobControlInOutSteptDtos.OrderBy(o => o.Id).AsList();
+
+            return responseDto;
         }
 
         /// <summary>
@@ -299,7 +303,7 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
-            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).ThenByDescending(o => o.Operatetype).AsEnumerable();
+            var dtoOrdered = listDto.OrderBy(o => o.Id).AsEnumerable();
             return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }
