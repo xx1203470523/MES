@@ -615,10 +615,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ProcedureId = commonBo.ProcedureId,
             });
 
-            // 查询工序信息
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId);
-            var cycle = procProcedureEntity.Cycle ?? 1;
-
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
             {
