@@ -1,9 +1,12 @@
 ﻿using Dapper;
+using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -31,6 +34,7 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -225,8 +229,41 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
-                              .VerifyProcedure(commonBo.ProcedureId)
                               .VerifyResource(commonBo.ResourceId);
+
+            // 条码对应工序是否和出站工序一致
+            var validationProduceFailures = new List<ValidationFailure>();
+            var noMatchProcedure = sfcProduceEntities.Where(w => w.ProcedureId != commonBo.ProcedureId);
+            if (noMatchProcedure.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16308));
+                //throw new CustomerValidationException(nameof(ErrorCode.MES16359)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
+
+                /*
+                foreach (var item in noMatchProcedure)
+                {
+                    var validationFailure = new ValidationFailure();
+                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
+                    }
+                    else
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
+                    }
+                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16359);
+                    validationProduceFailures.Add(validationFailure);
+                }
+                */
+            }
+
+            /*
+            if (validationProduceFailures.Any())
+            {
+                throw new ValidationException(commonBo.LocalizationService.GetResource("SFCError"), validationProduceFailures);
+            }
+            */
 
             // 获取生产工单（附带工单状态校验）
             _ = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo
@@ -385,9 +422,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.SFCEntities = responseBos.Select(s => s.SFCEntity);
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
-            responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.IsLastProcedure).Select(s => s.MaterialInventoryEntity);
-            responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.IsLastProcedure).Select(s => s.MaterialStandingbookEntity);
-            responseSummaryBo.UpdateOutputQtySummaryCommands = responseBos.Select(s => s.UpdateOutputQtySummaryCommand);
+            responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.MaterialInventoryEntity != null).Select(s => s.MaterialInventoryEntity);
+            responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.MaterialStandingbookEntity != null).Select(s => s.MaterialStandingbookEntity);
+            responseSummaryBo.UpdateOutputQtySummaryCommands = responseBos.Where(w => w.UpdateOutputQtySummaryCommand != null).Select(s => s.UpdateOutputQtySummaryCommand);
             responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
             responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);

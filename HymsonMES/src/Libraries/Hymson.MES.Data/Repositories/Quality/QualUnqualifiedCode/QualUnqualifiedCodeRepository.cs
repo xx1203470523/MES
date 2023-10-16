@@ -269,7 +269,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByCodeSql = @"SELECT 
                                Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                             FROM `qual_unqualified_code`  WHERE UnqualifiedCode = @Code  AND SiteId=@Site AND IsDeleted=0 ";
-        const string GetByCodesSql = @"SELECT * FROM qual_unqualified_code WHERE SiteId = @SiteId AND IsDeleted = 0 AND UnqualifiedCode = @Code";
+        const string GetByCodesSql = @"SELECT * FROM qual_unqualified_code WHERE SiteId = @SiteId AND IsDeleted = 0 AND UnqualifiedCode IN @Codes";
         const string UpdateStatusSql = "UPDATE `qual_unqualified_code` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
     }
