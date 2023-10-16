@@ -4,7 +4,7 @@ using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Parameter.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.Utils;

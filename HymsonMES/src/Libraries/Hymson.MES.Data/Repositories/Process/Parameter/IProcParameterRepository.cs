@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process.Parameter.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {

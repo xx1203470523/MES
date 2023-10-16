@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Data.Repositories.Process.Parameter.Query
+namespace Hymson.MES.Data.Repositories.Process.Query
 {
     /// <summary>
     /// 标准参数表 分页参数
