@@ -674,7 +674,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 var endNodeEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
 
                 _logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{routeProcedureRandomCompareBo.ProcessRouteId}，条码工序ID：{routeProcedureRandomCompareBo.BeginProcedureId}，进站工序ID：{routeProcedureRandomCompareBo.EndProcedureId}");
-                throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("Begin", beginNodeEntity!.Code).WithData("End", endNodeEntity!.Code);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("Begin", endNodeEntity!.Code).WithData("End", beginNodeEntity!.Code);
             }
 
             // 如果中间的工序存在不是随机工序的话，就返回false
