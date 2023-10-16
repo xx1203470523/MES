@@ -97,7 +97,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         {
             // 复投次数验证
             if (sfcProduceEntities.Any(a => a.RepeatedCount >= repeatedCount))
-                throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("Status", sfcProduceEntities.Where(a => a.RepeatedCount >= repeatedCount).Select(x => x.SFC));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16353))
+                    .WithData("SFC", string.Join(',', sfcProduceEntities.Where(a => a.RepeatedCount >= repeatedCount).Select(x => x.SFC)));
             return sfcProduceEntities;
         }
 
