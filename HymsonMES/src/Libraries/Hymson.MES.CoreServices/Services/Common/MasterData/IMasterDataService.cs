@@ -33,13 +33,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntityWithNullCheckAsync(IEnumerable<long> materialIds);
 
         /// <summary>
-        /// 获取工序基础信息（带空检查）
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId);
-
-        /// <summary>
         /// 获取物料基础信息（带空检查）
         /// </summary>
         /// <param name="materialId"></param>
@@ -68,6 +61,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo);
 
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 获取生产条码信息

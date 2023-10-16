@@ -14,7 +14,6 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
@@ -86,7 +85,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
 
-        /// <summary>sss
+        /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
@@ -243,20 +242,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
-        /// 获取工序基础信息（带空检查）
-        /// </summary>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        public async Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId)
-        {
-            // 获取工序信息
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
-
-            return procProcedureEntity;
-        }
-
-        /// <summary>
         /// 获取工艺路线基础信息（带空检查）
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -352,6 +337,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo)
         {
+            bo.WorkOrderIds = bo.WorkOrderIds.Distinct();
+
             var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds);
             if (planWorkOrderEntities == null || bo.WorkOrderIds.Count() > planWorkOrderEntities.Count())
             {
@@ -389,7 +376,24 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return planWorkOrderEntities;
         }
 
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos)
+        {
+            if (sfcBos.SFCs.Any(a => a.Contains(' '))) throw new CustomerValidationException(nameof(ErrorCode.MES16305));
 
+            // 条码在制表
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            {
+                SiteId = sfcBos.SiteId,
+                Sfcs = sfcBos.SFCs
+            });
+
+            return sfcProduceEntities;
+        }
 
         /// <summary>
         /// 获取生产条码信息
@@ -407,10 +411,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 Sfcs = sfcBos.SFCs
             });
 
-            if (!sfcProduceEntities.Any())
+            if (sfcProduceEntities.Any() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            }
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', sfcBos.SFCs));
+            };
 
             // 不存在在制表的话，就去库存查找？？
 
@@ -666,11 +670,15 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
             if (nodesOfOrdered.Any() == false)
             {
-                var beginNodeEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.BeginProcedureId);
-                var endNodeEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
+                // 当前工序
+                var currentEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
+                // 条码对应工序
+                var procedureEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.BeginProcedureId);
 
-                _logger.LogError($"工艺路线工序节点数据异常，工艺路线ID：{routeProcedureRandomCompareBo.ProcessRouteId}，条码工序ID：{routeProcedureRandomCompareBo.BeginProcedureId}，进站工序ID：{routeProcedureRandomCompareBo.EndProcedureId}");
-                throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("Begin", beginNodeEntity!.Code).WithData("End", endNodeEntity!.Code);
+                _logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{routeProcedureRandomCompareBo.ProcessRouteId}，条码工序ID：{routeProcedureRandomCompareBo.BeginProcedureId}，进站工序ID：{routeProcedureRandomCompareBo.EndProcedureId}");
+                throw new CustomerValidationException(nameof(ErrorCode.MES16354))
+                    .WithData("Current", currentEntity!.Code)
+                    .WithData("Procedure", procedureEntity!.Code);
             }
 
             // 如果中间的工序存在不是随机工序的话，就返回false

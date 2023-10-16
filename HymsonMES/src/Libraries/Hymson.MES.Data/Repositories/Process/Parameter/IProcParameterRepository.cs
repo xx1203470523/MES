@@ -18,6 +18,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> InsertAsync(ProcParameterEntity procParameterEntity);
 
         /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcParameterEntity> entities);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="procParameterEntity"></param>

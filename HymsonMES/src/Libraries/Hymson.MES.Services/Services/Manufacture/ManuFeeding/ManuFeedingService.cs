@@ -440,7 +440,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
                 if (feedingEntity != null)
                 {
-                    _logger.LogError($"MES15507 -> FeedingPointId:{entity.FeedingPointId.Value},ProductId:{entity.ProductId},BarCode:{entity.BarCode}");
+                    _logger.LogWarning($"MES15507 -> FeedingPointId:{entity.FeedingPointId.Value},ProductId:{entity.ProductId},BarCode:{entity.BarCode}");
                     throw new CustomerValidationException(nameof(ErrorCode.MES15507)).WithData("BarCode", entity.BarCode);
                 }
             }

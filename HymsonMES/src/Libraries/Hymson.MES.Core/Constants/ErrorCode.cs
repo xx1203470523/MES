@@ -763,6 +763,7 @@
         public const string MES16044 = "数量需为整数且大于0";
         public const string MES16045 = "工单状态不合法！";
         public const string MES16046 = "工单状态不为未开始，不能编辑！";
+        public const string MES16047 = "条码{SFC}超过最大复投次数{Cycle}，当前复投次数{RepeatedCount}，不允许生产！";
         #endregion
 
         #region 条码接收 16100
@@ -815,6 +816,7 @@
         public const string MES16205 = "通配符{value}未定义";
         public const string MES16206 = "流水号转换只实现了16,32进制";
         public const string MES16207 = "生成的序列号{BarCode}超过规则限制";
+        public const string MES16208 = "统配失败-统配编码{code},类型{type}查询不到值";
         #endregion
 
         #region 生产通用 MES16300
@@ -869,9 +871,14 @@
         public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
         public const string MES16352 = "工序不存在";
-        public const string MES16353 = "SFC条码{SFC}循环次数超过当前工序的循环次数，不允许操作。";
-        public const string MES16354 = "当前实际进站的工序{Begin}，处于条码记录的应进站工序{End}前面，不允许操作。";
-
+        public const string MES16353 = "条码{SFC}已被Marking拦截！";
+        public const string MES16354 = "当前进站工序{Current}，属于应进站工序{Procedure}的前面工序，不允许操作。";
+        public const string MES16355 = "未找到工序{ProcedureCode}关联的资源";
+        //public const string MES16356 = "条码{SFCs}不存在或不是在制品";
+        public const string MES16357 = "当前工序是{Current}，条码{SFC}应在工序{Procedure}处排队进站，请检查。";
+        public const string MES16358 = "指定的工序{Procedure}不存在";
+        public const string MES16359 = "条码{SFC}由工序{InProcedure}进站，与当前出站工序{OutProcedure}不一致，不允许出站操作。";
+        public const string MES16360 = "条码【{SFC}】循环次数超过当前工序的循环次数，不允许操作。";
         #endregion
 
         #region 工单激活 MES16400
@@ -1005,7 +1012,8 @@
         public const string MES17104 = "获取条码信息失败！";
         public const string MES17105 = "存在不在BOM消耗清单里面的消耗条码！";
         public const string MES17106 = "部分产品信息读取失败！";
-        public const string MES17108 = "条码【{SFCs}】存在未关闭的不合格信息，请去【不合格报告】查看详细信息";
+        public const string MES17107 = "消耗条码{BarCodes}不存在BOM消耗清单里面！";
+        public const string MES17108 = "条码【{SFCs}】存在物未关闭的不合格信息，请去【不合格报告】查看详细信息";
         #endregion
 
         #region 面板维护 MES17200
@@ -1294,10 +1302,14 @@
         public const string MES19008 = "资源不匹配";
         #endregion
 
-        #region  产品参数采集
-        public const string MES19100 = "产品参数采集异常";
-        public const string MES19101 = "未找到资源{ResCode}对应工序";
-        public const string MES19102 = "参数{ResCode}不存在";
+        #region 产品参数采集
+        public const string MES19600 = "产品参数采集异常";
+        public const string MES19601 = "未找到资源{ResCode}对应工序";
+        public const string MES19602 = "参数{ResCode}不存在";
+        public const string MES19603 = "资源编码{Code}不存在";
+        public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
+        public const string MES19605 = "条码生成失败,半成品记录未找到！";
+
         #endregion
 
 

@@ -67,14 +67,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<InStationRequestBo>? InStationRequestBos { get; set; }
 
         /// <summary>
-        /// 出站对象
+        /// 出站对象 / 半成品
         /// </summary>
         public IEnumerable<OutStationRequestBo>? OutStationRequestBos { get; set; }
-
-        /// <summary>
-        /// 出站对象（半成品）
-        /// </summary>
-        public IEnumerable<SmiFinishedRequestBo>? SmiFinishedRequestBos { get; set; }
 
     }
 

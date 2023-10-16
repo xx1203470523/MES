@@ -331,8 +331,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = dto.Param["ResourceId"].ParseToLong(),
                 SFCs = new string[] { dto.Param["SFC"] },   // 这句后面要改
                 InStationRequestBos = new List<InStationRequestBo> { new InStationRequestBo { SFC = dto.Param["SFC"] } },
-                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = dto.Param["SFC"] } },
-                SmiFinishedRequestBos = new List<SmiFinishedRequestBo> { new SmiFinishedRequestBo { SFC = dto.Param["SFC"] } }
+                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = dto.Param["SFC"] } }
             });
 
             foreach (var item in jobResponses)

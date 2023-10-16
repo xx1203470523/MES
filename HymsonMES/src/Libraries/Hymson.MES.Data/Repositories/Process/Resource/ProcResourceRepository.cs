@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -55,6 +56,21 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetResByIdsSql, new { Id = id });
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            var key = $"proc_resource&{query.Site}&{query.Code}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
+            });
         }
 
         /// <summary>
@@ -459,7 +475,6 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(ClearResourceTypeIds, command);
         }
 
-
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -531,6 +546,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteId=@SiteId and ResTypeId in @Ids and IsDeleted =0 ";
         const string GetByIdsAndStatusSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
         const string GetByIdsSql = "select * from proc_resource  WHERE Id IN @ids and IsDeleted=0";
+        const string GetByCodeSql = "SELECT * FROM proc_resource WHERE `IsDeleted` = 0 AND SiteId = @Site AND ResCode = @Code LIMIT 1";
         const string GetByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND ResCode = @ResCode and SiteId =@SiteId ";
         const string GetByEquipmentCode = @"SELECT R.Id, R.ResCode FROM proc_resource_equipment_bind REB 
             LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id

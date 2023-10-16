@@ -97,6 +97,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode
         public int StartNumber { get; set; }
 
         public IEnumerable<CodeRulesMakeDto> CodeRulesMakeList { get; set; } = new List<CodeRulesMakeDto>();
+
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
     }
 
     /// <summary>

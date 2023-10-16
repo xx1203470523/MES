@@ -120,6 +120,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventTypeUpgradeRepository, InteEventTypeUpgradeRepository>();
             services.AddSingleton<IInteEventTypeUpgradeMessageGroupRelationRepository, InteEventTypeUpgradeMessageGroupRelationRepository>();
 
+            services.AddSingleton<IInteTimeWildcardRepository, InteTimeWildcardRepository>();
+
             services.AddSingleton<IInteMessageManageRepository, InteMessageManageRepository>();
             services.AddSingleton<IInteMessageManageAnalysisReportAttachmentRepository, InteMessageManageAnalysisReportAttachmentRepository>();
             services.AddSingleton<IInteMessageManageHandleProgrammeAttachmentRepository, InteMessageManageHandleProgrammeAttachmentRepository>();
