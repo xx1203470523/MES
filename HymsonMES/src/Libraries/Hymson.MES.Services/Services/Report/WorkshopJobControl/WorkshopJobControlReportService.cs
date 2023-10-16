@@ -232,7 +232,7 @@ namespace Hymson.MES.Services.Services.Report
                         outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
                     }
 
-                    responseDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto()
+                    responseDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto
                     {
                         Id = currentStep.Id,
                         WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
