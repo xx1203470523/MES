@@ -5,8 +5,6 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -34,7 +32,6 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -233,37 +230,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 条码对应工序是否和出站工序一致
             var validationProduceFailures = new List<ValidationFailure>();
-            var noMatchProcedure = sfcProduceEntities.Where(w => w.ProcedureId != commonBo.ProcedureId);
-            if (noMatchProcedure.Any())
+            var noMatchSFCProcedureEntities = sfcProduceEntities.Where(w => w.ProcedureId != commonBo.ProcedureId);
+            if (noMatchSFCProcedureEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16308));
-                //throw new CustomerValidationException(nameof(ErrorCode.MES16359)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
-
-                /*
-                foreach (var item in noMatchProcedure)
+                foreach (var sfcProduceEntity in noMatchSFCProcedureEntities)
                 {
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", sfc } };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
-                    }
-                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES16359);
-                    validationProduceFailures.Add(validationFailure);
-                }
-                */
-            }
+                    var inProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId)
+                           ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduceEntity.ProcedureId);
 
-            /*
-            if (validationProduceFailures.Any())
-            {
-                throw new ValidationException(commonBo.LocalizationService.GetResource("SFCError"), validationProduceFailures);
+                    var outProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16359))
+                        .WithData("SFC", sfcProduceEntity.SFC)
+                        .WithData("InProcedure", inProcedureEntity.Code)
+                        .WithData("OutProcedure", outProcedureEntity.Code);
+                }
             }
-            */
 
             // 获取生产工单（附带工单状态校验）
             _ = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdsAsync, new WorkOrderIdsBo
