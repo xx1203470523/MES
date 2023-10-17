@@ -882,10 +882,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
                     Qty = stepEntity.Qty,
-                    Status = stepEntity.CurrentStatus == SfcStatusEnum.InProductionComplete ? ProductBadRecordStatusEnum.Close : ProductBadRecordStatusEnum.Open,
+                    Status = stepEntity.CurrentStatus == SfcStatusEnum.InProductionComplete ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
                     Remark = stepEntity.Remark,
-                    //DisposalResult = ProductBadDisposalResultEnum.AutoHandle,
+                    DisposalResult = stepEntity.CurrentStatus == SfcStatusEnum.InProductionComplete ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
