@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _resourceRepository = resourceRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _manuSfcStepRepository=manuSfcStepRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _eventBus = eventBus;
         }
 
@@ -415,13 +415,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     return;
                 }
 
-                //记录step信息
-                //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
+                // 记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
                 if (inventoryEntity != null)
                 {
-                    //回写库存数据
+                    // 回写库存数据
                     rows += await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueAsync(quantityCommand);
                 }
 
@@ -648,7 +647,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 //记录step信息
                 rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-              
+
 
                 //添加组件信息
                 rows += await _circulationRepository.InsertAsync(sfcCirculationEntity);
@@ -914,14 +913,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     return;
                 }
 
-                //记录step信息
-                //rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
-                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStepEntity });
+                // 记录step信息
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
-                //旧件如果不是外部的需要去加库存
+                // 旧件如果不是外部的需要去加库存
                 if (replaceOld != null)
                 {
-                    //回写库存数据
+                    // 回写库存数据
                     rows += await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueAsync(oldQuantityCommand);
                 }
 
