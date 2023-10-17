@@ -680,8 +680,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             if (bomDetailEntities == null) return null;
 
             // 数据收集方式为“批次”的物料
-            var bomDetailEntitiesOfBatch = bomDetailEntities.Where(w => w.DataCollectionWay == MaterialSerialNumberEnum.Batch);
-            if (procedureId.HasValue) bomDetailEntitiesOfBatch = bomDetailEntitiesOfBatch.Where(w => w.ProcedureId == procedureId.Value);
+            var bomDetailEntitiesOfBatch = bomDetailEntities
+                .Where(w => w.DataCollectionWay == MaterialSerialNumberEnum.Batch)
+                .Where(w => w.ProcedureId == procedureId);
 
             // 当“数据收集方式”为空，则去检查物料维护中 物料的“数据收集方式”，为批次也可以加载进来
             // 因为目前BOM里面的“数据收集方式”为必填项，因为无需理会
