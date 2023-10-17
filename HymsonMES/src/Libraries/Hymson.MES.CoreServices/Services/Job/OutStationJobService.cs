@@ -305,6 +305,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
+            // 是否有不属于在制品表的条码
+            var notIncludeSFCs = multiSFCBo.SFCs.Except(sfcProduceEntities.Select(s => s.SFC));
+            if (notIncludeSFCs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', notIncludeSFCs));
+            }
+
             // 条码信息
             var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
             if (manuSFCEntities == null || manuSFCEntities.Any() == false) return default;

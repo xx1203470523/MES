@@ -173,7 +173,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', notIncludeSFCs));
             }
 
-
             // 判断条码锁状态
             var sfcProduceBusinessEntities = await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
