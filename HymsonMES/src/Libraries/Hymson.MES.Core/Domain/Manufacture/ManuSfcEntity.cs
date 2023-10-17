@@ -35,5 +35,15 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 是否使用
         /// </summary>
         public YesOrNoEnum IsUsed { get; set; } = YesOrNoEnum.No;
+
+        /// <summary>
+        /// 报废表Id
+        /// </summary>
+        public long? SfcScrapId { get; set; }
+
+        /// <summary>
+        /// 备份字段  用户状态回撤
+        /// </summary>
+        public SfcStatusEnum StatusBack { get; set; }
     }
 }

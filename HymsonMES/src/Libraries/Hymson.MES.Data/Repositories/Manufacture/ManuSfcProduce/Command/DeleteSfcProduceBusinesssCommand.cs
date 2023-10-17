@@ -13,7 +13,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public long? SiteId { get; set; }
 
         /// <summary>
-        /// 删除条码id
+        /// 删除条码id（这里的ID其实是指在制品表的ID）
         /// </summary>
         public long SfcInfoId { get; set; }
     }
@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
     /// <summary>
     /// 删除在制品业务实体类
     /// </summary>
-    public class DeleteSfcProduceBusinesssBySfcInfoIdsCommand
+    public class DeleteSFCProduceBusinesssByIdsCommand
     {
         /// <summary>
         /// 站点编码 

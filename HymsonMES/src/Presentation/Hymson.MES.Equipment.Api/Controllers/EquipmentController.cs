@@ -1,10 +1,5 @@
-﻿using Hymson.Infrastructure;
-using Hymson.MES.EquipmentServices;
-using Hymson.MES.EquipmentServices.Dtos.InBound;
-using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
+﻿using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
-using IdGen;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -20,12 +15,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     [Route("EquipmentService/api/v1/[controller]")]
     public class EquipmentController : ControllerBase
     {
-
-        /// <summary>
-        /// 进站
-        /// </summary>
-        private readonly IInStationService _InStationService;
-
         /// <summary>
         /// 条码绑定
         /// </summary>
@@ -34,25 +23,10 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="manuInStationService"></param>
         /// <param name="sfcBindingService"></param>
-        public EquipmentController(IInStationService manuInStationService, ISfcBindingService sfcBindingService)
+        public EquipmentController(ISfcBindingService sfcBindingService)
         {
-            _InStationService = manuInStationService;
             _sfcBindingService = sfcBindingService;
-        }
-
-
-        /// <summary>
-        ///进站
-        /// </summary>
-        /// <param name="inStationDto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("InStation")]
-        public async Task InStationAsync(InStationDto inStationDto)
-        {
-            await _InStationService.InStationExecuteAsync(inStationDto);
         }
 
         /// <summary>

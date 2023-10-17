@@ -26,11 +26,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId);
 
         /// <summary>
-        /// 获取工序基础信息（带空检查）
+        /// 获取物料基础信息（带空检查）
         /// </summary>
-        /// <param name="procedureId"></param>
+        /// <param name="materialIds"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheckAsync(long procedureId);
+        Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntityWithNullCheckAsync(IEnumerable<long> materialIds);
 
         /// <summary>
         /// 获取物料基础信息（带空检查）
@@ -55,6 +55,20 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo);
 
         /// <summary>
+        /// 获取生产工单（批量）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo);
+
+        /// <summary>
+        /// 获取生产条码信息
+        /// </summary>
+        /// <param name="sfcBos"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos);
+
+        /// <summary>
         /// 获取生产条码信息
         /// </summary>
         /// <param name="sfcBos"></param>
@@ -76,14 +90,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
-        /// 通过BomId获取物料集合（包含替代料）
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<BomMaterialBo>> GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(long bomId, long procedureId);
-
-        /// <summary>
         /// 获取首工序
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -93,9 +99,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="manuSfcProduce"></param>
+        /// <param name="routeProcedureWithWorkOrderBo"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuRouteProcedureWithWorkOrderBo routeProcedureWithWorkOrderBo);
 
         /// <summary>
         /// 判断上一工序是否随机工序
@@ -110,6 +116,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
         Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
+
+        /// <summary>
+        /// 比较两个工序之间是否均是随机工序
+        /// </summary>
+        /// <param name="routeProcedureRandomCompareBo"></param>
+        /// <returns></returns>
+        Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo);
 
         /// <summary>
         /// 判断是否首工序
@@ -149,9 +162,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获取即将扣料的物料数据
         /// </summary>
-        /// <param name="sfcProduceEntity"></param>
+        /// <param name="requestBo"></param>
         /// <returns></returns>
-        Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo);
 
         /// <summary>
         /// 获取不合格代码列表
@@ -180,13 +193,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">替代料BO对象</param>
         /// <param name="isMain">是否主物料</param>
-        void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
+        void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
              ref List<ManuSfcCirculationEntity> adds,
              ref decimal residue,
              ManuSfcProduceEntity sfcProduceEntity,
              Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-             MaterialDeductBo mainMaterialBo,
-             MaterialDeductBo currentBo,
+             MaterialDeductResponseBo mainMaterialBo,
+             MaterialDeductResponseBo currentBo,
              bool isMain = true);
     }
 }

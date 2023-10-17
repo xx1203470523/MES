@@ -28,6 +28,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
         /// <summary>
         /// 条码列表
         /// </summary>
-        public string[] Sfcs { get; set; }
+        public IEnumerable<string> Sfcs { get; set; }
     }
 }

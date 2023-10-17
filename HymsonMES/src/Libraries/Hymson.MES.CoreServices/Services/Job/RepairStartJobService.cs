@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -23,6 +24,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("维修开始", JobTypeEnum.Standard)]
     public class RepairStartJobService : IJobService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<RepairStartJobService> _logger;
+
         /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
@@ -38,7 +44,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IMasterDataService _masterDataService;
 
-
         /// <summary>
         /// 仓储接口（工艺路线工序节点）
         /// </summary>
@@ -53,18 +58,26 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 验证器
         /// </summary>
         private readonly AbstractValidator<RepairStartRequestBo> _validationRepairJob;
+
         /// <summary>
-        /// 构造函数 
+        /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="validationRepairJob"></param>
+        /// <param name="masterDataService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public RepairStartJobService(IProcProcedureRepository procProcedureRepository,
+        public RepairStartJobService(ILogger<RepairStartJobService> logger,
+            IProcProcedureRepository procProcedureRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             AbstractValidator<RepairStartRequestBo> validationRepairJob,
             IMasterDataService masterDataService,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository)
         {
+            _logger = logger;
             _procProcedureRepository = procProcedureRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _validationRepairJob = validationRepairJob;
@@ -148,14 +161,26 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 sfcProduceEntity.ProcessRouteId = bo.ProcedureId;
             }
 
+            // 获取当前工序信息
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bo.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16352));
+
+            // 读取工序关联的资源
+            var resourceIds = await param.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
+            if (resourceIds == null || resourceIds.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("ProcedureCode", procedureEntity.Code);
+            }
+
             // 校验工序和资源是否对应
-            var resourceIds = await param.Proxy.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
-            if (resourceIds == null || !resourceIds.Any(a => a == bo.ResourceId)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
-
-
+            if (resourceIds.Any(a => a == bo.ResourceId) == false)
+            {
+                _logger.LogWarning($"工序{bo.ProcedureId}和资源{bo.ResourceId}不对应");
+                throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+            }
 
             // 当前工序是否是排队状态
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity)
+            if (sfcProduceEntity.Status == SfcStatusEnum.Activity)
             {
                 // 如果状态已经为活动中，就直接返回成功
                 return new RepairStartResponseBo();
@@ -163,9 +188,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产工单（附带工单状态校验）
             _ = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceWorkOrderByIdAsync, new WorkOrderIdBo { WorkOrderId = sfcProduceEntity.WorkOrderId });
-
-            // 获取当前工序信息
-            var procedureEntity = await param.Proxy.GetValueAsync(_procProcedureRepository.GetByIdAsync, sfcProduceEntity.ProcedureId);
 
             // 检查是否测试工序
             if (procedureEntity?.Type == ProcedureTypeEnum.Test)

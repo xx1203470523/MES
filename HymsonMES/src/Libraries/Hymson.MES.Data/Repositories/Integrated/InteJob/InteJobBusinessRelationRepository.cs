@@ -205,6 +205,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class InteJobBusinessRelationRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_job_business_relation` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";

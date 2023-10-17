@@ -1,11 +1,9 @@
 ﻿using Dapper;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -13,10 +11,8 @@ using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
@@ -25,11 +21,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -61,17 +52,19 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcRepository _manuSfcRepository;
 
         /// <summary>
-        /// 条码步骤表仓储 仓储
+        /// 仓储接口（条码步骤）
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="localizationService"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public ProductBadRecordJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
@@ -121,7 +114,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //判断条码锁定状态
-            var lockSfcs = sfcProduceEntities.Where(x => x.Status == SfcProduceStatusEnum.Locked).Select(x => x.SFC).ToArray();
+            var lockSfcs = sfcProduceEntities.Where(x => x.Status == SfcStatusEnum.Locked).Select(x => x.SFC).ToArray();
             if (lockSfcs.Any())
             {
                 var strs = string.Join("','", scrapSfcs);
@@ -249,7 +242,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         FoundBadResourceId = bo.ResourceId,
                         OutflowOperationId = bo.ProcedureId,
                         UnqualifiedId = unqualified.Id,
-                        SfcStepId= sfcStepEntity.Id,
+                        SfcStepId = sfcStepEntity.Id,
                         SFC = item.SFC,
                         SfcInfoId = item.SfcInfoId,
                         Qty = item.Qty,
@@ -298,7 +291,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProcessRouteId = bo.BadProcessRouteId ?? 0,
                     ProcedureId = processRouteProcedure.ProcedureId,
                     UpdatedBy = bo.UserName,
-                    Status = SfcProduceStatusEnum.lineUp,
+                    Status = SfcStatusEnum.lineUp,
                     Ids = manuSfcs.Select(x => x.Id).ToArray()
                 };
             }

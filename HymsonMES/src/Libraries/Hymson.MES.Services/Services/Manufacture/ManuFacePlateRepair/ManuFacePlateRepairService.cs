@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -14,24 +15,25 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFacePlateRepair.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuInStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -100,11 +102,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuOutStationService _manuOutStationService;
 
         /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 仓储接口（工艺路线工序连线）
         /// </summary>
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
@@ -118,22 +115,64 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 容器装载表（物理删除）仓储
         /// </summary>
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 仓储接口（条码）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
 
         private readonly ILocalizationService _localizationService;
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateRepairModifyDto> _validationModifyRules;
 
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuFacePlateRepairRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="procProcessRouteNodeRepository"></param>
+        /// <param name="manuFacePlateButtonService"></param>
+        /// <param name="manuOutStationService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="procProcessRouteDetailLinkRepository"></param>
+        /// <param name="manuCommonService"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="eventBus"></param>
         public ManuFacePlateRepairService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository, IPlanWorkOrderRepository planWorkOrderRepository,
             IProcProcedureRepository procProcedureRepository, IProcMaterialRepository procMaterialRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository, IProcResourceRepository procResourceRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository, IManuFacePlateButtonService manuFacePlateButtonService,
-            IManuOutStationService manuOutStationService, ILocalizationService localizationService,
-            IManuInStationService manuInStationService, IManuSfcStepRepository manuSfcStepRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-        AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules, AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules,
-        IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository, IManuCommonService manuCommonService, IManuContainerPackRepository manuContainerPackRepository)
+            IManuOutStationService manuOutStationService, ILocalizationService localizationService, IManuSfcStepRepository manuSfcStepRepository,
+            IManuSfcRepository manuSfcRepository,
+        AbstractValidator<ManuFacePlateRepairCreateDto> validationCreateRules,
+        AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules,
+        IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
+        IManuCommonService manuCommonService,
+        IManuContainerPackRepository manuContainerPackRepository,
+        IEventBus<EventBusInstance1> eventBus)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -151,10 +190,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
             _manuCommonService = manuCommonService;
             _manuContainerPackRepository = manuContainerPackRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -269,7 +310,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Qty = sfcProduceEntity.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.Repair,
-                CurrentStatus = SfcProduceStatusEnum.Activity,
+                CurrentStatus = SfcStatusEnum.Activity,
                 EquipmentId = sfcProduceEntity.EquipmentId,
                 ResourceId = sfcProduceEntity.ResourceId,
                 CreatedBy = _currentUser.UserName,
@@ -279,12 +320,29 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             // 更改状态，将条码由"排队"改为"活动"
-            sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
+            sfcProduceEntity.Status = SfcStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
-            _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
-            await _manuSfcStepRepository.InsertAsync(sfcStep);
+            ManuSfcUpdateStatusByIdCommand manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
+            {
+                Id = sfcProduceEntity.SFCId,
+                CurrentStatus = sfcProduceEntity.Status,
+                Status = SfcStatusEnum.Activity,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+            };
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+
+                _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+
+                await _manuSfcStepRepository.InsertAsync(sfcStep);
+
+                await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
+                //_eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
+                trans.Complete();
+            }
             return manuFacePlateRepairOpenInfoDto;
         }
 
@@ -335,7 +393,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 productInfo = new ManuFacePlateRepairProductInfoDto
                 {
                     SFC = manuSfcProduceEntit.SFC,
-                    Status = manuSfcProduceEntit.Status == SfcProduceStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324)),// manuSfcProduceEntit.Status.ToString(),
+                    Status = manuSfcProduceEntit.Status == SfcStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324)),// manuSfcProduceEntit.Status.ToString(),
                     ProcedureCode = procProcedureEntity.Code,
                     OrderCode = planWorkOrderEntity.OrderCode,
                     MaterialCode = procMaterialEntity.MaterialCode,
@@ -434,7 +492,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfc = beginRepairDto.SFC
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16306));
-            if (manuSfcProduceEntit.Status != SfcProduceStatusEnum.Activity)
+            if (manuSfcProduceEntit.Status != SfcStatusEnum.Activity)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17322));
             }
@@ -470,7 +528,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES17306));
             }
             #endregion
-
 
             #region 工序判断
             var endProcessRouteDetailId = await GetEndProcessRouteDetailIdAsync(manuSfcProduceEntit.ProcessRouteId);
@@ -667,7 +724,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var updateProcedureCommand = new UpdateProcedureCommand
             {
                 Id = manuSfcProduceEntit.Id,
-                Status = SfcProduceStatusEnum.lineUp,
+                Status = SfcStatusEnum.lineUp,
                 ProcedureId = confirmSubmitDto.ReturnProcedureId,
                 ResourceId = null, //resourcesId, //资源这里 直接设置为null 为null生产不检测匹配工序
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId,
@@ -690,7 +747,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Qty = manuSfcProduceEntit.Qty,
                 IsRepair = true,
                 Operatetype = ManuSfcStepTypeEnum.RepairReturn,
-                CurrentStatus = SfcProduceStatusEnum.lineUp,
+                CurrentStatus = SfcStatusEnum.lineUp,
                 EquipmentId = manuSfcProduceEntit.EquipmentId,
                 ResourceId = manuSfcProduceEntit.ResourceId,
                 CreatedBy = _currentUser.UserName,
@@ -698,8 +755,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
             };
-            #endregion
 
+            ManuSfcUpdateStatusByIdCommand manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
+            {
+                Id = manuSfcProduceEntit.SFCId,
+                CurrentStatus = manuSfcProduceEntit.Status,
+                Status = SfcStatusEnum.lineUp,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+            };
+            #endregion
 
             #region 事务入库
             var rows = 0;
@@ -733,6 +798,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ReturnProcedureId = confirmSubmitDto.ReturnProcedureId,
                     ResourceId = confirmSubmitDto.ResourceId
                 });
+                await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
                 if (confirmSubmitDto.ProcedureId == endProcessRouteDetailId)
                 {
                     //返回工序
@@ -742,8 +808,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SiteId = manuSfcProduceEntit.SiteId,
                         SfcInfoId = manuSfcProduceEntit.Id
                     });
-                    //步骤
+
+                    // 步骤
                     rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
+                    //_eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
                 }
 
                 trans.Complete();

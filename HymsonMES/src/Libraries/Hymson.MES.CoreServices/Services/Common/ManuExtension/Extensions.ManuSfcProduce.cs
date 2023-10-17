@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Process;
@@ -55,10 +56,10 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// <param name="sfcProduceEntity"></param>
         /// <param name="produceStatus"></param>
         /// <param name="produceStatusDescription"></param>
-        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
+        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcStatusEnum produceStatus, string produceStatusDescription)
         {
             // 当前条码是否是被锁定
-            if (sfcProduceEntity.Status == SfcProduceStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
+            if (sfcProduceEntity.Status == SfcStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
 
             // 当前条码是否是已报废
             if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);
@@ -73,21 +74,76 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// 检查条码状态是否合法
         /// </summary>
         /// <param name="sfcProduceEntities"></param>
-        /// <param name="produceStatus"></param>
-        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcProduceStatusEnum produceStatus, string produceStatusDescription)
+        /// <param name="sfcStatus"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcStatusEnum sfcStatus, string produceStatusDescription)
         {
             // 当前条码是否是已报废
             if (sfcProduceEntities.Any(a => a.IsScrap == TrueOrFalseEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16324));
 
             // 当前条码是否是被锁定
-            if (sfcProduceEntities.Any(a => a.Status == SfcProduceStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
+            if (sfcProduceEntities.Any(a => a.Status == SfcStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
 
-            // 当前工序是否是指定状态
-            if (sfcProduceEntities.Any(a => a.Status != produceStatus)) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
+            // 当前条码是否是指定状态
+            var sfcProduceEntitiesOfStatus = sfcProduceEntities.Where(a => a.Status != sfcStatus);
+            if (sfcProduceEntitiesOfStatus.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
+            }
 
             return sfcProduceEntities;
         }
 
+        /// <summary>
+        /// 检查条码状态是否合法
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="sfcStatus"></param>
+        /// <param name="localizationService"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcStatusEnum sfcStatus, ILocalizationService localizationService)
+        {
+            // 当前条码是否是已报废
+            if (sfcProduceEntities.Any(a => a.IsScrap == TrueOrFalseEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16324));
+
+            // 当前条码是否是被锁定
+            if (sfcProduceEntities.Any(a => a.Status == SfcStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
+
+            // 当前条码是否是指定状态
+            var sfcProduceEntitiesOfStatus = sfcProduceEntities.Where(a => a.Status != sfcStatus);
+            if (sfcProduceEntitiesOfStatus.Any())
+            {
+                foreach (var item in sfcProduceEntitiesOfStatus)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16361))
+                        .WithData("SFC", item.SFC)
+                        .WithData("Current", localizationService.GetSFCStatusEnumDescription(item.Status))
+                        .WithData("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
+                }
+            }
+
+            return sfcProduceEntities;
+        }
+
+        /// <summary>
+        /// 检查条码的复投次数
+        /// </summary>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="cycle"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCRepeatedCount(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, int cycle)
+        {
+            // 复投次数验证
+            var moreThanEntities = sfcProduceEntities.Where(a => a.RepeatedCount >= cycle);
+            if (moreThanEntities.Any() == false) return sfcProduceEntities;
+
+            foreach (var entity in moreThanEntities)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16360))
+                    .WithData("Current", entity.RepeatedCount)
+                    .WithData("Cycle", cycle)
+                    .WithData("SFC", entity.SFC);
+            }
+
+            return moreThanEntities;
+        }
 
         /// <summary>
         /// 工序活动状态校验
@@ -220,7 +276,25 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             return true;
         }
 
-
+        /// <summary>
+        /// 验证条码
+        /// </summary>
+        /// <param name="barCode"></param>
+        /// <param name="maskCodeRules"></param>
+        /// <returns></returns>
+        public static string GetSFCStatusEnumDescription(this ILocalizationService localizationService, SfcStatusEnum statusEnum)
+        {
+            return statusEnum switch
+            {
+                SfcStatusEnum.lineUp => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"),
+                SfcStatusEnum.Activity => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"),
+                SfcStatusEnum.InProductionComplete => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.InProductionComplete)}"),
+                SfcStatusEnum.Complete => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Complete)}"),
+                SfcStatusEnum.Locked => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Locked)}"),
+                SfcStatusEnum.Scrapping => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Scrapping)}"),
+                _ => ""
+            };
+        }
 
         /// <summary>
         /// 转换BO对象

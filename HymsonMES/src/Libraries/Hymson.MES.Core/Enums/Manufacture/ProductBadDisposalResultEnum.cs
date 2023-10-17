@@ -42,5 +42,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("维修")]
         repair = 6,
+
+        /// <summary>
+        /// 等待判定
+        /// </summary>
+        [Description("等待判定")]
+        WaitingJudge = 7,
     }
 }

@@ -51,5 +51,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         /// 是否在用
         /// </summary>
         public long? IsUsed { get; set; }
+
+        /// <summary>
+        /// manu_sfc_info 表 id
+        /// </summary>
+        public long SFCInfoId { get; set; }
+        
     }
 }

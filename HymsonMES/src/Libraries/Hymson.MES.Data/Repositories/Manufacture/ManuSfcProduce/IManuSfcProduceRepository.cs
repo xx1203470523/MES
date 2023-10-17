@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity> entities);
+        Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity>? entities);
 
         /// <summary>
         /// 批量更新（带状态检查）
@@ -111,11 +111,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> MultiUpdateRangeWithStatusCheckAsync(MultiUpdateProduceSFCCommand multiUpdateStatusCommand);
 
         /// <summary>
+        /// 批量更新（带状态检查）
+        /// </summary>
+        /// <param name="multiUpdateStatusCommand"></param>
+        /// <returns></returns>
+        Task<int> UpdateProduceInStationSFCAsync(IEnumerable<UpdateProduceInStationSFCCommand> multiUpdateProduceInStationSFCCommands);
+
+        /// <summary>
         /// 批量更新 
         /// </summary>
         /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys);
+
+        /// <summary>
+        /// 批量更新数量
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateQtyRangeAsync(IEnumerable<UpdateSfcProcedureQtyByIdCommand> commands);
 
         /// <summary>
         /// 删除
@@ -150,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<int> DeletePhysicalRangeByIdsSqlAsync(DeletePhysicalByProduceIdsCommand idsCommand);
+        Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand);
 
         /// <summary>
         /// 批量更新条码IsScrap
@@ -158,6 +172,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> UpdateIsScrapAsync(UpdateIsScrapCommand command);
+
+        /// <summary>
+        /// 根据清空复投次数
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> CleanRepeatedCountById(CleanRepeatedCountCommand command);
+
+        /// <summary>
+        /// 批量更新条码工艺路线和工序信息（条码独立更新）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateRouteByIdRangeAsync(IEnumerable<ManuSfcUpdateRouteByIdCommand> commands);
+
+        /// <summary>
+        /// 更新条码工艺路线和工序信息
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateRouteByIdAsync(ManuSfcUpdateRouteByIdCommand command);
 
         /// <summary>
         /// 批量更新条码工艺路线和工序信息
@@ -172,6 +207,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcInfoEntity"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(UpdateStatusCommand command);
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusByIdRangeAsync(IEnumerable<UpdateManuSfcProduceStatusByIdCommand> commands);
+
+        /// <summary>
+        /// 更新条码Status
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusByIdAsync(UpdateManuSfcProduceStatusByIdCommand command);
+
 
         /// <summary>
         /// 更新工序和工艺路线
@@ -284,7 +334,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSfcProduceBusinesssBySfcInfoIdsCommand command);
+        Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSFCProduceBusinesssByIdsCommand command);
 
         /// <summary>
         /// 批量删除（物理删除）

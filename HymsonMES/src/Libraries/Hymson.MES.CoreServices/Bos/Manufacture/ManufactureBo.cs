@@ -50,19 +50,30 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 扣料
     /// </summary>
-    public class MaterialDeductBo : MaterialDeductItemBo
+    public class MaterialDeductRequestBo
     {
         /// <summary>
-        /// 数据收集方式 
+        /// 站点Id
         /// </summary>
-        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+        public long SiteId { get; set; }
 
         /// <summary>
-        /// 描述 :数据收集方式
-        /// 空值 : true  
+        /// 工序id
         /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+        public long ProcedureId { get; set; }
 
+        /// <summary>
+        /// BOMId
+        /// </summary>
+        public long ProductBOMId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 扣料
+    /// </summary>
+    public class MaterialDeductResponseBo : MaterialDeductItemBo
+    {
         /// <summary>
         /// 替代料集合
         /// </summary>
@@ -81,6 +92,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long MaterialId { get; set; }
 
         /// <summary>
+        /// 物料Code
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
         /// 用量
         /// </summary>
         public decimal Usages { get; set; }
@@ -94,6 +110,16 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 消耗系数
         /// </summary>
         public decimal ConsumeRatio { get; set; } = 100;
+
+        /// <summary>
+        /// 数据收集方式（用之前要确认是否有赋值）
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 数据收集方式（用之前要确认是否有赋值）
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
 
