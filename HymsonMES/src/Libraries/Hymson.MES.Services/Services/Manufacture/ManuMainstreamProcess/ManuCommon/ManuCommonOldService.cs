@@ -11,6 +11,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -39,6 +40,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// 序列号服务
         /// </summary>
         private readonly ISequenceService _sequenceService;
+
+        /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
@@ -116,6 +122,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// </summary>
         /// <param name="currentSite"></param>
         /// <param name="sequenceService"></param>
+        /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
@@ -131,6 +138,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         public ManuCommonOldService(ICurrentSite currentSite, ISequenceService sequenceService,
+            IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -148,6 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         {
             _currentSite = currentSite;
             _sequenceService = sequenceService;
+            _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -434,82 +443,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <returns></returns>
         public async Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce)
         {
-            return await GetNextProcedureAsync(manuSfcProduce.ProcessRouteId, manuSfcProduce.ProcedureId, manuSfcProduce.WorkOrderId);
-        }
-
-        /// <summary>
-        /// 获当前工序对应的下一工序
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="workOrderId"></param>
-        /// <returns></returns>
-        public async Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0)
-        {
-            // 因为可能有分叉，所以返回的下一步工序是集合
-            var processRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetProcessRouteDetailLinksByProcessRouteIdAsync(processRouteId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
-
-            var processRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetProcessRouteDetailNodesByProcessRouteIdAsync(processRouteId)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
-
-            // 数据过滤
-            processRouteDetailLinks = processRouteDetailLinks.Where(w => w.PreProcessRouteDetailId == procedureId);
-            processRouteDetailNodes = processRouteDetailNodes.Where(w => processRouteDetailLinks.Select(s => s.ProcessRouteDetailId).Contains(w.ProcedureId));
-
-            // 随机工序Key
-            var cacheKey = $"{workOrderId}-{processRouteId}-{procedureId}";
-            var count = await _sequenceService.GetSerialNumberAsync(Sequences.Enums.SerialNumberTypeEnum.None, cacheKey, maxLength: 9);
-
-            // 默认下一工序
-            ProcProcessRouteDetailNodeEntity? defaultNextProcedure = null;
-
-            // 有多工序分叉的情况
-            if (processRouteDetailNodes.Count() > 1)
+            return await _masterDataService.GetNextProcedureAsync(new ManuRouteProcedureWithWorkOrderBo
             {
-                // 检查是否有"空值"类型的工序
-                defaultNextProcedure = processRouteDetailNodes.FirstOrDefault(f => f.CheckType == ProcessRouteInspectTypeEnum.None)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10441));
-
-                // 如果不是第一次走该工序，count是从1开始，不包括0。
-                if (count > 1)
-                {
-                    // 抽检类型不为空值的下一工序
-                    var nextProcedureOfNone = processRouteDetailNodes.FirstOrDefault(f => f.CheckType != ProcessRouteInspectTypeEnum.None)
-                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES10447));
-
-                    // 判断工序抽检比例
-                    if (nextProcedureOfNone.CheckType == ProcessRouteInspectTypeEnum.FixedScale
-                        && nextProcedureOfNone.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
-
-                    // 如果满足抽检次数，就取出一个非"空值"的随机工序作为下一工序
-                    if (count > 1 && count % nextProcedureOfNone.CheckRate == 0) defaultNextProcedure = nextProcedureOfNone;
-                }
-            }
-            // 没有分叉的情况
-            else
-            {
-                // 抽检类型不为空值的下一工序
-                defaultNextProcedure = processRouteDetailNodes.FirstOrDefault()
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10440));
-
-                switch (defaultNextProcedure.CheckType)
-                {
-                    case ProcessRouteInspectTypeEnum.FixedScale:
-                        // 判断工序抽检比例
-                        if (defaultNextProcedure.CheckRate == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10446));
-                        break;
-                    case ProcessRouteInspectTypeEnum.None:
-                    case ProcessRouteInspectTypeEnum.RandomInspection:
-                    case ProcessRouteInspectTypeEnum.SpecialSamplingInspection:
-                    default:
-                        break;
-                }
-            }
-
-            // 获取下一工序
-            if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
-            return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
+                ProcessRouteId = manuSfcProduce.ProcessRouteId,
+                ProcedureId = manuSfcProduce.ProcedureId,
+                WorkOrderId = manuSfcProduce.WorkOrderId
+            });
         }
 
         /// <summary>
