@@ -556,12 +556,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             //查询模组的NG记录
             var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(summaryQuery);
-            IEnumerable<ManuSfcSummaryEntity> InsertsRecord = manuSfcSummaries;
-            if (manuSfcSummaries.Any())
-            {
-                foreach (var item in manuSfcSummaries) { item.QualityStatus = 1; }
-            }
-
+            //IEnumerable<ManuSfcSummaryEntity> InsertsRecord = manuSfcSummaries;
 
             sfcProduceEntities.UpdatedBy = "PDA";
             sfcProduceEntities.UpdatedOn = HymsonClock.Now();
@@ -580,7 +575,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
- 
+
 
                 //解绑
                 if (sfcEntity.Any())
@@ -597,11 +592,17 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                     await _manuSfcCirculationRepository.UpdateRangeAsync(sfcEntity);
                 }
 
-                //ng记录
-                await _manuSfcSummaryRepository.InsertsRecordAsync(InsertsRecord.ToList());
 
-                //更新汇总
-                await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaries.ToList());
+                if (manuSfcSummaries.Any())
+                {
+                    //ng记录
+                    await _manuSfcSummaryRepository.InsertsRecordAsync(manuSfcSummaries.ToList());
+
+                    foreach (var item in manuSfcSummaries) { item.QualityStatus = 1; }
+
+                    //更新汇总
+                    await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaries.ToList());
+                }   
 
                 //在制更新
                 await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntities);
