@@ -381,7 +381,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
+            sfcProduceEntity.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                             .VerifyProcedure(bo.ProcedureId);
 
             // 出站

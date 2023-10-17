@@ -69,7 +69,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }
