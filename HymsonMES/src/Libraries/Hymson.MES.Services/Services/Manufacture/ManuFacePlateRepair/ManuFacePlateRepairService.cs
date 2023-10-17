@@ -2,7 +2,6 @@ using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -127,10 +126,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateRepairModifyDto> _validationModifyRules;
 
-        /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -156,7 +151,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuContainerPackRepository"></param>
-        /// <param name="eventBus"></param>
         public ManuFacePlateRepairService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository, IPlanWorkOrderRepository planWorkOrderRepository,
@@ -169,8 +163,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules,
         IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
         IManuCommonService manuCommonService,
-        IManuContainerPackRepository manuContainerPackRepository,
-        IEventBus<EventBusInstance1> eventBus)
+        IManuContainerPackRepository manuContainerPackRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -193,7 +186,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuContainerPackRepository = manuContainerPackRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
-            _eventBus = eventBus;
         }
 
         /// <summary>

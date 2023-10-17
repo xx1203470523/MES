@@ -107,7 +107,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procResourceRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
-        /// <param name="eventBus"></param>
         public ManuContainerBarcodeService(ICurrentUser currentUser,
             ICurrentSite currentSite,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository

@@ -54,16 +54,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="localizationService"></param>
-        /// <param name="eventBus"></param>
         public StopJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            ILocalizationService localizationService, IManuSfcRepository manuSfcRepository, IManuSfcStepRepository manuSfcStepRepository)
+            ILocalizationService localizationService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _localizationService = localizationService;
-            _manuSfcRepository= manuSfcRepository;
-            _manuSfcStepRepository= manuSfcStepRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
 
