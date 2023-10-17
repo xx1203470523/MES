@@ -225,7 +225,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                               .VerifyResource(commonBo.ResourceId);
 
             // 条码对应工序是否和出站工序一致
