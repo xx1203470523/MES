@@ -55,7 +55,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task GetBindCCSLocationAsyncTest()
         {
-            var bindCCSLocationDto = await _sfcCirculationService.GetBindCCSLocationAsync("AAATESTSFC2308091");
+            var bindCCSLocationDto = await _sfcCirculationService.GetBindCCSLocationAsync("YTLSM202310150292A");
             Assert.IsTrue(!string.IsNullOrEmpty(bindCCSLocationDto.CurrentLocation));
         }
         /// <summary>
@@ -236,11 +236,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
         [TestMethod()]
         public async Task GetCirculationModuleCCSInfoTest()
         {
-            string equipmentCode = "YTLPACK01VIR06";
+            string equipmentCode = "YTLPACK01AE019";
             try
             {
                 await SetEquInfoAsync(equipmentCode);
-                var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("YTLSM202310140063A");
+                var moduleCCSInfoDto = await _sfcCirculationService.GetCirculationModuleCCSInfoAsync("YTLSM202310150292A");
                 Assert.IsTrue(moduleCCSInfoDto != null);
             }
             catch (Exception ex)

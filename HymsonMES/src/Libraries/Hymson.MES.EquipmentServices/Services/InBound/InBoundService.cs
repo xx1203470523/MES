@@ -153,7 +153,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         {
             bool validateBatch = false;
             //校验电芯批次, 扫码&OCVR测试机,稍候增加配置管理功能
-            if (_currentEquipment.Code.Equals("YTLPACK01AE004-false"))
+            if (_currentEquipment.Code.Equals("YTLPACK01AE004"))
             {
                 validateBatch = true;
             }
@@ -213,10 +213,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             procedureEntityList = procProcedures.ToList();
 
             //复投次数限制，对于测试类型工序，条码复投数量大于等于工序循环次数限制进站
-            var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && c.RepeatedCount > (p.Cycle ?? 1))
-                                                         .Select(p => p.Id).Contains(c.ProcedureId)).Select(p => p.SFC);
-            if (noNeedRepeat.Any())
-                throw new CustomerValidationException(nameof(ErrorCode.MES19130)).WithData("SFCS", string.Join(',', noNeedRepeat));
+            //var noNeedRepeat = sfcProduceList.Where(c => procedureEntityList.Where(p => p.Type == ProcedureTypeEnum.Test && c.RepeatedCount > (p.Cycle ?? 1))
+            //                                             .Select(p => p.Id).Contains(c.ProcedureId)).Select(p => p.SFC);
+            //if (noNeedRepeat.Any())
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19130)).WithData("SFCS", string.Join(',', noNeedRepeat));
 
             //当前所在工序不是测试工序，条码不是排队状态不允许进站
             var noLinUpSFCs = sfcProduceList.Where(c => c.Status != SfcProduceStatusEnum.lineUp

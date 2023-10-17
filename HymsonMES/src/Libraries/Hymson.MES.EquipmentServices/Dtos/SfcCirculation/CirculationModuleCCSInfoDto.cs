@@ -22,6 +22,32 @@
         /// 模组是否存在NG
         /// </summary>
         public bool IsNg { get; set; } = false;
+
+        /// <summary>
+        /// NG信息
+        /// </summary>
+        public CirculationModuleNgInfo? NgInfo { get; set; }
+    }
+
+    /// <summary>
+    /// Ng信息
+    /// </summary>
+    public class CirculationModuleNgInfo
+    {
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string? ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime? CreatedOn { get; set; }
     }
 
     /// <summary>
