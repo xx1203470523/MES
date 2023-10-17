@@ -661,6 +661,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 已完工（ 如果没有尾工序，就表示已完工）
             if (nextProcedure == null)
             {
+                responseBo.IsLastProcedure = true;
+
                 // 条码状态为"完成"
                 manuSfcEntity.Status = SfcStatusEnum.Complete;
 
@@ -713,7 +715,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 未完工（下一工序排队）
             else
             {
-                responseBo.IsLastProcedure = false;
                 responseBo.NextProcedureCode = nextProcedure.Code;
 
                 // 条码状态跟在制品状态一致
@@ -813,6 +814,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 已完工（ 如果没有尾工序，就表示已完工）
                 if (nextProcedure == null)
                 {
+                    //responseBo.IsLastProcedure = true;
+
                     // 清空复投次数
                     sfcProduceEntity.RepeatedCount = 0;
 
@@ -825,7 +828,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 未完工（下一工序排队）
                 else
                 {
-                    responseBo.IsLastProcedure = false;
                     responseBo.NextProcedureCode = nextProcedure.Code;
 
                     // 条码状态跟在制品状态一致

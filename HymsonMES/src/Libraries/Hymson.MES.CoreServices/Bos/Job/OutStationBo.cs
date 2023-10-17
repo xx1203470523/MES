@@ -74,7 +74,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 是否尾工序（ 如果已经是尾工序，就表示已完工）
         /// </summary>
-        public bool IsLastProcedure { get; set; } = true;
+        public bool IsLastProcedure { get; set; } = false;
 
         /// <summary>
         /// 
