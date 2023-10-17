@@ -127,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
-        /// 
+        /// 仓储接口（条码工序生产汇总表）
         /// </summary>
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
@@ -809,8 +809,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             sfcProduceEntity.UpdatedOn = commonBo.Time;
 
             // 如果超过复投次数
+            var isMoreThanCycle = false;
             if (sfcProduceEntity.RepeatedCount >= cycle)
             {
+                // 是否超过复投次数
+                isMoreThanCycle = true;
+
                 // 已完工（ 如果没有尾工序，就表示已完工）
                 if (nextProcedure == null)
                 {
@@ -882,10 +886,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
                     Qty = stepEntity.Qty,
-                    Status = stepEntity.CurrentStatus == SfcStatusEnum.InProductionComplete ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
+                    Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
                     Remark = stepEntity.Remark,
-                    DisposalResult = stepEntity.CurrentStatus == SfcStatusEnum.InProductionComplete ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
+                    DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
