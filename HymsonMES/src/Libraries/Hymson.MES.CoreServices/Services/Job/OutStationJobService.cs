@@ -127,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
-        /// 
+        /// 仓储接口（条码工序生产汇总表）
         /// </summary>
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
 
@@ -303,6 +303,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
+            }
+
+            // 是否有不属于在制品表的条码
+            var notIncludeSFCs = multiSFCBo.SFCs.Except(sfcProduceEntities.Select(s => s.SFC));
+            if (notIncludeSFCs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', notIncludeSFCs));
             }
 
             // 条码信息
@@ -809,8 +816,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             sfcProduceEntity.UpdatedOn = commonBo.Time;
 
             // 如果超过复投次数
+            var isMoreThanCycle = false;
             if (sfcProduceEntity.RepeatedCount >= cycle)
             {
+                // 是否超过复投次数
+                isMoreThanCycle = true;
+
                 // 已完工（ 如果没有尾工序，就表示已完工）
                 if (nextProcedure == null)
                 {
@@ -882,10 +893,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
                     Qty = stepEntity.Qty,
-                    Status = stepEntity.CurrentStatus == SfcStatusEnum.InProductionComplete ? ProductBadRecordStatusEnum.Close : ProductBadRecordStatusEnum.Open,
+                    Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
                     Remark = stepEntity.Remark,
-                    //DisposalResult = ProductBadDisposalResultEnum.AutoHandle,
+                    DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });

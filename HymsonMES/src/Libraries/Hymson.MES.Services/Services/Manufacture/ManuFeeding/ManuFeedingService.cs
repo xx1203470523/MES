@@ -90,6 +90,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
         /// <summary>
+        /// 仓储接口（工序）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
         ///  仓储（工单）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -134,6 +139,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procReplaceMaterialRepository"></param>
+        /// <param name="procProcedureRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="manuFeedingRepository"></param>
@@ -150,6 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
+            IProcProcedureRepository procProcedureRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IManuFeedingRepository manuFeedingRepository,
@@ -168,6 +175,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
+            _procProcedureRepository = procProcedureRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _manuFeedingRepository = manuFeedingRepository;
@@ -278,8 +286,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             if (queryDto.Source == ManuSFCFeedingSourceEnum.BOM)
             {
+                // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料
+                var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    ResourceId = queryDto.ResourceId
+                });
+
                 // 通过产线->工单->BOM->查询物料
-                bomMaterialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId);
+                bomMaterialIds = await GetMaterialIdsByWorkCenterIdAsync(workCenterLineEntity.Id, queryDto.WorkOrderId, procedureEntity?.Id);
 
                 // BOM的物料ID
                 if (bomMaterialIds != null) materialIds.AddRange(bomMaterialIds);
@@ -653,8 +668,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="workCenterId"></param>
         /// <param name="workOrderId"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId, long? workOrderId)
+        private async Task<IEnumerable<long>?> GetMaterialIdsByWorkCenterIdAsync(long workCenterId, long? workOrderId, long? procedureId)
         {
             // 通过工单查询BOM
             var bomIds = await GetBomIdsByWorkCenterIdAsync(workCenterId, workOrderId);
@@ -664,7 +680,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             if (bomDetailEntities == null) return null;
 
             // 数据收集方式为“批次”的物料
-            var bomDetailEntitiesOfBatch = bomDetailEntities.Where(w => w.DataCollectionWay == MaterialSerialNumberEnum.Batch);
+            var bomDetailEntitiesOfBatch = bomDetailEntities
+                .Where(w => w.DataCollectionWay == MaterialSerialNumberEnum.Batch)
+                .Where(w => w.ProcedureId == procedureId);
 
             // 当“数据收集方式”为空，则去检查物料维护中 物料的“数据收集方式”，为批次也可以加载进来
             // 因为目前BOM里面的“数据收集方式”为必填项，因为无需理会
