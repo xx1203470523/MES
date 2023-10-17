@@ -345,7 +345,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 { "SiteId", 123456 },
                 {"SiteName","单元测试站点"}
             };
-            
+
 
             await _sfcCirculationService.PDASfcCirculationUnBindAsync(request, SfcCirculationTypeEnum.Merge);
 
@@ -427,8 +427,8 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 SiteId = 123456,
                 Sfcs = SFCs
             });
-            
-            if(!sfcProduceEntities.Any())
+
+            if (!sfcProduceEntities.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", SFCs);
 
             //加工中,未出站
@@ -519,39 +519,99 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             };
 
             var sfcEntity = await _sfcCirculationService.GetSfcCirculationUnBindAsync(unbound, SfcCirculationTypeEnum.Merge);
-   
 
-            if(!sfcEntity.Any())
+
+            if (!sfcEntity.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19106));
             }
-            var SFCs = sfcEntity.Select(x => x.SFC).ToArray();
+
+            //实际这里只处理模组在制即可
+            //var SFCs = sfcEntity.Select(x => x.SFC).ToArray();
             // 条码在制表
-            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            //var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
+            //{
+            //    SiteId = 123456,
+            //    Sfcs = SFCs
+            //});
+
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
             {
                 SiteId = 123456,
-                Sfcs = SFCs
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", SFCs);
+                Sfc = resumptionInputDto.SFC
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", resumptionInputDto.SFC);
 
 
+            //复投位的资源
             var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(resumptionInputDto.RepeatLocationId);
 
-            //更新manuSfcProduce
 
-            foreach (var item in sfcProduceEntities)
+            //更新汇总表
+            var summaryQuery = new ManuSfcSummaryQuery()
             {
-                item.UpdatedBy = "PDA";
-                item.UpdatedOn = HymsonClock.Now();
+                SFCS = new string[] { resumptionInputDto.SFC },
+                QualityStatus = 0,//0 不合格，代表NG状态
+                SiteId = _currentEquipment.SiteId,
+            };
 
-                item.Status = SfcProduceStatusEnum.lineUp;
-                item.ProcedureId = resumptionInputDto.RepeatLocationId;
-                item.ResourceId = resources.FirstOrDefault()?.Id;
+            //查询模组的NG记录
+            var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(summaryQuery);
+            IEnumerable<ManuSfcSummaryEntity> InsertsRecord = manuSfcSummaries;
+            if (manuSfcSummaries.Any())
+            {
+                foreach (var item in manuSfcSummaries) { item.QualityStatus = 1; }
             }
-            //在制更新
-            await _manuSfcProduceRepository.UpdateRangeAsync(sfcProduceEntities);
 
 
-            //报废 暂时不废
+            sfcProduceEntities.UpdatedBy = "PDA";
+            sfcProduceEntities.UpdatedOn = HymsonClock.Now();
+            sfcProduceEntities.Status = SfcProduceStatusEnum.lineUp;
+            sfcProduceEntities.ProcedureId = resumptionInputDto.RepeatLocationId;
+            sfcProduceEntities.ResourceId = resources.FirstOrDefault()?.Id;
+            //更新在制
+            //foreach (var item in sfcProduceEntities)
+            //{
+            //    item.UpdatedBy = "PDA";
+            //    item.UpdatedOn = HymsonClock.Now();
+            //    item.Status = SfcProduceStatusEnum.lineUp;
+            //    item.ProcedureId = resumptionInputDto.RepeatLocationId;
+            //    item.ResourceId = resources.FirstOrDefault()?.Id;
+            //}
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+ 
+
+                //解绑
+                if (sfcEntity.Any())
+                {
+                    foreach (var entity in sfcEntity)
+                    {
+                        entity.IsDisassemble = TrueOrFalseEnum.Yes;
+                        entity.DisassembledBy = "PDA";
+                        entity.DisassembledOn = HymsonClock.Now();
+                        entity.UpdatedBy = "PDA";
+                        entity.UpdatedOn = HymsonClock.Now();
+                        //manuSfcCirculationEntities.Add(entity);
+                    }
+                    await _manuSfcCirculationRepository.UpdateRangeAsync(sfcEntity);
+                }
+
+                //ng记录
+                await _manuSfcSummaryRepository.InsertsRecordAsync(InsertsRecord.ToList());
+
+                //更新汇总
+                await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaries.ToList());
+
+                //在制更新
+                await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntities);
+
+
+                //报废 暂时不废
+
+
+                ts.Complete();
+            }
         }
 
     }

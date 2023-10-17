@@ -182,6 +182,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量新增记录表
+        /// </summary>
+        /// <param name="manuSfcSummaryEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsRecordAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertsRecordSql, manuSfcSummaryEntitys);
+        }
+
+        
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcSummaryEntity"></param>
@@ -228,6 +241,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string InsertSql = "INSERT INTO `manu_sfc_summary`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `BeginTime`, `EndTime`, `RepeatedCount`, `Qty`, `NgNum`, `FirstQualityStatus`, `QualityStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @SFC, @WorkOrderId, @ProductId, @BeginTime, @EndTime, @RepeatedCount, @Qty, @NgNum, @FirstQualityStatus, @QualityStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `manu_sfc_summary`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `BeginTime`, `EndTime`, `RepeatedCount`, `Qty`, `NgNum`, `FirstQualityStatus`, `QualityStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @SFC, @WorkOrderId, @ProductId, @BeginTime, @EndTime, @RepeatedCount, @Qty, @NgNum, @FirstQualityStatus, @QualityStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsRecordSql = "INSERT INTO `manu_sfc_summary_record`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `BeginTime`, `EndTime`, `RepeatedCount`, `Qty`, `NgNum`, `FirstQualityStatus`, `QualityStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @SFC, @WorkOrderId, @ProductId, @BeginTime, @EndTime, @RepeatedCount, @Qty, @NgNum, @FirstQualityStatus, @QualityStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string InsertOrUpdateSql = "INSERT INTO `manu_sfc_summary`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `BeginTime`, `EndTime`, `RepeatedCount`, `Qty`, `NgNum`, `FirstQualityStatus`, `QualityStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @SFC, @WorkOrderId, @ProductId, @BeginTime, @EndTime, @RepeatedCount, @Qty, @NgNum, @FirstQualityStatus, @QualityStatus, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ) ON DUPLICATE KEY UPDATE" +
                                         " BeginTime=@BeginTime,EndTime=@EndTime,RepeatedCount=@RepeatedCount,Qty=@Qty,NgNum=@NgNum,FirstQualityStatus=@FirstQualityStatus,QualityStatus=@QualityStatus,UpdatedBy=@UpdatedBy,UpdatedOn=NOW(),IsDeleted=@IsDeleted ";

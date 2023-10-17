@@ -32,6 +32,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertsAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys);
 
         /// <summary>
+        /// 批量新增记录表
+        /// </summary>
+        /// <param name="manuSfcSummaryEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertsRecordAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuSfcSummaryEntity"></param>

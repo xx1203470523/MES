@@ -473,7 +473,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 
 
         /// <summary>
-        /// 流转表解绑，并返回流转信息
+        /// 流转表解绑，并返回流转信息 PDA复投
         /// </summary>
         /// <param name="sfcCirculationUnBindDto"></param>
         /// <param name="sfcCirculationTypeEnum"></param>
@@ -509,19 +509,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //查询流转条码绑定记录
             var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodequery);
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
-            if (circulationBarCodeEntities.Any())
-            {
-                foreach (var entity in circulationBarCodeEntities)
-                {
-                    entity.IsDisassemble = TrueOrFalseEnum.Yes;
-                    entity.DisassembledBy = "PDA";
-                    entity.DisassembledOn = HymsonClock.Now();
-                    entity.UpdatedBy = "PDA";
-                    entity.UpdatedOn = HymsonClock.Now();
-                    manuSfcCirculationEntities.Add(entity);
-                }
-                await _manuSfcCirculationRepository.UpdateRangeAsync(manuSfcCirculationEntities);
-            }
+         
 
             return circulationBarCodeEntities;
         }

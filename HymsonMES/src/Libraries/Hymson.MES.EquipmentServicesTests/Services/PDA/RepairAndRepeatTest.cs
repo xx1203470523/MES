@@ -74,8 +74,8 @@ public class RepairAndRepeatTest : BaseTest
     {
         var query = new ResumptionInputDto
         {
-            SFC = "YTLSM202309110005A",
-            RepeatLocationId = 20033299167047680,
+            SFC = "YTLSM202309130013A",
+            RepeatLocationId = 20033521880395776,
             NGLocationId = 0
         };
 
