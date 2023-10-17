@@ -303,7 +303,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" si.IsDeleted = 0 ");
             sqlBuilder.Where(" si.IsUsed = 1 ");
 
-            sqlBuilder.Where(" s.IsDeleted = 0 ");
+            // 2023.10.17 中越说去掉，克明说可以去掉
+            //sqlBuilder.Where(" s.IsDeleted = 0 ");
 
             if (pageQuery.MaterialId.HasValue)
             {
