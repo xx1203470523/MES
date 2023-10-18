@@ -175,6 +175,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 类型;0、产品序列码   1 载具编码
         /// </summary>
         public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
 
@@ -281,6 +286,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 类型;0、产品序列码   1 载具编码
         /// </summary>
         public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>
@@ -392,6 +402,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
 
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>

@@ -117,5 +117,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 类型;0、产品序列码   1 载具编码
         /// </summary>
         public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 }
