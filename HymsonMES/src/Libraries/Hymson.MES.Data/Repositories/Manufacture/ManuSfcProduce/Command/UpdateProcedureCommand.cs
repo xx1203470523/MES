@@ -20,7 +20,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工序
@@ -77,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 状态
         /// </summary>
-        public SfcProduceStatusEnum? Status { get; set; }
+        public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 操作人员

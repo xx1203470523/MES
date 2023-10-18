@@ -88,5 +88,35 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 说明
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 关闭人
+        /// </summary>
+        public string? CloseBy { get; set; }
+
+        /// <summary>
+        /// 关闭时间
+        /// </summary>
+        public DateTime? CloseOn { get; set; }
+
+        /// <summary>
+        /// 复判人
+        /// </summary>
+        public string? ReJudgmentBy { get; set; }
+
+        /// <summary>
+        /// 复判时间
+        /// </summary>
+        public DateTime? ReJudgmentOn { get; set; }
+
+        /// <summary>
+        /// 复判结果
+        /// </summary>
+        public ProductBadDisposalResultEnum? ReJudgmentResult { get; set; }
+
+        /// <summary>
+        /// 复判步骤表id
+        /// </summary>
+        public long? ReJudgmentSfcStepId { get; set; }
     }
 }

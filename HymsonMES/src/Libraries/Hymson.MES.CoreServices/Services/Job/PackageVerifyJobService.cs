@@ -3,7 +3,6 @@ using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
@@ -29,11 +28,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="localizationService"></param>
-        public PackageVerifyJobService(IMasterDataService masterDataService,
-            ILocalizationService localizationService)
+        public PackageVerifyJobService(IMasterDataService masterDataService, ILocalizationService localizationService)
         {
             _masterDataService = masterDataService;
             _localizationService = localizationService;
@@ -55,7 +52,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }

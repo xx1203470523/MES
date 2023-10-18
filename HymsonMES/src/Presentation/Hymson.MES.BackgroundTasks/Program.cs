@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.BackgroundTasks;
 using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
+using Hymson.MES.BackgroundTasks.Manufacture;
 using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +46,11 @@ Host.CreateDefaultBuilder(args)
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
            q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
            #endregion
+
+           #region 生产
+           q.AddJobAndTrigger<Productionstatistic>(hostContext.Configuration);
+           #endregion
+
            q.UsePersistentStore((persistentStoreOptions) =>
            {
                persistentStoreOptions.UseProperties = true;
@@ -57,7 +63,7 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
        });
-       
+
        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
        services.AddHostedService<SubHostedService>();
        services.AddSqlExecuteTaskService(hostContext.Configuration);

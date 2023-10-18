@@ -62,11 +62,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("不良复判")]
         BadRejudgment = 11,
-        ///// <summary>
-        ///// 合并
-        ///// </summary>
-        //[Description("合并")]
-        //Merge = 12,
+        /// <summary>
+        /// 返修
+        /// </summary>
+        [Description("返修")]
+        Maintenance = 12,
         /// <summary>
         /// 转换
         /// </summary>
@@ -137,16 +137,16 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("替换")]
         Replace = 26,
-        ///// <summary>
-        ///// 条码绑定
-        ///// </summary>
-        //[Description("条码绑定")]
-        //BarcodeBinding = 27,
-        ///// <summary>
-        ///// 条码解绑
-        ///// </summary>
-        //[Description("条码解绑")]
-        //BarcodeUnbinding = 28,
+        /// <summary>
+        /// 条码绑定
+        /// </summary>
+        [Description("条码绑定")]
+        BarcodeBinding = 27,
+        /// <summary>
+        /// 条码解绑
+        /// </summary>
+        [Description("条码解绑")]
+        BarcodeUnbinding = 28,
         /// <summary>
         /// 包装
         /// </summary>
@@ -167,6 +167,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 移除降级
         /// </summary>
         [Description("移除降级")]
-        RemoveDowngrading = 32
+        RemoveDowngrading = 32,
+        /// <summary>
+        /// 产出上报
+        /// </summary>
+        [Description("产出上报")]
+        OutputReport = 33
     }
 }

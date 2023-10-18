@@ -1,5 +1,4 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -33,7 +32,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     ///  
     /// </summary>
-    public class PackageOpenResponseBo : JobResultBo
+    public class PackageOpenResponseBo 
     {
         /// <summary>
         /// 内容

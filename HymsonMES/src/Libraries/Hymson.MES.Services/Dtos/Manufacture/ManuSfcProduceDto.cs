@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
@@ -198,6 +198,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 操作类型（报废/取消报废）
         /// </summary>
         public ScrapOperateTypeEnum OperationType { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long? ProcedureId { get; set; }
 
         /// <summary>
         /// 条码列表
@@ -456,7 +461,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 条码状态
         /// </summary>
-        public SfcProduceStatusEnum? Status { get; set; }
+        public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 工单
@@ -532,7 +537,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 条码状态
         /// </summary>
-        public SfcProduceStatusEnum? Status { get; set; }
+        public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 工单Id
@@ -619,7 +624,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public SfcProduceStatusEnum? Status { get; set; }
+        public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 工单
@@ -768,7 +773,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作类型
         /// </summary>
-        public SfcProduceStatusEnum Type { get; set; }
+        public SfcStatusEnum Type { get; set; }
 
         /// <summary>
         /// 备注
@@ -829,7 +834,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作类型
         /// </summary>
-        public SfcProduceStatusEnum OperationType { get; set; }
+        public SfcStatusEnum OperationType { get; set; }
 
         /// <summary>
         /// 备注
@@ -862,7 +867,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工序Code

@@ -57,14 +57,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuFacePlateContainerPackRepository _manuFacePlateContainerPackRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
+
         /// <summary>
         /// 仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
-        /// <summary>
-        /// 条码步骤表仓储 仓储
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
         /// <summary>
         /// 仓储接口（条码信息）
         /// </summary>
@@ -79,7 +77,39 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
-        public ManuContainerBarcodeService(ICurrentUser currentUser, ICurrentSite currentSite, IManuContainerBarcodeRepository manuContainerBarcodeRepository
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuContainerBarcodeRepository"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="ingiContainerRepository"></param>
+        /// <param name="inteCodeRulesRepository"></param>
+        /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuContainerPack"></param>
+        /// <param name="manuFacePlateRepository"></param>
+        /// <param name="manuFacePlateContainerPackRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="manuContainerPackRecordService"></param>
+        /// <param name="validationCreateManuContainerBarcodeRules"></param>
+        /// <param name="validationUpdateStatusRules"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="procResourceRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        public ManuContainerBarcodeService(ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository
             , AbstractValidator<ManuContainerBarcodeModifyDto> validationModifyRules
             , IManuContainerPackRepository manuContainerPackRepository
             , IInteContainerRepository ingiContainerRepository
@@ -94,11 +124,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             , IManuContainerPackRecordService manuContainerPackRecordService
             , AbstractValidator<CreateManuContainerBarcodeDto> validationCreateManuContainerBarcodeRules,
              AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules
-             , IManuSfcProduceRepository manuSfcProduceRepository
-            , IProcResourceRepository procResourceRepository
+             , IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
+            ProcResourceRepository procResourceRepository
             , IManuSfcRepository manuSfcRepository,
-           IWhMaterialInventoryRepository whMaterialInventoryRepository,
-           IManuSfcStepRepository manuSfcStepRepository)
+           IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -117,10 +147,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuFacePlateRepository = manuFacePlateRepository;
             _manuFacePlateContainerPackRepository = manuFacePlateContainerPackRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
         }
 
@@ -210,12 +240,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes)
                     throw new CustomerValidationException(nameof(ErrorCode.MES16720));
                 //是否允许活动产品
-                if (sfcProduceEntity.Status == SfcProduceStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
+                if (sfcProduceEntity.Status == SfcStatusEnum.Activity && !facePlateContainerPackEntity.IsAllowActiveProduct)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16711));
                 }
                 //是否允许排队产品
-                if (sfcProduceEntity.Status == SfcProduceStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
+                if (sfcProduceEntity.Status == SfcStatusEnum.lineUp && !facePlateContainerPackEntity.IsAllowQueueProduct)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16713));
                 }
@@ -251,7 +281,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProductBOMId = 0,
                         EquipmentId = 0,
                         Qty = sfcEntity?.Qty ?? 0,
-                        Status = SfcProduceStatusEnum.Complete,
+                        Status = SfcStatusEnum.Complete,
                         ResourceId = createManuContainerBarcodeDto.ResourceId,
                         ProcedureId = createManuContainerBarcodeDto.ProcedureId,
                     };
@@ -413,7 +443,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             var sfcStepEntity = CreateSFCStepEntity(sfcProduceEntity);
                             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
                             {
-                                //记录step信息
+                                // 记录step信息
                                 await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
 
                                 await _manuContainerPack.CreateManuContainerPackAsync(new ManuContainerPackCreateDto()
@@ -693,7 +723,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     if (level == 1)
                     {
-                        //记录step信息
+                        // 记录step信息
                         await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
                     }
                     rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);
@@ -753,7 +783,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             if (level == 1)
                             {
-                                //记录step信息
+                                // 记录step信息
                                 await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
                             }
                             rows += await _manuContainerBarcodeRepository.InsertAsync(manuContainerBarcodeEntity);

@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
@@ -21,11 +22,9 @@ using Hymson.MES.HttpClients;
 using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
-using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -71,7 +70,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 仓储（条码步骤）
+        /// 仓储接口（条码步骤）
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
@@ -91,7 +90,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcLabelTemplateRepository _procLabelTemplateRepository;
         private readonly ILabelPrintRequest _labelPrintRequest;
-
+        private readonly ILocalizationService _localizationService;
         /// <summary>
         /// 工序-物料-打印模板
         /// </summary>
@@ -107,6 +106,9 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="validationCreatePrintRules"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         /// <param name="procPrintConfigRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
@@ -114,16 +116,17 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="procMaterialRepository"></param>
         /// <param name="procLabelTemplateRepository"></param>
         /// <param name="labelPrintRequest"></param>
-        /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
-        /// /// <param name="manuCreateBarcodeService"></param>
+        /// <param name="manuCreateBarcodeService"></param>
+        /// <param name="localizationService"></param>
         public PlanSfcPrintService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<PlanSfcPrintCreateDto> validationCreateRules,
             AbstractValidator<PlanSfcPrintCreatePrintDto> validationCreatePrintRules,
             IManuCommonService manuCommonService,
             IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
             IProcPrintConfigRepository procPrintConfigRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
@@ -131,11 +134,9 @@ namespace Hymson.MES.Services.Services.Plan
             IProcMaterialRepository procMaterialRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             ILabelPrintRequest labelPrintRequest,
-            IManuSfcInfoRepository manuSfcInfoRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            IManuCreateBarcodeService manuCreateBarcodeService)
+            IManuCreateBarcodeService manuCreateBarcodeService,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -155,6 +156,7 @@ namespace Hymson.MES.Services.Services.Plan
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _labelPrintRequest = labelPrintRequest;
             _manuCreateBarcodeService = manuCreateBarcodeService;
+            _localizationService = localizationService;
         }
 
 
@@ -196,7 +198,7 @@ namespace Hymson.MES.Services.Services.Plan
                 work = await _planWorkOrderRepository.GetByCodeAsync(new Data.Repositories.Plan.PlanWorkOrder.Query.PlanWorkOrderQuery()
                 {
                     OrderCode = createDto.OrderCode,
-                    SiteId = _currentSite.SiteId ?? 123456
+                    SiteId = _currentSite.SiteId ?? 0
                 });
             }
             else
@@ -209,7 +211,7 @@ namespace Hymson.MES.Services.Services.Plan
                 MaterialId = material.Id,
                 ProcedureId = createDto.ProcedureId,
                 Version = material?.Version ?? "",
-                SiteId = _currentSite.SiteId ?? 123456
+                SiteId = _currentSite.SiteId ?? 0
 
             });
             PrintRequest printEntity = new PrintRequest();
@@ -223,7 +225,7 @@ namespace Hymson.MES.Services.Services.Plan
                     {
                         TemplatePath = tl.Path,
                         PrinterName = print.PrintName,
-                        PrintCount = pprp.Copy??1,
+                        PrintCount = pprp.Copy ?? 1,
                         Params = new List<PrintBody.ParamEntity>()
                         {
                             new PrintBody.ParamEntity()
@@ -237,7 +239,7 @@ namespace Hymson.MES.Services.Services.Plan
                                 ParamValue = (_currentSite.SiteId??123456).ToString()
                             }
                         }
-                        
+
                     };
                     printEntity.Bodies.Add(body);
                 }
@@ -247,8 +249,6 @@ namespace Hymson.MES.Services.Services.Plan
             var result = await _labelPrintRequest.PrintAsync(printEntity);
             if (!result.result)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17003)).WithData("msg", result.msg);
-
-
         }
 
         /// <summary>
@@ -281,11 +281,13 @@ namespace Hymson.MES.Services.Services.Plan
                     UserId = _currentUser.UserName,
                     DeleteOn = HymsonClock.Now()
                 });
+
                 rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new Data.Repositories.Manufacture.ManuSfcProduce.Command.DeletePhysicalBySfcsCommand()
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     Sfcs = sfcEntities.Select(s => s.SFC).ToArray()
                 });
+
                 rows += await _manuSfcStepRepository.InsertRangeAsync(sfcEntities.Select(s => new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -295,7 +297,7 @@ namespace Hymson.MES.Services.Services.Plan
                     ProductId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.ProductId,
                     WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId,
                     Operatetype = ManuSfcStepTypeEnum.Delete,
-                    CurrentStatus = SfcProduceStatusEnum.Complete,
+                    CurrentStatus = SfcStatusEnum.Complete,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 }));
@@ -344,7 +346,7 @@ namespace Hymson.MES.Services.Services.Plan
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
                 Qty = parm.Qty
-            });
+            }, _localizationService);
         }
 
         /// <summary>
@@ -360,7 +362,7 @@ namespace Hymson.MES.Services.Services.Plan
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
                 Qty = parm.Qty
-            });
+            }, _localizationService);
 
             foreach (var item in list)
             {

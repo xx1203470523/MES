@@ -120,6 +120,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventTypeUpgradeRepository, InteEventTypeUpgradeRepository>();
             services.AddSingleton<IInteEventTypeUpgradeMessageGroupRelationRepository, InteEventTypeUpgradeMessageGroupRelationRepository>();
 
+            services.AddSingleton<IInteTimeWildcardRepository, InteTimeWildcardRepository>();
+
             services.AddSingleton<IInteMessageManageRepository, InteMessageManageRepository>();
             services.AddSingleton<IInteMessageManageAnalysisReportAttachmentRepository, InteMessageManageAnalysisReportAttachmentRepository>();
             services.AddSingleton<IInteMessageManageHandleProgrammeAttachmentRepository, InteMessageManageHandleProgrammeAttachmentRepository>();
@@ -286,7 +288,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuDowngradingRepository, ManuDowngradingRepository>();
             services.AddSingleton<IManuDowngradingRecordRepository, ManuDowngradingRecordRepository>();
-
+            services.AddSingleton<IManuSfcSummaryRepository, ManuSfcSummaryRepository>();
+            services.AddSingleton<IManuSfcScrapRepository, ManuSfcScrapRepository>();
             #endregion
 
             #region Warehouse 

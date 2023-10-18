@@ -56,11 +56,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private readonly IMasterDataService _masterDataService;
 
         /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 仓储接口（条码信息）
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
@@ -69,6 +64,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 仓储接口（上料信息）
@@ -107,6 +107,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
         private readonly ILocalizationService _localizationService;
 
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -114,9 +115,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="currentSite"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="masterDataService"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
@@ -124,28 +125,29 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        /// /// <param name="localizationService"></param>
+        /// <param name="localizationService"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
             IMasterDataService masterDataService,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcMaterialRepository procMaterialRepository,
-             IProcProcessRouteRepository procProcessRouteRepository,
+            IProcProcessRouteRepository procProcessRouteRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
-            IWhMaterialStandingbookRepository whMaterialStandingbookRepository, ILocalizationService localizationService)
+            IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
             _masterDataService = masterDataService;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -198,7 +200,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var nextProcedure = await _manuCommonOldService.GetNextProcedureAsync(sfcProduceEntity);
 
             // 扣料
-            var initialMaterials = await _masterDataService.GetInitialMaterialsAsync(sfcProduceEntity);
+            var initialMaterials = await _masterDataService.GetInitialMaterialsAsync(new MaterialDeductRequestBo
+            {
+                SiteId = sfcProduceEntity.SiteId,
+                ProcedureId = sfcProduceEntity.ProcedureId,
+                ProductBOMId = sfcProduceEntity.ProductBOMId
+            });
 
             // 物料ID集合
             var materialIds = initialMaterials.Select(s => s.MaterialId);
@@ -214,7 +221,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var manuFeedingsDictionary = allFeedingEntities.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 过滤扣料集合
-            List<UpdateQtyByIdCommand> updates = new();
+            List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in initialMaterials)
             {
@@ -261,7 +268,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             // 更新物料库存
             if (updates.Any())
             {
-                rows += await _manuFeedingRepository.UpdateQtyByIdAsync(updates);
+                rows += await _manuFeedingRepository.UpdateFeedingQtyByIdAsync(updates);
 
                 // 未更新到全部需更新的数据，事务回滚
                 if (updates.Count > rows)
@@ -283,7 +290,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             {
                 // 插入 manu_sfc_step 状态为 完成
                 sfcStep.Operatetype = currentProcessRoute.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                sfcStep.CurrentStatus = SfcProduceStatusEnum.Complete;  // TODO 这里的状态？？
+                sfcStep.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
+
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
 
@@ -307,7 +315,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                     tasks.Add(manuSfcProduceDeleteSfcProduceBusinessBySfcInfoIdTask);
 
                     // 更新完工数量
-                    var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyCommand
+                    var planWorkOrderUpdateFinishProductQuantityByWorkOrderIdTask = _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdAsync(new UpdateQtyByWorkOrderIdCommand
                     {
                         UpdatedBy = sfcProduceEntity.UpdatedBy,
                         UpdatedOn = sfcProduceEntity.UpdatedOn,
@@ -334,15 +342,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             else
             {
                 // 修改 manu_sfc_produce 为排队, 工序修改为下一工序的id
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.ProcedureId = nextProcedure.Id;
                 // 不置空的话，可能进站时，可能校验不通过
                 sfcProduceEntity.ResourceId = null;
+
                 var manuSfcProduceUpdateTask = _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
                 tasks.Add(manuSfcProduceUpdateTask);
 
+
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
+           
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
             }
@@ -350,20 +361,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             await Task.WhenAll(tasks);
             trans.Complete();
 
-            return rows;
-        }
-
-        /// <summary>
-        /// 出站（批量）
-        /// </summary>
-        /// <param name="bos"></param>
-        /// <returns></returns>
-        public async Task<int> OutStationAsync(IEnumerable<ManufactureBo> bos)
-        {
-            var rows = 0;
-
-            // TODO
-            await Task.CompletedTask;
             return rows;
         }
 
@@ -378,7 +375,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntity.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                             .VerifyProcedure(bo.ProcedureId);
 
             // 出站

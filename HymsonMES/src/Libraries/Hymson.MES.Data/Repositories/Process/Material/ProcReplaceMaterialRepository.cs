@@ -165,6 +165,27 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcReplaceMaterialView>> GetProcReplaceMaterialViewsAsync(long siteId)
+        {
+            var key = $"proc_replace_material&proc_material";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetProcReplaceMaterialViewsSqlTemplate);
+                sqlBuilder.Where("r.IsDeleted = 0");
+                sqlBuilder.Where("r.SiteId = @SiteId");
+
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, new { SiteId = siteId });
+                return ProcReplaceMaterialViews;
+            });
+        }
+
+        /// <summary>
         /// 查询所有主物料的替代料
         /// </summary>
         /// <param name="siteId"></param>

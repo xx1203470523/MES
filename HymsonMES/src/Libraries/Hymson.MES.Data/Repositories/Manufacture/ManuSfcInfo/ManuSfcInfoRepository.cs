@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId= sfcId });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId = sfcId });
         }
 
         /// <summary>
@@ -149,12 +149,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="ManuSfcInfoEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> entities)
         {
+            if (entities == null || entities.Any() == false) return 0;
+
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);
+            return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
         /// <summary>
@@ -184,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand  manuSfcInfoUpdateIsUsedCommand)
+        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand manuSfcInfoUpdateIsUsedCommand)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdateIsUsedCommand);
@@ -301,7 +303,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" si.IsDeleted = 0 ");
             sqlBuilder.Where(" si.IsUsed = 1 ");
 
-            sqlBuilder.Where(" s.IsDeleted = 0 ");
+            // 2023.10.17 中越说去掉，克明说可以去掉
+            //sqlBuilder.Where(" s.IsDeleted = 0 ");
 
             if (pageQuery.MaterialId.HasValue)
             {
@@ -351,11 +354,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc) 
+        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
-        } 
+        }
     }
 
     /// <summary>

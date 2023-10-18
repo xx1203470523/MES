@@ -1,6 +1,4 @@
-﻿using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.Localization.Services;
+﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
@@ -11,13 +9,10 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -30,13 +25,20 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
     /// </summary>
     public class SfcBindingService : ISfcBindingService
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly ICurrentEquipment _currentEquipment;
 
         /// <summary>
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 仓储接口（条码流转信息）
@@ -47,7 +49,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// 仓储接口（工单信息）
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-
 
         /// <summary>
         /// 仓储接口（资源维护）
@@ -70,11 +71,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
-        /// 步骤
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 工序和资源半成品产品设置表仓储接口
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
@@ -83,34 +79,36 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// 仓储接口（公共方法）
         /// </summary>
         private readonly ICommonService _manuCommonOldService;
+
+
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="currentEquipment"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        /// <param name="currentEquipment"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="procProductSetRepository"></param>
         /// <param name="manuCommonOldService"></param>
-        public SfcBindingService(
+        public SfcBindingService(ICurrentEquipment currentEquipment,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
-            ICurrentEquipment currentEquipment,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IProcProductSetRepository procProductSetRepository,
             ICommonService manuCommonOldService)
         {
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _procResourceRepository = procResourceRepository;
@@ -118,7 +116,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             _currentEquipment = currentEquipment;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _procProductSetRepository = procProductSetRepository;
             _manuCommonOldService = manuCommonOldService;
         }
@@ -167,7 +164,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", sfcBindingDto.ResourceCode);
             }
             //验证子条码是否在当前工序活动
-            var sfcThisProcedure = manuSfcProduceEntitys.Where(it => it.ProcedureId != procedureEntity.Id || it.Status != SfcProduceStatusEnum.Activity);
+            var sfcThisProcedure = manuSfcProduceEntitys.Where(it => it.ProcedureId != procedureEntity.Id || it.Status != SfcStatusEnum.Activity);
             if (sfcThisProcedure != null && sfcThisProcedure.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19920)).WithData("SFC", string.Join(",", sfcThisProcedure.Select(it => it.SFC).ToArray()));
@@ -259,7 +256,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                     Qty = 1,
                     ProcedureId = item.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Change,
-                    CurrentStatus = SfcProduceStatusEnum.Complete,
+                    CurrentStatus = SfcStatusEnum.Complete,
                     CreatedBy = _currentEquipment.Name,
                     UpdatedBy = _currentEquipment.Name
                 });
@@ -289,7 +286,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 SFC = sfcBindingDto.SFC,
                 Qty = 1,
                 IsUsed = YesOrNoEnum.Yes,
-                Status = SfcStatusEnum.InProcess,
+                Status = SfcStatusEnum.lineUp,
                 CreatedBy = _currentEquipment.Name,
                 UpdatedBy = _currentEquipment.Name
             };
@@ -321,7 +318,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 ProductBOMId = planWorkOrderEntity.ProductBOMId,
                 Qty = 1,
                 ProcedureId = procedureEntity.Id,
-                Status = SfcProduceStatusEnum.Activity,
+                Status = SfcStatusEnum.Activity,
                 RepeatedCount = 0,
                 IsScrap = TrueOrFalseEnum.No,
                 CreatedBy = _currentEquipment.Name,
@@ -343,7 +340,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
                 Qty = 1,
                 ProcedureId = procedureEntity.Id,
                 Operatetype = ManuSfcStepTypeEnum.Change,
-                CurrentStatus = SfcProduceStatusEnum.Complete,
+                CurrentStatus = SfcStatusEnum.Complete,
                 CreatedBy = _currentEquipment.Name,
                 UpdatedBy = _currentEquipment.Name
             };

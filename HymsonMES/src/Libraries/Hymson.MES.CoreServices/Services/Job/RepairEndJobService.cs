@@ -107,7 +107,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16331));
             }
-            var sfcProduceActivitys = sfcProduceEntitys.Where(it => it.Status != SfcProduceStatusEnum.Activity);
+            var sfcProduceActivitys = sfcProduceEntitys.Where(it => it.Status != SfcStatusEnum.Activity);
             if (sfcProduceActivitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16336)).WithData("SFC", string.Join(",", sfcProduceActivitys.Select(it => it.SFC).ToArray()));

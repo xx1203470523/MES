@@ -4,7 +4,7 @@ using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Parameter.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.Utils;
@@ -98,7 +98,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
             });
             if (produreEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19101)).WithData("ResCode", param.ResourceCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ResCode", param.ResourceCode);
             }
 
             var parameters = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
@@ -136,7 +136,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
             }
             if (errorParameter.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19101)).WithData("ParameterCodes", string.Join(",", errorParameter));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
             await _manuProductParameterService.InsertRangeAsync(list);
@@ -190,7 +190,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
 
             if (errorParameter.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19101)).WithData("ParameterCodes", string.Join(",", errorParameter));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
             await _manuEquipmentParameterService.InsertRangeAsync(list);

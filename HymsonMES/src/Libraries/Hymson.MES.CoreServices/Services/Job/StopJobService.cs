@@ -7,11 +7,11 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -34,31 +34,37 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
-        /// 仓储接口（条码步骤）
-        /// </summary>
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
-
-        /// <summary>
         /// 
         /// </summary>
         private readonly ILocalizationService _localizationService;
+
+        /// <summary>
+        /// 仓储接口（条码信息）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
-        /// <param name="manuSfcStepRepository"></param>
         /// <param name="localizationService"></param>
         public StopJobService(IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _localizationService = localizationService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
 
@@ -79,7 +85,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }
@@ -119,14 +125,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 更新时间
             var updatedBy = bo.UserName;
             var updatedOn = HymsonClock.Now();
-
             responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
                 // 更改状态，将条码由"活动"改为"排队"
-                sfcProduceEntity.Status = SfcProduceStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.UpdatedBy = updatedBy;
                 sfcProduceEntity.UpdatedOn = updatedOn;
-
+                sfcProduceEntity.RepeatedCount = sfcProduceEntity.RepeatedCount - 1;
                 // 初始化步骤
                 responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
                 {
@@ -148,8 +153,15 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     UpdatedBy = updatedBy,
                     UpdatedOn = updatedOn
                 });
+                responseBo.InStationManuSfcByIdCommands.Add(new InStationManuSfcByIdCommand
+                {
+                    Id = sfcProduceEntity.SFCId,
+                    Status = SfcStatusEnum.Activity,
+                    IsUsed = YesOrNoEnum.Yes,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn
+                });
             });
-
             return responseBo;
         }
 
@@ -165,6 +177,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 更新数据
             List<Task<int>> tasks = new();
+            //更新条码表 状态为排队
+            var multiUpdateSfcIsUsedTask = _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands);
+            tasks.Add(multiUpdateSfcIsUsedTask);
 
             var insertRangeTask = _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities);
             tasks.Add(insertRangeTask);

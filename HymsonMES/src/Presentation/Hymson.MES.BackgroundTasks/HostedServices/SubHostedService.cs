@@ -2,9 +2,10 @@
 using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Enums;
 using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.BackgroundServices.EventHandling.ManufactureHandling.ManuSfcStepHandling;
+using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.BackgroundTasks.HostedServices
 {
@@ -18,7 +19,6 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         /// </summary>
         private readonly IEventBus<EventBusInstance1> _eventBus;
         private readonly IClearCacheService _clearCacheService;
-        private readonly ILogger<SubHostedService> _logger;
 
 
         /// <summary>
@@ -26,11 +26,10 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
         /// </summary>
         /// <param name="eventBus"></param>
         /// <param name="clearCacheService"></param>
-        public SubHostedService(IEventBus<EventBusInstance1> eventBus,IClearCacheService clearCacheService,ILogger<SubHostedService> logger)
+        public SubHostedService(IEventBus<EventBusInstance1> eventBus,IClearCacheService clearCacheService)
         {
             _eventBus = eventBus;
             _clearCacheService = clearCacheService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -44,6 +43,8 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
             _eventBus.Subscribe<MessageReceiveUpgradeIntegrationEvent, MessageReceiveUpgradeIntegrationEventHandler>();
             _eventBus.Subscribe<MessageHandleUpgradeIntegrationEvent, MessageHandleUpgradeIntegrationEventHandler>();
 
+            SubscribeManufactureServices();
+
             try
             {
                 await _clearCacheService.ClearCacheAsync(new ServiceTypeEnum[] { ServiceTypeEnum.MES }, cancellationToken);
@@ -52,8 +53,17 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
             catch (Exception ex)
             {
 
-                _logger.LogError(ex,"清理缓存订阅出错:");
+                Console.WriteLine(ex);
             }
+        }
+
+        /// <summary>
+        /// 生产订阅服务
+        /// </summary>
+        public void SubscribeManufactureServices()
+        {
+            _eventBus.Subscribe<ManuSfcStepEvent, ManuSfcStepHander>();
+            _eventBus.Subscribe<ManuSfcStepsEvent, ManuSfcStepsHander>();
         }
 
         /// <summary>
