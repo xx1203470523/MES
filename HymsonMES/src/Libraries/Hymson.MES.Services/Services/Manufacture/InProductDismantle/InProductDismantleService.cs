@@ -634,7 +634,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
 
                 // 说明位置号已经存在
-                if (manuSfcCirculationEntities != null && manuSfcCirculationEntities.Any())
+                if (manuSfcCirculationEntities != null && manuSfcCirculationEntities.Any(a => a.CirculationBarCode != sfcCirculationEntity.CirculationBarCode))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16619))
                         .WithData("Current", sfcCirculationEntity.CirculationBarCode)
