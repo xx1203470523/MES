@@ -1,9 +1,6 @@
-﻿using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Services.Dtos.Manufacture;
+﻿using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -11,7 +8,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// <summary>
     /// 在制品拆解
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InProductDismantleController : ControllerBase

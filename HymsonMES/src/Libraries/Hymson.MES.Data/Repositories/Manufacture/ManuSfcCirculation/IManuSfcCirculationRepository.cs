@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -19,6 +20,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<ManuSfcCirculationEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 根据Location查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetByLocationAsync(LocationQuery query);
+
+        /// <summary>
         /// 根据SFC获取数据
         /// </summary>
         /// <param name="sfc"></param>
@@ -30,7 +38,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns> 
-        Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationBySfcsQuery query); 
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetSfcMoudulesAsync(ManuSfcCirculationBySfcsQuery query);
 
         /// <summary>
         /// 根据IDs批量获取数据
