@@ -915,7 +915,6 @@
         #endregion
 
         #region 在制品移除添加 16600
-
         public const string MES16600 = "条码不存在或不是在制品!";
         public const string MES16601 = "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
         public const string MES16602 = "数据不存在!";
@@ -935,6 +934,7 @@
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
         public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
+        public const string MES16619 = "当前条码【{Current}】的位置号【{Location}】已被【{BarCode}】使用！";
         #endregion
 
         #region 容器包装 MES 16700
