@@ -1011,7 +1011,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 if (consume.ConsumeQty.HasValue)
                 {
-                    // （因为每次不一定是只产出一个，所以也要*数量）
+                    // 因为每次不一定是只产出一个，所以也要*数量
                     item.Usages = consume.ConsumeQty.Value * sfcProduceEntity.Qty;
                     //item.ConsumeRatio = 100;
                     //item.Loss = 0;
