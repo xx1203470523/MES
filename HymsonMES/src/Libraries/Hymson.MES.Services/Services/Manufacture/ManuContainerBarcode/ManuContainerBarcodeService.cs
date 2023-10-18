@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Services.Manufacture
              AbstractValidator<UpdateManuContainerBarcodeStatusDto> validationUpdateStatusRules
              , IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            ProcResourceRepository procResourceRepository
+            IProcResourceRepository procResourceRepository
             , IManuSfcRepository manuSfcRepository,
            IWhMaterialInventoryRepository whMaterialInventoryRepository)
         {
