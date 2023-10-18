@@ -235,7 +235,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 foreach (var sfcProduceEntity in noMatchSFCProcedureEntities)
                 {
-                    var inProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId) 
+                    var inProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduceEntity.ProcedureId);
 
                     var outProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
@@ -939,8 +939,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 if (manuFeedingsDictionary == null) continue;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                decimal residue = materialBo.Usages;
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
+                decimal residue = materialBo.Usages * sfcProduceEntity.Qty;
 
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
@@ -1011,7 +1011,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 if (consume.ConsumeQty.HasValue)
                 {
-                    item.Usages = consume.ConsumeQty.Value;
+                    // （因为每次不一定是只产出一个，所以也要*数量）
+                    item.Usages = consume.ConsumeQty.Value * sfcProduceEntity.Qty;
                     //item.ConsumeRatio = 100;
                     //item.Loss = 0;
                 }
