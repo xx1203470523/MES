@@ -167,6 +167,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo);
 
         /// <summary>
+        /// 获取流转数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetSFCCirculationEntitiesByTypesAsync(SFCCirculationBo bo);
+
+        /// <summary>
         /// 获取不合格代码列表
         /// </summary>
         /// <param name="unqualifiedIds"></param>

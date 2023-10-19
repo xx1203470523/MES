@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// <summary>
         /// 流转类型
         /// </summary>
-        public SfcCirculationTypeEnum[] CirculationTypes { get; set; }
+        public IEnumerable<SfcCirculationTypeEnum> CirculationTypes { get; set; }
 
         /// <summary>
         /// 工序id

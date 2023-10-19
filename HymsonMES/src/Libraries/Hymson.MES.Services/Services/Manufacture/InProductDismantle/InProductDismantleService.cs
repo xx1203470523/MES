@@ -9,7 +9,9 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
@@ -40,6 +42,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
 
         /// <summary>
         /// BOM表仓储接口
@@ -107,6 +114,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="masterDataService"></param>
         /// <param name="procBomRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="replaceMaterialRepository"></param>
@@ -120,6 +128,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
         public InProductDismantleService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IMasterDataService masterDataService,
             IProcBomRepository procBomRepository,
             IProcBomDetailRepository procBomDetailRepository,
             IProcBomDetailReplaceMaterialRepository replaceMaterialRepository,
@@ -135,7 +144,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-
+            _masterDataService = masterDataService;
             _procBomRepository = procBomRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _replaceMaterialRepository = replaceMaterialRepository;
@@ -157,31 +166,28 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<List<InProductDismantleDto>> GetProcBomDetailAsync(InProductDismantleQueryDto queryDto)
         {
+            if (queryDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
             var bomDetailViews = new List<InProductDismantleDto>();
 
-            if (queryDto == null)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            }
-
-            //查询bom
+            // 查询bom
             var bom = await _procBomRepository.GetByIdAsync(queryDto.BomId);
-            if (bom == null)
-            {
-                return bomDetailViews;
-            }
+            if (bom == null) return bomDetailViews;
 
-            //查询bom明细
+            // 查询bom明细
             var bomDetails = await _procBomDetailRepository.GetByBomIdAsync(queryDto.BomId);
-            if (!bomDetails.Any())
+            if (bomDetails.Any() == false) return bomDetailViews;
+
+            // 查询组件信息
+            var manuSfcCirculations = await _masterDataService.GetSFCCirculationEntitiesByTypesAsync(new SFCCirculationBo
             {
-                return bomDetailViews;
-            }
+                SiteId = _currentSite.SiteId ?? 0,
+                SFC = queryDto.Sfc,
+                Type = queryDto.Type
+            });
+            if (manuSfcCirculations.Any() == false) return bomDetailViews;
 
-            //查询组件信息
-            var manuSfcCirculations = await GetCirculationsBySfcAsync(queryDto);
-
-            //组件物料
+            // 组件物料
             var barCodeMaterialIds = manuSfcCirculations.Select(x => x.CirculationProductId).ToArray().Distinct();
 
             //bom物料
@@ -259,12 +265,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                         CirculationQty = circulation.CirculationQty ?? 0,
                         MaterialRemark = barcodeMaterial?.MaterialCode + "/" + barcodeMaterial?.Version,
                         ResCode = circulation.ResourceId.HasValue ? procResources.FirstOrDefault(x => x.Id == circulation.ResourceId.Value)?.ResCode ?? "" : "",
-                        Status = circulation.IsDisassemble == TrueOrFalseEnum.Yes ? InProductDismantleTypeEnum.Remove : InProductDismantleTypeEnum.Activity,
+                        Status = circulation.IsDisassemble == TrueOrFalseEnum.Yes ? SFCCirculationReportTypeEnum.Remove : SFCCirculationReportTypeEnum.Activity,
                         UpdatedBy = circulation.UpdatedBy ?? "",
                         UpdatedOn = circulation.UpdatedOn
                     };
                     bomDetail.Children.Add(manuSfcChild);
-                    assembleCount += manuSfcChild.Status == InProductDismantleTypeEnum.Activity ? circulation.CirculationQty ?? 0 : 0;
+                    assembleCount += manuSfcChild.Status == SFCCirculationReportTypeEnum.Activity ? circulation.CirculationQty ?? 0 : 0;
                 }
                 bomDetail.AssembleCount = assembleCount;
             }
@@ -294,43 +300,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 procResources = (await _resourceRepository.GetListByIdsAsync(resourceIds.ToArray())).ToList();
             }
             return procResources;
-        }
-
-        /// <summary>
-        /// 获取sfc组件信息
-        /// </summary>
-        /// <param name="queryDto"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<ManuSfcCirculationEntity>> GetCirculationsBySfcAsync(InProductDismantleQueryDto queryDto)
-        {
-            var types = new List<SfcCirculationTypeEnum>();
-            if (queryDto.Type == InProductDismantleTypeEnum.Remove
-                || queryDto.Type == InProductDismantleTypeEnum.Whole)
-            {
-                types.Add(SfcCirculationTypeEnum.Disassembly);
-            }
-
-            if (queryDto.Type == InProductDismantleTypeEnum.Activity
-              || queryDto.Type == InProductDismantleTypeEnum.Whole)
-            {
-                types.Add(SfcCirculationTypeEnum.Consume);
-                types.Add(SfcCirculationTypeEnum.ModuleAdd);
-                types.Add(SfcCirculationTypeEnum.ModuleReplace);
-            }
-
-            var query = new ManuSfcCirculationQuery { Sfc = queryDto.Sfc, SiteId = _currentSite.SiteId ?? 0, CirculationTypes = types.ToArray() };
-
-            if (queryDto.Type == InProductDismantleTypeEnum.Remove)
-            {
-                query.IsDisassemble = TrueOrFalseEnum.Yes;
-            }
-
-            if (queryDto.Type == InProductDismantleTypeEnum.Activity)
-            {
-                query.IsDisassemble = TrueOrFalseEnum.No;
-            }
-
-            return await _circulationRepository.GetSfcMoudulesAsync(query);
         }
 
         /// <summary>
@@ -460,7 +429,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcedureId = addDto.ProcedureId,
                 ProductId = addDto.CirculationMainProductId ?? 0,
                 CirculationBarCode = addDto.CirculationBarCode,
-                Type = InProductDismantleTypeEnum.Activity
+                Type = SFCCirculationReportTypeEnum.Activity
             });
 
             //查询bom明细
@@ -723,7 +692,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcedureId = replaceDto.ProcedureId,
                 ProductId = replaceDto.CirculationMainProductId ?? 0,
                 CirculationBarCode = replaceDto.CirculationBarCode,
-                Type = InProductDismantleTypeEnum.Activity
+                Type = SFCCirculationReportTypeEnum.Activity
             };
             var circulationEntities = (await GetBarCodesAsync(queryDto)).ToList();
             var oldBarCode = circulationEntities.FirstOrDefault(x => x.Id == replaceDto.Id);

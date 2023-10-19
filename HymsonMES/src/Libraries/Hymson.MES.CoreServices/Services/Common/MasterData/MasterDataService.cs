@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -59,6 +60,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码流转信息）
+        /// </summary>
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
         /// 仓储接口（工单信息）
@@ -147,6 +153,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procMaterialRepository"></param>
@@ -167,6 +174,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcMaterialRepository procMaterialRepository,
@@ -188,6 +196,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procMaterialRepository = procMaterialRepository;
@@ -930,6 +939,46 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return initialMaterials;
         }
 
+        /// <summary>
+        /// 获取流转数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetSFCCirculationEntitiesByTypesAsync(SFCCirculationBo bo)
+        {
+            var types = new List<SfcCirculationTypeEnum>();
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Remove || bo.Type == SFCCirculationReportTypeEnum.Whole)
+            {
+                types.Add(SfcCirculationTypeEnum.Disassembly);
+            }
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Activity || bo.Type == SFCCirculationReportTypeEnum.Whole)
+            {
+                types.Add(SfcCirculationTypeEnum.Consume);
+                types.Add(SfcCirculationTypeEnum.ModuleAdd);
+                types.Add(SfcCirculationTypeEnum.ModuleReplace);
+            }
+
+            var query = new ManuSfcCirculationQuery
+            {
+                Sfc = bo.SFC,
+                SiteId = bo.SiteId,
+                CirculationTypes = types
+            };
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Remove)
+            {
+                query.IsDisassemble = TrueOrFalseEnum.Yes;
+            }
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Activity)
+            {
+                query.IsDisassemble = TrueOrFalseEnum.No;
+            }
+
+            return await _manuSfcCirculationRepository.GetSfcMoudulesAsync(query);
+        }
 
         /// <summary>
         /// 获取不合格代码列表

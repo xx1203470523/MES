@@ -73,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("SFC = @Sfc");
             }
 
-            if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
+            if (query.CirculationTypes != null && query.CirculationTypes.Any())
             {
                 sqlBuilder.Where("CirculationType IN @CirculationTypes");
             }

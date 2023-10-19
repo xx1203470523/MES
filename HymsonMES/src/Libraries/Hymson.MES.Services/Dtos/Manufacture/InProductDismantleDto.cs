@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态,活动、移除、全部
         /// </summary>
-        public InProductDismantleTypeEnum Status { get; set; }
+        public SFCCirculationReportTypeEnum Status { get; set; }
 
         /// <summary>
         /// 更新时间
@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 查看类型
         /// </summary>
-        public InProductDismantleTypeEnum Type { get; set; }
+        public SFCCirculationReportTypeEnum Type { get; set; }
     }
 
     public class InProductDismantleRemoveDto
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 查看类型
         /// </summary>
-        public InProductDismantleTypeEnum Type { get; set; }
+        public SFCCirculationReportTypeEnum Type { get; set; }
     }
 
     public class BarCodeDataCollectionWayQueryDto
