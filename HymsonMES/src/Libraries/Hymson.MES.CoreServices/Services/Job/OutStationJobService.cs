@@ -23,7 +23,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -45,11 +44,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 日志对象
         /// </summary>
         private readonly ILogger<OutStationJobService> _logger;
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 服务接口（主数据）
@@ -127,11 +121,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
-        /// 仓储接口（条码工序生产汇总表）
-        /// </summary>
-        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
-
-        /// <summary>
         /// 
         /// </summary>
         private readonly ILocalizationService _localizationService;
@@ -140,7 +129,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuDegradedProductExtendService"></param>
         /// <param name="procProcedureRepository"></param>
@@ -156,10 +144,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        /// <param name="manuSfcSummaryRepository"></param>
         /// <param name="localizationService"></param>
         public OutStationJobService(ILogger<OutStationJobService> logger,
-            IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuDegradedProductExtendService manuDegradedProductExtendService,
             IProcProcedureRepository procProcedureRepository,
@@ -175,11 +161,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            IManuSfcSummaryRepository manuSfcSummaryRepository,
             ILocalizationService localizationService)
         {
             _logger = logger;
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuDegradedProductExtendService = manuDegradedProductExtendService;
             _procProcedureRepository = procProcedureRepository;
@@ -195,7 +179,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
-            _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _localizationService = localizationService;
         }
 
@@ -418,7 +401,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
             responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.MaterialInventoryEntity != null).Select(s => s.MaterialInventoryEntity);
             responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.MaterialStandingbookEntity != null).Select(s => s.MaterialStandingbookEntity);
-            responseSummaryBo.UpdateOutputQtySummaryCommands = responseBos.Where(w => w.UpdateOutputQtySummaryCommand != null).Select(s => s.UpdateOutputQtySummaryCommand);
             responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
             responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
@@ -518,9 +500,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // manu_sfc 更新状态
                 _manuSfcRepository.UpdateRangeWithStatusCheckAsync(data.SFCEntities),
-
-                // 汇总表
-                _manuSfcSummaryRepository.UpdateSummaryOutStationRangeAsync(data.UpdateOutputQtySummaryCommands),
 
                 // 添加流转记录
                 _manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities),
@@ -643,16 +622,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SiteId = commonBo.SiteId,
                 CreatedBy = commonBo.UserName,
                 CreatedOn = commonBo.Time,
-                UpdatedBy = commonBo.UserName,
-                UpdatedOn = commonBo.Time
-            };
-
-            // 合格产出更新
-            responseBo.UpdateOutputQtySummaryCommand = new UpdateOutputQtySummaryCommand
-            {
-                Id = sfcProduceEntity.SfcSummaryId ?? 0,
-                OutputQty = sfcProduceEntity.Qty,
-                EndOn = commonBo.Time,
                 UpdatedBy = commonBo.UserName,
                 UpdatedOn = commonBo.Time
             };
@@ -934,7 +903,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
@@ -1038,7 +1006,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
