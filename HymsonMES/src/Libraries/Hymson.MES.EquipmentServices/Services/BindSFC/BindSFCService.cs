@@ -16,6 +16,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using IdGen;
 using Mysqlx;
 using System.Drawing;
 using System.Transactions;
@@ -52,6 +53,12 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
         /// </summary>
         private readonly IProcResourceRepository _procResourceRepository;
 
+        /// <summary>
+        /// 工序表 仓储
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
@@ -68,7 +75,8 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcResourceRepository procResourceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IManuSfcSummaryRepository manuSfcSummaryRepository)
+            IManuSfcSummaryRepository manuSfcSummaryRepository,
+            IProcProcedureRepository procProcedureRepository)
 
         {
             _validationBindDtoRules = validationBindDtoRules;
@@ -82,6 +90,7 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             _procResourceRepository = procResourceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
+            _procProcedureRepository = procProcedureRepository;
         }
 
 
@@ -526,20 +535,23 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                 throw new CustomerValidationException(nameof(ErrorCode.MES19106));
             }
 
-            //实际这里只处理模组在制即可
-            //var SFCs = sfcEntity.Select(x => x.SFC).ToArray();
-            // 条码在制表
-            //var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
-            //{
-            //    SiteId = 123456,
-            //    Sfcs = SFCs
-            //});
+            //处理电芯以及模组
+            var SFCs = sfcEntity.Where(x => x.CirculationType == SfcCirculationTypeEnum.Merge).Select(x => x.SFC).ToList();
+            //SFCs = SFCs.ToList();
+            SFCs.Add(resumptionInputDto.SFC);
 
-            var sfcProduceEntities = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
+
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery
             {
                 SiteId = 123456,
-                Sfc = resumptionInputDto.SFC
+                Sfcs = SFCs
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", resumptionInputDto.SFC);
+
+            //var sfcProduceEntities = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
+            //{
+            //    SiteId = 123456,
+            //    Sfc = resumptionInputDto.SFC
+            //}) ?? throw new CustomerValidationException(nameof(ErrorCode.MES15304)).WithData("sfcs", resumptionInputDto.SFC);
 
 
             //复投位的资源
@@ -551,31 +563,56 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
             {
                 SFCS = new string[] { resumptionInputDto.SFC },
                 QualityStatus = 0,//0 不合格，代表NG状态
-                SiteId = _currentEquipment.SiteId,
+                SiteId = 123456,
             };
 
             //查询模组的NG记录
             var manuSfcSummaries = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(summaryQuery);
             //IEnumerable<ManuSfcSummaryEntity> InsertsRecord = manuSfcSummaries;
 
-            sfcProduceEntities.UpdatedBy = "PDA";
-            sfcProduceEntities.UpdatedOn = HymsonClock.Now();
-            sfcProduceEntities.Status = SfcProduceStatusEnum.lineUp;
-            sfcProduceEntities.ProcedureId = resumptionInputDto.RepeatLocationId;
-            sfcProduceEntities.ResourceId = resources.FirstOrDefault()?.Id;
+            //sfcProduceEntities.UpdatedBy = "PDA";
+            //sfcProduceEntities.UpdatedOn = HymsonClock.Now();
+            //sfcProduceEntities.Status = SfcProduceStatusEnum.lineUp;
+            //sfcProduceEntities.ProcedureId = resumptionInputDto.RepeatLocationId;
+            //sfcProduceEntities.ResourceId = resources.FirstOrDefault()?.Id;
+
+            long reProcedureId = resumptionInputDto.RepeatLocationId;
+            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(resumptionInputDto.RepeatLocationId);
+            switch (procProcedureEntity.Code)
+            {
+                case "OP14":
+                    //模组挤压钢带固定 后续优化，按工艺路线取上前一个节点的工序Id 
+                    reProcedureId = (long)20033398368628736; break;
+            }
             //更新在制
-            //foreach (var item in sfcProduceEntities)
-            //{
-            //    item.UpdatedBy = "PDA";
-            //    item.UpdatedOn = HymsonClock.Now();
-            //    item.Status = SfcProduceStatusEnum.lineUp;
-            //    item.ProcedureId = resumptionInputDto.RepeatLocationId;
-            //    item.ResourceId = resources.FirstOrDefault()?.Id;
-            //}
+            foreach (var item in sfcProduceEntities)
+            {
+                //模组 只出站
+                if (item.SFC == resumptionInputDto.SFC)
+                {
+                    item.UpdatedBy = "PDA";
+                    item.UpdatedOn = HymsonClock.Now();
+                    item.Status = SfcProduceStatusEnum.Activity;
+                    item.ProcedureId = resumptionInputDto.RepeatLocationId;
+                    item.ResourceId = resources.FirstOrDefault()?.Id;
+                }
+                //电芯
+                else
+                {
+                    item.UpdatedBy = "PDA";
+                    item.UpdatedOn = HymsonClock.Now();
+                    item.Status = SfcProduceStatusEnum.lineUp;
+                    item.ResourceId = resources.FirstOrDefault()?.Id;
+                    if (item.ProcedureId != reProcedureId)
+                    {
+                        item.ProcedureId = reProcedureId;
+                    }
+                }
+
+            }
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-
 
                 //解绑
                 if (sfcEntity.Any())
@@ -587,7 +624,6 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
                         entity.DisassembledOn = HymsonClock.Now();
                         entity.UpdatedBy = "PDA";
                         entity.UpdatedOn = HymsonClock.Now();
-                        //manuSfcCirculationEntities.Add(entity);
                     }
                     await _manuSfcCirculationRepository.UpdateRangeAsync(sfcEntity);
                 }
@@ -602,10 +638,10 @@ namespace Hymson.MES.EquipmentServices.Services.BindSFC
 
                     //更新汇总
                     await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaries.ToList());
-                }   
+                }
 
                 //在制更新
-                await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntities);
+                await _manuSfcProduceRepository.UpdateRangeAsync(sfcProduceEntities);
 
 
                 //报废 暂时不废

@@ -496,7 +496,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             }
             var manuSfcCirculationBarCodequery = new ManuSfcCirculationBarCodeQuery
             {
-                CirculationType = sfcCirculationTypeEnum,
+                //CirculationType = sfcCirculationTypeEnum, 所有
                 IsDisassemble = TrueOrFalseEnum.No,
                 CirculationBarCode = sfcCirculationUnBindDto.SFC,
                 SiteId = 123456
