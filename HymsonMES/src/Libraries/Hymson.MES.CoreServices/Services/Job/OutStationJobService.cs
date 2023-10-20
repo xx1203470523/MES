@@ -13,7 +13,6 @@ using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
@@ -728,6 +727,29 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
 
+            // 检查不合格代码信息是否为空
+            if (requestBo.OutStationUnqualifiedList == null || requestBo.OutStationUnqualifiedList.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17109)).WithData("SFC", requestBo.SFC);
+            }
+
+            // 如果有传不合格代码，进行校验是否存在
+            var unqualifiedCode = requestBo.OutStationUnqualifiedList.Select(s => s.UnqualifiedCode).Distinct();
+            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
+            {
+                SiteId = commonBo.SiteId,
+                Codes = unqualifiedCode
+            });
+
+            // 不在系统中的不合格代码
+            var ngCodeNotInSystem = unqualifiedCode.Except(qualUnqualifiedCodeEntities.Select(s => s.UnqualifiedCode));
+            if (ngCodeNotInSystem.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17110))
+                    .WithData("SFC", requestBo.SFC)
+                    .WithData("NGCode", string.Join(',', ngCodeNotInSystem));
+            }
+
             // 待执行的命令
             OutStationResponseBo responseBo = new();
 
@@ -840,36 +862,26 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
-            // 记录出站不良记录（如果有传不合格代码）
-            if (requestBo.OutStationUnqualifiedList != null && requestBo.OutStationUnqualifiedList.Any())
+            // 添加不良记录
+            responseBo.ProductBadRecordEntities = qualUnqualifiedCodeEntities.Select(s => new ManuProductBadRecordEntity
             {
-                var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
-                {
-                    SiteId = commonBo.SiteId,
-                    Codes = requestBo.OutStationUnqualifiedList.Select(s => s.UnqualifiedCode)
-                });
-
-                // 添加不良记录
-                responseBo.ProductBadRecordEntities = qualUnqualifiedCodeEntities.Select(s => new ManuProductBadRecordEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = commonBo.SiteId,
-                    FoundBadOperationId = commonBo.ProcedureId,
-                    FoundBadResourceId = commonBo.ResourceId,
-                    OutflowOperationId = commonBo.ProcedureId,
-                    UnqualifiedId = s.Id,
-                    SfcStepId = stepEntity.Id,
-                    SFC = stepEntity.SFC,
-                    SfcInfoId = stepEntity.SFCInfoId,
-                    Qty = stepEntity.Qty,
-                    Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
-                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = stepEntity.Remark,
-                    DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
-                    CreatedBy = commonBo.UserName,
-                    UpdatedBy = commonBo.UserName
-                });
-            }
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = commonBo.SiteId,
+                FoundBadOperationId = commonBo.ProcedureId,
+                FoundBadResourceId = commonBo.ResourceId,
+                OutflowOperationId = commonBo.ProcedureId,
+                UnqualifiedId = s.Id,
+                SfcStepId = stepEntity.Id,
+                SFC = stepEntity.SFC,
+                SfcInfoId = stepEntity.SFCInfoId,
+                Qty = stepEntity.Qty,
+                Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
+                Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                Remark = stepEntity.Remark,
+                DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
+                CreatedBy = commonBo.UserName,
+                UpdatedBy = commonBo.UserName
+            });
 
             return responseBo;
         }
@@ -952,7 +964,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="requestBo"></param>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
         private MaterialConsumptionBo ExecutenMaterialConsumptionWithBarCode(ref List<ManuFeedingEntity> allFeedingEntities, IEnumerable<MaterialDeductResponseBo>? initialMaterials, JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity)
         {
             // 物料消耗对象
