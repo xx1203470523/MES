@@ -241,10 +241,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
 
-            // 如果数量不一致
-            if (materialIds.Count() > procMaterialEntities.Count())
+            // 不在系统中的物料Id
+            var notInSystem = materialIds.Except(procMaterialEntities.Select(s => s.Id));
+            if (notInSystem.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17106));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17106)).WithData("Ids", string.Join(',', notInSystem));
             }
 
             return procMaterialEntities;
@@ -275,10 +276,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var processRouteEntities = await _procProcessRouteRepository.GetByIdsAsync(processRouteIds)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18107));
 
-            // 如果数量不一致
-            if (processRouteIds.Count() > processRouteEntities.Count())
+            // 不在系统中的工艺路线Id
+            var notInSystem = processRouteIds.Except(processRouteEntities.Select(s => s.Id));
+            if (notInSystem.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17106));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17111)).WithData("Ids", string.Join(',', notInSystem));
             }
 
             return processRouteEntities;
@@ -348,10 +350,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         {
             bo.WorkOrderIds = bo.WorkOrderIds.Distinct();
 
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds);
-            if (planWorkOrderEntities == null || bo.WorkOrderIds.Count() > planWorkOrderEntities.Count())
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+
+            // 不在系统中的工单Id
+            var notInSystem = bo.WorkOrderIds.Except(planWorkOrderEntities.Select(s => s.Id));
+            if (notInSystem.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17112)).WithData("Ids", string.Join(',', notInSystem));
             }
 
             foreach (var planWorkOrderEntity in planWorkOrderEntities)
