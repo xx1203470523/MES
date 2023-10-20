@@ -6,7 +6,7 @@ registryUrl=10.10.79.13:8081/dev
 imageName=hymson.mes.api
 docker build --build-arg PublishEnvironment=$PublishEnvironment -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile .
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
-docker push $registryUrl/$imageName:$timestamp
+#docker push $registryUrl/$imageName:$timestamp
 docker service rm $serviceName
 docker service create \
   --with-registry-auth \
