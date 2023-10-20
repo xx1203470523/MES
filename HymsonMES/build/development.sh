@@ -4,6 +4,15 @@ timestamp=$(date +%Y%m%d%H%M%S)
 serviceName=hymson-mes-api-dev
 registryUrl=10.10.79.13:8081/dev
 imageName=hymson.mes.api
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo pwd
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "PublishEnvironment=$PublishEnvironment -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile ."
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
 docker build --build-arg PublishEnvironment=$PublishEnvironment -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile .
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 #docker push $registryUrl/$imageName:$timestamp
