@@ -6,7 +6,9 @@ registryUrl=10.10.79.13:8081/dev
 imageName=hymson.mes.api
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo pwd
+# 输出当前目录
+current_directory=$(pwd)
+echo "当前目录为: $current_directory"
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "PublishEnvironment=$PublishEnvironment -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile ."
