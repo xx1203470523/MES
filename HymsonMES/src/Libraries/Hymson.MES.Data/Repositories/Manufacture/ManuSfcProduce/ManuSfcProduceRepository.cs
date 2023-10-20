@@ -747,6 +747,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuSfcProduceEntity>(GetListBySfcsSql, sfcsQuery);
         }
+
+        /// <summary>
+        /// 根据工序ID、资源ID获取活动在制品数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdQuery query) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcProduceEntity>(GetActivityListByProcedureIdAndResIdSql, query);
+        }
     }
 
     /// <summary>
@@ -812,5 +823,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UnLockSfcProcedureSql = "UPDATE `manu_sfc_produce`  SET Status = BeforeLockedStatus, BeforeLockedStatus=null,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE  SFC in  @Sfcs and SiteId=@SiteId ";
 
         const string GetListBySfcsSql = @"SELECT * FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
+
+        const string GetActivityListByProcedureIdAndResIdSql = @"SELECT * FROM manu_sfc_produce WHERE SiteId=@SiteId AND ProcedureId=@ProcedureId AND ResourceId=@ResourceId AND Status=2 ";
     }
 }

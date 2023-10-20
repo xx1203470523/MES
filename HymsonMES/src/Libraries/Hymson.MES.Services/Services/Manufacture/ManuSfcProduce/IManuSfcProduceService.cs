@@ -168,5 +168,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="sfcs"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetManuSfcAboutManuDowngradingBySfcsAsync(string[] sfcs);
+
+
+        /// <summary>
+        /// 根据工序ID与资源ID获取活动的在制品
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdDto query);
     }
 }

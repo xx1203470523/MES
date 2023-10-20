@@ -356,5 +356,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfcsQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceEntity>> GetListBySfcsAsync(ManuSfcProduceBySfcsQuery sfcsQuery);
+
+        /// <summary>
+        /// 根据工序ID、资源ID、状态获取在制品数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdQuery query);
     }
 }
