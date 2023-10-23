@@ -284,7 +284,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         Batch = "",//自制品 没有
                         WorkOrderId = sfcProduceEntity.WorkOrderId,
                         MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
-                        QuantityResidue = procMaterialEntity.Batch,
+                        QuantityResidue = sfcProduceEntity.Qty,
                         Status = WhMaterialInventoryStatusEnum.ToBeUsed,
                         Source = MaterialInventorySourceEnum.ManuComplete,
                         SiteId = commonBo.SiteId,
