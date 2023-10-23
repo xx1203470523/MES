@@ -987,15 +987,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (requestBo.ConsumeList == null) return responseBo;
             if (initialMaterials == null) return responseBo;
 
-            // 如果存在传过来的消耗编码不在BOM清单的物料里面，直接返回异常
-            var barCodeNotInBOM = requestBo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode));
+            // 指定消耗的物料集合
+            var barCodes = requestBo.ConsumeList.Select(s => s.BarCode);
+
+            // 如果存在传过来的消耗编码不在BOM清单的物料里面，直接返回异常（这里需要把替代品的平铺出来吗？）
+            var barCodeNotInBOM = barCodes.Except(initialMaterials.Select(s => s.MaterialCode));
             if (barCodeNotInBOM.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17107)).WithData("BarCodes", string.Join(',', barCodeNotInBOM));
             }
 
             // 如果存在传过来的消耗编码不在已上料的的物料里面，直接返回异常
-            var barCodeNotInFeeding = requestBo.ConsumeList.Select(s => s.BarCode).Except(allFeedingEntities.Select(s => s.BarCode));
+            var barCodeNotInFeeding = barCodes.Except(allFeedingEntities.Select(s => s.BarCode));
             if (barCodeNotInFeeding.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17113)).WithData("BarCodes", string.Join(',', barCodeNotInFeeding));
@@ -1022,14 +1025,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 filterMaterials.Add(item);
             }
 
-            // 重新赋值
-            initialMaterials = filterMaterials;
-
             // 物料ID集合
-            var materialIds = initialMaterials.Select(s => s.MaterialId);
+            var materialIds = filterMaterials.Select(s => s.MaterialId);
 
-            // 过滤扣料集合
-            var feedings = allFeedingEntities.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
+            // 过滤扣料集合（通过上料过滤一次）
+            var feedings = allFeedingEntities.Where(w => barCodes.Contains(w.BarCode));
+
+            // 过滤扣料集合（通过BOM过滤一次）
+            feedings = feedings.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
 
             // 通过物料分组
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
@@ -1037,7 +1040,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            foreach (var materialBo in initialMaterials)
+            foreach (var materialBo in filterMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
 
