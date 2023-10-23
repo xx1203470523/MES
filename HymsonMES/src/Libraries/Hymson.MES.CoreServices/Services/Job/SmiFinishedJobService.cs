@@ -303,7 +303,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         MaterialVersion = procMaterialEntity.Version ?? "",
                         MaterialBarCode = sfcProduceEntity.SFC,
                         Batch = "",//自制品 没有
-                        Quantity = procMaterialEntity.Batch,
+                        Quantity = sfcProduceEntity.Qty,
                         Unit = procMaterialEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.ManuComplete,
                         Source = MaterialInventorySourceEnum.ManuComplete,
