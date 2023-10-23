@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
+using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.Data.Repositories.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -13,6 +14,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MessagePush.Enum;
 using Hymson.MessagePush.Services;
 using Hymson.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Integrated
 {
@@ -21,6 +23,11 @@ namespace Hymson.MES.CoreServices.Services.Integrated
     /// </summary>
     public class MessagePushService : IMessagePushService
     {
+        /// <summary>
+        /// 日志对象
+        /// </summary>
+        private readonly ILogger<OutStationJobService> _logger;
+
         /// <summary>
         /// 消息服务
         /// </summary>
@@ -95,6 +102,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="messageService"></param>
         /// <param name="eventBus"></param>
         /// <param name="messageTemplateRepository"></param>
@@ -109,7 +117,9 @@ namespace Hymson.MES.CoreServices.Services.Integrated
         /// <param name="procResourceRepository"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
-        public MessagePushService(IMessageService messageService, IEventBus<EventBusInstance1> eventBus,
+        public MessagePushService(ILogger<OutStationJobService> logger,
+            IMessageService messageService,
+            IEventBus<EventBusInstance1> eventBus,
             IMessageTemplateRepository messageTemplateRepository,
             IInteMessageGroupPushMethodRepository inteMessageGroupPushMethodRepository,
             IInteEventTypeMessageGroupRelationRepository inteEventTypeMessageGroupRelationRepository,
@@ -123,6 +133,7 @@ namespace Hymson.MES.CoreServices.Services.Integrated
             IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository)
         {
+            _logger = logger;
             _messageService = messageService;
             _eventBus = eventBus;
             _messageTemplateRepository = messageTemplateRepository;
@@ -308,6 +319,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
 
                     // 推送即时消息
                     var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene);
+                    _logger.LogInformation($"发送即时消息：{messageType.GetDescription()}，地址：{config.Address}，内容：{templateEntity.Content}，消息内容：{messagePushBo}");
+
                     await _messageService.SendMessageAsync(messageType, config.Address, templateEntity.Content, messagePushBo, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
                 }
             }
@@ -409,6 +422,8 @@ namespace Hymson.MES.CoreServices.Services.Integrated
 
                     // 推送即时消息
                     var messagePushBo = await ConvertEntityToMessagePushBoAsync(messageEntity, pushScene);
+                    _logger.LogInformation($"发送升级消息：{messageType.GetDescription()}，地址：{config.Address}，内容：{templateEntity.Content}，消息内容：{messagePushBo}");
+
                     await _messageService.SendMessageAsync(messageType, config.Address, templateEntity.Content, messagePushBo, messageEntity.UpdatedBy ?? messageEntity.CreatedBy);
                 }
             }
