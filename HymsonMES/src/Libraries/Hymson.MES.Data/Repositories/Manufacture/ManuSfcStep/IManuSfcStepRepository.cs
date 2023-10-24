@@ -119,5 +119,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="queryParam"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoBySFCAsync(ManuSfcStepBySfcPagedQuery queryParam);
+
+        /// <summary>
+        /// 获取一些条码的所有进站信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInStepAsync(SfcInStepQuery query);
     }
 }

@@ -2663,18 +2663,28 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //查询物料
                 var materials = await _procMaterialRepository.GetByIdsAsync(sfcProduceList.Where(x => x.ProductId > 0).Select(x => x.ProductId).ToArray());
 
+                //查询开始时间-根据步骤表查询成功执行开始作业时间
+                var sfcSteps = await _manuSfcStepRepository.GetSFCInStepAsync(new SfcInStepQuery()
+                {
+                    SiteId = _currentSite.SiteId??0,
+                    Sfcs = sfcProduceList.Select(x=>x.SFC).Distinct().ToArray()
+                }) ;
+
+
                 foreach (var item in sfcProduceList)
                 {
                     var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
                    
                     var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
 
+                    var lastNewInStepTime= sfcSteps.Where(x=>x.SFC==item.SFC).Max(x=>x.CreatedOn);
+
                     manuSfcProduceDtos.Add(new ActivityManuSfcProduceViewDto
                     {
                         Id = item.Id,
                         Sfc = item.SFC,
                         Lock = item.Lock,
-                        CreatedOn = item.CreatedOn,
+                        CreatedOn = lastNewInStepTime,
                        
                         ProductId = item.ProductId,
                         OrderCode = workOrder != null ? workOrder.OrderCode : "",
