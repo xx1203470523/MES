@@ -1288,42 +1288,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
-        /// 获取条码步骤数据
-        /// </summary>
-        /// <param name="manuSfcs"></param>
-        /// <param name="remark"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private List<ManuSfcStepEntity> GetSfcStepList(IEnumerable<ManuSfcProduceEntity> manuSfcs, string remark, ManuSfcStepTypeEnum type)
-        {
-            var sfcStepList = new List<ManuSfcStepEntity>();
-            foreach (var sfc in manuSfcs)
-            {
-                sfcStepList.Add(new ManuSfcStepEntity
-                {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SFC = sfc.SFC,
-                    ProductId = sfc.ProductId,
-                    WorkOrderId = sfc.WorkOrderId,
-                    WorkCenterId = sfc.WorkCenterId,
-                    ProductBOMId = sfc.ProductBOMId,
-                    Qty = sfc.Qty,
-                    EquipmentId = sfc.EquipmentId,
-                    ResourceId = sfc.ResourceId,
-                    ProcedureId = sfc.ProcedureId,
-                    Operatetype = type,
-                    CurrentStatus = sfc.Status,
-                    //Lock = sfc.Lock,
-                    Remark = remark,
-                    SiteId = _currentSite.SiteId ?? 0,
-                    CreatedBy = sfc.CreatedBy,
-                    UpdatedBy = sfc.UpdatedBy
-                });
-            }
-            return sfcStepList;
-        }
-
-        /// <summary>
         /// 创建
         /// </summary>
         /// <param name="manuSfcProduceCreateDto"></param>
@@ -2482,49 +2446,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         /// <summary>
-        /// 验证sfc是否锁定
-        /// </summary>
-        /// <param name="manuSfcs"></param>
-        /// <returns></returns>
-        private async Task VerifySfcsLockAsync(ManuSfcProduceEntity[] manuSfcs)
-        {
-            var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
-            var sfcProduceBusinesss = await _manuSfcProduceRepository.GetSfcProduceBusinessListBySFCAsync(new SfcListProduceBusinessQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs, BusinessType = ManuSfcProduceBusinessType.Lock });
-            if (sfcProduceBusinesss != null && sfcProduceBusinesss.Any())
-            {
-                var sfcProduceBusinesssList = sfcProduceBusinesss.ToList();
-                var instantLockSfcs = new List<string>();
-                foreach (var business in sfcProduceBusinesssList)
-                {
-                    var manuSfc = manuSfcs.FirstOrDefault(x => x.Id == business.SfcProduceId);
-                    if (manuSfc == null)
-                    {
-                        continue;
-                    }
-                    var sfcProduceLockBo = System.Text.Json.JsonSerializer.Deserialize<SfcProduceLockBo>(business.BusinessContent);
-                    if (sfcProduceLockBo == null)
-                    {
-                        continue;
-                    }
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
-                    {
-                        instantLockSfcs.Add(manuSfc.SFC);
-                    }
-                    if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == manuSfc.ProcedureId)
-                    {
-                        instantLockSfcs.Add(manuSfc.SFC);
-                    }
-                }
-
-                if (instantLockSfcs.Any())
-                {
-                    var strs = string.Join(",", instantLockSfcs.Distinct().ToArray());
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15407)).WithData("sfcs", strs);
-                }
-            }
-        }
-
-        /// <summary>
         /// 验证将来工序
         /// </summary>
         /// <param name="sfcList"></param>
@@ -2570,7 +2491,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES15317)).WithData("lockproduction", procProcedureEntity.Code);
             }
         }
-
 
         /// <summary>
         /// 根据sfcs查询条码信息关联降级等级 
