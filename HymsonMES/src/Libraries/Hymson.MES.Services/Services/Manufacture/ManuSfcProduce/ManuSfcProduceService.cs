@@ -2697,7 +2697,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     });
                 }
 
-
+                manuSfcProduceDtos=manuSfcProduceDtos.OrderByDescending(x => x.CreatedOn).ToList();
             }
 
             return manuSfcProduceDtos;
