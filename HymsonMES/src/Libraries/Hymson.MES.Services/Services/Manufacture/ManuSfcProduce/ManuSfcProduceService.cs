@@ -2,7 +2,6 @@ using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -25,7 +24,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcScrap.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -38,10 +36,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
 using Microsoft.Extensions.Logging;
-using Minio.DataModel;
-using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -166,10 +161,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
         private readonly ILogger<ManuSfcProduceService> _logger;
 
-        /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -194,12 +185,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="procBomRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
         /// <param name="validationLockRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="logger"></param>
-        /// /// <param name="procProcessRouteNodeRepository"></param>
+        /// <param name="procProcessRouteNodeRepository"></param>
         /// <param name="manuDowngradingRepository"></param>
-        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="manuSfcScrapRepository"></param>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -222,8 +214,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             IInteWorkCenterRepository inteWorkCenterRepository,
             AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules,
-            ILogger<ManuSfcProduceService> logger, IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
-            IManuDowngradingRepository manuDowngradingRepository, IEventBus<EventBusInstance1> eventBus, IManuSfcScrapRepository manuSfcScrapRepository)
+            ILogger<ManuSfcProduceService> logger,
+            IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
+            IManuDowngradingRepository manuDowngradingRepository,
+            IManuSfcScrapRepository manuSfcScrapRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -250,7 +244,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             this._logger = logger;
             _procProcessRouteNodeRepository = procProcessRouteNodeRepository;
             _manuDowngradingRepository = manuDowngradingRepository;
-            _eventBus = eventBus;
             _manuSfcScrapRepository = manuSfcScrapRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
         }
