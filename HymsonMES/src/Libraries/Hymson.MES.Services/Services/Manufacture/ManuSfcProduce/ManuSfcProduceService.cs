@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -16,6 +17,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -23,6 +25,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcScrap.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -35,7 +38,10 @@ using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
 using Microsoft.Extensions.Logging;
+using Minio.DataModel;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -145,6 +151,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
 
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+
         /// <summary>
         /// 仓储（工艺路线节点）
         /// </summary>
@@ -158,6 +166,10 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
         private readonly ILogger<ManuSfcProduceService> _logger;
 
+        /// <summary>
+        /// 事件总线
+        /// </summary>
+        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -185,8 +197,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="validationLockRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="logger"></param>
-        /// <param name="procProcessRouteNodeRepository"></param>
+        /// /// <param name="procProcessRouteNodeRepository"></param>
         /// <param name="manuDowngradingRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -206,11 +219,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcBomRepository procBomRepository,
+            IInteWorkCenterRepository inteWorkCenterRepository,
             AbstractValidator<ManuSfcProduceLockDto> validationLockRules,
             AbstractValidator<ManuSfcProduceModifyDto> validationModifyRules,
             ILogger<ManuSfcProduceService> logger, IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
-            IManuDowngradingRepository manuDowngradingRepository, 
-            IManuSfcScrapRepository manuSfcScrapRepository)
+            IManuDowngradingRepository manuDowngradingRepository, IEventBus<EventBusInstance1> eventBus, IManuSfcScrapRepository manuSfcScrapRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -234,10 +247,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             _procBomRepository = procBomRepository;
             _validationLockRules = validationLockRules;
             _validationModifyRules = validationModifyRules;
-            _logger = logger;
+            this._logger = logger;
             _procProcessRouteNodeRepository = procProcessRouteNodeRepository;
             _manuDowngradingRepository = manuDowngradingRepository;
+            _eventBus = eventBus;
             _manuSfcScrapRepository = manuSfcScrapRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
         }
 
 
@@ -327,6 +342,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             //查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.ProductId > 0).Select(x => x.ProductId).Distinct().ToArray());
 
+            //查询工单相关的工作中心信息
+            var workCenterIds = workOrders != null && workOrders.Any() ? workOrders.Select(x => x.WorkCenterId ?? 0).Distinct().ToArray() : null;
+            var workCenters = workCenterIds != null ? await _inteWorkCenterRepository.GetByIdsAsync(workCenterIds) : null;
 
             foreach (var item in pagedInfo.Data)
             {
@@ -334,6 +352,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var procedure = procedures != null && procedures.Any() ? procedures.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
                 var resource = resources != null && resources.Any() ? resources.FirstOrDefault(x => x.Id == item.ResourceId) : null;
                 var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
+
+                var workCenter = workCenters != null && workCenters.Any() ? workCenters.FirstOrDefault(x => x.Id == workOrder?.WorkCenterId) : null;
 
                 manuSfcProduceDtos.Add(new ManuSfcProduceViewDto
                 {
@@ -1049,7 +1069,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Id = sfcEntity.Id,
                     Status = SfcStatusEnum.Scrapping,
                     CurrentStatus = sfcEntity.Status,
-                    SfcScrapId = manuSfcScrapEntity.Id
+                    SfcScrapId = manuSfcScrapEntity.Id,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName
                 });
             }
 
@@ -1501,6 +1523,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //查询工单
                 var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.WorkOrderId > 0).Select(x => x.WorkOrderId).ToArray());
 
+                var workCenters = await _inteWorkCenterRepository.GetByIdsAsync(workOrders.Select(x => x.WorkCenterId ?? 0).Distinct().ToArray());
+
                 //查询工序
                 var procedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Where(x => x.ProcedureId > 0).Select(x => x.ProcedureId).ToArray());
 
@@ -1517,6 +1541,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var resource = resources != null && resources.Any() ? resources.FirstOrDefault(x => x.Id == item.ResourceId) : null;
                     var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
 
+                    var workCenter = workCenters.FirstOrDefault(x => x.Id == workOrder?.WorkCenterId);
+
                     manuSfcProduceDtos.Add(new ManuSfcProduceSelectViewDto
                     {
                         Id = item.Id,
@@ -1531,9 +1557,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Code = procedure != null ? procedure.Code : "",
                         Name = procedure != null ? procedure.Name : "",
                         ResCode = resource != null ? resource.ResCode : "",
+                        ResName = resource != null ? resource.ResName : "",
                         MaterialCode = material != null ? material.MaterialCode : "",
                         MaterialName = material != null ? material.MaterialName : "",
-                        Version = material != null ? material.Version ?? "" : ""
+                        Version = material != null ? material.Version ?? "" : "",
+
+                        IsScrap = item.IsScrap,
+                        Qty = item.Qty,
+                        WorkCenterId = workCenter?.Id,
+                        WorkCenterCode = workCenter?.Code,
+                        WorkCenterName = workCenter?.Name,
                     });
                 }
 
@@ -1604,7 +1637,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             //为节点载入步骤数据
             foreach (var item in manuSfcProduceList!)
             {
-
                 //为错误信息添加SFC头
                 var validationFailure = new ValidationFailure();
                 if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())

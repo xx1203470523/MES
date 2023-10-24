@@ -746,6 +746,38 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源编码
         /// </summary>
         public string ResCode { get; set; }
+
+
+        // 2023.10.24 COPY FROM XINSHIJIE
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResName { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 工作中心Id
+        /// </summary>
+        public long? WorkCenterId { get; set; }
+
+        /// <summary>
+        /// 工作中心编码
+        /// </summary>
+        public string? WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 工作中心名称
+        /// </summary>
+        public string? WorkCenterName { get; set; }
     }
 
 
