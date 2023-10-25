@@ -141,9 +141,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             //OP23 模组入箱
             //OP12 模组挤压 
             //OP04 电芯扫码&OCVR测试
+            //OP14 端板刻码-电芯扫码绑定
             //string[] query=  { "OP13", "OP17", "OP12", "OP04" };
             //目前只给此工序复投
-            string[] query=  { "OP04" };
+            string[] query=  { "OP14" };
             var list = await _procProcedureRepository.GetByCodesAsync(query,site);
             var dto = new List<ProcProcedureViewPDADto>();
             foreach (var item in list)

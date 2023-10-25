@@ -486,21 +486,21 @@ public class EquipmentCollectService : IEquipmentCollectService
         };
         var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
 
-        List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
+        //List<ManuSfcSummaryEntity> manuSfcSummaryList = new List<ManuSfcSummaryEntity>();
         //Ng列表
         var manuSfcStepEntities = request.SFCParams.Select(s =>
         {
-            //汇总信息
-            var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == s.SFC).FirstOrDefault();
-            //汇总表
-            if (manuSfcSummaryEntity != null)
-            {
-                manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
-                manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
-                manuSfcSummaryEntity.QualityStatus = 0;
-                manuSfcSummaryEntity.NgNum++;
-                manuSfcSummaryList.Add(manuSfcSummaryEntity);
-            }
+            ////汇总信息
+            //var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == s.SFC).FirstOrDefault();
+            ////汇总表 模组OCVR不再更改结果
+            //if (manuSfcSummaryEntity != null && _currentEquipment.Code != "YTLPACK01AE018")
+            //{
+            //    manuSfcSummaryEntity.UpdatedBy = _currentEquipment.Name;
+            //    manuSfcSummaryEntity.UpdatedOn = HymsonClock.Now();
+            //    manuSfcSummaryEntity.QualityStatus = 0;
+            //    manuSfcSummaryEntity.NgNum++;
+            //    manuSfcSummaryList.Add(manuSfcSummaryEntity);
+            //}
             return new ManuSfcStepEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -531,7 +531,7 @@ public class EquipmentCollectService : IEquipmentCollectService
         await _manuSfcStepNgRepository.InsertsAsync(manuSfcStepNgs);
         await _procParameterRepository.InsertRangeAsync(procParameterEntities);
         await _manuProductParameterRepository.InsertsAsync(entities);
-        await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryList);
+        //await _manuSfcSummaryRepository.InsertOrUpdateRangeAsync(manuSfcSummaryList);
         trans.Complete();
     }
 
