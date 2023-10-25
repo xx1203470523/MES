@@ -7,10 +7,10 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -322,18 +322,50 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 如果没有读取到有效作业，就提示错误
             if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
 
-            // 执行Job
-            var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), new JobRequestBo
+            // 条码类型
+            var codeType = CodeTypeEnum.SFC;
+            if (dto.Param!["Type"] == null) codeType = CodeTypeEnum.SFC;
+            else
+            {
+                if (Enum.TryParse(dto.Param["Type"], out codeType) == false) codeType = CodeTypeEnum.SFC;
+            }
+
+            // 作业请求参数
+            var requestBo = new JobRequestBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 ProcedureId = dto.Param!["ProcedureId"].ParseToLong(),
-                ResourceId = dto.Param["ResourceId"].ParseToLong(),
-                SFCs = new string[] { dto.Param["SFC"] },   // 这句后面要改
-                InStationRequestBos = new List<InStationRequestBo> { new InStationRequestBo { SFC = dto.Param["SFC"] } },
-                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = dto.Param["SFC"] } }
-            });
+                ResourceId = dto.Param["ResourceId"].ParseToLong()
+            };
 
+            List<string> SFCs = new();
+            List<InStationRequestBo> inStationRequestBos = new();
+            List<OutStationRequestBo> outStationRequestBos = new();
+            switch (codeType)
+            {
+                case CodeTypeEnum.Vehicle:
+                    // TODO 读取载具关联的条码
+                    
+                    break;
+                case CodeTypeEnum.SFC:
+                default:
+                    var strings = dto.Param!["SFCs"].ToDeserialize<List<string>>();
+                    if (strings != null)
+                    {
+                        SFCs = strings;
+                        inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
+                        outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
+                    }
+                    break;
+            }
+
+            requestBo.SFCs = SFCs;  // 这句后面要改
+            requestBo.InStationRequestBos = inStationRequestBos;
+            requestBo.OutStationRequestBos = outStationRequestBos;
+
+            // 执行Job
+            var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), requestBo);
             foreach (var item in jobResponses)
             {
                 if (isClear) item.Value.Content.Add("IsClear", "True");

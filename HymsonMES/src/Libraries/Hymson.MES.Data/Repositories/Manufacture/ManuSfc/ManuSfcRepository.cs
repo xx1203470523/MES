@@ -138,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
+            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.`Lock`,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
@@ -154,11 +154,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             //if (manuSfcProducePagedQuery.Lock.HasValue)
             //{
-            //    sqlBuilder.Where("msp.Lock=@Lock");
+            //    sqlBuilder.Where("msp.`Lock`=@Lock");
             //}
             //if (manuSfcProducePagedQuery.NoLock.HasValue && manuSfcProducePagedQuery.NoLock != 1)
             //{
-            //    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
+            //    sqlBuilder.Where("(msp.`Lock`!=@NoLock or `Lock`  is null)");
             //}
             if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Sfc))
             {
@@ -223,7 +223,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
+            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.`Lock`,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
                                 , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
@@ -241,11 +241,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (query.Lock.HasValue)
             {
-                sqlBuilder.Where("msp.Lock=@Lock");
+                sqlBuilder.Where("msp.`Lock`=@Lock");
             }
             if (query.NoLock.HasValue && query.NoLock != 1)
             {
-                sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
+                sqlBuilder.Where("(msp.`Lock`!=@NoLock or `Lock`  is null)");
             }
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
