@@ -1,3 +1,4 @@
+using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -8,7 +9,6 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
@@ -380,14 +380,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                             .WithData("Code", string.Join(',', notInSystem));
                     }
 
-                    /*
-                    var sdsd = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery
+                    // 查询载具关联的条码明细
+                    var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
                     {
                         SiteId = requestBo.SiteId,
-                        VehicleId = inteVehicle.Id,
+                        ParentIds = vehicleEntities.Select(s => s.Id)
                     });
-                    */
+                    var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
 
+                    SFCs = vehicleFreightStackEntities.Select(s => s.BarCode).AsList();
+                    foreach (var item in vehicleFreightStackDic)
+                    {
+                        var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
+                        if (vehicleEntity == null) continue;
+
+                        inStationRequestBos.AddRange(item.Value.Select(s => new InStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
+                        outStationRequestBos.AddRange(item.Value.Select(s => new OutStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
+                    }
                     break;
                 case CodeTypeEnum.SFC:
                 default:
