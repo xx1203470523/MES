@@ -8,12 +8,14 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -45,6 +47,15 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
 
+        /// <summary>
+        /// 仓储接口（载具注册）
+        /// </summary>
+        private readonly IInteVehicleRepository _inteVehicleRepository;
+
+        /// <summary>
+        /// 仓储接口（二维载具条码明细）
+        /// </summary>
+        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
 
         /// <summary>
         /// 仓储接口（作业）
@@ -52,7 +63,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IExecuteJobService<JobBaseBo> _executeJobService;
 
         /// <summary>
-        /// 
+        /// 验证器
         /// </summary>
         private readonly AbstractValidator<ManuFacePlateButtonCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateButtonModifyDto> _validationModifyRules;
@@ -65,6 +76,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateButtonRepository"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
         /// <param name="inteJobRepository"></param>
+        /// <param name="inteVehicleRepository"></param>
+        /// <param name="inteVehiceFreightStackRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="executeJobService"></param>
@@ -72,6 +85,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
             IInteJobRepository inteJobRepository,
+            IInteVehicleRepository inteVehicleRepository,
+            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
             AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules, IExecuteJobService<JobBaseBo> executeJobService)
         {
@@ -80,6 +95,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
             _inteJobRepository = inteJobRepository;
+            _inteVehicleRepository = inteVehicleRepository;
+            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _executeJobService = executeJobService;
@@ -345,18 +362,41 @@ namespace Hymson.MES.Services.Services.Manufacture
             switch (codeType)
             {
                 case CodeTypeEnum.Vehicle:
-                    // TODO 读取载具关联的条码
-                    
+                    var vehicleCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", dto.Param!["SFCs"]);
+
+                    // 读取载具关联的条码
+                    var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+                    {
+                        SiteId = requestBo.SiteId,
+                        Codes = vehicleCodes
+                    });
+
+                    // 不在系统中的载具代码
+                    var notInSystem = vehicleCodes.Except(vehicleEntities.Select(s => s.Code));
+                    if (notInSystem.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18624))
+                            .WithData("Code", string.Join(',', notInSystem));
+                    }
+
+                    /*
+                    var sdsd = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery
+                    {
+                        SiteId = requestBo.SiteId,
+                        VehicleId = inteVehicle.Id,
+                    });
+                    */
+
                     break;
                 case CodeTypeEnum.SFC:
                 default:
-                    var strings = dto.Param!["SFCs"].ToDeserialize<List<string>>();
-                    if (strings != null)
-                    {
-                        SFCs = strings;
-                        inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
-                        outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
-                    }
+                    var sfcCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", dto.Param!["SFCs"]);
+
+                    SFCs = sfcCodes;
+                    inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
+                    outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
                     break;
             }
 

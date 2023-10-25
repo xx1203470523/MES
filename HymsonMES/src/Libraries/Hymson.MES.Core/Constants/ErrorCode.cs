@@ -1223,9 +1223,7 @@
         public const string MES18513 = "载具类型验证类型不能为空";
         public const string MES18514 = "载具类型验证类型不合法";
         public const string MES18515 = "载具类型验证物料或物料组不合法";
-
         public const string MES18516 = "载具类型编码不允许有空格";
-
         public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
         public const string MES18518 = "该载具类型已被关联了产品的载具关联，不允许更改该载具类型";
         #endregion
@@ -1254,6 +1252,8 @@
         public const string MES18620 = "载具位置Id不能为0！";
         public const string MES18621 = "载具SFC信息不能为空！";
         public const string MES18622 = "载具待解盘条码不能为空！";
+        public const string MES18623 = "载具编码【{Code}】读取失败！";
+        public const string MES18624 = "载具编码【{Code}】不存在，具体请查看【载具注册】！";
         #endregion
 
         #region Recipe参数 18700
