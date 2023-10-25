@@ -278,5 +278,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcProduceService.GetManuSfcAboutManuDowngradingBySfcsAsync(sfcs);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("getActivityListByProcedureIdAndResId")]
+        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
+        {
+            return await _manuSfcProduceService.GetActivityListByProcedureIdAndResId(query);
+        }
     }
 }

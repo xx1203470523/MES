@@ -496,6 +496,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLabelTemplateCreateDto, ProcLabelTemplateEntity>();
 
             CreateMap<ProcLabelTemplatePagedQueryDto, ProcLabelTemplatePagedQuery>();
+
+            CreateMap<ProcLabelTemplateRelationCreateDto, ProcLabelTemplateRelationEntity>();
+            CreateMap<ProcLabelTemplateRelationEntity, ProcLabelTemplateRelationDto>();
+
             #endregion
 
             #region ProcSortingRule

@@ -128,6 +128,8 @@
         public const string MES10370 = "存储路径超长，最大255!";
         public const string MES10371 = "IP最大长度为50";
 
+        public const string MES10372 = "模板没有打印设计!";
+
         #endregion
 
         #region 工序 10400

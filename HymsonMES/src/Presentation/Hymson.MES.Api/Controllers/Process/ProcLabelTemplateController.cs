@@ -107,5 +107,16 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
 
+        /// <summary>
+        /// 查询详情（仓库标签模板的打印设计）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getRelationByLabelTemplateId/{id}")]
+        public async Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long id)
+        {
+            return await _procLabelTemplateService.QueryProcLabelTemplateRelationByLabelTemplateIdAsync(id);
+        }
+
     }
 }

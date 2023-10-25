@@ -210,6 +210,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region LabelTemplate
             services.AddSingleton<IProcLabelTemplateRepository, ProcLabelTemplateRepository>();
+            services.AddSingleton<IProcLabelTemplateRelationRepository, ProcLabelTemplateRelationRepository>();
+
             #endregion
 
             #region printConfig
