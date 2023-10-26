@@ -8,62 +8,62 @@ namespace Hymson.MES.Core.Domain.Process
     /// @author admin
     /// @date 2023-02-08
     /// </summary>
-    public class ProcProcedureEntity: BaseEntity
+    public class ProcProcedureEntity : BaseEntity
     {
         /// <summary>
         /// 描述 :工序BOM代码 
         /// 空值 : false  
         /// </summary>
         public string Code { get; set; }
-        
+
         /// <summary>
         /// 描述 :工序BOM名称 
         /// 空值 : false  
         /// </summary>
         public string Name { get; set; }
-        
+
         /// <summary>
         /// 描述 :状态 
         /// 空值 : false  
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
-        
+
         /// <summary>
         /// 描述 :类型 
         /// 空值 : false  
         /// </summary>
         public ProcedureTypeEnum Type { get; set; }
-        
+
         /// <summary>
         /// 描述 :包装等级（字典数据） 
         /// 空值 : true  
         /// </summary>
         public int? PackingLevel { get; set; }
-        
+
         /// <summary>
         /// 描述 :所属资源类型ID 
         /// 空值 : true  
         /// </summary>
         public long? ResourceTypeId { get; set; }
-        
+
         /// <summary>
         /// 描述 :循环次数 
         /// 空值 : true  
         /// </summary>
         public int? Cycle { get; set; }
-        
+
         /// <summary>
         /// 描述 :是否维修返回 
         /// 空值 : true  
         /// </summary>
         public byte IsRepairReturn { get; set; }
-        
+
         /// <summary>
         /// 描述 :版本 
         /// 空值 : true  
         /// </summary>
         public string Version { get; set; }
-        
+
         /// <summary>
         /// 描述 :说明 
         /// 空值 : true  
@@ -73,5 +73,33 @@ namespace Hymson.MES.Core.Domain.Process
         /// 站点id
         /// </summary>
         public long SiteId { get; set; } = 0;
+
+
+        // 2023.10.26 add
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public TrueOrFalseEnum? IsRejudge { get; set; }
+
+        /// <summary>
+        /// 是否校验NG信息
+        /// </summary>
+        public TrueOrFalseEnum? IsValidNGCode { get; set; }
+
+        /// <summary>
+        /// 标记缺陷编码
+        /// </summary>
+        public string MarkUnqualifiedCode { get; set; } = "";
+
+        /// <summary>
+        /// 最终缺陷编码
+        /// </summary>
+        public string LastUnqualifiedCode { get; set; } = "";
+
+        /// <summary>
+        /// 阻断缺陷编码
+        /// </summary>
+        public string BlockUnqualifiedCode { get; set; } = "";
+
     }
 }
