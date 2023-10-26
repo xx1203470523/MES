@@ -253,7 +253,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 {
                     // 工艺路线管控,校验工序和资源是否对应,后续改为批量
                     var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(sfcProduceEntity.ProcedureId);
-                    if (!resources.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+                    if (!resources.Any(x => x.ResCode == procResource.ResCode)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
 
                     //进站修改为激活
                     sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
