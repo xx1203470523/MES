@@ -1,18 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 产品不良录入    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:49:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -118,5 +105,13 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 复判步骤表id
         /// </summary>
         public long? ReJudgmentSfcStepId { get; set; }
+
+
+        // 2023.10.26 add
+        /// <summary>
+        /// 不合格代码Id（标记缺陷）
+        /// </summary>
+        public long? MarkUnqualifiedId { get; set; }
+
     }
 }

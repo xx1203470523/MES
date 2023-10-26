@@ -86,20 +86,5 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public TrueOrFalseEnum? IsValidNGCode { get; set; }
 
-        /// <summary>
-        /// 标记缺陷编码
-        /// </summary>
-        public string MarkUnqualifiedCode { get; set; } = "";
-
-        /// <summary>
-        /// 最终缺陷编码
-        /// </summary>
-        public string LastUnqualifiedCode { get; set; } = "";
-
-        /// <summary>
-        /// 阻断缺陷编码
-        /// </summary>
-        public string BlockUnqualifiedCode { get; set; } = "";
-
     }
 }
