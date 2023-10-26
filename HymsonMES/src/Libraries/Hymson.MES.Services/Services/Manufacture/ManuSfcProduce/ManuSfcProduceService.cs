@@ -1473,7 +1473,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18011));
             }
-            return nodes = nodes.Where(it => it.ProcedureId != ProcessRoute.LastProcedureId).OrderBy(x => x.ManualSortNumber).Distinct();
+            return nodes = nodes.Where(it => it.ProcedureId != ProcessRoute.LastProcedureId).OrderBy(x => int.Parse(x.ManualSortNumber)).Distinct();
         }
 
 
@@ -1776,14 +1776,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                             });
 
                             // 状态和是否再用一起改
-                            await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
-                            {
-                                Sfcs = manuSfcs,
-                                Status = SfcStatusEnum.Complete,
-                                IsUsed = YesOrNoEnum.Yes,
-                                UserId = _currentUser.UserName,
-                                UpdatedOn = HymsonClock.Now()
-                            });
+                            //await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
+                            //{
+                            //    Sfcs = manuSfcs,
+                            //    Status = SfcStatusEnum.Complete,
+                            //    IsUsed = YesOrNoEnum.Yes,
+                            //    UserId = _currentUser.UserName,
+                            //    UpdatedOn = HymsonClock.Now()
+                            //});
 
                             // 库存增加
                             if (updateInventoryQuantityList.Any() == true) await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueRangeAsync(updateInventoryQuantityList);
@@ -1828,14 +1828,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                         });
 
                         // 更新条码状态 
-                        if (notManuSfcs != null && notManuSfcs.Any()) await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
-                        {
-                            Sfcs = notManuSfcs.ToArray(),
-                            Status = SfcStatusEnum.InProcess,
-                            IsUsed = YesOrNoEnum.Yes,
-                            UserId = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now()
-                        });
+                        //if (notManuSfcs != null && notManuSfcs.Any()) await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
+                        //{
+                        //    Sfcs = notManuSfcs.ToArray(),
+                        //    Status = SfcStatusEnum.InProcess,
+                        //    IsUsed = YesOrNoEnum.Yes,
+                        //    UserId = _currentUser.UserName,
+                        //    UpdatedOn = HymsonClock.Now()
+                        //});
 
                         // 库存减少
                         if (updateInventoryQuantityList.Any() == true) await _whMaterialInventoryRepository.UpdateReduceQuantityResidueRangeAsync(updateInventoryQuantityList);
