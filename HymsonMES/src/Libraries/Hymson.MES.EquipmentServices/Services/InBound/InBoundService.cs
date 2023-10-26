@@ -45,6 +45,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
+
         /// <summary>
         /// 物料维护 仓储
         /// </summary>
@@ -250,6 +251,10 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
                 if (sfcProduceEntity != null)
                 {
+                    // 工艺路线管控,校验工序和资源是否对应,后续改为批量
+                    var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(sfcProduceEntity.ProcedureId);
+                    if (!resources.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+
                     //进站修改为激活
                     sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
                     //当前SFC的工序信息
