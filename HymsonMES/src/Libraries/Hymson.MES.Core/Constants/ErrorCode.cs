@@ -880,6 +880,7 @@
         public const string MES16359 = "条码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
         public const string MES16360 = "条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
         public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
+        public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         #endregion
 
         #region 工单激活 MES16400
@@ -914,7 +915,6 @@
         #endregion
 
         #region 在制品移除添加 16600
-
         public const string MES16600 = "条码不存在或不是在制品!";
         public const string MES16601 = "组件{CirculationBarCode}同SFC{SFC}已绑定,请检查!";
         public const string MES16602 = "数据不存在!";
@@ -934,6 +934,7 @@
         public const string MES16616 = "组件条码{barCode}未设置掩码规则!";
         public const string MES16617 = "条码已报废,不可再执行当前操作!";
         public const string MES16618 = "组件条码{barCode}的数据收集方式与主物料数据收集方式冲突!";
+        public const string MES16619 = "当前条码【{Current}】的位置号【{Location}】已被【{BarCode}】使用！";
         #endregion
 
         #region 容器包装 MES 16700
@@ -1012,9 +1013,14 @@
         public const string MES17103 = "获取出站产品信息失败！";
         public const string MES17104 = "获取条码信息失败！";
         public const string MES17105 = "存在不在BOM消耗清单里面的消耗条码！";
-        public const string MES17106 = "部分产品信息读取失败！";
-        public const string MES17107 = "消耗条码{BarCodes}不存在BOM消耗清单里面！";
+        public const string MES17106 = "产品【{Ids}】信息读取失败！";
+        public const string MES17107 = "消耗条码{BarCodes}不属于BOM消耗清单！";
         public const string MES17108 = "条码【{SFCs}】存在物未关闭的不合格信息，请去【不合格报告】查看详细信息";
+        public const string MES17109 = "条码【{SFC}】对应的不合代码信息为空，请检查！";
+        public const string MES17110 = "条码【{SFC}】处有不属于系统的不合格代码【{NGCode}】，请检查！";
+        public const string MES17111 = "工艺路线【{Ids}】信息读取失败！";
+        public const string MES17112 = "工单【{Ids}】信息读取失败！";
+        public const string MES17113 = "消耗条码{BarCodes}不属于已上料清单！";
         #endregion
 
         #region 面板维护 MES17200

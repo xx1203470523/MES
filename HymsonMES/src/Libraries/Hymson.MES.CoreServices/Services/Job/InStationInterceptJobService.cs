@@ -4,14 +4,17 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [Job("进站拦截", JobTypeEnum.Standard)]
     public class InStationInterceptJobService : IJobService
     {
@@ -20,11 +23,19 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
-        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
         /// <summary>
-        /// 
+        /// 仓储接口（不合格代码）
         /// </summary>
-        public InStationInterceptJobService(IManuProductBadRecordRepository manuProductBadRecordRepository, IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
+        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="qualUnqualifiedCodeRepository"></param>
+        public InStationInterceptJobService(IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
@@ -60,22 +71,30 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
+            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return default;
+
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
+
+            // 获取不良记录
             var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
                 SiteId = commonBo.SiteId,
-                Sfcs = commonBo.InStationRequestBos?.Select(s => s.SFC),
+                Sfcs = multiSFCBo.SFCs,
                 Status = ProductBadRecordStatusEnum.Open
             });
+            if (manuProductBadRecordEntities == null || manuProductBadRecordEntities.Any() == false) return default;
 
-            if (manuProductBadRecordEntities != null && manuProductBadRecordEntities.Any())
+            // 读取存在的不合格代码
+            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
+            if (qualUnqualifiedCodeEntities == null || qualUnqualifiedCodeEntities.Any() == false) return default;
+
+            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect))
             {
-                var qualUnqualifiedCodeEntity = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
-                if (qualUnqualifiedCodeEntity != null && qualUnqualifiedCodeEntity.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect))
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
-                }
+                throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
             }
-            return null;
+
+            return default;
         }
 
         /// <summary>
@@ -86,7 +105,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             await Task.CompletedTask;
-            return null;
+            return default;
         }
 
         /// <summary>

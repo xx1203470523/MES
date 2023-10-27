@@ -22,7 +22,6 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -178,7 +177,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.lineUp, _localizationService);
-            sfcProduceBusinessEntities?.VerifyProcedureLock(multiSFCBo.SFCs, commonBo.ProcedureId);
+            sfcProduceBusinessEntities?.VerifyProcedureLock(sfcProduceEntities, procedureEntity);
 
             // 验证条码是否被容器包装
             await _manuCommonService.VerifyContainerAsync(multiSFCBo);
@@ -474,7 +473,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
-                LinkPoint = ResourceJobLinkPointEnum.BeforeFinish
+                LinkPoint = ResourceJobLinkPointEnum.AfterStart
             });
         }
 

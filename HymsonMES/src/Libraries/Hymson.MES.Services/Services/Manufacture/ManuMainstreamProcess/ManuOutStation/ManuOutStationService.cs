@@ -1,6 +1,5 @@
 ﻿using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
@@ -11,7 +10,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -68,6 +66,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
         /// 仓储接口（上料信息）
         /// </summary>
         private readonly IManuFeedingRepository _manuFeedingRepository;
@@ -104,10 +107,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
         private readonly ILocalizationService _localizationService;
 
-        /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -118,6 +117,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
@@ -126,21 +126,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="localizationService"></param>
-        /// <param name="eventBus"></param>
         public ManuOutStationService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuCommonOldService manuCommonOldService,
             IMasterDataService masterDataService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcStepRepository manuSfcStepRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcMaterialRepository procMaterialRepository,
-             IProcProcessRouteRepository procProcessRouteRepository,
+            IProcProcessRouteRepository procProcessRouteRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            ILocalizationService localizationService,
-            IEventBus<EventBusInstance1> eventBus)
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -148,6 +147,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcStepRepository = manuSfcStepRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -156,7 +156,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
-            _eventBus = eventBus;
         }
 
 
@@ -293,11 +292,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
                 sfcStep.Operatetype = currentProcessRoute.Type == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
                 sfcStep.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
 
-                /*
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
-                */
-                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
 
                 // 只有"生产主工艺路线"，出站时才走下面流程
                 if (currentProcessRoute.Type == ProcessRouteTypeEnum.ProductionRoute)
@@ -357,11 +353,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
 
                 // 插入 manu_sfc_step 状态为 进站
                 sfcStep.Operatetype = ManuSfcStepTypeEnum.OutStock;
-                /*
+           
                 var manuSfcStepInsertTask = _manuSfcStepRepository.InsertAsync(sfcStep);
                 tasks.Add(manuSfcStepInsertTask);
-                */
-                _eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
             }
 
             await Task.WhenAll(tasks);
@@ -381,7 +375,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOut
             var (sfcProduceEntity, _) = await _manuCommonOldService.GetProduceSFCAsync(bo.SFC);
 
             // 合法性校验
-            sfcProduceEntity.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
+            sfcProduceEntity.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                             .VerifyProcedure(bo.ProcedureId);
 
             // 出站

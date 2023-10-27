@@ -556,7 +556,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Status <> @Status AND SFC IN @Sfcs ";
         const string UpdateWithStatusCheckSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
-        const string UpdateManuSfcQtyByIdSql = "UPDATE `manu_sfc` SET  Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateManuSfcQtyByIdSql = "UPDATE `manu_sfc` SET  Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string MultiUpdateSfcIsUsedSql = "UPDATE manu_sfc SET IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId = @SiteId AND IsUsed <> @IsUsed AND SFC IN @SFCs ";
         const string MultiUpdateStatusSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SiteId = @SiteId AND SFC IN @SFCs; ";

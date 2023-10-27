@@ -5,6 +5,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
@@ -13,7 +14,6 @@ using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
@@ -23,7 +23,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -45,11 +44,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 日志对象
         /// </summary>
         private readonly ILogger<OutStationJobService> _logger;
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 服务接口（主数据）
@@ -127,11 +121,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
-        /// 仓储接口（条码工序生产汇总表）
-        /// </summary>
-        private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
-
-        /// <summary>
         /// 
         /// </summary>
         private readonly ILocalizationService _localizationService;
@@ -140,7 +129,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuDegradedProductExtendService"></param>
         /// <param name="procProcedureRepository"></param>
@@ -156,10 +144,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
-        /// <param name="manuSfcSummaryRepository"></param>
         /// <param name="localizationService"></param>
         public OutStationJobService(ILogger<OutStationJobService> logger,
-            IManuCommonService manuCommonService,
             IMasterDataService masterDataService,
             IManuDegradedProductExtendService manuDegradedProductExtendService,
             IProcProcedureRepository procProcedureRepository,
@@ -175,11 +161,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-            IManuSfcSummaryRepository manuSfcSummaryRepository,
             ILocalizationService localizationService)
         {
             _logger = logger;
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuDegradedProductExtendService = manuDegradedProductExtendService;
             _procProcedureRepository = procProcedureRepository;
@@ -195,7 +179,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
-            _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _localizationService = localizationService;
         }
 
@@ -236,7 +219,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 foreach (var sfcProduceEntity in noMatchSFCProcedureEntities)
                 {
                     var inProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId)
-                           ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduceEntity.ProcedureId);
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduceEntity.ProcedureId);
 
                     var outProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
@@ -418,7 +401,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
             responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.MaterialInventoryEntity != null).Select(s => s.MaterialInventoryEntity);
             responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.MaterialStandingbookEntity != null).Select(s => s.MaterialStandingbookEntity);
-            responseSummaryBo.UpdateOutputQtySummaryCommands = responseBos.Where(w => w.UpdateOutputQtySummaryCommand != null).Select(s => s.UpdateOutputQtySummaryCommand);
             responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
             responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
@@ -518,9 +500,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // manu_sfc 更新状态
                 _manuSfcRepository.UpdateRangeWithStatusCheckAsync(data.SFCEntities),
-
-                // 汇总表
-                _manuSfcSummaryRepository.UpdateSummaryOutStationRangeAsync(data.UpdateOutputQtySummaryCommands),
 
                 // 添加流转记录
                 _manuSfcCirculationRepository.InsertRangeAsync(data.ManuSfcCirculationEntities),
@@ -647,16 +626,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 UpdatedOn = commonBo.Time
             };
 
-            // 合格产出更新
-            responseBo.UpdateOutputQtySummaryCommand = new UpdateOutputQtySummaryCommand
-            {
-                Id = sfcProduceEntity.SfcSummaryId ?? 0,
-                OutputQty = sfcProduceEntity.Qty,
-                EndOn = commonBo.Time,
-                UpdatedBy = commonBo.UserName,
-                UpdatedOn = commonBo.Time
-            };
-
             // 更新条码信息
             manuSfcEntity.UpdatedBy = commonBo.UserName;
             manuSfcEntity.UpdatedOn = commonBo.Time;
@@ -758,6 +727,38 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
+
+            // 2023.10.23 旭科说有些场景是不合格的，但是没有传不合格代码，所以这里不再校验
+            var isHasUnqualifiedCode = requestBo.OutStationUnqualifiedList != null && requestBo.OutStationUnqualifiedList.Any();
+
+            /*
+            // 检查不合格代码信息是否为空
+            if (requestBo.OutStationUnqualifiedList == null || requestBo.OutStationUnqualifiedList.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17109)).WithData("SFC", requestBo.SFC);
+            }
+            */
+
+            IEnumerable<QualUnqualifiedCodeEntity> qualUnqualifiedCodeEntities = new List<QualUnqualifiedCodeEntity>();
+            if (isHasUnqualifiedCode)
+            {
+                // 如果有传不合格代码，进行校验是否存在
+                var unqualifiedCode = requestBo.OutStationUnqualifiedList!.Select(s => s.UnqualifiedCode).Distinct();
+                qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
+                {
+                    SiteId = commonBo.SiteId,
+                    Codes = unqualifiedCode
+                });
+
+                // 不在系统中的不合格代码
+                var ngCodeNotInSystem = unqualifiedCode.Except(qualUnqualifiedCodeEntities.Select(s => s.UnqualifiedCode));
+                if (ngCodeNotInSystem.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17110))
+                        .WithData("SFC", requestBo.SFC)
+                        .WithData("NGCode", string.Join(',', ngCodeNotInSystem));
+                }
+            }
 
             // 待执行的命令
             OutStationResponseBo responseBo = new();
@@ -871,15 +872,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
-            // 记录出站不良记录（如果有传不合格代码）
-            if (requestBo.OutStationUnqualifiedList != null && requestBo.OutStationUnqualifiedList.Any())
+            if (isHasUnqualifiedCode)
             {
-                var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
-                {
-                    SiteId = commonBo.SiteId,
-                    Codes = requestBo.OutStationUnqualifiedList.Select(s => s.UnqualifiedCode)
-                });
-
                 // 添加不良记录
                 responseBo.ProductBadRecordEntities = qualUnqualifiedCodeEntities.Select(s => new ManuProductBadRecordEntity
                 {
@@ -934,13 +928,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
             foreach (var materialBo in initialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
-                decimal residue = materialBo.Usages;
+                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
+                decimal residue = materialBo.Usages * sfcProduceEntity.Qty;
 
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
@@ -976,7 +969,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         }
 
         /// <summary>
-        /// 执行物料消耗（指定物料）
+        /// 执行物料消耗（指定物料条码）
         /// </summary>
         /// <param name="allFeedingEntities"></param>
         /// <param name="initialMaterials"></param>
@@ -984,7 +977,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="requestBo"></param>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
         private MaterialConsumptionBo ExecutenMaterialConsumptionWithBarCode(ref List<ManuFeedingEntity> allFeedingEntities, IEnumerable<MaterialDeductResponseBo>? initialMaterials, JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity)
         {
             // 物料消耗对象
@@ -995,11 +987,21 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (requestBo.ConsumeList == null) return responseBo;
             if (initialMaterials == null) return responseBo;
 
-            // 如果存在传过来的消耗编码不在BOM清单里面的物料，直接返回异常
-            var barCodeNotInBOM = requestBo.ConsumeList.Select(s => s.BarCode).Except(initialMaterials.Select(s => s.MaterialCode));
+            // 指定消耗的物料集合
+            var barCodes = requestBo.ConsumeList.Select(s => s.BarCode);
+
+            // 如果存在传过来的消耗编码不在BOM清单的物料里面，直接返回异常（这里需要把替代品的平铺出来吗？）
+            var barCodeNotInBOM = barCodes.Except(initialMaterials.Select(s => s.MaterialCode));
             if (barCodeNotInBOM.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17107)).WithData("BarCodes", string.Join(',', barCodeNotInBOM));
+            }
+
+            // 如果存在传过来的消耗编码不在已上料的的物料里面，直接返回异常
+            var barCodeNotInFeeding = barCodes.Except(allFeedingEntities.Select(s => s.BarCode));
+            if (barCodeNotInFeeding.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17113)).WithData("BarCodes", string.Join(',', barCodeNotInFeeding));
             }
 
             // 只保留传过来的消耗编码
@@ -1011,7 +1013,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 if (consume.ConsumeQty.HasValue)
                 {
-                    item.Usages = consume.ConsumeQty.Value;
+                    // 因为每次不一定是只产出一个，所以也要*数量
+                    item.Usages = consume.ConsumeQty.Value * sfcProduceEntity.Qty;
                     //item.ConsumeRatio = 100;
                     //item.Loss = 0;
                 }
@@ -1022,14 +1025,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 filterMaterials.Add(item);
             }
 
-            // 重新赋值
-            initialMaterials = filterMaterials;
-
             // 物料ID集合
-            var materialIds = initialMaterials.Select(s => s.MaterialId);
+            var materialIds = filterMaterials.Select(s => s.MaterialId);
 
-            // 过滤扣料集合
-            var feedings = allFeedingEntities.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
+            // 过滤扣料集合（通过上料过滤一次）
+            var feedings = allFeedingEntities.Where(w => barCodes.Contains(w.BarCode));
+
+            // 过滤扣料集合（通过BOM过滤一次）
+            feedings = feedings.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
 
             // 通过物料分组
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
@@ -1037,8 +1040,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            List<UpdateOutputQtySummaryCommand> updateSummaryOutStationCommands = new();
-            foreach (var materialBo in initialMaterials)
+            foreach (var materialBo in filterMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
 
