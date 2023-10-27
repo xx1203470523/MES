@@ -340,16 +340,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                         UpdatedBy = _currentUser.UserName,
                     };
 
-                    if (isScrap || unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
+                    if (isScrap)
                     {
                         manuProductBadRecordEntity.CloseOn = HymsonClock.Now();
                         manuProductBadRecordEntity.CloseBy = _currentUser.UserName;
                         manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
-                        manuProductBadRecordEntity.DisposalResult = isScrap ? ProductBadDisposalResultEnum.scrap : ProductBadDisposalResultEnum.repair;
+                        manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.scrap;
                     }
                     else
                     {
-                        manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
+                        manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Open;
+                        if (unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
+                        {
+                            manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.repair;
+                        }
                     }
 
                     manuProductBadRecords.Add(manuProductBadRecordEntity);
@@ -466,7 +470,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //在制品处理
                     if (manuSfcProduceInfoEntity != null)
                     {
-                        if (manuSfcProduceInfoEntity.IsRepair ?? false) continue;
+                        if ((manuSfcProduceInfoEntity.IsRepair ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes) continue;
                         //返工工艺路线与条码工艺路线不能一致
                         if (manuSfcProduceInfoEntity.ProcessRouteId == manuProductBadRecordCreateDto.BadProcessRouteId)
                         {
@@ -810,7 +814,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
 
             //返修中无需复判
-            if (manuSfcProduceEntity != null && (manuSfcProduceEntity.IsRepair ?? false))
+            if (manuSfcProduceEntity != null && (manuSfcProduceEntity.IsRepair ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15424));
             }
@@ -1065,13 +1069,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 else
                 {
-                    var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
+                    //var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
                     // 末尾工序在制完成
-                    if (isLast && manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
+                    if (manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
                     {
                         var manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
                         {
-                            Id = manuSfcProduceEntity.Id,
+                            Id = manuSfcProduceEntity.SFCId,
                             UpdatedBy = _currentUser.UserName,
                             UpdatedOn = HymsonClock.Now(),
                             Status = SfcStatusEnum.Complete,
