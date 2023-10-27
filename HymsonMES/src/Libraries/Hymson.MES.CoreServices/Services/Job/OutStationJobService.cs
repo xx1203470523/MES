@@ -430,6 +430,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
             responseSummaryBo.DowngradingRecordEntities = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
             responseSummaryBo.ProductBadRecordEntities = responseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
+            responseSummaryBo.ProductNgRecordEntities = responseBos.Where(w => w.ProductNgRecordEntities != null).SelectMany(s => s.ProductNgRecordEntities);
 
             // 删除 manu_sfc_produce
             responseSummaryBo.DeletePhysicalByProduceIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
@@ -532,7 +533,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities),
 
                 // 插入不良记录
-                _manuProductBadRecordRepository.InsertRangeAsync(data.ProductBadRecordEntities)
+                _manuProductBadRecordRepository.InsertRangeAsync(data.ProductBadRecordEntities),
+
+                // 插入NG记录
+                //_manuProductNGRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities)
             };
 
             var rowArray = await Task.WhenAll(tasks);
@@ -951,7 +955,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 Codes = unqualifiedCodes
             });
 
-            // 不在系统中的不合格代码
+            // 检查不在系统中的不合格代码（如果有设置需要校验NG信息）
             var ngCodeNotInSystem = unqualifiedCodes.Except(qualUnqualifiedCodeEntities.Select(s => s.UnqualifiedCode));
             if (ngCodeNotInSystem.Any() && procedureRejudgeBo.IsValidNGCode == TrueOrFalseEnum.Yes)
             {
@@ -969,7 +973,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 var ngCodeInBlock = unqualifiedCodes.Intersect(qualUnqualifiedCodeEntities.Select(s => s.UnqualifiedCode));
                 if (ngCodeNotInSystem.Any())
                 {
-
+                    // TODO
                 }
             }
 
@@ -1030,12 +1034,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             sfcProduceEntity.UpdatedOn = commonBo.Time;
 
             // 如果超过复投次数
-            var isMoreThanCycle = false;
-            if (sfcProduceEntity.RepeatedCount >= procedureRejudgeBo.Cycle)
+            var isMoreThanCycle = sfcProduceEntity.RepeatedCount >= procedureRejudgeBo.Cycle;
+            if (isMoreThanCycle)
             {
-                // 是否超过复投次数
-                isMoreThanCycle = true;
-
                 // 已完工（ 如果没有尾工序，就表示已完工）
                 if (nextProcedure == null)
                 {
@@ -1085,28 +1086,44 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
-            // 添加不良记录
-
-            responseBo.ProductBadRecordEntities = qualUnqualifiedCodeEntities.Select(s => new ManuProductBadRecordEntity
+            // 如果有标记缺陷
+            if (procedureRejudgeBo.MarkUnqualifiedId.HasValue)
             {
-                Id = IdGenProvider.Instance.CreateId(),
-                SiteId = commonBo.SiteId,
-                FoundBadOperationId = commonBo.ProcedureId,
-                FoundBadResourceId = commonBo.ResourceId,
-                OutflowOperationId = commonBo.ProcedureId,
-                UnqualifiedId = s.Id,
-                MarkUnqualifiedId = procedureRejudgeBo.MarkUnqualifiedId,
-                SfcStepId = stepEntity.Id,
-                SFC = stepEntity.SFC,
-                SfcInfoId = stepEntity.SFCInfoId,
-                Qty = stepEntity.Qty,
-                Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
-                Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                Remark = stepEntity.Remark,
-                DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
-                CreatedBy = commonBo.UserName,
-                UpdatedBy = commonBo.UserName
-            });
+                // 添加不良记录
+                var badRecordEntity = new ManuProductBadRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = commonBo.SiteId,
+                    FoundBadOperationId = commonBo.ProcedureId,
+                    FoundBadResourceId = commonBo.ResourceId,
+                    OutflowOperationId = commonBo.ProcedureId,
+                    UnqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value,
+                    SfcStepId = stepEntity.Id,
+                    SFC = stepEntity.SFC,
+                    SfcInfoId = stepEntity.SFCInfoId,
+                    Qty = stepEntity.Qty,
+                    Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
+                    Source = ProductBadRecordSourceEnum.EquipmentReBad,
+                    Remark = stepEntity.Remark,
+                    DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
+                    CreatedBy = commonBo.UserName,
+                    UpdatedBy = commonBo.UserName
+                };
+                responseBo.ProductBadRecordEntities = new List<ManuProductBadRecordEntity> { badRecordEntity };
+
+                // 添加NG记录
+                responseBo.ProductNgRecordEntities = unqualifiedCodes.Select(s => new ManuProductNgRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = commonBo.SiteId,
+                    BadRecordId = badRecordEntity.Id,
+                    UnqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value,
+                    NGCode = s,
+                    Remark = stepEntity.Remark,
+                    CreatedBy = commonBo.UserName,
+                    UpdatedBy = commonBo.UserName
+                });
+            }
 
             return responseBo;
         }

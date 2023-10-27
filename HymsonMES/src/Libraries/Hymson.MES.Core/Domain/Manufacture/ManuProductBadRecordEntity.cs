@@ -107,11 +107,5 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? ReJudgmentSfcStepId { get; set; }
 
 
-        // 2023.10.26 add
-        /// <summary>
-        /// 不合格代码Id（标记缺陷）
-        /// </summary>
-        public long? MarkUnqualifiedId { get; set; }
-
     }
 }
