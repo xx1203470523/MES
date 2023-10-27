@@ -1040,16 +1040,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 已完工（ 如果没有尾工序，就表示已完工）
                 if (nextProcedure == null)
                 {
-                    //responseBo.IsLastProcedure = true;
+                    if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.Yes)
+                    {
+                        //responseBo.IsLastProcedure = true;
 
-                    // 清空复投次数
-                    sfcProduceEntity.RepeatedCount = 0;
+                        // 清空复投次数
+                        sfcProduceEntity.RepeatedCount = 0;
 
-                    // 标记条码为"在制-完成"
-                    //responseBo.IsCompleted = true;
-                    manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
-                    sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
-                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
+                        // 标记条码为"在制-完成"
+                        //responseBo.IsCompleted = true;
+                        manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
+                        sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
+                        stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
+                    }
+                    else
+                    {
+                        // TODO 置于不合格工艺路线首工序排队
+                    }
                 }
                 // 未完工（下一工序排队）
                 else
