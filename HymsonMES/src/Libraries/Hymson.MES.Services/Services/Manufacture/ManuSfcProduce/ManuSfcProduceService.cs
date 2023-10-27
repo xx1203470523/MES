@@ -924,24 +924,24 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //取消报废， 验证工单是否已经激活，若已经取消激活，不能取消报废条码
             var orderIds = manuSfcs.Select(x => x.WorkOrderId).Distinct().ToArray();
-            var activeOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIds);
-            if (!activeOrders.Any())
-            {
-                var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
-                var orderCodes = orders.Select(x => x.OrderCode).ToArray();
-                throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", string.Join("','", orderCodes));
-            }
+            //var activeOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIds);
+            //if (!activeOrders.Any())
+            //{
+            //    var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
+            //    var orderCodes = orders.Select(x => x.OrderCode).ToArray();
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", string.Join("','", orderCodes));
+            //}
 
-            var activeOrderList = activeOrders.ToList();
-            if (activeOrderList.Count < orderIds.Length)
-            {
-                var activeOrderIds = activeOrderList.Select(x => x.WorkOrderId).ToArray();
-                //找出相同元素(即交集)
-                var diffOrderIds = orderIds.Where(c => !activeOrderIds.Contains(c)).ToArray();
-                var orders = await _planWorkOrderRepository.GetByIdsAsync(diffOrderIds);
-                var orderCodesStr = string.Join(",", orders.Select(x => x.OrderCode).ToArray());
-                throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", orderCodesStr);
-            }
+            //var activeOrderList = activeOrders.ToList();
+            //if (activeOrderList.Count < orderIds.Length)
+            //{
+            //    var activeOrderIds = activeOrderList.Select(x => x.WorkOrderId).ToArray();
+            //    //找出相同元素(即交集)
+            //    var diffOrderIds = orderIds.Where(c => !activeOrderIds.Contains(c)).ToArray();
+            //    var orders = await _planWorkOrderRepository.GetByIdsAsync(diffOrderIds);
+            //    var orderCodesStr = string.Join(",", orders.Select(x => x.OrderCode).ToArray());
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES15404)).WithData("orders", orderCodesStr);
+            //}
             #endregion
 
             #region  组装数据
