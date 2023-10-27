@@ -25,5 +25,10 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// 
         /// </summary>
         public const string MultipleVariable = "%MULTIPLE_VARIABLE%";
+
+        /// <summary>
+        /// 年月日通配符
+        /// </summary>
+        public const string YMDWildcard = "%YMD_WILDCARD%";
     }
 }

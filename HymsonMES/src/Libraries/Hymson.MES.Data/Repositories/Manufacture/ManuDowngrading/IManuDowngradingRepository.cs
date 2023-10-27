@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuDowngradingEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable<ManuDowngradingEntity> manuDowngradingEntitys);
+        Task<int> InsertsAsync(IEnumerable<ManuDowngradingEntity>? manuDowngradingEntitys);
 
         /// <summary>
         /// 更新

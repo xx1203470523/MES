@@ -20,7 +20,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -54,24 +53,45 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 接口（操作面板按钮）
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuContainerBarcodeRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuContainerPackRecordRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuFacePlateButtonService"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuContainerPackRecordRepository manuContainerPackRecordRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             AbstractValidator<ManuContainerPackCreateDto> validationCreateRules,
             AbstractValidator<ManuContainerPackModifyDto> validationModifyRules,
             IProcMaterialRepository procMaterialRepository,
-            IManuFacePlateButtonService manuFacePlateButtonService)
+            IManuFacePlateButtonService manuFacePlateButtonService,
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -82,11 +102,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
             _manuContainerPackRecordRepository = manuContainerPackRecordRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFacePlateButtonService = manuFacePlateButtonService;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -192,7 +212,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Qty = manuSfcEntity.Qty,
                                 WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
                                 ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
-                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcStatusEnum.Complete : manuSfcProduceEntity.Status
                             });
                         }
                     }
@@ -276,7 +296,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Qty = manuSfcEntity.Qty,
                                 WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
                                 ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
-                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcStatusEnum.Complete : manuSfcProduceEntity.Status
                             });
                         }
                     }

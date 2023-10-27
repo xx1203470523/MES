@@ -28,9 +28,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// 构造函数
         /// </summary>
         /// <param name="manuGenerateBarcodeService"></param>
-        public ManuGenerateBarcodeExampleService(IManuGenerateBarcodeService manuGenerateBarcodeService)
+        public ManuGenerateBarcodeExampleService(IManuGenerateBarcodeService manuGenerateBarcodeService,ICurrentSite currentSite,ICurrentUser currentUser)
         {
             _manuGenerateBarcodeService = manuGenerateBarcodeService;
+            _currentSite = currentSite;
+            _currentUser = currentUser;
         }
 
         /// <summary>
@@ -71,7 +73,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
                 OrderLength = param.OrderLength,
                 ResetType= param.ResetType,
                 StartNumber = param.StartNumber,
-                CodeRulesMakeList= param.CodeRulesMakeList
+                CodeRulesMakeList= param.CodeRulesMakeList,
+                SiteId=_currentSite.SiteId??0
             }) ;
         }
     }

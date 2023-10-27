@@ -31,5 +31,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <returns></returns>
         Task<int> CreateManuDowngradingsByConsumesAsync(DegradedProductExtendBo bo, IEnumerable<ManuDowngradingEntity>? downgradingEntities);
 
+        /// <summary>
+        /// 创建降级品记录（当需要读写分拆时，调用该方法）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="downgradingEntities"></param>
+        /// <returns></returns>
+        Task<(List<ManuDowngradingEntity>, List<ManuDowngradingRecordEntity>)> GetManuDowngradingsByConsumesAsync(DegradedProductExtendBo bo, IEnumerable<ManuDowngradingEntity>? downgradingEntities);
+
     }
 }

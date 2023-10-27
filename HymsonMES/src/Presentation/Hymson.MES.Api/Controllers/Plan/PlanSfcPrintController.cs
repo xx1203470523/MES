@@ -86,7 +86,5 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             return await _planSfcPrintService.GetPagedListAsync(pagedQueryDto);
         }
-
-
     }
 }

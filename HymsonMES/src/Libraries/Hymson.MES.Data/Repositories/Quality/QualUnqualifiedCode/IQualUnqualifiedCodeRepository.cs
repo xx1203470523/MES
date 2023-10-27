@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 新增
@@ -80,6 +80,13 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         /// <param name="parm"></param>
         /// <returns></returns>
         Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm);
+
+        /// <summary>
+        /// 根据编码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByCodesAsync(QualUnqualifiedCodeByCodesQuery query);
 
         /// <summary>
         /// 获取不合格代码关联不合格代码关系表

@@ -73,5 +73,11 @@ namespace Hymson.MES.Core.Domain.Warehouse
         /// 物料类型
         /// </summary>
         public MaterialInventoryMaterialTypeEnum MaterialType { get; set; }
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
     }
 }

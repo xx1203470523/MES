@@ -1,8 +1,8 @@
-﻿using Hymson.MES.CoreServices.Bos.Job;
+﻿using Hymson.Localization.Services;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.DependencyInjection;
-using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
 {
@@ -18,12 +18,19 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="serviceProvider"></param>
-        public ExecuteJobService(IServiceProvider serviceProvider)
+        /// <param name="localizationService"></param>
+        public ExecuteJobService(IServiceProvider serviceProvider, ILocalizationService localizationService)
         {
             _serviceProvider = serviceProvider;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -35,6 +42,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             var services = _serviceProvider.GetServices<IJobService>();
 
             using var scope = _serviceProvider.CreateScope();
+            param.LocalizationService = _localizationService;
             param.Proxy = scope.ServiceProvider.GetRequiredService<IJobContextProxy>();
 
             var execJobBos = new List<JobBo>();
@@ -76,7 +84,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
             var responseDtos = new Dictionary<string, JobResponseBo>();
             using var trans = TransactionHelper.GetTransactionScope();
 
-            foreach (var jobName in execJobBos.Select(job=>job.Name))
+            foreach (var jobName in execJobBos.Select(job => job.Name))
             {
                 var service = services.FirstOrDefault(x => x.GetType().Name == jobName);
                 if (service == null) continue;

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
@@ -65,6 +66,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetListAsync(ProcProcessRouteDetailNodeQuery query);
+
+        /// <summary>
+        /// 查询List（已缓存）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetListAsync(EntityBySiteIdQuery query);
 
         /// <summary>
         /// 批量新增

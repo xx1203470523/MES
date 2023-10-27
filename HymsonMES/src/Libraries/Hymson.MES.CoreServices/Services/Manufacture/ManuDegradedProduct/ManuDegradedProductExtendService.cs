@@ -67,8 +67,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <summary>
         /// 创建降级品记录（当需要读写分拆时，调用该方法）
         /// </summary>
-        /// <param name="currentEntities"></param>
+        /// <param name="bo"></param>
+        /// <param name="downgradingEntities"></param>
         /// <returns></returns>
+        [Obsolete("建议用下面的方法，去方法外保存", false)]
         public async Task<int> CreateManuDowngradingsByConsumesAsync(DegradedProductExtendBo bo, IEnumerable<ManuDowngradingEntity>? downgradingEntities)
         {
             if (bo == null || downgradingEntities == null || !downgradingEntities.Any()) return 0;
@@ -107,5 +109,44 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             return rows;
         }
 
+        /// <summary>
+        /// 创建降级品记录（当需要读写分拆时，调用该方法）
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <param name="downgradingEntities"></param>
+        /// <returns></returns>
+        public async Task<(List<ManuDowngradingEntity>, List<ManuDowngradingRecordEntity>)> GetManuDowngradingsByConsumesAsync(DegradedProductExtendBo bo, IEnumerable<ManuDowngradingEntity>? downgradingEntities)
+        {
+            if (bo == null || downgradingEntities == null || !downgradingEntities.Any()) return default;
+
+            List<ManuDowngradingEntity> manuDowngradingEntities = new();
+            List<ManuDowngradingRecordEntity> manuDowngradingRecordEntities = new();
+            foreach (var entity in downgradingEntities)
+            {
+                var keyValueBo = bo.KeyValues.FirstOrDefault(f => f.BarCode == entity.SFC);
+                if (keyValueBo == null) continue;
+
+                manuDowngradingEntities.Add(new ManuDowngradingEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = keyValueBo.SFC,
+                    Grade = entity.Grade,
+                    SiteId = entity.SiteId,
+                    CreatedBy = bo.UserName ?? ""
+                });
+
+                manuDowngradingRecordEntities.Add(new ManuDowngradingRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = keyValueBo.SFC,
+                    Grade = entity.Grade,
+                    SiteId = entity.SiteId,
+                    IsCancellation = Core.Enums.Manufacture.ManuDowngradingRecordTypeEnum.Entry,
+                    CreatedBy = bo.UserName ?? ""
+                });
+            }
+
+            return await Task.FromResult((manuDowngradingEntities, manuDowngradingRecordEntities));
+        }
     }
 }

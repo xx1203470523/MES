@@ -5,7 +5,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command
     /// <summary>
     /// 
     /// </summary>
-    public class UpdateQtyByIdCommand : UpdateCommand
+    public class UpdateFeedingQtyByIdCommand : UpdateCommand
     {
         /// <summary>
         /// ID（主键）

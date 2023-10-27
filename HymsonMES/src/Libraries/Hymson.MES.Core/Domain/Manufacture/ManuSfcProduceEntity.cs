@@ -64,7 +64,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 设备Id
         /// </summary>
-        public long EquipmentId { get; set; }
+        public long? EquipmentId { get; set; }
 
         /// <summary>
         /// 资源id
@@ -77,9 +77,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
-        /// 状态;1：排队；2：活动；
+        /// 状态
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 锁;1：未锁定；2：即时锁；3：将来锁；
@@ -109,6 +109,16 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 锁定前状态
         /// </summary>
-        public TrueOrFalseEnum BeforeLockedStatus { get; set; }
+        public SfcStatusEnum? BeforeLockedStatus { get; set; }
+
+        /// <summary>
+        /// 汇总表id
+        /// </summary>
+        public long? SfcSummaryId { get; set; }
+
+       /// <summary>
+       /// 是否维修
+       /// </summary>
+        public bool? IsRepair { get; set; }
     }
 }

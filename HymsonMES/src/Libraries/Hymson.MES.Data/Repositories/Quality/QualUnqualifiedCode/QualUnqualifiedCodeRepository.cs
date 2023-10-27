@@ -96,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync( IEnumerable<long>  ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<QualUnqualifiedCodeEntity>(GetByIdsSql, new { ids = ids });
@@ -111,6 +111,17 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedCodeEntity>(GetByCodeSql, parm);
+        }
+
+        /// <summary>
+        /// 根据编码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByCodesAsync(QualUnqualifiedCodeByCodesQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<QualUnqualifiedCodeEntity>(GetByCodesSql, query);
         }
 
         /// <summary>
@@ -258,7 +269,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string GetByCodeSql = @"SELECT 
                                Id, SiteId, UnqualifiedCode, UnqualifiedCodeName, Status, Type, Degree, ProcessRouteId, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted
                             FROM `qual_unqualified_code`  WHERE UnqualifiedCode = @Code  AND SiteId=@Site AND IsDeleted=0 ";
-
+        const string GetByCodesSql = @"SELECT * FROM qual_unqualified_code WHERE SiteId = @SiteId AND IsDeleted = 0 AND UnqualifiedCode IN @Codes";
         const string UpdateStatusSql = "UPDATE `qual_unqualified_code` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
     }

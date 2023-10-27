@@ -5,6 +5,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
@@ -214,7 +215,7 @@ namespace Hymson.MES.Services.Services.Plan
                         }
                         qty = whMaterialInventoryEntity.QuantityResidue;
                     }
-                    if (manuSfcEntity != null && manuSfcEntity.Status == SfcStatusEnum.InProcess)
+                    if (manuSfcEntity != null &&  ManuSfcStatus.sfcStatusInProcess.Contains(manuSfcEntity.Status))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -324,7 +325,7 @@ namespace Hymson.MES.Services.Services.Plan
                     UserName = _currentUser.UserName,
                     WorkOrderId = planSfcInfoCreateDto.WorkOrderId,
                     OldSFCs = barcodeList
-                });
+                }, _localizationService);
                 await _whMaterialInventoryRepository.UpdateWhMaterialInventoryEmptyByBarCodeAync(new UpdateWhMaterialInventoryEmptyCommand
                 {
                     BarCodeList = whMaterialInventoryList.Select(x => x.MaterialBarCode).ToList(),
@@ -341,7 +342,7 @@ namespace Hymson.MES.Services.Services.Plan
                     UserName = _currentUser.UserName,
                     WorkOrderId = planSfcInfoCreateDto.WorkOrderId,
                     ExternalSFCs = barcodeList
-                });
+                }, _localizationService);
             }
             ts.Complete();
         }
@@ -370,7 +371,7 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16128)).WithData("sfc", param.SFC);
 
                 }
-                if (manuSfcEntity.Status == SfcStatusEnum.InProcess)
+                if (ManuSfcStatus.sfcStatusInProcess.Contains(manuSfcEntity.Status))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16123)).WithData("sfc", param.SFC);
                 }

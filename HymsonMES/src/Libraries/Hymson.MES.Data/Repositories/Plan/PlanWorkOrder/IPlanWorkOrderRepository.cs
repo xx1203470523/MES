@@ -65,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据 workOrderId 获取数据
@@ -151,21 +151,28 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyCommand param);
+        Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param);
 
         /// <summary>
         /// 更新数量（投入数量）
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        Task<int> UpdateInputQtyByWorkOrderIdAsync(IEnumerable<UpdateQtyCommand> commands);
+        Task<int> UpdateInputQtyByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands);
 
         /// <summary>
         /// 更新数量（完工数量）
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyCommand param);
+        Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param);
+
+        /// <summary>
+        /// 更新数量（完工数量）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands);
 
         /// <summary>
         /// 新增工单记录表

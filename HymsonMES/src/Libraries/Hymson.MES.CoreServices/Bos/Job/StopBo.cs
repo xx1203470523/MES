@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -40,6 +41,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 
         /// </summary>
         public List<ManuSfcStepEntity> SFCStepEntities { get; set; } = new();
-
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; } = new();
     }
 }

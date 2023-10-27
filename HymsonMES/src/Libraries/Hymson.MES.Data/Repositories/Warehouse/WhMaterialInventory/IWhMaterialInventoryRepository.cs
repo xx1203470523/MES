@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialInventoryEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity> whMaterialInventoryEntitys);
+        Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity>? whMaterialInventoryEntitys);
 
         /// <summary>
         /// 更新
@@ -53,6 +53,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         Task<int> UpdatePointByBarCodeAsync(UpdateStatusByBarCodeCommand command);
 
         /// <summary>
+        /// 批量更新更新状态
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdatePointByBarCodeRangeAsync(IEnumerable<UpdateStatusByBarCodeCommand> commands);
+
+        /// <summary>
         /// 更新状态（批量）
         /// </summary>
         /// <param name="command"></param>
@@ -73,6 +80,20 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateWhMaterialInventoryEmptyByBarCodeAync(UpdateWhMaterialInventoryEmptyCommand command);
+
+        /// <summary>
+        /// 批量清空库存(根据id)
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        Task<int> UpdateWhMaterialInventoryEmptyByIdRangeAync(IEnumerable<UpdateWhMaterialInventoryEmptyByIdCommand> commands);
+
+        /// <summary>
+        /// 清空库存(根据id)
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateWhMaterialInventoryEmptyByIdAync(UpdateWhMaterialInventoryEmptyByIdCommand command);
 
         /// <summary>
         /// 批量更新库存数量(增加库存)
