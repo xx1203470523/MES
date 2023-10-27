@@ -1076,6 +1076,8 @@
         public const string MES19151 = "换绑失败,执行换绑更新时失败";
         public const string MES19152 = "{SFC}未出站,不能执行操作";
         public const string MES19153 = "{SFC}流转查不到数据";
+
+        public const string MES19154 = "补料确认：更新{SFC}是否补料状态失败！";
         #endregion
 
         #region 系统对接 MES19201

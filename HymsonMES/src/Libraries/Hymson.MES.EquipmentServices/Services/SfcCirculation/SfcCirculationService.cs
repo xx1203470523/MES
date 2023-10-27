@@ -509,7 +509,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //查询流转条码绑定记录
             var circulationBarCodeEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(manuSfcCirculationBarCodequery);
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
-         
+
 
             return circulationBarCodeEntities;
         }
@@ -804,13 +804,13 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 
                 if (manuSfcSummaries.Any())
                 {
-                    var sumFirst = manuSfcSummaries.FirstOrDefault();                    
+                    var sumFirst = manuSfcSummaries.FirstOrDefault();
                     //获取工序 
                     var procedures = await _procProcedureRepository.GetByIdAsync(sumFirst.ProcedureId);
                     ngInfo.ProcedureCode = procedures.Code;
-                    ngInfo.ProcedureName= procedures.Name;
+                    ngInfo.ProcedureName = procedures.Name;
                     ngInfo.CreatedOn = sumFirst.CreatedOn;
-               
+
                 }
 
                 circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;
@@ -985,10 +985,8 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// <returns></returns>
         public async Task ReplenishNGConfirmAsync(ReplenishInputDto param)
         {
-            if (string.IsNullOrEmpty(param.SFC) || param.ProcedureId == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19003));//SFC条码不能为空
-            }
+            //SFC条码不能为空
+            if (string.IsNullOrEmpty(param.SFC) || param.ProcedureId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES19003));
 
             var procedureInfo = await _procProcedureRepository.GetByIdAsync(param.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10406));
@@ -1014,7 +1012,10 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             {
                 item.IsReplenish = 1;
             }
-            await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
+
+            var updateRows = await _manuSfcSummaryRepository.UpdatesAsync(manuSfcSummaryEntities.ToList());
+
+            if (updateRows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES19154)).WithData("SFC", param.SFC);
 
         }
     }

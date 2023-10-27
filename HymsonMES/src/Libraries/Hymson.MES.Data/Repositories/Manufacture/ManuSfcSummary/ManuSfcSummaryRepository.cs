@@ -145,7 +145,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (manuSfcSummaryQuery.IsReplenish.HasValue)
             {
                 sqlBuilder.Where("IsReplenish = @IsReplenish");
-            } 
+            }
             if (manuSfcSummaryQuery.StartTime.HasValue)
             {
                 sqlBuilder.Where("CreatedOn >= @StartTime");
@@ -192,7 +192,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(InsertsRecordSql, manuSfcSummaryEntitys);
         }
 
-        
+
 
         /// <summary>
         /// 更新
@@ -214,6 +214,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, manuSfcSummaryEntitys);
+        }
+
+        /// <summary>
+        /// 更新是否补料状态
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> UpdateIsReplenish(List<ManuSfcSummaryEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateIsReplenishSql, entities);
         }
 
         /// <summary>
@@ -248,6 +258,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string UpdateSql = "UPDATE `manu_sfc_summary` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, BeginTime = @BeginTime, EndTime = @EndTime, RepeatedCount = @RepeatedCount, Qty = @Qty, NgNum = @NgNum, FirstQualityStatus = @FirstQualityStatus, QualityStatus = @QualityStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_sfc_summary` SET   SiteId = @SiteId, ProcedureId = @ProcedureId, ResourceId = @ResourceId, EquipmentId = @EquipmentId, SFC = @SFC, WorkOrderId = @WorkOrderId, ProductId = @ProductId, BeginTime = @BeginTime, EndTime = @EndTime, RepeatedCount = @RepeatedCount, Qty = @Qty, NgNum = @NgNum, FirstQualityStatus = @FirstQualityStatus, QualityStatus = @QualityStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateIsReplenishSql = "UPDATE `manu_sfc_summary` SET IsReplenish = @IsReplenish WHERE Id = @Id ";
+
 
         const string DeleteSql = "UPDATE `manu_sfc_summary` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_summary` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
