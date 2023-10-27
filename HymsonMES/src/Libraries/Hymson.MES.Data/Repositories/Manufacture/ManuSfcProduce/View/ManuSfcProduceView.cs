@@ -147,8 +147,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品Id
         /// </summary>
         public long ProductId { get; set; }
+
+
+        // 2023.10.24 COPY FROM XINSHIJIE
+        /// <summary>
+        /// 
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ManuSfcProduceInfoView : ManuSfcProduceEntity
     {
         public long SfcInfoId { get; set; }

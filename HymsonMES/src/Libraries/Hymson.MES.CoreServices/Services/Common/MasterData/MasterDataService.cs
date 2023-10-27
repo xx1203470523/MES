@@ -20,6 +20,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
@@ -59,6 +60,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 仓储接口（条码生产信息）
         /// </summary>
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码流转信息）
+        /// </summary>
+        private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
         /// 仓储接口（工单信息）
@@ -147,6 +153,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="sequenceService"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procMaterialRepository"></param>
@@ -167,6 +174,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcMaterialRepository procMaterialRepository,
@@ -188,6 +196,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _sequenceService = sequenceService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procMaterialRepository = procMaterialRepository;
@@ -232,10 +241,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17103));
 
-            // 如果数量不一致
-            if (materialIds.Count() > procMaterialEntities.Count())
+            // 不在系统中的物料Id
+            var notInSystem = materialIds.Except(procMaterialEntities.Select(s => s.Id));
+            if (notInSystem.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17106));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17106)).WithData("Ids", string.Join(',', notInSystem));
             }
 
             return procMaterialEntities;
@@ -266,10 +276,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var processRouteEntities = await _procProcessRouteRepository.GetByIdsAsync(processRouteIds)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18107));
 
-            // 如果数量不一致
-            if (processRouteIds.Count() > processRouteEntities.Count())
+            // 不在系统中的工艺路线Id
+            var notInSystem = processRouteIds.Except(processRouteEntities.Select(s => s.Id));
+            if (notInSystem.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17106));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17111)).WithData("Ids", string.Join(',', notInSystem));
             }
 
             return processRouteEntities;
@@ -339,10 +350,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         {
             bo.WorkOrderIds = bo.WorkOrderIds.Distinct();
 
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds);
-            if (planWorkOrderEntities == null || bo.WorkOrderIds.Count() > planWorkOrderEntities.Count())
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(bo.WorkOrderIds)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+
+            // 不在系统中的工单Id
+            var notInSystem = bo.WorkOrderIds.Except(planWorkOrderEntities.Select(s => s.Id));
+            if (notInSystem.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16301));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17112)).WithData("Ids", string.Join(',', notInSystem));
             }
 
             foreach (var planWorkOrderEntity in planWorkOrderEntities)
@@ -930,6 +945,46 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return initialMaterials;
         }
 
+        /// <summary>
+        /// 获取流转数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetSFCCirculationEntitiesByTypesAsync(SFCCirculationBo bo)
+        {
+            var types = new List<SfcCirculationTypeEnum>();
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Remove || bo.Type == SFCCirculationReportTypeEnum.Whole)
+            {
+                types.Add(SfcCirculationTypeEnum.Disassembly);
+            }
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Activity || bo.Type == SFCCirculationReportTypeEnum.Whole)
+            {
+                types.Add(SfcCirculationTypeEnum.Consume);
+                types.Add(SfcCirculationTypeEnum.ModuleAdd);
+                types.Add(SfcCirculationTypeEnum.ModuleReplace);
+            }
+
+            var query = new ManuSfcCirculationQuery
+            {
+                Sfc = bo.SFC,
+                SiteId = bo.SiteId,
+                CirculationTypes = types
+            };
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Remove)
+            {
+                query.IsDisassemble = TrueOrFalseEnum.Yes;
+            }
+
+            if (bo.Type == SFCCirculationReportTypeEnum.Activity)
+            {
+                query.IsDisassemble = TrueOrFalseEnum.No;
+            }
+
+            return await _manuSfcCirculationRepository.GetSfcMoudulesAsync(query);
+        }
 
         /// <summary>
         /// 获取不合格代码列表

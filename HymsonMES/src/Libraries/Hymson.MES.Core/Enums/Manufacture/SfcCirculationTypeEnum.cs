@@ -44,4 +44,27 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("换件")]
         ModuleReplace = 7
     }
+
+    /// <summary>
+    /// ManuSfcCirculation类型枚举（报表用的分类）
+    /// InProductDismantleTypeEnum / OriginalSummaryReportTypeEnum
+    /// </summary>
+    public enum SFCCirculationReportTypeEnum : sbyte
+    {
+        /// <summary>
+        /// 活动（Consume / ModuleAdd / ModuleReplace）
+        /// </summary>
+        [Description("活动")]
+        Activity = 1,
+        /// <summary>
+        /// 移除（Disassembly）
+        /// </summary>
+        [Description("移除")]
+        Remove = 2,
+        /// <summary>
+        /// 全部
+        /// </summary>
+        [Description("全部")]
+        Whole = 3
+    }
 }

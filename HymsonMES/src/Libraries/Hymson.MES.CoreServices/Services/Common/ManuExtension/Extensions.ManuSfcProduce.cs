@@ -9,6 +9,7 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.Utils;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -54,9 +55,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// 检查条码状态是否合法
         /// </summary>
         /// <param name="sfcProduceEntity"></param>
-        /// <param name="produceStatus"></param>
-        /// <param name="produceStatusDescription"></param>
-        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcStatusEnum produceStatus, string produceStatusDescription)
+        /// <param name="sfcStatus"></param>
+        /// <param name="localizationService"></param>
+        public static ManuSfcProduceEntity VerifySFCStatus(this ManuSfcProduceEntity sfcProduceEntity, SfcStatusEnum sfcStatus, ILocalizationService localizationService)
         {
             // 当前条码是否是被锁定
             if (sfcProduceEntity.Status == SfcStatusEnum.Locked) throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
@@ -65,32 +66,15 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);
 
             // 当前工序是否是指定状态
-            if (sfcProduceEntity.Status != produceStatus) throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
-
-            return sfcProduceEntity;
-        }
-
-        /// <summary>
-        /// 检查条码状态是否合法
-        /// </summary>
-        /// <param name="sfcProduceEntities"></param>
-        /// <param name="sfcStatus"></param>
-        public static IEnumerable<ManuSfcProduceEntity> VerifySFCStatus(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, SfcStatusEnum sfcStatus, string produceStatusDescription)
-        {
-            // 当前条码是否是已报废
-            if (sfcProduceEntities.Any(a => a.IsScrap == TrueOrFalseEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16324));
-
-            // 当前条码是否是被锁定
-            if (sfcProduceEntities.Any(a => a.Status == SfcStatusEnum.Locked)) throw new CustomerValidationException(nameof(ErrorCode.MES16325));
-
-            // 当前条码是否是指定状态
-            var sfcProduceEntitiesOfStatus = sfcProduceEntities.Where(a => a.Status != sfcStatus);
-            if (sfcProduceEntitiesOfStatus.Any())
+            if (sfcProduceEntity.Status != sfcStatus)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16313)).WithData("Status", produceStatusDescription);
+                throw new CustomerValidationException(nameof(ErrorCode.MES16361))
+                            .WithData("SFC", sfcProduceEntity.SFC)
+                            .WithData("Current", localizationService.GetSFCStatusEnumDescription(sfcProduceEntity.Status))
+                            .WithData("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
             }
 
-            return sfcProduceEntities;
+            return sfcProduceEntity;
         }
 
         /// <summary>
@@ -211,30 +195,37 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// 工序锁校验
         /// </summary>
         /// <param name="sfcProduceBusinessEntities"></param>
-        /// <param name="SFCs"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="sfcProduceEntities"></param>
+        /// <param name="procedureEntity"></param>
         /// <returns></returns>
-        public static IEnumerable<ManuSfcProduceBusinessEntity>? VerifyProcedureLock(this IEnumerable<ManuSfcProduceBusinessEntity> sfcProduceBusinessEntities, IEnumerable<string> SFCs, long procedureId)
+        public static IEnumerable<ManuSfcProduceBusinessEntity>? VerifyProcedureLock(this IEnumerable<ManuSfcProduceBusinessEntity> sfcProduceBusinessEntities, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, ProcProcedureEntity procedureEntity)
         {
-            /*
             // 是否被锁定
-            if (sfcProduceBusinessEntity == null) return sfcProduceBusinessEntity;
-            if (sfcProduceBusinessEntity.BusinessType != ManuSfcProduceBusinessType.Lock) return sfcProduceBusinessEntity;
+            if (sfcProduceBusinessEntities == null || sfcProduceBusinessEntities.Any() == false) return sfcProduceBusinessEntities;
+            if (sfcProduceBusinessEntities.Any(a => a.BusinessType != ManuSfcProduceBusinessType.Lock)) return sfcProduceBusinessEntities;
 
-            var sfcProduceLockBo = JsonSerializer.Deserialize<SfcProduceLockBo>(sfcProduceBusinessEntity.BusinessContent);//sfcProduceBusinessEntity.BusinessContent
-            if (sfcProduceLockBo == null) return sfcProduceBusinessEntity;
-
-            if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+            foreach (var sfcProduceBusinessEntity in sfcProduceBusinessEntities)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
+                var sfcProduceLockBo = sfcProduceBusinessEntity.BusinessContent.ToDeserialize<SfcProduceLockBo>();
+                if (sfcProduceLockBo == null) continue;
+
+                var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(a => a.Id == sfcProduceBusinessEntity.SfcProduceId);
+                if (sfcProduceEntity == null) continue;
+
+                if (sfcProduceLockBo.Lock == QualityLockEnum.InstantLock)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfcProduceEntity.SFC);
+                }
+
+                // TODO 这里是不是锁定工序前面的工序均锁定？？？
+                if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureEntity.Id)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16362))
+                        .WithData("SFC", sfcProduceEntity.SFC)
+                        .WithData("Procedure", procedureEntity.Code);
+                }
             }
 
-            if (sfcProduceLockBo.Lock == QualityLockEnum.FutureLock && sfcProduceLockBo.LockProductionId == procedureId)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16314)).WithData("SFC", sfc);
-            }
-            */
-            // TODO
             return sfcProduceBusinessEntities;
         }
 

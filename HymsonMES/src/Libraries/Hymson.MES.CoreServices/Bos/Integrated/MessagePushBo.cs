@@ -3,7 +3,7 @@
     /// <summary>
     /// BO对象（消息推送）
     /// </summary>
-    public class MessagePushBo
+    public record MessagePushBo
     {
         /// <summary>
         /// 推送场景

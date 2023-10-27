@@ -2,7 +2,6 @@ using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.EventBus.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -15,7 +14,6 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Events.ManufactureEvents.ManuSfcStepEvents;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -33,7 +31,6 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -129,10 +126,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuFacePlateRepairCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuFacePlateRepairModifyDto> _validationModifyRules;
 
-        /// <summary>
-        /// 事件总线
-        /// </summary>
-        private readonly IEventBus<EventBusInstance1> _eventBus;
 
         /// <summary>
         /// 构造函数
@@ -158,7 +151,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procProcessRouteDetailLinkRepository"></param>
         /// <param name="manuCommonService"></param>
         /// <param name="manuContainerPackRepository"></param>
-        /// <param name="eventBus"></param>
         public ManuFacePlateRepairService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuFacePlateRepairRepository manuFacePlateRepairRepository, IManuSfcProduceRepository manuSfcProduceRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository, IPlanWorkOrderRepository planWorkOrderRepository,
@@ -171,8 +163,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         AbstractValidator<ManuFacePlateRepairModifyDto> validationModifyRules,
         IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
         IManuCommonService manuCommonService,
-        IManuContainerPackRepository manuContainerPackRepository,
-        IEventBus<EventBusInstance1> eventBus)
+        IManuContainerPackRepository manuContainerPackRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -195,7 +186,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuContainerPackRepository = manuContainerPackRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcRepository = manuSfcRepository;
-            _eventBus = eventBus;
         }
 
         /// <summary>
@@ -292,7 +282,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
-
             // 这方法里面包含有验证
             var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDtoAsync(sfcProduceEntity);
 
@@ -334,13 +323,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-
                 _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
                 await _manuSfcStepRepository.InsertAsync(sfcStep);
 
                 await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
-                //_eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
+
                 trans.Complete();
             }
             return manuFacePlateRepairOpenInfoDto;
@@ -811,7 +799,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                     // 步骤
                     rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
-                    //_eventBus.Publish(new ManuSfcStepEvent { manuSfcStep = sfcStep });
                 }
 
                 trans.Complete();
