@@ -78,14 +78,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto);
+        Task<Dictionary<string, JobResponseDto>> InStationAsync(InStationRequestDto dto);
 
         /// <summary>
         /// 出站（接口）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto);
+        Task<Dictionary<string, JobResponseDto>> OutStationAsync(OutStationRequestDto dto);
 
 
 

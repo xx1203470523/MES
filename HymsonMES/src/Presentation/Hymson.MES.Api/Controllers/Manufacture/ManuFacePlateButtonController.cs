@@ -124,7 +124,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut("inStation")]
         [AllowAnonymous]
-        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto)
+        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(InStationRequestDto dto)
         {
             return await _manuFacePlateButtonService.InStationAsync(dto);
         }
@@ -136,7 +136,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPut("outStation")]
         [AllowAnonymous]
-        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
+        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(OutStationRequestDto dto)
         {
             return await _manuFacePlateButtonService.OutStationAsync(dto);
         }
