@@ -1086,6 +1086,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
             // 添加不良记录
+
             responseBo.ProductBadRecordEntities = qualUnqualifiedCodeEntities.Select(s => new ManuProductBadRecordEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
