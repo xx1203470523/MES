@@ -265,7 +265,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                         CreatedBy = manuSfc.CreatedBy,
                         UpdatedBy = manuSfc.UpdatedBy
                     };
-                    manuSfcProduceList.Add(manuSfcProduceBusinessEntity);
+                    if (manuSfcProduceList.GroupBy(it => new { it.SfcProduceId, it.BusinessType }).Distinct().Count()==0)
+                    {
+                        manuSfcProduceList.Add(manuSfcProduceBusinessEntity);
+                    }
                 }
             }
 
@@ -319,14 +322,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                     }
-                    if (manuSfcProduceList.Any())
+                    if (manuSfcProduceList != null && manuSfcProduceList.Any())
                     {
                         //添加维修业务
                         await _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(manuSfcProduceList);
-
-                        //修改在制品工艺路线和工序信息
-                        await _manuSfcProduceRepository.UpdateRouteAsync(updateRouteCommand);
                     }
+                    //修改在制品工艺路线和工序信息
+                    await _manuSfcProduceRepository.UpdateRouteAsync(updateRouteCommand);
                     trans.Complete();
                 }
             }
@@ -344,14 +346,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
                     }
-                    if (manuSfcProduceList.Any())
+                    if (manuSfcProduceList != null && manuSfcProduceList.Any())
                     {
                         //添加维修业务
                         await _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(manuSfcProduceList);
-
-                        //修改在制品工艺路线和工序信息
-                        await _manuSfcProduceRepository.UpdateRouteAsync(updateRouteCommand);
                     }
+                    //修改在制品工艺路线和工序信息
+                    await _manuSfcProduceRepository.UpdateRouteAsync(updateRouteCommand);
                     trans.Complete();
                 }
             }

@@ -1486,7 +1486,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18011));
             }
-            return nodes = nodes.Where(it => it.ProcedureId != ProcessRoute.LastProcedureId).OrderBy(x => int.Parse(x.ManualSortNumber)).Distinct();
+            return nodes = nodes.Where(it => it.ProcedureId != ProcessRoute.LastProcedureId).OrderBy(x => x.ManualSortNumber).Distinct();
         }
 
 
