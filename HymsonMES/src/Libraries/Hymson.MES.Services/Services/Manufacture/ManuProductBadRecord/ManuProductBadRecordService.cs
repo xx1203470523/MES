@@ -15,6 +15,7 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -35,6 +36,8 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Newtonsoft.Json;
+
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -182,8 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 获取不合格代码列表
             var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordCreateDto.UnqualifiedIds);
-            //首工序
-            var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(manuProductBadRecordCreateDto.BadProcessRouteId ?? 0);
+
 
             //工单激活信息
             var orderIds = sfcInfoEntities.Select(x => x.WorkOrderId).Distinct().ToArray();
@@ -213,6 +215,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             var updateStatusByBarCodeCommands = new List<UpdateStatusByBarCodeCommand>();
             var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
             bool isScrap = qualUnqualifiedCodes.Any(x => x.UnqualifiedCode.ToUpperInvariant() == ManuProductBadRecord.ScrapCode);
+            Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto.ProcessRouteProcedureDto processRouteProcedure = new();
+            if (qualUnqualifiedCodes.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect))
+            {
+                //首工序
+                processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(manuProductBadRecordCreateDto.BadProcessRouteId ?? 0);
+            }
             foreach (var sfc in manuProductBadRecordCreateDto.Sfcs)
             {
                 var sfcEntity = sfcEntities.FirstOrDefault(x => x.SFC == sfc);
@@ -332,16 +340,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                         UpdatedBy = _currentUser.UserName,
                     };
 
-                    if (isScrap || unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
+                    if (isScrap)
                     {
                         manuProductBadRecordEntity.CloseOn = HymsonClock.Now();
                         manuProductBadRecordEntity.CloseBy = _currentUser.UserName;
                         manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
-                        manuProductBadRecordEntity.DisposalResult = isScrap ? ProductBadDisposalResultEnum.scrap : ProductBadDisposalResultEnum.repair;
+                        manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.scrap;
                     }
                     else
                     {
-                        manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
+                        manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Open;
+                        if (unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
+                        {
+                            manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.repair;
+                        }
                     }
 
                     manuProductBadRecords.Add(manuProductBadRecordEntity);
@@ -458,7 +470,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //在制品处理
                     if (manuSfcProduceInfoEntity != null)
                     {
-                        if (manuSfcProduceInfoEntity.IsRepair ?? false) continue;
+                        if ((manuSfcProduceInfoEntity.IsRepair ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes) continue;
                         //返工工艺路线与条码工艺路线不能一致
                         if (manuSfcProduceInfoEntity.ProcessRouteId == manuProductBadRecordCreateDto.BadProcessRouteId)
                         {
@@ -504,7 +516,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             UpdatedBy = _currentUser.UserName,
                             UpdatedOn = HymsonClock.Now(),
                             Status = SfcStatusEnum.lineUp,
-                            IsRepair = true,
+                            IsRepair = TrueOrFalseEnum.Yes,
                             Id = manuSfcProduceInfoEntity.Id
                         });
                     }
@@ -802,7 +814,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
 
             //返修中无需复判
-            if (manuSfcProduceEntity != null && (manuSfcProduceEntity.IsRepair ?? false))
+            if (manuSfcProduceEntity != null && (manuSfcProduceEntity.IsRepair ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15424));
             }
@@ -921,7 +933,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ProcedureId = processRouteProcedure.ProcedureId,
                         Status = SfcStatusEnum.lineUp,
                         RepeatedCount = 0,
-                        IsScrap = TrueOrFalseEnum.No,
+                        IsScrap = TrueOrFalseEnum.Yes,
                         CreatedOn = HymsonClock.Now(),
                         CreatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now(),
@@ -1012,11 +1024,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //修改在制品条码状态
                     var manuSfcUpdateRouteByIdCommand = new ManuSfcUpdateRouteByIdCommand
                     {
-                        Id = manuSfcEntity.Id,
+                        Id = manuSfcProduceEntity.Id,
                         Status = manuSfcEntity.Status,
                         ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
                         ProcedureId = processRouteProcedure.ProcedureId,
-                        IsRepair = true,
+                        IsRepair = TrueOrFalseEnum.Yes,
                     };
 
                     using (var trans = TransactionHelper.GetTransactionScope())
@@ -1056,15 +1068,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                 }
                 else
-
                 {
-                    var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
+                    //var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
                     // 末尾工序在制完成
-                    if (isLast && manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
+                    if (manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
                     {
                         var manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
                         {
-                            Id = manuSfcProduceEntity.Id,
+                            Id = manuSfcProduceEntity.SFCId,
                             UpdatedBy = _currentUser.UserName,
                             UpdatedOn = HymsonClock.Now(),
                             Status = SfcStatusEnum.Complete,

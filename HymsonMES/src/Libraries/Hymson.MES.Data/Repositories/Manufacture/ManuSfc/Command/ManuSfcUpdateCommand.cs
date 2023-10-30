@@ -112,7 +112,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         /// <summary>
         /// 是否维修
         /// </summary>
-        public bool IsRepair { get; set; }
+        public TrueOrFalseEnum IsRepair { get; set; }
     }
 
     /// <summary>
