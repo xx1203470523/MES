@@ -68,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM proc_procedure_rejudge /**where**/  ";
 
-        const string InsertsSql = "INSERT INTO proc_procedure_rejudge (`Id`, `ProcedureId`, `UnqualifiedCodeId`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ProcedureId, @UnqualifiedCodeId, @Type, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT INTO proc_procedure_rejudge (`Id`, `ProcedureId`, `UnqualifiedCodeId`, `DefectType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ProcedureId, @UnqualifiedCodeId, @DefectType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string DeleteByParentId = "DELETE FROM proc_procedure_rejudge WHERE ProcedureId = @ParentId";
 

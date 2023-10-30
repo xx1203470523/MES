@@ -1382,7 +1382,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeEntities.Select(s => s.UnqualifiedCodeId));
 
             // 复投相关设置分组
-            var procedureRejudgeEntitiesDic = procedureRejudgeEntities.ToLookup(e => e.Type).ToDictionary(d => d.Key, d => d);
+            var procedureRejudgeEntitiesDic = procedureRejudgeEntities.ToLookup(e => e.DefectType).ToDictionary(d => d.Key, d => d);
             foreach (var item in procedureRejudgeEntitiesDic)
             {
                 switch (item.Key)

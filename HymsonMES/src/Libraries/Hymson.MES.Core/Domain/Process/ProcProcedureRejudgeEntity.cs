@@ -22,9 +22,9 @@ namespace Hymson.MES.Core.Domain.Process
         public long UnqualifiedCodeId { get; set; }
 
         /// <summary>
-        /// 不合格代码类型;1:标记编码;2:最终缺陷编码;3:阻断缺陷编码;
+        /// 缺陷类型;1:标记编码;2:最终缺陷编码;3:阻断缺陷编码;
         /// </summary>
-        public RejudgeUnqualifiedCodeEnum Type { get; set; }
+        public RejudgeUnqualifiedCodeEnum DefectType { get; set; }
 
         /// <summary>
         /// 站点Id
