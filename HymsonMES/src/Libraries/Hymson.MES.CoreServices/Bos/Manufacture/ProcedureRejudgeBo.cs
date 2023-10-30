@@ -19,6 +19,21 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ProcedureId { get; set; }
 
         /// <summary>
+        /// 编码（工序）
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// ID（下工序）
+        /// </summary>
+        public long NextProcedureId { get; set; }
+
+        /// <summary>
+        /// 编码（下工序）
+        /// </summary>
+        public string NextProcedureCode { get; set; }
+
+        /// <summary>
         /// 循环次数 
         /// </summary>
         public int Cycle { get; set; }
