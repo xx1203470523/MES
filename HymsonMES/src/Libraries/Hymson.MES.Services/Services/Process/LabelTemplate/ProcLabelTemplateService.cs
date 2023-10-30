@@ -12,7 +12,9 @@ using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Newtonsoft.Json;
+using System.Xml.Linq;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
 {
@@ -31,10 +33,12 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         private readonly AbstractValidator<ProcLabelTemplateModifyDto> _validationModifyRules;
         private readonly ILabelPrintRequest _labelPrintRequest;
 
+        private readonly IProcLabelTemplateRelationRepository _procLabelTemplateRelationRepository;
+
         public ProcLabelTemplateService(ICurrentUser currentUser, ICurrentSite currentSite
             , IProcLabelTemplateRepository procLabelTemplateRepository
             , AbstractValidator<ProcLabelTemplateCreateDto> validationCreateRules
-            , AbstractValidator<ProcLabelTemplateModifyDto> validationModifyRules, ILabelPrintRequest labelPrintRequest)
+            , AbstractValidator<ProcLabelTemplateModifyDto> validationModifyRules, ILabelPrintRequest labelPrintRequest, IProcLabelTemplateRelationRepository procLabelTemplateRelationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -42,6 +46,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _labelPrintRequest = labelPrintRequest;
+            _procLabelTemplateRelationRepository = procLabelTemplateRelationRepository;
         }
 
         /// <summary>
@@ -56,6 +61,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateCreateDto.Remark = procLabelTemplateCreateDto.Remark ?? "".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLabelTemplateCreateDto);
+
+            if (procLabelTemplateCreateDto.procLabelTemplateRelationCreateDto == null || string.IsNullOrEmpty(procLabelTemplateCreateDto.procLabelTemplateRelationCreateDto.PrintConfig))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10372));
+            }
 
             //DTO转换实体
             var procLabelTemplateEntity = procLabelTemplateCreateDto.ToEntity<ProcLabelTemplateEntity>();
@@ -73,9 +83,27 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
             procLabelTemplateEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            //入库
-            await _procLabelTemplateRepository.InsertAsync(procLabelTemplateEntity);
+            //打印设计配置
+            var procLabelTemplateRelationEntity = procLabelTemplateCreateDto.procLabelTemplateRelationCreateDto.ToEntity<ProcLabelTemplateRelationEntity>();
+            procLabelTemplateRelationEntity.LabelTemplateId = procLabelTemplateEntity.Id;
 
+            procLabelTemplateRelationEntity.Id = IdGenProvider.Instance.CreateId();
+            procLabelTemplateRelationEntity.CreatedBy = _currentUser.UserName;
+            procLabelTemplateRelationEntity.UpdatedBy = _currentUser.UserName;
+            procLabelTemplateRelationEntity.CreatedOn = HymsonClock.Now();
+            procLabelTemplateRelationEntity.UpdatedOn = HymsonClock.Now();
+            procLabelTemplateRelationEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+
+                //入库
+                await _procLabelTemplateRepository.InsertAsync(procLabelTemplateEntity);
+
+                await _procLabelTemplateRelationRepository.InsertAsync(procLabelTemplateRelationEntity);
+
+                trans.Complete();
+            }
         }
 
         /// <summary>
@@ -175,6 +203,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLabelTemplateModifyDto);
 
+            if (procLabelTemplateModifyDto.procLabelTemplateRelationCreateDto == null || string.IsNullOrEmpty(procLabelTemplateModifyDto.procLabelTemplateRelationCreateDto.PrintConfig))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10372));
+            }
+
             //DTO转换实体
             var procLabelTemplateEntity = procLabelTemplateModifyDto.ToEntity<ProcLabelTemplateEntity>();
             //验证模板名称是否重复
@@ -187,7 +220,28 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             procLabelTemplateEntity.UpdatedBy = _currentUser.UserName;
             procLabelTemplateEntity.UpdatedOn = HymsonClock.Now();
 
-            await _procLabelTemplateRepository.UpdateAsync(procLabelTemplateEntity);
+
+            //打印设计配置
+            var procLabelTemplateRelationEntity = procLabelTemplateModifyDto.procLabelTemplateRelationCreateDto.ToEntity<ProcLabelTemplateRelationEntity>();
+            procLabelTemplateRelationEntity.LabelTemplateId = procLabelTemplateEntity.Id;
+
+            procLabelTemplateRelationEntity.Id = IdGenProvider.Instance.CreateId();
+            procLabelTemplateRelationEntity.CreatedBy = _currentUser.UserName;
+            procLabelTemplateRelationEntity.UpdatedBy = _currentUser.UserName;
+            procLabelTemplateRelationEntity.CreatedOn = HymsonClock.Now();
+            procLabelTemplateRelationEntity.UpdatedOn = HymsonClock.Now();
+            procLabelTemplateRelationEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                await _procLabelTemplateRepository.UpdateAsync(procLabelTemplateEntity);
+
+                //删除打印设计 然后新增
+                await _procLabelTemplateRelationRepository.DeleteByLabelTemplateIdAsync(procLabelTemplateEntity.Id);
+                await _procLabelTemplateRelationRepository.InsertAsync(procLabelTemplateRelationEntity);
+
+                trans.Complete();
+            }
         }
 
         /// <summary>
@@ -208,6 +262,22 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         {
             return await _procLabelTemplateRepository.GetByNameAsync(new ProcLabelTemplateByNameQuery() { SiteId = _currentSite.SiteId ?? 0, Name = name });
 
+        }
+
+        /// <summary>
+        /// 查询标签模板对应的打印设计信息
+        /// </summary>
+        /// <param name="labelTemplateId"></param>
+        /// <returns></returns>
+        public async Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long labelTemplateId) 
+        {
+            var procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(labelTemplateId);
+            if (procLabelTemplateRelationEntity != null)
+            {
+                return procLabelTemplateRelationEntity.ToModel<ProcLabelTemplateRelationDto>();
+            }
+
+            return null;
         }
     }
 }

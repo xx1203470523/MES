@@ -136,6 +136,10 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public IEnumerable<ManuProductBadRecordEntity> ProductBadRecordEntities { get; set; }
 
+        /// <summary>
+        /// 产品NG记录对象
+        /// </summary>
+        public IEnumerable<ManuProductNgRecordEntity> ProductNgRecordEntities { get; set; }
 
         // 额外给面板用来显示的参数
         /// <summary>
@@ -203,6 +207,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 不良品录入对象
         /// </summary>
         public IEnumerable<ManuProductBadRecordEntity>? ProductBadRecordEntities { get; set; }
+
+        /// <summary>
+        /// 产品NG记录对象
+        /// </summary>
+        public IEnumerable<ManuProductNgRecordEntity> ProductNgRecordEntities { get; set; }
 
         /// <summary>
         /// 

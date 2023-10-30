@@ -128,6 +128,8 @@
         public const string MES10370 = "存储路径超长，最大255!";
         public const string MES10371 = "IP最大长度为50";
 
+        public const string MES10372 = "模板没有打印设计!";
+
         #endregion
 
         #region 工序 10400
@@ -1021,6 +1023,9 @@
         public const string MES17111 = "工艺路线【{Ids}】信息读取失败！";
         public const string MES17112 = "工单【{Ids}】信息读取失败！";
         public const string MES17113 = "消耗条码{BarCodes}不属于已上料清单！";
+        public const string MES17114 = "获取工序基本信息失败，请检查工序参数【{Procedure}】！";
+        public const string MES17115 = "工序【{Procedure}】未设置【缺陷编码】参数项，具体请查看【工序维护】！";
+        public const string MES17116 = "不合格代码【{Code}】未设置【不合格工艺路线】参数项，具体请查看【不合格代码】！";
         #endregion
 
         #region 面板维护 MES17200
@@ -1221,9 +1226,7 @@
         public const string MES18513 = "载具类型验证类型不能为空";
         public const string MES18514 = "载具类型验证类型不合法";
         public const string MES18515 = "载具类型验证物料或物料组不合法";
-
         public const string MES18516 = "载具类型编码不允许有空格";
-
         public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
         public const string MES18518 = "该载具类型已被关联了产品的载具关联，不允许更改该载具类型";
         #endregion
@@ -1252,6 +1255,8 @@
         public const string MES18620 = "载具位置Id不能为0！";
         public const string MES18621 = "载具SFC信息不能为空！";
         public const string MES18622 = "载具待解盘条码不能为空！";
+        public const string MES18623 = "载具编码【{Code}】读取失败！";
+        public const string MES18624 = "载具编码【{Code}】不存在，具体请查看【载具注册】！";
         #endregion
 
         #region Recipe参数 18700

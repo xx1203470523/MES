@@ -32,4 +32,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long SiteId { get; set; }
     }
+
+    public class ManuSfcProduceByProcedureIdAndResourceIdQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+    }
 }

@@ -1,28 +1,22 @@
-/*
- *creator: Karl
- *
- *describe: 载具装载记录 仓储类 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-07-24 04:45:45
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 载具装载记录仓储
     /// </summary>
-    public partial class InteVehicleFreightRecordRepository :BaseRepository, IInteVehicleFreightRecordRepository
+    public partial class InteVehicleFreightRecordRepository : BaseRepository, IInteVehicleFreightRecordRepository
     {
-
-        public InteVehicleFreightRecordRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        public InteVehicleFreightRecordRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteVehicleFreightRecordEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightRecordEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightRecordEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +59,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteVehicleFreightRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteVehicleFreightRecordEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteVehicleFreightRecordEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<InteVehicleFreightRecordEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -83,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-           
+
             var offSet = (inteVehicleFreightRecordPagedQuery.PageIndex - 1) * inteVehicleFreightRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = inteVehicleFreightRecordPagedQuery.PageSize });

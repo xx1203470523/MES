@@ -107,6 +107,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 模板内容
         /// </summary>
         public string? Content { get; set; }
+
+        /// <summary>
+        /// 模板打印配置信息
+        /// </summary>
+        public ProcLabelTemplateRelationCreateDto procLabelTemplateRelationCreateDto { get; set; }
     }
 
     /// <summary>
@@ -167,6 +172,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 模板打印配置信息
+        /// </summary>
+        public ProcLabelTemplateRelationCreateDto procLabelTemplateRelationCreateDto { get; set; }
     }
 
     /// <summary>

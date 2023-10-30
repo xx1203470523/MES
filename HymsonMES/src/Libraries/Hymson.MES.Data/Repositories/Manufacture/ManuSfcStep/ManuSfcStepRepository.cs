@@ -229,6 +229,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuSfcStepEntity>(manuSfcStepEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 获取一些条码的所有进站信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInStepAsync(SfcInStepQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSfcsInStepSql, query);
+            return manuSfcStepEntities;
+
+        }
     }
 
     /// <summary>
@@ -266,5 +279,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
+
+        /// <summary>
+        /// 获取条码的进站信息
+        /// </summary>
+        const string GetSfcsInStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted=0 AND SiteId=@SiteId   AND  Operatetype=3 AND sfc IN @sfcs ";
     }
 }

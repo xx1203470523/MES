@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -170,7 +171,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long IsDeleted { get; set; }
 
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
 
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
 
@@ -273,6 +282,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public bool? IsShowLog { get; set; }
 
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>
@@ -379,6 +397,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public bool? IsShowLog { get; set; }
 
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>

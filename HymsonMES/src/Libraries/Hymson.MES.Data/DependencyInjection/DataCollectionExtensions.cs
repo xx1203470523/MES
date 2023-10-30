@@ -195,6 +195,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Procedure
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
+            services.AddSingleton<IProcProcedureRejudgeRepository, ProcProcedureRejudgeRepository>();
             services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion
 
@@ -210,6 +211,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region LabelTemplate
             services.AddSingleton<IProcLabelTemplateRepository, ProcLabelTemplateRepository>();
+            services.AddSingleton<IProcLabelTemplateRelationRepository, ProcLabelTemplateRelationRepository>();
+
             #endregion
 
             #region printConfig
@@ -264,6 +267,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFeedingRepository, ManuFeedingRepository>();
             services.AddSingleton<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
             services.AddSingleton<IManuProductBadRecordRepository, ManuProductBadRecordRepository>();
+            services.AddSingleton<IManuProductNgRecordRepository, ManuProductNgRecordRepository>();
             services.AddSingleton<IManuSfcCirculationRepository, ManuSfcCirculationRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
             services.AddSingleton<IManuSfcRepository, ManuSfcRepository>();
