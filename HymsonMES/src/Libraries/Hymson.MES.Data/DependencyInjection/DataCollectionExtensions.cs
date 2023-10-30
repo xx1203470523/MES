@@ -267,6 +267,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFeedingRepository, ManuFeedingRepository>();
             services.AddSingleton<IManuFeedingRecordRepository, ManuFeedingRecordRepository>();
             services.AddSingleton<IManuProductBadRecordRepository, ManuProductBadRecordRepository>();
+            services.AddSingleton<IManuProductNgRecordRepository, ManuProductNgRecordRepository>();
             services.AddSingleton<IManuSfcCirculationRepository, ManuSfcCirculationRepository>();
             services.AddSingleton<IManuSfcInfoRepository, ManuSfcInfoRepository>();
             services.AddSingleton<IManuSfcRepository, ManuSfcRepository>();

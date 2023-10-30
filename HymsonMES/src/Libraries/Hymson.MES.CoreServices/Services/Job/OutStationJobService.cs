@@ -97,6 +97,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
 
         /// <summary>
+        /// 仓储接口（产品NG记录表）
+        /// </summary>
+        private readonly IManuProductNgRecordRepository _manuProductNgRecordRepository;
+
+        /// <summary>
         /// 仓储接口（降级录入）
         /// </summary>
         private readonly IManuDowngradingRepository _manuDowngradingRepository;
@@ -148,6 +153,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuDowngradingRepository"></param>
         /// <param name="manuDowngradingRecordRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
+        /// <param name="manuProductNgRecordRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
@@ -166,6 +172,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             IManuDowngradingRepository manuDowngradingRepository,
             IManuDowngradingRecordRepository manuDowngradingRecordRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
+            IManuProductNgRecordRepository manuProductNgRecordRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
@@ -185,6 +192,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             _manuDowngradingRepository = manuDowngradingRepository;
             _manuDowngradingRecordRepository = manuDowngradingRecordRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
+            _manuProductNgRecordRepository = manuProductNgRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
@@ -537,7 +545,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 _manuProductBadRecordRepository.InsertRangeAsync(data.ProductBadRecordEntities),
 
                 // 插入NG记录
-                //_manuProductNGRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities)
+                _manuProductNgRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities)
             };
 
             var rowArray = await Task.WhenAll(tasks);

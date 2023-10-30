@@ -5,7 +5,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
