@@ -84,8 +84,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public int? RepeatedCount { get; set; }
 
-
-        public bool? IsRepair { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public TrueOrFalseEnum? IsRepair { get; set; }
 
         /// <summary>
         /// 备注
