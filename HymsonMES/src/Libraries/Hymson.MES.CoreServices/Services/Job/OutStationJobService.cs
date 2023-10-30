@@ -1036,9 +1036,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 // 已完工（ 如果没有尾工序，就表示已完工）
                 if (nextProcedure == null)
                 {
+                    #region 需要复判（置于在制完成）
                     if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.Yes)
                     {
-                        #region 置于在制完成
                         //responseBo.IsLastProcedure = true;
 
                         // 清空复投次数
@@ -1049,11 +1049,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                         manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
                         sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
                         stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
-                        #endregion
                     }
+                    #endregion
+
+                    #region 无需复判（置于不合格工艺路线首工序排队）
                     else
                     {
-                        #region 置于不合格工艺路线首工序排队
                         responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
                         // 条码状态跟在制品状态一致
@@ -1068,8 +1069,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                         // 不置空的话，进站时，可能校验不通过
                         sfcProduceEntity.ResourceId = null;
-                        #endregion
                     }
+                    #endregion
                 }
                 // 未完工（下一工序排队）
                 else
@@ -1113,7 +1114,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     var ngCodeInBlock = unqualifiedCodes.Intersect(qualUnqualifiedCodeEntities.Select(s => s.UnqualifiedCode));
                     if (ngCodeNotInSystem.Any())
                     {
-                        #region 置于不合格工艺路线首工序排队
+                        #region 出现首次不良代码（置于不合格工艺路线首工序排队）
                         responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
                         // 条码状态跟在制品状态一致
