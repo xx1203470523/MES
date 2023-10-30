@@ -1414,16 +1414,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES17116))
                     .WithData("Code", procedureRejudgeBo.LastUnqualified.UnqualifiedCode);
 
-            // 置于不合格工艺路线首工序排队
+            // 取得不合格工艺路线首工序
             var processRouteProcedureDto = await _masterDataService.GetFirstProcedureAsync(procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17111))
                 .WithData("Ids", procedureRejudgeBo.LastUnqualified.ProcessRouteId);
 
+            // 首工序信息
             var nextProcedureEntity = await _procProcedureRepository.GetByIdAsync(processRouteProcedureDto.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17114))
                 .WithData("Procedure", processRouteProcedureDto.ProcedureId);
 
-            procedureRejudgeBo.NextProcedureId = processRouteProcedureDto.ProcedureId;
+            // 置于不合格工艺路线首工序排队
+            procedureRejudgeBo.NextProcedureId = nextProcedureEntity.Id;
             procedureRejudgeBo.NextProcedureCode = nextProcedureEntity.Code;
 
             return procedureRejudgeBo;
