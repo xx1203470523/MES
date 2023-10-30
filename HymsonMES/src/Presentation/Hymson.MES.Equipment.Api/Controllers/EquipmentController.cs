@@ -2,7 +2,7 @@
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Api.Controllers.Manufacture
+namespace Hymson.MES.Equipment.Api.Controllers
 {
     /// <summary>
     /// 控制器（设备）
