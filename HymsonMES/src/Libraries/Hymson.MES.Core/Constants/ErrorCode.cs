@@ -807,6 +807,7 @@
         public const string MES16135 = "条码不在工单{WorkOrder}的bom中";
         public const string MES16136 = "库存不足";
         public const string MES16137 = "物料{MaterialCode}批次数量大于0";
+        public const string MES16138 = "条码状态不为最新，请刷新后再操作";
         #endregion
 
         #region 条码生成 MES16200

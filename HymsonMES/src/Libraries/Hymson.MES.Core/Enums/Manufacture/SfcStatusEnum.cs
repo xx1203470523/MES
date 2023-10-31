@@ -41,6 +41,12 @@ namespace Hymson.MES.Core.Enums
         /// 报废
         /// </summary>
         [Description("报废")]
-        Scrapping = 6
+        Scrapping = 6,
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        [Description("删除")]
+        Delete = 7
     }
 }
