@@ -142,12 +142,12 @@ namespace Hymson.MES.Equipment.Api
                 // 在header 中添加token，传递到后台
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
                 // JwtBearerDefaults.AuthenticationScheme
-                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
                     Description = "前置Bearer。示例：Bearer {Token}",
                     Name = "Authorization",//jwt默认的参数名称,
-                    Type = SecuritySchemeType.ApiKey, //指定ApiKey
+                    Type = SecuritySchemeType.Http, //指定ApiKey
                     BearerFormat = "JWT",//标识承载令牌的格式 该信息主要是出于文档目的
                     Scheme = JwtBearerDefaults.AuthenticationScheme//授权中要使用的HTTP授权方案的名称
                 });
