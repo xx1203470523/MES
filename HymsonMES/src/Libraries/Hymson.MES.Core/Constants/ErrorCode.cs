@@ -707,6 +707,7 @@
         public const string MES15424 = "正在返修中，不需要复判";
         public const string MES15425 = "不合格信息最新状态,请刷新后再次操作";
         public const string MES15426 = "条码状态不为最新新状态,请刷新后再次操作";
+        public const string MES15427 = "条码工单未激活,无法取消报废";
         #endregion
 
         #region 物料加载 15500

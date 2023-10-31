@@ -1205,7 +1205,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                         }
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES15418);
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES15427);
                         validationFailures.Add(validationFailure);
                         continue;
                     }
