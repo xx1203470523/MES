@@ -87,7 +87,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             IInteVehicleRepository inteVehicleRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
-            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules, IExecuteJobService<JobBaseBo> executeJobService)
+            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules, 
+            IExecuteJobService<JobBaseBo> executeJobService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
