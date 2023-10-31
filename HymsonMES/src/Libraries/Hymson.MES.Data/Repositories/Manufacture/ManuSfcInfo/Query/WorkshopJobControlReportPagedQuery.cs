@@ -97,11 +97,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query
         public SfcStatusEnum? SFCStatus { get; set; }
 
         /// <summary>
-        /// 条码在制状态
-        /// </summary>
-        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
-
-        /// <summary>
         /// 工序Id
         /// </summary>
         public long? ProcedureId { get; set; }

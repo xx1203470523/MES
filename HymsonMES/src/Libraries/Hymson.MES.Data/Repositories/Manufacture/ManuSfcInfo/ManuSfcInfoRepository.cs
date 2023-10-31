@@ -330,10 +330,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where(" sp.ResourceId =  @ResourceId ");
             }
-            if (pageQuery.SFCProduceStatus.HasValue)
-            {
-                sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
-            }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
