@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeletesAsync(IEnumerable<long> idsArr);
 
         /// <summary>
         /// 分页查询列表（条码打印）
