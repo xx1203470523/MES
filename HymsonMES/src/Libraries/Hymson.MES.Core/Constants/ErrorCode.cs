@@ -916,6 +916,9 @@
         public const string MES16506 = "条码不为已完成状态，无法复用。";
         public const string MES16507 = "资源和工序对应的资源类型不匹配。";
         public const string MES16508 = "下达数量不合法。";
+        public const string MES16509 = "工序不在工艺路线上。";
+        public const string MES16510 = "工序不存在。";
+        public const string MES16511 = "资源编码{Code}未与线体绑定";
         #endregion
 
         #region 在制品移除添加 16600
@@ -1302,6 +1305,7 @@
         public const string MES18903 = "请求实体不能为空！";
         public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
+
 
         #region 设备对接错误
 

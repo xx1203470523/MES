@@ -359,6 +359,8 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
+                ProcedureId = parm.ProcedureId,
+                ResourceId = parm.ResourceId,
                 Qty = parm.Qty
             }, _localizationService);
         }
@@ -375,6 +377,8 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
+                ProcedureId = parm.ProcedureId,
+                ResourceId = parm.ResourceId,
                 Qty = parm.Qty
             }, _localizationService);
 
