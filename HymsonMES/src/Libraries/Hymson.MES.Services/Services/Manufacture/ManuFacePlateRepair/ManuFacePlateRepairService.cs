@@ -716,6 +716,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ProcedureId = confirmSubmitDto.ReturnProcedureId,
                 ResourceId = null, //resourcesId, //资源这里 直接设置为null 为null生产不检测匹配工序
                 ProcessRouteId = sfcProduceRepairBo.ProcessRouteId,
+                IsRepair = TrueOrFalseEnum.No,
                 UserId = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
             };
