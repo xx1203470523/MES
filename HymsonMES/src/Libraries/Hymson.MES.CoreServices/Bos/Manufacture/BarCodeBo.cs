@@ -102,6 +102,14 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     }
 
     /// <summary>
+    /// 条码扩展属性
+    /// </summary>
+    public class BarCodeExtendBo
+    {
+        public string LineCode { get; set; }
+    }
+
+    /// <summary>
     /// 生成的条码信息
     /// </summary>
     public class BarCodeInfo 

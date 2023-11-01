@@ -707,6 +707,7 @@
         public const string MES15424 = "正在返修中，不需要复判";
         public const string MES15425 = "不合格信息最新状态,请刷新后再次操作";
         public const string MES15426 = "条码状态不为最新新状态,请刷新后再次操作";
+        public const string MES15427 = "条码工单未激活,无法取消报废";
         #endregion
 
         #region 物料加载 15500
@@ -807,6 +808,7 @@
         public const string MES16135 = "条码不在工单{WorkOrder}的bom中";
         public const string MES16136 = "库存不足";
         public const string MES16137 = "物料{MaterialCode}批次数量大于0";
+        public const string MES16138 = "条码状态不为最新，请刷新后再操作";
         #endregion
 
         #region 条码生成 MES16200
@@ -914,6 +916,9 @@
         public const string MES16506 = "条码不为已完成状态，无法复用。";
         public const string MES16507 = "资源和工序对应的资源类型不匹配。";
         public const string MES16508 = "下达数量不合法。";
+        public const string MES16509 = "工序不在工艺路线上。";
+        public const string MES16510 = "工序不存在。";
+        public const string MES16511 = "资源编码{Code}未与线体绑定";
         #endregion
 
         #region 在制品移除添加 16600
@@ -1300,6 +1305,7 @@
         public const string MES18903 = "请求实体不能为空！";
         public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
+
 
         #region 设备对接错误
 

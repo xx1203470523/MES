@@ -148,11 +148,6 @@ namespace Hymson.MES.Services.Dtos.Report
         public SfcStatusEnum? SFCStatus { get; set; }
 
         /// <summary>
-        /// 条码在制状态
-        /// </summary>
-        public SfcStatusEnum? SFCProduceStatus { get; set; }
-
-        /// <summary>
         /// 工序Id
         /// </summary>
         public long? ProcedureId { get; set; }

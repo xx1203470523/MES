@@ -27,7 +27,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public decimal Qty { get; set; }
 
         /// <summary>
-        /// 状态;1：在制；2：完成；3：已入库；4：报废
+        /// 状态: 1：排队中 2：活动中 3：完成-在制 4：完成 5：锁定 6：报废 7：删除
         /// </summary>
         public SfcStatusEnum Status { get; set; }
 

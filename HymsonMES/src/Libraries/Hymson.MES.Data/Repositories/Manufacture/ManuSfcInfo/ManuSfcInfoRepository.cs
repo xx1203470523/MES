@@ -330,10 +330,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where(" sp.ResourceId =  @ResourceId ");
             }
-            if (pageQuery.SFCProduceStatus.HasValue)
-            {
-                sqlBuilder.Where(" sp.`Status` =  @SFCProduceStatus ");
-            }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -444,7 +440,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             s.Qty
                         from manu_sfc_info si
                         LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
-                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询关联的工序，资源等
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC 
                         /**where**/ 
                         Order by si.CreatedOn desc
                         LIMIT @Offset,@Rows 
@@ -453,7 +449,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         select count(1)
                         from manu_sfc_info si
                         LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
-                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC and s.Status=1 -- 为了查询关联的工序，资源等
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC 
                         /**where**/ 
         ";
 

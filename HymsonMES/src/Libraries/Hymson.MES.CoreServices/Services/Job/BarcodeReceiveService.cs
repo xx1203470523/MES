@@ -2,9 +2,11 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
@@ -27,6 +29,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// <summary>
     /// 条码接收
     /// </summary>
+    [Job("条码接收", JobTypeEnum.Standard)]
     public class BarcodeReceiveService : IJobService
     {
         /// <summary>
