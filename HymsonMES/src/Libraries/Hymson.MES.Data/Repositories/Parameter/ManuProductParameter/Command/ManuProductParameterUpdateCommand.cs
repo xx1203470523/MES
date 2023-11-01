@@ -17,6 +17,21 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Command
         public long Id { get; set; }
 
         /// <summary>
+        /// 主键
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; } = "";
+
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
         /// 参数值
         /// </summary>
         public string ParameterValue { get; set; }

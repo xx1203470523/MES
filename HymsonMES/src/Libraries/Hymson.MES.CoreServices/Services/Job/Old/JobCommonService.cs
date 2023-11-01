@@ -2,7 +2,10 @@
 using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection.Metadata;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using Hymson.MES.Core.Attribute.Job;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -69,12 +72,14 @@ namespace Hymson.MES.CoreServices.Services.Job
             return await Task.FromResult(services.Select(s =>
             {
                 var type = s.GetType();
+                var jobAttribute = type.GetCustomAttribute<JobAttribute>();
                 var classModule = Regex.Replace(type.Module.Name, ".dll", "");
                 return new JobClassBo
                 {
                     ClassName = type.Name,
                     ClassNamespace = type.Namespace ?? "",
-                    ClassModule = classModule
+                    ClassModule = classModule,
+                    Remark= jobAttribute?.Name
                 };
             }));
         }
@@ -91,7 +96,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return new SelectOptionDto
                 {
                     Key = $"{s.ClassName}",
-                    Label = $"【{s.ClassModule}】 {s.ClassName}",
+                    Label = $"【{s.ClassModule}】 {s.ClassName}【{s.Remark}】",
                     Value = $"{s.ClassName}"
                 };
             });

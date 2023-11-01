@@ -341,6 +341,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             //数据库连接
             services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
+            services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
             return services;
         }
 

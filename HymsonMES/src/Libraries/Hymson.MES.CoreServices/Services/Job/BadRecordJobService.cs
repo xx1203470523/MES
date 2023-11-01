@@ -11,6 +11,7 @@ using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Core.Attribute;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
