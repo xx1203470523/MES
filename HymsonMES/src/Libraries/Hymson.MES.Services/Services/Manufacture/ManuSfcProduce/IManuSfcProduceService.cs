@@ -176,5 +176,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdDto query);
+
+        /// <summary>
+        /// 根据工序与资源查询活动的载具
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId(ActivityVehicleByProcedureIdAndResourceIdDto query);
     }
 }
