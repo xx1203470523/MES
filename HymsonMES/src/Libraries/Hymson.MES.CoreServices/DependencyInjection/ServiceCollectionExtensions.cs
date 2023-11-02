@@ -14,6 +14,7 @@ using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
 using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.Data.Options;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -114,7 +115,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
             //数据库连接
-            services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
+            services.Configure<Data.Options.ParameterOptions>(configuration.GetSection(nameof(Data.Options.ParameterOptions)));
             return services;
         }
     }

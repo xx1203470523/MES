@@ -1,4 +1,5 @@
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 
@@ -21,7 +22,14 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
+        Task<int> DeleteByParentIdAndDefectTypeAsync(long ProcedureId, RejudgeUnqualifiedCodeEnum[] ids);
+
+        /// <summary>
+        /// 删除（软删除）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteByParentIdAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 查询List

@@ -8,6 +8,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -29,6 +30,7 @@ namespace Hymson.MES.Services.Services.Integrated
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+        private readonly IExcelService _excelService;
 
         /// <summary>
         /// 客户维护 仓储
@@ -37,10 +39,16 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteCustomCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteCustomModifyDto> _validationModifyRules;
 
-        public InteCustomService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCustomRepository inteCustomRepository, AbstractValidator<InteCustomCreateDto> validationCreateRules, AbstractValidator<InteCustomModifyDto> validationModifyRules)
+        public InteCustomService(ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            IInteCustomRepository inteCustomRepository,
+            IExcelService excelService,
+            AbstractValidator<InteCustomCreateDto> validationCreateRules,
+            AbstractValidator<InteCustomModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _excelService = excelService;
             _inteCustomRepository = inteCustomRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
@@ -160,6 +168,17 @@ namespace Hymson.MES.Services.Services.Integrated
                return inteCustomEntity.ToModel<InteCustomDto>();
            }
            throw new CustomerValidationException(nameof(ErrorCode.MES18401));
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<InteCustomImportDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "客户维护导入模板");
         }
     }
 }

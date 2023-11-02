@@ -20,7 +20,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
-using System.Data.SqlTypes;
 
 namespace Hymson.MES.Services.Services.Equipment.EquEquipment
 {
@@ -125,8 +124,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             parm.EquipmentCode = parm.EquipmentCode.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(parm);
 
-            if (string.IsNullOrEmpty(parm.EntryDate)) parm.EntryDate = SqlDateTime.MinValue.Value.ToString();
-
             // DTO转换实体
             var entity = parm.ToEntity<EquEquipmentEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
@@ -134,7 +131,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
+            if (entity.QualTime.HasValue && entity.EntryDate.HasValue)
+            {
+                entity.ExpireDate = entity.EntryDate.Value.AddMonths(entity.QualTime.Value);
+            }
 
             // 绑定Api
             List<EquEquipmentLinkApiEntity> linkApiList = new();
@@ -221,14 +221,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         public async Task<int> ModifyAsync(EquEquipmentSaveDto parm)
         {
             #region 参数处理
-            if (string.IsNullOrEmpty(parm.EntryDate)) parm.EntryDate = SqlDateTime.MinValue.Value.ToString();
             await _validationSaveRules.ValidateAndThrowAsync(parm);
 
             // DTO转换实体
             var entity = parm.ToEntity<EquEquipmentEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
-            if (entity.QualTime > 0 && entity.EntryDate > SqlDateTime.MinValue.Value) entity.ExpireDate = entity.EntryDate.AddMonths(entity.QualTime);
+            if (entity.QualTime.HasValue && entity.EntryDate.HasValue)
+            {
+                entity.ExpireDate = entity.EntryDate.Value.AddMonths(entity.QualTime.Value);
+            }
 
             // 绑定Api
             List<EquEquipmentLinkApiEntity> linkApiList = new();

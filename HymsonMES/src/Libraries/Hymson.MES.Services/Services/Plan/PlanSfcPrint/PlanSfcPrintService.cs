@@ -16,6 +16,7 @@ using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
@@ -25,6 +26,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using IdGen;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -256,7 +258,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(IEnumerable<long> idsArr)
         {
             var sfcEntities = await _manuSfcRepository.GetByIdsAsync(idsArr);
             if (sfcEntities.Any(it => it.IsUsed == YesOrNoEnum.Yes)) throw new CustomerValidationException(nameof(ErrorCode.MES16116));
@@ -265,22 +267,34 @@ namespace Hymson.MES.Services.Services.Plan
             // 对锁定状态进行验证
             await _manuCommonService.VerifySfcsLockAsync(new ManuProcedureBo
             {
-                SiteId = 0,
+                SiteId = _currentSite.SiteId ?? 0,
                 SFCs = sfcEntities.Select(s => s.SFC)
             });
 
             // 条码集合
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(s => s.Id));
 
+            var manuSfcUpdateStatusByIdCommands = new List<ManuSfcUpdateStatusByIdCommand>();
+
+            foreach (var item in sfcEntities)
+            {
+                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                {
+                    Id = item.Id,
+                    Status = SfcStatusEnum.Delete,
+                    CurrentStatus = item.Status,
+                    UpdatedBy = _currentUser.UserName
+                });
+            }
+
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _manuSfcRepository.DeletesAsync(new DeleteCommand
+                rows += await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
+                if (rows != manuSfcUpdateStatusByIdCommands.Count)
                 {
-                    Ids = idsArr,
-                    UserId = _currentUser.UserName,
-                    DeleteOn = HymsonClock.Now()
-                });
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16138));
+                }
 
                 rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new Data.Repositories.Manufacture.ManuSfcProduce.Command.DeletePhysicalBySfcsCommand()
                 {
@@ -324,7 +338,7 @@ namespace Hymson.MES.Services.Services.Plan
                 Id = s.Id,
                 SFC = s.SFC,
                 IsUsed = s.IsUsed,
-                UpdatedOn = s.UpdatedOn,
+                UpdatedOn = s.CreatedOn,    // 这里用创建时间作为条码生成时间更准确
                 OrderCode = s.OrderCode,
                 MaterialCode = s.MaterialCode,
                 MaterialName = s.MaterialName,
@@ -345,6 +359,8 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
+                ProcedureId = parm.ProcedureId,
+                ResourceId = parm.ResourceId,
                 Qty = parm.Qty
             }, _localizationService);
         }
@@ -361,6 +377,8 @@ namespace Hymson.MES.Services.Services.Plan
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 WorkOrderId = parm.WorkOrderId,
+                ProcedureId = parm.ProcedureId,
+                ResourceId = parm.ResourceId,
                 Qty = parm.Qty
             }, _localizationService);
 

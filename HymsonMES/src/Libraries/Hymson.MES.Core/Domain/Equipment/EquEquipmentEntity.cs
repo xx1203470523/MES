@@ -115,13 +115,13 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :入场日期 
         /// 空值 : true  
         /// </summary>
-        public DateTime EntryDate { get; set; }
+        public DateTime? EntryDate { get; set; }
 
         /// <summary>
         /// 描述 :质保期限（月） 
         /// 空值 : true  
         /// </summary>
-        public int QualTime { get; set; }
+        public int? QualTime { get; set; }
 
         /// <summary>
         /// 描述 :过期时间，根据进厂日期+质保日期得出 

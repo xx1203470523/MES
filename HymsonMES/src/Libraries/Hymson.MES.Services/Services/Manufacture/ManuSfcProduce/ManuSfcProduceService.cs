@@ -1215,7 +1215,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                         }
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES15418);
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES15427);
                         validationFailures.Add(validationFailure);
                         continue;
                     }
@@ -1946,12 +1946,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 validationFailures.Add(validationFailure);
                                 isSuccess = false;
                             }
+                            /*
+                             * 2023.11.01 克明大佬说可以不用限制
                             if (whMaterialInventoryWhereEntit?.QuantityResidue < procMaterial?.Batch)
                             {
                                 validationFailure.ErrorCode = nameof(ErrorCode.MES18021);
                                 validationFailures.Add(validationFailure);
                                 isSuccess = false;
                             }
+                            */
                             if (isSuccess)
                             {
                                 #region 数据组装
@@ -2600,17 +2603,17 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdDto query)
         {
-            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResId(new ManuSfcProduceByProcedureIdAndResourceIdQuery 
-            { 
-                SiteId = _currentSite.SiteId??0,
-                ProcedureId=query.ProcedureId,
-                ResourceId=query.ResourceId 
+            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResId(new ManuSfcProduceByProcedureIdAndResourceIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = query.ProcedureId,
+                ResourceId = query.ResourceId
             });
 
             //实体到DTO转换 装载数据
             List<ActivityManuSfcProduceViewDto> manuSfcProduceDtos = new List<ActivityManuSfcProduceViewDto>();
 
-            if (sfcProduceList.Any()) 
+            if (sfcProduceList.Any())
             {
                 //查询工单
                 var workOrders = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceList.Where(x => x.WorkOrderId > 0).Select(x => x.WorkOrderId).ToArray());
@@ -2621,13 +2624,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //查询开始时间-根据步骤表查询成功执行开始作业时间
                 var sfcSteps = await _manuSfcStepRepository.GetSFCInStepAsync(new SfcInStepQuery()
                 {
-                    SiteId = _currentSite.SiteId??0,
-                    Sfcs = sfcProduceList.Select(x=>x.SFC).Distinct().ToArray()
-                }) ;
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Sfcs = sfcProduceList.Select(x => x.SFC).Distinct().ToArray()
+                });
+
+
                 foreach (var item in sfcProduceList)
                 {
                     var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
-                   
+
                     var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
 
                     var sfcStepTemps = sfcSteps.Where(x => x.SFC == item.SFC);
@@ -2644,19 +2649,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Sfc = item.SFC,
                         Lock = item.Lock,
                         CreatedOn = lastNewInStepTime,
-                       
+
                         ProductId = item.ProductId,
                         OrderCode = workOrder != null ? workOrder.OrderCode : "",
-                      
+
                         MaterialCode = material != null ? material.MaterialCode : "",
                         MaterialName = material != null ? material.MaterialName : "",
                         Version = material != null ? material.Version ?? "" : "",
-                        
+
 
                     });
                 }
 
-                manuSfcProduceDtos=manuSfcProduceDtos.OrderByDescending(x => x.CreatedOn).ToList();
+                manuSfcProduceDtos = manuSfcProduceDtos.OrderByDescending(x => x.CreatedOn).ToList();
             }
 
             return manuSfcProduceDtos;

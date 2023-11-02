@@ -224,9 +224,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
 
         /// <summary>
-        /// 更新工序和工艺路线
+        /// 更新资源，工艺路线，工序，维修状态
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateProcedureIdAsync(UpdateProcedureCommand command);
 

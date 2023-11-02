@@ -92,8 +92,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
             sqlBuilder.Where("MS.IsDeleted = 0");
             sqlBuilder.Where("MS.SiteId = @SiteId");
-            sqlBuilder.OrderBy("MS.UpdatedOn DESC");
-            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.UpdatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName, PM.BuyType");
+            sqlBuilder.OrderBy("MS.CreatedOn DESC");
+            sqlBuilder.Select("MS.Id, MS.SFC, MS.IsUsed, MS.CreatedOn, PWO.OrderCode, PM.MaterialCode, PM.MaterialName, PM.BuyType");
 
             if (pagedQuery.IsUsed.HasValue) sqlBuilder.Where("MS.IsUsed = @IsUsed");
 
@@ -223,7 +223,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.`Lock`,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
+            sqlBuilder.Select(@"msp.ProductBOMId,msp.IsScrap,msp.Id,msp.`Lock`,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
                                 , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");

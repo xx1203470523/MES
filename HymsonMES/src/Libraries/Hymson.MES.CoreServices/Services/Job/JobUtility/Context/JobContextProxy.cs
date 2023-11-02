@@ -389,10 +389,6 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
             finally { }
         }
 
-
-
-
-
         /// <summary>
         /// 取值
         /// </summary>

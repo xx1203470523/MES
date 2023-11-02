@@ -142,7 +142,6 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 dic[tableNameBySFC].Add(sfc);
             }
 
-            // 更新数据
             List<Task<IEnumerable<ManuProductParameterEntity>>> tasks = new();
             foreach (var dicItem in dic)
             {
