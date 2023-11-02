@@ -338,7 +338,7 @@ namespace Hymson.MES.Services.Services.Plan
                 Id = s.Id,
                 SFC = s.SFC,
                 IsUsed = s.IsUsed,
-                UpdatedOn = s.UpdatedOn,
+                UpdatedOn = s.CreatedOn,    // 这里用创建时间作为条码生成时间更准备
                 OrderCode = s.OrderCode,
                 MaterialCode = s.MaterialCode,
                 MaterialName = s.MaterialName,
