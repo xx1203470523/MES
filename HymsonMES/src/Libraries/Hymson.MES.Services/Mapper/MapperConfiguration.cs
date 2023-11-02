@@ -534,12 +534,17 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region SortingRule
-            CreateMap< ProcSortingRuleEntity, ProcSortingRuleDto > ();
+            CreateMap<ProcSortingRuleEntity, ProcSortingRuleDto>();
             CreateMap<ProcSortingRuleCreateDto, ProcSortingRuleEntity>();
             CreateMap<ProcSortingRuleModifyDto, ProcSortingRuleEntity>();
 
 
             CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
+
+            #endregion
+
+            #region Esop 
+             
             #endregion
         }
 

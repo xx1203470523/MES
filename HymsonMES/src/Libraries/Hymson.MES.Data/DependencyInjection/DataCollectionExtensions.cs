@@ -328,6 +328,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuProductParameterRepository, ManuProductParameterRepository>();
             #endregion
 
+            #region ESOP 
+            services.AddSingleton<IProcEsopFileRepository, ProcEsopFileRepository>();
+            services.AddSingleton<IProcEsopRepository, ProcEsopRepository>();
+            #endregion
             return services;
         }
 
