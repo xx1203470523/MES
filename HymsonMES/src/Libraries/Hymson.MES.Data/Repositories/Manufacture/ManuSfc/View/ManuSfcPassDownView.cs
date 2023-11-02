@@ -19,10 +19,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         /// 使用状态
         /// </summary>
         public YesOrNoEnum IsUsed { get; set; }
+
         /// <summary>
         /// 生成时间
         /// </summary>
-        public DateTime UpdatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         /// <summary>
         /// 工单号

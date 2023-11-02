@@ -28,6 +28,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 接口（客户维护）
         /// </summary>
         private readonly IInteCustomService _inteCustomService;
+
         private readonly ILogger<InteCustomController> _logger;
 
         /// <summary>
@@ -109,5 +110,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         #endregion
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _inteCustomService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"客户维护导入模板.xlsx");
+        }
     }
 }

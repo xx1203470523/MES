@@ -1052,6 +1052,7 @@
         public const string MES17253 = "按钮中存在，作业序列号不合法，请检查！";
         public const string MES17254 = "按钮中存在，作业为空，请检查！";
         public const string MES17255 = "未读取到有效作业，请检查！";
+        public const string MES17256 = "作业参数【{Param}】获取失败，请检查！";
         #endregion
 
         #region 在制维修 MES17300
