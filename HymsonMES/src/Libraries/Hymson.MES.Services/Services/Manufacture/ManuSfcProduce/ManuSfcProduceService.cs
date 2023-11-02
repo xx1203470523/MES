@@ -10,12 +10,14 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
@@ -161,6 +163,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly AbstractValidator<ManuSfcProduceModifyDto> _validationModifyRules;
         private readonly ILogger<ManuSfcProduceService> _logger;
 
+        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
+
+        private readonly IInteVehicleRepository _inteVehicleRepository;
 
         /// <summary>
         /// 构造函数
@@ -192,6 +197,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="procProcessRouteNodeRepository"></param>
         /// <param name="manuDowngradingRepository"></param>
         /// <param name="manuSfcScrapRepository"></param>
+        /// <param name="inteVehiceFreightStackRepository"></param>
+        /// <param name="inteVehicleRepository"></param>
         public ManuSfcProduceService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
@@ -217,7 +224,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             ILogger<ManuSfcProduceService> logger,
             IProcProcessRouteDetailNodeRepository procProcessRouteNodeRepository,
             IManuDowngradingRepository manuDowngradingRepository,
-            IManuSfcScrapRepository manuSfcScrapRepository)
+            IManuSfcScrapRepository manuSfcScrapRepository, IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+            IInteVehicleRepository inteVehicleRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -246,6 +254,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuDowngradingRepository = manuDowngradingRepository;
             _manuSfcScrapRepository = manuSfcScrapRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
+            _inteVehiceFreightStackRepository=inteVehiceFreightStackRepository;
+            _inteVehicleRepository = inteVehicleRepository;
         }
 
 
@@ -2625,7 +2635,13 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                     var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
 
-                    var lastNewInStepTime = sfcSteps.Where(x => x.SFC == item.SFC).Max(x => x.CreatedOn);
+                    var sfcStepTemps = sfcSteps.Where(x => x.SFC == item.SFC);
+
+                    if (!sfcStepTemps.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15321)).WithData("sfc", item.SFC);
+                    }
+                    var lastNewInStepTime = sfcStepTemps.Max(x => x.CreatedOn);
 
                     manuSfcProduceDtos.Add(new ActivityManuSfcProduceViewDto
                     {
@@ -2649,6 +2665,101 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             return manuSfcProduceDtos;
+        }
+
+        /// <summary>
+        /// 根据工序与资源查询活动的载具
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId(ActivityVehicleByProcedureIdAndResourceIdDto query) 
+        {
+            //实体到DTO转换 装载数据
+            List<ActivityVehicleViewDto> activityVehicleViewDtos = new List<ActivityVehicleViewDto>();
+
+            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResId(new ManuSfcProduceByProcedureIdAndResourceIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = query.ProcedureId,
+                ResourceId = query.ResourceId
+            });
+
+            if(!sfcProduceList.Any()) return activityVehicleViewDtos;
+
+            //查询这些条码属于哪些载具
+            var vehiceFreightStacks = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery 
+            {
+                SiteId=_currentSite.SiteId ?? 0,
+                Sfcs= sfcProduceList.Select(x=>x.SFC).ToList()
+            });
+
+            if (!vehiceFreightStacks.Any()) return activityVehicleViewDtos;
+
+            var vehiceFreightStackGroups = vehiceFreightStacks.GroupBy(x => x.VehicleId);
+
+            //查询载具信息
+            var vehicles = await _inteVehicleRepository.GetAboutVehicleTypeByIdsAsync(new InteVehicleIdsQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Ids = vehiceFreightStackGroups.Select(x => x.Key).ToArray()
+            }) ;
+
+            //查询载具里的物料信息
+            var materials = await _procMaterialRepository.GetByIdsAsync(sfcProduceList.Where(x => x.ProductId > 0).Select(x => x.ProductId).ToArray());
+
+            //查询开始时间-根据步骤表查询成功执行开始作业时间
+            var sfcSteps = await _manuSfcStepRepository.GetSFCInStepAsync(new SfcInStepQuery()
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = sfcProduceList.Select(x => x.SFC).Distinct().ToArray()
+            });
+
+            foreach (var item in vehicles)
+            {
+                //找到对应的条码下最后的一条
+                var itemVehiceFreightStacks= vehiceFreightStackGroups.FirstOrDefault(x => x.Key == item.Id)?.ToList();
+                if (itemVehiceFreightStacks==null || !itemVehiceFreightStacks.Any()) 
+                {
+                    throw new CustomerValidationException("载具内没有条码");
+                }
+
+                //var vehiceFreightStack= vehiceFreightStacks.Where(x=>x.VehicleId==item.Id).FirstOrDefault();
+
+                var sfcStepTemps = sfcSteps.Where(x=> itemVehiceFreightStacks.Select(y=>y.BarCode).Contains( x.SFC) );
+                if (!sfcStepTemps.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15321)).WithData("sfc", item.Code);
+                }
+
+                var lastNewInStepTime = sfcStepTemps.Max(x => x.CreatedOn);
+
+                //找载具内的一个条码
+                var sfc= sfcProduceList.FirstOrDefault(x => itemVehiceFreightStacks.Select(y => y.BarCode).Contains(x.SFC));
+
+                var material = materials.FirstOrDefault(x => x.Id == sfc?.ProductId);
+
+                activityVehicleViewDtos.Add(new ActivityVehicleViewDto
+                {
+                    Id = item.Id,
+                    Code = item.Code,
+                    VehicleTypeId = item.VehicleTypeId,
+
+                    Row = item.Row,
+                    Column = item.Column,
+                    BarCodeNum = itemVehiceFreightStacks.Count,
+
+                    ProductId = material?.Id ?? 0,
+                    MaterialCode = material?.MaterialCode ?? "",
+                    MaterialName=material?.MaterialName ?? "",
+                    MaterialVersion = material?.Version ?? "",
+
+                    StartTime= lastNewInStepTime
+                });
+
+            }
+
+            return activityVehicleViewDtos;
         }
     }
 }

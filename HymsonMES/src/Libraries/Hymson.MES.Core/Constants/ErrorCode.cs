@@ -677,6 +677,7 @@
         public const string MES15318 = "条码已经被锁定";
 
         public const string MES15320 = "条码【{sfcs}】已不存在";
+        public const string MES15321 = "条码【{sfc}】缺失步骤信息，无法查询到开始时间";
         #endregion
 
         #region 质量录入 15400
