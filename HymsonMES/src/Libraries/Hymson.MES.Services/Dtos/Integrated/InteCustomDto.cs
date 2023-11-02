@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
@@ -152,5 +153,42 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 客户名称
         /// </summary>
         public string? Name { get; set; }
+    }
+
+    /// <summary>
+    /// 客户维护导入模板模型
+    /// </summary>
+    public record InteCustomImportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 客户编码
+        /// </summary>
+        [EpplusTableColumn(Header = "客户编码(必填)", Order = 1)]
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 客户名称
+        /// </summary>
+        [EpplusTableColumn(Header = "客户名称(必填)", Order = 2)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [EpplusTableColumn(Header = "描述", Order = 3)]
+        public string? Describe { get; set; }
+
+        /// <summary>
+        /// 地址
+        /// </summary>
+        [EpplusTableColumn(Header = "地址", Order = 4)]
+        public string? Address { get; set; }
+
+        /// <summary>
+        /// 电话
+        /// </summary>
+        [EpplusTableColumn(Header = "电话", Order = 5)]
+        public string? Telephone { get; set; }
+
     }
 }
