@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +68,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:parameter:insert")]
         public async Task<int> AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
         {
-             return await _procParameterService.CreateProcParameterAsync(parm);
+            return await _procParameterService.CreateProcParameterAsync(parm);
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:parameter:update")]
         public async Task UpdateProcParameterAsync([FromBody] ProcParameterModifyDto parm)
         {
-             await _procParameterService.ModifyProcParameterAsync(parm);
+            await _procParameterService.ModifyProcParameterAsync(parm);
         }
 
         /// <summary>
@@ -98,5 +99,43 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procParameterService.DeletesProcParameterAsync(ids);
         }
 
+        /// <summary>
+        /// 导入参数数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [PermissionDescription("proc:parameter:import")]
+        public async Task ImportSfcMarkingAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _procParameterService.ImportParameterAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procParameterService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"参数导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导出标准参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<ParameterExportResultDto> ExprotComUsagePageListAsync([FromQuery] ProcParameterPagedQueryDto param)
+        {
+            return await _procParameterService.ExprotParameterListAsync(param);
+        }
     }
 }
