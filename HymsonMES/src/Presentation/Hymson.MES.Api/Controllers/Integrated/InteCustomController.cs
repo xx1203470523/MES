@@ -7,6 +7,8 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Integrated;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -137,6 +139,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
             await _inteCustomService.ImportInteCustomAsync(formFile);
         }
 
+        /// <summary>
+        /// 导出客户维护信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<InteCustomExportResultDto> ExprotComUsagePageListAsync([FromQuery] InteCustomPagedQueryDto param)
+        {
+            return await _inteCustomService.ExprotInteCustomPageListAsync(param);
+        }
 
     }
 }

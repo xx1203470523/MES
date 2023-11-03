@@ -24,6 +24,7 @@ using Hymson.Utils.Tools;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using System.Transactions;
+using Hymson.Minio;
 
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -38,6 +39,7 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IExcelService _excelService;
         private readonly IInteCustomRepository _inteCustomRepository1;
         private readonly ILocalizationService _localizationService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
         /// 客户维护 仓储
@@ -53,6 +55,7 @@ namespace Hymson.MES.Services.Services.Integrated
             IInteCustomRepository inteCustomRepository,
             IExcelService excelService,
             IInteCustomRepository inteCustomRepository1,
+            IMinioService minioService,
             ILocalizationService localizationService,
             AbstractValidator<InteCustomImportDto> validationImportRules,
             AbstractValidator<InteCustomCreateDto> validationCreateRules,
@@ -61,6 +64,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentUser = currentUser;
             _currentSite = currentSite;
             _excelService = excelService;
+            _minioService = minioService;
             _localizationService = localizationService;
             _inteCustomRepository = inteCustomRepository;
             _validationCreateRules = validationCreateRules;
@@ -245,7 +249,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             if (repeats.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10114)).WithData("repeats", string.Join(",", repeats));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18402)).WithData("repeats", string.Join(",", repeats));
             }
 
             List<InteCustomEntity> inteCustomList = new();
@@ -266,7 +270,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 if (customCode.Contains(item.Code))
                 {
-
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18402), item.Code, currentRow, "Code"));
                 }
                 //如果客户编码不存在，则组装数据
                 if (!customCode.Contains(item.Code))
@@ -304,6 +308,78 @@ namespace Hymson.MES.Services.Services.Integrated
                     await _inteCustomRepository1.InsertsAsync(inteCustomList);
                 ts.Complete();
             }
+
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<InteCustomExportResultDto> ExprotInteCustomPageListAsync(InteCustomPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<InteCustomPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId.Value;
+            pagedQuery.PageSize = 1000;
+            var pagedInfo = await _inteCustomRepository.GetPagedInfoAsync(pagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<InteCustomExportDto> listDto = new();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomReport"), _localizationService.GetResource("CustomReport"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new InteCustomExportResultDto
+                {
+                    FileName = _localizationService.GetResource("CustomReport"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new InteCustomExportDto()
+                {
+                    Code = item.Code ?? "",
+                    Name = item.Name ?? "",
+                    Describe = item.Describe ?? "",
+                    Address = item.Address,
+                    Telephone = item.Telephone ?? ""
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomInfo"), _localizationService.GetResource("Parameter"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new InteCustomExportResultDto
+            {
+                FileName = _localizationService.GetResource("CustomInfo"),
+                Path = uploadResult.AbsoluteUrl,
+            };
 
         }
 
