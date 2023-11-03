@@ -2,29 +2,12 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
-using MySqlX.XDevAPI.Common;
-using System.Threading.Tasks.Dataflow;
-using System.Linq;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Newtonsoft.Json;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Job;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
 {
@@ -38,6 +21,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 验证器
         /// </summary>
         private readonly AbstractValidator<PackageIngRequestBo> _validationRepairJob;
+
         /// <summary>
         /// 构造函数 
         /// </summary>
@@ -63,7 +47,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 验证DTO
             await _validationRepairJob.ValidateAndThrowAsync(bo);
         }
-
 
         /// <summary>
         /// 执行前节点
