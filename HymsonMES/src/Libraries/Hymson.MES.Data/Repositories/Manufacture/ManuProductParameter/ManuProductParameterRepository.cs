@@ -152,6 +152,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("T1.SiteId=@SiteId ")
                 .Where("T1.IsDeleted=0 ")
                 .Where("T1.SFC=@SFC ");//条码必须传递
+
+            sqlBuilder.OrderBy("T1.ProcedureId");
+
             if (queryParam.ParameterType.HasValue)
             {
                 //如果为产品参数，把未关联参数类型的上报参数也展示出来

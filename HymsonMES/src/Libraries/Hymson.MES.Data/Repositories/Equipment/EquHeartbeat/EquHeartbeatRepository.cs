@@ -108,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             if (pageQuery.AcquisitionTime != null && pageQuery.AcquisitionTime.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { AcquisitionStart = pageQuery.AcquisitionTime[0], AcquisitionEnd = pageQuery.AcquisitionTime[1].AddDays(1) });
-                sqlBuilder.Where(" eh.CreatedOn >= @AcquisitionStart AND eh.CreatedOn < @AcquisitionEnd ");
+                sqlBuilder.Where(" eh.UpdatedOn >= @AcquisitionStart AND eh.UpdatedOn < @AcquisitionEnd ");
             }
             if (pageQuery.EquipmentStatus.HasValue)
             {

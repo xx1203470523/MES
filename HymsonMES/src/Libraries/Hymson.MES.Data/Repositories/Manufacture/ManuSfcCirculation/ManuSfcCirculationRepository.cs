@@ -388,6 +388,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("T2.CirculationBarCode=T3.SFC ");//反向追溯
             }
 
+            sqlBuilder.OrderBy("T.ProcedureId");
+
             var offSet = (queryParam.PageIndex - 1) * queryParam.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
@@ -453,7 +455,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 		            FROM manu_sfc_circulation T2, recursion T3  /**where**/
             )
             /*主查询*/
-            SELECT T.id, T.SFC, T.CirculationBarCode,IsDeleted,IsDisassemble,CirculationType,CirculationQty,ProcedureId,ResourceId,EquipmentId,WorkOrderId,ProductId,Location,CreatedOn,CreatedBy FROM recursion T  LIMIT @Offset,@Rows  ";
+            SELECT T.id, T.SFC, T.CirculationBarCode,IsDeleted,IsDisassemble,CirculationType,CirculationQty,ProcedureId,ResourceId,EquipmentId,WorkOrderId,ProductId,Location,CreatedOn,CreatedBy FROM recursion T /**orderby**/  LIMIT @Offset,@Rows  ";
 
         const string GetTraceReportPagedInfoCountSqlTemplate = @"
             WITH RECURSIVE recursion (id, sfc, CirculationBarCode,IsDeleted,IsDisassemble,CirculationType,CirculationQty,ProcedureId,ResourceId,EquipmentId,WorkOrderId,ProductId,Location,CreatedOn,CreatedBy) AS
