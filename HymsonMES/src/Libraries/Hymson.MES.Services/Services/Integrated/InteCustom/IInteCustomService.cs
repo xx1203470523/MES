@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -63,5 +64,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="stream"></param>
         /// <returns></returns>
         Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入客户信息表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportInteCustomAsync(IFormFile formFile);
+
     }
 }

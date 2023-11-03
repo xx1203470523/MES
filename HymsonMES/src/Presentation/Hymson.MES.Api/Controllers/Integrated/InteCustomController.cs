@@ -123,5 +123,20 @@ namespace Hymson.MES.Api.Controllers.Integrated
             await _inteCustomService.DownloadImportTemplateAsync(stream);
             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"客户维护导入模板.xlsx");
         }
+
+        /// <summary>
+        /// 导入客户数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importCustom")]
+        public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+ 
+            await _inteCustomService.ImportInteCustomAsync(formFile);
+        }
+
+
     }
 }
