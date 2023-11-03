@@ -307,6 +307,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Parameter
             services.AddSingleton<AbstractValidator<ProcParameterCreateDto>, ProcParameterCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcParameterModifyDto>, ProcParameterModifyValidator>();
+            services.AddSingleton<AbstractValidator<ProcParameterImportDto>, ProcParameterImportValidator>();
             #endregion
 
             #region ParameterLinkType
