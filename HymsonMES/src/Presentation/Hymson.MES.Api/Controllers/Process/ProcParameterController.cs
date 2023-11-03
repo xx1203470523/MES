@@ -107,7 +107,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPost]
         [Route("import")]
         [PermissionDescription("proc:parameter:import")]
-        public async Task ImportSfcMarkingAsync([FromForm(Name = "file")] IFormFile formFile)
+        public async Task ImportParameterAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _procParameterService.ImportParameterAsync(formFile);
         }
@@ -133,7 +133,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpGet]
         [Route("export")]
         [PermissionDescription("proc:parameter:export")]
-        public async Task<ParameterExportResultDto> ExprotComUsagePageListAsync([FromQuery] ProcParameterPagedQueryDto param)
+        public async Task<ParameterExportResultDto> ExprotParameterListAsync([FromQuery] ProcParameterPagedQueryDto param)
         {
             return await _procParameterService.ExprotParameterListAsync(param);
         }

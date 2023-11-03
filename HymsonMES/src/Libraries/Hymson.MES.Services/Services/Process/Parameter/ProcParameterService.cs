@@ -388,7 +388,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task DownloadImportTemplateAsync(Stream stream)
         {
             var excelTemplateDtos = new List<ProcParameterImportDto>();
-            await _excelService.ExportAsync(excelTemplateDtos, stream, "Marking导入模板");
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "参数导入模板");
         }
 
         /// <summary>

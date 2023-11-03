@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Dtos.Process
     }
 
     /// <summary>
-    /// 参数导入模板模型
+    /// 参数导出
     /// </summary>
     public record ProcParameterExportDto : BaseExcelDto
     {
