@@ -350,12 +350,12 @@ namespace Hymson.MES.Services.Services.Integrated
 
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomReport"), _localizationService.GetResource("CustomReport"));
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomInfo"), _localizationService.GetResource("CustomInfo"));
                 //上传到文件服务器
                 var uploadResultN = await _minioService.PutObjectAsync(filePathN);
                 return new InteCustomExportResultDto
                 {
-                    FileName = _localizationService.GetResource("CustomReport"),
+                    FileName = _localizationService.GetResource("CustomInfo"),
                     Path = uploadResultN.AbsoluteUrl,
                 };
             }
@@ -372,7 +372,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 });
             }
 
-            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomInfo"), _localizationService.GetResource("Parameter"));
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomInfo"), _localizationService.GetResource("CustomInfo"));
             //上传到文件服务器
             var uploadResult = await _minioService.PutObjectAsync(filePath);
             return new InteCustomExportResultDto
