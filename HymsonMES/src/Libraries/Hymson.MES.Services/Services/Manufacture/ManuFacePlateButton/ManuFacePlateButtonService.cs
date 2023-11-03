@@ -355,14 +355,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
+                Type = codeType,
                 ProcedureId = dto.Param!["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong()
             };
 
             List<string> SFCs = new();
+            List<PanelRequestBo> panelRequestBos = new();
             List<InStationRequestBo> inStationRequestBos = new();
             List<OutStationRequestBo> outStationRequestBos = new();
-            switch (codeType)
+            switch (requestBo.Type)
             {
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
@@ -397,6 +399,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
                         if (vehicleEntity == null) continue;
 
+                        panelRequestBos.AddRange(item.Value.Select(s => new PanelRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
                         inStationRequestBos.AddRange(item.Value.Select(s => new InStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
                         outStationRequestBos.AddRange(item.Value.Select(s => new OutStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
                     }
@@ -413,6 +416,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             requestBo.SFCs = SFCs;  // 这句后面要改
+            requestBo.PanelRequestBos = panelRequestBos;
             requestBo.InStationRequestBos = inStationRequestBos;
             requestBo.OutStationRequestBos = outStationRequestBos;
 
@@ -447,13 +451,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
+                Type = dto.Type,
                 ProcedureId = dto.ProcedureId,
                 ResourceId = dto.ResourceId
             };
 
             List<string> SFCs = new();
             List<InStationRequestBo> inStationRequestBos = new();
-            switch (dto.Type)
+            switch (requestBo.Type)
             {
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
@@ -542,13 +547,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
+                Type = dto.Type,
                 ProcedureId = dto.ProcedureId,
                 ResourceId = dto.ResourceId
             };
 
             List<string> SFCs = new();
             List<OutStationRequestBo> outStationRequestBos = new();
-            switch (dto.Type)
+            switch (requestBo.Type)
             {
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;

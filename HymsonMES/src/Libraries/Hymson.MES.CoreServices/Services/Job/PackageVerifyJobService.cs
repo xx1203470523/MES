@@ -1,7 +1,10 @@
-﻿using Hymson.Localization.Services;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
@@ -44,17 +47,27 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<PackageRequestBo>();
-            if (bo == null) return;
+            if (param is not JobRequestBo commonBo) return;
+            if (commonBo == null) return;
+            if (commonBo.PanelRequestBos == null || commonBo.PanelRequestBos.Any() == false) return;
+
+            // 存在载具条码（说明是载具传参）
+            if (commonBo.PanelRequestBos.Any(a => string.IsNullOrEmpty(a.VehicleCode) == false))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18519));
+            }
+
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.PanelRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
             // 合法性校验
             sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
-                              .VerifyProcedure(bo.ProcedureId)
-                              .VerifyResource(bo.ResourceId);
+                              .VerifyProcedure(commonBo.ProcedureId)
+                              .VerifyResource(commonBo.ResourceId);
         }
 
         /// <summary>
