@@ -946,6 +946,104 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 获取即将扣料的物料数据（包含半成品信息）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<MaterialDeductResponseSummaryBo> GetInitialMaterialsWithSmiFinishedAsync(MaterialDeductRequestBo requestBo)
+        {
+            var responseSummaryBo = new MaterialDeductResponseSummaryBo
+            {
+                // 初始扣料数据
+                InitialMaterials = new()
+            };
+
+            // 获取BOM绑定的物料
+            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(requestBo.ProductBOMId);
+
+            // 半成品清单
+            responseSummaryBo.SmiFinisheds = mainMaterials.Where(w => w.MaterialId == requestBo.ProductId);
+
+            // 未设置物料（克明说化成和返工的是没有投料的）
+            if (mainMaterials == null || !mainMaterials.Any()) return responseSummaryBo;
+
+            // 取得特定工序的物料（经过此过滤，结果已不存在半成品）
+            mainMaterials = mainMaterials.Where(w => w.ProcedureId == requestBo.ProcedureId);
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
+
+            // 查询BOM替代料
+            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(requestBo.ProductBOMId);
+            var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
+
+            // 查询物料基础数据的替代料
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(requestBo.SiteId);
+            replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
+            var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
+
+            // 组合主物料ID和替代料ID
+            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
+            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
+            var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(requestBo.SiteId);
+            materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
+
+            foreach (var item in mainMaterials)
+            {
+                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+                if (materialEntitiy == null) continue;
+
+                var deduct = new MaterialDeductResponseBo
+                {
+                    MaterialId = item.MaterialId,
+                    MaterialCode = materialEntitiy.MaterialCode,
+                    Usages = item.Usages,
+                    Loss = item.Loss,
+                    DataCollectionWay = item.DataCollectionWay,
+                    SerialNumber = materialEntitiy.SerialNumber
+                };
+                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
+
+                // 填充BOM替代料
+                if (item.IsEnableReplace == false)
+                {
+                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
+                    {
+                        // 启用的替代物料（BOM）
+                        deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.ReplaceMaterialId,
+                            Usages = s.Usages,
+                            Loss = s.Loss,
+                            DataCollectionWay = materialEntities.FirstOrDefault(f => f.Id == s.ReplaceMaterialId)!.SerialNumber,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
+                        });
+                    }
+                }
+                // 填充物料替代料
+                else
+                {
+                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces))
+                    {
+                        // 启用的替代物料（物料维护）
+                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.MaterialId,
+                            Usages = item.Usages,
+                            Loss = item.Loss,
+                            DataCollectionWay = materialEntities.FirstOrDefault(f => f.Id == s.ReplaceMaterialId)!.SerialNumber,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
+                        });
+                    }
+                }
+
+                // 添加到初始扣料集合
+                responseSummaryBo.InitialMaterials.Add(deduct);
+            }
+
+            return responseSummaryBo;
+        }
+
+        /// <summary>
         /// 获取流转数据
         /// </summary>
         /// <param name="bo"></param>

@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
@@ -41,6 +42,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
         /// <summary>
         /// 产品条码
         /// </summary>
@@ -67,6 +69,10 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public long ProductBOMId { get; set; }
 
+        /// <summary>
+        /// 产品ID
+        /// </summary>
+        public long ProductId { get; set; }
     }
 
     /// <summary>
@@ -78,6 +84,23 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 替代料集合
         /// </summary>
         public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();
+
+    }
+
+    /// <summary>
+    /// 扣料
+    /// </summary>
+    public class MaterialDeductResponseSummaryBo 
+    {
+        /// <summary>
+        /// 即将扣料的物料数据
+        /// </summary>
+        public IEnumerable<ProcBomDetailEntity> SmiFinisheds { get; set; }
+
+        /// <summary>
+        /// 即将扣料的物料数据
+        /// </summary>
+        public List<MaterialDeductResponseBo> InitialMaterials { get; set; }
 
     }
 

@@ -375,23 +375,25 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 #region 物料消耗明细数据
                 // 组合物料数据（放缓存）
-                var initialMaterials = await commonBo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsAsync, new MaterialDeductRequestBo
+                var initialMaterialSummary = await commonBo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsWithSmiFinishedAsync, new MaterialDeductRequestBo
                 {
                     SiteId = commonBo.SiteId,
                     ProcedureId = commonBo.ProcedureId,
-                    ProductBOMId = sfcProduceEntity.ProductBOMId
+                    ProductBOMId = sfcProduceEntity.ProductBOMId,
+                    ProductId = sfcProduceEntity.ProductId
                 });
+                if (initialMaterialSummary == null) continue;
 
                 MaterialConsumptionBo consumptionBo = new();
                 // 指定消耗物料
                 if (requestBo.ConsumeList != null && requestBo.ConsumeList.Any())
                 {
-                    consumptionBo = ExecutenMaterialConsumptionWithBarCode(ref allFeedingEntities, initialMaterials, commonBo, requestBo, sfcProduceEntity);
+                    consumptionBo = ExecutenMaterialConsumptionWithBarCode(ref allFeedingEntities, initialMaterialSummary, requestBo, sfcProduceEntity);
                 }
                 // 默认消耗逻辑
                 else
                 {
-                    consumptionBo = ExecutenMaterialConsumptionWithBOM(ref allFeedingEntities, initialMaterials, commonBo, sfcProduceEntity);
+                    consumptionBo = ExecutenMaterialConsumptionWithBOM(ref allFeedingEntities, initialMaterialSummary, sfcProduceEntity);
                 }
                 responseBo.UpdateFeedingQtyByIdCommands = consumptionBo.UpdateFeedingQtyByIdCommands;
                 responseBo.ManuSfcCirculationEntities = consumptionBo.ManuSfcCirculationEntities;
@@ -1186,20 +1188,17 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="allFeedingEntities"></param>
         /// <param name="initialMaterials"></param>
-        /// <param name="commonBo"></param>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        private MaterialConsumptionBo ExecutenMaterialConsumptionWithBOM(ref List<ManuFeedingEntity> allFeedingEntities, IEnumerable<MaterialDeductResponseBo>? initialMaterials, JobRequestBo commonBo, ManuSfcProduceEntity sfcProduceEntity)
+        private MaterialConsumptionBo ExecutenMaterialConsumptionWithBOM(ref List<ManuFeedingEntity> allFeedingEntities, MaterialDeductResponseSummaryBo summaryBo, ManuSfcProduceEntity sfcProduceEntity)
         {
             // 物料消耗对象
             MaterialConsumptionBo responseBo = new();
 
-            if (commonBo == null) return responseBo;
-            if (commonBo.Proxy == null) return responseBo;
-            if (initialMaterials == null) return responseBo;
+            if (summaryBo.InitialMaterials == null) return responseBo;
 
             // 物料ID集合
-            var materialIds = initialMaterials.Select(s => s.MaterialId);
+            var materialIds = summaryBo.InitialMaterials.Select(s => s.MaterialId);
 
             // 过滤扣料集合
             var feedings = allFeedingEntities.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
@@ -1210,12 +1209,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
-            foreach (var materialBo in initialMaterials)
+            foreach (var materialBo in summaryBo.InitialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
-                decimal residue = materialBo.Usages * sfcProduceEntity.Qty;
+                // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
+                // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
+                decimal residue = sfcProduceEntity.Qty * materialBo.Usages;
 
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
@@ -1255,42 +1255,43 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         /// <param name="allFeedingEntities"></param>
         /// <param name="initialMaterials"></param>
-        /// <param name="commonBo"></param>
         /// <param name="requestBo"></param>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
-        private MaterialConsumptionBo ExecutenMaterialConsumptionWithBarCode(ref List<ManuFeedingEntity> allFeedingEntities, IEnumerable<MaterialDeductResponseBo>? initialMaterials, JobRequestBo commonBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity)
+        private MaterialConsumptionBo ExecutenMaterialConsumptionWithBarCode(ref List<ManuFeedingEntity> allFeedingEntities, MaterialDeductResponseSummaryBo summaryBo, OutStationRequestBo requestBo, ManuSfcProduceEntity sfcProduceEntity)
         {
             // 物料消耗对象
             MaterialConsumptionBo responseBo = new();
 
-            if (commonBo == null) return responseBo;
-            if (commonBo.Proxy == null) return responseBo;
             if (requestBo.ConsumeList == null) return responseBo;
-            if (initialMaterials == null) return responseBo;
+            if (summaryBo.InitialMaterials == null) return responseBo;
 
-            // 指定消耗的物料集合
-            var barCodes = requestBo.ConsumeList.Select(s => s.BarCode);
-
-            // 如果存在传过来的消耗编码不在BOM清单的物料里面，直接返回异常（这里需要把替代品的平铺出来吗？）
-            var barCodeNotInBOM = barCodes.Except(initialMaterials.Select(s => s.MaterialCode));
-            if (barCodeNotInBOM.Any())
+            List<ManuFeedingEntity> feedings = new();
+            foreach (var item in requestBo.ConsumeList)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17107)).WithData("BarCodes", string.Join(',', barCodeNotInBOM));
+                var feedingEntity = allFeedingEntities.FirstOrDefault(f => f.BarCode == item.BarCode);
+                if (feedingEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17113))
+                        .WithData("BarCodes", item.BarCode);
+                }
+
+                var bomMaterial = summaryBo.InitialMaterials.FirstOrDefault(f => f.MaterialId == feedingEntity.MaterialId);
+                if (bomMaterial == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17107))
+                        .WithData("BarCodes", item.BarCode);
+                }
+
+                item.MaterialId = bomMaterial.MaterialId;
+                feedings.Add(feedingEntity);
             }
 
-            // 如果存在传过来的消耗编码不在已上料的的物料里面，直接返回异常
-            var barCodeNotInFeeding = barCodes.Except(allFeedingEntities.Select(s => s.BarCode));
-            if (barCodeNotInFeeding.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17113)).WithData("BarCodes", string.Join(',', barCodeNotInFeeding));
-            }
-
-            // 只保留传过来的消耗编码
+            // 只保留传过来的消耗条码
             List<MaterialDeductResponseBo> filterMaterials = new();
-            foreach (var item in initialMaterials)
+            foreach (var item in summaryBo.InitialMaterials)
             {
-                var consume = requestBo.ConsumeList.FirstOrDefault(f => f.BarCode == item.MaterialCode);
+                var consume = requestBo.ConsumeList.FirstOrDefault(f => f.MaterialId == item.MaterialId);
                 if (consume == null) continue;
 
                 if (consume.ConsumeQty.HasValue)
@@ -1307,15 +1308,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 filterMaterials.Add(item);
             }
 
-            // 物料ID集合
-            var materialIds = filterMaterials.Select(s => s.MaterialId);
-
-            // 过滤扣料集合（通过上料过滤一次）
-            var feedings = allFeedingEntities.Where(w => barCodes.Contains(w.BarCode));
-
-            // 过滤扣料集合（通过BOM过滤一次）
-            feedings = feedings.Where(w => w.Qty > 0 && materialIds.Contains(w.MaterialId));
-
             // 通过物料分组
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
@@ -1326,7 +1318,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 if (manuFeedingsDictionary == null) continue;
 
-                // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
+                // 需扣减数量 = 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100
                 decimal residue = materialBo.Usages;
 
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
