@@ -210,7 +210,13 @@ namespace Hymson.MES.Services.Services.Integrated
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             var excelImportDtos = _excelService.Import<InteCustomImportDto>(memoryStream);
-
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入数据为空");
+            }
 
             #region 验证基础数据
             var validationFailures = new List<ValidationFailure>();
@@ -237,7 +243,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             #endregion
 
-            #region 检测导入数据是否重复
+            #region 检测导入数据编码是否重复
             var repeats =new List<string>();
              var hasDuplicates = excelImportDtos.GroupBy(x => new { x.Code});
             foreach (var item in hasDuplicates)
@@ -249,7 +255,7 @@ namespace Hymson.MES.Services.Services.Integrated
             }
             if (repeats.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18402)).WithData("repeats", string.Join(",", repeats));
+                throw new CustomerValidationException("客户编码{repeats}重复").WithData("repeats", string.Join(",", repeats));
             }
 
             List<InteCustomEntity> inteCustomList = new();
