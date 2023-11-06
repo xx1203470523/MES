@@ -208,5 +208,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
              MaterialDeductResponseBo mainMaterialBo,
              MaterialDeductResponseBo currentBo,
              bool isMain = true);
+
+        /// <summary>
+        /// 获取当前生产对象
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param);
     }
 }

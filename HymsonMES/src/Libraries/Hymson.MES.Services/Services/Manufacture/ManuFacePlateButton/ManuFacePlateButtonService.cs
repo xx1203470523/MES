@@ -87,7 +87,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IInteVehicleRepository inteVehicleRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
-            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules, 
+            AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules,
             IExecuteJobService<JobBaseBo> executeJobService)
         {
             _currentUser = currentUser;
@@ -341,7 +341,10 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 条码类型
             var codeType = CodeTypeEnum.SFC;
-            if (dto.Param!["Type"] == null) codeType = CodeTypeEnum.SFC;
+            if (!dto.Param!.ContainsKey("Type"))
+            {
+                codeType = CodeTypeEnum.SFC;
+            }
             else
             {
                 if (Enum.TryParse(dto.Param["Type"], out codeType) == false) codeType = CodeTypeEnum.SFC;
