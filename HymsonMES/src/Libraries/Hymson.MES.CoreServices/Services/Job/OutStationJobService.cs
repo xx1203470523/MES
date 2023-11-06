@@ -16,7 +16,6 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -31,9 +30,10 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 出站
@@ -560,9 +560,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (SFCProduceEntity != null)
                 {
                     // 面板需要的参数
+                    List<PanelModuleEnum> panelModules = new();
                     responseBo.Content = new Dictionary<string, string> {
-                        { "PackageCom", "False" },
-                        { "BadEntryCom", "False" },
+                        { "PanelModules", panelModules.ToSerialize() },
                         { "Qty", "1" },
                         { "IsLastProcedure", $"{data.IsLastProcedure}" },
                         { "NextProcedureCode", $"{data.NextProcedureCode}" }

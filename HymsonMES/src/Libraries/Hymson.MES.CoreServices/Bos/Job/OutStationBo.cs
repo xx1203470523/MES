@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
@@ -37,38 +38,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 出站不良信息
         /// </summary>
         public IEnumerable<OutStationUnqualifiedBo>? OutStationUnqualifiedList { get; set; }
-    }
-
-    /// <summary>
-    /// 消耗
-    /// </summary>
-    public class OutStationConsumeBo
-    {
-        /// <summary>
-        /// 消耗条码的物料ID
-        /// </summary>
-        public long MaterialId { get; set; }
-
-        /// <summary>
-        /// 消耗条码
-        /// </summary>
-        public string BarCode { get; set; }
-
-        /// <summary>
-        /// 消耗数量
-        /// </summary>
-        public decimal? ConsumeQty { get; set; }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public class OutStationUnqualifiedBo
-    {
-        /// <summary>
-        /// 不合格代码
-        /// </summary>
-        public string UnqualifiedCode { get; set; }
     }
 
     /// <summary>

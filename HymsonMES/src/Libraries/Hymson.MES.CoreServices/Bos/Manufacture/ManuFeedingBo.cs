@@ -1,6 +1,4 @@
-﻿using Hymson.MES.Core.Enums;
-
-namespace Hymson.MES.CoreServices.Bos.Manufacture
+﻿namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
     /// <summary>
     /// 

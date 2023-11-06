@@ -12,7 +12,6 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
@@ -21,9 +20,10 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 进站
@@ -447,11 +447,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (SFCProduceEntity != null)
                 {
                     // 面板需要的数据
-                    responseBo.Content = new Dictionary<string, string> {
-                        { "PackageCom", "False" },
-                        { "BadEntryCom", "False" },
-                    };
-
+                    List<PanelModuleEnum> panelModules = new();
+                    responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), SFCProduceEntity.SFC);
                 }
             }

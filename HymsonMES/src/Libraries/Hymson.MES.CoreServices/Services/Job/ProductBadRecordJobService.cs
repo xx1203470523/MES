@@ -20,7 +20,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Newtonsoft.Json;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -270,11 +269,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                         Id = IdGenProvider.Instance.CreateId(),
                         SfcProduceId = manuSfc!.Id,
                         BusinessType = ManuSfcProduceBusinessType.Repair,
-                        BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
+                        BusinessContent = new SfcProduceRepairBo
                         {
                             ProcessRouteId = manuSfc.ProcessRouteId, //createDto.BadProcessRouteId ?? 0,
                             ProcedureId = manuSfc.ProcedureId //processRouteProcedure.ProcedureId
-                        }),
+                        }.ToSerialize(),
                         SiteId = bo.SiteId,
                         CreatedBy = manuSfc.CreatedBy,
                         UpdatedBy = manuSfc.UpdatedBy

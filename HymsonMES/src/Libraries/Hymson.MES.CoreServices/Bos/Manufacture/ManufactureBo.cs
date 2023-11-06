@@ -1,21 +1,39 @@
 ﻿using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ManufactureBo
+    public record ManufactureBo
     {
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
         /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
         /// <summary>
         /// 产品条码
         /// </summary>
