@@ -1,5 +1,7 @@
-﻿using Hymson.Localization.Services;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Common;
@@ -49,6 +51,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
             if (commonBo.PanelRequestBos == null || commonBo.PanelRequestBos.Any() == false) return;
+
+            // 存在载具条码（说明是载具传参）
+            if (commonBo.PanelRequestBos.Any(a => string.IsNullOrEmpty(a.VehicleCode) == false))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18520));
+            }
+
+            // 只允许对单一条码进行参数收集操作
+            if (commonBo.PanelRequestBos.Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18521));
+            }
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.PanelRequestBos.Select(s => s.SFC) };
