@@ -9,6 +9,9 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using MimeKit;
+using Mysqlx.Crud;
+using OfficeOpenXml.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -582,6 +585,231 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 需要变更为的状态
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+
+    }
+
+    public class ProcMaterialExportResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
+    }
+
+    /// <summary>
+    /// 物料导入模板
+    /// </summary>
+    public record ProcMaterialImportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 编码（物料）
+        /// </summary>
+        [EpplusTableColumn(Header = "物料编码(必填)", Order = 1)]
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 名称（物料）
+        /// </summary>
+        [EpplusTableColumn(Header = "物料名称(必填)", Order = 2)]
+        public string MaterialName { get; set; }
+
+        ///// <summary>
+        ///// 来源
+        ///// </summary>
+        //[EpplusTableColumn(Header = "物料来源", Order = 3)]
+        //public MaterialOriginEnum? Origin { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        [EpplusTableColumn(Header = "物料版本(必填)", Order = 3)]
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [EpplusTableColumn(Header = "备注", Order = 4)]
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 采购类型
+        /// </summary>
+        [EpplusTableColumn(Header = "采购类型", Order = 5)]
+        public MaterialBuyTypeEnum? BuyType { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        [EpplusTableColumn(Header = "工艺路线编码", Order = 6)]
+        public string? ProcessRouteCode { get; set; }
+
+        /// <summary>
+        /// Bom
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom编码", Order = 7)]
+        public string? BomCode { get; set; }
+
+        /// <summary>
+        /// 批次大小
+        /// </summary>
+        [EpplusTableColumn(Header = "批次大小(必填)", Order = 8)]
+        public int Batch { get; set; }
+
+        /// <summary>
+        /// 标包数量
+        /// </summary>
+        [EpplusTableColumn(Header = "标包数量", Order = 9)]
+        public int? PackageNum { get; set; }
+
+        /// <summary>
+        /// 计量单位(字典定义)
+        /// </summary>
+        [EpplusTableColumn(Header = "计量单位", Order = 10)]
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// 内/外序列号
+        /// </summary>
+        [EpplusTableColumn(Header = "数据收集方式(必填)", Order = 11)]
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
+        /// 基于时间(字典定义)
+        /// </summary>
+        [EpplusTableColumn(Header = "基于时间", Order = 12)]
+        public MaterialBaseTimeEnum? BaseTime { get; set; }
+
+        /// <summary>
+        /// 消耗公差
+        /// </summary>
+        [EpplusTableColumn(Header = "消耗公差", Order = 13)]
+        public int? ConsumptionTolerance { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        [EpplusTableColumn(Header = "是否默认版本(必填)", Order = 14)]
+        public bool IsDefaultVersion { get; set; } = false;
+
+        /// <summary>
+        /// 消耗系数
+        /// </summary>
+        [EpplusTableColumn(Header = "消耗系数", Order = 15)]
+        public decimal? ConsumeRatio { get; set; }
+
+        /// <summary>
+        /// 验证掩码组
+        /// </summary>
+        [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
+        public string? MaskCode { get; set; }
+
+    }
+
+    /// <summary>
+    /// 物料导出模板
+    /// </summary>
+    public record ProcMaterialExportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 编码（物料）
+        /// </summary>
+        [EpplusTableColumn(Header = "物料编码(必填)", Order = 1)]
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 名称（物料）
+        /// </summary>
+        [EpplusTableColumn(Header = "物料名称(必填)", Order = 2)]
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 来源
+        /// </summary>
+        [EpplusTableColumn(Header = "物料来源", Order = 3)]
+        public MaterialOriginEnum? Origin { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        [EpplusTableColumn(Header = "物料版本(必填)", Order = 4)]
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [EpplusTableColumn(Header = "备注", Order = 5)]
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 采购类型
+        /// </summary>
+        [EpplusTableColumn(Header = "采购类型", Order = 6)]
+        public MaterialBuyTypeEnum? BuyType { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        [EpplusTableColumn(Header = "工艺路线编码", Order = 7)]
+        public string? ProcessRouteCode { get; set; }
+
+        /// <summary>
+        /// Bom
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom编码", Order = 8)]
+        public string? BomCode { get; set; }
+
+        /// <summary>
+        /// 批次大小
+        /// </summary>
+        [EpplusTableColumn(Header = "批次大小(必填)", Order = 9)]
+        public int Batch { get; set; }
+
+        /// <summary>
+        /// 标包数量
+        /// </summary>
+        [EpplusTableColumn(Header = "标包数量", Order = 10)]
+        public int? PackageNum { get; set; }
+
+        /// <summary>
+        /// 计量单位(字典定义)
+        /// </summary>
+        [EpplusTableColumn(Header = "计量单位", Order = 11)]
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// 内/外序列号
+        /// </summary>
+        [EpplusTableColumn(Header = "数据收集方式(必填)", Order = 12)]
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+
+        /// <summary>
+        /// 基于时间(字典定义)
+        /// </summary>
+        [EpplusTableColumn(Header = "基于时间", Order = 14)]
+        public MaterialBaseTimeEnum? BaseTime { get; set; }
+
+        /// <summary>
+        /// 消耗公差
+        /// </summary>
+        [EpplusTableColumn(Header = "消耗公差", Order = 15)]
+        public int? ConsumptionTolerance { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        [EpplusTableColumn(Header = "是否默认版本(必填)", Order = 16)]
+        public bool IsDefaultVersion { get; set; } = false;
+
+        /// <summary>
+        /// 消耗系数
+        /// </summary>
+        [EpplusTableColumn(Header = "消耗系数", Order = 17)]
+        public decimal? ConsumeRatio { get; set; }
+
+        /// <summary>
+        /// 验证掩码组
+        /// </summary>
+        [EpplusTableColumn(Header = "验证掩码组", Order = 18)]
+        public string? MaskCode { get; set; }
 
     }
 

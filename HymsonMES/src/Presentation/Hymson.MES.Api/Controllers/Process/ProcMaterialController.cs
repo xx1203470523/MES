@@ -2,6 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -167,6 +168,45 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         #endregion
+
+        /// <summary>
+        /// 导入物料数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [PermissionDescription("proc:material:import")]
+        public async Task ImportProcMaterialAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _procMaterialService.ImportProcMaterialAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procMaterialService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"物料导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导出物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:material:export")]
+        public async Task<ProcMaterialExportResultDto> ExprotProcMaterialListAsync([FromQuery] ProcMaterialPagedQueryDto param)
+        {
+            return await _procMaterialService.ExprotProcMaterialListAsync(param);
+        }
 
     }
 }

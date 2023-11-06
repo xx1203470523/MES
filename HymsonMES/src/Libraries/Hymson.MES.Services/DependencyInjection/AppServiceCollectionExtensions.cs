@@ -298,6 +298,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcMaterialImportDto>, ProcMaterialImportValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
 
             services.AddSingleton<AbstractValidator<ProcMaterialSupplierRelationCreateDto>, ProcMaterialSupplierRelationCreateValidator>();
