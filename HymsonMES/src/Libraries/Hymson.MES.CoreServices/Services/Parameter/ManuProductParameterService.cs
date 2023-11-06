@@ -4,22 +4,21 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.CoreServices.Options;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Command;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
-using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text;
-using System.Xml.Linq;
 
 namespace Hymson.MES.CoreServices.Services.Parameter
 {
@@ -28,22 +27,44 @@ namespace Hymson.MES.CoreServices.Services.Parameter
     /// </summary>
     public class ManuProductParameterService : IManuProductParameterService
     {
-        private readonly IManuProductParameterRepository _manuProductParameterRepository;
-        private readonly IProcProcedureRepository _procProcedureRepository;
-        private readonly ParameterOptions _parameterOptions;
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="manuProductParameterRepository"></param>
+        private readonly ParameterOptions _parameterOptions;
+
+        /// <summary>
+        /// 仓储接口（参数维护）
+        /// </summary>
+        private readonly IProcParameterRepository _procParameterRepository;
+
+        /// <summary>
+        /// 仓储接口（工序维护）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
+        /// 仓储接口（产品过程参数）
+        /// </summary>
+        private readonly IManuProductParameterRepository _manuProductParameterRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         /// <param name="parameterOptions"></param>
+        /// <param name="procParameterRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        public ManuProductParameterService(IManuProductParameterRepository manuProductParameterRepository, IOptions<ParameterOptions> parameterOptions, IProcProcedureRepository procProcedureRepository)
+        /// <param name="manuProductParameterRepository"></param>
+        public ManuProductParameterService(IOptions<ParameterOptions> parameterOptions,
+            IProcParameterRepository procParameterRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IManuProductParameterRepository manuProductParameterRepository)
         {
-            _manuProductParameterRepository = manuProductParameterRepository;
-            _procProcedureRepository = procProcedureRepository;
             _parameterOptions = parameterOptions.Value;
+            _procParameterRepository = procParameterRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _manuProductParameterRepository = manuProductParameterRepository;
         }
+
 
         /// <summary>
         /// 插入数据
@@ -225,8 +246,8 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         public async Task CreateProductParameterTableAsync(string tabname)
         {
             var sql = await _manuProductParameterRepository.ShowCreateTableAsync(ProductParameter.ProductProcedureParameterTemplateName);
-            sql= sql?.Replace(ProductParameter.ProductProcedureParameterTemplateName, tabname);
-            sql= sql?.Replace($"CREATE TABLE", $"CREATE TABLE  IF NOT EXISTS");
+            sql = sql?.Replace(ProductParameter.ProductProcedureParameterTemplateName, tabname);
+            sql = sql?.Replace($"CREATE TABLE", $"CREATE TABLE  IF NOT EXISTS");
             await _manuProductParameterRepository.CreateProductParameterTableAsync(sql ?? "");
         }
 
@@ -242,6 +263,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
 
             await CreateProductParameterTableAsync(tabname);
         }
+
         /// <summary>
         /// 准备工序维度创建数据库表sql语句
         /// </summary>
@@ -255,6 +277,104 @@ namespace Hymson.MES.CoreServices.Services.Parameter
             string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{ProductParameter.ProductProcedureParameterTemplateName}`;";
             return createTableSql;
         }
+
+
+        // 2023.11.06 add
+        /// <summary>
+        /// 参数采集
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        public async Task ProductParameterCollectAsync(ProductProcessParameterBo bo)
+        {
+            var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
+            {
+                SiteId = bo.SiteId,
+                Codes = bo.Parameters.Select(x => x.ParameterCode)
+            });
+
+            List<ParameterBo> list = new();
+            var errorParameter = new List<string>();
+            foreach (var parameter in bo.Parameters)
+            {
+                var parameterEntity = parameterEntities.FirstOrDefault(x => x.ParameterCode == parameter.ParameterCode);
+                if (parameterEntity == null)
+                {
+                    errorParameter.Add(parameter.ParameterCode);
+                    continue;
+                }
+
+                list.Add(new ParameterBo
+                {
+                    SiteId = bo.SiteId,
+                    UserName = bo.UserName,
+                    Time = bo.Time,
+                    SFC = bo.SFC,
+                    ProcedureId = bo.ProcedureId,
+                    ParameterId = parameterEntity.Id,
+                    ParameterValue = parameter.ParameterValue,
+                    CollectionTime = parameter.CollectionTime
+                });
+            }
+
+            if (errorParameter.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19601))
+                    .WithData("ParameterCodes", string.Join(",", errorParameter));
+            }
+
+            await SaveAsync(list);
+        }
+
+        /// <summary>
+        /// 保存数据
+        /// </summary>
+        /// <param name="bos"></param>
+        /// <returns></returns>
+        public async Task SaveAsync(IEnumerable<ParameterBo> bos)
+        {
+            var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
+
+            // 查询工序集合
+            var procProcedureEntites = await _procProcedureRepository.GetByIdsAsync(bos.Select(x => x.ProcedureId));
+            foreach (var bo in bos)
+            {
+                var procProcedureEntity = procProcedureEntites.FirstOrDefault(x => x.Id == bo.ProcedureId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES10476));
+
+                var entity = new ManuProductParameterEntity
+                {
+                    ProcedureId = procProcedureEntity.Id,
+                    SFC = bo.SFC,
+                    ParameterId = bo.ParameterId,
+                    ParameterValue = bo.ParameterValue,
+                    CollectionTime = bo.Time,
+                    SiteId = bo.SiteId,
+                    CreatedBy = bo.UserName,
+                    UpdatedBy = bo.UserName,
+                    CreatedOn = bo.Time,
+                    UpdatedOn = bo.Time,
+                    Id = IdGenProvider.Instance.CreateId()
+                };
+
+                // 生成表名（通过条码）
+                var tableNameBySFC = GetTableNameBySFC(bo.SiteId, bo.SFC);
+                if (!dic.ContainsKey(tableNameBySFC)) dic[tableNameBySFC] = new();
+                dic[tableNameBySFC].Add(entity);
+
+                // 生成表名（通过工序）
+                var tableNameByProcedureCode = GetTableNameByProcedureCode(bo.SiteId, procProcedureEntity.Code);
+                if (!dic.ContainsKey(tableNameByProcedureCode)) dic[tableNameByProcedureCode] = new();
+                dic[tableNameByProcedureCode].Add(entity);
+            }
+
+            using var trans = TransactionHelper.GetTransactionScope();
+            await Task.WhenAll(dic.Select(s => _manuProductParameterRepository.InsertRangeAsync(s.Value, s.Key)));
+            trans.Complete();
+        }
+
+
+
         #region 内部方法
         /// <summary>
         /// 更具SFC获取表名
@@ -264,7 +384,6 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         private string GetTableNameBySFC(long siteId, string sfc)
         {
             var key = CalculateCrc32($"{siteId}{sfc}");
-
             return $"{ProductParameter.ProductParameterPrefix}{key % _parameterOptions.ParameterDelivery}";
         }
 
@@ -277,7 +396,6 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         private static string GetTableNameByProcedureCode(long siteId, string procedureCode)
         {
             var key = $"{siteId}_{procedureCode}";
-
             return $"{ProductParameter.ProductProcedureParameterPrefix}{key}";
         }
 
@@ -288,17 +406,18 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <returns></returns>
         public static BigInteger CalculateSHA256Hash(string input)
         {
-            using (SHA256 hasher = SHA256.Create())
-            {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-                byte[] hashBytes = hasher.ComputeHash(inputBytes);
+            using SHA256 hasher = SHA256.Create();
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            byte[] hashBytes = hasher.ComputeHash(inputBytes);
 
-                BigInteger hashValue = new BigInteger(hashBytes);
-
-                return hashValue;
-            }
+            return new(hashBytes);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static uint CalculateCrc32(string input)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(input);
