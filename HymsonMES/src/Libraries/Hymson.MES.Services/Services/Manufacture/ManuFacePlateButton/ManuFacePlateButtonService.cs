@@ -339,6 +339,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 如果没有读取到有效作业，就提示错误
             if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
 
+            if (dto.Param!.ContainsKey("Type") == false) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "Type");
+            if (dto.Param!.ContainsKey("SFCs") == false) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "SFCs");
+
             // 条码类型
             var codeType = CodeTypeEnum.SFC;
             if (!dto.Param!.ContainsKey("Type"))

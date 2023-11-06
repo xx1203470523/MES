@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -129,6 +130,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCustomEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (inteCustomQuery.Codes != null && inteCustomQuery.Codes.Any())
+            {
+                sqlBuilder.Where(" Code in @Codes ");
+            }
+
             using var conn = GetMESDbConnection();
             var inteCustomEntities = await conn.QueryAsync<InteCustomEntity>(template.RawSql, inteCustomQuery);
             return inteCustomEntities;

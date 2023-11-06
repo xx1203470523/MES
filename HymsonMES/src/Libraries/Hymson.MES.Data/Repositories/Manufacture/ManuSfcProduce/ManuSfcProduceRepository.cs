@@ -534,9 +534,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 更新工序和工艺路线
+        /// 更新资源，工艺路线，工序，维修状态
         /// </summary>
-        /// <param name="manuSfcInfoEntity"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         public async Task<int> UpdateProcedureIdAsync(UpdateProcedureCommand command)
         {
@@ -809,7 +809,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         //在制维修 
         const string UpdateStatusSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateStatusByIdSql = "UPDATE `manu_sfc_produce` SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id AND Status=@CurrentStatus ";
-        const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET  ResourceId=@ResourceId,ProcessRouteId = @ProcessRouteId, ProcedureId=@ProcedureId, Status = @Status,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateProcedureIdSql = "UPDATE `manu_sfc_produce` SET ResourceId = @ResourceId, ProcessRouteId = @ProcessRouteId, ProcedureId = @ProcedureId, Status = @Status, IsRepair = @IsRepair, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateProcedureAndResourceSql = "UPDATE `manu_sfc_produce` SET   ProcedureId = @ProcedureId,ResourceId=@ResourceId,UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
         //在制品步骤控制 

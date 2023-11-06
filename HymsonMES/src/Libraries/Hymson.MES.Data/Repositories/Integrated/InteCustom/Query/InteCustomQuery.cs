@@ -13,5 +13,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public class InteCustomQuery
     {
+        /// <summary>
+        /// 所属站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 客户编码列表
+        /// </summary>
+        public string[]? Codes { get; set; }
     }
 }

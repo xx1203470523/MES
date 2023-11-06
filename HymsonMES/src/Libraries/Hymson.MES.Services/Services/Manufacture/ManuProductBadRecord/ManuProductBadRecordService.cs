@@ -169,7 +169,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task CreateManuProductBadRecordAsync(ManuProductBadRecordCreateDto manuProductBadRecordCreateDto)
         {
-
             // 验证DTO
             if (manuProductBadRecordCreateDto.Sfcs == null || manuProductBadRecordCreateDto.Sfcs.Length < 1)
             {

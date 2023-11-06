@@ -389,6 +389,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcParameterPagedQueryDto, ProcParameterPagedQuery>();
             CreateMap<ProcParameterEntity, ProcParameterDto>();
             CreateMap<ProcParameterEntity, CustomProcParameterDto>();
+            CreateMap<ProcParameterEntity, ProcParameterExportDto>();
             #endregion
 
             #region ParameterLinkType
