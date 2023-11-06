@@ -11,7 +11,6 @@ using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
-using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
