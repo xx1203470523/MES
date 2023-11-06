@@ -227,6 +227,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        /// <summary>
+        /// 更改物料与工序的 非当前版本
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateSameMaterialIdProcedureIdToNoVersionAsync(ProcProductParameterGroupEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSameMaterialIdProcedureIdToNoVersionSql, entity);
+        }
     }
 
 
@@ -241,11 +252,11 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM `proc_product_parameter_group` /**where**/  ";
 
-        const string InsertSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
-        const string InsertsSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "INSERT IGNORE `proc_product_parameter_group`(`Id`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `Status`, `MaterialId`, `ProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Version, @IsDefaultVersion, @Status, @MaterialId, @ProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, IsDefaultVersion=@IsDefaultVersion, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `proc_product_parameter_group` SET Name = @Name, Version = @Version, IsDefaultVersion=@IsDefaultVersion, Status = @Status, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_product_parameter_group` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_product_parameter_group` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -256,6 +267,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT * FROM `proc_product_parameter_group`  WHERE Id IN @Ids ";
 
         const string UpdateStatusSql = "UPDATE `proc_product_parameter_group` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
-
+        const string UpdateSameMaterialIdProcedureIdToNoVersionSql = @"UPDATE `proc_product_parameter_group` SET IsDefaultVersion= 0 WHERE MaterialId= @MaterialId AND ProcedureId =@ProcedureId AND IsDeleted = 0 ";
     }
 }

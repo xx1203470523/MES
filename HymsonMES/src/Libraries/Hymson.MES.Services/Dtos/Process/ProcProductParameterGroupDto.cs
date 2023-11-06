@@ -29,6 +29,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Version { get; set; }
 
         /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
@@ -74,6 +79,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 状态
@@ -141,6 +151,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 状态

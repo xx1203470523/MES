@@ -150,7 +150,13 @@ namespace Hymson.MES.Services.Services.Process
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                if (entity.IsDefaultVersion.HasValue && entity.IsDefaultVersion.Value) {
+                    //更改同产品id与工序的版本 为非当前版本
+                    await _procProductParameterGroupRepository.UpdateSameMaterialIdProcedureIdToNoVersionAsync(entity);
+                }
+
                 rows = await _procProductParameterGroupRepository.InsertAsync(entity);
+
                 if (rows <= 0)
                 {
                     trans.Dispose();
@@ -223,6 +229,12 @@ namespace Hymson.MES.Services.Services.Process
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
+                if (entity.IsDefaultVersion.HasValue && entity.IsDefaultVersion.Value)
+                {
+                    //更改同产品id与工序的版本 为非当前版本
+                    await _procProductParameterGroupRepository.UpdateSameMaterialIdProcedureIdToNoVersionAsync(entity);
+                }
+
                 rows += await _procProductParameterGroupRepository.UpdateAsync(entity);
                 rows += await _procProductParameterGroupDetailRepository.DeleteByParentIdAsync(command);
                 rows += await _procProductParameterGroupDetailRepository.InsertRangeAsync(details);
