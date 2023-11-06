@@ -9,7 +9,9 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.Parameter;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection
@@ -98,6 +100,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                 ResourceId = resourceEntity.Id,
                 SiteId = _currentEquipment.SiteId
             });
+
             if (produreEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ResCode", param.ResourceCode);
@@ -124,6 +127,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                     {
                         list.Add(new ManuProductParameterEntity
                         {
+                            Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentEquipment.SiteId,
                             SFC = product.SFC,
                             ProcedureId = produreEntity.Id,
@@ -136,12 +140,17 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                     }
                 }
             }
+
             if (errorParameter.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ParameterCodes", string.Join(",", errorParameter));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
+            using var trans = TransactionHelper.GetTransactionScope();
+
             await _manuProductParameterRepository.InsertRangeAsync(list);
+
+            trans.Complete();
         }
 
         /// <summary>

@@ -74,6 +74,14 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         Task<int> CreateProductParameterTableAsync(string tableName);
 
         /// <summary>
+        /// 准备工序维度创建数据库表sql语句
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        string PrepareProductParameterProcedureCodeTableSql(long siteId, long procedureId);
+
+        /// <summary>
         /// 获取创建表脚本
         /// </summary>
         /// <returns></returns>

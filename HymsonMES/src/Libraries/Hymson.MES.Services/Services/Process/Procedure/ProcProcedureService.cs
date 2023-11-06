@@ -15,6 +15,7 @@ using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -84,7 +85,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// sql执行器
         /// </summary>
         private readonly ISqlExecuteTaskService _sqlExecuteTaskService;
-        private readonly IManuProductParameterService _manuProductParameterService;
+
+        /// <summary>
+        /// 参数收集仓储
+        /// </summary>
+        private readonly IManuProductParameterRepository _manuProductParameterRepository;
 
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
@@ -102,7 +107,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
-            IManuProductParameterService manuProductParameterService,
+            IManuProductParameterRepository manuProductParameterRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService, ISqlExecuteTaskService sqlExecuteTaskService)
         {
@@ -116,7 +121,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _inteJobRepository = inteJobRepository;
             _procLabelTemplateRepository = procLabelTemplateRepository;
             _procProductSetRepository = procProductSetRepository;
-            _manuProductParameterService = manuProductParameterService;
+            _manuProductParameterRepository = manuProductParameterRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
@@ -520,7 +525,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     productSetList.Add(relationEntity);
                 }
             }
-            var createProductParameterProcedureCodeTableSql =   _manuProductParameterService.PrepareProductParameterProcedureCodeTableSql(siteId, procProcedureCreateDto.Procedure.Code);
+            var createProductParameterProcedureCodeTableSql = _manuProductParameterRepository.PrepareProductParameterProcedureCodeTableSql(siteId, procProcedureEntity.Id);
             using (TransactionScope ts = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted))
             {
                 //入库
@@ -540,11 +545,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 {
                     await _procProductSetRepository.InsertsAsync(productSetList);
                 }
-                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql,userName);
+                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql, userName);
                 //提交
                 ts.Complete();
             }
-            
+
         }
 
         /// <summary>
@@ -845,6 +850,5 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         }
 
         #endregion
-
     }
 }
