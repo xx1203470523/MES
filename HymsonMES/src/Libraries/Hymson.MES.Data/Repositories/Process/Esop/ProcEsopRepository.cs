@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("esop.SiteId = @SiteId");
             sqlBuilder.Where("esop.IsDeleted=0");
 
-            sqlBuilder.Select("esop.Id,pm.MaterialCode,pm.Version,pp.`Code` ProcedureCode,pp.`Name` ProcedureName,esop.`Status`,esop.UpdatedBy,esop.UpdatedOn");
+            sqlBuilder.Select("esop.Id,pm.MaterialCode,pm.Version,pm.MaterialName,pp.`Code` ProcedureCode,pp.`Name` ProcedureName,esop.`Status`,esop.UpdatedBy,esop.UpdatedOn");
             sqlBuilder.LeftJoin("proc_material pm on esop.MaterialId=pm.Id and pm.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_procedure pp on esop.ProcedureId=pp.Id and pp.IsDeleted=0");
 
@@ -206,7 +206,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_esop` esop /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_esop esop ` /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_esop` esop /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ ";
         const string GetProcEsopEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_esop` /**where**/  ";

@@ -36,6 +36,6 @@ namespace Hymson.MES.Core.Domain.Process
         /// <summary>
         /// 状态 0-未启用  1-启用
         /// </summary>
-        public TrueOrFalseEnum? Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
     }
 }
