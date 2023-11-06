@@ -8,9 +8,8 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 维修结束

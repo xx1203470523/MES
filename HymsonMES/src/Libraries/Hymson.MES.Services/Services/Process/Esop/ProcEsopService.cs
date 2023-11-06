@@ -103,6 +103,7 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<PagedInfo<ProcEsopDto>> GetPagedListAsync(ProcEsopPagedQueryDto procEsopPagedQueryDto)
         {
             var procEsopPagedQuery = procEsopPagedQueryDto.ToQuery<ProcEsopPagedQuery>();
+            procEsopPagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _procEsopRepository.GetPagedInfoAsync(procEsopPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -111,11 +112,11 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 
+        /// 实体转换
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcEsopDto> PrepareProcEsopDtos(PagedInfo<ProcEsopEntity>   pagedInfo)
+        private static List<ProcEsopDto> PrepareProcEsopDtos(PagedInfo<ProcEsopView>   pagedInfo)
         {
             var procEsopDtos = new List<ProcEsopDto>();
             foreach (var procEsopEntity in pagedInfo.Data)
@@ -130,7 +131,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procEsopDto"></param>
+        /// <param name="procEsopModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyProcEsopAsync(ProcEsopModifyDto procEsopModifyDto)
         {

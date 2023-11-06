@@ -6,6 +6,7 @@
  *build datetime: 2023-11-02 02:39:53
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Process
 {
@@ -22,21 +23,19 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 物料Id  proc_material 表Id
         /// </summary>
         public long? MaterialId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 工序Id  proc_procedure表 Id
         /// </summary>
         public long? ProcedureId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态 0-未启用  1-启用
         /// </summary>
-        public bool? Status { get; set; }
-
-       
+        public TrueOrFalseEnum? Status { get; set; }
     }
 }

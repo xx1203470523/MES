@@ -8,9 +8,9 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
+using Hymson.Utils;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 组装
@@ -88,7 +88,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            return await Task.FromResult(new PackageResponseBo { });
+            return await Task.FromResult(new EmptyRequestBo { });
         }
 
         /// <summary>
@@ -99,12 +99,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             // 面板需要的数据
+            List<PanelModuleEnum> panelModules = new() { PanelModuleEnum.Package };
             return await Task.FromResult(new JobResponseBo
             {
-                Content = new Dictionary<string, string> {
-                { "PackageCom", "True" },
-                { "BadEntryCom", "False" },
-            },
+                Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } },
                 Message = ""
             });
         }

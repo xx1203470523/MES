@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Options;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Integrated;
@@ -12,9 +11,7 @@ using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
-using Hymson.MES.CoreServices.Services.NewJob;
 using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,6 +61,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, StopJobService>();
             services.AddSingleton<IJobService, BadRecordJobService>();
             services.AddSingleton<IJobService, PackageVerifyJobService>();
+            services.AddSingleton<IJobService, ParameterCollectJobService>();
             services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton<IJobService, RepairEndJobService>();
             services.AddSingleton<IJobService, PackageIngJobService>();
@@ -75,6 +73,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
+            services.AddSingleton<IManuPassStationService, ManuPassStationService>();
             services.AddSingleton<IManuSfcSummaryService, ManuSfcSummaryService>();
             return services;
         }

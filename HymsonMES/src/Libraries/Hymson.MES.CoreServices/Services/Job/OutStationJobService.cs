@@ -16,7 +16,6 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -31,9 +30,10 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 出站
@@ -560,9 +560,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (SFCProduceEntity != null)
                 {
                     // 面板需要的参数
+                    List<PanelModuleEnum> panelModules = new();
                     responseBo.Content = new Dictionary<string, string> {
-                        { "PackageCom", "False" },
-                        { "BadEntryCom", "False" },
+                        { "PanelModules", panelModules.ToSerialize() },
                         { "Qty", "1" },
                         { "IsLastProcedure", $"{data.IsLastProcedure}" },
                         { "NextProcedureCode", $"{data.NextProcedureCode}" }
@@ -1195,6 +1195,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 物料消耗对象
             MaterialConsumptionBo responseBo = new();
 
+            if (summaryBo == null) return responseBo;
             if (summaryBo.InitialMaterials == null) return responseBo;
 
             // 物料ID集合
@@ -1206,6 +1207,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 通过物料分组
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
+            // 取得半成品的总数量
+            var smiFinishedUsages = 1m;
+            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
@@ -1215,9 +1220,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
                 // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
-                decimal residue = sfcProduceEntity.Qty * materialBo.Usages;
+                decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次
@@ -1264,6 +1269,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             MaterialConsumptionBo responseBo = new();
 
             if (requestBo.ConsumeList == null) return responseBo;
+            if (summaryBo == null) return responseBo;
             if (summaryBo.InitialMaterials == null) return responseBo;
 
             List<ManuFeedingEntity> feedings = new();
@@ -1311,6 +1317,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 通过物料分组
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
+            // 取得半成品的总数量
+            var smiFinishedUsages = 1m;
+            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
@@ -1318,10 +1328,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 if (manuFeedingsDictionary == null) continue;
 
+                // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100
-                decimal residue = materialBo.Usages;
+                decimal residue = materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= materialBo.Loss.Value;
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 // 收集方式是批次

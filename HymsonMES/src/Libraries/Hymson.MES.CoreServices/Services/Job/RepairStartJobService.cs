@@ -9,14 +9,13 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 维修开始
