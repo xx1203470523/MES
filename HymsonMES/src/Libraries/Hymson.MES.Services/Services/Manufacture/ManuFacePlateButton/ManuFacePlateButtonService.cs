@@ -11,9 +11,11 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.CoreServices.Services.Manufacture;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -49,6 +51,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuPassStationService _manuPassStationService;
 
         /// <summary>
+        /// 接口（参数收集）
+        /// </summary>
+        private readonly IManuProductParameterService _manuProductParameterService;
+
+        /// <summary>
         /// 仓储接口（作业）
         /// </summary>
         private readonly IInteJobRepository _inteJobRepository;
@@ -82,6 +89,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuFacePlateButtonRepository"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
         /// <param name="manuPassStationService"></param>
+        /// <param name="manuProductParameterService"></param>
         /// <param name="inteJobRepository"></param>
         /// <param name="inteVehicleRepository"></param>
         /// <param name="inteVehiceFreightStackRepository"></param>
@@ -92,6 +100,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
             IManuPassStationService manuPassStationService,
+            IManuProductParameterService manuProductParameterService,
             IInteJobRepository inteJobRepository,
             IInteVehicleRepository inteVehicleRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
@@ -104,6 +113,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
             _manuPassStationService = manuPassStationService;
+            _manuProductParameterService = manuProductParameterService;
             _inteJobRepository = inteJobRepository;
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
@@ -572,6 +582,24 @@ namespace Hymson.MES.Services.Services.Manufacture
             return result;
         }
 
+        /// <summary>
+        /// 参数收集（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> ProductParameterCollectAsync(ProductProcessParameterDto dto)
+        {
+            return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
+            {
+                SiteId = dto.SiteId,
+                UserName = dto.UserName,
+                Time = dto.Time,
+                ProcedureId = dto.ProcedureId,
+                ResourceId = dto.ResourceId,
+                SFC = dto.SFC,
+                Parameters = dto.Parameters
+            });
+        }
 
         /// <summary>
         ///  新按钮（点击）

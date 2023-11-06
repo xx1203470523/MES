@@ -5,7 +5,7 @@ namespace Hymson.MES.CoreServices.Bos.Parameter
     /// <summary>
     /// 参数采集实体类
     /// </summary>
-    public class ParameterBo : ManufactureBo
+    public record ParameterBo : ManufactureBo
     {
         /// <summary>
         /// 参数Id

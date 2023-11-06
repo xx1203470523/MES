@@ -13,7 +13,6 @@ using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.Snowflake;
-using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Options;
 using System.Numerics;
@@ -285,7 +284,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task ProductParameterCollectAsync(ProductProcessParameterBo bo)
+        public async Task<int> ProductParameterCollectAsync(ProductProcessParameterBo bo)
         {
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
             {
@@ -323,7 +322,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     .WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
-            await SaveAsync(list);
+            return await SaveAsync(list);
         }
 
         /// <summary>
@@ -331,7 +330,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="bos"></param>
         /// <returns></returns>
-        public async Task SaveAsync(IEnumerable<ParameterBo> bos)
+        public async Task<int> SaveAsync(IEnumerable<ParameterBo> bos)
         {
             var dic = new Dictionary<string, List<ManuProductParameterEntity>>();
 
@@ -368,9 +367,13 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 dic[tableNameByProcedureCode].Add(entity);
             }
 
+            var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
-            await Task.WhenAll(dic.Select(s => _manuProductParameterRepository.InsertRangeAsync(s.Value, s.Key)));
+            var rowArray = await Task.WhenAll(dic.Select(s => _manuProductParameterRepository.InsertRangeAsync(s.Value, s.Key)));
+            rows += rowArray.Sum();
             trans.Complete();
+
+            return rows;
         }
 
 

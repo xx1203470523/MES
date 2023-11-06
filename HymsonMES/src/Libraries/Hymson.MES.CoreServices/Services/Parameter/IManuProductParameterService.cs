@@ -66,14 +66,14 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        Task ProductParameterCollectAsync(ProductProcessParameterBo bo);
+        Task<int> ProductParameterCollectAsync(ProductProcessParameterBo bo);
 
         /// <summary>
         /// 保存数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task SaveAsync(IEnumerable<ParameterBo> param);
+        Task<int> SaveAsync(IEnumerable<ParameterBo> param);
 
     }
 }

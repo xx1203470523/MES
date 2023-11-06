@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class OutStationUnqualifiedBo
+    public record OutStationUnqualifiedBo
     {
         /// <summary>
         /// 不合格代码

@@ -3,7 +3,7 @@
     /// <summary>
     /// 消耗
     /// </summary>
-    public class OutStationConsumeBo
+    public record OutStationConsumeBo
     {
         /// <summary>
         /// 消耗条码的物料ID

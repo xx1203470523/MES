@@ -5,7 +5,7 @@ namespace Hymson.MES.CoreServices.Bos.Parameter
     /// <summary>
     /// 产品过程参数（面板）
     /// </summary>
-    public class ProductProcessParameterBo : ManufactureBo
+    public record ProductProcessParameterBo : ManufactureBo
     {
         /// <summary>
         /// 参数

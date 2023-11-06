@@ -3,7 +3,7 @@
     /// <summary>
     /// 参数信息
     /// </summary>
-    public class ProductParameterBo
+    public record ProductParameterBo
     {
         /// <summary>
         /// 参数编码

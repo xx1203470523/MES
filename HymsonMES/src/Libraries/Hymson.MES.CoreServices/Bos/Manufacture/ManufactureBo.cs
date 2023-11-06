@@ -7,7 +7,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 
     /// </summary>
-    public class ManufactureBo
+    public record ManufactureBo
     {
         /// <summary>
         /// 工厂Id
