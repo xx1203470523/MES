@@ -143,5 +143,19 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据编码获取物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetByCodesAsync(ProcMaterialsByCodeQuery param);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcMaterialEntity> entities);
     }
 }

@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Command;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -242,6 +243,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        /// <summary>
+        /// 根据编码获取工艺路线信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcessRouteEntity>> GetByCodesAsync(ProcProcessRoutesByCodeQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcessRouteEntity>(GetByCodesSql, param);
+        }
     }
 
     /// <summary>
@@ -266,5 +278,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string UpdateStatusSql = "UPDATE `proc_process_route` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
+        const string GetByCodesSql = @"SELECT * FROM `proc_process_route` WHERE Code IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }
