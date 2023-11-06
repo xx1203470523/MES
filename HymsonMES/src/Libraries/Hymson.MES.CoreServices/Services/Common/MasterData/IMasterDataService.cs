@@ -167,6 +167,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo);
 
         /// <summary>
+        /// 获取即将扣料的物料数据（包含半成品信息）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<MaterialDeductResponseSummaryBo> GetInitialMaterialsWithSmiFinishedAsync(MaterialDeductRequestBo requestBo);
+
+        /// <summary>
         /// 获取流转数据
         /// </summary>
         /// <param name="bo"></param>

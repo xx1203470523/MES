@@ -151,7 +151,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             // 校验工序和资源是否对应
             if (resourceIds.Any(a => a == commonBo.ResourceId) == false)
             {
-                _logger.LogWarning($"工序{commonBo.ProcedureId}和资源{commonBo.ResourceId}不对应");
+                _logger.LogWarning($"工序{commonBo.ProcedureId}和资源{commonBo.ResourceId}不对应！");
                 throw new CustomerValidationException(nameof(ErrorCode.MES16317));
             }
 
@@ -260,7 +260,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
-        /// <returns></returns>00
+        /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             if (param is not JobRequestBo commonBo) return default;

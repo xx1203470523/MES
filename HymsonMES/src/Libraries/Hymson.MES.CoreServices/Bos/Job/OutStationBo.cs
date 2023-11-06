@@ -45,6 +45,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class OutStationConsumeBo
     {
         /// <summary>
+        /// 消耗条码的物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
         /// 消耗条码
         /// </summary>
         public string BarCode { get; set; }
@@ -238,6 +243,22 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 下一工序编码
         /// </summary>
         public string NextProcedureCode { get; set; } = "";
+    }
+
+    /// <summary>
+    /// 半成品的消耗
+    /// </summary>
+    public class SmiFinishedConsumptionBo
+    {
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 用量
+        /// </summary>
+        public decimal Usages { get; set; }
     }
 
     /// <summary>

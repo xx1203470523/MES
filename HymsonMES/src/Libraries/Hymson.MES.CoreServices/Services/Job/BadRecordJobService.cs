@@ -129,7 +129,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 { "IsShow", $"{data.IsShow}" },
             };
 
-            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), data.SFCs.FirstOrDefault()!);
+            var SFCs = string.Join(",", data.SFCs);
+            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), SFCs);
             return await Task.FromResult(responseBo);
         }
 
