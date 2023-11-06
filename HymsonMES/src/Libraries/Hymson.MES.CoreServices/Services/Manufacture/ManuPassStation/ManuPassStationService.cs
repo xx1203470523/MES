@@ -3,6 +3,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -53,7 +54,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
         }
 
-
+        #region 进站
         /// <summary>
         /// 批量进站（条码进站）
         /// </summary>
@@ -150,8 +151,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             return await _executeJobService.ExecuteAsync(jobBos, requestBo);
         }
+        #endregion
 
-
+        #region 出站
         /// <summary>
         /// 批量出站（条码出站）
         /// </summary>
@@ -248,6 +250,19 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             return await _executeJobService.ExecuteAsync(jobBos, requestBo);
         }
+        #endregion
 
+        #region 产品参数收集
+        /// <summary>
+        /// 产品参数收集（出站）
+        /// </summary>
+        /// <param name="bos"></param>
+        /// <returns></returns>
+        public async Task ParameterForOutStation(IEnumerable<OutStationParameterBo> bos)
+        {
+            // TODO
+            await Task.CompletedTask;
+        }
+        #endregion
     }
 }
