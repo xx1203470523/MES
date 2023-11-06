@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -19,10 +20,10 @@ namespace Hymson.MES.Data.Repositories.Process
     /// <summary>
     /// ESOP仓储
     /// </summary>
-    public partial class ProcEsopRepository :BaseRepository, IProcEsopRepository
+    public partial class ProcEsopRepository : BaseRepository, IProcEsopRepository
     {
 
-        public ProcEsopRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ProcEsopRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcEsopEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcEsopEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ProcEsopEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -65,10 +66,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcEsopEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcEsopEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ProcEsopEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ProcEsopEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -76,30 +77,68 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="procEsopPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcEsopEntity>> GetPagedInfoAsync(ProcEsopPagedQuery procEsopPagedQuery)
+        public async Task<PagedInfo<ProcEsopView>> GetPagedInfoAsync(ProcEsopPagedQuery procEsopPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
+            sqlBuilder.Where("esop.SiteId = @SiteId");
+            sqlBuilder.Where("esop.IsDeleted=0");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
+            sqlBuilder.Select("esop.Id,pm.MaterialCode,pm.Version,pp.`Code` ProcedureCode,pp.`Name` ProcedureName,esop.`Status`,esop.UpdatedBy,esop.UpdatedOn");
+            sqlBuilder.LeftJoin("proc_material pm on esop.MaterialId=pm.Id and pm.IsDeleted=0");
+            sqlBuilder.LeftJoin("proc_procedure pp on esop.ProcedureId=pp.Id and pp.IsDeleted=0");
+
+            if (string.IsNullOrEmpty(procEsopPagedQuery.Sorting))
+            {
+                sqlBuilder.OrderBy("esop.UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(procEsopPagedQuery.Sorting);
+            }
+
+            //状态
+            if (procEsopPagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("esop.Status=@Status");
+            }
+            //物料编码
+            if (!string.IsNullOrWhiteSpace(procEsopPagedQuery.MaterialCode))
+            {
+                procEsopPagedQuery.MaterialCode = $"%{procEsopPagedQuery.MaterialCode}%";
+                sqlBuilder.Where("pm.MaterialCode like @MaterialCode");
+            }
+            //物料名称
+            if (!string.IsNullOrWhiteSpace(procEsopPagedQuery.MaterialName))
+            {
+                procEsopPagedQuery.MaterialName = $"%{procEsopPagedQuery.MaterialName}%";
+                sqlBuilder.Where("pm.MaterialName like @MaterialName");
+            }
+            //工序编码
+            if (!string.IsNullOrWhiteSpace(procEsopPagedQuery.ProcedureCode))
+            {
+                procEsopPagedQuery.ProcedureCode = $"%{procEsopPagedQuery.ProcedureCode}%";
+                sqlBuilder.Where("pp.Code like @ProcedureCode");
+            }
+            //工序名称
+            if (!string.IsNullOrWhiteSpace(procEsopPagedQuery.ProcedureName))
+            {
+                procEsopPagedQuery.ProcedureName = $"%{procEsopPagedQuery.ProcedureName}%";
+                sqlBuilder.Where("pp.Name like @ProcedureName");
+            }
+
             var offSet = (procEsopPagedQuery.PageIndex - 1) * procEsopPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procEsopPagedQuery.PageSize });
             sqlBuilder.AddParameters(procEsopPagedQuery);
 
             using var conn = GetMESDbConnection();
-            var procEsopEntitiesTask = conn.QueryAsync<ProcEsopEntity>(templateData.RawSql, templateData.Parameters);
+            var procEsopEntitiesTask = conn.QueryAsync<ProcEsopView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procEsopEntities = await procEsopEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcEsopEntity>(procEsopEntities, procEsopPagedQuery.PageIndex, procEsopPagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcEsopView>(procEsopEntities, procEsopPagedQuery.PageIndex, procEsopPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -166,8 +205,8 @@ namespace Hymson.MES.Data.Repositories.Process
     public partial class ProcEsopRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_esop` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_esop` /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_esop` esop /**innerjoin**/ /**leftjoin**/ /**where**/  /**orderby**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_esop esop ` /**where**/ ";
         const string GetProcEsopEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_esop` /**where**/  ";

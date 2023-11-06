@@ -543,8 +543,10 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            CreateMap<ProcEsopView, ProcEsopDto>();
+            CreateMap<ProcEsopPagedQueryDto, ProcEsopPagedQuery>();
             #region Esop 
-             
+
             #endregion
         }
 
