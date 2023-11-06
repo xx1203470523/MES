@@ -31,6 +31,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public class EmptyRequestBo { }
+
+    /// <summary>
     /// 请求Bo
     /// </summary>
     public class JobRequestBo : JobBaseBo

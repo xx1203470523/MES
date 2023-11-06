@@ -192,11 +192,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.Rows += rowArray.Sum();
 
             // 面板需要的数据
-            responseBo.Content = new Dictionary<string, string> {
-                { "PackageCom", "False" },
-                { "BadEntryCom", "False" },
-            };
-
+            List<PanelModuleEnum> panelModules = new();
+            responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
             responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16340), data.FirstSFCProduceEntity.SFC);
             return responseBo;
         }

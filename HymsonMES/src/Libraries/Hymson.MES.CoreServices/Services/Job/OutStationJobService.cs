@@ -31,6 +31,7 @@ using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
+using Hymson.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.NewJob
@@ -560,9 +561,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 if (SFCProduceEntity != null)
                 {
                     // 面板需要的参数
+                    List<PanelModuleEnum> panelModules = new();
                     responseBo.Content = new Dictionary<string, string> {
-                        { "PackageCom", "False" },
-                        { "BadEntryCom", "False" },
+                        { "PanelModules", panelModules.ToSerialize() },
                         { "Qty", "1" },
                         { "IsLastProcedure", $"{data.IsLastProcedure}" },
                         { "NextProcedureCode", $"{data.NextProcedureCode}" }
