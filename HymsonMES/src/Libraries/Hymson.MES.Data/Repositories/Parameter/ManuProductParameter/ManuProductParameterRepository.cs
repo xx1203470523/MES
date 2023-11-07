@@ -21,7 +21,7 @@ using static Dapper.SqlMapper;
 namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
 {
     /// <summary>
-    /// 产品类型参数
+    /// 参数收集仓储
     /// </summary>
     public partial class ManuProductParameterRepository : BaseRepository, IManuProductParameterRepository
     {
@@ -231,6 +231,20 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         {
             using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
             return await conn.ExecuteAsync(tableName);
+        }
+
+        /// <summary>
+        /// 准备工序维度创建数据库表sql语句
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        public string PrepareProductParameterProcedureCodeTableSql(long siteId, long procedureId)
+        {
+            //获取目标表名
+            var destinationTableName = GetTableNameByProcedureId(siteId, procedureId);
+            string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{ProductParameter.ProductProcedureParameterTemplateName}`;";
+            return createTableSql;
         }
 
         #region 内部方法

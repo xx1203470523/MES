@@ -1328,7 +1328,7 @@
         public const string MES19603 = "资源编码{Code}不存在";
         public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
         public const string MES19605 = "条码生成失败,半成品记录未找到！";
-
+        public const string MES19606 = "参数{ParameterCodes}不存在";
         #endregion
 
 
