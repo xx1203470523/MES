@@ -226,6 +226,9 @@
         public const string MES10525 = "工作中心{WorkCenterCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10526 = "产品{ProductCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10527 = "数据类型不合法";
+        public const string MES10528 = "条码不在当前工序";
+        public const string MES10529 = "没有当前条码与工序的产品参数收集组";
+
         #endregion
 
         #region Bom 10600

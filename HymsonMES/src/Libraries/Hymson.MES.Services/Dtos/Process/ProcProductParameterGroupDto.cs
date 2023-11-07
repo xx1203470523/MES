@@ -230,4 +230,16 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ProcedureName { get; set; }
     }
 
+    public class ProcProductParameterGroupBySfcAndProcedureIdQueryDto 
+    { 
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+    }
 }
