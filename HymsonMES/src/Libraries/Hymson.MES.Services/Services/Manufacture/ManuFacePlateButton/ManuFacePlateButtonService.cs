@@ -431,6 +431,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", dto.Param!["SFCs"]);
 
                     SFCs = sfcCodes;
+                    panelRequestBos.AddRange(SFCs.Select(s => new PanelRequestBo { SFC = s }));
                     inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
                     outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
                     break;
