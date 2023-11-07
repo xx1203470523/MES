@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
@@ -19,8 +18,6 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// 设备参数采集
         /// </summary>
         /// <param name="manuEquipmentParameterRepository"></param>
-        /// <param name="parameterOptions"></param>
-        /// <param name="equEquipmentRepository"></param>
         public ManuEquipmentParameterService(IManuEquipmentParameterRepository manuEquipmentParameterRepository)
         {
             _manuEquipmentParameterRepository = manuEquipmentParameterRepository;
