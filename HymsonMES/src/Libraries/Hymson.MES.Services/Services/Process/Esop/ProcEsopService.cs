@@ -11,10 +11,14 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -34,14 +38,24 @@ namespace Hymson.MES.Services.Services.Process
         /// ESOP 仓储
         /// </summary>
         private readonly IProcEsopRepository _procEsopRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
+        private readonly IProcProcedureRepository _procedureRepository;
+
         private readonly AbstractValidator<ProcEsopCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcEsopModifyDto> _validationModifyRules;
 
-        public ProcEsopService(ICurrentUser currentUser, ICurrentSite currentSite, IProcEsopRepository procEsopRepository, AbstractValidator<ProcEsopCreateDto> validationCreateRules, AbstractValidator<ProcEsopModifyDto> validationModifyRules)
+        public ProcEsopService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IProcEsopRepository procEsopRepository,
+            IProcMaterialRepository procMaterialRepository,
+            IProcProcedureRepository procedureRepository,
+            AbstractValidator<ProcEsopCreateDto> validationCreateRules,
+            AbstractValidator<ProcEsopModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procEsopRepository = procEsopRepository;
+            _procMaterialRepository = procMaterialRepository;
+            _procedureRepository = procedureRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -62,14 +76,31 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procEsopCreateDto);
 
+            //判断同一物料同一工序只能有一个
+            var procEsops = await _procEsopRepository.GetProcEsopEntitiesAsync(new ProcEsopQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = procEsopCreateDto.ProcedureId,
+                MaterialId = procEsopCreateDto.MaterialId
+            });
+            if (procEsops != null && procEsops.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11500));
+            }
+
             //DTO转换实体
-            var procEsopEntity = procEsopCreateDto.ToEntity<ProcEsopEntity>();
-            procEsopEntity.Id= IdGenProvider.Instance.CreateId();
-            procEsopEntity.CreatedBy = _currentUser.UserName;
-            procEsopEntity.UpdatedBy = _currentUser.UserName;
-            procEsopEntity.CreatedOn = HymsonClock.Now();
-            procEsopEntity.UpdatedOn = HymsonClock.Now();
-            procEsopEntity.SiteId = _currentSite.SiteId ?? 0;
+            var procEsopEntity = new ProcEsopEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                MaterialId = procEsopCreateDto.MaterialId,
+                ProcedureId = procEsopCreateDto.ProcedureId,
+                Status = procEsopCreateDto.Status,
+                CreatedBy = _currentUser.UserName,
+                UpdatedBy = _currentUser.UserName,
+                CreatedOn = HymsonClock.Now(),
+                UpdatedOn = HymsonClock.Now(),
+                SiteId = _currentSite.SiteId ?? 0
+            };
 
             //入库
             await _procEsopRepository.InsertAsync(procEsopEntity);
@@ -116,7 +147,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<ProcEsopDto> PrepareProcEsopDtos(PagedInfo<ProcEsopView>   pagedInfo)
+        private static List<ProcEsopDto> PrepareProcEsopDtos(PagedInfo<ProcEsopView> pagedInfo)
         {
             var procEsopDtos = new List<ProcEsopDto>();
             foreach (var procEsopEntity in pagedInfo.Data)
@@ -135,20 +166,38 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcEsopAsync(ProcEsopModifyDto procEsopModifyDto)
         {
-             // 判断是否有获取到站点码 
+            // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procEsopModifyDto);
 
-            //DTO转换实体
-            var procEsopEntity = procEsopModifyDto.ToEntity<ProcEsopEntity>();
-            procEsopEntity.UpdatedBy = _currentUser.UserName;
-            procEsopEntity.UpdatedOn = HymsonClock.Now();
+            //判断同一物料同一工序只能有一个
+            var procEsops = await _procEsopRepository.GetProcEsopEntitiesAsync(new ProcEsopQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = procEsopModifyDto.ProcedureId,
+                MaterialId = procEsopModifyDto.MaterialId
+            });
+            procEsops = procEsops.Where(x => x.Id != procEsopModifyDto.Id);
+            if (procEsops != null && procEsops.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11500));
+            }
 
+            //DTO转换实体
+            var procEsopEntity = new ProcEsopEntity()
+            {
+                Id = procEsopModifyDto.Id,
+                MaterialId = procEsopModifyDto.MaterialId,
+                ProcedureId = procEsopModifyDto.ProcedureId,
+                Status = procEsopModifyDto.Status,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
             await _procEsopRepository.UpdateAsync(procEsopEntity);
         }
 
@@ -157,14 +206,39 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcEsopDto> QueryProcEsopByIdAsync(long id) 
+        public async Task<ProcEsopDto> QueryProcEsopByIdAsync(long id)
         {
-           var procEsopEntity = await _procEsopRepository.GetByIdAsync(id);
-           if (procEsopEntity != null) 
-           {
-               return procEsopEntity.ToModel<ProcEsopDto>();
-           }
-            return null;
+            var procEsopEntity = await _procEsopRepository.GetByIdAsync(id);
+
+            var procEsopDto = new ProcEsopDto
+            {
+                Id = procEsopEntity.Id,
+                MaterialId = procEsopEntity.MaterialId,
+                ProcedureId = procEsopEntity.ProcedureId,
+                Status = procEsopEntity.Status,
+            };
+            if (procEsopEntity != null)
+            {
+                //关联物料
+                var material = await _procMaterialRepository.GetByIdAsync(procEsopEntity.MaterialId.GetValueOrDefault());
+                if (material != null)
+                {
+                    procEsopDto.MaterialCode = material.MaterialCode;
+                    procEsopDto.Version = material.Version ?? "";
+                    procEsopDto.MaterialName = material.MaterialName;
+                }
+
+                //关联工序
+                var procedure = await _procedureRepository.GetByIdAsync(procEsopEntity.ProcedureId.GetValueOrDefault());
+                if (material != null)
+                {
+                    procEsopDto.ProcedureCode = procedure.Code;
+                    procEsopDto.ProcedureName = procedure.Name;
+                }
+                return procEsopDto;
+            }
+
+            return new ProcEsopDto();
         }
     }
 }

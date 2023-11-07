@@ -6,8 +6,11 @@
  *build datetime: 2023-11-02 02:39:53
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,9 +74,10 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("proc:esop:insert")]
         public async Task AddProcEsopAsync([FromBody] ProcEsopCreateDto parm)
         {
-             await _procEsopService.CreateProcEsopAsync(parm);
+            await _procEsopService.CreateProcEsopAsync(parm);
         }
 
         /// <summary>
@@ -83,21 +87,23 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("proc:esop:update")]
         public async Task UpdateProcEsopAsync([FromBody] ProcEsopModifyDto parm)
         {
-             await _procEsopService.ModifyProcEsopAsync(parm);
+            await _procEsopService.ModifyProcEsopAsync(parm);
         }
 
         /// <summary>
         /// 删除（ESOP）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="deleteDto"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
-        public async Task DeleteProcEsopAsync([FromBody] long[] ids)
+        [PermissionDescription("proc:esop:delete")]
+        public async Task DeleteProcEsopAsync(DeleteDto deleteDto)
         {
-            await _procEsopService.DeletesProcEsopAsync(ids);
+            await _procEsopService.DeletesProcEsopAsync(deleteDto.Ids);
         }
 
         #endregion

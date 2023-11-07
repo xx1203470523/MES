@@ -158,5 +158,15 @@ namespace Hymson.MES.Api.Controllers.Process
 
         #endregion
 
+        /// <summary>
+        /// 根据条码与工序查询当前版本的产品参数收集详情
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet("getBySfcAndProcedureId")]
+        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync([FromQuery] ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto)
+        {
+            return await _procProductParameterGroupService.GetBySfcAndProcedureIdAsync(queryDto);
+        }
     }
 }

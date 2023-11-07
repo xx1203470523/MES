@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Common;
@@ -70,6 +71,8 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -82,13 +85,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcedureRepository"></param>
         /// <param name="procParameterRepository"></param>
         /// <param name="localizationService"></param>
+        /// <param name="manuSfcProduceRepository"></param>
         public ProcProductParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcProductParameterGroupSaveDto> validationSaveRules,
             IProcProductParameterGroupRepository procProductParameterGroupRepository,
             IProcProductParameterGroupDetailRepository procProductParameterGroupDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcParameterRepository procParameterRepository,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService, IManuSfcProduceRepository manuSfcProduceRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -99,6 +103,7 @@ namespace Hymson.MES.Services.Services.Process
             _procProcedureRepository = procProcedureRepository;
             _procParameterRepository = procParameterRepository;
             _localizationService = localizationService;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
         }
 
 
@@ -354,7 +359,51 @@ namespace Hymson.MES.Services.Services.Process
             return new PagedInfo<ProcProductParameterGroupDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
+        /// <summary>
+        /// 根据条码与工序查询当前版本的产品参数收集详情
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto) 
+        {
+            //根据SFC 查找到对应的物料信息
+            #region 验证对应的sfc 是否符合要求：如是否存在
+            //查询sfc对应的在制品
+            var sfcProduce = (await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = new[] { queryDto.Sfc},
+            })).FirstOrDefault();
 
+            if (sfcProduce==null) 
+            {
+                throw new CustomerValidationException(ErrorCode.MES16600);
+            }
+            if (sfcProduce.ProcedureId != queryDto.ProcedureId)
+            {
+                throw new CustomerValidationException(ErrorCode.MES10528);
+            }
+            if (sfcProduce.Status != SfcStatusEnum.Activity) 
+            {
+                throw new CustomerValidationException(ErrorCode.MES19920);
+            }
+            #endregion
+
+            var productParameterGroup = (await _procProductParameterGroupRepository.GetByProductProcedureListAsync(new EntityByProductProcedureQuery
+            {
+                SiteId = _currentSite.SiteId??0,
+                ProductId = sfcProduce.ProductId,
+                ProcedureId = queryDto.ProcedureId
+            })).FirstOrDefault(x => x.IsDefaultVersion.HasValue && x.IsDefaultVersion.Value);
+            if (productParameterGroup == null) 
+            {
+                throw new CustomerValidationException(ErrorCode.MES10529);
+            }
+
+            //查找参数收集组的详情
+            return await QueryDetailsByMainIdAsync(productParameterGroup.Id);
+        }
 
         #region 内部方法
         /// <summary>

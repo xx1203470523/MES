@@ -226,6 +226,9 @@
         public const string MES10525 = "工作中心{WorkCenterCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10526 = "产品{ProductCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10527 = "数据类型不合法";
+        public const string MES10528 = "条码不在当前工序";
+        public const string MES10529 = "没有当前条码与工序的产品参数收集组";
+
         #endregion
 
         #region Bom 10600
@@ -380,6 +383,10 @@
         public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
         public const string MES11410 = "降级移除失败:有数据已经被移除了,请清除后重新处理";
 
+        #endregion
+
+        #region ESOP维护 11500
+        public const string MES11500 = "ESOP已存在同一物料、工序数据";
         #endregion
 
         #region 作业12000
