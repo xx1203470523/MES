@@ -155,7 +155,8 @@ namespace Hymson.MES.Services.Services.Process
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                if (entity.IsDefaultVersion.HasValue && entity.IsDefaultVersion.Value) {
+                if (entity.IsDefaultVersion.HasValue && entity.IsDefaultVersion.Value)
+                {
                     //更改同产品id与工序的版本 为非当前版本
                     await _procProductParameterGroupRepository.UpdateSameMaterialIdProcedureIdToNoVersionAsync(entity);
                 }
@@ -364,8 +365,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto) 
+        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto)
         {
             //根据SFC 查找到对应的物料信息
             #region 验证对应的sfc 是否符合要求：如是否存在
@@ -373,10 +373,10 @@ namespace Hymson.MES.Services.Services.Process
             var sfcProduce = (await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Sfcs = new[] { queryDto.Sfc},
+                Sfcs = new[] { queryDto.Sfc },
             })).FirstOrDefault();
 
-            if (sfcProduce==null) 
+            if (sfcProduce == null)
             {
                 throw new CustomerValidationException(ErrorCode.MES16600);
             }
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException(ErrorCode.MES10528);
             }
-            if (sfcProduce.Status != SfcStatusEnum.Activity) 
+            if (sfcProduce.Status != SfcStatusEnum.Activity)
             {
                 throw new CustomerValidationException(ErrorCode.MES19920);
             }
@@ -392,11 +392,11 @@ namespace Hymson.MES.Services.Services.Process
 
             var productParameterGroup = (await _procProductParameterGroupRepository.GetByProductProcedureListAsync(new EntityByProductProcedureQuery
             {
-                SiteId = _currentSite.SiteId??0,
+                SiteId = _currentSite.SiteId ?? 0,
                 ProductId = sfcProduce.ProductId,
                 ProcedureId = queryDto.ProcedureId
             })).FirstOrDefault(x => x.IsDefaultVersion.HasValue && x.IsDefaultVersion.Value);
-            if (productParameterGroup == null) 
+            if (productParameterGroup == null)
             {
                 throw new CustomerValidationException(ErrorCode.MES10529);
             }

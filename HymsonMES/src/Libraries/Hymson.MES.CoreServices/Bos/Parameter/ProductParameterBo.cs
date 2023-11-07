@@ -8,11 +8,6 @@ namespace Hymson.MES.CoreServices.Bos.Parameter
     public record ProductParameterBo
     {
         /// <summary>
-        /// 参数ID
-        /// </summary>
-        public long? ParameterId { get; set; }
-
-        /// <summary>
         /// 参数编码
         /// </summary>
         public string ParameterCode { get; set; } = "";

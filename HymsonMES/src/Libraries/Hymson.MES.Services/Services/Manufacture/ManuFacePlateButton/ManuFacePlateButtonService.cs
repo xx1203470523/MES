@@ -591,9 +591,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
             {
-                SiteId = dto.SiteId,
-                UserName = dto.UserName,
-                Time = dto.Time,
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                Time = HymsonClock.Now(),
                 ProcedureId = dto.ProcedureId,
                 ResourceId = dto.ResourceId,
                 SFC = dto.SFC,

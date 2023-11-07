@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Parameter;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
 
@@ -62,6 +63,13 @@ namespace Hymson.MES.CoreServices.Services.Parameter
 
         // 2023.11.06 add
         /// <summary>
+        /// 根据产品参数ID获取关联明细
+        /// </summary>
+        /// <param name="productParameterGroupId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProductParameterGroupDetailBo>> GetDetailsByProductParameterGroupIdAsync(long productParameterGroupId);
+
+        /// <summary>
         /// 参数采集（面板用）
         /// </summary>
         /// <param name="bo"></param>
@@ -71,9 +79,10 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <summary>
         /// 保存数据
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="manufactureBo"></param>
+        /// <param name="bos"></param>
         /// <returns></returns>
-        Task<int> SaveAsync(IEnumerable<ParameterBo> param);
+        Task<int> SaveAsync(ManufactureBo manufactureBo, IEnumerable<ParameterBo> bos);
 
     }
 }
