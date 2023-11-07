@@ -420,6 +420,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointModifyDto, ProcLoadPointEntity>();
             CreateMap<ProcLoadPointPagedQueryDto, ProcLoadPointPagedQuery>();
             CreateMap<ProcLoadPointEntity, ProcLoadPointDto>();
+            CreateMap<ProcLoadPointPagedQuery, ProcLoadPointPagedQueryDto>();
             #endregion
 
             #region LoadPointLink

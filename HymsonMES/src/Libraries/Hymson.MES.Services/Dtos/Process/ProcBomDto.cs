@@ -227,7 +227,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否当前版本
         /// </summary>
         [EpplusTableColumn(Header = "是否为当前版本(0为不是/1为是)", Order = 4)]
-        public string IsCurrentVersion { get; set; }
+        public bool IsCurrentVersion { get; set; }
 
 
         /// <summary>

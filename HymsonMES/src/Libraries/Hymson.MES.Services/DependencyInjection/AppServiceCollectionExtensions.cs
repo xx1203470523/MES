@@ -326,6 +326,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region LoadPoint
             services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
+            services.AddSingleton<AbstractValidator<ImportLoadPointDto>, ProcLoadPointImportValidator>();
             services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
             #endregion
 
