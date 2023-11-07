@@ -38,6 +38,8 @@ using Hymson.Utils.Tools;
 using Newtonsoft.Json;
 
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -124,6 +126,15 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private readonly IProcMaterialRepository _procMaterialRepository;
 
+        /// <summary>
+        /// 仓储接口（载具注册）
+        /// </summary>
+        private readonly IInteVehicleRepository _inteVehicleRepository;
+
+        /// <summary>
+        /// 仓储接口（二维载具条码明细）
+        /// </summary>
+        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
 
         /// <summary>
         /// 构造函数
@@ -142,7 +153,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 IWhMaterialInventoryRepository whMaterialInventoryRepository,
                 IManuSfcScrapRepository manuSfcScrapRepository,
                 IProcMaterialRepository procMaterialRepository,
-                AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules)
+                AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules, 
+                IInteVehicleRepository inteVehicleRepository, 
+                IInteVehiceFreightStackRepository inteVehiceFreightStackRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -160,6 +173,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procMaterialRepository = procMaterialRepository;
             _manuSfcScrapRepository = manuSfcScrapRepository;
+            _inteVehicleRepository = inteVehicleRepository;
+            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
         }
 
         /// <summary>
@@ -723,6 +738,58 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 trans.Complete();
             }
+        }
+
+        /// <summary>
+        /// 新增 (有条码类型)
+        /// 给面板 特殊业务使用：多个载具编码
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        public async Task CreateManuProductBadRecordAboutCodeTypeAsync(FacePlateManuProductBadRecordCreateDto createDto) 
+        {
+            //如果是 条码的情况还是走原来的 不良录入
+            if (createDto.BarcodeType == ManuFacePlateBarcodeTypeEnum.Product) 
+            {
+                await CreateManuProductBadRecordAsync(createDto);
+                return;
+            }
+
+            //检验载具数据
+            if (createDto.Sfcs == null || createDto.Sfcs.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15430));
+            }
+
+            #region 查询载具对应的条码
+            // 读取载具关联的条码
+            var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+            {
+                SiteId = _currentSite.SiteId??0,
+                Codes = createDto.Sfcs
+            });
+
+            // 不在系统中的载具代码
+            var notInSystem = createDto.Sfcs.Except(vehicleEntities.Select(s => s.Code));
+            if (notInSystem.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18624))
+                    .WithData("Code", string.Join(',', notInSystem));
+            }
+
+            // 查询载具关联的条码明细
+            var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
+            {
+                SiteId = _currentSite.SiteId??0,
+                ParentIds = vehicleEntities.Select(s => s.Id)
+            });
+
+            var sfcs = vehicleFreightStackEntities.Select(s => s.BarCode).ToArray();
+            #endregion
+
+            createDto.Sfcs = sfcs;
+            //调取之前的不良录入方法
+            await CreateManuProductBadRecordAsync(createDto);
         }
 
         /// <summary>

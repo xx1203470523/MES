@@ -1,4 +1,5 @@
-﻿using Hymson.Utils;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -14,6 +15,27 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public class PanelRequestBo
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 载具条码
+        /// </summary>
+        public string? VehicleCode { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class EmptyRequestBo { }
+
+    /// <summary>
     /// 请求Bo
     /// </summary>
     public class JobRequestBo : JobBaseBo
@@ -22,10 +44,12 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 用户名
         /// </summary>
         public string UserName { get; set; } = "";
+
         /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>
@@ -57,9 +81,19 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public long? EquipmentId { get; set; }
 
         /// <summary>
+        /// 条码类型
+        /// </summary>
+        public CodeTypeEnum Type { get; set; } = CodeTypeEnum.SFC;
+
+        /// <summary>
         /// 当前时间
         /// </summary>
         public DateTime Time { get; set; } = HymsonClock.Now();
+
+        /// <summary>
+        /// 条码（面板用）
+        /// </summary>
+        public IEnumerable<PanelRequestBo>? PanelRequestBos { get; set; }
 
         /// <summary>
         /// 进站对象

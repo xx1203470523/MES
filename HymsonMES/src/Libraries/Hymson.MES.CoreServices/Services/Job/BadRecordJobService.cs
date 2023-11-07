@@ -5,15 +5,13 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
-using Hymson.MES.Core.Attribute;
+using Hymson.Utils;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 不良录入
@@ -123,13 +121,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not BadRecordResponseBo data) return responseBo;
 
             // 面板需要的数据
-            responseBo.Content = new Dictionary<string, string> {
-                { "PackageCom", "False" },
-                { "BadEntryCom", $"{data.IsShow}" },
-                { "IsShow", $"{data.IsShow}" },
-            };
+            List<PanelModuleEnum> panelModules = new();
+            if (data.IsShow) panelModules.Add(PanelModuleEnum.BadRecord);
+            responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
 
-            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), data.SFCs.FirstOrDefault()!);
+            var SFCs = string.Join(",", data.SFCs);
+            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), SFCs);
             return await Task.FromResult(responseBo);
         }
 

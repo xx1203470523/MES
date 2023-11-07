@@ -10,8 +10,12 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
+using Hymson.MES.CoreServices.Services.Manufacture;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -40,6 +44,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 仓储接口（面板按钮作业关系）
         /// </summary>
         private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
+
+        /// <summary>
+        /// 仓储接口（载具注册）
+        /// </summary>
+        private readonly IManuPassStationService _manuPassStationService;
+
+        /// <summary>
+        /// 接口（参数收集）
+        /// </summary>
+        private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
         /// 仓储接口（作业）
@@ -74,6 +88,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuFacePlateButtonRepository"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
+        /// <param name="manuPassStationService"></param>
+        /// <param name="manuProductParameterService"></param>
         /// <param name="inteJobRepository"></param>
         /// <param name="inteVehicleRepository"></param>
         /// <param name="inteVehiceFreightStackRepository"></param>
@@ -83,6 +99,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
+            IManuPassStationService manuPassStationService,
+            IManuProductParameterService manuProductParameterService,
             IInteJobRepository inteJobRepository,
             IInteVehicleRepository inteVehicleRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
@@ -94,6 +112,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
+            _manuPassStationService = manuPassStationService;
+            _manuProductParameterService = manuProductParameterService;
             _inteJobRepository = inteJobRepository;
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
@@ -101,6 +121,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
             _executeJobService = executeJobService;
         }
+
 
         /// <summary>
         /// 创建
@@ -358,14 +379,16 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
+                Type = codeType,
                 ProcedureId = dto.Param!["ProcedureId"].ParseToLong(),
                 ResourceId = dto.Param["ResourceId"].ParseToLong()
             };
 
             List<string> SFCs = new();
+            List<PanelRequestBo> panelRequestBos = new();
             List<InStationRequestBo> inStationRequestBos = new();
             List<OutStationRequestBo> outStationRequestBos = new();
-            switch (codeType)
+            switch (requestBo.Type)
             {
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
@@ -400,6 +423,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
                         if (vehicleEntity == null) continue;
 
+                        panelRequestBos.AddRange(item.Value.Select(s => new PanelRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
                         inStationRequestBos.AddRange(item.Value.Select(s => new InStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
                         outStationRequestBos.AddRange(item.Value.Select(s => new OutStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
                     }
@@ -416,6 +440,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             requestBo.SFCs = SFCs;  // 这句后面要改
+            requestBo.PanelRequestBos = panelRequestBos;
             requestBo.InStationRequestBos = inStationRequestBos;
             requestBo.OutStationRequestBos = outStationRequestBos;
 
@@ -445,19 +470,25 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
 
-            // 作业请求参数
-            var requestBo = new JobRequestBo
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                UserName = _currentUser.UserName,
-                ProcedureId = dto.ProcedureId,
-                ResourceId = dto.ResourceId
-            };
-
-            List<string> SFCs = new();
-            List<InStationRequestBo> inStationRequestBos = new();
+            var boResult = new Dictionary<string, JobResponseBo> { };
             switch (dto.Type)
             {
+                case CodeTypeEnum.SFC:
+                    var sfcCodes = dto.Params;
+                    if (sfcCodes == null || sfcCodes.Any() == false)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
+                    }
+
+                    boResult = await _manuPassStationService.InStationRangeBySFC(new SFCInStationBo
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        UserName = _currentUser.UserName,
+                        ProcedureId = dto.ProcedureId,
+                        ResourceId = dto.ResourceId,
+                        SFCs = sfcCodes
+                    });
+                    break;
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
                     if (vehicleCodes == null || vehicleCodes.Any() == false)
@@ -465,59 +496,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
                     }
 
-                    // 读取载具关联的条码
-                    var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+                    boResult = await _manuPassStationService.InStationRangeByVehicle(new VehicleInStationBo
                     {
-                        SiteId = requestBo.SiteId,
-                        Codes = vehicleCodes
+                        SiteId = _currentSite.SiteId ?? 0,
+                        UserName = _currentUser.UserName,
+                        ProcedureId = dto.ProcedureId,
+                        ResourceId = dto.ResourceId,
+                        VehicleCodes = vehicleCodes
                     });
-
-                    // 不在系统中的载具代码
-                    var notInSystem = vehicleCodes.Except(vehicleEntities.Select(s => s.Code));
-                    if (notInSystem.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18624))
-                            .WithData("Code", string.Join(',', notInSystem));
-                    }
-
-                    // 查询载具关联的条码明细
-                    var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
-                    {
-                        SiteId = requestBo.SiteId,
-                        ParentIds = vehicleEntities.Select(s => s.Id)
-                    });
-                    var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
-
-                    SFCs = vehicleFreightStackEntities.Select(s => s.BarCode).AsList();
-                    foreach (var item in vehicleFreightStackDic)
-                    {
-                        var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
-                        if (vehicleEntity == null) continue;
-
-                        inStationRequestBos.AddRange(item.Value.Select(s => new InStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-                    }
                     break;
-                case CodeTypeEnum.SFC:
                 default:
-                    var sfcCodes = dto.Params;
-                    if (sfcCodes == null || sfcCodes.Any() == false)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
-                    }
-
-                    SFCs = sfcCodes.AsList();
-                    inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
                     break;
             }
 
-            requestBo.SFCs = SFCs;  // 这句后面要改
-            requestBo.InStationRequestBos = inStationRequestBos;
-
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
-
-            var responseBo = await _executeJobService.ExecuteAsync(jobBos, requestBo);
-            foreach (var item in responseBo)
+            foreach (var item in boResult)
             {
                 result.Add(item.Key, new JobResponseDto
                 {
@@ -540,19 +532,25 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
 
-            // 作业请求参数
-            var requestBo = new JobRequestBo
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                UserName = _currentUser.UserName,
-                ProcedureId = dto.ProcedureId,
-                ResourceId = dto.ResourceId
-            };
-
-            List<string> SFCs = new();
-            List<OutStationRequestBo> outStationRequestBos = new();
+            var boResult = new Dictionary<string, JobResponseBo> { };
             switch (dto.Type)
             {
+                case CodeTypeEnum.SFC:
+                    var sfcCodes = dto.Params;
+                    if (sfcCodes == null || sfcCodes.Any() == false)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
+                    }
+
+                    boResult = await _manuPassStationService.OutStationRangeBySFC(new SFCOutStationBo
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        UserName = _currentUser.UserName,
+                        ProcedureId = dto.ProcedureId,
+                        ResourceId = dto.ResourceId,
+                        SFCs = sfcCodes
+                    });
+                    break;
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
                     if (vehicleCodes == null || vehicleCodes.Any() == false)
@@ -560,59 +558,20 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
                     }
 
-                    // 读取载具关联的条码
-                    var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+                    boResult = await _manuPassStationService.OutStationRangeByVehicle(new VehicleOutStationBo
                     {
-                        SiteId = requestBo.SiteId,
-                        Codes = vehicleCodes
+                        SiteId = _currentSite.SiteId ?? 0,
+                        UserName = _currentUser.UserName,
+                        ProcedureId = dto.ProcedureId,
+                        ResourceId = dto.ResourceId,
+                        VehicleCodes = vehicleCodes
                     });
-
-                    // 不在系统中的载具代码
-                    var notInSystem = vehicleCodes.Except(vehicleEntities.Select(s => s.Code));
-                    if (notInSystem.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18624))
-                            .WithData("Code", string.Join(',', notInSystem));
-                    }
-
-                    // 查询载具关联的条码明细
-                    var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
-                    {
-                        SiteId = requestBo.SiteId,
-                        ParentIds = vehicleEntities.Select(s => s.Id)
-                    });
-                    var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
-
-                    SFCs = vehicleFreightStackEntities.Select(s => s.BarCode).AsList();
-                    foreach (var item in vehicleFreightStackDic)
-                    {
-                        var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
-                        if (vehicleEntity == null) continue;
-
-                        outStationRequestBos.AddRange(item.Value.Select(s => new OutStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-                    }
                     break;
-                case CodeTypeEnum.SFC:
                 default:
-                    var sfcCodes = dto.Params;
-                    if (sfcCodes == null || sfcCodes.Any() == false)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
-                    }
-
-                    SFCs = sfcCodes.AsList();
-                    outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
                     break;
             }
 
-            requestBo.SFCs = SFCs;  // 这句后面要改
-            requestBo.OutStationRequestBos = outStationRequestBos;
-
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "OutStationJobService" });
-
-            var responseBo = await _executeJobService.ExecuteAsync(jobBos, requestBo);
-            foreach (var item in responseBo)
+            foreach (var item in boResult)
             {
                 result.Add(item.Key, new JobResponseDto
                 {
@@ -626,6 +585,25 @@ namespace Hymson.MES.Services.Services.Manufacture
             return result;
         }
 
+        /// <summary>
+        /// 参数收集（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> ProductParameterCollectAsync(ProductProcessParameterDto dto)
+        {
+            //return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
+            //{
+            //    SiteId = dto.SiteId,
+            //    UserName = dto.UserName,
+            //    Time = dto.Time,
+            //    ProcedureId = dto.ProcedureId,
+            //    ResourceId = dto.ResourceId,
+            //    SFC = dto.SFC,
+            //    Parameters = dto.Parameters
+            //});
+            return 1;
+        }
 
         /// <summary>
         ///  新按钮（点击）

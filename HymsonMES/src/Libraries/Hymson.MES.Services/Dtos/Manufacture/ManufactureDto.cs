@@ -1,5 +1,5 @@
 using Hymson.MES.Core.Enums;
-using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Parameter;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -49,5 +49,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public IEnumerable<string> Params { get; set; }
     }
 
+    /// <summary>
+    /// 进站
+    /// </summary>
+    public record ProductProcessParameterDto : ProductProcessParameterBo { }
 
 }

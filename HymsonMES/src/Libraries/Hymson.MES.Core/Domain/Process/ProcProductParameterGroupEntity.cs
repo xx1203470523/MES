@@ -26,6 +26,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public string Version { get; set; }
 
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
        /// <summary>
         /// 状态
         /// </summary>

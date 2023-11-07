@@ -21,6 +21,6 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query
         /// <summary>
         /// 条码属性
         /// </summary>
-        public IEnumerable<string> SFCs { get; set; }
+        public IEnumerable<string>? SFCs { get; set; }
     }
 }

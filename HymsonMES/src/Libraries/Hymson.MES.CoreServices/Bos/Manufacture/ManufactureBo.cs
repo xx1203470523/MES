@@ -1,20 +1,39 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ManufactureBo
+    public record ManufactureBo
     {
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
         /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
         /// <summary>
         /// 产品条码
         /// </summary>
@@ -41,6 +60,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
         /// <summary>
         /// 产品条码
         /// </summary>
@@ -67,6 +87,10 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public long ProductBOMId { get; set; }
 
+        /// <summary>
+        /// 产品ID
+        /// </summary>
+        public long ProductId { get; set; }
     }
 
     /// <summary>
@@ -78,6 +102,23 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 替代料集合
         /// </summary>
         public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();
+
+    }
+
+    /// <summary>
+    /// 扣料
+    /// </summary>
+    public class MaterialDeductResponseSummaryBo 
+    {
+        /// <summary>
+        /// 即将扣料的物料数据
+        /// </summary>
+        public IEnumerable<ProcBomDetailEntity> SmiFinisheds { get; set; }
+
+        /// <summary>
+        /// 即将扣料的物料数据
+        /// </summary>
+        public List<MaterialDeductResponseBo> InitialMaterials { get; set; }
 
     }
 

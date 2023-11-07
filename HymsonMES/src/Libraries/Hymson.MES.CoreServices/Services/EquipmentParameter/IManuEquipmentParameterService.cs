@@ -19,12 +19,5 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <param name="param"></param>
         /// <returns></returns>
         Task InsertRangeAsync(IEnumerable<EquipmentParameterDto> param);
-
-        /// <summary>
-        /// 创建数据库表
-        /// </summary>
-        /// <param name="tabname"></param>
-        /// <returns></returns>
-        Task CreateEquipmentParameterTable(string tabname);
     }
 }

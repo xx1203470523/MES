@@ -1024,6 +1024,21 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ResourceId { get; set; }
     }
 
+
+    public class ActivityVehicleByProcedureIdAndResourceIdDto 
+    {
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+    }
+
     /// <summary>
     /// 活动在制品
     /// </summary>
@@ -1083,6 +1098,78 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
+    }
+
+    /// <summary>
+    /// 活动载具
+    /// </summary>
+    public class ActivityVehicleViewDto
+    {
+        /// <summary>
+        ///  唯一标识
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 载具编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 载具类型id
+        /// </summary>
+        public long VehicleTypeId { get; set; }
+
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 行
+        /// </summary>
+        public int Row { get; set; }
+
+        /// <summary>
+        /// 列
+        /// </summary>
+        public int Column { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        public int BarCodeNum { get; set; }
+
+        /// <summary>
+        /// 产品编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 产品名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 产品编码/版本
+        /// </summary>
+        public string MaterialCodeVersion
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(MaterialCode) && !string.IsNullOrEmpty(MaterialVersion) ? MaterialCode + "/" + MaterialVersion : "";
+            }
+        }
+
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        public DateTime StartTime { get; set; }
     }
 
 }
