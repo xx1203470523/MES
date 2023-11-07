@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Process;
@@ -9,6 +10,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -25,6 +27,7 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcBomDetailModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+        private readonly IExcelService _excelService;
 
         /// <summary>
         /// 
@@ -34,13 +37,15 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// /// <param name="currentSite"></param>
-        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite)
+        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite, IExcelService excelService)
         {
             _currentUser = currentUser;
             _currentSite= currentSite;
             _procBomDetailRepository = procBomDetailRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _excelService = excelService;
+
         }
 
 
@@ -149,5 +154,6 @@ namespace Hymson.MES.Services.Services.Process
 
             return procBomDetailEntity.ToModel<ProcBomDetailDto>();
         }
+
     }
 }

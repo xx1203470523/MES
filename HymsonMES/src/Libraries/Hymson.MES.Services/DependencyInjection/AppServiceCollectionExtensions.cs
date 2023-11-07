@@ -329,6 +329,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region LoadPoint
             services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
+            services.AddSingleton<AbstractValidator<ImportLoadPointDto>, ProcLoadPointImportValidator>();
             services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
             #endregion
 
@@ -396,6 +397,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteSystemTokenCreateDto>, InteSystemTokenCreateValidator>();
             services.AddSingleton<AbstractValidator<InteSystemTokenModifyDto>, InteSystemTokenModifyValidator>();
             services.AddSingleton<AbstractValidator<InteCustomImportDto>, InteCustomImportValidator>();
+            services.AddSingleton<AbstractValidator<ImportBomDto>, ProcBomImportValidator>();
             services.AddSingleton<AbstractValidator<InteCustomCreateDto>, InteCustomCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCustomModifyDto>, InteCustomModifyValidator>();
             services.AddSingleton<AbstractValidator<InteUnitSaveDto>, InteUnitSaveValidator>();
