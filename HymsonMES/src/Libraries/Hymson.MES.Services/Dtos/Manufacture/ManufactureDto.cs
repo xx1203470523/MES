@@ -52,6 +52,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// <summary>
     /// 进站
     /// </summary>
-    public record ProductProcessParameterDto : ProductProcessParameterBo { }
+    public record ProductProcessParameterDto : ProductProcessParameterBo
+    {
+        /// <summary>
+        /// 产品参数组ID
+        /// </summary>
+        public long? ProductParameterGroupId { get; set; }
+    }
 
 }
