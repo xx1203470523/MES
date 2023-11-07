@@ -13,5 +13,19 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcEsopQuery
     {
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set;}
     }
 }

@@ -385,6 +385,10 @@
 
         #endregion
 
+        #region ESOP维护 11500
+        public const string MES11500 = "ESOP已存在同一物料、工序数据";
+        #endregion
+
         #region 作业12000
         public const string MES12000 = "作业维护错误";
         public const string MES12001 = "作业{code}已经存在";
