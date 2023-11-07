@@ -209,6 +209,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteVehicleEntity>(GetByVehicleTypeIdsSql, query);
         }
+
+        /// <summary>
+        /// 根据Ids查询载具信息包含载具类型
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteVehicleAboutVehicleTypeView>> GetAboutVehicleTypeByIdsAsync(InteVehicleIdsQuery query) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteVehicleAboutVehicleTypeView>(GetAboutVehicleTypeByIdsSql, query);
+        }
     }
 
     public partial class InteVehicleRepository
@@ -247,5 +258,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByCodeSql = @"SELECT * FROM `inte_vehicle`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
         const string GetByCodesSql = @"SELECT * FROM `inte_vehicle` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Code IN @Codes ";
         const string GetByVehicleTypeIdsSql = @"SELECT * FROM `inte_vehicle` WHERE IsDeleted=0 AND SiteId=@SiteId AND VehicleTypeId in @VehicleTypeIds";
+
+        const string GetAboutVehicleTypeByIdsSql = @"SELECT v.*,
+                            vt.Code as VehicleTypeCode,
+                            vt.Name as VehicleTypeName,
+                            vt.Status as VehicleTypeStatus,
+                            vt.Row, vt.Column, vt.CellQty
+                    FROM `inte_vehicle` v
+                    LEFT JOIN inte_vehicle_type vt ON vt.id= v.VehicleTypeId
+                    WHERE v.IsDeleted=0 
+                    AND v.SiteId=@SiteId 
+                    AND v.Id IN @Ids";
     }
 }

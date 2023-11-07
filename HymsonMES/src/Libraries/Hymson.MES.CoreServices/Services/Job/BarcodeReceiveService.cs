@@ -122,7 +122,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 数据组装
         /// </summary>
         /// <param name="param"></param>
-        /// <returns></returns>00
+        /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
             if (param is not JobRequestBo commonBo) return default;

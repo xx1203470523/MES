@@ -127,6 +127,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     }
 
     /// <summary>
+    /// 面板的产品不良录入新增Dto
+    /// </summary>
+    public record FacePlateManuProductBadRecordCreateDto: ManuProductBadRecordCreateDto
+    {
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
+    }
+
+    /// <summary>
     /// 产品不良录入更新Dto
     /// </summary>
     public record ManuProductBadRecordModifyDto : BaseEntityDto

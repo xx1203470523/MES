@@ -2,7 +2,6 @@
 using Hymson.MES.BackgroundServices.EventHandling;
 using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
-using Hymson.MES.CoreServices.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,8 +35,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
-            services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
             return services;
         }
         /// <summary>

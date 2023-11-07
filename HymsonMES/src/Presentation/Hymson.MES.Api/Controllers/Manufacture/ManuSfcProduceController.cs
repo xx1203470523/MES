@@ -280,7 +280,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 
+        /// 根据工序ID与资源ID获取活动的在制品
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -288,6 +288,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
         {
             return await _manuSfcProduceService.GetActivityListByProcedureIdAndResId(query);
+        }
+
+        /// <summary>
+        /// 根据工序Id与资源Id查看活动的载具
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("getVehicleActivityListByProcedureIdAndResId")]
+        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
+        {
+            return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResId(query);
         }
     }
 }

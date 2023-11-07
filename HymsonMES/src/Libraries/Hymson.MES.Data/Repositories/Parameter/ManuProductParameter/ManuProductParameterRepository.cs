@@ -7,13 +7,7 @@ using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Command;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Common;
-using MySqlX.XDevAPI.Relational;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Numerics;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using static Dapper.SqlMapper;
@@ -82,12 +76,8 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
                 tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
             }
             var result = await Task.WhenAll(tasks);
-            var row = 0;
-            foreach (var item in result)
-            {
-                row += item;
-            }
-            return row;
+
+            return result.Sum();
         }
 
         /// <summary>
@@ -108,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntities(ManuProductParameterBySfcQuery param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCEntities(ManuProductParameterBySfcQuery param)
         {
             var list = new List<ManuProductParameterEntity>();
             var dic = new Dictionary<string, List<string>>();
@@ -143,12 +133,21 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntities(ManuProductParameterByProcedureIdQuery param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterByProcedureIdEntities(ManuProductParameterByProcedureIdQuery param)
         {
             var tableNameByProcedureId = GetTableNameByProcedureId(param.SiteId, param.ProcedureId);
-            string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {tableNameByProcedureId}  WHERE SFC IN @SFCs AND  ProcedureId=@ProcedureId  AND SiteId =@SiteId AND IsDeleted=0";
+            var sqlBuilder = new SqlBuilder();
+            string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {tableNameByProcedureId}  /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+            var templateData = sqlBuilder.AddTemplate(getBySFCSql);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId =@SiteId");
+            sqlBuilder.Where("ProcedureId = @ProcedureId");
+            if (param.SFCs != null && param.SFCs.Any())
+            {
+                sqlBuilder.Where("SFC = @SFCs");
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
-            return await conn.QueryAsync<ManuProductParameterEntity>(getBySFCSql, param);
+            return await conn.QueryAsync<ManuProductParameterEntity>(templateData.RawSql, param);
         }
 
         /// <summary>
@@ -209,37 +208,12 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         }
 
         /// <summary>
-        /// 查询参数
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public async Task<string?> ShowCreateTableAsync(string tableName)
-        {
-            string sql = $"SHOW  CREATE TABLE {tableName}";
-            using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
-            var result = await conn.QueryFirstOrDefaultAsync(sql);
-            return ((ICollection<KeyValuePair<string, object>>)result).FirstOrDefault(x => x.Key == "Create Table").Value.ToString();
-        }
-
-        /// <summary>
-        /// 创建数据库表
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public async Task<int> CreateProductParameterTableAsync(string tableName)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
-            return await conn.ExecuteAsync(tableName);
-        }
-
-        /// <summary>
         /// 准备工序维度创建数据库表sql语句
         /// </summary>
         /// <param name="siteId"></param>
         /// <param name="procedureId"></param>
         /// <returns></returns>
-        public string PrepareProductParameterProcedureCodeTableSql(long siteId, long procedureId)
+        public string PrepareProductParameterProcedureIdTableSql(long siteId, long procedureId)
         {
             //获取目标表名
             var destinationTableName = GetTableNameByProcedureId(siteId, procedureId);
@@ -271,24 +245,6 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
             var key = CalculateCrc32($"{siteId}{procedureId}");
 
             return $"{ProductParameter.ProductProcedureParameterPrefix}{key}";
-        }
-
-        /// <summary>
-        /// SHA256 hash
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        private BigInteger CalculateSHA256Hash(string input)
-        {
-            using (SHA256 hasher = SHA256.Create())
-            {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-                byte[] hashBytes = hasher.ComputeHash(inputBytes);
-
-                BigInteger hashValue = new BigInteger(hashBytes);
-
-                return hashValue;
-            }
         }
 
         private uint CalculateCrc32(string input)

@@ -162,6 +162,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // 工艺设备组
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
+
+            //ESOP
+            services.AddSingleton<IProcEsopService, ProcEsopService>();
             #endregion
 
             #region Quality
@@ -377,6 +380,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupSaveDto>, ProcProcessEquipmentGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
 
+            #region Esop
+            services.AddSingleton<AbstractValidator<ProcEsopCreateDto>, ProcEsopCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcEsopModifyDto>, ProcEsopModifyValidator>();
+            #endregion
             #endregion
 
             #region Integrated
