@@ -76,6 +76,18 @@ namespace Hymson.MES.Services.Services.Process
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procEsopCreateDto);
 
+            //判断同一物料同一工序只能有一个
+            var procEsops = await _procEsopRepository.GetProcEsopEntitiesAsync(new ProcEsopQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = procEsopCreateDto.ProcedureId,
+                MaterialId = procEsopCreateDto.MaterialId
+            });
+            if (procEsops != null && procEsops.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11500));
+            }
+
             //DTO转换实体
             var procEsopEntity = new ProcEsopEntity
             {
@@ -157,11 +169,24 @@ namespace Hymson.MES.Services.Services.Process
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
-                throw new ValidationException(nameof(ErrorCode.MES10101));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procEsopModifyDto);
+
+            //判断同一物料同一工序只能有一个
+            var procEsops = await _procEsopRepository.GetProcEsopEntitiesAsync(new ProcEsopQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                ProcedureId = procEsopModifyDto.ProcedureId,
+                MaterialId = procEsopModifyDto.MaterialId
+            });
+            procEsops = procEsops.Where(x => x.Id != procEsopModifyDto.Id);
+            if (procEsops != null && procEsops.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11500));
+            }
 
             //DTO转换实体
             var procEsopEntity = new ProcEsopEntity()
@@ -212,7 +237,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
                 return procEsopDto;
             }
-       
+
             return new ProcEsopDto();
         }
     }

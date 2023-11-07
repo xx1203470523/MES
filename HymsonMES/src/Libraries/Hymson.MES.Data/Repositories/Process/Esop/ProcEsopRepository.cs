@@ -150,6 +150,21 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcEsopEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (procEsopQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where(" MaterialId=@MaterialId ");
+            }
+            if (procEsopQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where(" ProcedureId=@ProcedureId ");
+            }
+            sqlBuilder.AddParameters(procEsopQuery);
+
             using var conn = GetMESDbConnection();
             var procEsopEntities = await conn.QueryAsync<ProcEsopEntity>(template.RawSql, procEsopQuery);
             return procEsopEntities;
@@ -196,7 +211,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> UpdatesAsync(List<ProcEsopEntity> procEsopEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, procEsopEntitys);
+            return await conn.ExecuteAsync(UpdateSql, procEsopEntitys);
         }
         #endregion
 
@@ -214,8 +229,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_esop`(  `Id`, `SiteId`, `MaterialId`, `ProcedureId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @MaterialId, @ProcedureId, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_esop`(  `Id`, `SiteId`, `MaterialId`, `ProcedureId`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @MaterialId, @ProcedureId, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `proc_esop` SET   SiteId = @SiteId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_esop` SET   SiteId = @SiteId, MaterialId = @MaterialId, ProcedureId = @ProcedureId, Status = @Status, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_esop` SET   MaterialId = @MaterialId, ProcedureId = @ProcedureId, Status = @Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_esop` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_esop` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
