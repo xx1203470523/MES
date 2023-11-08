@@ -696,13 +696,13 @@ namespace Hymson.MES.Services.Services.Process
 
             //检测导入数据是否重复
             var repeats = new List<string>();
-            //检验重复  目前只设定检验 物料编码 是否重复
-            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.MaterialCode });
+            //检验重复  目前只设定检验 物料编码+版本 是否重复
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.MaterialCode,x.Version });
             foreach (var item in hasDuplicates)
             {
                 if (item.Count() > 1)
                 {
-                    repeats.Add(item.Key.MaterialCode);
+                    repeats.Add($@"[{item.Key.MaterialCode},{item.Key.Version}]");
                 }
             }
             if (repeats.Any())
@@ -746,11 +746,11 @@ namespace Hymson.MES.Services.Services.Process
                 cuurrentRow++;
 
                 var haveError = false;
-                //判断是否已经录入
-                if (materials.Any(x => x.MaterialCode == item.MaterialCode))
+                //判断是否已经录入    编码+版本  唯一标识
+                if (materials.Any(x => x.MaterialCode == item.MaterialCode && x.Version == item.Version))
                 {
                     haveError= true;
-                    validationFailures.Add(GetValidationFailure("此物料编码{MaterialCode}在系统已经存在！", item.MaterialCode, cuurrentRow, "materialCode"));
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10201), item.MaterialCode, item.Version, cuurrentRow, "materialCode", "version"));
                 }
                 //工艺路线
                 if(item.ProcessRouteCode != null)
@@ -848,6 +848,20 @@ namespace Hymson.MES.Services.Services.Process
             {
                 { "CollectionIndex", cuurrentRow },
                 { key, codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, string versionFormattedMessage, int cuurrentRow = 1, string codeKey = "code", string versionKey = "version")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { codeKey, codeFormattedMessage },
+                { versionKey, versionFormattedMessage }
             };
             return validationFailure;
         }

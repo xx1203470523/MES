@@ -55,10 +55,19 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.MaterialCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10223));
             RuleFor(x => x.MaterialName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10224));
             RuleFor(x => x.SerialNumber).Must(it => it != null && Enum.IsDefined(typeof(MaterialSerialNumberEnum), it)).WithErrorCode(ErrorCode.MES10227);
-            RuleFor(x => x.Batch).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES10228));
+            RuleFor(x => x.Batch).Must(it => it > 0).WithErrorCode("批次需为大于0整数！");
             RuleFor(x => x.BuyType).Must(it => it != null && Enum.IsDefined(typeof(MaterialBuyTypeEnum), it)).WithErrorCode(ErrorCode.MES10229);
 
             RuleFor(x => x.Version).NotEmpty().WithErrorCode(ErrorCode.MES10231);
+
+            //标包数量
+            RuleFor(x => x.PackageNum).Must(it => it==null || it > 0).WithErrorCode("标包数量需为大于0整数！");
+            //基于时间
+            RuleFor(x => x.BaseTime).Must(it => it == null || Enum.IsDefined(typeof(MaterialBaseTimeEnum), it)).WithErrorCode("基于时间不合法！");
+            //消耗公差
+            RuleFor(x => x.ConsumptionTolerance).Must(it => it == null || it > 0).WithErrorCode("消耗公差需为大于0整数！");
+            //消耗系数
+            RuleFor(x => x.ConsumeRatio).Must(it => it == null || it > 0).WithErrorCode("消耗系数需大于0！");
 
         }
     }

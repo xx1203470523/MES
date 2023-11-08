@@ -612,12 +612,6 @@ namespace Hymson.MES.Services.Dtos.Process
         [EpplusTableColumn(Header = "物料名称(必填)", Order = 2)]
         public string MaterialName { get; set; }
 
-        ///// <summary>
-        ///// 来源
-        ///// </summary>
-        //[EpplusTableColumn(Header = "物料来源", Order = 3)]
-        //public MaterialOriginEnum? Origin { get; set; }
-
         /// <summary>
         /// 版本
         /// </summary>
@@ -633,9 +627,9 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 采购类型
         /// </summary>
-        [EpplusTableColumn(Header = "采购类型", Order = 5)]
-        public MaterialBuyTypeEnum? BuyType { get; set; }
-
+        [EpplusTableColumn(Header = "采购类型(必填)", Order = 5)]
+        public MaterialBuyTypeEnum? BuyType { get; set; } = null;
+        
         /// <summary>
         /// 工艺路线
         /// </summary>
@@ -701,7 +695,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
         public string? MaskCode { get; set; }
-
+        
     }
 
     /// <summary>
@@ -742,7 +736,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 采购类型
         /// </summary>
-        [EpplusTableColumn(Header = "采购类型", Order = 6)]
+        [EpplusTableColumn(Header = "采购类型(必填)", Order = 6)]
         public MaterialBuyTypeEnum? BuyType { get; set; }
 
         /// <summary>
