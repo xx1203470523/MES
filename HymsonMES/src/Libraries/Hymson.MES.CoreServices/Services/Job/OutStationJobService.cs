@@ -1225,6 +1225,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
+                /*
                 // 收集方式是批次
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
@@ -1235,6 +1236,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
                 if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+                */
 
                 // 进行扣料
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);
@@ -1335,6 +1337,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
+                /*
                 // 收集方式是批次
                 if (materialBo.DataCollectionWay == MaterialSerialNumberEnum.Batch)
                 {
@@ -1345,6 +1348,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 2.确认主物料的收集方式，不是"批次"就结束（不对该物料进行扣料）
                 if (materialBo.SerialNumber != MaterialSerialNumberEnum.Batch) continue;
+                */
 
                 // 进行扣料
                 _masterDataService.DeductMaterialQty(ref updates, ref adds, ref residue, sfcProduceEntity, manuFeedingsDictionary, materialBo, materialBo);

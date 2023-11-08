@@ -1,5 +1,4 @@
 ﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -7,7 +6,6 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.Utils;
 using System.Text.Json;
@@ -18,7 +16,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
     /// <summary>
     /// 扩展方法
     /// </summary>
-    public static class ManuSfcProduceExtensions
+    public static class ManufactureExtensions
     {
         /// <summary>
         /// 条码资源关联校验
@@ -285,18 +283,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 SfcStatusEnum.Scrapping => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Scrapping)}"),
                 _ => ""
             };
-        }
-
-        /// <summary>
-        /// 转换BO对象
-        /// </summary>
-        /// <typeparam name="TBo"></typeparam>
-        /// <param name="bo"></param>
-        /// <returns></returns>
-        public static TBo ToBo<TBo>(this JobBaseBo bo) where TBo : JobBaseBo
-        {
-            if (bo == null) throw new ArgumentNullException(nameof(bo));
-            return AutoMapperConfiguration.Mapper.Map<TBo>(bo);
         }
 
     }
