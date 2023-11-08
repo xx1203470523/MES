@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
 
 namespace Hymson.MES.CoreServices.Mapper
@@ -47,7 +48,8 @@ namespace Hymson.MES.CoreServices.Mapper
         /// </summary>
         protected virtual void CreateParameterBoMaps()
         {
-            CreateMap<ParameterDto,ManuProductParameterEntity> ();
+            CreateMap<ParameterDto, ManuProductParameterEntity>();
+            CreateMap<ParameterBo, ManuProductParameterEntity>();
             CreateMap<EquipmentParameterDto, EquipmentParameterEntity>();
         }
 
