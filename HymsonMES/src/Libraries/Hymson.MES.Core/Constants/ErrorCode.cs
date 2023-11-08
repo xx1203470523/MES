@@ -895,7 +895,7 @@
         public const string MES16360 = "条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
         public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
-        public const string MES16363 = "参数收集成功！";
+        public const string MES16363 = "参数收集开始！";
         #endregion
 
         #region 工单激活 MES16400
