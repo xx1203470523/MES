@@ -362,6 +362,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdAndResIdStatusAsync(ManuSfcProduceByProcedureIdAndResourceIdStatusQuery query);
+        Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdStatusAsync(ManuSfcProduceByProcedureIdStatusQuery query);
     }
 }

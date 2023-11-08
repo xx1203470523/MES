@@ -18,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {
@@ -184,5 +185,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId(ActivityVehicleByProcedureIdAndResourceIdDto query);
+
+        /// <summary>
+        /// 查询工序下排队中的载具分页信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<InteVehicleViewDto>> GetVehicleLineUpPageByProcedureIdPagedInfoAsync(LineUpVehicleByProcedureIdDto query);
     }
 }

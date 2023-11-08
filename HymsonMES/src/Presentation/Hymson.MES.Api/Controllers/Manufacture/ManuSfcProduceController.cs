@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Web.Framework.Attributes;
@@ -299,6 +300,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
         {
             return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResId(query);
+        }
+
+        /// <summary>
+        /// 获取工序排队条码所对应的载具信息进行分页查询列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("getVehicleBySfcLineUpPageList")]
+        public async Task<PagedInfo<InteVehicleViewDto>> GetVehicleInfoBySfcLineUpPagedInfoAsync([FromQuery] LineUpVehicleByProcedureIdDto query)
+        {
+            return await _manuSfcProduceService.GetVehicleLineUpPageByProcedureIdPagedInfoAsync(query);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long SiteId { get; set; }
     }
 
-    public class ManuSfcProduceByProcedureIdAndResourceIdStatusQuery
+    public class ManuSfcProduceByProcedureIdStatusQuery
     {
         /// <summary>
         /// 站点id
@@ -50,7 +50,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 资源ID
         /// </summary>
-        public long ResourceId { get; set; }
+        public long? ResourceId { get; set; }
 
         /// <summary>
         /// 条码状态

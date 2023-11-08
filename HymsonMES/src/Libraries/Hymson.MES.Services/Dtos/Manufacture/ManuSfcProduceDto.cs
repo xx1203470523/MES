@@ -1039,6 +1039,42 @@ namespace Hymson.MES.Services.Dtos.Manufacture
 
     }
 
+    public class LineUpVehicleByProcedureIdDto : PagerInfo
+    {
+        /// <summary>
+        /// 托盘编码
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 托盘名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 载具类型编码
+        /// </summary>
+        public string? VehicleTypeCode { get; set; }
+
+
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+    }
+
     /// <summary>
     /// 活动在制品
     /// </summary>

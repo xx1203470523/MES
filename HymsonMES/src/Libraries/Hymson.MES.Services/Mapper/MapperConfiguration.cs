@@ -264,6 +264,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region InteVehicle
             CreateMap<InteVehiclePagedQueryDto, InteVehiclePagedQuery>();
+            CreateMap<LineUpVehicleByProcedureIdDto, InteVehiclePagedQuery>();
             CreateMap<InteVehicleEntity, InteVehicleDto>();
             CreateMap<InteVehicleCreateDto, InteVehicleEntity>();
             CreateMap<InteVehicleModifyDto, InteVehicleEntity>();

@@ -749,14 +749,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 根据工序ID、资源ID,状态获取在制品数据
+        /// 根据工序ID,状态获取在制品数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdAndResIdStatusAsync(ManuSfcProduceByProcedureIdAndResourceIdStatusQuery query) 
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdStatusAsync(ManuSfcProduceByProcedureIdStatusQuery query) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcProduceEntity>(GetListByProcedureIdAndResIdStatusSql, query);
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetListByProcedureIdAndResIdStatusSql);
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("ProcedureId = @ProcedureId");
+            if (query.ResourceId.HasValue) 
+            {
+                sqlBuilder.Where(" ResourceId = @ResourceId");
+            }
+            sqlBuilder.Where("Status = @Status");
+
+            return await conn.QueryAsync<ManuSfcProduceEntity>(template.RawSql, query);
         }
     }
 
@@ -824,6 +834,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetListBySfcsSql = @"SELECT * FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
-        const string GetListByProcedureIdAndResIdStatusSql = @"SELECT * FROM manu_sfc_produce WHERE SiteId=@SiteId AND ProcedureId=@ProcedureId AND ResourceId=@ResourceId AND Status=@Status ";
+        const string GetListByProcedureIdAndResIdStatusSql = @"SELECT * FROM manu_sfc_produce /**where**/ ";
     }
 }
