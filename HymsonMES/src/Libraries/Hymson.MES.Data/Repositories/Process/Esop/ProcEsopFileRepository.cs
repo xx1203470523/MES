@@ -163,7 +163,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<int> UpdatesAsync(List<ProcEsopFileEntity> procEsopFileEntitys)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, procEsopFileEntitys);
+            return await conn.ExecuteAsync(UpdateSql, procEsopFileEntitys);
         }
         #endregion
 
@@ -181,8 +181,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string InsertSql = "INSERT INTO `proc_esop_file`(  `Id`, `SiteId`, `EsopId`, `AttachmentId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EsopId, @AttachmentId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_esop_file`(  `Id`, `SiteId`, `EsopId`, `AttachmentId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @EsopId, @AttachmentId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `proc_esop_file` SET   SiteId = @SiteId, EsopId = @EsopId, AttachmentId = @AttachmentId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `proc_esop_file` SET   SiteId = @SiteId, EsopId = @EsopId, AttachmentId = @AttachmentId, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `proc_esop_file` SET  EsopId = @EsopId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `proc_esop_file` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_esop_file` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
