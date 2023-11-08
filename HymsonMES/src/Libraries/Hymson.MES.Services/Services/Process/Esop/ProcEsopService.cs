@@ -17,6 +17,7 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
@@ -38,6 +39,10 @@ namespace Hymson.MES.Services.Services.Process
         /// ESOP 仓储
         /// </summary>
         private readonly IProcEsopRepository _procEsopRepository;
+        private readonly IProcEsopFileRepository _esopFileRepository;
+        //文件信息
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
+
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcProcedureRepository _procedureRepository;
 
@@ -46,6 +51,8 @@ namespace Hymson.MES.Services.Services.Process
 
         public ProcEsopService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcEsopRepository procEsopRepository,
+            IProcEsopFileRepository esopFileRepository,
+            IInteAttachmentRepository inteAttachmentRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procedureRepository,
             AbstractValidator<ProcEsopCreateDto> validationCreateRules,
@@ -54,6 +61,8 @@ namespace Hymson.MES.Services.Services.Process
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procEsopRepository = procEsopRepository;
+            _esopFileRepository = esopFileRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
             _procMaterialRepository = procMaterialRepository;
             _procedureRepository = procedureRepository;
             _validationCreateRules = validationCreateRules;
