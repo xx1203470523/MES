@@ -286,9 +286,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("getActivityListByProcedureIdAndResId")]
-        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResIdAsync([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
         {
-            return await _manuSfcProduceService.GetActivityListByProcedureIdAndResId(query);
+            return await _manuSfcProduceService.GetActivityListByProcedureIdAndResIdAsync(query);
         }
 
         /// <summary>
@@ -297,9 +297,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("getVehicleActivityListByProcedureIdAndResId")]
-        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResIdAsync([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
         {
-            return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResId(query);
+            return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResIdAsync(query);
         }
 
         /// <summary>

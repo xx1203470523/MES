@@ -2602,7 +2602,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdDto query)
+        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResIdAsync(ManuSfcProduceByProcedureIdAndResourceIdDto query)
         {
             var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdStatusAsync(new ManuSfcProduceByProcedureIdStatusQuery
             {
@@ -2675,7 +2675,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId(ActivityVehicleByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResIdAsync(ActivityVehicleByProcedureIdAndResourceIdDto query) 
         {
             //实体到DTO转换 装载数据
             List<ActivityVehicleViewDto> activityVehicleViewDtos = new List<ActivityVehicleViewDto>();
