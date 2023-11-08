@@ -111,6 +111,12 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcEsopFileEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            if (procEsopFileQuery.EsopId.HasValue)
+            {
+                sqlBuilder.Where("EsopId = @EsopId");
+            }
             using var conn = GetMESDbConnection();
             var procEsopFileEntities = await conn.QueryAsync<ProcEsopFileEntity>(template.RawSql, procEsopFileQuery);
             return procEsopFileEntities;
