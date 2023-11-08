@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums;
+
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
@@ -33,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long SiteId { get; set; }
     }
 
-    public class ManuSfcProduceByProcedureIdAndResourceIdQuery
+    public class ManuSfcProduceByProcedureIdAndResourceIdStatusQuery
     {
         /// <summary>
         /// 站点id
@@ -49,5 +51,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcProduceStatusEnum Status { get; set; }
     }
 }

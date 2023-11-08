@@ -2603,11 +2603,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdDto query)
         {
-            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResId(new ManuSfcProduceByProcedureIdAndResourceIdQuery
+            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResIdStatusAsync(new ManuSfcProduceByProcedureIdAndResourceIdStatusQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
-                ResourceId = query.ResourceId
+                ResourceId = query.ResourceId,
+                Status= SfcProduceStatusEnum.Activity
             });
 
             //实体到DTO转换 装载数据
@@ -2678,11 +2679,12 @@ namespace Hymson.MES.Services.Services.Manufacture
             //实体到DTO转换 装载数据
             List<ActivityVehicleViewDto> activityVehicleViewDtos = new List<ActivityVehicleViewDto>();
 
-            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResId(new ManuSfcProduceByProcedureIdAndResourceIdQuery
+            var sfcProduceList = await _manuSfcProduceRepository.GetActivityListByProcedureIdAndResIdStatusAsync(new ManuSfcProduceByProcedureIdAndResourceIdStatusQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
-                ResourceId = query.ResourceId
+                ResourceId = query.ResourceId,
+                Status= SfcProduceStatusEnum.Activity
             });
 
             if(!sfcProduceList.Any()) return activityVehicleViewDtos;
