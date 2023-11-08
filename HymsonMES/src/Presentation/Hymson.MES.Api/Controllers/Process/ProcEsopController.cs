@@ -8,7 +8,9 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -106,6 +108,42 @@ namespace Hymson.MES.Api.Controllers.Process
             await _procEsopService.DeletesProcEsopAsync(deleteDto.Ids);
         }
 
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("attachmentAdd")]
+        [PermissionDescription("quality:ipqcInspectionHead:attachmentAdd")]
+        public async Task AttachmentAddAsync([FromBody] AttachmentAddDto dto)
+        {
+            await _procEsopService.AttachmentAddAsync(dto);
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("attachmentDelete")]
+        [PermissionDescription("quality:ipqcInspectionHead:attachmentDelete")]
+        public async Task AttachmentDeleteAsync([FromBody] long[] ids)
+        {
+            await _procEsopService.AttachmentDeleteAsync(ids);
+        }
+
+        /// <summary>
+        /// 根据检验单ID获取检验单附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("attachmentlist/{id}")]
+        public async Task<IEnumerable<InteAttachmentDto>?> GetAttachmentListAsync(long id)
+        {
+            return await _procEsopService.GetAttachmentListAsync(id);
+        }
         #endregion
     }
 }
