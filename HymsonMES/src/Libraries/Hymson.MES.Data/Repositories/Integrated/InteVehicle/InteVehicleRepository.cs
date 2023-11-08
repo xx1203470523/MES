@@ -96,6 +96,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("v.IsDeleted=0");
             sqlBuilder.Where("v.SiteId=@SiteId");
 
+            if (query.Ids!=null&&query.Ids.Length>0)
+            {
+                sqlBuilder.Where("v.Id IN @Ids");
+            }
+
             if (!string.IsNullOrWhiteSpace(query.Code))
             {
                 query.Code = $"%{query.Code}%";
