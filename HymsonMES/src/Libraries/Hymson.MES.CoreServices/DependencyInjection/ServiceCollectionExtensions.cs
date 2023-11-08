@@ -74,6 +74,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
             services.AddSingleton<IManuSfcSummaryService, ManuSfcSummaryService>();
+            services.AddSingleton<IManuPassStationService, ManuPassStationService>();
             return services;
         }
 
