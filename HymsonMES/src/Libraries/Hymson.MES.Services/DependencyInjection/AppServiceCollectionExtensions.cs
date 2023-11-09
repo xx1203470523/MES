@@ -66,7 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
-        
+
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -289,6 +289,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region ManuProductParameterReport
             services.AddSingleton<IManuProductParameterReportService, ManuProductParameterReportService>();
+            #endregion
+
+            #region ProductDetailReport
+            services.AddSingleton<IProductDetailService, ProductDetailService>();
             #endregion
 
             #endregion
@@ -528,6 +532,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-       
+
     }
 }

@@ -40,6 +40,7 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -240,7 +241,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region InteSFCBox
-            CreateMap<InteSFCBoxEntity, InteSFCBoxRView>();    
+            CreateMap<InteSFCBoxEntity, InteSFCBoxRView>();
             CreateMap<InteSFCBoxEntity, InteSFCBoxDto>();
             CreateMap<InteSFCBoxQueryDto, InteSFCBoxQueryRep>();
             #endregion
@@ -615,7 +616,7 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
-            
+
             CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
@@ -650,7 +651,7 @@ namespace Hymson.MES.Services.Mapper
             #region ProductTraceReport
             CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
-            CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>(); 
+            CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>();
             CreateMap<ManuProductParameterView, ManuProductParameterViewDto>();
             CreateMap<ManuSfcStepPagedQueryDto, ManuSfcStepPagedQuery>();
             CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();
@@ -669,6 +670,14 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
             CreateMap<ProductTracePagedQueryDto, ManuSfcStepPagedQuery>();
             CreateMap<PlanWorkOrderListDetailView, ProductTracePlanWorkOrderReportExportDto>();
+
+            #region ProductDetailReport
+
+            CreateMap<ProductDetailReportQueryDto, ProductDetailReportQuery>();
+            CreateMap<ProductDetailReportOutputDto, ProductDetailReportView>();
+            CreateMap<ProductDetailReportView, ProductDetailReportOutputDto>();
+
+            #endregion
         }
 
         /// <summary>

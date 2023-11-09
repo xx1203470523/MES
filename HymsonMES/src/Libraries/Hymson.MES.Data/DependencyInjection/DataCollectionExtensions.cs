@@ -24,6 +24,7 @@ using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Microsoft.Extensions.Configuration;
 
@@ -256,6 +257,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
             services.AddSingleton<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
             #endregion
+            #endregion
+
+            #region Report
+            services.AddSingleton<IProductDetailReportRepository, ProductDetailReportRepository>();
             #endregion
 
             return services;
