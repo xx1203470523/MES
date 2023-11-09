@@ -772,24 +772,24 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
-            var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
+            var inteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
                 BusinessId = param.ResourceId,
                 LinkPoint = param.LinkPoint,
                 IsUse = true
             });
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false)
+            if (inteJobBusinessRelations == null || inteJobBusinessRelations.Any() == false)
             {
-                InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
+                inteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
                     BusinessId = param.ProcedureId,
                     LinkPoint = param.LinkPoint,
                     IsUse = true
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return null;
+            if (inteJobBusinessRelations == null || inteJobBusinessRelations.Any() == false) return null;
 
-            var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
+            var jobEntities = await _inteJobRepository.GetByIdsAsync(inteJobBusinessRelations.Select(s => s.JobId));
             return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
         }
 
