@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Process
+namespace Hymson.MES.Data.Repositories.Process.LoadPointLink.Query
 {
     /// <summary>
     /// 上料点关联物料表 分页参数

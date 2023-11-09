@@ -1,18 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 上料点关联资源表仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-18 09:36:09
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -27,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkResourceEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcLoadPointLinkResourceEntity procLoadPointLinkResourceEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -41,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkResourceEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcLoadPointLinkResourceEntity procLoadPointLinkResourceEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -55,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -76,13 +65,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcLoadPointLinkResourceEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByResourceIdAsync(long resourceId);
 
         /// <summary>
         /// 根据IDs批量获取数据
@@ -97,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointLinkResourceQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetProcLoadPointLinkResourceEntitiesAsync(ProcLoadPointLinkResourceQuery procLoadPointLinkResourceQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

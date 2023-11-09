@@ -1,5 +1,4 @@
-﻿using Dapper;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -65,6 +64,11 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 仓储接口（工序复投设置）
         /// </summary>
         private readonly IProcProcedureRejudgeRepository _procProcedureRejudgeRepository;
+
+        /// <summary>
+        ///  仓储（上料点关联资源）
+        /// </summary>
+        private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
 
         /// <summary>
         /// 仓储接口（生产工单）
@@ -144,6 +148,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="manuDegradedProductExtendService"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procProcedureRejudgeRepository"></param>
+        /// <param name="procLoadPointLinkResourceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcRepository"></param>
@@ -163,6 +168,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             IManuDegradedProductExtendService manuDegradedProductExtendService,
             IProcProcedureRepository procProcedureRepository,
             IProcProcedureRejudgeRepository procProcedureRejudgeRepository,
+            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcRepository manuSfcRepository,
@@ -183,6 +189,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuDegradedProductExtendService = manuDegradedProductExtendService;
             _procProcedureRepository = procProcedureRepository;
             _procProcedureRejudgeRepository = procProcedureRejudgeRepository;
+            _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcRepository = manuSfcRepository;
@@ -316,12 +323,23 @@ namespace Hymson.MES.CoreServices.Services.Job
             var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
             if (manuSFCEntities == null || manuSFCEntities.Any() == false) return default;
 
+            // 全部物料加载数据
+            List<ManuFeedingEntity> allFeedingEntities = new();
+
             // 批量读取物料加载数据（需要实时数据，勿缓存）
-            var allFeedingEntitiesByResourceId = await commonBo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
+            var resourceFeeds = await commonBo.Proxy.GetValueAsync(_manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync, new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = commonBo.ResourceId
             });
-            var allFeedingEntities = allFeedingEntitiesByResourceId.AsList();
+            if (resourceFeeds != null) allFeedingEntities.AddRange(resourceFeeds);
+
+            // 通过资源 -> 上料点
+            var loadPoints = await _procLoadPointLinkResourceRepository.GetByResourceIdAsync(commonBo.ResourceId);
+            var pointFeeds = await _manuFeedingRepository.GetByFeedingPointIdWithOutZeroAsync(new GetByFeedingPointIdsQuery
+            {
+                FeedingPointIds = loadPoints.Select(s => s.LoadPointId)
+            });
+            if (pointFeeds != null) allFeedingEntities = allFeedingEntities.UnionBy(pointFeeds, s => s.Id).ToList();
 
             // 查询工序信息
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
@@ -1187,7 +1205,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 执行物料消耗（默认BOM清单）
         /// </summary>
         /// <param name="allFeedingEntities"></param>
-        /// <param name="initialMaterials"></param>
+        /// <param name="summaryBo"></param>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
         private MaterialConsumptionBo ExecutenMaterialConsumptionWithBOM(ref List<ManuFeedingEntity> allFeedingEntities, MaterialDeductResponseSummaryBo summaryBo, ManuSfcProduceEntity sfcProduceEntity)
@@ -1261,7 +1279,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 执行物料消耗（指定物料条码）
         /// </summary>
         /// <param name="allFeedingEntities"></param>
-        /// <param name="initialMaterials"></param>
+        /// <param name="summaryBo"></param>
         /// <param name="requestBo"></param>
         /// <param name="sfcProduceEntity"></param>
         /// <returns></returns>
