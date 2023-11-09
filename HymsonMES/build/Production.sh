@@ -12,4 +12,4 @@ docker service create \
   --env SERVICE_NAME={{.Service.Name}} \
   --hostname="{{.Node.ID}}-{{.Service.Name}}"\
    --mount type=volume,src=hymsonvolume,dst=/logs \
-   10.10.79.13:8081/test/hymson.mes.api:20231109014106
+   10.10.79.13:8081/dev/hymson.mes.api:20231109014106
