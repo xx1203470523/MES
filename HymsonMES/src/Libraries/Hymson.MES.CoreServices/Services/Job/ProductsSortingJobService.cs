@@ -7,6 +7,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Process;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,16 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("产品分选", JobTypeEnum.Standard)]
     public class ProductsSortingJobService : IJobService
     {
-        private readonly IMasterDataService _masterDataService;
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 分选规则
+        /// </summary>
+        private readonly IProcSortingRuleRepository _sortingRuleRepository;
+        private readonly IProcSortingRuleDetailRepository _sortingRuleDetailRepository;
+        private readonly IProcSortingRuleGradeRepository _sortingRuleGradeRepository;
+        private readonly IProcSortingRuleGradeDetailsRepository _ruleGradeDetailsRepository;
+
         /// <summary>
         /// 条码档位表 仓储
         /// </summary>
@@ -32,16 +42,19 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// </summary>
         private readonly IManuSfcGradeDetailRepository _gradeDetailRepository;
 
-        private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IMasterDataService _masterDataService;
 
-        public ProductsSortingJobService(IManuSfcRepository manuSfcRepository,IMasterDataService masterDataService,
+        public ProductsSortingJobService(IManuSfcRepository manuSfcRepository,
+            IProcSortingRuleRepository sortingRuleRepository,
             IManuSfcGradeRepository manuSfcGradeRepository,
-            IManuSfcGradeDetailRepository gradeDetailRepository)
+            IManuSfcGradeDetailRepository gradeDetailRepository,
+            IMasterDataService masterDataService)
         {
             _manuSfcRepository = manuSfcRepository;
-            _masterDataService = masterDataService;
+            _sortingRuleRepository = sortingRuleRepository;
             _manuSfcGradeRepository = manuSfcGradeRepository;
             _gradeDetailRepository = gradeDetailRepository;
+            _masterDataService = masterDataService;
         }
 
         /// <summary>
@@ -62,11 +75,30 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
 
-            // 获取条码信息
-            var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_manuSfcRepository.GetBySFCsAsync, sfcs);
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
+
+            // 获取生产条码信息
+            var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16128)).WithData("SFC", string.Join(',', sfcs));
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
+            }
+
+            //判断条码的分选规则信息
+            var productIds = sfcProduceEntities.Select(x => x.ProductId).Distinct().ToArray();
+            //根据物料找到分选规则
+            var query = new ProcSortingRuleQuery
+            {
+                SiteId = commonBo.SiteId,
+                Status = Core.Enums.SysDataStatusEnum.Enable,
+                IsDefaultVersion= true,
+                MaterialIds=productIds
+            };
+            var procSortingRules = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetSortingRulesAsync, query);
+            if (procSortingRules == null || !procSortingRules.Any())
+            {
+
             }
         }
 
@@ -99,12 +131,27 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
 
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
             // 获取条码信息
-            var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_manuSfcRepository.GetBySFCsAsync, sfcs);
+            var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
             {
                 return default;
             }
+
+            //判断条码的分选规则信息
+            var productIds = sfcProduceEntities.Select(x => x.ProductId).Distinct().ToArray();
+            //根据物料找到分选规则
+            var query = new ProcSortingRuleQuery
+            {
+                SiteId = commonBo.SiteId,
+                Status = Core.Enums.SysDataStatusEnum.Enable,
+                IsDefaultVersion = true,
+                MaterialIds = productIds
+            };
+            var procSortingRules = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetSortingRulesAsync, query);
+
             //为了不报错
             await Task.CompletedTask;
             return default;

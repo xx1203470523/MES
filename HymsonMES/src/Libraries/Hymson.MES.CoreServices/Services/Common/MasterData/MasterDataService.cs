@@ -145,6 +145,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 不合格代码仓储
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+        private readonly IProcSortingRuleRepository _sortingRuleRepository;
 
         /// <summary>
         /// 构造函数
@@ -190,7 +191,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProductSetRepository procProductSetRepository,
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IProcSortingRuleRepository sortingRuleRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -213,6 +215,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _sortingRuleRepository = sortingRuleRepository;
         }
 
 
@@ -1277,5 +1280,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return targetQty * originValue / originQty;
         }
 
+        /// <summary>
+        /// 读取分选规则信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query)
+        {
+            return await _sortingRuleRepository.GetProcSortingRuleEntitiesAsync(query);
+        }
     }
 }

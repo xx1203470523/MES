@@ -157,9 +157,18 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("MaterialId=@MaterialId");
             }
+            if (procSortingRuleQuery.MaterialIds!=null&& procSortingRuleQuery.MaterialIds.Any())
+            {
+                sqlBuilder.Where("MaterialId in @MaterialIds");
+            }
+
             if (procSortingRuleQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status=@Status");
+            }
+            if (procSortingRuleQuery.IsDefaultVersion.HasValue)
+            {
+                sqlBuilder.Where("IsDefaultVersion=@IsDefaultVersion");
             }
 
             var template = sqlBuilder.AddTemplate(GetProcSortingRuleEntitiesSqlTemplate);
