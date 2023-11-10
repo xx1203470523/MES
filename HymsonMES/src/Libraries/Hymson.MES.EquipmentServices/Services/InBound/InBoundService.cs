@@ -230,6 +230,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //获取工艺路线首工序
             var processRouteFirstProcedure = await GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
 
+            //20231108改动，直接根据设备资源获取工序
+            //根据资源获取工序
+            var procedureEntity = await _procedureRepository.GetProcProdureByResourceIdAsync(new() { ResourceId = procResource.Id, SiteId = _currentEquipment.SiteId })
+             ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", procResource.ResCode);
+
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
             {
@@ -349,11 +354,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     manuSfcStepList.Add(sfcStep);
                     updateManuSfcProduceList.Add(sfcProduceEntity);
                     //更新条码为已使用
-                    sfcEntity.UpdatedBy = _currentEquipment.Name;
-                    sfcEntity.UpdatedOn = HymsonClock.Now();
-                    sfcEntity.IsUsed = YesOrNoEnum.Yes;
-                    updateManuSfcList.Add(sfcEntity);
-
+                    if (sfcEntity != null)
+                    {
+                        sfcEntity.UpdatedBy = _currentEquipment.Name;
+                        sfcEntity.UpdatedOn = HymsonClock.Now();
+                        sfcEntity.IsUsed = YesOrNoEnum.Yes;
+                        updateManuSfcList.Add(sfcEntity);
+                    }
                     //查询已有条码信息
                     var sfcInfoEntity = sfcInfoEntities.Where(c => c.SfcId == sfcEntity.Id && c.WorkOrderId != planWorkOrderEntity.Id).FirstOrDefault();
                     //已有条码信息不是当前工单
@@ -462,7 +469,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     EquipmentId = _currentEquipment.Id ?? 0,
                     ResourceId = procResource.Id,
                     Qty = 1,//电芯进站默认都是1个
-                    ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    //ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    ProcedureId = procedureEntity.Id,
                     Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
@@ -482,7 +490,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = 1,//电芯进站默认都是1个
-                    ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    //ProcedureId = processRouteFirstProcedure.ProcedureId,
+                    ProcedureId = procedureEntity.Id,
                     Operatetype = ManuSfcStepTypeEnum.InStock,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     EquipmentId = _currentEquipment.Id,
@@ -499,7 +508,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentEquipment.SiteId,
-                        ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        //ProcedureId = processRouteFirstProcedure.ProcedureId,
+                        ProcedureId = procedureEntity.Id,
                         EquipmentId = _currentEquipment.Id ?? 0,
                         ProductId = planWorkOrderEntity.ProductId,
                         WorkOrderId = planWorkOrderEntity.Id,

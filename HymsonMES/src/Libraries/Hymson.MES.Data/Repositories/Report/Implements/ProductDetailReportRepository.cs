@@ -94,7 +94,7 @@ SELECT mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type) AS startDate , LEFT(
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime <  @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
-AND ProcedureId  = 20033695396655104 
+AND  ResourceId  =  19867386041061376
 GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type),LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type)
 )
 SELECT t1.workOrderId,t1.ProductId,t1.startDate,t1.EndDate,t1.OutputQty FeedingQty,IFNULL(t2.OutputQty,0) OutputQty FROM T1
@@ -114,7 +114,7 @@ SELECT mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type) AS startDate , LEFT(
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime <  @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
-AND ProcedureId  = 20033695396655104 
+AND ResourceId  =  19867386041061376
 GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type),LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type)
 )
 SELECT COUNT(1) FROM T1
