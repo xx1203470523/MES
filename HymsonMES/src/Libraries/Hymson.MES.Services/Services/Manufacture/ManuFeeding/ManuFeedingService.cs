@@ -397,6 +397,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
             }
 
+            // 根据条件再查询一次主物料（这么查会使参数更加严谨）
+            var manuFeedingMaterialDtos = await GetFeedingMaterialListAsync(new ManuFeedingMaterialQueryDto
+            {
+                ResourceId = saveDto.ResourceId,
+                Source = saveDto.Source,
+                FeedingPointId = saveDto.FeedingPointId
+            });
+            if (manuFeedingMaterialDtos == null || manuFeedingMaterialDtos.Any() == false) return 0;
+
+            // 主物料ID集合
+            saveDto.MaterialIds = manuFeedingMaterialDtos.Select(s => s.MaterialId);
+
             // 查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(saveDto.MaterialIds);
             if (materials == null || materials.Any() == false)
