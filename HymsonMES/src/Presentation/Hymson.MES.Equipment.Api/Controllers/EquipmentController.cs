@@ -6,10 +6,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 {
     /// <summary>
     /// 控制器（设备）
-    /// @author pengxin
-    /// @date 2023-05-31
     /// </summary>
-
     [ApiController]
     //[AllowAnonymous]
     [Route("EquipmentService/api/v1/[controller]")]
