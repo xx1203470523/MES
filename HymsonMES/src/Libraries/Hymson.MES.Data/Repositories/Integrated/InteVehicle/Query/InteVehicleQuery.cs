@@ -28,4 +28,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         public long SiteId { get; set; }
     }
+
+    public class InteVehicleIdsQuery
+    {
+        public long[] Ids { get; set; }
+
+        public long SiteId { get; set; }
+    }
 }

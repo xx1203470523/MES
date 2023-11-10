@@ -72,6 +72,7 @@ namespace Hymson.MES.Api
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+
             }
             //#endif
 

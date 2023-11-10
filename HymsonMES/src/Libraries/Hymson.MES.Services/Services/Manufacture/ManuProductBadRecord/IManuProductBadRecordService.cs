@@ -35,6 +35,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task CreateManuProductBadRecordAsync(ManuProductBadRecordCreateDto manuProductBadRecordCreateDto);
 
         /// <summary>
+        /// 新增 (有条码类型)
+        /// 给面板 特殊业务使用：多个载具编码
+        /// </summary>
+        /// <param name="createDto"></param>
+        /// <returns></returns>
+        Task CreateManuProductBadRecordAboutCodeTypeAsync(FacePlateManuProductBadRecordCreateDto createDto);
+
+        /// <summary>
         /// 查询条码的不合格代码信息
         /// </summary>
         /// <param name="queryDto"></param>

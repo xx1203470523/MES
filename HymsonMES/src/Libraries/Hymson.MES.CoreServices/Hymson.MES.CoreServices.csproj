@@ -16,11 +16,11 @@
 
   <ItemGroup>
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
-    <PackageReference Include="Hymson.EventBus.Abstractions" Version="2.1.98" />
-    <PackageReference Include="Hymson.Infrastructure" Version="2.1.98" />
-    <PackageReference Include="Hymson.Localization" Version="2.1.98" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.98" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.98" />
+    <PackageReference Include="Hymson.EventBus.Abstractions" Version="2.1.103" />
+    <PackageReference Include="Hymson.Infrastructure" Version="2.1.103" />
+    <PackageReference Include="Hymson.Localization" Version="2.1.103" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.103" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.103" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Options\" />
     <Folder Include="Services\Manufacture\ManuBarcodeReceive\" />
   </ItemGroup>
 

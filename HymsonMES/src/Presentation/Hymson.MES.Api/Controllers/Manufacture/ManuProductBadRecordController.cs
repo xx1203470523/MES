@@ -76,6 +76,20 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 面板添加（产品不良录入）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("addManuProductBadRecordByFacePlate")]
+        [LogDescription("面板添加产品不良录入", BusinessType.INSERT)]
+        [PermissionDescription("manu:badRecord:insert")]
+        public async Task FacePlateAddManuProductBadRecordAsync([FromBody] FacePlateManuProductBadRecordCreateDto parm)
+        {
+            await _manuProductBadRecordService.CreateManuProductBadRecordAboutCodeTypeAsync(parm);
+        }
+
+        /// <summary>
         /// 查询条码的不合格代码信息
         /// </summary>
         /// <param name="parm"></param>

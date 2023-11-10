@@ -14,6 +14,8 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
@@ -25,12 +27,14 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -147,6 +151,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
 
         /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
@@ -190,7 +199,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProductSetRepository procProductSetRepository,
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
+            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IEquEquipmentRepository equEquipmentRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -213,6 +223,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _equEquipmentRepository= equEquipmentRepository;
         }
 
 
@@ -946,6 +957,104 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
+        /// 获取即将扣料的物料数据（包含半成品信息）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<MaterialDeductResponseSummaryBo> GetInitialMaterialsWithSmiFinishedAsync(MaterialDeductRequestBo requestBo)
+        {
+            var responseSummaryBo = new MaterialDeductResponseSummaryBo
+            {
+                // 初始扣料数据
+                InitialMaterials = new()
+            };
+
+            // 获取BOM绑定的物料
+            var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(requestBo.ProductBOMId);
+
+            // 半成品清单
+            responseSummaryBo.SmiFinisheds = mainMaterials.Where(w => w.MaterialId == requestBo.ProductId);
+
+            // 未设置物料（克明说化成和返工的是没有投料的）
+            if (mainMaterials == null || !mainMaterials.Any()) return responseSummaryBo;
+
+            // 取得特定工序的物料（经过此过滤，结果已不存在半成品）
+            mainMaterials = mainMaterials.Where(w => w.ProcedureId == requestBo.ProcedureId);
+            var materialIds = mainMaterials.Select(s => s.MaterialId).AsList();
+
+            // 查询BOM替代料
+            var replaceMaterialsForBOM = await _procBomDetailReplaceMaterialRepository.GetByBomIdAsync(requestBo.ProductBOMId);
+            var replaceMaterialsForBOMDic = replaceMaterialsForBOM.ToLookup(w => w.BomDetailId).ToDictionary(d => d.Key, d => d);
+
+            // 查询物料基础数据的替代料
+            var replaceMaterialsForMain = await _procReplaceMaterialRepository.GetProcReplaceMaterialViewsAsync(requestBo.SiteId);
+            replaceMaterialsForMain = replaceMaterialsForMain.Where(w => materialIds.Contains(w.MaterialId));
+            var replaceMaterialsForMainDic = replaceMaterialsForMain.ToLookup(w => w.MaterialId).ToDictionary(d => d.Key, d => d);
+
+            // 组合主物料ID和替代料ID
+            materialIds.AddRange(replaceMaterialsForBOM.Select(s => s.ReplaceMaterialId));
+
+            // 查询所有主物料和替代料的基础信息（为了读取消耗系数和收集方式）
+            var materialEntities = await _procMaterialRepository.GetBySiteIdAsync(requestBo.SiteId);
+            materialEntities = materialEntities.Where(w => materialIds.Contains(w.Id));
+
+            foreach (var item in mainMaterials)
+            {
+                var materialEntitiy = materialEntities.FirstOrDefault(f => f.Id == item.MaterialId);
+                if (materialEntitiy == null) continue;
+
+                var deduct = new MaterialDeductResponseBo
+                {
+                    MaterialId = item.MaterialId,
+                    MaterialCode = materialEntitiy.MaterialCode,
+                    Usages = item.Usages,
+                    Loss = item.Loss,
+                    DataCollectionWay = item.DataCollectionWay,
+                    SerialNumber = materialEntitiy.SerialNumber
+                };
+                if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
+
+                // 填充BOM替代料
+                if (item.IsEnableReplace == false)
+                {
+                    if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
+                    {
+                        // 启用的替代物料（BOM）
+                        deduct.ReplaceMaterials = replaces.Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.ReplaceMaterialId,
+                            Usages = s.Usages,
+                            Loss = s.Loss,
+                            DataCollectionWay = materialEntities.FirstOrDefault(f => f.Id == s.ReplaceMaterialId)!.SerialNumber,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.ReplaceMaterialId)
+                        });
+                    }
+                }
+                // 填充物料替代料
+                else
+                {
+                    if (replaceMaterialsForMainDic.TryGetValue(item.MaterialId, out var replaces))
+                    {
+                        // 启用的替代物料（物料维护）
+                        deduct.ReplaceMaterials = replaces.Where(w => w.IsEnabled).Select(s => new MaterialDeductItemBo
+                        {
+                            MaterialId = s.MaterialId,
+                            Usages = item.Usages,
+                            Loss = item.Loss,
+                            DataCollectionWay = materialEntities.FirstOrDefault(f => f.Id == s.ReplaceMaterialId)!.SerialNumber,
+                            ConsumeRatio = GetConsumeRatio(materialEntities, s.MaterialId)
+                        });
+                    }
+                }
+
+                // 添加到初始扣料集合
+                responseSummaryBo.InitialMaterials.Add(deduct);
+            }
+
+            return responseSummaryBo;
+        }
+
+        /// <summary>
         /// 获取流转数据
         /// </summary>
         /// <param name="bo"></param>
@@ -1165,6 +1274,56 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     }, false);
             }
         }
+
+        /// <summary>
+        /// 获取当前生产对象
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public  async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
+        {
+            // 根据设备
+            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = param.SiteId,
+                Code = param.EquipmentCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", param.EquipmentCode);
+
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = param.SiteId,
+                Code = param.ResourceCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", param.ResourceCode);
+
+            // 读取设备绑定的资源
+            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
+            {
+                SiteId = param.SiteId,
+                EquipmentCode = param.EquipmentCode
+            });
+            if (resourceBindEntities == null || resourceBindEntities.Any() == false)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19910))
+                    .WithData("ResCode", param.ResourceCode)
+                    .WithData("EquCode", param.EquipmentCode);
+            }
+
+            // 读取资源对应的工序
+            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
+            {
+                SiteId = param.SiteId,
+                ResourceId = resourceEntity.Id
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", param.ResourceCode);
+
+            return new ManufactureProcedureBo
+            {
+                ResourceId = resourceEntity.Id,
+                ProcedureId = procProcedureEntity.Id,
+                EquipmentId = equipmentEntity.Id
+            };
+        }
+
 
         /// <summary>
         /// 转换数量

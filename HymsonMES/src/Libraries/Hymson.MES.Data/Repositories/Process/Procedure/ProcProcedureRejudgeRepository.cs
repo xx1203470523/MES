@@ -1,5 +1,6 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -34,10 +35,28 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
+        public async Task<int> DeleteByParentIdAndDefectTypeAsync(long ProcedureId, RejudgeUnqualifiedCodeEnum[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeleteByParentId, command);
+            return await conn.ExecuteAsync(DeleteByParentIdANdDefectType, new
+            {
+                ProcedureId,
+                ids
+            });
+        }
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByParentIdAsync(IEnumerable<long> ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByParentId, new
+            {
+                ids
+            });
         }
 
         /// <summary>
@@ -70,7 +89,8 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string InsertsSql = "INSERT INTO proc_procedure_rejudge (`Id`, `ProcedureId`, `UnqualifiedCodeId`, `DefectType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @ProcedureId, @UnqualifiedCodeId, @DefectType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string DeleteByParentId = "DELETE FROM proc_procedure_rejudge WHERE ProcedureId = @ParentId";
+        const string DeleteByParentIdANdDefectType = "DELETE FROM proc_procedure_rejudge WHERE ProcedureId = @ProcedureId AND DefectType in @ids";
 
+        const string DeleteByParentId = "DELETE FROM proc_procedure_rejudge WHERE ProcedureId in @ids";
     }
 }

@@ -162,6 +162,9 @@ namespace Microsoft.Extensions.DependencyInjection
             // 工艺设备组
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
+
+            //ESOP
+            services.AddSingleton<IProcEsopService, ProcEsopService>();
             #endregion
 
             #region Quality
@@ -298,6 +301,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Material
             services.AddSingleton<AbstractValidator<ProcMaterialCreateDto>, ProcMaterialCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcMaterialImportDto>, ProcMaterialImportValidator>();
             services.AddSingleton<AbstractValidator<ProcMaterialModifyDto>, ProcMaterialModifyValidator>();
 
             services.AddSingleton<AbstractValidator<ProcMaterialSupplierRelationCreateDto>, ProcMaterialSupplierRelationCreateValidator>();
@@ -325,6 +329,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region LoadPoint
             services.AddSingleton<AbstractValidator<ProcLoadPointCreateDto>, ProcLoadPointCreateValidator>();
+            services.AddSingleton<AbstractValidator<ImportLoadPointDto>, ProcLoadPointImportValidator>();
             services.AddSingleton<AbstractValidator<ProcLoadPointModifyDto>, ProcLoadPointModifyValidator>();
             #endregion
 
@@ -376,6 +381,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupSaveDto>, ProcProcessEquipmentGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
 
+            #region Esop
+            services.AddSingleton<AbstractValidator<ProcEsopCreateDto>, ProcEsopCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcEsopModifyDto>, ProcEsopModifyValidator>();
+            #endregion
             #endregion
 
             #region Integrated
@@ -388,6 +397,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteSystemTokenCreateDto>, InteSystemTokenCreateValidator>();
             services.AddSingleton<AbstractValidator<InteSystemTokenModifyDto>, InteSystemTokenModifyValidator>();
             services.AddSingleton<AbstractValidator<InteCustomImportDto>, InteCustomImportValidator>();
+            services.AddSingleton<AbstractValidator<ImportBomDto>, ProcBomImportValidator>();
             services.AddSingleton<AbstractValidator<InteCustomCreateDto>, InteCustomCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCustomModifyDto>, InteCustomModifyValidator>();
             services.AddSingleton<AbstractValidator<InteUnitSaveDto>, InteUnitSaveValidator>();

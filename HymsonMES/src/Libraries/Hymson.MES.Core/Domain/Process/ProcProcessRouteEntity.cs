@@ -58,4 +58,20 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public string Remark { get; set; }
     }
+
+    /// <summary>
+    ///根具编码查询工艺路线
+    /// </summary>
+    public class ProcProcessRoutesByCodeQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string?> Codes { get; set; }
+    }
 }

@@ -77,14 +77,14 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                         {
                             Type listTypeDefinition = typeof(List<>);
                             Type listType = listTypeDefinition.MakeGenericType(iEnumerableType.UnderlyingSystemType);
-                            dynamic list = Activator.CreateInstance(listType);
+                            var list = Activator.CreateInstance(listType);
                             if (list != null)
                             {
                                 var newCacheValue = cacheValue as IEnumerable<BaseEntity> ?? throw new Exception();
 
                                 foreach (object valueItem in (IEnumerable<object>)value)
                                 {
-                                    if (valueItem != null)
+                                    if (valueItem != null)  
                                     {
                                         var newValueItem = valueItem as BaseEntity;
                                         var index = ((IEnumerable<BaseEntity>)newCacheValue).ToList().FindLastIndex(x => x.Id == newValueItem?.Id);
@@ -94,8 +94,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                                             if (type != null)
                                             {
                                                 // 获取集合类型的 get_Item 方法
-                                                MethodInfo getItemMethod = type.GetMethod("get_Item");
-                                                object item = getItemMethod?.Invoke(cacheValue, new object[] { index });
+                                                var getItemMethod = type.GetMethod("get_Item");
+                                                var item = getItemMethod?.Invoke(cacheValue, new object[] { index });
 
                                                 var addMethod = list.GetType().GetMethod("Add");
                                                 addMethod?.Invoke(list, new[] { item });

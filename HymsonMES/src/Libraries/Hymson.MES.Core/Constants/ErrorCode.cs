@@ -71,6 +71,15 @@
         public const string MES10229 = "采购类型不合法！";
         public const string MES10230 = "状态不合法！";
         public const string MES10231 = "版本不能为空！";
+        public const string MES10232 = "工艺路线{code}没有找到对应的数据！";
+        public const string MES10233 = "Bom {bomCode}没有找到对应的数据！";
+        public const string MES10234 = "掩码{code}没有找到对应的数据！";
+        public const string MES10235 = "批次需为大于0整数！";
+        public const string MES10236 = "是否默认版本不合法！";
+        public const string MES10237 = "标包数量需为大于0整数！";
+        public const string MES10238 = "基于时间不合法！";
+        public const string MES10239 = "消耗公差需为大于0整数！";
+        public const string MES10240 = "消耗系数需大于0！";
         #endregion
 
         #region 资源 10300
@@ -226,6 +235,9 @@
         public const string MES10525 = "工作中心{WorkCenterCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10526 = "产品{ProductCode}+工序{ProcedureCode}+版本{Version}已存在，请重新输入！";
         public const string MES10527 = "数据类型不合法";
+        public const string MES10528 = "条码不在当前工序";
+        public const string MES10529 = "没有当前条码与工序的产品参数收集组";
+
         #endregion
 
         #region Bom 10600
@@ -380,6 +392,10 @@
         public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
         public const string MES11410 = "降级移除失败:有数据已经被移除了,请清除后重新处理";
 
+        #endregion
+
+        #region ESOP维护 11500
+        public const string MES11500 = "ESOP已存在同一物料、工序数据";
         #endregion
 
         #region 作业12000
@@ -677,6 +693,7 @@
         public const string MES15318 = "条码已经被锁定";
 
         public const string MES15320 = "条码【{sfcs}】已不存在";
+        public const string MES15321 = "条码【{sfc}】缺失步骤信息，无法查询到开始时间";
         #endregion
 
         #region 质量录入 15400
@@ -708,6 +725,8 @@
         public const string MES15425 = "不合格信息最新状态,请刷新后再次操作";
         public const string MES15426 = "条码状态不为最新新状态,请刷新后再次操作";
         public const string MES15427 = "条码工单未激活,无法取消报废";
+
+        public const string MES15430 = "载具编码不能为空";
         #endregion
 
         #region 物料加载 15500
@@ -885,6 +904,7 @@
         public const string MES16360 = "条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
         public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
+
         #endregion
 
         #region 工单激活 MES16400
@@ -994,7 +1014,7 @@
         public const string MES16900 = "面板操作-生产过站面板错误";
         public const string MES16901 = "没有查找到对应条码的生产信息！";
         public const string MES16902 = "无法将主物料ID转为long类型！";
-        public const string MES16903 = "当前工序与条码生产信息中的不一致！";
+        //public const string MES16903 = "当前工序与条码生产信息中的不一致！";
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
 
@@ -1235,6 +1255,9 @@
         public const string MES18516 = "载具类型编码不允许有空格";
         public const string MES18517 = "选择的载具类型有被载具绑定，请先去载具上解绑！";
         public const string MES18518 = "该载具类型已被关联了产品的载具关联，不允许更改该载具类型";
+        public const string MES18519 = "不支持对载具进行组装操作！";
+        public const string MES18520 = "不支持对载具进行参数收集操作！";
+        public const string MES18521 = "只允许对单一条码进行参数收集操作！";
         #endregion
 
         #region 载具注册 18600
@@ -1328,7 +1351,7 @@
         public const string MES19603 = "资源编码{Code}不存在";
         public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
         public const string MES19605 = "条码生成失败,半成品记录未找到！";
-
+        public const string MES19606 = "参数{ParameterCodes}不存在";
         #endregion
 
 

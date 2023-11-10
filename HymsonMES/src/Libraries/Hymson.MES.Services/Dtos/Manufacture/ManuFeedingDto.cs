@@ -189,7 +189,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 全部主物料ID集合
         /// </summary>
-        public IEnumerable<long> MaterialIds { get; set; }
+        public IEnumerable<long>? MaterialIds { get; set; }
 
     }
 }

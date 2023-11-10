@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 
@@ -65,5 +66,12 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
 
+        /// <summary>
+        /// 根据条码与工序查询当前版本的产品参数收集详情
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto);
     }
 }

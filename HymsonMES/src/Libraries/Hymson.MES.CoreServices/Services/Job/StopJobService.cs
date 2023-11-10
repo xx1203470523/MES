@@ -9,13 +9,12 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 中止
@@ -192,11 +191,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             responseBo.Rows += rowArray.Sum();
 
             // 面板需要的数据
-            responseBo.Content = new Dictionary<string, string> {
-                { "PackageCom", "False" },
-                { "BadEntryCom", "False" },
-            };
-
+            List<PanelModuleEnum> panelModules = new();
+            responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
             responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16340), data.FirstSFCProduceEntity.SFC);
             return responseBo;
         }

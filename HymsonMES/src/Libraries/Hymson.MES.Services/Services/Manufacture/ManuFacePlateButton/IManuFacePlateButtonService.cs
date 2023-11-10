@@ -87,6 +87,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         Task<Dictionary<string, JobResponseDto>> OutStationAsync(OutStationRequestDto dto);
 
+        /// <summary>
+        /// 参数收集（点击）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> ProductParameterCollectAsync(ProductProcessParameterDto dto);
 
 
         /// <summary>

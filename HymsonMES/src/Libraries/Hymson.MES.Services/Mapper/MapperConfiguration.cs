@@ -361,8 +361,10 @@ namespace Hymson.MES.Services.Mapper
             #region Material
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
+            CreateMap<ProcMaterialImportDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
             CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+            CreateMap<ProcMaterialEntity, ProcMaterialExportDto>();
             CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
@@ -418,6 +420,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointModifyDto, ProcLoadPointEntity>();
             CreateMap<ProcLoadPointPagedQueryDto, ProcLoadPointPagedQuery>();
             CreateMap<ProcLoadPointEntity, ProcLoadPointDto>();
+            CreateMap<ProcLoadPointPagedQuery, ProcLoadPointPagedQueryDto>();
             #endregion
 
             #region LoadPointLink
@@ -535,12 +538,19 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region SortingRule
-            CreateMap< ProcSortingRuleEntity, ProcSortingRuleDto > ();
+            CreateMap<ProcSortingRuleEntity, ProcSortingRuleDto>();
             CreateMap<ProcSortingRuleCreateDto, ProcSortingRuleEntity>();
             CreateMap<ProcSortingRuleModifyDto, ProcSortingRuleEntity>();
 
 
             CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
+
+            #endregion
+
+            CreateMap<ProcEsopView, ProcEsopDto>();
+            CreateMap<ProcEsopPagedQueryDto, ProcEsopPagedQuery>();
+            #region Esop 
+
             #endregion
         }
 
