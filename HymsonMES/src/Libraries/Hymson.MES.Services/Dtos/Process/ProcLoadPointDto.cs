@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态
         /// </summary>
         [EpplusTableColumn(Header = "状态", Order = 3)]
-        public SysDataStatusEnum? Status { get; set; }
+        public string Status { get; set; }
     }
 
     /// <summary>

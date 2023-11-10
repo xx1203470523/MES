@@ -706,7 +706,7 @@ namespace Hymson.MES.Services.Services.Process
                  });
                 if (Boms.Any())
                 {
-                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10601), item.BomCode, currentRow, "Bom"));
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10601), item.BomCode, currentRow, "bomCode","version"));
                 }
 
                 if (!Boms.Any())
@@ -716,7 +716,7 @@ namespace Hymson.MES.Services.Services.Process
                         BomCode = item.BomCode,
                         BomName = item.BomName,
                         Version = item.Version,
-                        IsCurrentVersion = item.IsCurrentVersion,
+                        IsCurrentVersion = item.IsCurrentVersion== YesOrNoEnum.Yes?true:false,
                         Remark = item.Remark,
                         Status = SysDataStatusEnum.Build,
 
@@ -755,8 +755,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="codeFormattedMessage"></param>
         /// <param name="cuurrentRow"></param>
         /// <param name="key"></param>
+        /// <param name="keys"></param>
+        /// 
         /// <returns></returns>
-        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code",string keys="codes")
         {
             var validationFailure = new ValidationFailure
             {
@@ -765,7 +767,8 @@ namespace Hymson.MES.Services.Services.Process
             validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
             {
                 { "CollectionIndex", cuurrentRow },
-                { key, codeFormattedMessage }
+                { key, codeFormattedMessage },
+                {keys,codeFormattedMessage }
             };
             return validationFailure;
         }
@@ -815,7 +818,7 @@ namespace Hymson.MES.Services.Services.Process
                     BomCode = item.BomCode ?? "",
                     BomName = item.BomName ?? "",
                     Version = item.Version ?? "",
-                    Status = item.Status
+                    Status = item.Status.GetDescription()
                 }) ;
             }
 

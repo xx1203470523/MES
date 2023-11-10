@@ -226,8 +226,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 是否当前版本
         /// </summary>
-        [EpplusTableColumn(Header = "是否为当前版本(true/false)", Order = 4)]
-        public bool IsCurrentVersion { get; set; }
+        [EpplusTableColumn(Header = "是否为当前版本(是/否)", Order = 4)]
+        public YesOrNoEnum IsCurrentVersion { get; set; }
 
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态
         /// </summary>
         [EpplusTableColumn(Header = "状态", Order = 4)]
-        public SysDataStatusEnum? Status { get; set; }
+        public string Status { get; set; }
 
     }
 
