@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Services.Process
             _validationModifyRules = validationModifyRules;
             _validationImportRules = validationImportRules;
             _procProcessRouteRepository = procProcessRouteRepository;
-            _procBomRepository= procBomRepository;
+            _procBomRepository = procBomRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _currentSite = currentSite;
             _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
@@ -266,7 +266,7 @@ namespace Hymson.MES.Services.Services.Process
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
-            
+
             if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //验证某些是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
-            if (!canEditStatusEnum.Any(x=>x== modelOrigin.Status))
+            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
@@ -609,22 +609,22 @@ namespace Hymson.MES.Services.Services.Process
         public async Task UpdateStatusAsync(ChangeStatusDto param)
         {
             #region 参数校验
-            if (param.Id==0) 
+            if (param.Id == 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10125));
             }
-            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status)) 
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10126));
             }
-            if (param.Status== SysDataStatusEnum.Build)
+            if (param.Status == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10128));
             }
 
             #endregion
 
-            var changeStatusCommand = new ChangeStatusCommand() 
+            var changeStatusCommand = new ChangeStatusCommand()
             {
                 Id = param.Id,
                 Status = param.Status,
@@ -634,12 +634,12 @@ namespace Hymson.MES.Services.Services.Process
             };
 
             #region 校验数据
-            var material= await _procMaterialRepository.GetByIdAsync(changeStatusCommand.Id);
+            var material = await _procMaterialRepository.GetByIdAsync(changeStatusCommand.Id);
             if (material == null || material.IsDeleted != 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10204));
             }
-            if (material.Status == changeStatusCommand.Status) 
+            if (material.Status == changeStatusCommand.Status)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), material.Status)}"));
             }
@@ -697,7 +697,7 @@ namespace Hymson.MES.Services.Services.Process
             //检测导入数据是否重复
             var repeats = new List<string>();
             //检验重复  目前只设定检验 物料编码+版本 是否重复
-            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.MaterialCode,x.Version });
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.MaterialCode, x.Version });
             foreach (var item in hasDuplicates)
             {
                 if (item.Count() > 1)
@@ -723,43 +723,51 @@ namespace Hymson.MES.Services.Services.Process
             var processRoutes = await _procProcessRouteRepository.GetByCodesAsync(new ProcProcessRoutesByCodeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Codes = excelImportDtos.Select(x => x.ProcessRouteCode).Distinct().ToArray()
+                Codes = excelImportDtos.Select(x => x.ProcessRouteCode).Where(y=>!string.IsNullOrEmpty(y)).Distinct().ToArray()
             });
             //Bom编码
             var boms = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Codes = excelImportDtos.Select(x => x.BomCode).Distinct().ToArray()
+                Codes = excelImportDtos.Select(x => x.BomCode).Where(y => !string.IsNullOrEmpty(y)).Distinct().ToArray()
             });
             //掩码编码
             var maskCodes = await _procMaskCodeRepository.GetByCodesAsync(new ProcMaskCodesByCodeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Codes = excelImportDtos.Select(x => x.MaskCode).Distinct().ToArray()
+                Codes = excelImportDtos.Select(x => x.MaskCode).Where(y => !string.IsNullOrEmpty(y)).Distinct().ToArray()
             });
 
             var cuurrentRow = 0;
             foreach (var item in excelImportDtos)
             {
                 var procMaterialEntity = item.ToEntity<ProcMaterialEntity>();
-
+                //单独给是否默认版本赋值
+                if(item.DefaultVersion.HasValue)
+                {
+                    if (item.DefaultVersion == YesOrNoEnum.Yes)
+                        procMaterialEntity.IsDefaultVersion = true;
+                    else
+                        if (item.DefaultVersion == YesOrNoEnum.No)
+                        procMaterialEntity.IsDefaultVersion = false;
+                }
                 cuurrentRow++;
 
                 var haveError = false;
                 //判断是否已经录入    编码+版本  唯一标识
                 if (materials.Any(x => x.MaterialCode == item.MaterialCode && x.Version == item.Version))
                 {
-                    haveError= true;
+                    haveError = true;
                     validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10201), item.MaterialCode, item.Version, cuurrentRow, "materialCode", "version"));
                 }
                 //工艺路线
-                if(item.ProcessRouteCode != null)
+                if (item.ProcessRouteCode != null)
                 {
                     var processRouteCode = processRoutes.FirstOrDefault(x => x.Code == item.ProcessRouteCode);
                     if (processRouteCode == null)
                     {
                         haveError = true;
-                        validationFailures.Add(GetValidationFailure("工艺路线{Code}没有找到对应的数据", item.ProcessRouteCode, cuurrentRow));
+                        validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10232), item.ProcessRouteCode, cuurrentRow));
                     }
                     else
                     {
@@ -773,11 +781,11 @@ namespace Hymson.MES.Services.Services.Process
                     if (bomCode == null)
                     {
                         haveError = true;
-                        validationFailures.Add(GetValidationFailure("Bom{BomCode}没有找到对应的数据", item.BomCode, cuurrentRow));
+                        validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10233), item.BomCode, cuurrentRow, "bomCode"));
                     }
                     else
                     {
-                        procMaterialEntity.BomId= bomCode.Id;
+                        procMaterialEntity.BomId = bomCode.Id;
                     }
                 }
                 //掩码
@@ -787,7 +795,7 @@ namespace Hymson.MES.Services.Services.Process
                     if (maskCode == null)
                     {
                         haveError = true;
-                        validationFailures.Add(GetValidationFailure("掩码{Code}没有找到对应的数据", item.MaskCode, cuurrentRow));
+                        validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10234), item.MaskCode, cuurrentRow));
                     }
                     else
                     {
@@ -916,6 +924,15 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var item in pagedInfo.Data)
             {
                 var procMaterialDto = item.ToExcelModel<ProcMaterialExportDto>();
+                //单独给是否默认版本赋值
+                if(item.IsDefaultVersion)
+                {
+                    procMaterialDto.DefaultVersion=YesOrNoEnum.Yes;
+                }
+                else
+                {
+                    procMaterialDto.DefaultVersion = YesOrNoEnum.No;
+                }
 
                 if (item.ProcessRouteId.HasValue)
                 {

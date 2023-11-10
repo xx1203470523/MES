@@ -628,8 +628,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 采购类型
         /// </summary>
         [EpplusTableColumn(Header = "采购类型(必填)", Order = 5)]
-        public MaterialBuyTypeEnum? BuyType { get; set; } = null;
-        
+        public MaterialBuyTypeEnum? BuyType { get; set; }
+
         /// <summary>
         /// 工艺路线
         /// </summary>
@@ -682,7 +682,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否默认版本
         /// </summary>
         [EpplusTableColumn(Header = "是否默认版本(必填)", Order = 14)]
-        public bool IsDefaultVersion { get; set; } = false;
+        public YesOrNoEnum? DefaultVersion { get; set; }
 
         /// <summary>
         /// 消耗系数
@@ -695,7 +695,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         [EpplusTableColumn(Header = "验证掩码组", Order = 16)]
         public string? MaskCode { get; set; }
-        
+
     }
 
     /// <summary>
@@ -791,7 +791,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否默认版本
         /// </summary>
         [EpplusTableColumn(Header = "是否默认版本(必填)", Order = 16)]
-        public bool IsDefaultVersion { get; set; } = false;
+        public YesOrNoEnum? DefaultVersion { get; set; }
 
         /// <summary>
         /// 消耗系数
