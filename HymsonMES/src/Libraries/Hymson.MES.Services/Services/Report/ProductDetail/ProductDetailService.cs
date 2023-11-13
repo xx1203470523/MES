@@ -93,6 +93,13 @@ namespace Hymson.MES.Services.Services.Report
                     _ => ""
                 };
 
+                item.SearchDate = query.Type switch
+                {
+                    13 => item.StartDate,
+                    10 => item.StartDate?.Substring(0, 7),
+                    _ => item.StartDate,
+                };
+
                 item.StartDate = query.Type switch
                 {
                     13 => item.StartDate?.Substring(11, 2) + ":00",
@@ -123,6 +130,7 @@ namespace Hymson.MES.Services.Services.Report
         public async Task<ExportResultDto> ExportExcelAsync(ProductDetailReportQueryDto queryDto)
         {
             string fileName = string.Format("({0})产能报表", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            queryDto.PageIndex = 1;
             queryDto.PageSize = 1000000;
 
             var pageData = await GetPageInfoAsync(queryDto);
@@ -134,7 +142,6 @@ namespace Hymson.MES.Services.Services.Report
 
                 exportExcel.StartDate = item.StartDate;
                 exportExcel.EndDate = item.EndDate;
-                exportExcel.UpdatedOn = item.UpdatedOn;
                 exportExcel.OutputQty = item.OutputQty;
                 exportExcel.FeedingQty = item.FeedingQty;
                 exportExcel.MaterialCode = item.MaterialCode;
@@ -152,6 +159,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 FileName = fileName,
                 Path = uploadResult.AbsoluteUrl,
+                RelativePath = uploadResult.RelativeUrl
             };
         }
     }

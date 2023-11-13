@@ -825,6 +825,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 FileName = fileName,
                 Path = uploadResult.AbsoluteUrl,
+                RelativePath = uploadResult.RelativeUrl
             };
         }
 

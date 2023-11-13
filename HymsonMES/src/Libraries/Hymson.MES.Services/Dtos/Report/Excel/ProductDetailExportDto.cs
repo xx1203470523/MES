@@ -62,11 +62,5 @@ namespace Hymson.MES.Services.Dtos.Report.Excel
         /// </summary>
         [EpplusTableColumn(Header = "产出数", Order = 8)]
         public decimal? OutputQty { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        [EpplusTableColumn(Header = "最后更新时间", Order = 8)]
-        public DateTime? UpdatedOn { get; set; }
     }
 }

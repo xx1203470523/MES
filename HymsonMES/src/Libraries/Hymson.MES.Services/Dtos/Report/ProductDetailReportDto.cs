@@ -29,6 +29,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? Type { get; set; }
 
         /// <summary>
+        /// 查询数据日期
+        /// </summary>
+        public string? SearchDate { get; set; }
+
+        /// <summary>
         /// 开始时间
         /// </summary>
         public string? StartDate { get; set; }
@@ -47,11 +52,6 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 产出
         /// </summary>
         public decimal? OutputQty { get; set; }
-
-        /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime? UpdatedOn { get; set; }
     }
 
     /// <summary>

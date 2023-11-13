@@ -41,6 +41,11 @@ namespace Hymson.MES.Data.Repositories.Report
         public string? Type { get; set; }
 
         /// <summary>
+        /// 查询日期
+        /// </summary>
+        public string? SearchDate { get; set; }
+
+        /// <summary>
         /// 开始时间
         /// </summary>
         public string? StartDate { get; set; }

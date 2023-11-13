@@ -83,42 +83,44 @@ public partial class ProductDetailReportRepository : BaseRepository, IProductDet
 public partial class ProductDetailReportRepository
 {
     private readonly string GetPageInfoSql = @"WITH T1 AS(
-SELECT mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type) AS startDate,LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty,MAX(mss.UpdatedOn) UpdatedOn FROM manu_sfc_summary mss 
+SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate,LEFT(date_add(EndTime,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty FROM manu_sfc_summary mss 
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime < @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
 AND ProcedureId  = 20033299167047680 AND mss.QualityStatus =  1
-GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type),LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type)
+GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 ),T2 AS(
-SELECT mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type) AS startDate , LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty,MAX(UpdatedOn) UpdatedOn FROM manu_sfc_summary mss
+SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate , LEFT(date_add(EndTime,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty FROM manu_sfc_summary mss
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime <  @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
 AND  ResourceId  =  19867386041061376
-GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type),LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type)
+GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 )
 SELECT t1.workOrderId,t1.ProductId,t1.startDate,t1.EndDate,t1.OutputQty FeedingQty,IFNULL(t2.OutputQty,0) OutputQty FROM T1
 LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.workorderid = t2.workorderid AND t1.productId = t2.productId
+ORDER BY T1.startDate
 LIMIT @offSet,@Rows
 ";
 
     private readonly string GetPageInfoCountSql = @"WITH T1 AS(
-SELECT mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type) AS startDate,LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty,MAX(mss.UpdatedOn) UpdatedOn FROM manu_sfc_summary mss 
+SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate,LEFT(date_add(EndTime,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty FROM manu_sfc_summary mss 
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime < @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
 AND ProcedureId  = 20033299167047680 AND mss.QualityStatus =  1
-GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type),LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type)
+GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 ),T2 AS(
-SELECT mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type) AS startDate , LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty,MAX(UpdatedOn) UpdatedOn FROM manu_sfc_summary mss
+SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate , LEFT(date_add(EndTime,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty FROM manu_sfc_summary mss
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime <  @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
 AND ResourceId  =  19867386041061376
-GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(CreatedOn,@Type),LEFT(date_add(CreatedOn,interval 1 @SearchType),@Type)
+GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 )
 SELECT COUNT(1) FROM T1
 LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.workorderid = t2.workorderid AND t1.productId = t2.productId
+ORDER BY T1.startDate
 ";
 
 }
