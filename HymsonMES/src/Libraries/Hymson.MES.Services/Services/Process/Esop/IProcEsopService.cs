@@ -6,7 +6,9 @@
  *build datetime: 2023-11-02 02:39:53
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -56,5 +58,26 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcEsopDto> QueryProcEsopByIdAsync(long id);
+
+        /// <summary>
+        /// 根据Esop ID获取esop附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteAttachmentDto>?> GetAttachmentListAsync(long id);
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<int> AttachmentAddAsync(AttachmentAddDto dto);
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> AttachmentDeleteAsync(long[] ids);
     }
 }

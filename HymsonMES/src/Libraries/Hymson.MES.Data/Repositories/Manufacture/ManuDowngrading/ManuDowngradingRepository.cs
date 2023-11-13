@@ -129,7 +129,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<ManuDowngradingEntity>? manuDowngradingEntitys)
         {
-            if (manuDowngradingEntitys == null || manuDowngradingEntitys.Any() == false) return 0;
+            if (manuDowngradingEntitys == null || !manuDowngradingEntitys.Any()) return 0;
 
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, manuDowngradingEntitys);

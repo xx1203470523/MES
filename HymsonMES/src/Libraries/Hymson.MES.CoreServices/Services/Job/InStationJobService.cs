@@ -1,4 +1,6 @@
-﻿using Hymson.Infrastructure.Exceptions;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -235,7 +237,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 循环次数验证（复投次数）
-            sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1);
+            sfcProduceEntities?.VerifySFCRepeatedCount(procedureEntity.Cycle ?? 1, _localizationService);
         }
 
         /// <summary>

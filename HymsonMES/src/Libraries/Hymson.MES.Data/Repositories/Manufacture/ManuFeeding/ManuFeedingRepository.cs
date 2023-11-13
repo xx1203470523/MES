@@ -170,6 +170,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
+
+        /// <summary>
+        /// 获取加载数据列表（只读取剩余数量大于0的）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdWithOutZeroAsync(GetByFeedingPointIdsQuery query)
+        {
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND FeedingPointId IN @FeedingPointIds ");
+
+            sqlBuilder.Append("AND Qty > 0 ");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
+        }
+
     }
 
 

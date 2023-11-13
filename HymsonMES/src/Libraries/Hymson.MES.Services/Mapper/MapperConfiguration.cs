@@ -30,6 +30,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Data.Repositories.Process.Query;
@@ -264,6 +265,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region InteVehicle
             CreateMap<InteVehiclePagedQueryDto, InteVehiclePagedQuery>();
+            CreateMap<LineUpVehicleByProcedureIdDto, InteVehiclePagedQuery>();
             CreateMap<InteVehicleEntity, InteVehicleDto>();
             CreateMap<InteVehicleCreateDto, InteVehicleEntity>();
             CreateMap<InteVehicleModifyDto, InteVehicleEntity>();

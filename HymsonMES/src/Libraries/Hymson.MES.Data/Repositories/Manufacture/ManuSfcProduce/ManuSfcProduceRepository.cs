@@ -292,7 +292,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> entities)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (entities == null || !entities.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entities);
@@ -338,7 +338,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity>? entities)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (entities == null || !entities.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWithStatusCheckSql, entities);
@@ -439,7 +439,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand)
         {
-            if (idsCommand == null || idsCommand.Ids == null || idsCommand.Ids.Any() == false) return 0;
+            if (idsCommand == null || idsCommand.Ids == null || !idsCommand.Ids.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletePhysicalRangeByIdsSql, idsCommand);
@@ -719,7 +719,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSFCProduceBusinesssByIdsCommand command)
         {
-            if (command == null || command.SfcInfoIds == null || command.SfcInfoIds.Any() == false) return 0;
+            if (command == null || command.SfcInfoIds == null || !command.SfcInfoIds.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSfcProduceBusinessBySfcInfoIdsSql, command);
@@ -749,14 +749,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 根据工序ID、资源ID获取活动在制品数据
+        /// 根据工序ID,状态获取在制品数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdAndResId(ManuSfcProduceByProcedureIdAndResourceIdQuery query) 
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdStatusAsync(ManuSfcProduceByProcedureIdStatusQuery query) 
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcProduceEntity>(GetActivityListByProcedureIdAndResIdSql, query);
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetListByProcedureIdAndResIdStatusSql);
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("ProcedureId = @ProcedureId");
+            if (query.ResourceId.HasValue) 
+            {
+                sqlBuilder.Where(" ResourceId = @ResourceId");
+            }
+            sqlBuilder.Where("Status = @Status");
+
+            return await conn.QueryAsync<ManuSfcProduceEntity>(template.RawSql, query);
         }
     }
 
@@ -824,6 +834,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetListBySfcsSql = @"SELECT * FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
-        const string GetActivityListByProcedureIdAndResIdSql = @"SELECT * FROM manu_sfc_produce WHERE SiteId=@SiteId AND ProcedureId=@ProcedureId AND ResourceId=@ResourceId AND Status=2 ";
+        const string GetListByProcedureIdAndResIdStatusSql = @"SELECT * FROM manu_sfc_produce /**where**/ ";
     }
 }

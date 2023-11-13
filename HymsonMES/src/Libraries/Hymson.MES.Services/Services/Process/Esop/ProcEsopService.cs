@@ -13,16 +13,26 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using IdGen;
+using System.Collections.Generic;
 using System.Transactions;
+using System.Xml.Linq;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -38,6 +48,10 @@ namespace Hymson.MES.Services.Services.Process
         /// ESOP 仓储
         /// </summary>
         private readonly IProcEsopRepository _procEsopRepository;
+        private readonly IProcEsopFileRepository _esopFileRepository;
+        //文件信息
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
+
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcProcedureRepository _procedureRepository;
 
@@ -46,6 +60,8 @@ namespace Hymson.MES.Services.Services.Process
 
         public ProcEsopService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcEsopRepository procEsopRepository,
+            IProcEsopFileRepository esopFileRepository,
+            IInteAttachmentRepository inteAttachmentRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procedureRepository,
             AbstractValidator<ProcEsopCreateDto> validationCreateRules,
@@ -54,6 +70,8 @@ namespace Hymson.MES.Services.Services.Process
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procEsopRepository = procEsopRepository;
+            _esopFileRepository = esopFileRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
             _procMaterialRepository = procMaterialRepository;
             _procedureRepository = procedureRepository;
             _validationCreateRules = validationCreateRules;
@@ -89,9 +107,10 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //DTO转换实体
+            var esopId = IdGenProvider.Instance.CreateId();
             var procEsopEntity = new ProcEsopEntity
             {
-                Id = IdGenProvider.Instance.CreateId(),
+                Id = esopId,
                 MaterialId = procEsopCreateDto.MaterialId,
                 ProcedureId = procEsopCreateDto.ProcedureId,
                 Status = procEsopCreateDto.Status,
@@ -102,8 +121,37 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = _currentSite.SiteId ?? 0
             };
 
-            //入库
-            await _procEsopRepository.InsertAsync(procEsopEntity);
+            var procEsopFiles = new List<ProcEsopFileEntity>();
+            if (procEsopCreateDto.EsopFileIds != null && procEsopCreateDto.EsopFileIds.Length > 0)
+            {
+                foreach (var item in procEsopCreateDto.EsopFileIds)
+                {
+                    if (item.HasValue && item.Value > 0)
+                    {
+                        procEsopFiles.Add(new ProcEsopFileEntity
+                        {
+                            Id = item.Value,
+                            EsopId = esopId,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                        });
+                    }
+                }
+            }
+
+            // 保存
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //入库
+                rows+= await _procEsopRepository.InsertAsync(procEsopEntity);
+                if (procEsopFiles.Any())
+                {
+                    //如果有文件上传，更新附件的id信息
+                    rows+= await _esopFileRepository.UpdatesAsync(procEsopFiles);
+                }
+                trans.Complete();
+            }   
         }
 
         /// <summary>
@@ -209,6 +257,10 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcEsopDto> QueryProcEsopByIdAsync(long id)
         {
             var procEsopEntity = await _procEsopRepository.GetByIdAsync(id);
+            if (procEsopEntity == null)
+            {
+                return new ProcEsopDto();
+            }
 
             var procEsopDto = new ProcEsopDto
             {
@@ -239,6 +291,103 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             return new ProcEsopDto();
+        }
+
+        /// <summary>
+        /// 根据Esop ID获取esop附件列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteAttachmentDto>?> GetAttachmentListAsync(long id)
+        {
+            var entities = await _esopFileRepository.GetProcEsopFileEntitiesAsync(new ProcEsopFileQuery { EsopId = id });
+            if (entities == null)
+            {
+                return null;
+            }
+
+            var attachments = await _inteAttachmentRepository.GetByIdsAsync(entities.Select(x => x.AttachmentId));
+            var inteAttachments = entities.Select(item =>
+            {
+                var dto = new InteAttachmentDto();
+                var attachment = attachments.FirstOrDefault(x => x.Id == item.AttachmentId);
+                if (attachment != null)
+                {
+                    dto.Id = item.Id;
+                    dto.Name = attachment.Name;
+                    dto.Path = attachment.Path;
+                    dto.CreatedOn = attachment.CreatedOn;
+                }
+                return dto;
+            });
+            return inteAttachments;
+        }
+
+        /// <summary>
+        /// 附件上传
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<int> AttachmentAddAsync(AttachmentAddDto dto)
+        {
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerDataException(nameof(ErrorCode.MES10101));
+            }
+
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+            List<InteAttachmentEntity> attachments = new();
+            List<ProcEsopFileEntity> annexs = new();
+            foreach (var item in dto.Attachments)
+            {
+                var attachment = new InteAttachmentEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Name = item.Name,
+                    Path = item.Path,
+                    CreatedBy = updatedBy,
+                    UpdatedBy = updatedBy
+                };
+                attachments.Add(attachment);
+
+                var annex = new ProcEsopFileEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    EsopId = dto.Id,
+                    AttachmentId = attachment.Id,
+                    CreatedBy = updatedBy,
+                    UpdatedBy = updatedBy
+                };
+                annexs.Add(annex);
+            }
+
+            int rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows += await _inteAttachmentRepository.InsertRangeAsync(attachments);
+                rows += await _esopFileRepository.InsertsAsync(annexs);
+                trans.Complete();
+            }
+            return rows;
+        }
+
+        /// <summary>
+        /// 附件删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> AttachmentDeleteAsync(long[] ids)
+        {
+            return await _esopFileRepository.DeletesAsync(new DeleteCommand
+            {
+                Ids = ids,
+                DeleteOn = HymsonClock.Now(),
+                UserId = _currentUser.UserName
+            });
         }
     }
 }

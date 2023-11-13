@@ -49,10 +49,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.PanelRequestBos == null || commonBo.PanelRequestBos.Any() == false) return;
+            if (commonBo.PanelRequestBos == null || !commonBo.PanelRequestBos.Any()) return;
 
             // 存在载具条码（说明是载具传参）
-            if (commonBo.PanelRequestBos.Any(a => string.IsNullOrEmpty(a.VehicleCode) == false))
+            if (commonBo.PanelRequestBos.Any(a => !string.IsNullOrEmpty(a.VehicleCode)))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18520));
             }
@@ -109,7 +109,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             return await Task.FromResult(new JobResponseBo
             {
                 Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } },
-                Message = ""
+                Message = _localizationService.GetResource(nameof(ErrorCode.MES16363))
             });
         }
 

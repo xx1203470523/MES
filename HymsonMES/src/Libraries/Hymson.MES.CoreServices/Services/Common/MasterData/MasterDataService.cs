@@ -34,7 +34,6 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -149,6 +148,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 不合格代码仓储
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+        private readonly IProcSortingRuleRepository _sortingRuleRepository;
 
         /// <summary>
         /// 仓储接口（设备注册）
@@ -200,7 +200,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-            IEquEquipmentRepository equEquipmentRepository)
+            IEquEquipmentRepository equEquipmentRepository,
+            IProcSortingRuleRepository sortingRuleRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -224,6 +225,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _equEquipmentRepository= equEquipmentRepository;
+            _sortingRuleRepository = sortingRuleRepository;
         }
 
 
@@ -591,8 +593,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
             }
 
-            // 获取下一工序
-            if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
             return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
         }
 
@@ -694,7 +694,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
 
             // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
-            if (nodesOfOrdered.Any() == false)
+            if (!nodesOfOrdered.Any())
             {
                 // 当前工序
                 var currentEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
@@ -783,24 +783,24 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param)
         {
-            var InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
+            var inteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
             {
                 BusinessId = param.ResourceId,
                 LinkPoint = param.LinkPoint,
                 IsUse = true
             });
-            if (InteJobBusinessRelations == null || !InteJobBusinessRelations.Any())
+            if (inteJobBusinessRelations == null || !inteJobBusinessRelations.Any())
             {
-                InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
+                inteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
                     BusinessId = param.ProcedureId,
                     LinkPoint = param.LinkPoint,
                     IsUse = true
                 });
             }
-            if (InteJobBusinessRelations == null || !InteJobBusinessRelations.Any()) return null;
+            if (inteJobBusinessRelations == null || !inteJobBusinessRelations.Any()) return null;
 
-            var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
+            var jobEntities = await _inteJobRepository.GetByIdsAsync(inteJobBusinessRelations.Select(s => s.JobId));
             return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
         }
 
@@ -1338,5 +1338,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             return targetQty * originValue / originQty;
         }
 
+        /// <summary>
+        /// 读取分选规则信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query)
+        {
+            return await _sortingRuleRepository.GetProcSortingRuleEntitiesAsync(query);
+        }
     }
 }

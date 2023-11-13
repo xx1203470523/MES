@@ -116,12 +116,12 @@ namespace Hymson.MES.Services.Services.Report
                 SFC = queryDto.Sfc,
                 Type = queryDto.Type
             });
-            if (manuSfcCirculations.Any() == false) return bomDetailViews;
+            if (!manuSfcCirculations.Any()) return bomDetailViews;
 
             // 拿到所有工单
             var orderIds = manuSfcCirculations.Select(x => x.WorkOrderId);
             var orders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
-            if (orders.Any() == false) return bomDetailViews;
+            if (!orders.Any()) return bomDetailViews;
 
             //根据工单拿到所有bom信息
             var bomIds = orders.Select(x => x.ProductBOMId).ToList();

@@ -1,5 +1,6 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.Infrastructure.Mapper;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
@@ -7,18 +8,18 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.Utils;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
 {
     /// <summary>
     /// 扩展方法
     /// </summary>
-    public static class ManuSfcProduceExtensions
+    public static class ManufactureExtensions
     {
         /// <summary>
         /// 条码资源关联校验
@@ -95,12 +96,28 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             var sfcProduceEntitiesOfStatus = sfcProduceEntities.Where(a => a.Status != sfcStatus);
             if (sfcProduceEntitiesOfStatus.Any())
             {
+                var validationFailures = new List<ValidationFailure>();
                 foreach (var item in sfcProduceEntitiesOfStatus)
                 {
+                    var validationFailure = new ValidationFailure();
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Status));
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16361);
+                    validationFailures.Add(validationFailure);
+
+                    /*
                     throw new CustomerValidationException(nameof(ErrorCode.MES16361))
                         .WithData("SFC", item.SFC)
                         .WithData("Current", localizationService.GetSFCStatusEnumDescription(item.Status))
                         .WithData("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
+                    */
+                }
+
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException(localizationService.GetResource("SFCError"), validationFailures);
                 }
             }
 
@@ -112,18 +129,35 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// </summary>
         /// <param name="sfcProduceEntities"></param>
         /// <param name="cycle"></param>
-        public static IEnumerable<ManuSfcProduceEntity> VerifySFCRepeatedCount(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, int cycle)
+        /// <param name="localizationService"></param>
+        public static IEnumerable<ManuSfcProduceEntity> VerifySFCRepeatedCount(this IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, int cycle, ILocalizationService localizationService)
         {
             // 复投次数验证
             var moreThanEntities = sfcProduceEntities.Where(a => a.RepeatedCount >= cycle);
             if (!moreThanEntities.Any()) return sfcProduceEntities;
 
+            var validationFailures = new List<ValidationFailure>();
             foreach (var entity in moreThanEntities)
             {
+                var validationFailure = new ValidationFailure();
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", entity.SFC);
+                validationFailure.FormattedMessagePlaceholderValues.Add("SFC", entity.SFC);
+                validationFailure.FormattedMessagePlaceholderValues.Add("Current", entity.RepeatedCount);
+                validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", cycle);
+                validationFailure.ErrorCode = nameof(ErrorCode.MES16360);
+                validationFailures.Add(validationFailure);
+
+                /*
                 throw new CustomerValidationException(nameof(ErrorCode.MES16360))
                     .WithData("Current", entity.RepeatedCount)
                     .WithData("Cycle", cycle)
                     .WithData("SFC", entity.SFC);
+                */
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(localizationService.GetResource("SFCError"), validationFailures);
             }
 
             return moreThanEntities;
@@ -285,18 +319,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 SfcStatusEnum.Scrapping => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Scrapping)}"),
                 _ => ""
             };
-        }
-
-        /// <summary>
-        /// 转换BO对象
-        /// </summary>
-        /// <typeparam name="TBo"></typeparam>
-        /// <param name="bo"></param>
-        /// <returns></returns>
-        public static TBo ToBo<TBo>(this JobBaseBo bo) where TBo : JobBaseBo
-        {
-            if (bo == null) throw new ArgumentNullException(nameof(bo));
-            return AutoMapperConfiguration.Mapper.Map<TBo>(bo);
         }
 
     }

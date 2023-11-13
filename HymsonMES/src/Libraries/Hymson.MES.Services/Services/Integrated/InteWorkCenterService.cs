@@ -250,7 +250,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
-                    if (param.ResourceIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
+                    if (!param.ResourceIds.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
 
                     inteWorkCenterResourceRelations.AddRange(param.ResourceIds.Select(s => new InteWorkCenterResourceRelation
                     {
@@ -359,7 +359,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
-                    //if (param.ResourceIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
+                    //if (!param.ResourceIds.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
 
                     inteWorkCenterResourceRelations.AddRange(param.ResourceIds.Select(s => new InteWorkCenterResourceRelation
                     {
@@ -387,7 +387,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     // 判断资源是否被重复绑定
                     var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
-                    if (workCenterIds != null && workCenterIds.Any() == true && workCenterIds.Contains(entity.Id) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
+                    if (workCenterIds != null && workCenterIds.Any() == true && !workCenterIds.Contains(entity.Id)) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
                     break;
                 default:
                     break;

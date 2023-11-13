@@ -1,11 +1,12 @@
-﻿using Hymson.MES.CoreServices.Bos.Manufacture;
+﻿using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Parameter
 {
     /// <summary>
     /// 参数采集实体类
     /// </summary>
-    public record ParameterBo : ManufactureBo
+    public record ParameterBo : BaseBo
     {
         /// <summary>
         /// 参数Id

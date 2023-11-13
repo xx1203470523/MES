@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Web.Framework.Attributes;
@@ -285,9 +286,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("getActivityListByProcedureIdAndResId")]
-        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResId([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResIdAsync([FromQuery] ManuSfcProduceByProcedureIdAndResourceIdDto query) 
         {
-            return await _manuSfcProduceService.GetActivityListByProcedureIdAndResId(query);
+            return await _manuSfcProduceService.GetActivityListByProcedureIdAndResIdAsync(query);
         }
 
         /// <summary>
@@ -296,9 +297,20 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpGet("getVehicleActivityListByProcedureIdAndResId")]
-        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResId([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
+        public async Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResIdAsync([FromQuery] ActivityVehicleByProcedureIdAndResourceIdDto query) 
         {
-            return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResId(query);
+            return await _manuSfcProduceService.GetVehicleActivityListByProcedureIdAndResIdAsync(query);
+        }
+
+        /// <summary>
+        /// 获取工序排队条码所对应的载具信息进行分页查询列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [HttpGet("getVehicleBySfcLineUpPageList")]
+        public async Task<PagedInfo<InteVehicleViewDto>> GetVehicleInfoBySfcLineUpPagedInfoAsync([FromQuery] LineUpVehicleByProcedureIdDto query)
+        {
+            return await _manuSfcProduceService.GetVehicleLineUpPageByProcedureIdPagedInfoAsync(query);
         }
     }
 }

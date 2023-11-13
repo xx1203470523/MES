@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="stepIds"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long>  stepIds)
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long> stepIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetBySfcStepIdsSql, new { StepIds = stepIds });
@@ -178,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys)
         {
-            if (manuProductBadRecordEntitys == null || manuProductBadRecordEntitys.Any() == false) return 0;
+            if (manuProductBadRecordEntitys == null || !manuProductBadRecordEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, manuProductBadRecordEntitys);
@@ -288,8 +288,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
             {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
-                    sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
             }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;

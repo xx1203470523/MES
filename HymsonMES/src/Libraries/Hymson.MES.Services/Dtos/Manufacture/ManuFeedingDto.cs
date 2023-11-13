@@ -192,4 +192,50 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public IEnumerable<long>? MaterialIds { get; set; }
 
     }
+
+    /// <summary>
+    /// 保存响应对象（物料加载）
+    /// </summary>
+    public record ManuFeedingMaterialResponseDto
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 主物料ID/产品ID（选中的主物料）
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 主物料编码/产品编码（选中的主物料）
+        /// </summary>
+        public string ProductCode { get; set; }
+
+        /// <summary>
+        /// 物料条码
+        /// </summary>
+        public string BarCode { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+    }
 }
