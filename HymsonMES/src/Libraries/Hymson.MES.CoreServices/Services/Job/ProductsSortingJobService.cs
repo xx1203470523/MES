@@ -4,6 +4,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
@@ -486,6 +487,11 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             {
                 await _gradeDetailRepository.InsertsAsync(data.GradeDetailEntities);
             }
+
+            // 面板需要的数据
+            List<PanelModuleEnum> panelModules = new() { PanelModuleEnum.ProcSortingRule };
+            responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
+
             return responseBo;
         }
 

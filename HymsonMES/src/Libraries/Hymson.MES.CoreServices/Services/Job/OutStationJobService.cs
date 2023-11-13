@@ -587,7 +587,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                 if (SFCProduceEntity != null)
                 {
-                    // 面板需要的参数
+                    // 面板需要的数据
                     List<PanelModuleEnum> panelModules = new();
                     responseBo.Content = new Dictionary<string, string> {
                         { "PanelModules", panelModules.ToSerialize() },
