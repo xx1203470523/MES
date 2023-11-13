@@ -22,7 +22,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         {
             services.AddCoreService(configuration);
             AddEventBusServices(services);
-            AddConfig(services, configuration);
+            AddConfig(services);
             AddServices(services);
             return services;
         }
