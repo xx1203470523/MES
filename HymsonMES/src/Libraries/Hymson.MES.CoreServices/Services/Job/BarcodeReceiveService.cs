@@ -127,7 +127,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return default;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return default;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
@@ -138,7 +138,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 SiteId = multiSFCBo.SiteId,
                 Sfcs = multiSFCBo.SFCs
             });
-            //var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
 
             var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetManuSfcEntitiesAsync, new ManuSfcQuery { SiteId = multiSFCBo.SiteId, SFCs = multiSFCBo.SFCs });
 
@@ -393,14 +392,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 throw new ValidationException(commonBo.LocalizationService.GetResource("SFCError"), validationFailures);
             }
-
-            /*
-            // 手动写进缓存
-            var func = _masterDataService.GetProduceEntitiesBySFCsWithCheckAsync;
-            var paramString = multiSFCBo.ToSerialize();
-            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{paramString}".GetHashCode();
-            commonBo.Proxy.Set(cacheKey, manuSfcProduceList);
-            */
 
             return new BarcodeSfcReceiveResponseBo
             {

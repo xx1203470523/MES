@@ -437,10 +437,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 Sfcs = sfcBos.SFCs
             });
 
-            if (sfcProduceEntities.Any() == false)
+            if (!sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', sfcBos.SFCs));
-            };
+            }
 
             // 不存在在制表的话，就去库存查找？？
 
@@ -789,7 +789,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 LinkPoint = param.LinkPoint,
                 IsUse = true
             });
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false)
+            if (InteJobBusinessRelations == null || !InteJobBusinessRelations.Any())
             {
                 InteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
@@ -798,7 +798,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     IsUse = true
                 });
             }
-            if (InteJobBusinessRelations == null || InteJobBusinessRelations.Any() == false) return null;
+            if (InteJobBusinessRelations == null || !InteJobBusinessRelations.Any()) return null;
 
             var jobEntities = await _inteJobRepository.GetByIdsAsync(InteJobBusinessRelations.Select(s => s.JobId));
             return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
@@ -917,7 +917,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
                     if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
                     {
@@ -1015,7 +1015,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
                     if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
                     {
@@ -1302,7 +1302,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 SiteId = param.SiteId,
                 EquipmentCode = param.EquipmentCode
             });
-            if (resourceBindEntities == null || resourceBindEntities.Any() == false)
+            if (resourceBindEntities == null || !resourceBindEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19910))
                     .WithData("ResCode", param.ResourceCode)

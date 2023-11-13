@@ -31,9 +31,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// 添加配置
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="configuration"></param>
         /// <returns></returns>
-        private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection AddConfig(IServiceCollection services)
         {
             return services;
         }

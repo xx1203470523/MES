@@ -116,7 +116,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         {
             // 复投次数验证
             var moreThanEntities = sfcProduceEntities.Where(a => a.RepeatedCount >= cycle);
-            if (moreThanEntities.Any() == false) return sfcProduceEntities;
+            if (!moreThanEntities.Any()) return sfcProduceEntities;
 
             foreach (var entity in moreThanEntities)
             {
@@ -201,7 +201,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         public static IEnumerable<ManuSfcProduceBusinessEntity>? VerifyProcedureLock(this IEnumerable<ManuSfcProduceBusinessEntity> sfcProduceBusinessEntities, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, ProcProcedureEntity procedureEntity)
         {
             // 是否被锁定
-            if (sfcProduceBusinessEntities == null || sfcProduceBusinessEntities.Any() == false) return sfcProduceBusinessEntities;
+            if (sfcProduceBusinessEntities == null || !sfcProduceBusinessEntities.Any()) return sfcProduceBusinessEntities;
             if (sfcProduceBusinessEntities.Any(a => a.BusinessType != ManuSfcProduceBusinessType.Lock)) return sfcProduceBusinessEntities;
 
             foreach (var sfcProduceBusinessEntity in sfcProduceBusinessEntities)

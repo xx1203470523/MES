@@ -135,7 +135,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
 
             // 进站工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
@@ -143,13 +143,13 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 读取工序关联的资源
             var resourceIds = await commonBo.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, commonBo.ProcedureId);
-            if (resourceIds == null || resourceIds.Any() == false)
+            if (resourceIds == null || !resourceIds.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("ProcedureCode", procedureEntity.Code);
             }
 
             // 校验工序和资源是否对应
-            if (resourceIds.Any(a => a == commonBo.ResourceId) == false)
+            if (!resourceIds.Any(a => a == commonBo.ResourceId))
             {
                 _logger.LogWarning($"工序{commonBo.ProcedureId}和资源{commonBo.ResourceId}不对应！");
                 throw new CustomerValidationException(nameof(ErrorCode.MES16317));
@@ -160,7 +160,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 获取生产条码信息
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
@@ -219,7 +219,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         BeginProcedureId = sfcProduce.ProcedureId,
                         EndProcedureId = commonBo.ProcedureId
                     });
-                    if (isAllRandomProcedureBetween == false)
+                    if (!isAllRandomProcedureBetween)
                     {
                         _logger.LogWarning($"条码{sfcProduce.SFC}，工艺路线:{sfcProduce.ProcessRouteId}，应进站工序{sfcProduce.ProcedureId}和实际进站工序{commonBo.ProcedureId}之间不是全部都是随机工序");
 
@@ -265,7 +265,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return default;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return default;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
@@ -375,7 +375,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 归集每个条码的出站结果
-            if (responseBos.Any() == false) return responseSummaryBo;
+            if (!responseBos.Any()) return responseSummaryBo;
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
             responseSummaryBo.InStationManuSfcByIdCommands = responseBos.Select(s => s.InStationManuSfcByIdCommand);
@@ -409,7 +409,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             JobResponseBo responseBo = new();
             if (obj is not InStationResponseSummaryBo data) return responseBo;
-            if (data.SFCProduceEntities == null || data.SFCProduceEntities.Any() == false) return responseBo;
+            if (data.SFCProduceEntities == null || !data.SFCProduceEntities.Any()) return responseBo;
 
             // 更改状态（在制品），如果状态一致，这里会直接返回0
             responseBo.Rows += await _manuSfcProduceRepository.UpdateProduceInStationSFCAsync(data.UpdateProduceInStationSFCCommands);
