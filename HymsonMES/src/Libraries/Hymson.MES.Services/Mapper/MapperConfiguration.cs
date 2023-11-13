@@ -363,8 +363,10 @@ namespace Hymson.MES.Services.Mapper
             #region Material
             CreateMap<ProcMaterialCreateDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialModifyDto, ProcMaterialEntity>();
+            CreateMap<ProcMaterialImportDto, ProcMaterialEntity>();
             CreateMap<ProcMaterialPagedQueryDto, ProcMaterialPagedQuery>();
             CreateMap<ProcMaterialEntity, ProcMaterialDto>();
+            CreateMap<ProcMaterialEntity, ProcMaterialExportDto>();
             CreateMap<ProcMaterialView, ProcMaterialViewDto>();
 
             CreateMap<ProcMaterialReplaceDto, ProcReplaceMaterialEntity>();
@@ -391,6 +393,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcParameterPagedQueryDto, ProcParameterPagedQuery>();
             CreateMap<ProcParameterEntity, ProcParameterDto>();
             CreateMap<ProcParameterEntity, CustomProcParameterDto>();
+            CreateMap<ProcParameterEntity, ProcParameterExportDto>();
             #endregion
 
             #region ParameterLinkType
@@ -419,6 +422,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcLoadPointModifyDto, ProcLoadPointEntity>();
             CreateMap<ProcLoadPointPagedQueryDto, ProcLoadPointPagedQuery>();
             CreateMap<ProcLoadPointEntity, ProcLoadPointDto>();
+            CreateMap<ProcLoadPointPagedQuery, ProcLoadPointPagedQueryDto>();
             #endregion
 
             #region LoadPointLink

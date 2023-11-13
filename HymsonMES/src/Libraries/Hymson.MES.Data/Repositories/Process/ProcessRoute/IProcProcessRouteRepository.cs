@@ -101,5 +101,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
+        /// <summary>
+        /// 根据编码获取工艺路线信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteEntity>> GetByCodesAsync(ProcProcessRoutesByCodeQuery param);
+
     }
 }

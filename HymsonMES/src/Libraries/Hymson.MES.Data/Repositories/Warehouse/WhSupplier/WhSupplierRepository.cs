@@ -8,9 +8,11 @@
 
 using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -185,6 +187,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             return await conn.ExecuteAsync(UpdatesSql, whSupplierEntitys);
         }
 
+        /// <summary>
+        /// 根据编码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<WhSupplierEntity>> GetByCodesAsync(WhSuppliersByCodeQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<WhSupplierEntity>(GetByCodesSql, param);
+        }
+
     }
 
     public partial class WhSupplierRepository
@@ -208,5 +221,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                                           `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `wh_supplier`  WHERE Id IN @ids "
         ;
+        const string GetByCodesSql = @"SELECT * FROM `wh_supplier` WHERE Code IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

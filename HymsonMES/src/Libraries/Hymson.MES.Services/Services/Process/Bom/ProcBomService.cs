@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -9,14 +10,20 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using FluentValidation.Results;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
 using System.Transactions;
+using Minio.DataModel;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -40,12 +47,15 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
         private readonly AbstractValidator<ProcBomCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<ImportBomDto> _validationImportRules;
         private readonly AbstractValidator<ProcBomModifyDto> _validationModifyRules;
 
         private readonly IProcBomDetailRepository _procBomDetailRepository;
         private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
 
         private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
         /// 构造函数
@@ -58,22 +68,31 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="localizationService"></param>
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
+        /// <param name="validationImportRules"></param>
         public ProcBomService(ICurrentSite currentSite, ICurrentUser currentUser,
             IProcBomRepository procBomRepository,
             AbstractValidator<ProcBomCreateDto> validationCreateRules,
             AbstractValidator<ProcBomModifyDto> validationModifyRules,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
+            AbstractValidator<ImportBomDto> validationImportRules,
+        IProcBomDetailRepository procBomDetailRepository,
+            IExcelService excelService,
+            IMinioService minioService,
+        IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
             ,ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
             _procBomRepository = procBomRepository;
             _validationCreateRules = validationCreateRules;
+            _validationImportRules= validationImportRules;
             _validationModifyRules = validationModifyRules;
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _localizationService = localizationService;
+            _excelService= excelService;
+            _minioService= minioService;
         }
 
         /// <summary>
@@ -612,5 +631,207 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         #endregion
+
+        /// <summary>
+        /// 导入Bom录入表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportBomAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<ImportBomDto>(memoryStream);
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach (var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid)
+                {
+                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    {
+                        foreach (var validationFailure in validationResult.Errors)
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                            validationFailures.Add(validationFailure);
+                        }
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            #region 检测导入Bon编码是否重复
+            var repeats = new List<string>();
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.BomCode,x.Version});
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add($@"[{item.Key.BomCode},{item.Key.Version}]");
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("Bom编码{repeats}重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            List<ProcBomEntity> importBomList = new();
+            #endregion
+
+            #region  验证数据库中是否存在数据，且组装数据
+
+            var currentRow=0;
+            foreach(var item in excelImportDtos)
+            {
+                currentRow++;
+                 var Boms= await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery
+                 {
+                     SiteId = _currentSite.SiteId ?? 0,
+                     BomCode=item.BomCode,
+                     Version =item.Version
+                 });
+                if (Boms.Any())
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10601), item.BomCode, currentRow, "bomCode","version"));
+                }
+
+                if (!Boms.Any())
+                {
+                    var BomInfoEntity = new ProcBomEntity()
+                    {
+                        BomCode = item.BomCode,
+                        BomName = item.BomName,
+                        Version = item.Version,
+                        IsCurrentVersion = item.IsCurrentVersion== YesOrNoEnum.Yes?true:false,
+                        Remark = item.Remark,
+                        Status = SysDataStatusEnum.Build,
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0
+                    };
+                    importBomList.Add(BomInfoEntity);
+                }
+            }
+            #endregion
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+
+                //保存记录 
+                if (importBomList.Any())
+                    await _procBomRepository.InsertsAsync(importBomList);
+                ts.Complete();
+            }
+
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <param name="keys"></param>
+        /// 
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code",string keys="codes")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage },
+                {keys,codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ImportBomDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "Bom导入模板");
+        }
+
+        /// <summary>
+        /// 根据查询条件导出Bom数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<BomExportResultDto> ExprotBomPageListAsync(ProcBomPagedQuery param)
+        {
+            var pagedQuery = param.ToQuery<ProcBomPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId.Value;
+            pagedQuery.PageSize = 1000;
+            var pagedInfo = await _procBomRepository.GetPagedInfoAsync(param);
+
+            //实体到DTO转换 装载数据
+            List<ExportBomDto> listDto = new();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BomInfo"), _localizationService.GetResource("BomInfo"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new BomExportResultDto
+                {
+                    FileName = _localizationService.GetResource("BomInfo"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new ExportBomDto()
+                {
+                    BomCode = item.BomCode ?? "",
+                    BomName = item.BomName ?? "",
+                    Version = item.Version ?? "",
+                    Status = item.Status.GetDescription()
+                }) ;
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BomInfo"), _localizationService.GetResource("BomInfo"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new BomExportResultDto
+            {
+                FileName = _localizationService.GetResource("BomInfo"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+
+        }
+
     }
 }

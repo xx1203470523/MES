@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Warehouse;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -71,5 +73,25 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="param"></param>
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
+
+        /// <summary>
+        /// 导入物料表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportProcMaterialAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 根据查询条件导出物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<ProcMaterialExportResultDto> ExprotProcMaterialListAsync(ProcMaterialPagedQueryDto param);
     }
 }

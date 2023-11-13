@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -364,7 +365,30 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 
-        
+        /// <summary>
+        /// 根据编码获取物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetByCodesAsync(ProcMaterialsByCodeQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetByCodesSql, param);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ProcMaterialEntity> entities)
+        {
+            if (entities == null || entities.Any() == false) return 0;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertSql, entities);
+        }
+
     }
 
     public partial class ProcMaterialRepository
@@ -439,5 +463,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateProcMaterialUnboundSql = "UPDATE `proc_material` SET GroupId= 0 WHERE GroupId = @GroupId ";
 
         const string UpdateStatusSql = "UPDATE `proc_material` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        
+        const string GetByCodesSql = @"SELECT * FROM `proc_material` WHERE MaterialCode IN @MaterialCodes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

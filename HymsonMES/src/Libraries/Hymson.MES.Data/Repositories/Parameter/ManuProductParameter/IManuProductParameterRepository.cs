@@ -42,14 +42,14 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntities(ManuProductParameterBySfcQuery param);
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCEntities(ManuProductParameterBySfcQuery param);
 
         /// <summary>
         /// 更具工序获取参数信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntities(ManuProductParameterByProcedureIdQuery param);
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterByProcedureIdEntities(ManuProductParameterByProcedureIdQuery param);
 
         /// <summary>
         /// 修改参数值
@@ -65,18 +65,12 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="list"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<ManuProductParameterUpdateCommand> list, string tableName);
-
         /// <summary>
-        /// 创建数据库表
+        /// 准备工序维度创建数据库表sql语句
         /// </summary>
-        /// <param name="tableName"></param>
+        /// <param name="siteId"></param>
+        /// <param name="procedureId"></param>
         /// <returns></returns>
-        Task<int> CreateProductParameterTableAsync(string tableName);
-
-        /// <summary>
-        /// 获取创建表脚本
-        /// </summary>
-        /// <returns></returns>
-        Task<string?> ShowCreateTableAsync(string tableName);
+        string PrepareProductParameterProcedureIdTableSql(long siteId, long procedureId);
     }
 }

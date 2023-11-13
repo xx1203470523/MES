@@ -11,13 +11,6 @@ namespace Hymson.MES.CoreServices.Services.Parameter
     public interface IManuProductParameterService
     {
         /// <summary>
-        /// 插入数据
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task InsertRangeAsync(IEnumerable<ParameterDto> param);
-
-        /// <summary>
         /// 更具工序参数信息
         /// </summary>
         /// <param name="param"></param>
@@ -25,21 +18,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param);
 
         /// <summary>
-        /// 更具条码获取参数信息
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFCAsync(QueryParameterBySfcDto param);
-
-        /// <summary>
-        /// 修改参数
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task UpdateProductParameterByIdAsync(List<UpdateParameterDto> param);
-
-        /// <summary>
-        ///创建数据库表
+        /// 参数采集
         /// </summary>
         /// <returns></returns>
         Task CreateProductParameterTableAsync(string tabname);

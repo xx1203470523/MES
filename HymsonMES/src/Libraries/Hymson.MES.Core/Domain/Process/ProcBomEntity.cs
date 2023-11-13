@@ -51,5 +51,21 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string? Remark { get; set; }
-        }
+    }
+
+    /// <summary>
+    ///根具编码查询Bom
+    /// </summary>
+    public class ProcBomsByCodeQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string?> Codes { get; set; }
+    }
 }

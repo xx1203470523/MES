@@ -9,7 +9,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Parameter
     /// <summary>
     /// 产品过程参数
     /// </summary>
-    public  class ProductProcessParameterDto
+    public class ProductProcessParameterDto
     {
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Parameter
         /// <summary>
         /// 产品列表
         /// </summary>
-        public IEnumerable<ProductDto> Products { get; set; }=new List<ProductDto>();
+        public IEnumerable<ProductDto> Products { get; set; } = new List<ProductDto>();
     }
 
     /// <summary>
@@ -59,4 +59,4 @@ namespace Hymson.MES.EquipmentServices.Dtos.Parameter
         /// </summary>
         public DateTime CollectionTime { get; set; }
     }
-    }
+}
