@@ -15,6 +15,8 @@ using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcGrade.Command;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -55,23 +57,23 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         ///产品参数采集
         /// </summary>
-        private readonly IManuProductParameterService _manuProductParameterService;
+        private readonly IManuProductParameterRepository _productParameterRepository;
 
         public ProductsSortingJobService(IManuSfcGradeRepository manuSfcGradeRepository,
             IManuSfcGradeDetailRepository gradeDetailRepository,
             IProcSortingRuleDetailRepository sortingRuleDetailRepository,
             IProcSortingRuleGradeRepository sortingRuleGradeRepository,
             IProcSortingRuleGradeDetailsRepository ruleGradeDetailsRepository,
-            IMasterDataService masterDataService,
-            IManuProductParameterService manuProductParameterService)
+            IManuProductParameterRepository productParameterRepository,
+            IMasterDataService masterDataService)
         {
             _manuSfcGradeRepository = manuSfcGradeRepository;
             _gradeDetailRepository = gradeDetailRepository;
             _sortingRuleDetailRepository = sortingRuleDetailRepository;
             _sortingRuleGradeRepository = sortingRuleGradeRepository;
             _ruleGradeDetailsRepository = ruleGradeDetailsRepository;
+            _productParameterRepository = productParameterRepository;
             _masterDataService = masterDataService;
-            _manuProductParameterService = manuProductParameterService;
         }
 
         /// <summary>
@@ -121,10 +123,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             //获取到条码的参数信息
-            var parameterList = await _manuProductParameterService.GetProductParameterListByProcedureAsync(new QueryParameterByProcedureDto
+            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(new ManuProductParameterBySfcQuery
             {
                 SiteId = commonBo.SiteId,
-                ProcedureId = commonBo.ProcedureId,
                 SFCs = sfcs
             });
 
@@ -204,10 +205,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             sfcs = sfcProduceEntities.Select(x => x.SFC).ToList();
             //获取到条码的参数信息
-            var parameterList = await _manuProductParameterService.GetProductParameterListByProcedureAsync(new QueryParameterByProcedureDto
+            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(new ManuProductParameterBySfcQuery
             {
                 SiteId = commonBo.SiteId,
-                ProcedureId = commonBo.ProcedureId,
                 SFCs = sfcs
             });
             if (parameterList == null || !parameterList.Any())
