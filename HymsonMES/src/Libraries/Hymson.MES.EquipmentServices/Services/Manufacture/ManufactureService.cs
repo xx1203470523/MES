@@ -108,7 +108,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceCode = baseDto.ResourceCode
             });
 
-            if (manuSFCEntities == null || manuSFCEntities.Any() == false) return Enumerable.Empty<string>();
+            if (manuSFCEntities == null || !manuSFCEntities.Any()) return Enumerable.Empty<string>();
             return manuSFCEntities.Select(s => s.SFC);
         }
 
@@ -352,7 +352,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 SiteId = requestBo.SiteId,
                 EquipmentCode = requestBo.EquipmentCode
             });
-            if (resourceBindEntities == null || resourceBindEntities.Any() == false)
+            if (resourceBindEntities == null || !resourceBindEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19131))
                     .WithData("ResCode", requestBo.ResourceCode)

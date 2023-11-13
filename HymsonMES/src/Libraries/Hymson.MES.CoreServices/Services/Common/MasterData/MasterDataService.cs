@@ -14,6 +14,8 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
@@ -25,6 +27,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Sequences;
@@ -148,6 +151,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IProcSortingRuleRepository _sortingRuleRepository;
 
         /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
@@ -192,6 +200,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IEquEquipmentRepository equEquipmentRepository,
             IProcSortingRuleRepository sortingRuleRepository)
         {
             _logger = logger;
@@ -215,6 +224,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
+            _equEquipmentRepository= equEquipmentRepository;
             _sortingRuleRepository = sortingRuleRepository;
         }
 
@@ -429,7 +439,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 Sfcs = sfcBos.SFCs
             });
 
-            if (sfcProduceEntities.Any() == false)
+            if (!sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', sfcBos.SFCs));
             };
@@ -583,8 +593,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
             }
 
-            // 获取下一工序
-            if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
             return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
         }
 
@@ -686,7 +694,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
 
             // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
-            if (nodesOfOrdered.Any() == false)
+            if (!nodesOfOrdered.Any())
             {
                 // 当前工序
                 var currentEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
@@ -781,7 +789,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 LinkPoint = param.LinkPoint,
                 IsUse = true
             });
-            if (inteJobBusinessRelations == null || inteJobBusinessRelations.Any() == false)
+            if (inteJobBusinessRelations == null || !inteJobBusinessRelations.Any())
             {
                 inteJobBusinessRelations = await _inteJobBusinessRelationRepository.GetByJobByBusinessIdAsync(new InteJobBusinessRelationByBusinessIdQuery
                 {
@@ -790,7 +798,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     IsUse = true
                 });
             }
-            if (inteJobBusinessRelations == null || inteJobBusinessRelations.Any() == false) return null;
+            if (inteJobBusinessRelations == null || !inteJobBusinessRelations.Any()) return null;
 
             var jobEntities = await _inteJobRepository.GetByIdsAsync(inteJobBusinessRelations.Select(s => s.JobId));
             return jobEntities.Select(s => new JobBo { Name = s.ClassProgram });
@@ -909,7 +917,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
                     if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
                     {
@@ -1007,7 +1015,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 if (materialEntitiy.ConsumeRatio.HasValue) deduct.ConsumeRatio = materialEntitiy.ConsumeRatio.Value;
 
                 // 填充BOM替代料
-                if (item.IsEnableReplace == false)
+                if (!item.IsEnableReplace)
                 {
                     if (replaceMaterialsForBOMDic.TryGetValue(item.Id, out var replaces))
                     {
@@ -1266,6 +1274,56 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     }, false);
             }
         }
+
+        /// <summary>
+        /// 获取当前生产对象
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public  async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
+        {
+            // 根据设备
+            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = param.SiteId,
+                Code = param.EquipmentCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", param.EquipmentCode);
+
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = param.SiteId,
+                Code = param.ResourceCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", param.ResourceCode);
+
+            // 读取设备绑定的资源
+            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
+            {
+                SiteId = param.SiteId,
+                EquipmentCode = param.EquipmentCode
+            });
+            if (resourceBindEntities == null || !resourceBindEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19910))
+                    .WithData("ResCode", param.ResourceCode)
+                    .WithData("EquCode", param.EquipmentCode);
+            }
+
+            // 读取资源对应的工序
+            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
+            {
+                SiteId = param.SiteId,
+                ResourceId = resourceEntity.Id
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", param.ResourceCode);
+
+            return new ManufactureProcedureBo
+            {
+                ResourceId = resourceEntity.Id,
+                ProcedureId = procProcedureEntity.Id,
+                EquipmentId = equipmentEntity.Id
+            };
+        }
+
 
         /// <summary>
         /// 转换数量

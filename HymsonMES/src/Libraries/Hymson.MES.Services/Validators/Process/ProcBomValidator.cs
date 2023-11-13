@@ -36,6 +36,18 @@ namespace Hymson.MES.Services.Validators.Process
         }
     }
 
+    internal class ProcBomImportValidator : AbstractValidator<ImportBomDto>
+    {
+        public ProcBomImportValidator()
+        {
+            RuleFor(x => x.BomCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10613));
+            RuleFor(x => x.BomCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10614));
+            RuleFor(x => x.BomName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10615));
+            RuleFor(x => x.BomName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10616));
+            RuleFor(x => x.Version).NotEmpty().Must(it => it != "").WithErrorCode(nameof(ErrorCode.MES10618));
+        }
+    }
+
     /// <summary>
     /// BOM表 修改 验证
     /// </summary>

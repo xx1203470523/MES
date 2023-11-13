@@ -90,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
-            if (ids.Any() == false) return new List<PlanWorkOrderEntity>();
+            if (!ids.Any()) return new List<PlanWorkOrderEntity>();
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids = ids });
@@ -349,7 +349,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateInputQtyByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands)
         {
-            if (commands == null || commands.Any() == false) return 0;
+            if (commands == null || !commands.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateInputQtySql, commands);
@@ -373,7 +373,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands)
         {
-            if (commands == null || commands.Any() == false) return 0;
+            if (commands == null || !commands.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, commands);

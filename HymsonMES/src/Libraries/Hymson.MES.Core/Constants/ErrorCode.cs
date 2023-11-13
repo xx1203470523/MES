@@ -71,6 +71,15 @@
         public const string MES10229 = "采购类型不合法！";
         public const string MES10230 = "状态不合法！";
         public const string MES10231 = "版本不能为空！";
+        public const string MES10232 = "工艺路线{code}没有找到对应的数据！";
+        public const string MES10233 = "Bom {bomCode}没有找到对应的数据！";
+        public const string MES10234 = "掩码{code}没有找到对应的数据！";
+        public const string MES10235 = "批次需为大于0整数！";
+        public const string MES10236 = "是否默认版本不合法！";
+        public const string MES10237 = "标包数量需为大于0整数！";
+        public const string MES10238 = "基于时间不合法！";
+        public const string MES10239 = "消耗公差需为大于0整数！";
+        public const string MES10240 = "消耗系数需大于0！";
         #endregion
 
         #region 资源 10300
@@ -1015,6 +1024,7 @@
         public const string MES16911 = "实际使用的物料与条码不合!";
 
         public const string MES16913 = "不能删除启用或保留的记录！";
+        public const string MES16914 = "未找到能挂载物料条码的主物料!";
         #endregion
 
         #region 条码打印 MES17000
@@ -1389,7 +1399,7 @@
         public const string MES19603 = "资源编码{Code}不存在";
         public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
         public const string MES19605 = "条码生成失败,半成品记录未找到！";
-
+        public const string MES19606 = "参数{ParameterCodes}不存在";
         #endregion
 
 

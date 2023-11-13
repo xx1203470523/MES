@@ -6,8 +6,10 @@
  *build datetime: 2023-03-03 01:51:43
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,5 +92,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="whSupplierPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<WhSupplierEntity>> GetPagedInfoAsync(WhSupplierPagedQuery whSupplierPagedQuery);
+
+        /// <summary>
+        /// 根据编码获取供应商信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WhSupplierEntity>> GetByCodesAsync(WhSuppliersByCodeQuery param);
     }
 }

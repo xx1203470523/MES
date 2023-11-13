@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -57,6 +59,26 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="param"></param>
         /// <returns></returns>
         Task UpdateStatusAsync(ChangeStatusDto param);
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入上料点录入表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportLoadPointAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 根据查询条件导出上料点数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<LoadPointExportResultDto> ExprotLoadPointPageListAsync(ProcLoadPointPagedQueryDto param);
 
     }
 }

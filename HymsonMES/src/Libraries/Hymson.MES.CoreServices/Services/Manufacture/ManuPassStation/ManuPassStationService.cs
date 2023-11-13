@@ -106,7 +106,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             List<string> SFCs = new();
             List<InStationRequestBo> inStationRequestBos = new();
-            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
+            if (bo.VehicleCodes == null || !bo.VehicleCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
@@ -205,7 +205,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             List<string> SFCs = new();
             List<OutStationRequestBo> outStationRequestBos = new();
-            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
+            if (bo.VehicleCodes == null || !bo.VehicleCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }

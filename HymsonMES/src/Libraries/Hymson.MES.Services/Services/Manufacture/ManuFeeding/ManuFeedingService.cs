@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<long> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
+        public async Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
             // 查询条码
             var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
@@ -404,14 +404,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 Source = saveDto.Source,
                 FeedingPointId = saveDto.FeedingPointId
             });
-            if (manuFeedingMaterialDtos == null || manuFeedingMaterialDtos.Any() == false) return 0;
+            if (manuFeedingMaterialDtos == null || !manuFeedingMaterialDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16914));
 
             // 主物料ID集合
             saveDto.MaterialIds = manuFeedingMaterialDtos.Select(s => s.MaterialId);
 
             // 查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(saveDto.MaterialIds);
-            if (materials == null || materials.Any() == false)
+            if (materials == null || !materials.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             }
@@ -510,7 +510,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             trans.Complete();
 
             // 因为前端要展开这级表格，所以把ID返回去
-            return material.Id;
+            return new ManuFeedingMaterialResponseDto
+            {
+                ResourceId = entity.ResourceId,
+                ProductId = entity.ProductId,
+                ProductCode = material.MaterialCode,
+                Version = material.Version ?? "",
+                Qty = inventory.QuantityResidue,
+                BarCode = inventory.MaterialBarCode,
+                CreatedBy = entity.CreatedBy,
+                CreatedOn = entity.CreatedOn
+            };
         }
 
         /// <summary>
@@ -744,15 +754,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 // 填充主物料替代料
                 if (bomDetailEntitiy.IsEnableReplace)
                 {
-                    if (replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces) == false) continue;
-                    if (replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId) == false) continue;
+                    if (!replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces)) continue;
+                    if (!replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId)) continue;
                 }
                 // 填充BOM替代料
                 else
                 {
                     // 检查是否符合替代料
                     var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                    if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == bo.InventoryMaterialId) == false) continue;
+                    if (!bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == bo.InventoryMaterialId)) continue;
                     //throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
                 }
 
@@ -785,8 +795,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 }
 
                 // 如果不是主物料，就找下替代料
-                if (replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces) == false) continue;
-                if (replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId) == false) continue;
+                if (!replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces)) continue;
+                if (!replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId)) continue;
 
                 material = item;
             }

@@ -18,8 +18,14 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
+using Hymson.Localization.Services;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using System.Transactions;
+using Hymson.Minio;
+
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -31,6 +37,9 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
         private readonly IExcelService _excelService;
+        private readonly IInteCustomRepository _inteCustomRepository1;
+        private readonly ILocalizationService _localizationService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
         /// 客户维护 仓储
@@ -38,20 +47,31 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteCustomRepository _inteCustomRepository;
         private readonly AbstractValidator<InteCustomCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteCustomModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<InteCustomImportDto> _validationImportRules;
+
 
         public InteCustomService(ICurrentUser currentUser,
             ICurrentSite currentSite,
             IInteCustomRepository inteCustomRepository,
             IExcelService excelService,
+            IInteCustomRepository inteCustomRepository1,
+            IMinioService minioService,
+            ILocalizationService localizationService,
+            AbstractValidator<InteCustomImportDto> validationImportRules,
             AbstractValidator<InteCustomCreateDto> validationCreateRules,
-            AbstractValidator<InteCustomModifyDto> validationModifyRules)
+           AbstractValidator<InteCustomModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _excelService = excelService;
+            _minioService = minioService;
+            _localizationService = localizationService;
             _inteCustomRepository = inteCustomRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _validationImportRules = validationImportRules;
+            _inteCustomRepository1=inteCustomRepository1;
+
         }
 
         /// <summary>
@@ -180,5 +200,194 @@ namespace Hymson.MES.Services.Services.Integrated
             var excelTemplateDtos = new List<InteCustomImportDto>();
             await _excelService.ExportAsync(excelTemplateDtos, stream, "客户维护导入模板");
         }
+
+        /// <summary>
+        /// 导入客户信息表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportInteCustomAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<InteCustomImportDto>(memoryStream);
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach(var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid)
+                {
+                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    {
+                        foreach (var validationFailure in validationResult.Errors)
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                            validationFailures.Add(validationFailure);
+                        }
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            #region 检测导入数据编码是否重复
+            var repeats =new List<string>();
+             var hasDuplicates = excelImportDtos.GroupBy(x => new { x.Code});
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add($@"[{item.Key.Code}]");
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("客户编码{repeats}重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            List<InteCustomEntity> inteCustomList = new();
+            #endregion
+
+            #region  验证数据库中是否存在数据，且组装数据
+            var customCodes = await _inteCustomRepository1.GetInteCustomEntitiesAsync(new InteCustomQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.Code).Distinct().ToArray()
+            });
+
+            var currentRow = 0;
+            var customCode=customCodes.Select(x => x.Code).Distinct().ToList();
+            foreach( var item in excelImportDtos) 
+            {
+                currentRow++;
+
+                if (customCode.Contains(item.Code))
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES18402), item.Code, currentRow, "Code"));
+                }
+                //如果客户编码不存在，则组装数据
+                if (!customCode.Contains(item.Code))
+                {
+                    var inteCustomInfoEntity = new InteCustomEntity()
+                    {
+                        Code = item.Code,
+                        Name = item.Name,
+                        Describe = item.Describe ?? "",
+                        Address = item.Address ?? "",
+                        Telephone = item.Telephone ?? "",
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0
+                    };
+                    inteCustomList.Add(inteCustomInfoEntity);
+                }
+            }
+            #endregion
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+
+                //保存记录 
+                if (inteCustomList.Any())
+                    await _inteCustomRepository1.InsertsAsync(inteCustomList);
+                ts.Complete();
+            }
+
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<InteCustomExportResultDto> ExprotInteCustomPageListAsync(InteCustomPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<InteCustomPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId.Value;
+            pagedQuery.PageSize = 1000;
+            var pagedInfo = await _inteCustomRepository.GetPagedInfoAsync(pagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<InteCustomExportDto> listDto = new();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomInfo"), _localizationService.GetResource("CustomInfo"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new InteCustomExportResultDto
+                {
+                    FileName = _localizationService.GetResource("CustomInfo"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new InteCustomExportDto()
+                {
+                    Code = item.Code ?? "",
+                    Name = item.Name ?? "",
+                    Describe = item.Describe ?? "",
+                    Address = item.Address,
+                    Telephone = item.Telephone ?? ""
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("CustomInfo"), _localizationService.GetResource("CustomInfo"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new InteCustomExportResultDto
+            {
+                FileName = _localizationService.GetResource("CustomInfo"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+
+        }
+
     }
 }

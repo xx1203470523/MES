@@ -6,7 +6,9 @@
  *build datetime: 2023-03-03 01:51:43
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,5 +70,25 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<UpdateWhSupplierDto> QueryUpdateWhSupplierByIdAsync(long id);
+
+        /// <summary>
+        /// 导入供应商表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportWhSupplierAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 根据查询条件导出供应商信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<WhSupplierExportResultDto> ExprotWhSupplierListAsync(WhSupplierPagedQueryDto param);
     }
 }

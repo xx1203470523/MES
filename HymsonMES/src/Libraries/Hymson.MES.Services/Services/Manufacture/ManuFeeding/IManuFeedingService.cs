@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<long> CreateAsync(ManuFeedingMaterialSaveDto saveDto);
+        Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto);
 
         /// <summary>
         /// 删除（物料加载）

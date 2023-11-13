@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
@@ -146,5 +147,44 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         #endregion
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procLoadPointService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"上料点导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入上料点数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importLoadPoint")]
+        public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+
+            await _procLoadPointService.ImportLoadPointAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导出客户维护信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<LoadPointExportResultDto> ExprotBomPageListAsync([FromQuery] ProcLoadPointPagedQueryDto param)
+        {
+            return await _procLoadPointService.ExprotLoadPointPageListAsync(param);
+        }
     }
 }

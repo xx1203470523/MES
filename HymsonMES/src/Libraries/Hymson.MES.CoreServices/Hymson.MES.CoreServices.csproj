@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Options\" />
     <Folder Include="Services\Manufacture\ManuBarcodeReceive\" />
   </ItemGroup>
 

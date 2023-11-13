@@ -83,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateSummaryOutStationRangeAsync(IEnumerable<UpdateOutputQtySummaryCommand>? multiUpdateSummaryOutStationCommands)
         {
-            if (multiUpdateSummaryOutStationCommands == null || multiUpdateSummaryOutStationCommands.Any() == false) return 0;
+            if (multiUpdateSummaryOutStationCommands == null || !multiUpdateSummaryOutStationCommands.Any()) return 0;
 
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSummaryOutStationSql, multiUpdateSummaryOutStationCommands);

@@ -82,7 +82,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             entity.SiteId = _currentSite.SiteId;
 
             // 参数校验
-            //if (createDto.DetailList.Any(a => TimeComparison(a.StartTime, a.EndTime) == false) == true)
+            //if (!createDto.DetailList.Any(a => TimeComparison(a.StartTime, a.EndTime)) == true)
             //{
             //    // TODO
             //    //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             List<InteClassDetailEntity> details = new();
             foreach (var item in modifyDto.DetailList)
             {
-                //if (TimeComparison(item.StartTime, item.EndTime) == false)
+                //if (!TimeComparison(item.StartTime, item.EndTime))
                 //{
                 //    // TODO
                 //    //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");

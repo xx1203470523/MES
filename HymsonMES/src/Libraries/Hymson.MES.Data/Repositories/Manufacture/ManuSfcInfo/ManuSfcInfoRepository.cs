@@ -153,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> entities)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (entities == null || !entities.Any()) return 0;
 
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);

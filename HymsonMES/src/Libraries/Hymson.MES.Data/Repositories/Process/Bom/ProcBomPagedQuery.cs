@@ -30,13 +30,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 描述 :BomName 
         /// 空值 : false  
         /// </summary>
-        public string BomCode { get; set; }
+        public string? BomCode { get; set; }
 
         /// <summary>
         /// 描述 :BomName名称 
         /// 空值 : false  
         /// </summary>
-        public string BomName { get; set; }
+        public string? BomName { get; set; }
 
         /// <summary>
         /// 状态
@@ -46,6 +46,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 版本
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
     }
 }
