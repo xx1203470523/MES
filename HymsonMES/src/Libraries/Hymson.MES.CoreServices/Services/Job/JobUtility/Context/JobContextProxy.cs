@@ -356,7 +356,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 if (cacheObj == null) return default;
                 var cacheResult = (IEnumerable<TResult>)cacheObj;
 
-                if (cacheResult == null || cacheResult.Any() == false)
+                if (cacheResult == null || !cacheResult.Any())
                 {
                     try
                     {

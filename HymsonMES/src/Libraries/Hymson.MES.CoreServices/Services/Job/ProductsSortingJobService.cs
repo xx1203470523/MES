@@ -66,7 +66,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
 
             var sfcs = commonBo.InStationRequestBos.Select(s => s.SFC);
             // 验证DTO
@@ -80,7 +80,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             // 获取生产条码信息
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
@@ -122,7 +122,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return default;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return default;
 
             var sfcs = commonBo.InStationRequestBos.Select(s => s.SFC);
             // 验证DTO
@@ -135,7 +135,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
             // 获取条码信息
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false)
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
                 return default;
             }

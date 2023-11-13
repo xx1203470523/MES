@@ -609,7 +609,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             IEnumerable<ProcProcessRouteDetailNodeEntity> childNodes)
         {
             var targetNodes = childNodes;
-            if (nodesOfSorted.Any() == false)
+            if (!nodesOfSorted.Any())
             {
                 // 首工序
                 var firstNode = allNodes.FirstOrDefault(f => f.IsFirstProcess == 1);
@@ -636,7 +636,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             }
 
             //childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
-            if (nextNodes.Any() == false) return;
+            if (!nextNodes.Any()) return;
             if (nodesOfSorted.Count >= allNodes.Count()) return;
 
             SortNodes(ref nodesOfSorted, allNodes, allLinks, nextNodes);

@@ -360,8 +360,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 如果没有读取到有效作业，就提示错误
             if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
 
-            if (dto.Param!.ContainsKey("Type") == false) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "Type");
-            if (dto.Param!.ContainsKey("SFCs") == false) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "SFCs");
+            if (!dto.Param!.ContainsKey("Type")) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "Type");
+            if (!dto.Param!.ContainsKey("SFCs")) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "SFCs");
 
             // 条码类型
             var codeType = CodeTypeEnum.SFC;
@@ -371,7 +371,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             else
             {
-                if (Enum.TryParse(dto.Param["Type"], out codeType) == false) codeType = CodeTypeEnum.SFC;
+                if (!Enum.TryParse(dto.Param["Type"], out codeType)) codeType = CodeTypeEnum.SFC;
             }
 
             // 作业请求参数
@@ -476,7 +476,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 case CodeTypeEnum.SFC:
                     var sfcCodes = dto.Params;
-                    if (sfcCodes == null || sfcCodes.Any() == false)
+                    if (sfcCodes == null || !sfcCodes.Any())
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
                     }
@@ -492,7 +492,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     break;
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
-                    if (vehicleCodes == null || vehicleCodes.Any() == false)
+                    if (vehicleCodes == null || !vehicleCodes.Any())
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
                     }
@@ -538,7 +538,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 case CodeTypeEnum.SFC:
                     var sfcCodes = dto.Params;
-                    if (sfcCodes == null || sfcCodes.Any() == false)
+                    if (sfcCodes == null || !sfcCodes.Any())
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
                     }
@@ -554,7 +554,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     break;
                 case CodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
-                    if (vehicleCodes == null || vehicleCodes.Any() == false)
+                    if (vehicleCodes == null || !vehicleCodes.Any())
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
                     }

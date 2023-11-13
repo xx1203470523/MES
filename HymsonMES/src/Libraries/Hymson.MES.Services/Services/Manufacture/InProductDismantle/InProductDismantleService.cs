@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 查询bom明细
             var bomDetails = await _procBomDetailRepository.GetByBomIdAsync(queryDto.BomId);
-            if (bomDetails.Any() == false) return bomDetailViews;
+            if (!bomDetails.Any()) return bomDetailViews;
 
             // 查询组件信息
             var manuSfcCirculations = await _masterDataService.GetSFCCirculationEntitiesByTypesAsync(new SFCCirculationBo
@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = queryDto.Sfc,
                 Type = queryDto.Type
             });
-            if (manuSfcCirculations.Any() == false) return bomDetailViews;
+            if (!manuSfcCirculations.Any()) return bomDetailViews;
 
             // 组件物料
             var barCodeMaterialIds = manuSfcCirculations.Select(x => x.CirculationProductId).ToArray().Distinct();
@@ -593,7 +593,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             // 2023.10.18 add
-            if (addDto.Location != null && string.IsNullOrEmpty(addDto.Location) == false)
+            if (addDto.Location != null && !string.IsNullOrEmpty(addDto.Location))
             {
                 var manuSfcCirculationEntities = await _circulationRepository.GetByLocationAsync(new LocationQuery
                 {
@@ -612,7 +612,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
 
-            var type = addDto.IsAssemble == false ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
+            var type = !addDto.IsAssemble ? ManuSfcStepTypeEnum.Add : ManuSfcStepTypeEnum.Assemble;
             var sfcStepEntity = CreateSFCStepEntity(manuSfcProduce, type, "");
             #endregion
 

@@ -122,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? entities)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (entities == null || !entities.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, entities);
