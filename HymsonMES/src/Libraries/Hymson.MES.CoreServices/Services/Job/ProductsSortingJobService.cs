@@ -8,6 +8,7 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Parameter;
@@ -119,12 +120,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             //获取到条码的参数信息
-            //var parameterList = await _manuProductParameterService.GetProductParameterListBySFCAsync(new CoreServices.Dtos.Parameter.QueryParameterBySfcDto
-            //{
-            //    SiteId = commonBo.SiteId,
-            //    SFCs = sfcs
-            //});
-            var parameterList = new List<ManuProductParameterEntity>();
+            var parameterList = await _manuProductParameterService.GetProductParameterListByProcedureAsync(new QueryParameterByProcedureDto
+            {
+                SiteId = commonBo.SiteId,
+                ProcedureId = commonBo.ProcedureId,
+                SFCs = sfcs
+            });
+
             if (parameterList == null || !parameterList.Any())
             {
                 // throw new CustomerValidationException(nameof(ErrorCode.MES14704));
@@ -201,12 +203,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             sfcs = sfcProduceEntities.Select(x => x.SFC).ToList();
             //获取到条码的参数信息
-            //var parameterList = await _manuProductParameterService.GetProductParameterListBySFCAsync(new CoreServices.Dtos.Parameter.QueryParameterBySfcDto
-            //{
-            //    SiteId = commonBo.SiteId,
-            //    SFCs = sfcs
-            //});
-            var parameterList = new List<ManuProductParameterEntity>();
+            var parameterList = await _manuProductParameterService.GetProductParameterListByProcedureAsync(new QueryParameterByProcedureDto
+            {
+                SiteId = commonBo.SiteId,
+                ProcedureId = commonBo.ProcedureId,
+                SFCs = sfcs
+            });
             if (parameterList == null || !parameterList.Any())
             {
                 return default;
