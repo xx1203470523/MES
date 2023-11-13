@@ -34,7 +34,6 @@ using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -201,8 +200,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-            IEquEquipmentRepository equEquipmentRepository)
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
+            IEquEquipmentRepository equEquipmentRepository,
             IProcSortingRuleRepository sortingRuleRepository)
         {
             _logger = logger;

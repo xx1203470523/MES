@@ -2,7 +2,7 @@
 using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.MES.EquipmentServices.Services.Manufacture.ProductionProcess;
+using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.Manufacture;
@@ -40,8 +40,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<ICommonService, CommonService>();
             services.AddSingleton<ISfcBindingService, SfcBindingService>();
+            services.AddSingleton<IManufactureService, ManufactureService>();
             services.AddSingleton<IProductProcessCollectionService, ProductProcessCollectionService>();
-            services.AddSingleton<IProductionProcessServices, ProductionProcessServices>();
         }
 
         /// <summary>
