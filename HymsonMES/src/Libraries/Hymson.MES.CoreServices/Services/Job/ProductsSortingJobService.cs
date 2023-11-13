@@ -119,12 +119,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             //获取到条码的参数信息
-            var parameterList = await _manuProductParameterService.GetProductParameterListBySFCAsync(new CoreServices.Dtos.Parameter.QueryParameterBySfcDto
-            {
-                SiteId = commonBo.SiteId,
-                SFCs = sfcs
-            });
-
+            //var parameterList = await _manuProductParameterService.GetProductParameterListBySFCAsync(new CoreServices.Dtos.Parameter.QueryParameterBySfcDto
+            //{
+            //    SiteId = commonBo.SiteId,
+            //    SFCs = sfcs
+            //});
+            var parameterList = new List<ManuProductParameterEntity>();
             if (parameterList == null || !parameterList.Any())
             {
                 // throw new CustomerValidationException(nameof(ErrorCode.MES14704));
@@ -201,11 +201,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             sfcs = sfcProduceEntities.Select(x => x.SFC).ToList();
             //获取到条码的参数信息
-            var parameterList = await _manuProductParameterService.GetProductParameterListBySFCAsync(new CoreServices.Dtos.Parameter.QueryParameterBySfcDto
-            {
-                SiteId = commonBo.SiteId,
-                SFCs = sfcs
-            });
+            //var parameterList = await _manuProductParameterService.GetProductParameterListBySFCAsync(new CoreServices.Dtos.Parameter.QueryParameterBySfcDto
+            //{
+            //    SiteId = commonBo.SiteId,
+            //    SFCs = sfcs
+            //});
+            var parameterList = new List<ManuProductParameterEntity>();
             if (parameterList == null || !parameterList.Any())
             {
                 return default;
