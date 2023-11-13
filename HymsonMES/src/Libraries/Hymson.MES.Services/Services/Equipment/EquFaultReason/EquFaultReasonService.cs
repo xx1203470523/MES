@@ -97,10 +97,6 @@ namespace Hymson.MES.Services.Services.Equipment
 
             var entityOld = await _equFaultReasonRepository.GetByIdAsync(EquFaultReasonModifyDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES13013));
-            //if (entityOld.UseStatus != SysDataStatusEnum.Build && EquFaultReasonModifyDto.UseStatus == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            //}
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))

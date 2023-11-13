@@ -125,11 +125,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             List<InteClassDetailEntity> details = new();
             foreach (var item in modifyDto.DetailList)
             {
-                //if (!TimeComparison(item.StartTime, item.EndTime))
-                //{
-                //    // TODO
-                //    //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
-                //}
                 var classDetailEntity = item.ToEntity<InteClassDetailEntity>();
                 classDetailEntity.Id = IdGenProvider.Instance.CreateId();
                 classDetailEntity.ClassId = entity.Id;

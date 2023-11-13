@@ -205,24 +205,11 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             if (modifyDto.UseStatus == CalendarUseStatusEnum.Enable)
             {
                 var isExists = await _inteCalendarRepository.IsExistsAsync(entity.EquOrLineId, modifyDto.Id);
-                if (isExists == true)
+                if (isExists)
                 {
                     // TODO 错误码
                     return 0;
 
-                    //// 判断同一线体、设备只能有一个日历
-                    //var msg = "";
-                    //if (entity?.CalendarType == ((int)CalendarTypeEnum.Equipment).ToString())
-                    //{
-                    //    msg = "设备";
-                    //}
-                    //else
-                    //{
-                    //    msg = "线体";
-                    //}
-
-                    //responseDto.Msg = $"选择的{msg}在系统已经有启用的日历存在！";
-                    //return responseDto;
                 }
             }
             #endregion
@@ -363,20 +350,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                     model.Code = equ.EquipmentCode;
                     model.Name = equ.EquipmentName;
                 }
-            }
-
-            // 线体
-            if (calendar.CalendarType == (int)CalendarTypeEnum.WorkCenter)
-            {
-                // TODO 工作中心
-                /*
-                var workCenter = await _inteWorkCenterRepository.GetByIdAsync(model.EquOrLineId);
-                if (workCenter != null)
-                {
-                    model.Code = workCenter.Code;
-                    model.Name = workCenter.Name;
-                }
-                */
             }
 
             // 日历详情
