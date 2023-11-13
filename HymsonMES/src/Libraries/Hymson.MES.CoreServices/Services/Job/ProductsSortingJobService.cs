@@ -110,7 +110,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var query = new ProcSortingRuleQuery
             {
                 SiteId = commonBo.SiteId,
-                Status = Core.Enums.SysDataStatusEnum.Enable,
+                Status =SysDataStatusEnum.Enable,
                 IsDefaultVersion = true,
                 MaterialIds = productIds
             };
@@ -119,7 +119,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var procSortingRules = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetSortingRulesAsync, query);
             if (procSortingRules == null || !procSortingRules.Any())
             {
-                //
+                throw new CustomerValidationException(nameof(ErrorCode.MES11309));
             }
 
             //获取到条码的参数信息
@@ -128,10 +128,9 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 SiteId = commonBo.SiteId,
                 SFCs = sfcs
             });
-
             if (parameterList == null || !parameterList.Any())
             {
-                // throw new CustomerValidationException(nameof(ErrorCode.MES14704));
+                 throw new CustomerValidationException(nameof(ErrorCode.MES16364));
             }
 
             //档位和最终档次信息算不出来报错
@@ -181,7 +180,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var query = new ProcSortingRuleQuery
             {
                 SiteId = commonBo.SiteId,
-                Status = Core.Enums.SysDataStatusEnum.Enable,
+                Status = SysDataStatusEnum.Enable,
                 IsDefaultVersion = true,
                 MaterialIds = productIds
             };
@@ -216,15 +215,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             var insertGrades = new List<ManuSfcGradeEntity>();
-            var updateGrades = new List<UpdateGradeCommand>();
             var gradeDetailEntities = new List<ManuSfcGradeDetailEntity>();
-
-            //读取条码的最终档位信息
-            var sfcGradeEntities = await _manuSfcGradeRepository.GetManuSfcGradeEntitiesAsync(new ManuSfcGradeQuery
-            {
-                SiteId = commonBo.SiteId,
-                Sfcs = sfcs.ToArray()
-            });
 
             foreach (var sfc in sfcs)
             {
@@ -244,16 +235,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     continue;
                 }
 
-                var grade = sfcGradeEntities.FirstOrDefault(x => x.SFC == sfc);
-                var gradeId = 0L;
-                if (grade == null)
-                {
-                    gradeId = IdGenProvider.Instance.CreateId();
-                }
-                else
-                {
-                    gradeId = grade.Id;
-                }
+                var gradeId = IdGenProvider.Instance.CreateId();
 
                 var sfcGradeDetails = new List<ManuSfcGradeDetailEntity>();
                 var ruleDetailIds = new List<long>();
@@ -293,36 +275,20 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                     //最终档次算不出来报错
                 }
 
-                if (grade == null)
+                insertGrades.Add(new ManuSfcGradeEntity
                 {
-                    gradeId = IdGenProvider.Instance.CreateId();
-                    insertGrades.Add(new ManuSfcGradeEntity
-                    {
-                        Id = gradeId,
-                        SFC = sfc,
-                        Grade = finalGrade,
-                        SiteId = commonBo.SiteId,
-                        CreatedBy = commonBo.UserName,
-                        UpdatedBy = commonBo.UserName
-                    });
-                }
-                else
-                {
-                    gradeId = grade.Id;
-                    updateGrades.Add(new UpdateGradeCommand
-                    {
-                        Id = gradeId,
-                        Grade = finalGrade,
-                        UpdatedBy = commonBo.UserName,
-                        UpdatedOn = HymsonClock.Now()
-                    });
-                }
+                    Id = gradeId,
+                    SFC = sfc,
+                    Grade = finalGrade,
+                    SiteId = commonBo.SiteId,
+                    CreatedBy = commonBo.UserName,
+                    UpdatedBy = commonBo.UserName
+                });
             }
 
             return new ProductsSortingResponseBo
             {
                 InsertGrades = insertGrades,
-                UpdateGrades = updateGrades,
                 GradeDetailEntities = gradeDetailEntities
             };
         }
@@ -361,7 +327,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             }
 
             //再查找范围在这个范围内的,根据类型取<还是小于等于
-            procSortingRules = procSortingRules.Where(x => x.MinContainingType.HasValue && x.MaxContainingType.HasValue).ToList();
+            // procSortingRules = procSortingRules.Where(x => x.MinContainingType.HasValue && x.MaxContainingType.HasValue).ToList();
             if (procSortingRules == null || !procSortingRules.Any())
             {
                 return procSortingRuleDetail;
@@ -372,18 +338,37 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 ruleDetail = new ProcSortingRuleDetailEntity();
                 if (rule.MinContainingType == ContainingTypeEnum.Lt && rule.MinValue < parameterValue)
                 {
-                    if (rule.MaxContainingType == ContainingTypeEnum.Lt && rule.MaxValue > parameterValue)
+                    if (!rule.MaxContainingType.HasValue)
                     {
                         ruleDetail = rule;
                     }
-
-                    if (rule.MaxContainingType == ContainingTypeEnum.LtOrE && rule.MaxValue >= parameterValue)
+                    else if (rule.MaxContainingType == ContainingTypeEnum.Lt && rule.MaxValue > parameterValue)
+                    {
+                        ruleDetail = rule;
+                    }
+                    else if (rule.MaxContainingType == ContainingTypeEnum.LtOrE && rule.MaxValue >= parameterValue)
                     {
                         ruleDetail = rule;
                     }
                 }
 
                 if (rule.MinContainingType == ContainingTypeEnum.LtOrE && rule.MinValue <= parameterValue)
+                {
+                    if (!rule.MaxContainingType.HasValue)
+                    {
+                        ruleDetail = rule;
+                    }
+                    else if (rule.MaxContainingType == ContainingTypeEnum.Lt && rule.MaxValue > parameterValue)
+                    {
+                        ruleDetail = rule;
+                    }
+                    else if (rule.MaxContainingType == ContainingTypeEnum.LtOrE && rule.MaxValue >= parameterValue)
+                    {
+                        ruleDetail = rule;
+                    }
+                }
+
+                if (!rule.MinContainingType.HasValue)
                 {
                     if (rule.MaxContainingType == ContainingTypeEnum.Lt && rule.MaxValue > parameterValue)
                     {
@@ -478,10 +463,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (data.InsertGrades.Any())
             {
                 await _manuSfcGradeRepository.InsertsAsync(data.InsertGrades);
-            }
-            if (data.UpdateGrades.Any())
-            {
-                await _manuSfcGradeRepository.UpdatesAsync(data.UpdateGrades);
             }
             if (data.GradeDetailEntities.Any())
             {

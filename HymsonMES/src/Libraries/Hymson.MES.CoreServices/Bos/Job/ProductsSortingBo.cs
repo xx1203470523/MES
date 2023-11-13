@@ -20,11 +20,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public List<ManuSfcGradeEntity> InsertGrades { get; set; }
 
         /// <summary>
-        /// 条码档位修改列表
-        /// </summary>
-        public List<UpdateGradeCommand> UpdateGrades { get; set; }
-
-        /// <summary>
         /// 分选参数信息
         /// </summary>
         public List<ManuSfcGradeDetailEntity> GradeDetailEntities { get; set; }
