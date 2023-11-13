@@ -18,6 +18,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
         /// 载具条码
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
@@ -37,6 +42,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 资源Id
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
 
         /// <summary>
         /// 载具条码
@@ -60,6 +70,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
         /// 载具条码
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
@@ -79,6 +94,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 资源Id
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
 
         /// <summary>
         /// 载具条码

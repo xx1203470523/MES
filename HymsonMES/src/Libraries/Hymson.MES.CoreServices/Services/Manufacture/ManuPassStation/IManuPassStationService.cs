@@ -13,14 +13,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseBo>> InStationRangeBySFC(SFCInStationBo dto);
+        Task<Dictionary<string, JobResponseBo>> InStationRangeBySFCAsync(SFCInStationBo dto);
 
         /// <summary>
         /// 批量进站（托盘进站）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicle(VehicleInStationBo dto);
+        Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicleAsync(VehicleInStationBo dto);
 
 
         /// <summary>
@@ -28,14 +28,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFC(SFCOutStationBo dto);
+        Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFCAsync(SFCOutStationBo dto);
 
         /// <summary>
         /// 批量出站（托盘出站）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicle(VehicleOutStationBo dto);
+        Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo dto);
 
     }
 }

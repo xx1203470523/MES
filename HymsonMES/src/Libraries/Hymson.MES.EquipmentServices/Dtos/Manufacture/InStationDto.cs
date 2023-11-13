@@ -22,5 +22,15 @@
         public IEnumerable<InBoundDto> SFCs { get; set; }
     }
 
+    /// <summary>
+    /// 进站（单载具）
+    /// </summary>
+    public record InBoundVehicleDto : BaseDto
+    {
+        /// <summary>
+        /// 载具编码
+        /// </summary>
+        public string VehicleCode { get; set; } = "";
+    }
 
 }
