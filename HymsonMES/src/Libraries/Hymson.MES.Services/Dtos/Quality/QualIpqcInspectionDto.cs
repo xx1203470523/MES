@@ -74,11 +74,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string Version { get; set; }
 
-        ///// <summary>
-        ///// 状态
-        ///// </summary>
-        //public SysDataStatusEnum Status { get; set; }
-
         /// <summary>
         /// 备注
         /// </summary>

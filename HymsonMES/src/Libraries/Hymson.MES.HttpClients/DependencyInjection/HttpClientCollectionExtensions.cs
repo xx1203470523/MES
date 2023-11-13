@@ -44,7 +44,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
             return services;
         }
