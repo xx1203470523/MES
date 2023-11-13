@@ -1024,6 +1024,7 @@
         public const string MES16911 = "实际使用的物料与条码不合!";
 
         public const string MES16913 = "不能删除启用或保留的记录！";
+        public const string MES16914 = "未找到能挂载物料条码的主物料!";
         #endregion
 
         #region 条码打印 MES17000

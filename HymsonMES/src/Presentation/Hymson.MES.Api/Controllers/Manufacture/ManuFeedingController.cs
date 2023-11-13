@@ -81,7 +81,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<long> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
+        public async Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
             return await _manuFeedingService.CreateAsync(saveDto);
         }

@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<long> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
+        public async Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
             // 查询条码
             var inventory = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
@@ -404,7 +404,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 Source = saveDto.Source,
                 FeedingPointId = saveDto.FeedingPointId
             });
-            if (manuFeedingMaterialDtos == null || manuFeedingMaterialDtos.Any() == false) return 0;
+            if (manuFeedingMaterialDtos == null || manuFeedingMaterialDtos.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16914));
 
             // 主物料ID集合
             saveDto.MaterialIds = manuFeedingMaterialDtos.Select(s => s.MaterialId);
@@ -510,7 +510,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             trans.Complete();
 
             // 因为前端要展开这级表格，所以把ID返回去
-            return material.Id;
+            return new ManuFeedingMaterialResponseDto
+            {
+                ResourceId = entity.ResourceId,
+                ProductId = entity.ProductId,
+                ProductCode = material.MaterialCode,
+                Version = material.Version ?? "",
+                Qty = inventory.QuantityResidue,
+                BarCode = inventory.MaterialBarCode,
+                CreatedBy = entity.CreatedBy,
+                CreatedOn = entity.CreatedOn
+            };
         }
 
         /// <summary>
