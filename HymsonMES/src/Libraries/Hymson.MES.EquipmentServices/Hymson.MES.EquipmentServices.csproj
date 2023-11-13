@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dtos\Bootup\**" />
+    <EmbeddedResource Remove="Dtos\Bootup\**" />
+    <None Remove="Dtos\Bootup\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 	<ItemGroup>
@@ -19,7 +25,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Dtos\Bootup\" />
+	  <Folder Include="Bos\Manufacture\" />
 	  <Folder Include="Services\Bootup\" />
 	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>

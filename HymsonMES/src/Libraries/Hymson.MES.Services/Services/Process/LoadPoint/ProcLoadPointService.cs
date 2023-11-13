@@ -652,7 +652,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             #region 验证基础数据
-            var validationFailures = new List<ValidationFailure>();
+                var validationFailures = new List<ValidationFailure>();
             var rows = 1;
             foreach (var item in excelImportDtos)
             {
@@ -706,9 +706,9 @@ namespace Hymson.MES.Services.Services.Process
                     LoadPoint =item.LoadPoint
                   });
 
-                if (loadPoints.Any())
+                 if (loadPoints.Any(x => x.LoadPoint == item.LoadPoint))
                 {
-                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10701), item.LoadPoint, currentRow, "上料点"));
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10701), item.LoadPoint, currentRow, "LoadPoint"));
                 }
 
                 if (!loadPoints.Any())
@@ -802,7 +802,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     LoadPoint = item.LoadPoint ?? "",
                     LoadPointName = item.LoadPointName ?? "",
-                    Status = item.Status
+                    Status = item.Status.GetDescription()
                 });
             }
 

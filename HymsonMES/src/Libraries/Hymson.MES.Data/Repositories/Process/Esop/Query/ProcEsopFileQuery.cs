@@ -13,5 +13,9 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcEsopFileQuery
     {
+        /// <summary>
+        /// EsopId  proc_esop 表Id
+        /// </summary>
+        public long? EsopId { get; set; }
     }
 }

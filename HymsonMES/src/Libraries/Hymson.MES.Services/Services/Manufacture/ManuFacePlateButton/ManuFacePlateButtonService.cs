@@ -434,6 +434,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", dto.Param!["SFCs"]);
 
                     SFCs = sfcCodes;
+                    panelRequestBos.AddRange(SFCs.Select(s => new PanelRequestBo { SFC = s }));
                     inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
                     outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
                     break;
@@ -592,17 +593,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<int> ProductParameterCollectAsync(ProductProcessParameterDto dto)
         {
-            //return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
-            //{
-            //    SiteId = dto.SiteId,
-            //    UserName = dto.UserName,
-            //    Time = dto.Time,
-            //    ProcedureId = dto.ProcedureId,
-            //    ResourceId = dto.ResourceId,
-            //    SFC = dto.SFC,
-            //    Parameters = dto.Parameters
-            //});
-            return 1;
+            return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                Time = HymsonClock.Now(),
+                ProcedureId = dto.ProcedureId,
+                ResourceId = dto.ResourceId,
+                SFC = dto.SFC,
+                Parameters = dto.Parameters
+            });
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
@@ -222,5 +223,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="requestBo"></param>
         /// <returns></returns>
         Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param);
+
+        /// <summary>
+        /// 读取分选规则信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query);
     }
 }

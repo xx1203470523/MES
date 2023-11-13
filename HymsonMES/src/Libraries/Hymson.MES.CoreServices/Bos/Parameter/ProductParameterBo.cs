@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Parameter
+﻿using Hymson.Utils;
+
+namespace Hymson.MES.CoreServices.Bos.Parameter
 {
     /// <summary>
     /// 参数信息
@@ -18,7 +20,7 @@
         /// <summary>
         /// 采集时间
         /// </summary>
-        public DateTime CollectionTime { get; set; }
+        public DateTime CollectionTime { get; set; } = HymsonClock.Now();
     }
 
 }
