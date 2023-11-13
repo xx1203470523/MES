@@ -71,6 +71,15 @@
         public const string MES10229 = "采购类型不合法！";
         public const string MES10230 = "状态不合法！";
         public const string MES10231 = "版本不能为空！";
+        public const string MES10232 = "工艺路线{code}没有找到对应的数据！";
+        public const string MES10233 = "Bom {bomCode}没有找到对应的数据！";
+        public const string MES10234 = "掩码{code}没有找到对应的数据！";
+        public const string MES10235 = "批次需为大于0整数！";
+        public const string MES10236 = "是否默认版本不合法！";
+        public const string MES10237 = "标包数量需为大于0整数！";
+        public const string MES10238 = "基于时间不合法！";
+        public const string MES10239 = "消耗公差需为大于0整数！";
+        public const string MES10240 = "消耗系数需大于0！";
         #endregion
 
         #region 资源 10300
@@ -1335,6 +1344,53 @@
         public const string MES19008 = "资源不匹配";
         #endregion
 
+        public const string MES19101 = "条码列表不能为空";
+        public const string MES19102 = "容器编码不能为空";
+        public const string MES19103 = "容器条码列表不能为空";
+        public const string MES19104 = "托盘装载信息不存在";
+        public const string MES19105 = "此托盘未装载任何信息";
+        public const string MES19106 = "不存在任何绑定关系不需要解绑";
+        public const string MES19107 = "参数列表不能为空";
+        public const string MES19108 = "参数编码{Code}不存在";
+        public const string MES19109 = "资源编码{Code}不存在";
+        public const string MES19110 = "产品条码参数列表不能为空";
+        public const string MES19111 = "托盘条码不能为空";
+        public const string MES19112 = "上传SFC信息不能为空";
+        public const string MES19113 = "该设备已经设置临时SFC";
+        public const string MES19114 = "NG编码：{Code}不存在";
+        public const string MES19115 = "产品编码不能为空";
+        public const string MES19116 = "请维护产品编码：{Code}的编码规则";
+        public const string MES19117 = "条码：{SFC}不存在";
+        public const string MES19118 = "产品编码：{Code}不存在";
+        public const string MES19119 = "绑定条码列表不能为空";
+        public const string MES19120 = "解绑条码列表不能为空";
+        public const string MES19121 = "绑定条码：{SFC}和BindSFC：{BindSFC}绑定关系已经存在";
+        public const string MES19122 = "容器：{ContainerCode}和SFC：{SFC}绑定关系已经存在";
+        public const string MES19123 = "资源：{ResourceCode}未找到关联的产线信息";
+        public const string MES19124 = "产线：{WorkCenterCode}未找到激活的工单信息";
+        public const string MES19125 = "条码：{SFCS}未找到条码信息,请先执行进站操作";
+        public const string MES19126 = "条码：{SFCS}未找到生产信息,或已完工";
+        public const string MES19127 = "条码：{SFCS}未进站不能操作出站";
+        public const string MES19128 = "条码：{SFCS}已进站不能操作过站";
+        public const string MES19129 = "条码：{SFCS}当前状态不是排队状态，不允许进站";
+        public const string MES19130 = "条码：{SFCS}超过或达到最大复投次数限制，不允许进站";
+        public const string MES19131 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
+        public const string MES19132 = "条码：{SFCS}未进站不能操作绑定";
+        public const string MES19133 = "IsVirtualSFC为True时不需要传递SFC";
+        public const string MES19134 = "条码：{SFCS}没找到关联虚拟码绑定关系";
+        public const string MES19135 = "IsBindVirtualSFC为True时不能传递多个条码";
+        public const string MES19136 = "条码：{SFCS}出站存在NG信息，Passed字段应传0";
+        public const string MES19137 = "条码：{SFCS}状态为不合格，不允许进站";
+        public const string MES19138 = "条码：{SFCS}已经存在绑定记录";
+        public const string MES19139 = "位置：{Location}已经存在条码：{SFCS}绑定记录";
+        public const string MES19140 = "错误的Location {SFCLocation}，只能为：{Location}";
+        public const string MES19141 = "CCS设定NG时Location和BindSfc方式必须任选其一";
+        public const string MES19142 = "条码：{SFC}没找到关联CCS码绑定关系";
+        public const string MES19143 = "条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系";
+        public const string MES19144 = "Location不能为空";
+        public const string MES19145 = "模组对应型号编码ModelCode不能为空";
+        public const string MES19146 = "条码：{SFCS}已被绑过其他条码";
+
         #region 产品参数采集
         public const string MES19600 = "产品参数采集异常";
         public const string MES19601 = "未找到资源{ResCode}对应工序";
@@ -1342,7 +1398,7 @@
         public const string MES19603 = "资源编码{Code}不存在";
         public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
         public const string MES19605 = "条码生成失败,半成品记录未找到！";
-
+        public const string MES19606 = "参数{ParameterCodes}不存在";
         #endregion
 
 

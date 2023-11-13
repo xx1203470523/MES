@@ -91,6 +91,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 状态 0-未启用  1-启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
+
+        /// <summary>
+        /// 上传的附件id列表
+        /// </summary>
+        public long?[] EsopFileIds { get; set; }
     }
 
     /// <summary>

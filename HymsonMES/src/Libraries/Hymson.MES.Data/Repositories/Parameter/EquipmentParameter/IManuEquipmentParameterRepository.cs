@@ -21,20 +21,13 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="list"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<EquipmentParameterEntity> list, string tableName);
-
-
-        /// <summary>
-        /// 创建数据库表
-        /// </summary>
-        /// <param name="tableSql"></param>
-        /// <returns></returns>
-        Task<int> CreateProductParameterTable(string tableSql);
+        Task<int> InsertRangeAsync(IEnumerable<EquipmentParameterEntity> list);
 
         /// <summary>
-        /// 获取创建表脚本
+        /// 获取建表SQL语句
         /// </summary>
+        /// <param name="sequence"></param>
         /// <returns></returns>
-        Task<string?> ShowCreateTable(string tableName);
+        string PrepareEquipmentParameterBySequenceTableSql(int sequence);
     }
 }

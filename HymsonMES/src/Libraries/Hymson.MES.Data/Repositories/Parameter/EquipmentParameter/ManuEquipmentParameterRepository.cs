@@ -1,20 +1,26 @@
 ﻿using Dapper;
+using Force.Crc32;
+using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using System.Text;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
 {
     /// <summary>
-    /// 产品类型参数
+    /// 设备过程参数仓储
     /// </summary>
     public partial class ManuEquipmentParameterRepository : BaseRepository, IManuEquipmentParameterRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-        public ManuEquipmentParameterRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        private readonly ParameterOptions _parameterOptions;
+        public ManuEquipmentParameterRepository(IOptions<ConnectionOptions> connectionOptions, IOptions<ParameterOptions> parameterOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
+            _parameterOptions = parameterOptions.Value;
         }
 
         /// <summary>
@@ -23,37 +29,69 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="list"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<EquipmentParameterEntity> list, string tableName)
+        public async Task<int> InsertRangeAsync(IEnumerable<EquipmentParameterEntity> list)
         {
-            string insertSql = $"INSERT INTO {tableName}(`Id`, `SiteId`, `EquipmentId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId,@EquipmentId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+            var dic = new Dictionary<string, List<EquipmentParameterEntity>>();
+            foreach (var entity in list)
+            {
+                var tableName = GetTableNameByEquipmentId(entity.SiteId, entity.EquipmentId);
+                if (!dic.ContainsKey(tableName))
+                {
+                    dic[tableName] = new List<EquipmentParameterEntity>();
+                }
+                dic[tableName].Add(entity);
+            }
             using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
-            return await conn.ExecuteAsync(insertSql, list);
+
+            // 插入数据
+            List<Task<int>> tasks = new();
+            foreach (var dicItem in dic)
+            {
+                string insertSql = $"INSERT INTO {dicItem.Key}(`Id`, `SiteId`, `EquipmentId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId,@EquipmentId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
+                tasks.Add(conn.ExecuteAsync(insertSql, dicItem.Value));
+            }
+            var result = await Task.WhenAll(tasks);
+
+            return result.Sum();
         }
 
         /// <summary>
-        /// 查询参数
+        /// 获取建表SQL语句
         /// </summary>
-        /// <param name="param"></param>
-        /// <param name="tableName"></param>
+        /// <param name="sequence"></param>
         /// <returns></returns>
-        public async Task<string?> ShowCreateTable(string tableName)
+        public string PrepareEquipmentParameterBySequenceTableSql(int sequence)
         {
-            string sql = $"SHOW  CREATE TABLE {tableName}";
-            using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
-            var result = await conn.QueryFirstOrDefaultAsync(sql);
-            return ((ICollection<KeyValuePair<string, object>>)result).FirstOrDefault(x => x.Key == "Create Table").Value.ToString();
+            //获取目标表名
+            var destinationTableName = $"{EquipmentParameter.EquipmentParameterPrefix}{sequence}";
+            string createTableSql = $"CREATE TABLE `{destinationTableName}` LIKE `{EquipmentParameter.EquipmentProcedureParameterTemplateName}`;";
+            return createTableSql;
+        }
+
+        #region 内部方法
+        /// <summary>
+        /// 更具设备编码获取表名
+        /// </summary>
+        /// <param name="paran"></param>
+        /// <returns></returns>
+        private string GetTableNameByEquipmentId(long siteId, long equipmentId)
+        {
+            var key = CalculateCrc32($"{siteId}{equipmentId}");
+
+            return $"{EquipmentParameter.EquipmentParameterPrefix}{key % _parameterOptions.ParameterDelivery}";
         }
 
         /// <summary>
-        /// 创建数据库表
+        /// Crc32 加密
         /// </summary>
-        /// <param name="tableSql"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
-        public async Task<int> CreateProductParameterTable(string tableSql)
+        public static uint CalculateCrc32(string input)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
-            return await conn.ExecuteAsync(tableSql);
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            return Crc32Algorithm.Compute(bytes);
         }
+        #endregion
     }
 }
 

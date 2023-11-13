@@ -1,13 +1,18 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos.Parameter;
+using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection
@@ -37,7 +42,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
         /// <summary>
         /// 产品过程参数
         /// </summary>
-        private readonly IManuProductParameterService _manuProductParameterService;
+        private readonly IManuProductParameterRepository _manuProductParameterRepository;
 
         /// <summary>
         /// 设备过程参数
@@ -56,19 +61,19 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
         /// <param name="procProcedureRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procParameterRepository"></param>
-        /// <param name="manuProductParameterService"></param>
+        /// <param name="manuProductParameterRepository"></param>
         /// <param name="manuEquipmentParameterService"></param>
         /// <param name="equEquipmentRepository"></param>
         public ProductProcessCollectionService(ICurrentEquipment currentEquipment, IProcProcedureRepository
             procProcedureRepository, IProcResourceRepository procResourceRepository, IProcParameterRepository
-            procParameterRepository, IManuProductParameterService manuProductParameterService,
+            procParameterRepository, IManuProductParameterRepository manuProductParameterRepository,
             IManuEquipmentParameterService manuEquipmentParameterService, IEquEquipmentRepository equEquipmentRepository)
         {
             _currentEquipment = currentEquipment;
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _procParameterRepository = procParameterRepository;
-            _manuProductParameterService = manuProductParameterService;
+            _manuProductParameterRepository = manuProductParameterRepository;
             _manuEquipmentParameterService = manuEquipmentParameterService;
             _equEquipmentRepository = equEquipmentRepository;
         }
@@ -96,6 +101,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                 ResourceId = resourceEntity.Id,
                 SiteId = _currentEquipment.SiteId
             });
+
             if (produreEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ResCode", param.ResourceCode);
@@ -107,7 +113,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                 Codes = param.Products.SelectMany(x => x.Parameters).Select(x => x.ParameterCode)
             });
 
-            var list = new List<ParameterDto>();
+            var list = new List<ManuProductParameterEntity>();
             var errorParameter = new List<string>();
             foreach (var product in param.Products)
             {
@@ -120,26 +126,32 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollecti
                     }
                     else
                     {
-                        list.Add(new ParameterDto
+                        list.Add(new ManuProductParameterEntity
                         {
+                            Id = IdGenProvider.Instance.CreateId(),
                             SiteId = _currentEquipment.SiteId,
                             SFC = product.SFC,
                             ProcedureId = produreEntity.Id,
                             ParameterId = parameterEntity.Id,
                             ParameterValue = parameter.ParameterValue,
                             CollectionTime = parameter.CollectionTime,
-                            UserName = _currentEquipment.Name,
-                            Date = HymsonClock.Now()
+                            CreatedBy = _currentEquipment.Name,
+                            UpdatedBy = _currentEquipment.Name,
                         });
                     }
                 }
             }
+
             if (errorParameter.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19601)).WithData("ParameterCodes", string.Join(",", errorParameter));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19606)).WithData("ParameterCodes", string.Join(",", errorParameter));
             }
 
-            await _manuProductParameterService.InsertRangeAsync(list);
+            using var trans = TransactionHelper.GetTransactionScope();
+
+            await _manuProductParameterRepository.InsertRangeAsync(list);
+
+            trans.Complete();
         }
 
         /// <summary>

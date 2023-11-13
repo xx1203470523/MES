@@ -35,6 +35,17 @@ namespace Hymson.MES.Services.Validators.Process
         }
     }
 
+    internal class ProcLoadPointImportValidator : AbstractValidator<ImportLoadPointDto>
+    {
+        public ProcLoadPointImportValidator()
+        {
+            RuleFor(x => x.LoadPoint).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10712));
+            RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
+            RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
+            RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
+        }
+    }
+
     /// <summary>
     /// 上料点表 修改 验证
     /// </summary>

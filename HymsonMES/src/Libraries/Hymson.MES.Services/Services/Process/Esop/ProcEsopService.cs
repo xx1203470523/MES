@@ -107,9 +107,10 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //DTO转换实体
+            var esopId = IdGenProvider.Instance.CreateId();
             var procEsopEntity = new ProcEsopEntity
             {
-                Id = IdGenProvider.Instance.CreateId(),
+                Id = esopId,
                 MaterialId = procEsopCreateDto.MaterialId,
                 ProcedureId = procEsopCreateDto.ProcedureId,
                 Status = procEsopCreateDto.Status,
@@ -120,8 +121,37 @@ namespace Hymson.MES.Services.Services.Process
                 SiteId = _currentSite.SiteId ?? 0
             };
 
-            //入库
-            await _procEsopRepository.InsertAsync(procEsopEntity);
+            var procEsopFiles = new List<ProcEsopFileEntity>();
+            if (procEsopCreateDto.EsopFileIds != null && procEsopCreateDto.EsopFileIds.Length > 0)
+            {
+                foreach (var item in procEsopCreateDto.EsopFileIds)
+                {
+                    if (item.HasValue && item.Value > 0)
+                    {
+                        procEsopFiles.Add(new ProcEsopFileEntity
+                        {
+                            Id = item.Value,
+                            EsopId = esopId,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                        });
+                    }
+                }
+            }
+
+            // 保存
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //入库
+                rows+= await _procEsopRepository.InsertAsync(procEsopEntity);
+                if (procEsopFiles.Any())
+                {
+                    //如果有文件上传，更新附件的id信息
+                    rows+= await _esopFileRepository.UpdatesAsync(procEsopFiles);
+                }
+                trans.Complete();
+            }   
         }
 
         /// <summary>
@@ -227,6 +257,10 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcEsopDto> QueryProcEsopByIdAsync(long id)
         {
             var procEsopEntity = await _procEsopRepository.GetByIdAsync(id);
+            if (procEsopEntity == null)
+            {
+                return new ProcEsopDto();
+            }
 
             var procEsopDto = new ProcEsopDto
             {
@@ -348,7 +382,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> AttachmentDeleteAsync(long[] ids)
         {
-            return await _inteAttachmentRepository.DeletesAsync(new DeleteCommand
+            return await _esopFileRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),

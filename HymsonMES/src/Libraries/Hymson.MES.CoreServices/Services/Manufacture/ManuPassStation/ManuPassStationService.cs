@@ -58,24 +58,24 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <summary>
         /// 批量进站（条码进站）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFC(SFCInStationBo dto)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFC(SFCInStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
                 Type = CodeTypeEnum.SFC,
-                SiteId = dto.SiteId,
-                UserName = dto.UserName,
-                ProcedureId = dto.ProcedureId,
-                ResourceId = dto.ResourceId
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId
             };
 
             List<string> SFCs = new();
             List<InStationRequestBo> inStationRequestBos = new();
 
-            SFCs = dto.SFCs.ToList();
+            SFCs = bo.SFCs.ToList();
             inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
 
             requestBo.SFCs = SFCs;  // 这句后面要改
@@ -90,23 +90,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <summary>
         /// 批量进站（托盘进站）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicle(VehicleInStationBo dto)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicle(VehicleInStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
                 Type = CodeTypeEnum.Vehicle,
-                SiteId = dto.SiteId,
-                UserName = dto.UserName,
-                ProcedureId = dto.ProcedureId,
-                ResourceId = dto.ResourceId
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId
             };
 
             List<string> SFCs = new();
             List<InStationRequestBo> inStationRequestBos = new();
-            if (dto.VehicleCodes == null || dto.VehicleCodes.Any() == false)
+            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
@@ -115,11 +115,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
             {
                 SiteId = requestBo.SiteId,
-                Codes = dto.VehicleCodes
+                Codes = bo.VehicleCodes
             });
 
             // 不在系统中的载具代码
-            var notInSystem = dto.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
+            var notInSystem = bo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
             if (notInSystem.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18624))
@@ -157,24 +157,24 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <summary>
         /// 批量出站（条码出站）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFC(SFCOutStationBo dto)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFC(SFCOutStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
                 Type = CodeTypeEnum.SFC,
-                SiteId = dto.SiteId,
-                UserName = dto.UserName,
-                ProcedureId = dto.ProcedureId,
-                ResourceId = dto.ResourceId
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId
             };
 
             List<string> SFCs = new();
             List<OutStationRequestBo> outStationRequestBos = new();
 
-            SFCs = dto.SFCs.ToList();
+            SFCs = bo.SFCs.ToList();
             outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
 
             requestBo.SFCs = SFCs;  // 这句后面要改
@@ -189,23 +189,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <summary>
         /// 批量出站（托盘出站）
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicle(VehicleOutStationBo dto)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicle(VehicleOutStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
                 Type = CodeTypeEnum.Vehicle,
-                SiteId = dto.SiteId,
-                UserName = dto.UserName,
-                ProcedureId = dto.ProcedureId,
-                ResourceId = dto.ResourceId
+                SiteId = bo.SiteId,
+                UserName = bo.UserName,
+                ProcedureId = bo.ProcedureId,
+                ResourceId = bo.ResourceId
             };
 
             List<string> SFCs = new();
             List<OutStationRequestBo> outStationRequestBos = new();
-            if (dto.VehicleCodes == null || dto.VehicleCodes.Any() == false)
+            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
@@ -214,11 +214,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
             {
                 SiteId = requestBo.SiteId,
-                Codes = dto.VehicleCodes
+                Codes = bo.VehicleCodes
             });
 
             // 不在系统中的载具代码
-            var notInSystem = dto.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
+            var notInSystem = bo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
             if (notInSystem.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18624))

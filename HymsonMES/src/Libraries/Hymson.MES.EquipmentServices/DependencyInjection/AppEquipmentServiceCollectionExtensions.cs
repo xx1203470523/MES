@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
+using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
-using Hymson.MES.EquipmentServices.Validators.InStation;
+using Hymson.MES.EquipmentServices.Validators.Manufacture;
 using Hymson.MES.EquipmentServices.Validators.SfcBinding;
 using Microsoft.Extensions.Configuration;
 
@@ -39,6 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<ICommonService, CommonService>();
             services.AddSingleton<ISfcBindingService, SfcBindingService>();
+            services.AddSingleton<IManufactureService, ManufactureService>();
             services.AddSingleton<IProductProcessCollectionService, ProductProcessCollectionService>();
         }
 
@@ -58,7 +60,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<InStationDto>, InStationValidator>();
+            services.AddSingleton<AbstractValidator<InBoundDto>, InBoundValidator>();
+            services.AddSingleton<AbstractValidator<InBoundMoreDto>, InBoundMoreValidator>();
+            services.AddSingleton<AbstractValidator<OutBoundDto>, OutBoundValidator>();
+            services.AddSingleton<AbstractValidator<OutBoundMoreDto>, OutBoundMoreValidator>();
+
             services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
         }
 

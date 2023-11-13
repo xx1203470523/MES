@@ -189,6 +189,45 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         [EpplusTableColumn(Header = "电话", Order = 5)]
         public string? Telephone { get; set; }
+    }
 
+    public record InteCustomExportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 客户编码
+        /// </summary>
+        [EpplusTableColumn(Header = "客户编码", Order = 1)]
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 客户名称
+        /// </summary>
+        [EpplusTableColumn(Header = "客户名称", Order = 2)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [EpplusTableColumn(Header = "描述", Order = 3)]
+        public string? Describe { get; set; }
+
+        /// <summary>
+        /// 地址
+        /// </summary>
+        [EpplusTableColumn(Header = "地址", Order = 4)]
+        public string? Address { get; set; }
+
+        /// <summary>
+        /// 电话
+        /// </summary>
+        [EpplusTableColumn(Header = "电话", Order = 5)]
+        public string? Telephone { get; set; }
+    }
+
+    public class InteCustomExportResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
     }
 }

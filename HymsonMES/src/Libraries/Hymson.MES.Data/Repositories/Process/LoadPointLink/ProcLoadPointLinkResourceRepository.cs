@@ -1,17 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 上料点关联资源表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-18 09:36:09
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -84,6 +76,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByIdsSql, new { ids = ids });
+        }
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByResourceIdAsync(long resourceId)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByResourceIdSql, new { ResourceId = resourceId });
         }
 
         /// <summary>
@@ -184,6 +187,9 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcLoadPointLinkResourceRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_resource` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
@@ -205,6 +211,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `ResourceId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_load_point_link_resource`  WHERE Id IN @ids ";
+        const string GetByResourceIdSql = "SELECT * FROM proc_load_point_link_resource WHERE ResourceId = @ResourceId";
         const string GetLoadPointLinkResourceByIdsSql = @"SELECT 
                                            a.Id,  a.ResourceId, b.ResCode, b.ResName 
                             FROM `proc_load_point_link_resource` a

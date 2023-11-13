@@ -7,6 +7,8 @@
  */
 using FluentValidation;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Warehouse;
 using System;
 using System.Collections.Generic;
@@ -41,6 +43,17 @@ namespace Hymson.MES.Services.Validators.Warehouse
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15007));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES15010));
 
+        }
+    }
+
+    internal class WhSupplierImportValidator : AbstractValidator<WhSupplierImportDto>
+    {
+        public WhSupplierImportValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15007));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES15010));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15006));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES15009));
         }
     }
 }
