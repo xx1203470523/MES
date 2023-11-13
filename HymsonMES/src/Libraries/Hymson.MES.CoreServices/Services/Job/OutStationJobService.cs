@@ -1,4 +1,5 @@
-﻿using FluentValidation.Results;
+﻿using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -31,6 +32,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -236,7 +238,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                               .VerifyResource(commonBo.ResourceId);
 
             // 条码对应工序是否和出站工序一致
-            var validationProduceFailures = new List<ValidationFailure>();
+            var validationFailures = new List<ValidationFailure>();
             var noMatchSFCProcedureEntities = sfcProduceEntities.Where(w => w.ProcedureId != commonBo.ProcedureId);
             if (noMatchSFCProcedureEntities.Any())
             {
@@ -248,10 +250,18 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var outProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16359))
-                        .WithData("SFC", sfcProduceEntity.SFC)
-                        .WithData("InProcedure", inProcedureEntity.Code)
-                        .WithData("OutProcedure", outProcedureEntity.Code);
+                    var validationFailure = new ValidationFailure();
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduceEntity.SFC);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduceEntity.SFC);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("InProcedure", inProcedureEntity.Code);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("OutProcedure", outProcedureEntity.Code);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16359);
+                    validationFailures.Add(validationFailure);
+                }
+
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 }
             }
 

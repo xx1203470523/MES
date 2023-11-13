@@ -593,8 +593,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 }
             }
 
-            // 获取下一工序
-            if (defaultNextProcedure == null) throw new CustomerValidationException(nameof(ErrorCode.MES10440));
             return await _procProcedureRepository.GetByIdAsync(defaultNextProcedure.ProcedureId);
         }
 
