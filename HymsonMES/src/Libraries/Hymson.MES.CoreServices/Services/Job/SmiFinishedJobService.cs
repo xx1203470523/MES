@@ -264,7 +264,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     sfcProduceEntity.RepeatedCount = 0;
 
                     // 标记条码为"在制-完成"
-                    //responseBo.IsCompleted = true;
                     manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
                     sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
                     stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
@@ -349,7 +348,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.Rows += await _manuSfcRepository.UpdateRangeWithStatusCheckAsync(data.SFCEntities);
 
                 // 未更新到全部需更新的数据，事务回滚
-                if (data.SFCEntities.Count() > responseBo.Rows)
+                if (data.SFCEntities.Count > responseBo.Rows)
                 {
                     responseBo.Rows = -1;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), string.Join(',', data.SFCEntities!.Select(s => s.SFC)));

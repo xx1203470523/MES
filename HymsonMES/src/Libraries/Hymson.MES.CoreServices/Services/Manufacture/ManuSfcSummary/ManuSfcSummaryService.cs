@@ -410,7 +410,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                     IsDeleted = lastmanuSfcSummary.IsDeleted
                 };
                 changeManuSfcStepList.Add(lastmanuSfcSummary);
-                //lastmanuSfcSummary = manuSfcStepList?.OrderByDescending(x => x.StartOn).FirstOrDefault(x => x.SFC == sfc && x.ProcedureId == procedureId);
             }
             return lastmanuSfcSummary;
         }

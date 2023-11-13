@@ -63,8 +63,6 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Equipment
-            //services.AddSingleton<IEquConsumableRepository, EquConsumableRepository>();
-            //services.AddSingleton<IEquConsumableTypeRepository, EquConsumableTypeRepository>();
             services.AddSingleton<IEquEquipmentRepository, EquEquipmentRepository>();
             services.AddSingleton<IEquEquipmentGroupRepository, EquEquipmentGroupRepository>();
             services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
