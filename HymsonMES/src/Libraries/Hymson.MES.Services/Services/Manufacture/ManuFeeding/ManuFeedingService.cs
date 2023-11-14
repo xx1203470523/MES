@@ -356,7 +356,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
                     Version = item.Version ?? "-",
-                    IsInclude = materialIds.Any(a => a == item.Id),
+                    IsHistory = !materialIds.Any(a => a == item.Id),
                     Children = new()
                 };
 
@@ -407,7 +407,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             });
 
             // 过滤掉历史清单
-            manuFeedingMaterialDtos = manuFeedingMaterialDtos.Where(w => w.IsInclude);
+            manuFeedingMaterialDtos = manuFeedingMaterialDtos.Where(w => !w.IsHistory);
             if (manuFeedingMaterialDtos == null || !manuFeedingMaterialDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16914));
 
             // 主物料ID集合
