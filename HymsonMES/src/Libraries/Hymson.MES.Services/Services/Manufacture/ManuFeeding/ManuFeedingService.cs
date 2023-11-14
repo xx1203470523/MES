@@ -1,4 +1,3 @@
-using Dapper;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
@@ -26,7 +25,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
@@ -333,13 +331,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 已加载的物料ID
-            if (manuFeedings != null)
-            {
-                materialIds.AddRange(manuFeedings.Select(s => s.ProductId));
-                manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
-
-                materialIds = materialIds.Distinct().AsList();
-            }
+            if (manuFeedings != null) manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
             // 查询不到物料
             if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
