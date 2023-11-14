@@ -116,15 +116,10 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // 判断规格上限和规格下限（数据类型为数值）
             List<ValidationFailure> validationFailures = new();
-            foreach (var item in saveDto.Details)
-            {
-
-            }
 
             // 是否存在错误
             if (validationFailures.Any())
             {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 throw new ValidationException("", validationFailures);
             }
 
@@ -214,7 +209,6 @@ namespace Hymson.MES.Services.Services.Integrated
             // 是否存在错误
             if (validationFailures.Any())
             {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 throw new ValidationException("", validationFailures);
             }
 

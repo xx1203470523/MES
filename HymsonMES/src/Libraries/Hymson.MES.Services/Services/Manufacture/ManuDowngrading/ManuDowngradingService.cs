@@ -456,7 +456,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                     else
                     {
-                        //ts.Dispose();
                         throw new CustomerValidationException(nameof(ErrorCode.MES11410));
                     }
                 }
