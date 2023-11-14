@@ -1,4 +1,3 @@
-using Dapper;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
@@ -332,19 +331,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 已加载的物料ID
-            if (manuFeedings != null)
-            {
-                materialIds.AddRange(manuFeedings.Select(s => s.ProductId));
-                manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            if (manuFeedings != null) manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
-                materialIds = materialIds.Distinct().AsList();
-            }
+            // 不在集合里面的物料ID
+            var notIncludeIds = manuFeedingsDictionary.Keys.Except(materialIds);
+
+            // 集合
+            var unionMaterialIds = materialIds.Union(notIncludeIds);
 
             // 查询不到物料
             if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
 
             // 通过物料ID获取物料集合
-            var materials = await _procMaterialRepository.GetByIdsAsync(manuFeedingsDictionary.Keys);
+            var materials = await _procMaterialRepository.GetByIdsAsync(unionMaterialIds);
 
             // 填充返回集合
             List<ManuFeedingMaterialDto> list = new();
@@ -356,7 +355,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
                     Version = item.Version ?? "-",
-                    IsInclude = materialIds.Any(a => a == item.Id),
+                    IsHistory = notIncludeIds.Any(a => a == item.Id),
                     Children = new()
                 };
 
@@ -407,7 +406,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             });
 
             // 过滤掉历史清单
-            manuFeedingMaterialDtos = manuFeedingMaterialDtos.Where(w => w.IsInclude);
+            manuFeedingMaterialDtos = manuFeedingMaterialDtos.Where(w => !w.IsHistory);
             if (manuFeedingMaterialDtos == null || !manuFeedingMaterialDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16914));
 
             // 主物料ID集合
@@ -753,7 +752,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 // 如果不是主物料，就找下替代料
                 var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == item.Id);
                 if (bomDetailEntitiy == null) continue;
-                //?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
 
                 // 填充主物料替代料
                 if (bomDetailEntitiy.IsEnableReplace)

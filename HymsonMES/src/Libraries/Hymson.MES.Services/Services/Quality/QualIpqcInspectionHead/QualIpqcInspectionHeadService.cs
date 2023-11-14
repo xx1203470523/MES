@@ -868,12 +868,9 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13236)).WithData("SampleCode", query.SampleCode);
             }
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
-            if (manuSfcInfoEntity != null)
+            if (manuSfcInfoEntity != null&& entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
             {
-                if (entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
-                {
                     throw new CustomerValidationException(nameof(ErrorCode.MES13237));
-                }
             }
             //校验样品条码是否已检验
             var samples = await _qualIpqcInspectionHeadSampleRepository.GetEntitiesAsync(new QualIpqcInspectionHeadSampleQuery { InspectionOrderId = query.Id });

@@ -2066,16 +2066,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Sfcs = manuSfcs
                             });
 
-                            // 状态和是否再用一起改
-                            //await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
-                            //{
-                            //    Sfcs = manuSfcs,
-                            //    Status = SfcStatusEnum.Complete,
-                            //    IsUsed = YesOrNoEnum.Yes,
-                            //    UserId = _currentUser.UserName,
-                            //    UpdatedOn = HymsonClock.Now()
-                            //});
-
                             // 库存增加
                             if (updateInventoryQuantityList.Any()) await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueRangeAsync(updateInventoryQuantityList);
 
@@ -2117,16 +2107,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                             UpdatedOn = HymsonClock.Now(),
                             UserId = _currentUser.UserName
                         });
-
-                        //// 更新条码状态 
-                        //if (notManuSfcs != null && notManuSfcs.Any()) await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
-                        //{
-                        //    Sfcs = notManuSfcs.ToArray(),
-                        //    Status = sfcProduceStepDto.Type,
-                        //    IsUsed = YesOrNoEnum.Yes,
-                        //    UserId = _currentUser.UserName,
-                        //    UpdatedOn = HymsonClock.Now()
-                        //});
 
                         // 库存减少
 
@@ -2569,15 +2549,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //找到对应的状态
                     if (item.Status.HasValue)
                     {
-                        //switch (item.Status)
-                        //{
-                        //    case SfcStatusEnum.InProcess:
-                        //        viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (int)item.Status;
-                        //        break;
-                        //    default:
-                        //        viewDto.Status = (int)item.Status;
-                        //        break;
-                        //}
 
                         if (ManuSfcStatus.sfcStatusInProcess.Contains(item.Status ?? 0))
                         {
@@ -2726,8 +2697,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException("载具内没有条码");
                 }
-
-                //var vehiceFreightStack= vehiceFreightStacks.Where(x=>x.VehicleId==item.Id).FirstOrDefault();
 
                 var sfcStepTemps = sfcSteps.Where(x=> itemVehiceFreightStacks.Select(y=>y.BarCode).Contains( x.SFC) );
                 if (!sfcStepTemps.Any())

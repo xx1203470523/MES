@@ -81,13 +81,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteClass
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
 
-            // 参数校验
-            //if (!createDto.DetailList.Any(a => TimeComparison(a.StartTime, a.EndTime)) == true)
-            //{
-            //    // TODO
-            //    //return Error(ResultCode.PARAM_ERROR, "开始时间不能大于于结束时间");
-            //}
-
 
             List<InteClassDetailEntity> details = new();
             foreach (var item in createDto.DetailList)

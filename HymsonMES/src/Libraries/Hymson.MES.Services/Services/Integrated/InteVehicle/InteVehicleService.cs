@@ -497,7 +497,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 绑盘操作
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="ivo"></param>
         /// <returns></returns>
         private async Task VehicleBindOperationAsync(InteVehicleOperationDto ivo)
         {
@@ -543,7 +543,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 SiteId = _currentSite.SiteId??123456
             });
             var foo = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(new long[] { inteVehicleEntity.Id });
-            var count = foo.Where(i => i.Status == true).ToList().Count();
+            var count = foo.Where(i => i.Status == true).ToList().Count;
             if (vsr.Count() >= count * vtr.CellQty)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18613));
@@ -589,7 +589,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 载具解绑
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="ivo"></param>
         /// <returns></returns>
         private async Task VehicleUnBindOperationAsync(InteVehicleOperationDto ivo)
         {
@@ -626,7 +626,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 载具清盘
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="ivo"></param>
         /// <returns></returns>
         private async Task VehicleClearAsync(InteVehicleOperationDto ivo)
         {

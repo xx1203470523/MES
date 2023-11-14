@@ -50,7 +50,6 @@ namespace Hymson.MES.Services.Validators.Manufacture
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(ManuFacePlateTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES17210));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES17203));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES17207));
-
             RuleFor(x => x.ConversationTime).Must(it => it > 0).WithErrorCode(nameof(ErrorCode.MES17212));
         }
     }
