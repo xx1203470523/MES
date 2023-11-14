@@ -73,6 +73,7 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
             {
                 FileName = fileName,
                 Path = uploadResult.RelativeUrl,
+                RelativePath = uploadResult.RelativeUrl
             };
         }
     }

@@ -15,10 +15,12 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
+using Hymson.MES.EquipmentServices.Services.SfcCirculation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -27,6 +29,12 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
     /// </summary>
     public class InBoundService : IInBoundService
     {
+
+        /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<InBoundService> _logger;
+
         #region Repository
         private readonly ICurrentEquipment _currentEquipment;
         private readonly AbstractValidator<InBoundDto> _validationInBoundDtoRules;
@@ -51,7 +59,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
-        public InBoundService(AbstractValidator<InBoundDto> validationInBoundDtoRules,
+        public InBoundService(ILogger<InBoundService> logger,
+            AbstractValidator<InBoundDto> validationInBoundDtoRules,
             ICurrentEquipment currentEquipment,
             AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules,
             IProcResourceRepository procResourceRepository,
@@ -70,6 +79,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IProcMaterialRepository procMaterialRepository)
         {
+            _logger = logger;
             _validationInBoundDtoRules = validationInBoundDtoRules;
             _currentEquipment = currentEquipment;
             _validationInBoundMoreDtoRules = validationInBoundMoreDtoRules;
@@ -212,32 +222,13 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             //查询已有的条码信息
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfclist.Select(c => c.Id));
 
-            //电芯码直接获取工艺路线首工序
-            //TODO 模组和PACK，需要在条码流转表中查找绑定的条码，获取尾工序的下一道工序
-            //改成存在条码流转表记录，则直接根据资源获取工序
-            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
-            {
-                CirculationBarCodes = inBoundMoreDto.SFCs
-            });
-
             //工艺路线获取首工序
             var processRouteFirstProcedure = await GetFirstProcedureAsync(planWorkOrderEntity.ProcessRouteId);
-            long FirstProcedureId = 0;
 
-            //如果条码有绑定关系，说明是PACK模组进站，则直接根据资源获取工序，创建在制时取该工序
-            if (manuSfcCirculationEntities?.Any() == true)
-            {
-                //根据资源获取工序
-                var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery { ResourceId = procResource.Id, SiteId = _currentEquipment.SiteId })
-                   ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", procResource.ResCode);
-
-                FirstProcedureId = procedureEntity.Id;
-            }
-            else
-            {
-                FirstProcedureId = processRouteFirstProcedure.ProcedureId;
-            }
-
+            //20231108改动，直接根据设备资源获取工序
+            //根据资源获取工序
+            var procedureEntity = await _procedureRepository.GetProcProdureByResourceIdAsync(new() { ResourceId = procResource.Id, SiteId = _currentEquipment.SiteId })
+             ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", procResource.ResCode);
 
             //查询已有汇总信息
             ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
@@ -280,8 +271,14 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 {
                     // 工艺路线管控,校验工序和资源是否对应,后续改为批量
                     var resources = resourceEntities.Where(a => a.Id == sfcProduceEntity.ProcedureId);
-                    //var resources = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(sfcProduceEntity.ProcedureId);
-                    //if (!resources.Any(x => x.ResCode == procResource.ResCode)) throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+                    if (!resources.Any(x => x.ResCode == procResource.ResCode))
+                    {
+                        var resourcesCode = resources.FirstOrDefault()?.ResCode;
+
+                        //20231114 清安增加日志记录，观察卡控是否流程影响生产
+                        //throw new CustomerValidationException(nameof(ErrorCode.MES16317));
+                        _logger.LogInformation($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源时资源编码：{resourcesCode}，在制品资源编码：{procResource.ResCode}");
+                    }
 
                     //进站修改为激活
                     sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
@@ -303,6 +300,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                         }
                     }
                     //是否首工序
+                    //TODO 待优化foreach查询
                     var isFirstProcedure = await IsFirstProcedureAsync(sfcProduceEntity.ProcessRouteId, sfcProduceEntity.ProcedureId);
                     if (isFirstProcedure)
                     {
@@ -373,7 +371,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                             EquipmentId = _currentEquipment.Id ?? 0,
                             ResourceId = procResource.Id,
                             Qty = 1,//电芯进站默认都是1个
-                            ProcedureId = FirstProcedureId,
+                            ProcedureId = procedureEntity.Id,
                             Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
                             RepeatedCount = 0,
                             IsScrap = TrueOrFalseEnum.No,
@@ -445,7 +443,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     EquipmentId = _currentEquipment.Id ?? 0,
                     ResourceId = procResource.Id,
                     Qty = 1,//电芯进站默认都是1个
-                    ProcedureId = FirstProcedureId,
+                    ProcedureId = procedureEntity.Id,
                     Status = SfcProduceStatusEnum.Activity,//接口进站直接为活动
                     RepeatedCount = 0,
                     IsScrap = TrueOrFalseEnum.No,
@@ -465,7 +463,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = 1,//电芯进站默认都是1个
-                    ProcedureId = FirstProcedureId,
+                    ProcedureId = procedureEntity.Id,
                     Operatetype = ManuSfcStepTypeEnum.InStock,
                     CurrentStatus = SfcProduceStatusEnum.Activity,
                     EquipmentId = _currentEquipment.Id,
