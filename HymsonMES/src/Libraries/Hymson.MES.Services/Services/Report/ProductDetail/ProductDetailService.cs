@@ -14,6 +14,7 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Excel.Abstractions;
 using Hymson.Minio;
 using Hymson.MES.Services.Dtos.Report.Excel;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -29,6 +30,8 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IManuSfcSummaryRepository _manuSfcSummaryRepository;
         private readonly IProductDetailReportRepository _productDetailRepository;
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
         #endregion
 
 
@@ -38,7 +41,9 @@ namespace Hymson.MES.Services.Services.Report
             IProcMaterialRepository procMaterialRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcSummaryRepository manuSfcSummaryRepository,
-            IProductDetailReportRepository productDetailRepository)
+            IProductDetailReportRepository productDetailRepository,
+            IEquEquipmentRepository equEquipmentRepository,
+            IProcResourceRepository procResourceRepository)
         {
             _minioService = minioService;
             _excelService = excelService;
@@ -47,6 +52,8 @@ namespace Hymson.MES.Services.Services.Report
             _planWorkOrderRepository = planWorkOrderRepository;
             _manuSfcSummaryRepository = manuSfcSummaryRepository;
             _productDetailRepository = productDetailRepository;
+            _equEquipmentRepository = equEquipmentRepository;
+            _procResourceRepository = procResourceRepository;
         }
 
         /// <summary>
@@ -54,7 +61,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProductDetailReportOutputDto>> GetPageInfoAsync(ProductDetailReportQueryDto queryDto)
+        public async Task<PagedInfo<ProductDetailReportOutputDto>> GetPageInfoAsync(ProductDetailReportPageQueryDto queryDto)
         {
             var result = new PagedInfo<ProductDetailReportOutputDto>(new List<ProductDetailReportOutputDto>(), queryDto.PageIndex, queryDto.PageSize);
 
@@ -65,7 +72,7 @@ namespace Hymson.MES.Services.Services.Report
                 queryDto.OrderId = searchPlanWorkOrderEntity.Id;
             }
 
-            var query = queryDto.ToQuery<ProductDetailReportQuery>();
+            var query = queryDto.ToQuery<ProductDetailReportPageQuery>();
 
             var pageData = await _productDetailRepository.GetPageInfoAsync(query);
 
@@ -127,7 +134,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<ExportResultDto> ExportExcelAsync(ProductDetailReportQueryDto queryDto)
+        public async Task<ExportResultDto> ExportExcelAsync(ProductDetailReportPageQueryDto queryDto)
         {
             string fileName = string.Format("({0})产能报表", DateTime.Now.ToString("yyyyMMddHHmmss"));
             queryDto.PageIndex = 1;
@@ -161,6 +168,43 @@ namespace Hymson.MES.Services.Services.Report
                 Path = uploadResult.AbsoluteUrl,
                 RelativePath = uploadResult.RelativeUrl
             };
+        }
+
+        /// <summary>
+        /// 获取下线工序产出汇总数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<decimal> GetOutputQtyAsync([FromQuery] ProductDetailReportQueryDto queryDto)
+        {
+            decimal outputQty = 0;
+
+            var query = new ProductDetailReportQuery() {
+                StartDate = queryDto.StartDate,
+                EndDate = queryDto.EndDate,
+            };
+
+            if (queryDto.OrderCode != null)
+            {
+                var orderEntity = await _planWorkOrderRepository.GetByCodeAsync(new() { OrderCode = queryDto.OrderCode });
+                if (orderEntity != null) query.OrderId = orderEntity.Id;
+            }
+
+            if (queryDto.EquipmentCode != null)
+            {
+                var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new() { Code = queryDto.EquipmentCode });
+                if (equipmentEntity != null) query.EquipmentId = equipmentEntity.Id;
+            }
+
+            if (queryDto.ResourceCode != null)
+            {
+                var resourceEntity = await _procResourceRepository.GetByCodeAsync(new() { Code = queryDto.ResourceCode });
+                if (resourceEntity != null) query.ResourceId = resourceEntity.Id;
+            }
+
+            outputQty = await _productDetailRepository.GetOutputSumAsyc(query);
+
+            return outputQty;
         }
     }
 }

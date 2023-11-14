@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Report
 {
-    public class ProductDetailReportQuery : PagerInfo
+    public class ProductDetailReportPageQuery : PagerInfo
     {
         /// <summary>
         /// 产线Id
@@ -53,5 +53,33 @@ namespace Hymson.MES.Data.Repositories.Report
         /// 查询截至日期
         /// </summary>
         public DateTime[]? Date { get; set; }
+    }
+
+    public record ProductDetailReportQuery : BaseEntityDto
+    {
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? OrderId { get; set; }
+
+        /// <summary>
+        /// 设备编码Id
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 资源编码Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 查询起始日期
+        /// </summary>
+        public DateTime? StartDate { get; set; }
+
+        /// <summary>
+        /// 查询截至日期
+        /// </summary>
+        public DateTime? EndDate { get; set; }
     }
 }

@@ -10,6 +10,8 @@ namespace Hymson.MES.Data.Repositories.Report;
 
 public interface IProductDetailReportRepository
 {
-    Task<PagedInfo<ProductDetailReportView>> GetPageInfoAsync(ProductDetailReportQuery query);
+    Task<PagedInfo<ProductDetailReportView>> GetPageInfoAsync(ProductDetailReportPageQuery query);
+
+    Task<decimal> GetOutputSumAsyc(ProductDetailReportQuery query);
 }
 

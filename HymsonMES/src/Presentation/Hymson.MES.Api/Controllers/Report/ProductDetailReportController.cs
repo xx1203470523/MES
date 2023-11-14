@@ -42,9 +42,9 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("page")]
-        public async Task<PagedInfo<ProductDetailReportOutputDto>> GetPageInfoAsync([FromQuery]ProductDetailReportQueryDto queryDto)
+        public async Task<PagedInfo<ProductDetailReportOutputDto>> GetPageInfoAsync([FromQuery]ProductDetailReportPageQueryDto pageQueryDto)
         {
-            return await _productDetailService.GetPageInfoAsync(queryDto);
+            return await _productDetailService.GetPageInfoAsync(pageQueryDto);
         }
 
         /// <summary>
@@ -53,10 +53,20 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("export")]
-        public async Task<ExportResultDto> ExportExcelAsync([FromQuery] ProductDetailReportQueryDto queryDto)
+        public async Task<ExportResultDto> ExportExcelAsync([FromQuery] ProductDetailReportPageQueryDto pageQueryDto)
         {
-            return await _productDetailService.ExportExcelAsync(queryDto);
+            return await _productDetailService.ExportExcelAsync(pageQueryDto);
         }
 
+        /// <summary>
+        /// 获取下线产出数
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getOutputSum")]
+        public async Task<decimal> GetOutputSumQtyAsync([FromQuery] ProductDetailReportQueryDto query)
+        {
+            return await _productDetailService.GetOutputQtyAsync(query);
+        }
     }
 }

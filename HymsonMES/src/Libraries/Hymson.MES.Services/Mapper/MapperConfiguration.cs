@@ -673,7 +673,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region ProductDetailReport
 
-            CreateMap<ProductDetailReportQueryDto, ProductDetailReportQuery>();
+            CreateMap<ProductDetailReportPageQueryDto, ProductDetailReportPageQuery>();
             CreateMap<ProductDetailReportOutputDto, ProductDetailReportView>();
             CreateMap<ProductDetailReportView, ProductDetailReportOutputDto>();
 

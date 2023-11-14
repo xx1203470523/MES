@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.SysSetting;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Report;
 using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ public partial class ProductDetailReportRepository : BaseRepository, IProductDet
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    public async Task<PagedInfo<ProductDetailReportView>> GetPageInfoAsync(ProductDetailReportQuery query)
+    public async Task<PagedInfo<ProductDetailReportView>> GetPageInfoAsync(ProductDetailReportPageQuery query)
     {
         var sqlBuilder = new SqlBuilder();
 
@@ -75,6 +76,53 @@ public partial class ProductDetailReportRepository : BaseRepository, IProductDet
 
         return new PagedInfo<ProductDetailReportView>(pageData, query.PageIndex, query.PageSize, pageCount);
     }
+
+    /// <summary>
+    /// 获取下线工序产出总数
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<decimal> GetOutputSumAsyc(ProductDetailReportQuery query)
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+
+        var getSql = sqlBuilder.AddTemplate(GetSumQtySql);
+
+        if (query.OrderId != null)
+        {
+            sqlBuilder.Where(" WorkOrderId = @OrderId ");
+        }
+
+        if (query.EquipmentId != null)
+        {
+            sqlBuilder.Where(" EquipmentId = @EquipmentId ");
+        }
+
+        if (query.ResourceId != null)
+        {
+            sqlBuilder.Where(" ResourceId = @ResourceId ");
+        }
+        else
+        {
+            sqlBuilder.Where(" ResourceId = 19867386041061376 ");
+        }
+
+        if (query.StartDate != null)
+        {
+            sqlBuilder.Where(" EndTime >= @StartDate ");
+        }
+
+        if (query.EndDate != null)
+        {
+            sqlBuilder.Where(" EndTime < @EndDate ");
+        }
+
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = GetMESDbConnection();
+        return await conn.QueryFirstOrDefaultAsync<decimal>(getSql.RawSql, getSql.Parameters);
+    }
 }
 
 /// <summary>
@@ -87,7 +135,7 @@ SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate,LEFT(date
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime < @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
-AND ProcedureId  = 20033299167047680 AND mss.QualityStatus =  1
+AND ProcedureId  = 20033299167047680 AND mss.QualityStatus = 1
 GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 ),T2 AS(
 SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate , LEFT(date_add(EndTime,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty FROM manu_sfc_summary mss
@@ -108,14 +156,14 @@ SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate,LEFT(date
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime < @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
-AND ProcedureId  = 20033299167047680 AND mss.QualityStatus =  1
+AND ProcedureId = 20033299167047680 AND mss.QualityStatus = 1
 GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 ),T2 AS(
 SELECT mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type) AS startDate , LEFT(date_add(EndTime,interval 1 @SearchType),@Type) AS EndDate,NULLIF(SUM(mss.Qty),0) OutputQty FROM manu_sfc_summary mss
 WHERE (EndTime >=@StartDate OR @StartDate IS NULL)
 AND (EndTime <  @EndDate OR @EndDate IS NULL)
 AND (WorkOrderId = @OrderId OR @OrderId IS NULL)
-AND ResourceId  =  19867386041061376
+AND ResourceId = 19867386041061376
 GROUP BY mss.WorkOrderId ,mss.ProductId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 )
 SELECT COUNT(1) FROM T1
@@ -123,4 +171,5 @@ LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.w
 ORDER BY T1.startDate
 ";
 
+    private readonly string GetSumQtySql = "SELECT ifnull(SUM(ifnull(Qty,0)),0) FROM manu_sfc_summary mss  /**where**/";
 }

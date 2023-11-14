@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +17,20 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public Task<PagedInfo<ProductDetailReportOutputDto>> GetPageInfoAsync(ProductDetailReportQueryDto queryDto);
+        public Task<PagedInfo<ProductDetailReportOutputDto>> GetPageInfoAsync(ProductDetailReportPageQueryDto queryDto);
 
         /// <summary>
         /// 产能报表-导出Excel
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public Task<ExportResultDto> ExportExcelAsync(ProductDetailReportQueryDto queryDto);
+        public Task<ExportResultDto> ExportExcelAsync(ProductDetailReportPageQueryDto queryDto);
+
+        /// <summary>
+        /// 获取下线工序产出汇总数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public Task<decimal> GetOutputQtyAsync([FromQuery] ProductDetailReportQueryDto queryDto);
     }
 }
