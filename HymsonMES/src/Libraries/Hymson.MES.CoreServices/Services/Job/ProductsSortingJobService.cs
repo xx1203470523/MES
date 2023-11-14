@@ -70,7 +70,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var sfcs = commonBo.InStationRequestBos.Select(s => s.SFC);
             // 验证DTO
-            if (sfcs == null || sfcs.Count() == 0)
+            if (!sfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
@@ -96,10 +96,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 MaterialIds=productIds
             };
             var procSortingRules = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetSortingRulesAsync, query);
-            if (procSortingRules == null || !procSortingRules.Any())
-            {
-
-            }
         }
 
         /// <summary>
@@ -126,7 +122,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var sfcs = commonBo.InStationRequestBos.Select(s => s.SFC);
             // 验证DTO
-            if (sfcs == null || sfcs.Count() == 0)
+            if (!sfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }

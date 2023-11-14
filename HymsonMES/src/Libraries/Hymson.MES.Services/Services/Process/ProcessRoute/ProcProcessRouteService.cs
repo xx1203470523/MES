@@ -411,7 +411,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 Version = processRoute.Version,
                 Id = processRoute.Id,
             });
-            if (isExistsCode == true) throw new CustomerValidationException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
+            if (isExistsCode) throw new CustomerValidationException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
             #endregion
 
             // TODO 现在关联表批量删除批量新增，后面再修改
@@ -635,7 +635,6 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 }
             }
 
-            //childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
             if (!nextNodes.Any()) return;
             if (nodesOfSorted.Count >= allNodes.Count()) return;
 

@@ -309,7 +309,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             //TODO 清理关联表
             await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(param.Id);
 
-            if (list != null && list.Any())
+            if (list.Any())
             {
                 //插入不合格代码
                 await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(list);

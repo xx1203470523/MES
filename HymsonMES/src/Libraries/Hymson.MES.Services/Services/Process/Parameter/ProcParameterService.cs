@@ -264,7 +264,7 @@ namespace Hymson.MES.Services.Services.Process
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
                 if (!validationResult.IsValid)
                 {
-                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    if (validationResult.Errors.Any())
                     {
                         foreach (var validationFailure in validationResult.Errors)
                         {

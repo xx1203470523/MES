@@ -80,31 +80,6 @@ namespace Hymson.MES.Services.Validators.Process
             return true;
         }
 
-
-        /// <summary>
-        /// 参数验证交集
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        //private bool ManuSortingParamIntersectionValidator(IEnumerable<SortingParamDto>? param)
-        //{
-        //    if (param != null)
-        //    {
-        //        foreach (var item in param)
-        //        {
-        //            if (item.MaxValue != null)
-        //            {
-        //                if (item.MaxValue < item.MaxValue)
-        //                {
-        //                    return false;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return true;
-        //}
-
-
         /// <summary>
         /// 编码和版本 唯一验证
         /// </summary>
