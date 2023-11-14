@@ -102,6 +102,27 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _manufactureService.OutBoundMoreAsync(request);
         }
 
+        /// <summary>
+        /// 载具进站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("InBoundVehicle")]
+        public async Task InBoundVehicleAsync(InBoundVehicleDto request)
+        {
+            await _manufactureService.InBoundVehicleAsync(request);
+        }
+
+        /// <summary>
+        /// 载具出站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("OutBoundVehicle")]
+        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
+        {
+            await _manufactureService.OutBoundVehicleAsync(request);
+        }
 
     }
 }

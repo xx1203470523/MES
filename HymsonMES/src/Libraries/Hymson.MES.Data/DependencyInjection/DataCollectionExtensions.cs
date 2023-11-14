@@ -290,6 +290,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuDowngradingRecordRepository, ManuDowngradingRecordRepository>();
             services.AddSingleton<IManuSfcSummaryRepository, ManuSfcSummaryRepository>();
             services.AddSingleton<IManuSfcScrapRepository, ManuSfcScrapRepository>();
+
+            services.AddSingleton<IManuSfcGradeRepository, ManuSfcGradeRepository>();
+            services.AddSingleton<IManuSfcGradeDetailRepository, ManuSfcGradeDetailRepository>();
+            
             #endregion
 
             #region Warehouse 
@@ -330,6 +334,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcEsopFileRepository, ProcEsopFileRepository>();
             services.AddSingleton<IProcEsopRepository, ProcEsopRepository>();
             #endregion
+
             return services;
         }
 

@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Bos.Parameter;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -48,14 +47,15 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         private readonly IProcProcedureRepository _procProcedureRepository;
 
         /// <summary>
+        /// 服务接口（过站）
+        /// </summary>
+        private readonly IManuPassStationService _manuPassStationService;
+
+        /// <summary>
         /// 业务接口（创建条码服务）
         /// </summary>
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
 
-        /// <summary>
-        /// 服务接口
-        /// </summary>
-        private readonly IExecuteJobService<JobRequestBo> _executeJobService;
 
         /// <summary>
         /// 构造函数
@@ -68,8 +68,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <param name="equEquipmentRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
+        /// <param name="manuPassStationService"></param>
         /// <param name="manuCreateBarcodeService"></param>
-        /// <param name="executeJobService"></param>
         public ManufactureService(ICurrentEquipment currentEquipment,
             AbstractValidator<InBoundDto> validationInBoundDtoRules,
             AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules,
@@ -78,8 +78,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             IEquEquipmentRepository equEquipmentRepository,
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
-            IManuCreateBarcodeService manuCreateBarcodeService,
-            IExecuteJobService<JobRequestBo> executeJobService)
+            IManuPassStationService manuPassStationService,
+            IManuCreateBarcodeService manuCreateBarcodeService)
         {
             _currentEquipment = currentEquipment;
             _validationInBoundDtoRules = validationInBoundDtoRules;
@@ -89,8 +89,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             _equEquipmentRepository = equEquipmentRepository;
             _procResourceRepository = procResourceRepository;
             _procProcedureRepository = procProcedureRepository;
+            _manuPassStationService = manuPassStationService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
-            _executeJobService = executeJobService;
         }
 
 
@@ -116,212 +116,179 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <summary>
         /// 进站
         /// </summary>
-        /// <param name="inBoundDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public async Task InBoundAsync(InBoundDto inBoundDto)
+        public async Task InBoundAsync(InBoundDto request)
         {
-            await _validationInBoundDtoRules.ValidateAndThrowAsync(inBoundDto);
-            if (inBoundDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            await _validationInBoundDtoRules.ValidateAndThrowAsync(request);
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
-                ResourceCode = inBoundDto.ResourceCode,
-                EquipmentCode = inBoundDto.EquipmentCode
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
-
-            _ = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            _ = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
             {
                 SiteId = _currentEquipment.SiteId,
                 UserName = _currentEquipment.Name,
-                Time = inBoundDto.LocalTime,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                InStationRequestBos = new InStationRequestBo[] { new InStationRequestBo { SFC = inBoundDto.SFC } }
+                SFCs = new string[] { request.SFC }
             });
         }
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
-        /// <param name="inBoundMoreDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public async Task InBoundMoreAsync(InBoundMoreDto inBoundMoreDto)
+        public async Task InBoundMoreAsync(InBoundMoreDto request)
         {
-            await _validationInBoundMoreDtoRules.ValidateAndThrowAsync(inBoundMoreDto);
-            if (inBoundMoreDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            if (inBoundMoreDto.SFCs.Count() <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
+            await _validationInBoundMoreDtoRules.ValidateAndThrowAsync(request);
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (!request.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
 
             var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
-                ResourceCode = inBoundMoreDto.ResourceCode,
-                EquipmentCode = inBoundMoreDto.EquipmentCode
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "InStationJobService" });
-
-            _ = await _executeJobService.ExecuteAsync(jobBos, new JobRequestBo
+            _ = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
             {
                 SiteId = _currentEquipment.SiteId,
                 UserName = _currentEquipment.Name,
-                Time = inBoundMoreDto.LocalTime,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                InStationRequestBos = inBoundMoreDto.SFCs.Select(s => new InStationRequestBo { SFC = s.SFC })
+                SFCs = request.SFCs.Select(s => s.SFC)
             });
         }
 
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="outBoundDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public async Task OutBoundAsync(OutBoundDto outBoundDto)
+        public async Task OutBoundAsync(OutBoundDto request)
         {
-            await _validationOutBoundDtoRules.ValidateAndThrowAsync(outBoundDto);
-            if (outBoundDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
             var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
-                ResourceCode = outBoundDto.ResourceCode,
-                EquipmentCode = outBoundDto.EquipmentCode
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
-            var jobBos = new List<JobBo> { };
-            if (outBoundDto.IsPassingStation)
-            {
-                jobBos.Add(new JobBo { Name = "InStationJobService" });
-            }
-
-            // 进出站参数
-            var requestBo = new JobRequestBo
+            _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
             {
                 SiteId = _currentEquipment.SiteId,
                 UserName = _currentEquipment.Name,
-                Time = outBoundDto.LocalTime,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
-                EquipmentId = manuBo.EquipmentId
-            };
-
-            var outStationRequestBo = new OutStationRequestBo
-            {
-                SFC = outBoundDto.SFC,
-                IsQualified = outBoundDto.Passed == 1,
-            };
-
-            // 消耗信息
-            if (outBoundDto.BindFeedingCodes != null && outBoundDto.BindFeedingCodes.Any())
-            {
-                outStationRequestBo.ConsumeList = outBoundDto.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
-            }
-
-            // 不合格代码信息
-            if (outBoundDto.NG != null && outBoundDto.NG.Any())
-            {
-                outStationRequestBo.OutStationUnqualifiedList = outBoundDto.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
-            }
-
-            /*
-            // 出站参数信息
-            if (outBoundDto.ParamList != null && outBoundDto.ParamList.Any())
-            {
-                outStationRequestBo.ParamList = outBoundDto.ParamList;
-            }
-            */
-
-            jobBos.Add(new JobBo { Name = "OutStationJobService" });
-            requestBo.OutStationRequestBos = new OutStationRequestBo[] { outStationRequestBo };
-            _ = await _executeJobService.ExecuteAsync(jobBos, requestBo);
+                EquipmentId = manuBo.EquipmentId,
+                SFCs = new string[] { request.SFC }
+            });
         }
 
         /// <summary>
         /// 出站（多个）
         /// </summary>
-        /// <param name="outBoundMoreDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        public async Task OutBoundMoreAsync(OutBoundMoreDto outBoundMoreDto)
+        public async Task OutBoundMoreAsync(OutBoundMoreDto request)
         {
-            await _validationOutBoundMoreDtoRules.ValidateAndThrowAsync(outBoundMoreDto);
-            if (outBoundMoreDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-            if (outBoundMoreDto.SFCs.Length <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
+            await _validationOutBoundMoreDtoRules.ValidateAndThrowAsync(request);
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+            if (request.SFCs.Length <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
 
             var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
-                ResourceCode = outBoundMoreDto.ResourceCode,
-                EquipmentCode = outBoundMoreDto.EquipmentCode
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
             });
             if (manuBo == null) return;
 
-            var jobBos = new List<JobBo> { };
-
-            // 进出站参数
-            var requestBo = new JobRequestBo
+            _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
             {
                 SiteId = _currentEquipment.SiteId,
                 UserName = _currentEquipment.Name,
-                Time = outBoundMoreDto.LocalTime,
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
-                EquipmentId = manuBo.EquipmentId
-            };
-
-            // 进站参数
-            if (outBoundMoreDto.SFCs.Any(a => a.IsPassingStation))
-            {
-                jobBos.Add(new JobBo { Name = "InStationJobService" });
-                requestBo.InStationRequestBos = outBoundMoreDto.SFCs.Where(w => w.IsPassingStation).Select(s => new InStationRequestBo { SFC = s.SFC });
-            }
-
-            // 出站参数
-            var outStationRequestBos = new List<OutStationRequestBo>();
-            foreach (var outBoundDto in outBoundMoreDto.SFCs)
-            {
-                var outStationRequestBo = new OutStationRequestBo
-                {
-                    SFC = outBoundDto.SFC,
-                    IsQualified = outBoundDto.Passed == 1,
-                };
-
-                // 消耗信息
-                if (outBoundDto.BindFeedingCodes != null && outBoundDto.BindFeedingCodes.Any())
-                {
-                    outStationRequestBo.ConsumeList = outBoundDto.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
-                }
-
-                // 不合格代码信息
-                if (outBoundDto.NG != null && outBoundDto.NG.Any())
-                {
-                    outStationRequestBo.OutStationUnqualifiedList = outBoundDto.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
-                }
-
-                /*
-                // 出站参数信息
-                if (outBoundDto.ParamList != null && outBoundDto.ParamList.Any())
-                {
-                    outStationRequestBo.ParamList = outBoundDto.ParamList;
-                }
-                */
-
-                outStationRequestBos.Add(outStationRequestBo);
-            }
-
-            jobBos.Add(new JobBo { Name = "OutStationJobService" });
-            requestBo.OutStationRequestBos = outStationRequestBos;
-            _ = await _executeJobService.ExecuteAsync(jobBos, requestBo);
+                EquipmentId = manuBo.EquipmentId,
+                SFCs = request.SFCs.Select(s => s.SFC)
+            });
         }
+
+        /// <summary>
+        /// 载具进站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task InBoundVehicleAsync(InBoundVehicleDto request)
+        {
+            //await _validationInBoundDtoRules.ValidateAndThrowAsync(request);
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            {
+                SiteId = _currentEquipment.SiteId,
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
+            });
+            if (manuBo == null) return;
+
+            _ = await _manuPassStationService.InStationRangeByVehicleAsync(new VehicleInStationBo
+            {
+                SiteId = _currentEquipment.SiteId,
+                UserName = _currentEquipment.Name,
+                ProcedureId = manuBo.ProcedureId,
+                ResourceId = manuBo.ResourceId,
+                EquipmentId = manuBo.EquipmentId,
+                VehicleCodes = new string[] { request.VehicleCode }
+            });
+        }
+
+        /// <summary>
+        /// 载具出站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
+        {
+            //await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            {
+                SiteId = _currentEquipment.SiteId,
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
+            });
+            if (manuBo == null) return;
+
+            _ = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
+            {
+                SiteId = _currentEquipment.SiteId,
+                UserName = _currentEquipment.Name,
+                ProcedureId = manuBo.ProcedureId,
+                ResourceId = manuBo.ResourceId,
+                EquipmentId = manuBo.EquipmentId,
+                VehicleCodes = new string[] { request.VehicleCode }
+            });
+        }
+
 
 
         #region 内部方法

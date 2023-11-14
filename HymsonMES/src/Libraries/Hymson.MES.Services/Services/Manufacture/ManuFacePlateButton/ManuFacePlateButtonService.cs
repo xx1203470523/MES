@@ -46,7 +46,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
 
         /// <summary>
-        /// 仓储接口（载具注册）
+        /// 服务接口（过站）
         /// </summary>
         private readonly IManuPassStationService _manuPassStationService;
 
@@ -481,7 +481,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
                     }
 
-                    boResult = await _manuPassStationService.InStationRangeBySFC(new SFCInStationBo
+                    boResult = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         UserName = _currentUser.UserName,
@@ -497,7 +497,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
                     }
 
-                    boResult = await _manuPassStationService.InStationRangeByVehicle(new VehicleInStationBo
+                    boResult = await _manuPassStationService.InStationRangeByVehicleAsync(new VehicleInStationBo
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         UserName = _currentUser.UserName,
@@ -543,7 +543,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
                     }
 
-                    boResult = await _manuPassStationService.OutStationRangeBySFC(new SFCOutStationBo
+                    boResult = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         UserName = _currentUser.UserName,
@@ -559,7 +559,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
                     }
 
-                    boResult = await _manuPassStationService.OutStationRangeByVehicle(new VehicleOutStationBo
+                    boResult = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         UserName = _currentUser.UserName,

@@ -533,7 +533,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 未更新到全部需更新的数据，事务回滚
                 if (data.UpdateFeedingQtyByIdCommands.Count() > responseBo.Rows)
                 {
-                    responseBo.Rows = -1;
+                    responseBo.IsSuccess = false;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18218), string.Join(',', data.SFCProduceEntities!.Select(s => s.SFC)));
                     return responseBo;
                 }
@@ -587,7 +587,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
                 if (SFCProduceEntity != null)
                 {
-                    // 面板需要的参数
+                    // 面板需要的数据
                     List<PanelModuleEnum> panelModules = new();
                     responseBo.Content = new Dictionary<string, string> {
                         { "PanelModules", panelModules.ToSerialize() },
