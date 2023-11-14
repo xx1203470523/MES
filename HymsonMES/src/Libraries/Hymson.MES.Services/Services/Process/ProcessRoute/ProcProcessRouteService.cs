@@ -418,7 +418,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
 
             // 只允许保存一个当前版本
-            if (procProcessRouteEntity.IsCurrentVersion == 1)
+            if (procProcessRouteDto.IsCurrentVersion)
             {
                 // 取消其他记录为"非当前版本"
                 await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
