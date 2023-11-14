@@ -420,7 +420,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (responseBo.Rows != data.UpdateProduceInStationSFCCommands.Count())
             {
                 // 这里在外层会回滚事务
-                responseBo.Rows = -1;
+                responseBo.IsSuccess = false;
                 responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), string.Join(',', data.SFCProduceEntities.Select(s => s.SFC)));
                 return responseBo;
             }
