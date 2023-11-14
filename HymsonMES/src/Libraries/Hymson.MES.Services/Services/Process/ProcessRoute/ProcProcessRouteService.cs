@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -293,11 +294,12 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
 
             // 只允许保存一个当前版本
-            if (procProcessRouteEntity.IsCurrentVersion == 1)
+            if (procProcessRouteEntity.IsCurrentVersion)
             {
                 await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
                 {
                     SiteId = procProcessRouteEntity.SiteId,
+                    Code = procProcessRouteDto.Code,
                     UpdatedOn = procProcessRouteEntity.UpdatedOn,
                     UpdatedBy = procProcessRouteEntity.UpdatedBy
                 });
@@ -418,12 +420,13 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
 
             // 只允许保存一个当前版本
-            if (procProcessRouteDto.IsCurrentVersion)
+            if (procProcessRouteEntity.IsCurrentVersion)
             {
                 // 取消其他记录为"非当前版本"
                 await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
                 {
                     SiteId = processRoute.SiteId,
+                    Code= processRoute.Code,
                     UpdatedOn = procProcessRouteEntity.UpdatedOn,
                     UpdatedBy = procProcessRouteEntity.UpdatedBy
                 });
