@@ -250,7 +250,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var outProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
-                    var validationFailure = new ValidationFailure();
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("InProcedure", inProcedureEntity.Code);

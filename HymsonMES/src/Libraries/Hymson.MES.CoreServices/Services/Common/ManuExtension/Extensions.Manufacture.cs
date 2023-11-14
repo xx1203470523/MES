@@ -99,7 +99,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 var validationFailures = new List<ValidationFailure>();
                 foreach (var item in sfcProduceEntitiesOfStatus)
                 {
-                    var validationFailure = new ValidationFailure();
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Status));
@@ -139,7 +139,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             var validationFailures = new List<ValidationFailure>();
             foreach (var entity in moreThanEntities)
             {
-                var validationFailure = new ValidationFailure();
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                 validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", entity.SFC);
                 validationFailure.FormattedMessagePlaceholderValues.Add("SFC", entity.SFC);
                 validationFailure.FormattedMessagePlaceholderValues.Add("Current", entity.RepeatedCount);
