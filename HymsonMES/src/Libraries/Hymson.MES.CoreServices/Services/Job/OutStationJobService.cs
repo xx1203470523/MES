@@ -32,7 +32,6 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
-using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -251,7 +250,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
                     var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
-                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("InProcedure", inProcedureEntity.Code);
                     validationFailure.FormattedMessagePlaceholderValues.Add("OutProcedure", outProcedureEntity.Code);
