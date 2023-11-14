@@ -110,6 +110,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Version { get; set; }
 
         /// <summary>
+        /// 是否历史清单
+        /// </summary>
+        public bool IsHistory { get; set; } = false;
+
+        /// <summary>
         /// 物料库存集合
         /// </summary>
         public List<ManuFeedingMaterialItemDto> Children { get; set; }
