@@ -333,14 +333,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 已加载的物料ID
             if (manuFeedings != null) manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
-            // 查询不到物料
-            if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
-
             // 不在集合里面的物料ID
             var notIncludeIds = manuFeedingsDictionary.Keys.Except(materialIds);
 
             // 集合
             var unionMaterialIds = materialIds.Union(notIncludeIds);
+
+            // 查询不到物料
+            if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
 
             // 通过物料ID获取物料集合
             var materials = await _procMaterialRepository.GetByIdsAsync(unionMaterialIds);
