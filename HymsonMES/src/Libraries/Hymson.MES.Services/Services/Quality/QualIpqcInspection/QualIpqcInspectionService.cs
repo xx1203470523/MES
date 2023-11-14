@@ -284,7 +284,6 @@ namespace Hymson.MES.Services.Services.Quality
             entity.GenerateConditionUnit = saveDto.GenerateConditionUnit;
             entity.ControlTime = saveDto.ControlTime;
             entity.ControlTimeUnit = saveDto.ControlTimeUnit;
-            //entity.Status = saveDto.Status;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
 

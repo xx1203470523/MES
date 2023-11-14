@@ -753,7 +753,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 // 如果不是主物料，就找下替代料
                 var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == item.Id);
                 if (bomDetailEntitiy == null) continue;
-                //?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
 
                 // 填充主物料替代料
                 if (bomDetailEntitiy.IsEnableReplace)

@@ -297,8 +297,6 @@ namespace Hymson.MES.Services.Services.Process
                     UserId = _currentUser.UserName
                 });
 
-                //await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(idsArr);
-
                 await _procMaterialSupplierRelationRepository.DeleteTrueByMaterialIdsAsync(idsArr);
 
                 ts.Complete();
