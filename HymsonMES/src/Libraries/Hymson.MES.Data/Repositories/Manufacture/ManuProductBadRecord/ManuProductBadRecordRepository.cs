@@ -456,9 +456,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_product_bad_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_product_bad_record` /**where**/ ";
-        const string GetManuProductBadRecordEntitiesSqlTemplate = @"SELECT 
-                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_product_bad_record`  WHERE SFC = @SFC AND  Status=@Status AND SiteId=@SiteId AND IsDeleted=0";
 
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
