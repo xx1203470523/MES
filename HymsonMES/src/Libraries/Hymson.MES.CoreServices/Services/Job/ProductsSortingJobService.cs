@@ -263,9 +263,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (sfcGradeDetails.Any())
                 {
                     gradeDetailEntities.AddRange(sfcGradeDetails);
-                    //根据组合拿到sfc的最终档次信息
-                    finalGrade = await GetFinalGrade(sfcGradeDetails, ruleDetailIds, sortRuleId);
-                    //最终档次算不出来报错
+                    //根据组合拿到sfc的最终档次信息,最终档次算不出来报错
+                    finalGrade = await GetFinalGrade(sfcGradeDetails, sortingRuleDetails, ruleDetailIds, sortRuleId);
                 }
 
                 insertGrades.Add(new ManuSfcGradeEntity
@@ -393,7 +392,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="sortingRuleId"></param>
         /// <param name="SfcParamters"></param>
         /// <returns></returns>
-        private async Task<string> GetFinalGrade(List<ManuSfcGradeDetailEntity> sfcParamters, List<long> ruleDetailIds, long sortingRuleId)
+        private async Task<string> GetFinalGrade(List<ManuSfcGradeDetailEntity> sfcParamters, List<ProcSortingRuleDetailEntity> sortingRuleDetails, List<long> ruleDetailIds, long sortingRuleId)
         {
             if (sfcParamters == null || !sfcParamters.Any())
             {
@@ -423,7 +422,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return string.Empty;
             }
 
-            var sortingRuleDetails = await _sortingRuleDetailRepository.GetSortingRuleDetailByIdAsync(sortingRuleId);
             List<SortingRuleGradeDto> list = new();
             foreach (var item in ruleGradeEntities)
             {
