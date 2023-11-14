@@ -26,6 +26,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
@@ -343,8 +344,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             // 查询不到物料
             if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
 
+            // 不在集合里面的物料ID
+            var notIncludeIds = manuFeedingsDictionary.Keys.Except(materialIds);
+
+            // 集合
+            var unionMaterialIds = materialIds.Union(notIncludeIds);
+
             // 通过物料ID获取物料集合
-            var materials = await _procMaterialRepository.GetByIdsAsync(manuFeedingsDictionary.Keys);
+            var materials = await _procMaterialRepository.GetByIdsAsync(unionMaterialIds);
 
             // 填充返回集合
             List<ManuFeedingMaterialDto> list = new();
@@ -356,7 +363,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
                     Version = item.Version ?? "-",
-                    IsHistory = !materialIds.Any(a => a == item.Id),
+                    IsHistory = notIncludeIds.Any(a => a == item.Id),
                     Children = new()
                 };
 
