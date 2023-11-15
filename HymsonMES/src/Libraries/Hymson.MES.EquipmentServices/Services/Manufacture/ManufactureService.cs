@@ -265,7 +265,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
+        public async Task OutBoundVehicleAsync(OutBoundCarrierDto request)
         {
             //await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -285,7 +285,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                VehicleCodes = new string[] { request.VehicleCode }
+                VehicleCodes = new string[] { request.CarrierNo }
             });
         }
 

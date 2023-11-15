@@ -87,6 +87,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcGradeDetailPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcGradeDetailEntity>> GetPagedInfoAsync(ManuSfcGradeDetailPagedQuery manuSfcGradeDetailPagedQuery);
+
+        /// <summary>
+        /// 根据档位Id查询明细
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcGradeDetailEntity>> GetByGradeIdAsync(ManuSfcGradeDetailByGradeIdQuery query);
         #endregion
     }
 }

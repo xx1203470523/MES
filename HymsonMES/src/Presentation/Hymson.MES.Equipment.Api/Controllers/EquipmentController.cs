@@ -119,7 +119,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBoundVehicle")]
-        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
+        public async Task OutBoundVehicleAsync(OutBoundCarrierDto request)
         {
             await _manufactureService.OutBoundVehicleAsync(request);
         }
