@@ -54,7 +54,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task OutBoundVehicleAsync(OutBoundVehicleDto request);
+        Task OutBoundVehicleAsync(OutBoundCarrierDto request);
 
     }
 }

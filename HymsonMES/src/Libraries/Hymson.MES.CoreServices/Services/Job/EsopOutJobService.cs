@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Validators;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
@@ -9,6 +8,8 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -33,6 +34,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IProcEsopRepository _procEsopRepository;
         private readonly IProcEsopFileRepository _esopFileRepository;
         private readonly IInteAttachmentRepository _inteAttachmentRepository;
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+        private readonly IProcMaterialRepository _procMaterialRepository;
         #endregion
 
         /// <summary>
@@ -43,13 +48,21 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="esopFileRepository"></param>
         /// <param name="masterDataService"></param>
         /// <param name="inteAttachmentRepository"></param>
-        public EsopOutJobService(AbstractValidator<EsopOutRequestBo> validationEsopOutJob, IProcEsopRepository procEsopRepository, IProcEsopFileRepository esopFileRepository, IMasterDataService masterDataService, IInteAttachmentRepository inteAttachmentRepository)
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="inteWorkCenterRepository"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        public EsopOutJobService(AbstractValidator<EsopOutRequestBo> validationEsopOutJob, IProcEsopRepository procEsopRepository, IProcEsopFileRepository esopFileRepository, IMasterDataService masterDataService, IInteAttachmentRepository inteAttachmentRepository, IInteWorkCenterRepository inteWorkCenterRepository, IPlanWorkOrderRepository planWorkOrderRepository, IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, IProcMaterialRepository procMaterialRepository)
         {
             _validationEsopOutJob = validationEsopOutJob;
             _procEsopRepository = procEsopRepository;
             _esopFileRepository = esopFileRepository;
             _masterDataService = masterDataService;
             _inteAttachmentRepository = inteAttachmentRepository;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _procMaterialRepository = procMaterialRepository;
         }
 
 
@@ -108,17 +121,39 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return default;
             }
 
-            //获取物料数据
-            var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheckAsync(requestBo.MaterialId.GetValueOrDefault());
-            if (procMaterialEntity == null)
+            //获取工作中心（线体）
+            var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(new List<long> { requestBo.ResourceId.GetValueOrDefault()});
+            if (workCenterIds == null || !workCenterIds.Any()) {
+                return null;
+            }
+
+            //获取激活工单
+            var workOrderActivationEntities = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineIds = workCenterIds,SiteId=param.SiteId });
+            if (workOrderActivationEntities == null || !workOrderActivationEntities.Any())
+            {  
+                return null; 
+            }
+
+            //获取工单
+            var workOrderIds = workOrderActivationEntities.Select(a => a.WorkOrderId);
+            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            if (workOrderEntities == null || !workOrderEntities.Any()) {
+                return null;
+            }
+
+            //获取物料
+            var materialIds = workOrderEntities.Select(a => a.ProductId);
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            if (procMaterialEntities == null|| !procMaterialEntities.Any())
             {
                 return null;
             }
 
             var procEsopQuery = new ProcEsopQuery();
             procEsopQuery.ProcedureId = requestBo.ProcedureId;
-            procEsopQuery.MaterialId = requestBo.MaterialId;
+            procEsopQuery.MaterialIds = materialIds;
             procEsopQuery.Status = DisableOrEnableEnum.Enable;
+            procEsopQuery.SiteId = param.SiteId;
             //获取ESOP数据
             var procEsopEntities = await _procEsopRepository.GetProcEsopEntitiesAsync(procEsopQuery);
             if (procEsopEntities == null || !procEsopEntities.Any()) {
@@ -139,7 +174,16 @@ namespace Hymson.MES.CoreServices.Services.Job
             var result =  Enumerable.Empty<EsopOutResponseBo>();
             foreach ( var item in procEsopFileEntities) {
 
-                //var procEsopFileEntity = procEsopEntities.FirstOrDefault(a => a.Id == item.EsopId);
+                var procEsopEntity = procEsopEntities.FirstOrDefault(a => a.Id == item.EsopId);
+                if (procEsopEntity == null) {
+                    return null;
+                }
+
+                var procMaterialEntity = procMaterialEntities.FirstOrDefault(a => a.Id == procEsopEntity.MaterialId);
+                if (procMaterialEntity == null) 
+                {  
+                    return null; 
+                }
 
                 var attachmentEntity = attachmentEntities.FirstOrDefault(a => a.Id == item.AttachmentId);
                 if (attachmentEntity == null)

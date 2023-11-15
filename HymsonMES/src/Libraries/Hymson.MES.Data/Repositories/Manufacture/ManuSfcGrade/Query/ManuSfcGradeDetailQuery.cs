@@ -18,4 +18,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long SiteId { get; set; }
     }
+
+    public class ManuSfcGradeDetailByGradeIdQuery 
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 档位Id
+        /// </summary>
+        public long GadeId { get; set; }
+    }
 }

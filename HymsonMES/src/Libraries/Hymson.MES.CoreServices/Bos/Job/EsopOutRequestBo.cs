@@ -8,13 +8,19 @@ public class EsopOutRequestBo: JobBaseBo
     /// <summary>
     /// 工序ID
     /// </summary>
-    public long? ProcedureId { get; set; }
+    public long? ProcedureId { get; set; } 
+
+    ///// <summary>
+    ///// 物料Id
+    ///// </summary>
+    ////public long? MaterialId { get; set; }
 
     /// <summary>
-    /// 物料Id
+    /// 资源Id
     /// </summary>
-    public long? MaterialId { get; set; }
-    
+    public long? ResourceId { get; set; }
+
+
 }
 
 /// <summary>

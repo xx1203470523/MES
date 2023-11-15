@@ -34,5 +34,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 是否启用
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 物料Ids
+        /// </summary>
+        public IEnumerable<long>? MaterialIds { get; set; }
     }
 }

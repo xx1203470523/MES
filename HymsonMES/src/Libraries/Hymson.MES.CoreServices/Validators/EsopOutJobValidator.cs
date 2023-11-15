@@ -10,8 +10,8 @@ namespace Hymson.MES.CoreServices.Validators
     internal class EsopOutJobValidator: AbstractValidator<EsopOutRequestBo>
     {
         public EsopOutJobValidator() {
-            RuleFor(a => a.ProcedureId).NotEmpty().WithErrorCode(ErrorCode.MES10214);
-            RuleFor(a => a.MaterialId).NotEmpty().WithErrorCode(ErrorCode.MES16335);
+            RuleFor(a => a.ProcedureId).NotEmpty().WithErrorCode(ErrorCode.MES16335);
+            RuleFor(a => a.ResourceId).NotEmpty().WithErrorCode(ErrorCode.MES16334);
         }
     }
 }

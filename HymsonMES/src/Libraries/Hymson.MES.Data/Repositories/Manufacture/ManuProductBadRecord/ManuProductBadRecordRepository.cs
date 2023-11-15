@@ -259,7 +259,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //        AND rbr.CreatedOn BETWEEN '' and ''
 
             sqlBuilder.Where(" rbr.IsDeleted = 0 ");
-            sqlBuilder.Where(" rbr.SiteId=@SiteId ");
+            sqlBuilder.Where(" rbr.SiteId = @SiteId ");
 
             if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
             {
@@ -523,6 +523,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         r.ResCode,
                         uc.UnqualifiedCode,
                         uc.Type as UnqualifiedType,
+                        rbr.Id,
+                        rbr.UnqualifiedId,
                         rbr.`Status` as BadRecordStatus,
                         rbr.Qty,
                         rbr.CreatedBy,
@@ -544,7 +546,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 LIMIT @Offset,@Rows 
         ";
         const string GetPagedInfoLogReportCountSqlTemplate = @" 
-                SELECT  COUNT(1) 
+                SELECT COUNT(1) 
                 FROM manu_product_bad_record rbr
                 LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
                 LEFT JOIN proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源
