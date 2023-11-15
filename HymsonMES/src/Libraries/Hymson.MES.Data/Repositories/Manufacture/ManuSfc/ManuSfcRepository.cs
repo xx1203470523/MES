@@ -229,9 +229,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             //sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
             sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.Lock,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
-                                , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
+                                , msp.WorkOrderId, msp.ResourceId, msp.ProductId ");
 
-            sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
+            //sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
             //sqlBuilder.LeftJoin("proc_material pm  on msi.ProductId =pm.Id  AND pm.IsDeleted=0");
             //sqlBuilder.LeftJoin("plan_work_order pwo on pwo.Id= msi.WorkOrderId AND pwo.IsDeleted=0");
@@ -266,7 +266,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //工单
             if (query.OrderId.HasValue&& query.OrderId>0)
             {
-                sqlBuilder.Where(" msi.WorkOrderId = @OrderId ");
+                sqlBuilder.Where(" msp.WorkOrderId = @OrderId ");
             }
             //工序
             if (query.ProcedureId.HasValue && query.ProcedureId > 0)
@@ -445,7 +445,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY MS.CreatedOn DESC  LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetManuSfcInfoEntitiesSqlTemplate = @"SELECT 
                                             sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,info.WorkOrderId ,info.ProductId ,info.IsUsed  FROM manu_sfc sfc LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1

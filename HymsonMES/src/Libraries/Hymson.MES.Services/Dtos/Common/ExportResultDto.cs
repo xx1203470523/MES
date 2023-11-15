@@ -11,5 +11,7 @@ namespace Hymson.MES.Services.Dtos.Common
         public string Path { get; set; }
 
         public string FileName { get; set; }
+
+        public string RelativePath { get; set; }
     }
 }

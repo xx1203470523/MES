@@ -283,6 +283,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuProductParameterReportService, ManuProductParameterReportService>();
             #endregion
 
+            #region ProductDetailReport
+            services.AddSingleton<IProductDetailService, ProductDetailService>();
+            #endregion
+
             #endregion
 
             return services;

@@ -56,6 +56,7 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSqlLocalization(Configuration)
                 .AddSequenceService(Configuration)
                 .AddLocalization()
+                .AddLogging()
                 //.AddSingleton<ICurrentEquipment, CurrentEquipment>()//不能直接注入原有CurrentEquipment因为没在HttpContextAccessor层面模拟设备信息
                 .AddSingleton<ICurrentEquipment, TestCurrentEquipment>()//测试所用CurrentEquipment服务，修改CurrentEquipmentInfo模拟设备信息
                 .AddSingleton<ICurrentUser, TestCurrentUser>()//测试所用CurrentUser服务，用于模拟当前操作用户信息

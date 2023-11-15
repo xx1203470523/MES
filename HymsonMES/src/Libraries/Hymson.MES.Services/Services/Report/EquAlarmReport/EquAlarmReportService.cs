@@ -72,6 +72,7 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
             {
                 FileName = fileName,
                 Path = uploadResult.RelativeUrl,
+                RelativePath = uploadResult.RelativeUrl
             };
         }
     }
