@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using MailKit.Search;
 using System.Data;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -242,6 +243,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 foreach (var parameter in parameterEntities)
                 {
                     var ruleDetail = GetParameterRating(parameter, sortingRuleDetails);
+                    if (ruleDetail == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16365)).WithData("SFC", sfc);
+                    }
                     if (ruleDetail != null && !ruleDetailIds.Contains(ruleDetail.Id))
                     {
                         ruleDetailIds.Add(ruleDetail.Id);
@@ -271,7 +276,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     gradeDetailEntities.AddRange(sfcGradeDetails);
                     //根据组合拿到sfc的最终档次信息,最终档次算不出来报错
-                    finalGrade = await GetFinalGrade(sfcGradeDetails, sortingRuleDetails, ruleDetailIds, sortRuleId);
+                    finalGrade = await GetFinalGrade(sfcGradeDetails, sortingRuleDetails, ruleDetailIds);
+                    if (string.IsNullOrWhiteSpace(finalGrade))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16366)).WithData("SFC", sfc);
+                    }
                 }
 
                 insertGrades.Add(new ManuSfcGradeEntity
@@ -399,8 +408,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="sortingRuleId"></param>
         /// <param name="SfcParamters"></param>
         /// <returns></returns>
-        private async Task<string> GetFinalGrade(List<ManuSfcGradeDetailEntity> sfcParamters, List<ProcSortingRuleDetailEntity> sortingRuleDetails, List<long> ruleDetailIds, long sortingRuleId)
+        private async Task<string> GetFinalGrade(List<ManuSfcGradeDetailEntity> sfcParamters, List<ProcSortingRuleDetailEntity> sortingRuleDetails, List<long> ruleDetailIds)
         {
+            var sortingRuleId = sortingRuleDetails.FirstOrDefault()?.SortingRuleId ?? 0;
             if (sfcParamters == null || !sfcParamters.Any())
             {
                 return string.Empty;

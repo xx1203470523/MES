@@ -906,6 +906,8 @@
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
         public const string MES16364= "未找到条码的产品参数信息！";
+        public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
+        public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
         #endregion
 
         #region 工单激活 MES16400
