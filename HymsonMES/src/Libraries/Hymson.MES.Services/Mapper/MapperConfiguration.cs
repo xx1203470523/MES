@@ -38,6 +38,7 @@ using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
+using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -636,6 +637,15 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
             CreateMap<ProductTracePagedQueryDto, ManuSfcStepPagedQuery>();
             CreateMap<PlanWorkOrderListDetailView, ProductTracePlanWorkOrderReportExportDto>();
+
+
+            #region ProductDetailReport
+
+            CreateMap<ProductDetailReportPageQueryDto, ProductDetailReportPageQuery>();
+            CreateMap<ProductDetailReportOutputDto, ProductDetailReportView>();
+            CreateMap<ProductDetailReportView, ProductDetailReportOutputDto>();
+
+            #endregion
         }
 
         /// <summary>
