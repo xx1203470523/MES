@@ -280,14 +280,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys)
         {
-            if (entities == null || !entities.Any()) return 0;
+            if (manuSfcProduceEntitys == null || !manuSfcProduceEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entities);
+            return await conn.ExecuteAsync(InsertSql, manuSfcProduceEntitys);
         }
 
         /// <summary>
