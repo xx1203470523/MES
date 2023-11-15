@@ -1422,7 +1422,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18001));
             }
 
-            if (manuSfcs.Length != manuSfcInfos.Count())
+            if (manuSfcs.Length != manuSfcInfos.GroupBy(a=>a.SFC).Select(a=>a.Key).Count())
             {
                 var differentSfcs = manuSfcs.Where(it => !manuSfcInfos.Where(info => info.SFC.Contains(it)).Any()).Select(it => it).ToList();
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
