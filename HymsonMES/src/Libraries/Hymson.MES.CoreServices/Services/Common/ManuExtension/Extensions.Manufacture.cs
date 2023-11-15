@@ -104,13 +104,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                     validationFailure.FormattedMessagePlaceholderValues.Add("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
                     validationFailure.ErrorCode = nameof(ErrorCode.MES16361);
                     validationFailures.Add(validationFailure);
-
-                    /*
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16361))
-                        .WithData("SFC", item.SFC)
-                        .WithData("Current", localizationService.GetSFCStatusEnumDescription(item.Status))
-                        .WithData("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
-                    */
                 }
 
                 if (validationFailures.Any())
@@ -143,13 +136,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", cycle);
                 validationFailure.ErrorCode = nameof(ErrorCode.MES16360);
                 validationFailures.Add(validationFailure);
-
-                /*
-                throw new CustomerValidationException(nameof(ErrorCode.MES16360))
-                    .WithData("Current", entity.RepeatedCount)
-                    .WithData("Cycle", cycle)
-                    .WithData("SFC", entity.SFC);
-                */
             }
 
             if (validationFailures.Any())
