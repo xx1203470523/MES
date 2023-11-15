@@ -166,13 +166,13 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 读取工序关联的资源
             var resourceIds = await param.Proxy!.GetValueAsync(_masterDataService.GetProcResourceIdByProcedureIdAsync, bo.ProcedureId);
-            if (resourceIds == null || resourceIds.Any() == false)
+            if (resourceIds == null || !resourceIds.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16355)).WithData("ProcedureCode", procedureEntity.Code);
             }
 
             // 校验工序和资源是否对应
-            if (resourceIds.Any(a => a == bo.ResourceId) == false)
+            if (!resourceIds.Any(a => a == bo.ResourceId))
             {
                 _logger.LogWarning($"工序{bo.ProcedureId}和资源{bo.ResourceId}不对应");
                 throw new CustomerValidationException(nameof(ErrorCode.MES16317));

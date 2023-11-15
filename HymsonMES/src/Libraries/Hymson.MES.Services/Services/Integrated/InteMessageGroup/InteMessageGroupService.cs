@@ -327,7 +327,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var pushMethodsByMessageGroupIdDic = allMessageGroupPushMethods.ToLookup(w => w.MessageGroupId).ToDictionary(d => d.Key, d => d);
             foreach (var dto in dtos)
             {
-                if (pushMethodsByMessageGroupIdDic.TryGetValue(dto.Id, out var pushMethods) == false) continue;
+                if (!pushMethodsByMessageGroupIdDic.TryGetValue(dto.Id, out var pushMethods)) continue;
                 dto.PushTypes = pushMethods.Select(s => s.Type).Distinct();
             }
 

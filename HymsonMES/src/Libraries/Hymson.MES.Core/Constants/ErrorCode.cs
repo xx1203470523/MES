@@ -395,7 +395,7 @@
         #endregion
 
         #region ESOP维护 11500
-        public const string MES11500 = "ESOP已存在同一物料、工序数据";
+        public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
         #endregion
 
         #region 作业12000
@@ -905,6 +905,7 @@
         public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
+        public const string MES16364= "未找到条码的产品参数信息！";
         #endregion
 
         #region 工单激活 MES16400
@@ -1024,6 +1025,7 @@
         public const string MES16911 = "实际使用的物料与条码不合!";
 
         public const string MES16913 = "不能删除启用或保留的记录！";
+        public const string MES16914 = "未找到能挂载物料条码的主物料!";
         #endregion
 
         #region 条码打印 MES17000

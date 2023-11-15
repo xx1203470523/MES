@@ -113,6 +113,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class JobResponseBo
     {
         /// <summary>
+        /// 是否成功
+        /// </summary>
+        public bool IsSuccess { get; set; } = true;
+
+        /// <summary>
         /// 影响行数
         /// </summary>
         public int Rows { get; set; } = 0;

@@ -99,7 +99,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = procEsopCreateDto.ProcedureId,
-                MaterialId = procEsopCreateDto.MaterialId
+                MaterialId = procEsopCreateDto.MaterialId,
+                Status= procEsopCreateDto.Status
             });
             if (procEsops != null && procEsops.Any())
             {
@@ -228,7 +229,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = procEsopModifyDto.ProcedureId,
-                MaterialId = procEsopModifyDto.MaterialId
+                MaterialId = procEsopModifyDto.MaterialId,
+                Status = procEsopModifyDto.Status
             });
             procEsops = procEsops.Where(x => x.Id != procEsopModifyDto.Id);
             if (procEsops != null && procEsops.Any())

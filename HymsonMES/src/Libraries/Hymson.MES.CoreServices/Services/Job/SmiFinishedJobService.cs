@@ -115,7 +115,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return;
+            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
@@ -182,7 +182,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return default;
+            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return default;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
@@ -351,7 +351,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 未更新到全部需更新的数据，事务回滚
                 if (data.SFCEntities.Count() > responseBo.Rows)
                 {
-                    responseBo.Rows = -1;
+                    responseBo.IsSuccess = false;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), string.Join(',', data.SFCEntities!.Select(s => s.SFC)));
                     return responseBo;
                 }

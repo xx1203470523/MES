@@ -60,7 +60,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFC(SFCInStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFCAsync(SFCInStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
@@ -92,7 +92,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicle(VehicleInStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicleAsync(VehicleInStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
@@ -106,7 +106,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             List<string> SFCs = new();
             List<InStationRequestBo> inStationRequestBos = new();
-            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
+            if (bo.VehicleCodes == null || !bo.VehicleCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
@@ -159,7 +159,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFC(SFCOutStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFCAsync(SFCOutStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
@@ -191,7 +191,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicle(VehicleOutStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
@@ -205,7 +205,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
 
             List<string> SFCs = new();
             List<OutStationRequestBo> outStationRequestBos = new();
-            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
+            if (bo.VehicleCodes == null || !bo.VehicleCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
@@ -258,7 +258,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bos"></param>
         /// <returns></returns>
-        public async Task ParameterForOutStation(IEnumerable<OutStationParameterBo> bos)
+        public async Task ParameterForOutStationAsync(IEnumerable<OutStationParameterBo> bos)
         {
             // TODO
             await Task.CompletedTask;

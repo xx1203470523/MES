@@ -3,6 +3,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.LabelTemplate;
 using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
@@ -113,6 +114,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("getRelationByLabelTemplateId/{id}")]
+        [AllowAnonymous]
         public async Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long id)
         {
             return await _procLabelTemplateService.QueryProcLabelTemplateRelationByLabelTemplateIdAsync(id);
