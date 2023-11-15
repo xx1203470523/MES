@@ -377,6 +377,7 @@
         public const string MES11312 = "分选规则版本长度为10";
         public const string MES11313 = "分选规则备注长度为255";
         public const string MES11314 = "参数集合中有交集";
+        public const string MES11315 = "查询产品分选条码不能为空";
         #endregion
 
         #region 降级录入/移除 11400
