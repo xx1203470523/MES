@@ -25,11 +25,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// 工序Id（工序）
-        /// </summary>
-        public long? ProcedureId { get; set; }
-
-        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
@@ -61,21 +56,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// 工序Id（工序）
-        /// </summary>
-        public long ProcedureId { get; set; }
-
-        /// <summary>
-        /// 工序编码（工序）
-        /// </summary>
-        public string ProcedureCode { get; set; }
-
-        /// <summary>
-        /// 工序名称（工序）
-        /// </summary>
-        public string ProcedureName { get; set; }
-
-        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; } = "";
@@ -101,10 +81,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? Code { get; set; }
 
-        /// <summary>
-        /// 工序编码（工序）
-        /// </summary>
-        public string? ProcedureCode { get; set; }
     }
 
     /// <summary>

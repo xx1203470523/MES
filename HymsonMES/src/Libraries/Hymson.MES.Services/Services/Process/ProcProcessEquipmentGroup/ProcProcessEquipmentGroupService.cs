@@ -142,11 +142,11 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
                 IEnumerable< ProcProcessEquipmentGroupEntity > procProcessEquipmentGroupEntityList=new List<ProcProcessEquipmentGroupEntity >();
-                //找到相对应的工序+设备组
-                if (saveDto.ProcedureId != null)
-                    procProcessEquipmentGroupEntityList= await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
-                if(procProcessEquipmentGroupEntityList.Any())
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
+                ////找到相对应的工序+设备组
+                //if (saveDto.ProcedureId != null)
+                //    procProcessEquipmentGroupEntityList= await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
+                //if(procProcessEquipmentGroupEntityList.Any())
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
                 //Insert Relation
                 foreach (var item in equipmentIds)
                 {
@@ -233,11 +233,11 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
                 IEnumerable<ProcProcessEquipmentGroupEntity> procProcessEquipmentGroupEntityList = new List<ProcProcessEquipmentGroupEntity>();
-                //找到相对应的工序+设备组
-                if (saveDto.ProcedureId != null)
-                    procProcessEquipmentGroupEntityList = await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
-                if (procProcessEquipmentGroupEntityList.Any())
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
+                ////找到相对应的工序+设备组
+                //if (saveDto.ProcedureId != null)
+                //    procProcessEquipmentGroupEntityList = await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
+                //if (procProcessEquipmentGroupEntityList.Any())
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
 
                 foreach (var item in equipmentIds)
                 {
@@ -332,12 +332,6 @@ namespace Hymson.MES.Services.Services.Process
                 var procProcessEquipmentGroupEntity = await _procProcessEquipmentGroupRepository.GetByIdAsync(id);
                 dto.Info = procProcessEquipmentGroupEntity.ToModel<ProcProcessEquipmentGroupListDto>();
 
-                //读取工序数据
-                var procedureId = dto.Info.ProcedureId;
-                var procedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId);
-                dto.Info.ProcedureCode = procedureEntity.Code;
-                dto.Info.ProcedureName = procedureEntity.Name;
-
                 processEquipmentGroupRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, ProcessEquipmentGroupId = id });
             }
 
@@ -376,21 +370,6 @@ namespace Hymson.MES.Services.Services.Process
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<ProcProcessEquipmentGroupListDto>());
-            var procedureIds = dtos.Select(s => s.ProcedureId);
-            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
-
-            List<ProcProcessEquipmentGroupListDto> newDtos = new();
-            foreach (var item in dtos)
-            {
-                var procedure = procedureEntities.FirstOrDefault(p => p.Id == item.ProcedureId);
-                if (procedure == null) continue;
-
-                item.ProcedureCode = procedure.Code;
-                item.ProcedureName = procedure.Name;
-                newDtos.Add(item);
-            }
-            dtos = newDtos;
-
             return new PagedInfo<ProcProcessEquipmentGroupListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
