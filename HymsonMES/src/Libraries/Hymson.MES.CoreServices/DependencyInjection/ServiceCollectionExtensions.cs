@@ -71,6 +71,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, ProductBadRecordJobService>();
             services.AddSingleton<IJobService, ProductsSortingJobService>();
             services.AddSingleton<IJobService, SmiFinishedJobService>();
+            services.AddSingleton<IJobService, SFCRequestJobService>();
             services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
