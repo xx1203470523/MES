@@ -12,7 +12,6 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.Utils;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
 {
@@ -100,7 +99,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 foreach (var item in sfcProduceEntitiesOfStatus)
                 {
                     var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
-                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Status));
                     validationFailure.FormattedMessagePlaceholderValues.Add("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
@@ -140,7 +138,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             foreach (var entity in moreThanEntities)
             {
                 var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
-                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", entity.SFC);
                 validationFailure.FormattedMessagePlaceholderValues.Add("SFC", entity.SFC);
                 validationFailure.FormattedMessagePlaceholderValues.Add("Current", entity.RepeatedCount);
                 validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", cycle);
