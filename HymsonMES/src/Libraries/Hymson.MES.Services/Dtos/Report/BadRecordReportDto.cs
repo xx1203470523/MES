@@ -1,16 +1,12 @@
 ﻿using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class BadRecordReportDto : PagerInfo
     {
         /// <summary>
@@ -44,6 +40,9 @@ namespace Hymson.MES.Services.Dtos.Report
         public DateTime[]? CreatedOn { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ManuProductBadRecordReportViewDto
     {
         /// <summary>
@@ -130,9 +129,16 @@ namespace Hymson.MES.Services.Dtos.Report
         public ProductBadRecordStatusEnum? BadRecordStatus { get; set; }
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public record ManuProductBadRecordLogReportViewDto : BaseEntityDto
     {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 条码
         /// </summary>
@@ -164,6 +170,11 @@ namespace Hymson.MES.Services.Dtos.Report
         public string ResCode { get; set; }
 
         /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long UnqualifiedId { get; set; }
+
+        /// <summary>
         /// 不合格代码
         /// </summary>
         public string UnqualifiedCode { get; set; }
@@ -193,5 +204,53 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public DateTime CreatedOn { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public record ManuProductBadRecordLogReportRequestDto
+    {
+        /// <summary>
+        /// 不良记录Id
+        /// </summary>
+        public long BadRecordId { get; set; }
+
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long UnqualifiedId { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public record ManuProductBadRecordLogReportResponseDto : BaseEntityDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string UnqualifiedCodeName { get; set; }
+
+        /// <summary>
+        /// 录入人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 录入时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+    }
+
 
 }

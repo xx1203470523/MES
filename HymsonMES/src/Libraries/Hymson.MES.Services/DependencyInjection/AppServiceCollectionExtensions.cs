@@ -204,6 +204,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuBakingService, ManuBakingService>();
 
             services.AddSingleton<IManuDowngradingRuleService, ManuDowngradingRuleService>();
+            
+            services.AddSingleton<IManuSfcGradeService, ManuSfcGradeService>();
 
             services.AddSingleton<IManuDowngradingService, ManuDowngradingService>();
             services.AddSingleton<IManuDowngradingRecordService, ManuDowngradingRecordService>();
