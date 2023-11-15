@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Process
             IEnumerable<string> equipmentIds = procProcessEquipmentGroupRelations.EquipmentIDs;
             if (equipmentIds != null)
             {
-                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new Dictionary<long, List<long>>();
+                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new();
                 var processEquGroupRelationRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetEntitiesAsync(entity.SiteId);
                 foreach (var processEquipmentGroupRelationEntity in processEquGroupRelationRelationEntities)
                 {
@@ -141,12 +141,7 @@ namespace Hymson.MES.Services.Services.Process
                         EquipmentGroupIds.Add(key);
                     }
                 }
-                IEnumerable< ProcProcessEquipmentGroupEntity > procProcessEquipmentGroupEntityList=new List<ProcProcessEquipmentGroupEntity >();
-                ////找到相对应的工序+设备组
-                //if (saveDto.ProcedureId != null)
-                //    procProcessEquipmentGroupEntityList= await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
-                //if(procProcessEquipmentGroupEntityList.Any())
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
+               
                 //Insert Relation
                 foreach (var item in equipmentIds)
                 {
@@ -209,7 +204,7 @@ namespace Hymson.MES.Services.Services.Process
             IEnumerable<string> equipmentIds = procProcessEquipmentGroupRelations.EquipmentIDs;
             if (equipmentIds != null)
             {
-                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new Dictionary<long, List<long>>();
+                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new();
                 var processEquGroupRelationRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetEntitiesAsync(entity.SiteId);
                 foreach (var processEquipmentGroupRelationEntity in processEquGroupRelationRelationEntities)
                 {
@@ -224,7 +219,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
                 if(saveDto.Id!=null)
                     allProcProcessEquipmentGroupRelations.Remove(saveDto.Id.ParseToLong());
-                List<long> EquipmentGroupIds = new List<long>();//设备与当前设备组相同的所有设备组Id
+                List<long> EquipmentGroupIds = new();//设备与当前设备组相同的所有设备组Id
                 foreach (var key in allProcProcessEquipmentGroupRelations.Keys)
                 {
                     if (allProcProcessEquipmentGroupRelations[key].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList()))
@@ -232,12 +227,6 @@ namespace Hymson.MES.Services.Services.Process
                         EquipmentGroupIds.Add(key);
                     }
                 }
-                IEnumerable<ProcProcessEquipmentGroupEntity> procProcessEquipmentGroupEntityList = new List<ProcProcessEquipmentGroupEntity>();
-                ////找到相对应的工序+设备组
-                //if (saveDto.ProcedureId != null)
-                //    procProcessEquipmentGroupEntityList = await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
-                //if (procProcessEquipmentGroupEntityList.Any())
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
 
                 foreach (var item in equipmentIds)
                 {
@@ -259,7 +248,7 @@ namespace Hymson.MES.Services.Services.Process
             }
                 
             IEnumerable<long> Ids = new List<long>() { saveDto.Id ?? 0 };
-            DeleteCommand deleteCommand = new DeleteCommand()
+            DeleteCommand deleteCommand = new()
             {
                 Ids = Ids,
                 DeleteOn = updatedOn,
