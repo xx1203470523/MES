@@ -17,5 +17,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// EsopId  proc_esop 表Id
         /// </summary>
         public long? EsopId { get; set; }
+
+        /// <summary>
+        /// EsopIds
+        /// </summary>
+        public IEnumerable<long>? EsopIds { get; set; }
     }
 }

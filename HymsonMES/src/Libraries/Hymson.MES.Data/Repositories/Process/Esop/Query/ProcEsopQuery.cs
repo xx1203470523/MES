@@ -6,6 +6,8 @@
  *build datetime: 2023-11-02 02:39:53
  */
 
+using Hymson.MES.Core.Enums;
+
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
@@ -27,5 +29,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 工序Id
         /// </summary>
         public long? ProcedureId { get; set;}
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
     }
 }
