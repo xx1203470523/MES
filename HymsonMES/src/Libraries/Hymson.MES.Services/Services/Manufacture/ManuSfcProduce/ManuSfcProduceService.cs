@@ -2330,7 +2330,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);
             }
 
-
             var orderRecord = await _planWorkOrderRepository.GetByWorkOrderIdAsync(newPlanWorkOrderEntity.Id);
             var PlanQuantity = newPlanWorkOrderEntity.Qty * (1 + newPlanWorkOrderEntity.OverScale / 100);
             var remainingQuantity = PlanQuantity - orderRecord.PassDownQuantity;
@@ -2368,12 +2367,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ResourceId = item.ResourceId,
                     Operatetype = ManuSfcStepTypeEnum.ManuUpdate,
                     CurrentStatus = SfcStatusEnum.Activity,
-
                     CreatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now(),
-
                 };
                 sfcStepList.Add(sfcStep);
             }
@@ -2395,7 +2392,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     WorkOrderId = manuUpdateSaveDto.WorkOrderId,
                     ProductId = newPlanWorkOrderEntity.ProductId,
                     IsUsed = true,
-
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
                     CreatedBy = _currentUser.UserName,
