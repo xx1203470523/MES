@@ -209,9 +209,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT 
                                `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id = @Id ";
-        const string GetBySFCSql = @"SELECT 
-                               `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `inte_vehicle_freight` ";//需要修改
+
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `VehicleId`, `Qty`, `Row`, `Column`, `Location`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `inte_vehicle_freight`  WHERE Id IN @Ids ";

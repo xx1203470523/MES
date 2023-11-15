@@ -58,14 +58,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
-            //if (manuSfcProducePagedQuery.Lock.HasValue)
-            //{
-            //    sqlBuilder.Where("msp.Lock=@Lock");
-            //}
-            //if (manuSfcProducePagedQuery.NoLock.HasValue && manuSfcProducePagedQuery.NoLock != 1)
-            //{
-            //    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
-            //}
             if (manuSfcProducePagedQuery.IsScrap.HasValue)
             {
                 sqlBuilder.Where("msp.IsScrap=@IsScrap");

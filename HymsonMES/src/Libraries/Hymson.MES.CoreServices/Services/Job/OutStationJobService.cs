@@ -1334,8 +1334,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     // 因为每次不一定是只产出一个，所以也要*数量
                     item.Usages = consume.ConsumeQty.Value * sfcProduceEntity.Qty;
-                    //item.ConsumeRatio = 100;
-                    //item.Loss = 0;
                 }
 
                 // 如果不保留替代品（如果保留，就删除这句）

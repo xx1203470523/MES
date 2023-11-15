@@ -633,12 +633,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 MaterialIds = null
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19604)).WithData("ResourceCode", param.ResourceCode);
 
-            //var wob = await _planWorkOrderBindRepository.GetByResourceIDAsync(new PlanWorkOrderBindByResourceIdQuery()
-            //{
-            //    ResourceId = resourceEntity.Id,
-
-            //    SiteId = param.SiteId,
-            //}) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19136)).WithData("ResourceCode", param.ResourceCode); ;
             var foo = fr.FirstOrDefault(f => f.WorkOrderId != null && f.WorkOrderId != 0) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19604)).WithData("ResourceCode", param.ResourceCode);
 
             var wo = await _planWorkOrderRepository.GetByIdAsync(foo.WorkOrderId ?? 0) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19929));
