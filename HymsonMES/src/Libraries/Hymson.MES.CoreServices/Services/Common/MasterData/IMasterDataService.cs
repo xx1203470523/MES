@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
@@ -10,6 +11,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
@@ -230,5 +232,12 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query);
+
+        /// <summary>
+        /// 获取条码参数列表
+        /// </summary>
+        /// <param name="parameterBySfcQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
     }
 }

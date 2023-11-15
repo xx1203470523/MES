@@ -14,5 +14,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> InsertRangeAsync(IEnumerable<ManuProductNgRecordEntity> entities);
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductNgRecordEntity>> GetEntitiesAsync(ManuProducNGRecordQuery query);
+
     }
 }

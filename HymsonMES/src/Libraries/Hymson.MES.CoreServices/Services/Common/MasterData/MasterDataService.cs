@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
@@ -24,6 +25,8 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
@@ -154,6 +157,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 仓储接口（设备注册）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        /// <summary>
+        ///产品参数采集
+        /// </summary>
+        private readonly IManuProductParameterRepository _productParameterRepository;
 
         /// <summary>
         /// 构造函数
@@ -201,7 +208,8 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IEquEquipmentRepository equEquipmentRepository,
-            IProcSortingRuleRepository sortingRuleRepository)
+            IProcSortingRuleRepository sortingRuleRepository,
+            IManuProductParameterRepository productParameterRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -224,8 +232,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _equEquipmentRepository= equEquipmentRepository;
+            _equEquipmentRepository = equEquipmentRepository;
             _sortingRuleRepository = sortingRuleRepository;
+            _productParameterRepository = productParameterRepository;
         }
 
 
@@ -1280,7 +1289,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="requestBo"></param>
         /// <returns></returns>
-        public  async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
+        public async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
         {
             // 根据设备
             var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -1346,6 +1355,18 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query)
         {
             return await _sortingRuleRepository.GetProcSortingRuleEntitiesAsync(query);
+        }
+
+        /// <summary>
+        /// 获取条码参数列表
+        /// </summary>
+        /// <param name="parameterBySfcQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery)
+        {
+            //获取到条码的参数信息
+            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(parameterBySfcQuery);
+            return parameterList;
         }
     }
 }
