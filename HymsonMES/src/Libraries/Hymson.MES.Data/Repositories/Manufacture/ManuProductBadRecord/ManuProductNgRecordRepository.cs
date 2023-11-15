@@ -1,8 +1,8 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
+using System.Security.Policy;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -28,6 +28,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductNgRecordEntity>> GetEntitiesAsync(ManuProducNGRecordQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("BadRecordId = @BadRecordId");
+            sqlBuilder.Where("UnqualifiedId = @UnqualifiedId");
+            sqlBuilder.Select("*");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuProductNgRecordEntity>(template.RawSql, query);
+        }
+
     }
 
 
@@ -37,6 +55,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuProductNgRecordRepository
     {
         const string InsertsSql = "INSERT INTO manu_product_ng_record(`Id`, `SiteId`, `BadRecordId`, `UnqualifiedId`, `NGCode`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @BadRecordId, @UnqualifiedId, @NGCode, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_product_ng_record` /**where**/  ";
     }
 }
