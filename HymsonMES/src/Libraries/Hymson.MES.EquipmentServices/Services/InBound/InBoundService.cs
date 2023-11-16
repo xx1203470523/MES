@@ -277,7 +277,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
 
                         //20231114 清安增加日志记录，观察卡控是否流程影响生产
                         //throw new CustomerValidationException(nameof(ErrorCode.MES16317));
-                        _logger.LogInformation($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源时资源编码：{resourcesCode}，在制品资源编码：{procResource.ResCode}");
+                        _logger.LogError($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源时资源编码：{resourcesCode}，在制品资源编码：{procResource.ResCode}");
                     }
 
                     //进站修改为激活

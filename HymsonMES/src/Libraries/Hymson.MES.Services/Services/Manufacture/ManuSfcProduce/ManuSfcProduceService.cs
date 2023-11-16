@@ -1771,7 +1771,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             try
             {
-                using var trans = TransactionHelper.GetTransactionScope();
+                //TODO 这里提示事务内有不同数据库连接字符串，导致直接抛出异常，暂时先注释掉
+                //using var trans = TransactionHelper.GetTransactionScope();
 
                 // 写步骤
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
@@ -1861,11 +1862,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         break;
                 }
 
-                trans.Complete();
+                //trans.Complete();
             }
             catch (Exception ex)
             {
-                _logger.LogError("SaveManuSfcProduceStepAsync,在制品步骤控制保存,写库失败:", ex);
+                _logger.LogError($"在制品步骤控制保存,写库失败:{ex.Message}");
                 throw new CustomerValidationException(nameof(ErrorCode.MES18016));
             }
             #endregion
