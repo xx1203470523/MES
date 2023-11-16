@@ -130,20 +130,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 判断条码锁状态
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
-            // 验证条码对应的物料ID是否和工单物料ID一致
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.WorkOrderId));
-            foreach (var sfcProduceEntity in sfcProduceEntities)
-            {
-                var planWorkOrderEntity = planWorkOrderEntities.FirstOrDefault(f => f.Id == sfcProduceEntity.WorkOrderId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
-
-                if (sfcProduceEntity.ProductId == planWorkOrderEntity.ProductId)
-                {
-                    // 结束
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18219));
-                }
-            }
-
             // 判断条码状态是否是"完成"
             var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(commonBo.OutStationRequestBos.Select(s => s.SFC))
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
@@ -197,12 +183,21 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 待执行的命令
             SmiFinisheResponseSummaryBo responseSummaryBo = new();
 
+            // 查询条码里面所有的工单信息
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.WorkOrderId));
+
             // 遍历所有条码
             List<long> deleteSFCProduceIds = new();
             foreach (var requestBo in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
+
+                var planWorkOrderEntity = planWorkOrderEntities.FirstOrDefault(f => f.Id == sfcProduceEntity.WorkOrderId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16367)).WithData("SFC", requestBo.SFC);
+
+                // 验证条码对应的物料ID是否和工单物料ID一致
+                if (sfcProduceEntity.ProductId == planWorkOrderEntity.ProductId) continue;
 
                 // 读取产品基础信息
                 var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheckAsync(sfcProduceEntity.ProductId);
