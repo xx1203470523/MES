@@ -218,10 +218,11 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (obj is not EsopOutResponseBo data) { 
                 return responseBo; 
             }
+            var panelModules = new List<PanelModuleEnum>() { PanelModuleEnum.ESOPGet };
             return await Task.FromResult(new JobResponseBo {
                 Content = new Dictionary<string, string> { 
                     { "Data", data.esopOutPutBos.ToSerialize() },
-                    { "PanelModules",PanelModuleEnum.ESOPGet.ToSerialize()}
+                    { "PanelModules", panelModules.ToSerialize()}
                 },
                 Message=""
             });
