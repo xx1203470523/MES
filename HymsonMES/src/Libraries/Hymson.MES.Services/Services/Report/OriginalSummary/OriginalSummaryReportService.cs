@@ -250,13 +250,13 @@ namespace Hymson.MES.Services.Services.Report
         private async Task<List<ProcResourceEntity>> GetResourcesAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculations)
         {
             var resourceIds = new List<long>();
-            foreach (var item in manuSfcCirculations)
+            foreach (var item in manuSfcCirculations.Select(x=>x.ResourceId))
             {
-                if (item.ResourceId.HasValue && item.ResourceId.Value > 0)
+                if (item.HasValue && item.Value > 0)
                 {
-                    if (!resourceIds.Contains(item.ResourceId.Value))
+                    if (!resourceIds.Contains(item.Value))
                     {
-                        resourceIds.Add(item.ResourceId.Value);
+                        resourceIds.Add(item.Value);
                     }
                 }
             }

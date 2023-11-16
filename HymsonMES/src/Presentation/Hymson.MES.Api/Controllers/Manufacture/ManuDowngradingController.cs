@@ -41,17 +41,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             _logger = logger;
         }
 
-        ///// <summary>
-        ///// 根据sfcs查询详情（降级录入）
-        ///// </summary>
-        ///// <param name="queryDto"></param>
-        ///// <returns></returns>
-        //[HttpGet("getDowngradingBySfcs")]
-        //public async Task<IEnumerable<ManuDowngradingDto>> QueryManuDowngradingBySfcsAsync([FromQuery] ManuDowngradingQuerySfcsDto queryDto)
-        //{
-        //    return await _manuDowngradingService.GetManuDowngradingBySfcsAsync(queryDto.Sfcs);
-        //}
-
         /// <summary>
         /// 根据sfcs查询详情（降级录入）
         /// </summary>
