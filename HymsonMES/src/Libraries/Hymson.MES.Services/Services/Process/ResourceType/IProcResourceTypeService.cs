@@ -51,8 +51,8 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// <summary>
         /// 批量删除资源类型数据
         /// </summary>
-        /// <param name="idsAr"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeleteProcResourceTypeAsync(long[] idsAr);
+        Task<int> DeleteProcResourceTypeAsync(long[] idsArr);
     }
 }

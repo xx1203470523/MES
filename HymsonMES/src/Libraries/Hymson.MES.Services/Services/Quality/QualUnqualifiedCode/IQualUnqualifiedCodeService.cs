@@ -49,16 +49,16 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="qualUnqualifiedCodeCreateDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto qualUnqualifiedCodeCreateDto);
+        Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualUnqualifiedCodeModifyDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto qualUnqualifiedCodeModifyDto);
+        Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto param);
 
         /// <summary>
         ///删除

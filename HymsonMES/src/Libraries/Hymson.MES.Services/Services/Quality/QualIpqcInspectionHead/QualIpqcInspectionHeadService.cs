@@ -196,16 +196,6 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13224));
             }
             var ipqcInspection = ipqcInspectionList.First();
-            ////获取检验项目关联资源信息
-            //var ruleResourceEntities = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
-            //{
-            //    SiteId = _currentSite.SiteId ?? 0,
-            //    IpqcInspectionId = ipqcInspection.Id
-            //});
-            //if (ruleResourceEntities.IsNullOrEmpty() || !ruleResourceEntities.Any(x => x.ResourceId == resourceId))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES13225));
-            //}
             ////检验规则
             //var ipqcInspectRule = await _qualIpqcInspectionRuleRepository.GetByIdAsync(ruleResourceEntities.First().IpqcInspectionRuleId);
             //主设备Id
@@ -322,12 +312,12 @@ namespace Hymson.MES.Services.Services.Quality
                     {
                         continue;
                     }
-                    foreach (var resource in procedureResourceList)
+                    foreach (var resource in procedureResourceList.Select(x=>x.Id))
                     {
                         //主设备Id
                         var equipmentId = (await _procResourceEquipmentBindRepository.GetByResourceIdAsync(new ProcResourceEquipmentBindQuery
                         {
-                            ResourceId = resource.Id,
+                            ResourceId = resource,
                             IsMain = true
                         }))
                         .FirstOrDefault()?.EquipmentId ?? 0;
@@ -343,7 +333,7 @@ namespace Hymson.MES.Services.Services.Quality
                             WorkOrderId = workOrder.Id,
                             MaterialId = workOrder.ProductId,
                             ProcedureId = procedure.ProcedureId,
-                            ResourceId = resource.Id,
+                            ResourceId = resource,
                             EquipmentId = equipmentId,
                             TriggerCondition = TriggerConditionEnum.Shift,
                             IsStop = TrueOrFalseEnum.No,
