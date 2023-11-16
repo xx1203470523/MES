@@ -1,4 +1,6 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Job;
+﻿using Hymson.MES.Core.Enums;
+
+namespace Hymson.MES.CoreServices.Bos.Job;
 
 /// <summary>
 /// ESOP获取
@@ -19,8 +21,6 @@ public class EsopOutRequestBo: JobBaseBo
     /// 资源Id
     /// </summary>
     public long? ResourceId { get; set; }
-
-
 }
 
 /// <summary>
@@ -28,6 +28,13 @@ public class EsopOutRequestBo: JobBaseBo
 /// </summary>
 public class EsopOutResponseBo 
 {
+    public List<EsopOutPutBo> esopOutPutBos { get; set; }
+}
+
+/// <summary>
+/// 返回组装数据
+/// </summary>
+public class EsopOutPutBo {
     /// <summary>
     /// 物料编码
     /// </summary>
@@ -57,4 +64,5 @@ public class EsopOutResponseBo
     /// 文件Url
     /// </summary>
     public string Path { get; set; }
+    
 }

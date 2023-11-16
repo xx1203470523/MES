@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -135,14 +136,14 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //获取工单
-            var workOrderIds = workOrderActivationEntities.Select(a => a.WorkOrderId);
+            var workOrderIds = workOrderActivationEntities.Select(a => a.WorkOrderId).Distinct();
             var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
             if (workOrderEntities == null || !workOrderEntities.Any()) {
                 return null;
             }
 
             //获取物料
-            var materialIds = workOrderEntities.Select(a => a.ProductId);
+            var materialIds = workOrderEntities.Select(a => a.ProductId).Distinct();
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
             if (procMaterialEntities == null|| !procMaterialEntities.Any())
             {
@@ -171,7 +172,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var attachmentIds= procEsopFileEntities.Select(a => a.AttachmentId);
             var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(attachmentIds);
 
-            var result =  Enumerable.Empty<EsopOutResponseBo>();
+            var esopOutPutBoList = new List<EsopOutPutBo>();
             foreach ( var item in procEsopFileEntities) {
 
                 var procEsopEntity = procEsopEntities.FirstOrDefault(a => a.Id == item.EsopId);
@@ -191,16 +192,18 @@ namespace Hymson.MES.CoreServices.Services.Job
                     return null;
                 }
 
-                var model=new EsopOutResponseBo();
+                var model=new EsopOutPutBo();
                 model.MaterialCode = procMaterialEntity.MaterialCode;
                 model.MaterialName= procMaterialEntity.MaterialName;
                 model.Version = procMaterialEntity.Version;
                 model.FileName = attachmentEntity.Name;
                 model.Path= attachmentEntity.Path;
-                result.Append(model);
+                esopOutPutBoList.Add(model);
             }
 
-            return result;
+            return new EsopOutResponseBo {
+                esopOutPutBos=esopOutPutBoList
+            };
         }
 
         /// <summary>
@@ -212,8 +215,16 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
-            if (obj is not PackageIngResponseBo data) return responseBo;
-            return await Task.FromResult(new JobResponseBo { Content = data.Content! });
+            if (obj is not EsopOutResponseBo data) { 
+                return responseBo; 
+            }
+            return await Task.FromResult(new JobResponseBo {
+                Content = new Dictionary<string, string> { 
+                    { "Data", data.esopOutPutBos.ToSerialize() },
+                    { "PanelModules",PanelModuleEnum.ESOPGet.ToSerialize()}
+                },
+                Message=""
+            });
         }
 
         
