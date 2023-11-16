@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using MailKit.Search;
 using System.Data;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -103,7 +104,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var query = new ProcSortingRuleQuery
             {
                 SiteId = commonBo.SiteId,
-                Status =SysDataStatusEnum.Enable,
+                Status = SysDataStatusEnum.Enable,
                 IsDefaultVersion = true,
                 MaterialIds = productIds
             };
@@ -116,14 +117,15 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //获取到条码的参数信息
-            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(new ManuProductParameterBySfcQuery
+            var parameterBySfcQuery = new ManuProductParameterBySfcQuery
             {
                 SiteId = commonBo.SiteId,
                 SFCs = sfcs
-            });
+            };
+            var parameterList = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProductParameterBySfcsAsync, parameterBySfcQuery);
             if (parameterList == null || !parameterList.Any())
             {
-                 throw new CustomerValidationException(nameof(ErrorCode.MES16364));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16364));
             }
 
             //档位和最终档次信息算不出来报错
@@ -192,16 +194,17 @@ namespace Hymson.MES.CoreServices.Services.Job
             });
             if (sortingRuleDetailEntities == null || !sortingRuleDetailEntities.Any())
             {
-                return default;
+                throw new CustomerValidationException(nameof(ErrorCode.MES11309));
             }
 
             sfcs = sfcProduceEntities.Select(x => x.SFC).ToList();
             //获取到条码的参数信息
-            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(new ManuProductParameterBySfcQuery
+            var parameterBySfcQuery = new ManuProductParameterBySfcQuery
             {
                 SiteId = commonBo.SiteId,
                 SFCs = sfcs
-            });
+            };
+            var parameterList = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProductParameterBySfcsAsync, parameterBySfcQuery);
             if (parameterList == null || !parameterList.Any())
             {
                 return default;
@@ -212,14 +215,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             foreach (var sfc in sfcs)
             {
-                var sfcParameterList = parameterList.Where(x => x.SFC == sfc);
-                if (sfcParameterList == null || !sfcParameterList.Any())
-                {
-                    continue;
-                }
-
-                //根据参数筛选过滤拿到最新的参数信息
-                var parameterEntities = sfcParameterList.GroupBy(x => x.ParameterId).Select(x => x.OrderByDescending(x => x.CreatedOn).First()).ToList();
+                //条码的分选规则
                 var productId = sfcProduceEntities.FirstOrDefault(x => x.SFC == sfc)?.ProductId;
                 var sortRuleId = procSortingRules.FirstOrDefault(x => x.MaterialId == productId)?.Id ?? 0;
                 var sortingRuleDetails = sortingRuleDetailEntities.Where(x => x.SortingRuleId == sortRuleId).ToList();
@@ -228,13 +224,29 @@ namespace Hymson.MES.CoreServices.Services.Job
                     continue;
                 }
 
-                var gradeId = IdGenProvider.Instance.CreateId();
+                //根据参数筛选过滤拿到最新的参数信息
+                var parameterIds = new List<long> { };
+                parameterIds.AddRange(sortingRuleDetails.Select(a => a.ParameterId).Distinct().ToArray());
+                //条码的产品参数
+                var sfcParameterList = parameterList.Where(x => x.SFC == sfc && parameterIds.Contains(x.ParameterId));
+                if (sfcParameterList == null || !sfcParameterList.Any())
+                {
+                    continue;
+                }
 
+                var gradeId = IdGenProvider.Instance.CreateId();
                 var sfcGradeDetails = new List<ManuSfcGradeDetailEntity>();
                 var ruleDetailIds = new List<long>();
+
+                //根据参数筛选过滤拿到最新的参数信息
+                var parameterEntities = sfcParameterList.GroupBy(x => x.ParameterId).Select(x => x.OrderByDescending(x => x.CreatedOn).First()).ToList();
                 foreach (var parameter in parameterEntities)
                 {
-                    var ruleDetail = GetParameterRating(parameter, sortingRuleDetailEntities);
+                    var ruleDetail = GetParameterRating(parameter, sortingRuleDetails);
+                    if (ruleDetail == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16365)).WithData("SFC", sfc);
+                    }
                     if (ruleDetail != null && !ruleDetailIds.Contains(ruleDetail.Id))
                     {
                         ruleDetailIds.Add(ruleDetail.Id);
@@ -248,7 +260,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         ProduceId = parameter.ProcedureId,
                         SFC = sfc,
                         Grade = ruleDetail?.Rating ?? "",
-                        ParamId = parameter.Id,
+                        ParamId = parameter.ParameterId,
                         ParamValue = parameter.ParameterValue,
                         MaxValue = ruleDetail?.MaxValue ?? 0,
                         MinValue = ruleDetail?.MinValue ?? 0,
@@ -264,7 +276,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     gradeDetailEntities.AddRange(sfcGradeDetails);
                     //根据组合拿到sfc的最终档次信息,最终档次算不出来报错
-                    finalGrade = await GetFinalGrade(sfcGradeDetails, sortingRuleDetails, ruleDetailIds, sortRuleId);
+                    finalGrade = await GetFinalGrade(sfcGradeDetails, sortingRuleDetails, ruleDetailIds);
+                    if (string.IsNullOrWhiteSpace(finalGrade))
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16366)).WithData("SFC", sfc);
+                    }
                 }
 
                 insertGrades.Add(new ManuSfcGradeEntity
@@ -391,8 +407,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="sortingRuleId"></param>
         /// <param name="SfcParamters"></param>
         /// <returns></returns>
-        private async Task<string> GetFinalGrade(List<ManuSfcGradeDetailEntity> sfcParamters, List<ProcSortingRuleDetailEntity> sortingRuleDetails, List<long> ruleDetailIds, long sortingRuleId)
+        private async Task<string> GetFinalGrade(List<ManuSfcGradeDetailEntity> sfcParamters, List<ProcSortingRuleDetailEntity> sortingRuleDetails, List<long> ruleDetailIds)
         {
+            var sortingRuleId = sortingRuleDetails.FirstOrDefault()?.SortingRuleId ?? 0;
             if (sfcParamters == null || !sfcParamters.Any())
             {
                 return string.Empty;

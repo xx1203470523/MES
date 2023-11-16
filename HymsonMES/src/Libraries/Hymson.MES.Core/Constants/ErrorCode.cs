@@ -377,6 +377,7 @@
         public const string MES11312 = "分选规则版本长度为10";
         public const string MES11313 = "分选规则备注长度为255";
         public const string MES11314 = "参数集合中有交集";
+        public const string MES11315 = "查询产品分选条码不能为空";
         #endregion
 
         #region 降级录入/移除 11400
@@ -905,6 +906,8 @@
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
         public const string MES16364= "未找到条码的产品参数信息！";
+        public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
+        public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
         #endregion
 
         #region 工单激活 MES16400

@@ -41,5 +41,13 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="param"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuProductBadRecordLogReportViewDto>> GetLogPageListAsync(ManuProductBadRecordLogReportPagedQueryDto param);
+
+        /// <summary>
+        /// 查询不合格代码列表（不良报告日志）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordLogReportResponseDto>> GetLogPageDetailListAsync(ManuProductBadRecordLogReportRequestDto request);
+
     }
 }

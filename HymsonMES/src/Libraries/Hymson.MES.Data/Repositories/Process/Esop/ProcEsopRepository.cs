@@ -163,10 +163,16 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where(" ProcedureId=@ProcedureId ");
             }
-            if (procEsopQuery.Status.HasValue)
-            {
+
+            if (procEsopQuery.Status.HasValue) {
                 sqlBuilder.Where(" Status=@Status ");
             }
+
+            if (procEsopQuery.MaterialIds!=null&& procEsopQuery.MaterialIds.Any())
+            {
+                sqlBuilder.Where(" MaterialId IN @MaterialIds ");
+            }
+
             sqlBuilder.AddParameters(procEsopQuery);
 
             using var conn = GetMESDbConnection();
