@@ -178,7 +178,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 MaterialIds = productIds
             };
             var procSortingRules = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetSortingRulesAsync, query);
-            if (procSortingRules == null || procSortingRules.Any() == false)
+            if (procSortingRules == null || !procSortingRules.Any())
             {
                 return default;
             }
@@ -319,7 +319,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //再查找范围在这个范围内的,根据类型取<还是小于等于
-            // procSortingRules = procSortingRules.Where(x => x.MinContainingType.HasValue && x.MaxContainingType.HasValue).ToList();
             if (procSortingRules == null || !procSortingRules.Any())
             {
                 return procSortingRuleDetail;

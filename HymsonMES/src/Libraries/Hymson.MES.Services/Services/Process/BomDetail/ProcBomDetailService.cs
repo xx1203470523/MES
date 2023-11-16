@@ -27,7 +27,6 @@ namespace Hymson.MES.Services.Services.Process
         private readonly AbstractValidator<ProcBomDetailModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
-        private readonly IExcelService _excelService;
 
         /// <summary>
         /// 
@@ -37,14 +36,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// /// <param name="currentSite"></param>
-        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite, IExcelService excelService)
+        public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
             _currentSite= currentSite;
             _procBomDetailRepository = procBomDetailRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
-            _excelService = excelService;
 
         }
 

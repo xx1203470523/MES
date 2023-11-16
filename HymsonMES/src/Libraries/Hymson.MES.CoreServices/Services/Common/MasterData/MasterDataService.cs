@@ -682,7 +682,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
         {
             // TODO 目前只支持单线路的工艺路线
-            //routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.ManualSortNumber);
 
             var beginNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.BeginProcedureId);
             if (beginNode == null) return false;

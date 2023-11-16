@@ -271,16 +271,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId)
             });
 
-            /*
-            // 验证BOM主物料数量
-            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
-            {
-                SiteId = commonBo.SiteId,
-                SFCs = commonBo.SFCs,
-                ProcedureId = commonBo.ProcedureId,
-                BomId = firstProduceEntity.ProductBOMId
-            });
-            */
         }
 
         /// <summary>
@@ -386,8 +376,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && !requestBo.IsQualified.Value)
                 {
-                    // 不合格出站（欣世界特有）
-                    //responseBo = await OutStationForUnQualifiedProcedureXinShiJieAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
 
                     // 不合格出站
                     responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
