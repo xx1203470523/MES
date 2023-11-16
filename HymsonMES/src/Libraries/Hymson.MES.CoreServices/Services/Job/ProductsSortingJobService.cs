@@ -92,6 +92,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
 
             // 获取生产条码信息
+            if(commonBo.Proxy==null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
+            }
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
@@ -163,6 +167,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
             // 获取条码信息
+            if(commonBo.Proxy==null)
+            {
+                return default;
+            }
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {

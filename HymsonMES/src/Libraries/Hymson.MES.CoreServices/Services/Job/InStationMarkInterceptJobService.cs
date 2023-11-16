@@ -110,7 +110,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             await Task.CompletedTask;
-            return default;
+            return new JobResponseBo();
         }
 
         /// <summary>
