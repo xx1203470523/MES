@@ -79,5 +79,13 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> AttachmentDeleteAsync(long[] ids);
+
+
+        /// <summary>
+        /// ESOP获取Job
+        /// </summary>
+        /// <param name="procEsopGetJobQueryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcEsopGetJobOutputDto>> GetEsopJobAsync(ProcEsopGetJobQueryDto procEsopGetJobQueryDto);
     }
 }

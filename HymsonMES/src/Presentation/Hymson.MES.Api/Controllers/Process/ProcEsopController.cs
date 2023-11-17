@@ -144,6 +144,18 @@ namespace Hymson.MES.Api.Controllers.Process
         {
             return await _procEsopService.GetAttachmentListAsync(id);
         }
+
+        /// <summary>
+        /// ESOP获取Job
+        /// </summary>
+        /// <param name="procEsopGetJobQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getEsopJob")]
+        public async Task<IEnumerable<ProcEsopGetJobOutputDto>> GetEsopJobAsync([FromQuery] ProcEsopGetJobQueryDto procEsopGetJobQueryDto)
+        {
+            return await _procEsopService.GetEsopJobAsync(procEsopGetJobQueryDto);
+        }
         #endregion
     }
 }
