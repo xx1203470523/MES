@@ -18,6 +18,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Linq;
+using static Mysqlx.Expect.Open.Types.Condition.Types;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -53,11 +54,6 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IEquEquipmentRepository _equipmentRepository;
 
         /// <summary>
-        /// 仓储接口（工序）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -66,12 +62,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procProcessEquipmentGroupRelationRepository"></param>
         /// <param name="equipmentRepository"></param>
-        /// <param name="procProcedureRepository"></param>
         public ProcProcessEquipmentGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcProcessEquipmentGroupSaveDto> validationSaveRules,
             IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository,
             IProcProcessEquipmentGroupRelationRepository procProcessEquipmentGroupRelationRepository,
-            IEquEquipmentRepository equipmentRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IEquEquipmentRepository equipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -79,7 +73,6 @@ namespace Hymson.MES.Services.Services.Process
             _procProcessEquipmentGroupRepository = procProcessEquipmentGroupRepository;
             _procProcessEquipmentGroupRelationRepository = procProcessEquipmentGroupRelationRepository;
             _equipmentRepository = equipmentRepository;
-            _procProcedureRepository = procProcedureRepository;
         }
 
         /// <summary>
@@ -134,12 +127,10 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
                 List<long> EquipmentGroupIds = new();//设备与当前设备组相同的所有设备组Id
-                foreach (var key in allProcProcessEquipmentGroupRelations.Keys)
+                foreach (var key in allProcProcessEquipmentGroupRelations.Keys
+                    .Where(x=> allProcProcessEquipmentGroupRelations[x].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList())))
                 {
-                    if (allProcProcessEquipmentGroupRelations[key].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList()))
-                    {
-                        EquipmentGroupIds.Add(key);
-                    }
+                    EquipmentGroupIds.Add(key);
                 }
                
                 //Insert Relation
@@ -220,12 +211,10 @@ namespace Hymson.MES.Services.Services.Process
                 if(saveDto.Id!=null)
                     allProcProcessEquipmentGroupRelations.Remove(saveDto.Id.ParseToLong());
                 List<long> EquipmentGroupIds = new();//设备与当前设备组相同的所有设备组Id
-                foreach (var key in allProcProcessEquipmentGroupRelations.Keys)
+                foreach (var key in allProcProcessEquipmentGroupRelations.Keys
+                    .Where(x=> allProcProcessEquipmentGroupRelations[x].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList())))
                 {
-                    if (allProcProcessEquipmentGroupRelations[key].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList()))
-                    {
-                        EquipmentGroupIds.Add(key);
-                    }
+                    EquipmentGroupIds.Add(key);
                 }
 
                 foreach (var item in equipmentIds)

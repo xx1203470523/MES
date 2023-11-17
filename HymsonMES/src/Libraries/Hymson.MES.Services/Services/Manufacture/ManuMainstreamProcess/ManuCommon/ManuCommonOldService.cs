@@ -531,10 +531,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
             var processRouteDetails = processRouteDetailList.Where(x => x.ProcedureIds.Contains(startProcedureId) && x.ProcedureIds.Contains(endProcedureId));
             if (processRouteDetails != null && processRouteDetails.Any())
             {
-                foreach (var processRouteDetail in processRouteDetails)
+                foreach (var processRouteDetail in processRouteDetails.Select(x=>x.ProcedureIds))
                 {
-                    var startIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
-                    var endIndex = processRouteDetail.ProcedureIds.ToList().IndexOf(startProcedureId);
+                    var startIndex = processRouteDetail.ToList().IndexOf(startProcedureId);
+                    var endIndex = processRouteDetail.ToList().IndexOf(startProcedureId);
                     if (startIndex < endIndex)
                     {
                         return true;
@@ -615,14 +615,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 {
                     var procedureIds = processRouteDetail.ProcedureIds.ToList();
                     int index = 1;
-                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList)
+                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList.Select(x=>x.ProcessRouteDetailId))
                     {
-                        if (item.ProcessRouteDetailId != ProcessRoute.LastProcedureId)
+                        if (item != ProcessRoute.LastProcedureId)
                         {
                             if (index == 1)
                             {
-                                processRouteDetail.ProcedureIds.Add(item.ProcessRouteDetailId);
-                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
+                                processRouteDetail.ProcedureIds.Add(item);
+                                CombinationProcessRoute(ref list, item, procProcessRouteDetailLinkEntities, key);
                             }
                             else
                             {
@@ -631,9 +631,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                                     key = IdGenProvider.Instance.CreateId(),
                                     ProcedureIds = procedureIds,
                                 };
-                                processRouteDetailDto.ProcedureIds.Add(item.ProcessRouteDetailId);
+                                processRouteDetailDto.ProcedureIds.Add(item);
                                 list.Add(processRouteDetailDto);
-                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
+                                CombinationProcessRoute(ref list, item, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
                             }
                         }
                         index++;

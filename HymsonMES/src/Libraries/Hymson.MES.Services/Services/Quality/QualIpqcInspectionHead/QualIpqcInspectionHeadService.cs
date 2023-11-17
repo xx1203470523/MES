@@ -60,11 +60,8 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIpqcInspectionHeadSampleRepository _qualIpqcInspectionHeadSampleRepository;
         private readonly IQualIpqcInspectionHeadAnnexRepository _qualIpqcInspectionHeadAnnexRepository;
         private readonly IQualIpqcInspectionRepository _qualIpqcInspectionRepository;
-        private readonly IQualIpqcInspectionRuleRepository _qualIpqcInspectionRuleRepository;
-        private readonly IQualIpqcInspectionRuleResourceRelationRepository _qualIpqcInspectionRuleResourceRelationRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
-        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
@@ -90,11 +87,8 @@ namespace Hymson.MES.Services.Services.Quality
             IQualIpqcInspectionHeadSampleRepository qualIpqcInspectionHeadSampleRepository,
             IQualIpqcInspectionHeadAnnexRepository qualIpqcInspectionHeadAnnexRepository,
             IQualIpqcInspectionRepository qualIpqcInspectionRepository,
-            IQualIpqcInspectionRuleRepository qualIpqcInspectionRuleRepository,
-            IQualIpqcInspectionRuleResourceRelationRepository qualIpqcInspectionRuleResourceRelationRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
-            IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository procResourceRepository,
@@ -117,11 +111,8 @@ namespace Hymson.MES.Services.Services.Quality
             _qualIpqcInspectionHeadSampleRepository = qualIpqcInspectionHeadSampleRepository;
             _qualIpqcInspectionHeadAnnexRepository = qualIpqcInspectionHeadAnnexRepository;
             _qualIpqcInspectionRepository = qualIpqcInspectionRepository;
-            _qualIpqcInspectionRuleRepository = qualIpqcInspectionRuleRepository;
-            _qualIpqcInspectionRuleResourceRelationRepository = qualIpqcInspectionRuleResourceRelationRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
-            _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
@@ -298,16 +289,16 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     continue;
                 }
-                foreach (var procedure in procedureList)
+                foreach (var procedure in procedureList.Select(x=>x.ProcedureId))
                 {
                     //获取首件检验项目
-                    var ipqcInspection = ipqcInspectionList.FirstOrDefault(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure.ProcedureId);
+                    var ipqcInspection = ipqcInspectionList.FirstOrDefault(x => x.MaterialId == workOrder.ProductId && x.ProcedureId == procedure);
                     if (ipqcInspection == null)
                     {
                         continue;
                     }
                     //获取应检资源列表
-                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure.ProcedureId);
+                    var procedureResourceList = await _procResourceRepository.GetProcResourceListByProcedureIdAsync(procedure);
                     if (procedureResourceList.IsNullOrEmpty())
                     {
                         continue;
@@ -332,7 +323,7 @@ namespace Hymson.MES.Services.Services.Quality
                             IpqcInspectionId = ipqcInspection.Id,
                             WorkOrderId = workOrder.Id,
                             MaterialId = workOrder.ProductId,
-                            ProcedureId = procedure.ProcedureId,
+                            ProcedureId = procedure,
                             ResourceId = resource,
                             EquipmentId = equipmentId,
                             TriggerCondition = TriggerConditionEnum.Shift,
