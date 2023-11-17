@@ -134,7 +134,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19918)).WithData("SFC", string.Join(",", sfcs));
             }
-            var sfcsExistVerify = sfcs.Where(sfc => !manuSfcProduceEntitys.Where(it => it.SFC == sfc).Any()).ToArray();
+            var sfcsExistVerify = sfcs.Where(sfc => !manuSfcProduceEntitys.Any(it => it.SFC == sfc)).ToArray();
             if (sfcsExistVerify != null && sfcsExistVerify.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19918)).WithData("SFC", sfcsExistVerify);
