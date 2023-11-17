@@ -163,10 +163,10 @@ namespace Hymson.MES.Api.Controllers.Process
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        [HttpGet("getBySfcAndProcedureId")]
-        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync([FromQuery] ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto)
+        [HttpGet("getBySfcsAndProcedureId")]
+        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcsAndProcedureIdAsync([FromQuery] ProcProductParameterGroupToParameterCollectionQueryDto queryDto)
         {
-            return await _procProductParameterGroupService.GetBySfcAndProcedureIdAsync(queryDto);
+            return await _procProductParameterGroupService.GetBySfcsAndProcedureIdAsync(queryDto);
         }
     }
 }

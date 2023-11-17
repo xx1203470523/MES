@@ -237,6 +237,12 @@
         public const string MES10527 = "数据类型不合法";
         public const string MES10528 = "条码不在当前工序";
         public const string MES10529 = "没有当前条码与工序的产品参数收集组";
+        public const string MES10530 = "条码或载具编码不能为空";
+        public const string MES10531 = "条码[{sfc}]没有找到对应的生产信息";
+        public const string MES10532 = "条码[{sfc}]不在当前工序";
+        public const string MES10533 = "条码[{sfc}]不在当前工序活动";
+        public const string MES10534 = "有条码不是同一个产品";
+        public const string MES10535 = "载具没有绑定条码";
 
         #endregion
 
