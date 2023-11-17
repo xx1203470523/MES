@@ -363,7 +363,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 return inteVehicleVerify.ToModel<InteVehicleVerifyDto>();
             }
             else
-                return null;
+                return new InteVehicleVerifyDto();
         }
 
         /// <summary>
@@ -413,7 +413,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 var vsr = await _inteVehiceFreightStackRepository.GetInteVehiceFreightStackEntitiesAsync(new InteVehiceFreightStackQuery()
                 {
                     VehicleId = inteVehicle.Id,
-                    SiteId = _currentSite.SiteId.Value
+                    SiteId = _currentSite.SiteId??0
                 });
                 foreach (var item in inteVehicleFreightDtos)
                 {
@@ -468,7 +468,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     case Core.Enums.Integrated.VehicleOperationEnum.Bind: 
                         { 
                             var bind = dto as InteVehicleBindOperationDto;
-                            foo.BarCode = bind.SFC;
+                            foo.BarCode = bind!.SFC ??"";
                             foo.LocationId = bind.LocationId;
                             foo.OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Bind;
 
@@ -477,7 +477,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     case Core.Enums.Integrated.VehicleOperationEnum.Unbind:
                         {
                             var bind = dto as InteVehicleUnbindOperationDto;
-                            foo.BarCode = string.Join(",", bind.StackIds);
+                            foo.BarCode = string.Join(",", bind!.StackIds);
                             foo.LocationId = bind.LocationId;
                             foo.OperateType = (int)Core.Enums.Integrated.VehicleOperationEnum.Unbind;
                         }
@@ -509,10 +509,10 @@ namespace Hymson.MES.Services.Services.Integrated
           
             var  dto = ivo as InteVehicleBindOperationDto;
             //验证DTO
-            await _validateBindOperationRules.ValidateAndThrowAsync(dto);
+            await _validateBindOperationRules.ValidateAndThrowAsync(dto!);
             var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery()
             {
-                Sfc = dto.SFC,
+                Sfc = dto!.SFC,
                 SiteId = _currentSite.SiteId??123456
             });
 
@@ -594,10 +594,10 @@ namespace Hymson.MES.Services.Services.Integrated
         private async Task VehicleUnBindOperationAsync(InteVehicleOperationDto ivo)
         {
             var dto = ivo as InteVehicleUnbindOperationDto;
-            await _validationUnbindOperationRules.ValidateAndThrowAsync(dto);
+            await _validationUnbindOperationRules.ValidateAndThrowAsync(dto!);
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
-                Code = dto.PalletNo,
+                Code = dto!.PalletNo ?? "",
                 SiteId = _currentSite.SiteId ?? 0
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);
@@ -633,7 +633,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var dto = ivo as InteVehicleClearOperationDto;
             var inteVehicleEntity = await _inteVehicleRepository.GetByCodeAsync(new InteVehicleCodeQuery()
             {
-                Code = dto.PalletNo,
+                Code = dto!.PalletNo ?? "",
                 SiteId = _currentSite.SiteId??123456
             });
             var vtr = await _inteVehicleTypeRepository.GetByIdAsync(inteVehicleEntity.VehicleTypeId);

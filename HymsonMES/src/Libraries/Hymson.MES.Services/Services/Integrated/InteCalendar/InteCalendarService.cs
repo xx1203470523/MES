@@ -324,7 +324,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
             if (calendar == null)
             {
                 // TODO 错误码
-                return null;
+                return new InteCalendarDetailDto();
             }
 
             var calendarDates = await _inteCalendarDateRepository.GetEntitiesAsync(calendar.Id);
@@ -367,7 +367,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                     model.ClassRemark = inteClass.Remark;
                 }
                 model.Smonth = month;
-                if (first.RestType > 0)
+                if (first!=null && first.RestType > 0)
                 {
                     // 十进制转化为二进制
                     var weekDay = ConvertDecimalToBinary(first.RestType);

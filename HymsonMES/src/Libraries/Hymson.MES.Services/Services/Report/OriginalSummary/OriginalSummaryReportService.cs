@@ -46,17 +46,9 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
         /// <summary>
-        /// 条码流转表仓储
-        /// </summary>
-        private readonly IManuSfcCirculationRepository _circulationRepository;
-        /// <summary>
         /// 资源仓储
         /// </summary>
         private readonly IProcResourceRepository _resourceRepository;
-        /// <summary>
-        /// 条码生产信息（物理删除） 仓储
-        /// </summary>
-        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
         /// <summary>
         /// 工单信息表 仓储
         /// </summary>
@@ -72,8 +64,6 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="resourceRepository"></param>
-        /// <param name="circulationRepository"></param>
-        /// <param name="manuSfcProduceRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         public OriginalSummaryReportService(ICurrentSite currentSite,
             IMasterDataService masterDataService,
@@ -82,8 +72,6 @@ namespace Hymson.MES.Services.Services.Report
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository resourceRepository,
-            IManuSfcCirculationRepository circulationRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository,
             IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _currentSite = currentSite;
@@ -92,9 +80,7 @@ namespace Hymson.MES.Services.Services.Report
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
-            _circulationRepository = circulationRepository;
             _resourceRepository = resourceRepository;
-            _manuSfcProduceRepository = manuSfcProduceRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
         }
 
@@ -252,12 +238,9 @@ namespace Hymson.MES.Services.Services.Report
             var resourceIds = new List<long>();
             foreach (var item in manuSfcCirculations.Select(x=>x.ResourceId))
             {
-                if (item.HasValue && item.Value > 0)
+                if (item.HasValue && item.Value > 0 && !resourceIds.Contains(item.Value))
                 {
-                    if (!resourceIds.Contains(item.Value))
-                    {
-                        resourceIds.Add(item.Value);
-                    }
+                    resourceIds.Add(item.Value);
                 }
             }
             var procResources = new List<ProcResourceEntity>();

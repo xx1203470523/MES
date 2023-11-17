@@ -334,7 +334,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var pagedInfo = await _manuSfcProduceRepository.GetPagedListAsync(manuSfcProducePagedQuery);
             if (pagedInfo == null || !pagedInfo.Data.Any())
             {
-                return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+                return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, 1,0,0);
             }
 
             //查询工单
@@ -1040,7 +1040,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Discard,
                     CurrentStatus = sfcEntity.Status,
-                    Remark = parm.Remark,
+                    Remark = parm.Remark??"",
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
                     CreatedBy = _currentUser.UserName,
@@ -1645,18 +1645,18 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //已完成入库数据
             var manuSfcInfoList = manuSfcInfos.Where(it => it.Status == SfcStatusEnum.Complete).ToList();
-            foreach (var item in manuSfcInfoList)
+            foreach (var item in manuSfcInfoList.Select(x=>x.SFC))
             {
                 var validationFailure = new ValidationFailure();
                 if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                 {
                     validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.SFC}
+                            { "CollectionIndex", item}
                         };
                 }
                 else
                 {
-                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item);
                 }
                 var manuSfcProduceStep = manuSfcProduceStepList.FirstOrDefault(it => it.ProcedureId == endProcessRouteDetailId);
                 if (manuSfcProduceStep == null)
@@ -2548,11 +2548,11 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                         if (ManuSfcStatus.sfcStatusInProcess.Contains(item.Status ?? 0))
                         {
-                            viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (int)item.Status;
+                            viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (item.Status==null ? null:(int)item.Status);
                         }
                         else
                         {
-                            viewDto.Status = (int)item.Status;
+                            viewDto.Status = item.Status == null ? null : (int)item.Status;
                         }
                     }
 

@@ -224,21 +224,21 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (resJob == null || !resJob.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
-            foreach (var item in resJob)
+            foreach (var item in resJob.Select(x=>x.Key))
             {
-                if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService.ToString())
+                if (item == ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService.ToString())
                 {
                     if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService))
                         list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService);
                 }
-                else if (item.Key == ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService.ToString())
+                else if (item == ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService.ToString())
                 {
                     if (!list.Contains(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService))
                         list.Add(ManuFacePlateRepairButJobReturnTypeEnum.RepairEndJobService);
                 }
                 else
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17321)).WithData("key", item.Key);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17321)).WithData("key", item);
                 }
             }
 
@@ -442,15 +442,15 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             List<ManuFacePlateRepairReturnProcedureDto> manuFacePlateRepairReturnProcedureList = new();
             var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(procProcessRouteNodeList.Select(s => s.ProcedureId).ToArray());
-            foreach (var itemNode in procProcessRouteNodeList)
+            foreach (var itemNode in procProcessRouteNodeList.Select(x=>x.ProcedureId))
             {
-                procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Id == itemNode.ProcedureId);
+                procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Id == itemNode);
                 if (procProcedureEntity == null) continue;
                 if (procProcedureEntity.IsRepairReturn != 1) continue;
 
                 manuFacePlateRepairReturnProcedureList.Add(new ManuFacePlateRepairReturnProcedureDto
                 {
-                    ProcedureId = itemNode.ProcedureId,
+                    ProcedureId = itemNode,
                     ProcedureCode = procProcedureEntity.Code
                 });
             }
