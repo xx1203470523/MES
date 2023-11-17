@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Enums.Manufacture
 {
+    /// <summary>
+    /// 面板配置 条码类型
+    /// </summary>
     public enum ManuFacePlateBarcodeTypeEnum
     {
         /// <summary>

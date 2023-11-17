@@ -233,13 +233,6 @@ namespace Hymson.MES.Data.Repositories.Process
                                 where msr.MaterialId=@materialId and s.IsDeleted = 0
             ";
 
-        const string GetByMaterialIdsSql = @"Select 
-                                    msr.`Id`, msr.`MaterialId`, msr.`SupplierId`, msr.`CreatedBy`, msr.`CreatedOn`,
-                                    s.code, s.name
-                                from proc_material_supplier_relation msr
-                                LEFT join wh_supplier s on msr.SupplierId=s.Id
-                                where msr.MaterialId in @materialIds
-            ";
 
         const string GetBySupplierIdsSql = @"Select *  from proc_material_supplier_relation  where SupplierId in @supplierIds";
     }

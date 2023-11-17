@@ -152,14 +152,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
-            //if (manuSfcProducePagedQuery.Lock.HasValue)
-            //{
-            //    sqlBuilder.Where("msp.`Lock`=@Lock");
-            //}
-            //if (manuSfcProducePagedQuery.NoLock.HasValue && manuSfcProducePagedQuery.NoLock != 1)
-            //{
-            //    sqlBuilder.Where("(msp.`Lock`!=@NoLock or `Lock`  is null)");
-            //}
             if (!string.IsNullOrWhiteSpace(manuSfcProducePagedQuery.Sfc))
             {
                 manuSfcProducePagedQuery.Sfc = $"%{manuSfcProducePagedQuery.Sfc}%";
@@ -311,14 +303,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="manuSfcEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcEntity> manuSfcEntitys)
         {
-            if (entities == null || !entities.Any()) return 0;
+            if (manuSfcEntitys == null || !manuSfcEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertsSql, manuSfcEntitys);
         }
 
         /// <summary>
@@ -335,14 +327,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="manuSfcEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcEntity> entities)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcEntity> manuSfcEntitys)
         {
-            if (entities == null || !entities.Any()) return 0;
+            if (manuSfcEntitys == null || !manuSfcEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdatesSql, entities);
+            return await conn.ExecuteAsync(UpdatesSql, manuSfcEntitys);
         }
 
         /// <summary>

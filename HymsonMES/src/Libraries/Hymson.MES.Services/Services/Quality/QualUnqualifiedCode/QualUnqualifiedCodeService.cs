@@ -61,12 +61,12 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="pram"></param>
+        /// <param name="qualUnqualifiedCodePagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto pram)
+        public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto qualUnqualifiedCodePagedQueryDto)
         {
-            var qualUnqualifiedCodePagedQuery = pram.ToQuery<QualUnqualifiedCodePagedQuery>();
-            qualUnqualifiedCodePagedQuery.SiteId = _currentSite.SiteId ?? 0; // TODO _currentSite.Name;
+            var qualUnqualifiedCodePagedQuery = qualUnqualifiedCodePagedQueryDto.ToQuery<QualUnqualifiedCodePagedQuery>();
+            qualUnqualifiedCodePagedQuery.SiteId = _currentSite.SiteId ?? 0; 
             var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(qualUnqualifiedCodePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -309,7 +309,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
             //TODO 清理关联表
             await _qualUnqualifiedGroupRepository.RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(param.Id);
 
-            if (list != null && list.Any())
+            if (list.Any())
             {
                 //插入不合格代码
                 await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(list);

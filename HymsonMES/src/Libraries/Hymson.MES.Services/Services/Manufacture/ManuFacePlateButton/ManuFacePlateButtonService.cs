@@ -8,7 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
@@ -18,7 +18,6 @@ using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -61,16 +60,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IInteJobRepository _inteJobRepository;
 
         /// <summary>
-        /// 仓储接口（载具注册）
-        /// </summary>
-        private readonly IInteVehicleRepository _inteVehicleRepository;
-
-        /// <summary>
-        /// 仓储接口（二维载具条码明细）
-        /// </summary>
-        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
-
-        /// <summary>
         /// 仓储接口（作业）
         /// </summary>
         private readonly IExecuteJobService<JobBaseBo> _executeJobService;
@@ -102,8 +91,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             IManuPassStationService manuPassStationService,
             IManuProductParameterService manuProductParameterService,
             IInteJobRepository inteJobRepository,
-            IInteVehicleRepository inteVehicleRepository,
-            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
             AbstractValidator<ManuFacePlateButtonCreateDto> validationCreateRules,
             AbstractValidator<ManuFacePlateButtonModifyDto> validationModifyRules,
             IExecuteJobService<JobBaseBo> executeJobService)
@@ -115,8 +102,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuPassStationService = manuPassStationService;
             _manuProductParameterService = manuProductParameterService;
             _inteJobRepository = inteJobRepository;
-            _inteVehicleRepository = inteVehicleRepository;
-            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _executeJobService = executeJobService;
@@ -364,14 +349,14 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (!dto.Param!.ContainsKey("SFCs")) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "SFCs");
 
             // 条码类型
-            var codeType = CodeTypeEnum.SFC;
+            var codeType = ManuFacePlateBarcodeTypeEnum.Product;
             if (!dto.Param!.ContainsKey("Type"))
             {
-                codeType = CodeTypeEnum.SFC;
+                codeType = ManuFacePlateBarcodeTypeEnum.Product;
             }
             else
             {
-                if (!Enum.TryParse(dto.Param["Type"], out codeType)) codeType = CodeTypeEnum.SFC;
+                if (!Enum.TryParse(dto.Param["Type"], out codeType)) codeType = ManuFacePlateBarcodeTypeEnum.Product;
             }
 
             // 作业请求参数
@@ -390,45 +375,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<OutStationRequestBo> outStationRequestBos = new();
             switch (requestBo.Type)
             {
-                case CodeTypeEnum.Vehicle:
+                case ManuFacePlateBarcodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", dto.Param!["SFCs"]);
 
-                    // 读取载具关联的条码
-                    var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
-                    {
-                        SiteId = requestBo.SiteId,
-                        Codes = vehicleCodes
-                    });
+                    // 根据载具代码获取载具里面的条码
+                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = requestBo.SiteId, VehicleCodes = vehicleCodes });
 
-                    // 不在系统中的载具代码
-                    var notInSystem = vehicleCodes.Except(vehicleEntities.Select(s => s.Code));
-                    if (notInSystem.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18624))
-                            .WithData("Code", string.Join(',', notInSystem));
-                    }
-
-                    // 查询载具关联的条码明细
-                    var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
-                    {
-                        SiteId = requestBo.SiteId,
-                        ParentIds = vehicleEntities.Select(s => s.Id)
-                    });
-                    var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
-
-                    SFCs = vehicleFreightStackEntities.Select(s => s.BarCode).AsList();
-                    foreach (var item in vehicleFreightStackDic)
-                    {
-                        var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
-                        if (vehicleEntity == null) continue;
-
-                        panelRequestBos.AddRange(item.Value.Select(s => new PanelRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-                        inStationRequestBos.AddRange(item.Value.Select(s => new InStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-                        outStationRequestBos.AddRange(item.Value.Select(s => new OutStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-                    }
+                    SFCs = vehicleSFCs.Select(s => s.SFC).AsList();
+                    panelRequestBos.AddRange(vehicleSFCs.Select(s => new PanelRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
+                    inStationRequestBos.AddRange(vehicleSFCs.Select(s => new InStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
+                    outStationRequestBos.AddRange(vehicleSFCs.Select(s => new OutStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
                     break;
-                case CodeTypeEnum.SFC:
+                case ManuFacePlateBarcodeTypeEnum.Product:
                 default:
                     var sfcCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", dto.Param!["SFCs"]);
@@ -474,7 +433,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var boResult = new Dictionary<string, JobResponseBo> { };
             switch (dto.Type)
             {
-                case CodeTypeEnum.SFC:
+                case ManuFacePlateBarcodeTypeEnum.Product:
                     var sfcCodes = dto.Params;
                     if (sfcCodes == null || !sfcCodes.Any())
                     {
@@ -490,7 +449,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SFCs = sfcCodes
                     });
                     break;
-                case CodeTypeEnum.Vehicle:
+                case ManuFacePlateBarcodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
                     if (vehicleCodes == null || !vehicleCodes.Any())
                     {
@@ -536,7 +495,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var boResult = new Dictionary<string, JobResponseBo> { };
             switch (dto.Type)
             {
-                case CodeTypeEnum.SFC:
+                case ManuFacePlateBarcodeTypeEnum.Product:
                     var sfcCodes = dto.Params;
                     if (sfcCodes == null || !sfcCodes.Any())
                     {
@@ -552,7 +511,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         SFCs = sfcCodes
                     });
                     break;
-                case CodeTypeEnum.Vehicle:
+                case ManuFacePlateBarcodeTypeEnum.Vehicle:
                     var vehicleCodes = dto.Params;
                     if (vehicleCodes == null || !vehicleCodes.Any())
                     {
@@ -593,6 +552,23 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<int> ProductParameterCollectAsync(ProductProcessParameterDto dto)
         {
+            // 根据载具代码获取载具里面的条码
+            if (!dto.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+
+            List<string> SFCs = new();
+            switch (dto.Type)
+            {
+                case ManuFacePlateBarcodeTypeEnum.Product:
+                    SFCs = dto.SFCs.ToList();
+                    break;
+                case ManuFacePlateBarcodeTypeEnum.Vehicle:
+                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = dto.SiteId, VehicleCodes = dto.SFCs });
+                    SFCs = vehicleSFCs.Select(s => s.SFC).ToList();
+                    break;
+                default:
+                    break;
+            }
+
             return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
@@ -600,7 +576,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Time = HymsonClock.Now(),
                 ProcedureId = dto.ProcedureId,
                 ResourceId = dto.ResourceId,
-                SFC = dto.SFC,
+                SFCs = SFCs,
                 Parameters = dto.Parameters
             });
         }

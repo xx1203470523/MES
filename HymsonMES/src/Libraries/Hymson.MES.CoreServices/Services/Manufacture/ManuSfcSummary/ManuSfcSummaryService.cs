@@ -301,10 +301,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                                 break;
                             case ManuSfcStepTypeEnum.CancelDiscard:
                                 var cancelManuSfcScrap = cancelManuSfcScrapList.FirstOrDefault(x => x.CancelSfcStepId == item.Id);
-                                if (cancelManuSfcScrap != null)
+                                if (cancelManuSfcScrap != null&& cancelManuSfcScrap.ProcedureId.HasValue)
                                 {
-                                    if (cancelManuSfcScrap.ProcedureId.HasValue)
-                                    {
                                         var cancelDiscardLastmanuSfcSummary = GetLastManuSfcSummary(manuSfcSummaryProcedureLastList, manuSfcSummaryList, groupItem.Key, cancelManuSfcScrap.ProcedureId ?? 0);
                                         if (cancelDiscardLastmanuSfcSummary != null)
                                         {
@@ -321,8 +319,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                                             }
                                             cancelDiscardLastmanuSfcSummary.UpdatedBy = userId;
                                             cancelDiscardLastmanuSfcSummary.UpdatedOn = HymsonClock.Now();
-                                        }
-                                    }
+                                        }                                    
                                 }
                                 break;
                             case ManuSfcStepTypeEnum.CloseIdentification:
@@ -410,7 +407,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                     IsDeleted = lastmanuSfcSummary.IsDeleted
                 };
                 changeManuSfcStepList.Add(lastmanuSfcSummary);
-                //lastmanuSfcSummary = manuSfcStepList?.OrderByDescending(x => x.StartOn).FirstOrDefault(x => x.SFC == sfc && x.ProcedureId == procedureId);
             }
             return lastmanuSfcSummary;
         }

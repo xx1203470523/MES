@@ -29,6 +29,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// 构造函数（组件使用报告）
         /// </summary>
         /// <param name="comUsageReportService"></param>
+        /// <param name="logger"></param>
         public ComUsageReportController( ILogger<BadRecordReportController> logger, IComUsageReportService comUsageReportService)
         {
             _logger = logger;

@@ -1,4 +1,4 @@
-using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -19,7 +19,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 条码类型
         /// </summary>
-        public CodeTypeEnum Type { get; set; }
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; }
         /// <summary>
         /// 条码/托盘
         /// </summary>
@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 条码类型
         /// </summary>
-        public CodeTypeEnum Type { get; set; }
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; }
         /// <summary>
         /// 条码/托盘
         /// </summary>

@@ -17,9 +17,5 @@ namespace Hymson.MES.Data.Repositories.Process.Query
         /// </summary>
         public string Code { get; set; } = "";
 
-        /// <summary>
-        /// 工序编码（工序）
-        /// </summary>
-        public string ProcedureCode { get; set; } = "";
     }
 }

@@ -241,9 +241,9 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                    SiteId = _currentSite.SiteId ?? 0,
                    ParentId = id
                });
-                if (procProceduresList != null && procProceduresList.Count() > 0)
+                if (procProceduresList.Any())
                 {
-                    var markProcProcedure = procProceduresList.Where(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Mark).FirstOrDefault();
+                    var markProcProcedure = procProceduresList.FirstOrDefault(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Mark);
                     if (markProcProcedure != null)
                     {
                         var markQualUnqualifiedCode = await _qualUnqualifiedCodeRepository.GetByIdAsync(markProcProcedure.UnqualifiedCodeId);
@@ -255,7 +255,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         };
                     }
 
-                    var lastProcProcedure = procProceduresList.Where(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Last).FirstOrDefault();
+                    var lastProcProcedure = procProceduresList.FirstOrDefault(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Last);
                     if (lastProcProcedure != null)
                     {
                         var lastQualUnqualifiedCode = await _qualUnqualifiedCodeRepository.GetByIdAsync(lastProcProcedure.UnqualifiedCodeId);

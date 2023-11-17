@@ -135,6 +135,18 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
+        /// 通过托盘码获取托盘视图信息
+        /// </summary>
+        /// <param name="palletNo"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getVehicleFreightByPalletNo/{palletNo}")]
+        public async Task<InteVehicleStackView> QueryVehicleFreightByVehicleIdAsync(string palletNo)
+        {
+            return await _inteVehicleService.QueryVehicleFreightByPalletNoAsync(palletNo);
+        }
+
+        /// <summary>
         /// 载具绑盘
         /// </summary>
         /// <param name="dto"></param>
@@ -173,16 +185,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
             dto.OperationType = Core.Enums.Integrated.VehicleOperationEnum.Clear;
             await _inteVehicleService.VehicleOperationAsync(dto);
         }
-        /// <summary>
-        /// 通过托盘码获取托盘视图信息
-        /// </summary>
-        /// <param name="palletNo"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("getVehicleFreightByPalletNo/{palletNo}")]
-        public async Task<InteVehicleStackView> QueryVehicleFreightByVehicleIdAsync(string palletNo)
-        {
-            return await _inteVehicleService.QueryVehicleFreightByPalletNoAsync(palletNo);
-        }
+
     }
 }

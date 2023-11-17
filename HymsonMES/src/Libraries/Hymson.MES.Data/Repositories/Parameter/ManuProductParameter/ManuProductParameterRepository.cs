@@ -230,7 +230,6 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         private string GetTableNameBySFC(long siteId, string sfc)
         {
             var key = CalculateCrc32($"{siteId}{sfc}");
-
             return $"{ProductParameter.ProductParameterPrefix}{key % _parameterOptions.ParameterDelivery}";
         }
 

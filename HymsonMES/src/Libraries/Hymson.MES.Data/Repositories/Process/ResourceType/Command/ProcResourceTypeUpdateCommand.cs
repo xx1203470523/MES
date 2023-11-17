@@ -4,7 +4,7 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
 {
     public class ProcResourceTypeUpdateCommand:BaseEntity
     {
-        public long Id { get; set; }
+        public new long Id { get; set; }
 
         /// <summary>
         /// 描述 :资源类型名称 

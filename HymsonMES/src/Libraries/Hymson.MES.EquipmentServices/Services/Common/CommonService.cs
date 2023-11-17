@@ -301,13 +301,13 @@ namespace Hymson.MES.EquipmentServices.Services.Common
             pagedInfo = await _jobBusinessRelationRepository.GetInteJobBusinessRelationEntitiesAsync(query);
             if (pagedInfo != null && pagedInfo.Any())
             {
-                foreach (var item in pagedInfo)
+                foreach (var item in pagedInfo.Select(x=>x.JobId))
                 {
-                    if (jobIds.Contains(item.JobId))
+                    if (jobIds.Contains(item))
                     {
                             continue;
                     }
-                    jobIds.Add(item.JobId);
+                    jobIds.Add(item);
                 }
             }
             if (jobIds.Any())
