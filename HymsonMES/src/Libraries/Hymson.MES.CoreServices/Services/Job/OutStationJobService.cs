@@ -1159,6 +1159,9 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 如果有标记缺陷
             if (procedureRejudgeBo.MarkUnqualifiedId.HasValue)
             {
+                var unqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value;
+                if (isMoreThanCycle && procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
+
                 // 添加不良记录
                 var badRecordEntity = new ManuProductBadRecordEntity
                 {
@@ -1167,7 +1170,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     FoundBadOperationId = commonBo.ProcedureId,
                     FoundBadResourceId = commonBo.ResourceId,
                     OutflowOperationId = commonBo.ProcedureId,
-                    UnqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value,
+                    UnqualifiedId = unqualifiedId,
                     SfcStepId = stepEntity.Id,
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
