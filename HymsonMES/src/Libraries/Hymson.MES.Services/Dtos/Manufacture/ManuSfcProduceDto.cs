@@ -902,6 +902,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public SfcStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 工单
+        /// </summary>
+        public string OrderCode { get; set; }
+
+        /// <summary>
         /// 工序Code
         /// </summary>
         public string ProcedureCode { get; set; }
@@ -920,7 +925,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// Bom与版本
         /// </summary>
         public string BomAndVersion { get; set; }
-
     }
 
     /// <summary>
@@ -960,12 +964,27 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 工序ID
         /// </summary>
-        public long ProcedureId { get; set; }
+        public long? ProcedureId { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// Bom Id
+        /// </summary>
+        public long BomId { get; set; }
+
+        /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set; }
     }
 
 

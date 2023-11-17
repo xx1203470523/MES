@@ -150,6 +150,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdListAsync(long workOrderId);
 
         /// <summary>
+        /// 获取更改生产工序列表数据
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        Task<List<ManuUpdateProcedureViewDto>> GetProcedureByRouteIdListsync(long processRouteId);
+
+        /// <summary>
         /// 保存生产更改
         /// </summary>
         /// <param name="manuUpdateSaveDto"></param>

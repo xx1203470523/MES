@@ -1195,13 +1195,13 @@
         public const string MES18203 = "工序不能为空";
 
         public const string MES18204 = "条码:{SFC}已锁定";
-        public const string MES18205 = "条码:{SFC}的工单状态不允许操作";
-        public const string MES18206 = "工单必须相同";
+        public const string MES18205 = "条码:{SFC}对应的工单状态为锁定不允许操作";
+        public const string MES18206 = "选择的条码的工单必须相同";
         public const string MES18207 = "新工单可生产数量不足";
         public const string MES18208 = "未获取到工艺路线节点信息";
         public const string MES18209 = "工单:{Code}状态不允许操作！";
         public const string MES18210 = "生产更改错误";
-        public const string MES18211 = "条码非在制状态，不允许操作";
+        public const string MES18211 = "条码非在制或排队中状态，不允许操作";
         public const string MES18212 = "相同工单{Code}，不允许操作";
         public const string MES18213 = "未获取到工艺路线连线信息";
         public const string MES18214 = "工序不存在";
@@ -1212,7 +1212,9 @@
         public const string MES18218 = "条码{0}库存修改失败，请联系管理员！";
         public const string MES18219 = "条码对应物料和工单对应物料相同！";
         public const string MES18220 = "条码已是完成状态！";
-
+        public const string MES18221 = "条码:{SFC}对应的工单状态为关闭不允许操作";
+        public const string MES18222 = "条码:{SFC}在不合格工艺路线不允许操作";
+        public const string MES18223 = "请选择您要更改的工单/物料/Bom/工艺路线";
         #endregion
 
         #region 系统Token MES18300
