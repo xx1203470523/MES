@@ -434,7 +434,7 @@ namespace Hymson.MES.Services.Services.Process
                 Sfcs = sfcs,
             });
 
-            if (sfcProduces == null || sfcProduces.Any())
+            if (sfcProduces == null || sfcProduces.Count()==0)
             {
                 throw new CustomerValidationException(ErrorCode.MES16600);
             }
