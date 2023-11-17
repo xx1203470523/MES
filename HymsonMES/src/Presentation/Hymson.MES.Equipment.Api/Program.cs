@@ -107,7 +107,7 @@ namespace Hymson.MES.Equipment.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-#if DEBUG
+            //#if DEBUG
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
@@ -165,7 +165,7 @@ namespace Hymson.MES.Equipment.Api
                 //options.OperationFilter<SecurityRequirementsOperationFilter>();
                 //options.OperationFilter<AuthorizationOperationFilter>();
             });
-#endif
+            //#endif
         }
 
         /// <summary>
