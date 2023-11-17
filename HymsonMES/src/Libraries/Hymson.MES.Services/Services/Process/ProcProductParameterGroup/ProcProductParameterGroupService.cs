@@ -9,8 +9,10 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
@@ -74,6 +76,16 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         /// <summary>
+        /// 仓储接口（载具注册）
+        /// </summary>
+        private readonly IInteVehicleRepository _inteVehicleRepository;
+
+        /// <summary>
+        /// 仓储接口（二维载具条码明细）
+        /// </summary>
+        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -86,13 +98,15 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procParameterRepository"></param>
         /// <param name="localizationService"></param>
         /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="inteVehicleRepository"></param>
+        /// <param name="inteVehiceFreightStackRepository"></param>
         public ProcProductParameterGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcProductParameterGroupSaveDto> validationSaveRules,
             IProcProductParameterGroupRepository procProductParameterGroupRepository,
             IProcProductParameterGroupDetailRepository procProductParameterGroupDetailRepository,
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcParameterRepository procParameterRepository,
-            ILocalizationService localizationService, IManuSfcProduceRepository manuSfcProduceRepository)
+            ILocalizationService localizationService, IManuSfcProduceRepository manuSfcProduceRepository, IInteVehicleRepository inteVehicleRepository, IInteVehiceFreightStackRepository inteVehiceFreightStackRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -104,6 +118,8 @@ namespace Hymson.MES.Services.Services.Process
             _procParameterRepository = procParameterRepository;
             _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _inteVehicleRepository = inteVehicleRepository;
+            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
         }
 
 
@@ -361,39 +377,99 @@ namespace Hymson.MES.Services.Services.Process
         }
 
         /// <summary>
-        /// 根据条码与工序查询当前版本的产品参数收集详情
+        /// 根据(条码或载具编码)与工序查询当前版本的产品参数收集详情
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto)
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcsAndProcedureIdAsync(ProcProductParameterGroupToParameterCollectionQueryDto queryDto)
         {
-            //根据SFC 查找到对应的物料信息
-            #region 验证对应的sfc 是否符合要求：如是否存在
+            //检验数据
+            if (queryDto.Sfcs == null || queryDto.Sfcs.Length < 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10530));
+            }
+
+            string[] sfcs = queryDto.Sfcs.Distinct().ToArray();
+            //载具
+            if (queryDto.BarcodeType == ManuFacePlateBarcodeTypeEnum.Vehicle)
+            {
+                #region 获取载具对应的条码
+                // 读取载具关联的条码
+                var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Codes = queryDto.Sfcs
+                });
+
+                // 不在系统中的载具代码
+                var notInSystem = queryDto.Sfcs.Except(vehicleEntities.Select(s => s.Code));
+                if (notInSystem.Any())
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18624))
+                        .WithData("Code", string.Join(',', notInSystem));
+                }
+
+                // 查询载具关联的条码明细
+                var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    ParentIds = vehicleEntities.Select(s => s.Id)
+                });
+
+                sfcs = vehicleFreightStackEntities.Select(s => s.BarCode).ToArray();
+                if (sfcs==null||sfcs.Length == 0) 
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10535));
+                }
+                #endregion
+            }
+
+            #region 检测这些条码 是不是同一个 产品，是不是处于当前工序中
+
             //查询sfc对应的在制品
-            var sfcProduce = (await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            var sfcProduces = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Sfcs = new[] { queryDto.Sfc },
-            })).FirstOrDefault();
+                Sfcs = sfcs,
+            });
 
-            if (sfcProduce == null)
+            if (sfcProduces == null || sfcProduces.Any())
             {
                 throw new CustomerValidationException(ErrorCode.MES16600);
             }
-            if (sfcProduce.ProcedureId != queryDto.ProcedureId)
+
+            if (sfcProduces.Count() != sfcs.Length)
             {
-                throw new CustomerValidationException(ErrorCode.MES10528);
+                var missingSfcs = sfcs.Except(sfcProduces.Select(x => x.SFC));
+                throw new CustomerValidationException(ErrorCode.MES10531).WithData("sfc", string.Join(",", missingSfcs));
             }
-            if (sfcProduce.Status != SfcStatusEnum.Activity)
+
+            var notCurrentProcedureSfcproduces = sfcProduces.Where(x => x.ProcedureId != queryDto.ProcedureId);
+            if (notCurrentProcedureSfcproduces.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES19920);
+                throw new CustomerValidationException(ErrorCode.MES10532).WithData("sfc", string.Join(",", notCurrentProcedureSfcproduces.Select(x=>x.SFC)));
             }
+            var notActivitySfcs = sfcProduces.Where(x => x.Status != SfcStatusEnum.Activity);
+            if (notActivitySfcs.Any())
+            {
+                throw new CustomerValidationException(ErrorCode.MES10533).WithData("sfc", string.Join(",", notActivitySfcs.Select(x=>x.SFC)));
+            }
+
+            //检测这些条码是不是同一个产品
+            var sfcsProductGroup = sfcProduces.GroupBy(x => x.ProductId);
+            if (sfcsProductGroup.Count() > 1) 
+            {
+                throw new CustomerValidationException(ErrorCode.MES10534);
+            }
+            var currentProductId = sfcsProductGroup.FirstOrDefault()?.Key;//当前产品
             #endregion
 
+            //根据SFC对应的信息 查找到对应的产品参数组
             var productParameterGroup = (await _procProductParameterGroupRepository.GetByProductProcedureListAsync(new EntityByProductProcedureQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                ProductId = sfcProduce.ProductId,
+                ProductId = currentProductId ?? 0,
                 ProcedureId = queryDto.ProcedureId
             })).FirstOrDefault(x => x.IsDefaultVersion.HasValue && x.IsDefaultVersion.Value);
             if (productParameterGroup == null)
@@ -404,6 +480,51 @@ namespace Hymson.MES.Services.Services.Process
             //查找参数收集组的详情
             return await QueryDetailsByMainIdAsync(productParameterGroup.Id);
         }
+
+        ///// <summary>
+        ///// 根据条码与工序查询当前版本的产品参数收集详情
+        ///// </summary>
+        ///// <param name="queryDto"></param>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto)
+        //{
+        //    //根据SFC 查找到对应的物料信息
+        //    #region 验证对应的sfc 是否符合要求：如是否存在
+        //    //查询sfc对应的在制品
+        //    var sfcProduce = (await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+        //    {
+        //        SiteId = _currentSite.SiteId ?? 0,
+        //        Sfcs = new[] { queryDto.Sfc },
+        //    })).FirstOrDefault();
+
+        //    if (sfcProduce == null)
+        //    {
+        //        throw new CustomerValidationException(ErrorCode.MES16600);
+        //    }
+        //    if (sfcProduce.ProcedureId != queryDto.ProcedureId)
+        //    {
+        //        throw new CustomerValidationException(ErrorCode.MES10528);
+        //    }
+        //    if (sfcProduce.Status != SfcStatusEnum.Activity)
+        //    {
+        //        throw new CustomerValidationException(ErrorCode.MES19920);
+        //    }
+        //    #endregion
+
+        //    var productParameterGroup = (await _procProductParameterGroupRepository.GetByProductProcedureListAsync(new EntityByProductProcedureQuery
+        //    {
+        //        SiteId = _currentSite.SiteId ?? 0,
+        //        ProductId = sfcProduce.ProductId,
+        //        ProcedureId = queryDto.ProcedureId
+        //    })).FirstOrDefault(x => x.IsDefaultVersion.HasValue && x.IsDefaultVersion.Value);
+        //    if (productParameterGroup == null)
+        //    {
+        //        throw new CustomerValidationException(ErrorCode.MES10529);
+        //    }
+
+        //    //查找参数收集组的详情
+        //    return await QueryDetailsByMainIdAsync(productParameterGroup.Id);
+        //}
 
         #region 内部方法
         /// <summary>
