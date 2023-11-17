@@ -127,30 +127,6 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13152));
             }
 
-            //// 状态为启用时校验关联表数据
-            //if (saveDto.Status == SysDataStatusEnum.Enable)
-            //{
-            //    if (saveDto.Details == null || !saveDto.Details.Any())
-            //    {
-            //        throw new CustomerValidationException(nameof(ErrorCode.MES13121));
-            //    }
-            //    //首检校验检验规则
-            //    if (saveDto.Type == IPQCTypeEnum.FAI)
-            //    {
-            //        if (saveDto.Rules == null || saveDto.Rules.IsEmpty())
-            //        {
-            //            throw new CustomerValidationException(nameof(ErrorCode.MES13122));
-            //        }
-            //        foreach (var rule in saveDto.Rules)
-            //        {
-            //            if (rule.Resources == null || rule.Resources.IsEmpty())
-            //            {
-            //                throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
-            //            }
-            //        }
-            //    }
-            //}
-
             #endregion
 
             // DTO转换实体
@@ -284,7 +260,6 @@ namespace Hymson.MES.Services.Services.Quality
             entity.GenerateConditionUnit = saveDto.GenerateConditionUnit;
             entity.ControlTime = saveDto.ControlTime;
             entity.ControlTimeUnit = saveDto.ControlTimeUnit;
-            //entity.Status = saveDto.Status;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
 
@@ -600,34 +575,6 @@ namespace Hymson.MES.Services.Services.Quality
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13121));
             }
-
-            ////首检校验检验规则
-            //if (entity.Type == IPQCTypeEnum.FAI)
-            //{
-            //    var ipqcRules = await _qualIpqcInspectionRuleRepository.GetEntitiesAsync(new QualIpqcInspectionRuleQuery { IpqcInspectionId = id });
-
-            //    if (ipqcRules == null || !ipqcRules.Any())
-            //    {
-            //        throw new CustomerValidationException(nameof(ErrorCode.MES13122));
-            //    }
-
-            //    var ruleResourceEntities = await _qualIpqcInspectionRuleResourceRelationRepository.GetEntitiesAsync(new QualIpqcInspectionRuleResourceRelationQuery
-            //    {
-            //        SiteId = _currentSite.SiteId ?? 0,
-            //        IpqcInspectionId = id
-            //    });
-
-            //    foreach (var rule in ipqcRules)
-            //    {
-            //        var resources = ruleResourceEntities.Where(x => x.IpqcInspectionRuleId == rule.Id);
-
-            //        if (resources == null || !resources.Any())
-            //        {
-            //            throw new CustomerValidationException(nameof(ErrorCode.MES13123)).WithData("Way", rule.Way);
-            //        }
-            //    }
-            //}
-
             #region 操作数据库
             await _qualIpqcInspectionRepository.UpdateStatusAsync(changeStatusCommand);
             #endregion

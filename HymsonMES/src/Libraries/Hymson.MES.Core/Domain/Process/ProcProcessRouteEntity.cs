@@ -50,7 +50,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否当前版本 
         /// 空值 : true  
         /// </summary>
-        public byte IsCurrentVersion { get; set; }
+        public bool IsCurrentVersion { get; set; }
 
         /// <summary>
         /// 描述 :说明 

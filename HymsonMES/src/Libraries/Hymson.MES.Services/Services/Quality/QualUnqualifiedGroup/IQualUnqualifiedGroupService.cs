@@ -14,9 +14,9 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// <summary>
         /// 获取分页List
         /// </summary>
-        /// <param name="qualUnqualifiedGroupPagedQueryDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task<PagedInfo<QualUnqualifiedGroupDto>> GetPageListAsync(QualUnqualifiedGroupPagedQueryDto qualUnqualifiedGroupPagedQueryDto);
+        Task<PagedInfo<QualUnqualifiedGroupDto>> GetPageListAsync(QualUnqualifiedGroupPagedQueryDto param);
 
         /// <summary>
         /// 查询工序下的不合格组列表
@@ -28,16 +28,16 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="qualUnqualifiedGroupCreateDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto qualUnqualifiedGroupCreateDto);
+        Task CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto param);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualUnqualifiedGroupModifyDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task ModifyQualUnqualifiedGroupAsync(QualUnqualifiedGroupModifyDto qualUnqualifiedGroupModifyDto);
+        Task ModifyQualUnqualifiedGroupAsync(QualUnqualifiedGroupModifyDto param);
 
         /// <summary>
         /// 批量删除

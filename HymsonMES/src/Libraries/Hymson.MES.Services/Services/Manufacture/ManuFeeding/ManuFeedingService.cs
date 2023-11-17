@@ -285,7 +285,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             if (queryDto.Source == ManuSFCFeedingSourceEnum.BOM)
             {
-                // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料
+                // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
                 var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
                 {
                     SiteId = _currentSite.SiteId ?? 0,
@@ -752,7 +752,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 // 如果不是主物料，就找下替代料
                 var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == item.Id);
                 if (bomDetailEntitiy == null) continue;
-                //?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
 
                 // 填充主物料替代料
                 if (bomDetailEntitiy.IsEnableReplace)

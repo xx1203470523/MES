@@ -188,10 +188,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (!manuSfcCirculations.Any()) return bomDetailViews;
 
             // 组件物料
-            var barCodeMaterialIds = manuSfcCirculations.Select(x => x.CirculationProductId).ToArray().Distinct();
+            var barCodeMaterialIds = manuSfcCirculations.Select(x => x.CirculationProductId).Distinct();
 
             //bom物料
-            var bomMaterialIds = bomDetails.Select(item => item.MaterialId).ToArray().Distinct();
+            var bomMaterialIds = bomDetails.Select(item => item.MaterialId).Distinct();
 
             var materialIds = new List<long>();
             if (barCodeMaterialIds.Any())
@@ -287,11 +287,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private async Task<List<ProcResourceEntity>> GetResourcesAsync(IEnumerable<ManuSfcCirculationEntity> manuSfcCirculations)
         {
             var resourceIds = new List<long>();
-            foreach (var item in manuSfcCirculations)
+            foreach (var item in manuSfcCirculations.Select(x=>x.ResourceId))
             {
-                if (item.ResourceId.HasValue && item.ResourceId.Value > 0 && !resourceIds.Contains(item.ResourceId.Value))
+                if (item.HasValue && item.Value > 0 && !resourceIds.Contains(item.Value))
                 {
-                    resourceIds.Add(item.ResourceId.Value);
+                    resourceIds.Add(item.Value);
                 }
             }
             var procResources = new List<ProcResourceEntity>();
@@ -956,7 +956,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="circulationBarCode"></param>
         /// <param name="circulationEntities"></param>
         /// <returns></returns>
-        private bool IsBarCodeRepetAsync(string circulationBarCode, List<ManuSfcCirculationEntity> circulationEntities)
+        private static bool IsBarCodeRepetAsync(string circulationBarCode, List<ManuSfcCirculationEntity> circulationEntities)
         {
             if (circulationEntities.Any())
             {

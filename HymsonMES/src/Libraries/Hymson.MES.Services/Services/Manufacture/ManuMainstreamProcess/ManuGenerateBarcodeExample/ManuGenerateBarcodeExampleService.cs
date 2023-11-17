@@ -28,6 +28,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.Generat
         /// 构造函数
         /// </summary>
         /// <param name="manuGenerateBarcodeService"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="currentUser"></param>
         public ManuGenerateBarcodeExampleService(IManuGenerateBarcodeService manuGenerateBarcodeService,ICurrentSite currentSite,ICurrentUser currentUser)
         {
             _manuGenerateBarcodeService = manuGenerateBarcodeService;

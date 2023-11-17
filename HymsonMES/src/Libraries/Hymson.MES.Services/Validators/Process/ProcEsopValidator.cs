@@ -18,8 +18,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcEsopCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            
         }
     }
 
@@ -30,8 +29,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcEsopModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            
         }
     }
 

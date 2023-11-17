@@ -84,8 +84,8 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <summary>
         /// 获取检验样本数量
         /// </summary>
-        /// <param name="ipqcInspectionHeadId"></param>
+        /// <param name="ipqcInspectionId"></param>
         /// <returns></returns>
-        Task<int> GetCountByIpqcInspectionId(long ipqcInspectionHeadId);
+        Task<int> GetCountByIpqcInspectionId(long ipqcInspectionId);
     }
 }

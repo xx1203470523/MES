@@ -110,12 +110,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcessRouteEntity> GetByIdAsync(long id)
         {
-            //var key = $"proc_process_route&{id}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcProcessRouteEntity>(GetByIdSql, new { Id = id });
-            //});
         }
 
         /// <summary>
@@ -269,7 +265,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string ExistsSql = "SELECT Id FROM proc_process_route  /**where**/ LIMIT 1";
 
         const string InsertSql = "INSERT INTO `proc_process_route`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Type`, `Version`, `IsCurrentVersion`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Type, @Version, @IsCurrentVersion, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string ResetCurrentVersionSql = "UPDATE proc_process_route SET IsCurrentVersion = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND SiteId = @SiteId AND IsCurrentVersion = 1";
+        const string ResetCurrentVersionSql = "UPDATE proc_process_route SET IsCurrentVersion = 0, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND SiteId = @SiteId AND IsCurrentVersion = 1 AND Code=@Code ";
         const string UpdateSql = "UPDATE `proc_process_route` SET Name=@Name , Type = @Type, IsCurrentVersion = @IsCurrentVersion, Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_process_route` SET IsDeleted = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id in @Ids";
         const string GetByIdSql = @"SELECT * FROM `proc_process_route`  WHERE Id = @Id ";

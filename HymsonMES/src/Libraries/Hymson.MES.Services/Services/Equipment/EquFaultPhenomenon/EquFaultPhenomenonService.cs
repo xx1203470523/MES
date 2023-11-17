@@ -114,10 +114,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             var entityOld = await _equFaultPhenomenonRepository.GetByIdAsync(parm.Id.Value)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12905));
 
-            //if (entityOld.UseStatus != SysDataStatusEnum.Build && parm.UseStatus == SysDataStatusEnum.Build)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10108));
-            //}
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))

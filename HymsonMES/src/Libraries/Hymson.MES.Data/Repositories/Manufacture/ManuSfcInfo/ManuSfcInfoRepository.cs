@@ -149,14 +149,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> entities)
+        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
-            if (entities == null || !entities.Any()) return 0;
+            if (ManuSfcInfoEntitys == null || !ManuSfcInfoEntitys.Any()) return 0;
 
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);
         }
 
         /// <summary>
@@ -303,9 +303,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" si.IsDeleted = 0 ");
             sqlBuilder.Where(" si.IsUsed = 1 ");
 
-            // 2023.10.17 中越说去掉，克明说可以去掉
-            //sqlBuilder.Where(" s.IsDeleted = 0 ");
-
             if (pageQuery.MaterialId.HasValue)
             {
                 sqlBuilder.Where(" si.ProductId = @MaterialId ");
@@ -373,7 +370,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

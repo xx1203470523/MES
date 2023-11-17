@@ -831,7 +831,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 {
                     //获取 物料批次大小
                     var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(material.MaterialId);
-                    var qty = procMaterialEntity.Batch;
 
                     //记录流转信息
                     manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity

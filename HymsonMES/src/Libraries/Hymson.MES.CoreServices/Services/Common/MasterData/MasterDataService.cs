@@ -128,11 +128,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
-        /// 仓储接口（物料库存）
-        /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
-
-        /// <summary>
         /// 仓储接口（生产配置）
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
@@ -181,7 +176,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procProductSetRepository"></param>
         /// <param name="inteJobRepository"></param>
         /// <param name="inteJobBusinessRelationRepository"></param>
@@ -202,7 +196,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcProductSetRepository procProductSetRepository,
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
@@ -227,7 +220,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procProductSetRepository = procProductSetRepository;
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
@@ -451,7 +443,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             if (!sfcProduceEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', sfcBos.SFCs));
-            };
+            }
 
             // 不存在在制表的话，就去库存查找？？
 
@@ -691,7 +683,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
         {
             // TODO 目前只支持单线路的工艺路线
-            //routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.ManualSortNumber);
 
             var beginNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.BeginProcedureId);
             if (beginNode == null) return false;
@@ -843,14 +834,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 {
                     var procedureIds = processRouteDetail.ProcedureIds.ToList();
                     int index = 1;
-                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList)
+                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList.Select(x=>x.ProcessRouteDetailId))
                     {
-                        if (item.ProcessRouteDetailId != ProcessRoute.LastProcedureId)
+                        if (item != ProcessRoute.LastProcedureId)
                         {
                             if (index == 1)
                             {
-                                processRouteDetail.ProcedureIds.Add(item.ProcessRouteDetailId);
-                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
+                                processRouteDetail.ProcedureIds.Add(item);
+                                CombinationProcessRoute(ref list, item, procProcessRouteDetailLinkEntities, key);
                             }
                             else
                             {
@@ -859,9 +850,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                                     key = IdGenProvider.Instance.CreateId(),
                                     ProcedureIds = procedureIds,
                                 };
-                                processRouteDetailDto.ProcedureIds.Add(item.ProcessRouteDetailId);
+                                processRouteDetailDto.ProcedureIds.Add(item);
                                 list.Add(processRouteDetailDto);
-                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
+                                CombinationProcessRoute(ref list, item, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
                             }
                         }
                         index++;
