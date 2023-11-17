@@ -251,7 +251,6 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                     var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduceEntity.SFC);
-
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("InProcedure", inProcedureEntity.Code);
                     validationFailure.FormattedMessagePlaceholderValues.Add("OutProcedure", outProcedureEntity.Code);
