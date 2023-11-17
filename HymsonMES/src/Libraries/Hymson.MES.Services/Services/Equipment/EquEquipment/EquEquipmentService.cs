@@ -407,7 +407,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 equipmentDto.ResourceCodes = string.Join(",", resources.Select(x => x.ResCode));
             }
 
-            return equipmentDto;
+            return equipmentDto??new EquEquipmentDto();
         }
 
         /// <summary>
