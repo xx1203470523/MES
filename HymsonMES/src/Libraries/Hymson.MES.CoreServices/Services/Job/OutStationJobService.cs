@@ -1415,7 +1415,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         var lastProcProcedureRejudgeEntity = item.Value.FirstOrDefault();
                         if (lastProcProcedureRejudgeEntity == null) continue;
 
-                        procedureRejudgeBo.LastUnqualified = unqualifiedCodeEntities.FirstOrDefault(f => f.Id == lastProcProcedureRejudgeEntity?.Id);
+                        procedureRejudgeBo.LastUnqualified = unqualifiedCodeEntities.FirstOrDefault(f => f.Id == lastProcProcedureRejudgeEntity?.UnqualifiedCodeId);
                         break;
                     case RejudgeUnqualifiedCodeEnum.Block:
                         procedureRejudgeBo.BlockUnqualifiedIds = item.Value.Select(s => s.UnqualifiedCodeId);
