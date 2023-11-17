@@ -224,15 +224,12 @@ namespace Hymson.MES.Services.Services.Integrated
             foreach(var item in excelImportDtos)
             {
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
-                if (!validationResult.IsValid)
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
                 {
-                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    foreach (var validationFailure in validationResult.Errors)
                     {
-                        foreach (var validationFailure in validationResult.Errors)
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
-                            validationFailures.Add(validationFailure);
-                        }
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
                     }
                 }
                 rows++;
@@ -347,7 +344,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<InteCustomExportResultDto> ExprotInteCustomPageListAsync(InteCustomPagedQueryDto param)
         {
             var pagedQuery = param.ToQuery<InteCustomPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId.Value;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             pagedQuery.PageSize = 1000;
             var pagedInfo = await _inteCustomRepository.GetPagedInfoAsync(pagedQuery);
 
