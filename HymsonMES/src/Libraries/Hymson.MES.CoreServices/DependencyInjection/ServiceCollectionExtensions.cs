@@ -12,6 +12,7 @@ using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
 using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.CoreServices.Validators;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
@@ -57,25 +58,31 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobCommonService, JobCommonService>();
             services.AddSingleton<ScopedServiceFactory>();
             services.AddTransient<IJobContextProxy, JobContextProxy>();
-            services.AddSingleton<IJobService, InStationJobService>();
-            services.AddSingleton<IJobService, OutStationJobService>();
-            services.AddSingleton<IJobService, StopJobService>();
+
             services.AddSingleton<IJobService, BadRecordJobService>();
-            services.AddSingleton<IJobService, PackageVerifyJobService>();
-            services.AddSingleton<IJobService, RepairStartJobService>();
-            services.AddSingleton<IJobService, RepairEndJobService>();
+            services.AddSingleton<IJobService, BarcodeReceiveService>();
+            services.AddSingleton<IJobService, InStationInterceptJobService>();
+            services.AddSingleton<IJobService, InStationJobService>();
+            services.AddSingleton<IJobService, IOutputModifyService>();
+            services.AddSingleton<IJobService, OutStationJobService>();
+            services.AddSingleton<IJobService, PackageCloseJobService>();
             services.AddSingleton<IJobService, PackageIngJobService>();
             services.AddSingleton<IJobService, PackageOpenJobService>();
-            services.AddSingleton<IJobService, PackageCloseJobService>();
-            services.AddSingleton<IJobService, BarcodeReceiveService>();
+            services.AddSingleton<IJobService, PackageVerifyJobService>();
+            services.AddSingleton<IJobService, ParameterCollectJobService>();
+            services.AddSingleton<IJobService, PartialScrapJobService>();
             services.AddSingleton<IJobService, ProductBadRecordJobService>();
             services.AddSingleton<IJobService, ProductsSortingJobService>();
+            services.AddSingleton<IJobService, RepairEndJobService>();
+            services.AddSingleton<IJobService, RepairStartJobService>();
             services.AddSingleton<IJobService, SmiFinishedJobService>();
+            services.AddSingleton<IJobService, SFCRequestJobService>();
             services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
             services.AddSingleton<IManuSfcSummaryService, ManuSfcSummaryService>();
             services.AddSingleton<IManuPassStationService, ManuPassStationService>();
+            services.AddSingleton<IJobService, EsopOutJobService>();
             return services;
         }
 
@@ -102,6 +109,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
             services.AddSingleton<AbstractValidator<PackageOpenRequestBo>, PackageOpenJobValidator>();
             services.AddSingleton<AbstractValidator<PackageCloseRequestBo>, PackageCloseJobValidator>();
+            services.AddSingleton<AbstractValidator<EsopOutRequestBo>, EsopOutJobValidator>();
 
             return services;
         }

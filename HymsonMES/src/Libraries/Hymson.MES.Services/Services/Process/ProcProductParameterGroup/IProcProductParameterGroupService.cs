@@ -67,11 +67,11 @@ namespace Hymson.MES.Services.Services.Process
         Task UpdateStatusAsync(ChangeStatusDto param);
 
         /// <summary>
-        /// 根据条码与工序查询当前版本的产品参数收集详情
+        /// 根据(条码或载具编码)与工序查询当前版本的产品参数收集详情
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcAndProcedureIdAsync(ProcProductParameterGroupBySfcAndProcedureIdQueryDto queryDto);
+        Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcsAndProcedureIdAsync(ProcProductParameterGroupToParameterCollectionQueryDto queryDto);
     }
 }

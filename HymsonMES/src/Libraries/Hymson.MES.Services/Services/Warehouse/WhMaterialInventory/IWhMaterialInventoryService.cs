@@ -41,10 +41,10 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         ///批量新增
         /// </summary>
-        /// <param name="whMaterialInventoryCreateDto"></param>
+        /// <param name="whMaterialInventoryLists"></param>
         /// <returns></returns>
 
-        Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryCreateDto);
+        Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryLists);
 
         /// <summary>
         /// 修改

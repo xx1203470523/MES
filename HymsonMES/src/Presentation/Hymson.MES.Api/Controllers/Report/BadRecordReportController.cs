@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Mvc;
 
@@ -70,5 +68,18 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _badRecordReportService.GetLogPageListAsync(parm);
         }
+
+        /// <summary>
+        /// 查询不合格代码列表（不良报告日志）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("logPageDetailList")]
+        public async Task<IEnumerable<ManuProductBadRecordLogReportResponseDto>> GetLogPageDetailListAsync([FromQuery] ManuProductBadRecordLogReportRequestDto request)
+        {
+            return await _badRecordReportService.GetLogPageDetailListAsync(request);
+        }
+
     }
 }

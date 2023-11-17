@@ -558,10 +558,10 @@ namespace Hymson.MES.Services.Services.Process
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in param.PrintList)
+                foreach (var item in param.PrintList.Select(x=>x.PrintId))
                 {
                     i++;
-                    if (item.PrintId <= 0)
+                    if (item <= 0)
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -583,7 +583,7 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = entity.Id,
-                        PrintId = item.PrintId,
+                        PrintId = item,
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
@@ -868,7 +868,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     if (x.PrintId == 0)
                     {
-                        x.PrintId = x.Id.ParseToLong();
+                        x.PrintId = x.Id==null?0: x.Id.ParseToLong();
                     }
                 });
                 //判断打印机是否重复配置  数据库中 已经存储的情况
@@ -916,10 +916,10 @@ namespace Hymson.MES.Services.Services.Process
             if (param.PrintList != null && param.PrintList.Count > 0)
             {
                 int i = 0;
-                foreach (var item in param.PrintList)
+                foreach (var item in param.PrintList.Select(x=>x.PrintId))
                 {
                     i++;
-                    if (item.PrintId <= 0)
+                    if (item <= 0)
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -941,7 +941,7 @@ namespace Hymson.MES.Services.Services.Process
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         ResourceId = param.Id,
-                        PrintId = item.PrintId,
+                        PrintId = item,
                         Remark = "",
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedBy = userName,
@@ -1252,16 +1252,16 @@ namespace Hymson.MES.Services.Services.Process
             var resourceEquipmentBindEntities = await _resourceEquipmentBindRepository.GetByResourceIdAsync(new ProcResourceEquipmentBindQuery { ResourceId = resourceId });
 
             List<SelectOptionDto> selectOptionDtos = new();
-            foreach (var item in resourceEquipmentBindEntities)
+            foreach (var item in resourceEquipmentBindEntities.Select(x=>x.EquipmentId))
             {
-                var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(item.EquipmentId);
+                var equipmentEntity = await _equEquipmentRepository.GetByIdAsync(item);
                 if (equipmentEntity == null) continue;
 
                 selectOptionDtos.Add(new SelectOptionDto
                 {
-                    Key = $"{item.EquipmentId}",
+                    Key = $"{item}",
                     Label = $"{equipmentEntity.EquipmentName}",
-                    Value = $"{item.EquipmentId}"
+                    Value = $"{item}"
                 });
             }
 

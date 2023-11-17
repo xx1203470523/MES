@@ -40,9 +40,9 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobManufactureService>();
-            foreach (var job in jobs)
+            foreach (var item in jobs.Select(x=>x.ClassProgram))
             {
-                var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
+                var service = services.FirstOrDefault(f => f.GetType().Name == item);
                 if (service == null) continue;
 
                 // TODO 如果job有额外参数，可以在这里进行拼装
@@ -53,7 +53,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 执行job
 
                 var responseDto = await service.ExecuteAsync(param);
-                responseDtos.Add(job.ClassProgram, responseDto);
+                responseDtos.Add(item, responseDto);
 
                 if (responseDto.Rows < 0) break;
             }

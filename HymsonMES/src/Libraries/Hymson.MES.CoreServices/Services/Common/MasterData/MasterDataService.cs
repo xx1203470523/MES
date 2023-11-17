@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
@@ -24,6 +25,8 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
@@ -125,11 +128,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
 
         /// <summary>
-        /// 仓储接口（物料库存）
-        /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
-
-        /// <summary>
         /// 仓储接口（生产配置）
         /// </summary>
         private readonly IProcProductSetRepository _procProductSetRepository;
@@ -154,6 +152,10 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 仓储接口（设备注册）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+        /// <summary>
+        ///产品参数采集
+        /// </summary>
+        private readonly IManuProductParameterRepository _productParameterRepository;
 
         /// <summary>
         /// 构造函数
@@ -174,7 +176,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procProcessRouteRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procProductSetRepository"></param>
         /// <param name="inteJobRepository"></param>
         /// <param name="inteJobBusinessRelationRepository"></param>
@@ -195,13 +196,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IProcProcessRouteRepository procProcessRouteRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
             IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IProcProductSetRepository procProductSetRepository,
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IEquEquipmentRepository equEquipmentRepository,
-            IProcSortingRuleRepository sortingRuleRepository)
+            IProcSortingRuleRepository sortingRuleRepository,
+            IManuProductParameterRepository productParameterRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -219,13 +220,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _procProcessRouteRepository = procProcessRouteRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
             _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _procProductSetRepository = procProductSetRepository;
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _equEquipmentRepository= equEquipmentRepository;
+            _equEquipmentRepository = equEquipmentRepository;
             _sortingRuleRepository = sortingRuleRepository;
+            _productParameterRepository = productParameterRepository;
         }
 
 
@@ -682,7 +683,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
         {
             // TODO 目前只支持单线路的工艺路线
-            //routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.ManualSortNumber);
 
             var beginNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.BeginProcedureId);
             if (beginNode == null) return false;
@@ -834,14 +834,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 {
                     var procedureIds = processRouteDetail.ProcedureIds.ToList();
                     int index = 1;
-                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList)
+                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList.Select(x=>x.ProcessRouteDetailId))
                     {
-                        if (item.ProcessRouteDetailId != ProcessRoute.LastProcedureId)
+                        if (item != ProcessRoute.LastProcedureId)
                         {
                             if (index == 1)
                             {
-                                processRouteDetail.ProcedureIds.Add(item.ProcessRouteDetailId);
-                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, key);
+                                processRouteDetail.ProcedureIds.Add(item);
+                                CombinationProcessRoute(ref list, item, procProcessRouteDetailLinkEntities, key);
                             }
                             else
                             {
@@ -850,9 +850,9 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                                     key = IdGenProvider.Instance.CreateId(),
                                     ProcedureIds = procedureIds,
                                 };
-                                processRouteDetailDto.ProcedureIds.Add(item.ProcessRouteDetailId);
+                                processRouteDetailDto.ProcedureIds.Add(item);
                                 list.Add(processRouteDetailDto);
-                                CombinationProcessRoute(ref list, item.ProcessRouteDetailId, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
+                                CombinationProcessRoute(ref list, item, procProcessRouteDetailLinkEntities, processRouteDetailDto.key);
                             }
                         }
                         index++;
@@ -1280,7 +1280,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="requestBo"></param>
         /// <returns></returns>
-        public  async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
+        public async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
         {
             // 根据设备
             var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -1346,6 +1346,18 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query)
         {
             return await _sortingRuleRepository.GetProcSortingRuleEntitiesAsync(query);
+        }
+
+        /// <summary>
+        /// 获取条码参数列表
+        /// </summary>
+        /// <param name="parameterBySfcQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery)
+        {
+            //获取到条码的参数信息
+            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(parameterBySfcQuery);
+            return parameterList;
         }
     }
 }

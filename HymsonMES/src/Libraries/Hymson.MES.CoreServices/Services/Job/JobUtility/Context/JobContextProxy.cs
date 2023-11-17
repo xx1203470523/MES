@@ -280,7 +280,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                     if (itemPrimaryKeyValue != null)
                     {
                         var itemValue = itemPrimaryKeyValue.GetValue(targetItem);
-                        if (typeof(IEnumerable).IsAssignableFrom(field.Value.GetType()) && field.Value is not string)
+                        //if (typeof(IEnumerable).IsAssignableFrom(field.Value.GetType()) && field.Value is not string)
+                        if (field.Value is IEnumerable and not string)
                         {
                             foreach (var fieldValue in (IEnumerable)field.Value)
                             {

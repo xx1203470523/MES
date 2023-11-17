@@ -40,7 +40,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// 编码规则 仓储
         /// </summary>
         private readonly IInteCodeRulesRepository _inteCodeRulesRepository;
-        private readonly ISequenceService _sequenceService;
         private readonly AbstractValidator<InteCodeRulesCreateDto> _validationCreateRules;
         private readonly AbstractValidator<InteCodeRulesModifyDto> _validationModifyRules;
 
@@ -51,13 +50,12 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteCodeRulesMakeCreateDto> _validationMakeCreateRules;
 
         public InteCodeRulesService(ICurrentUser currentUser, ICurrentSite currentSite, IInteCodeRulesRepository inteCodeRulesRepository,
-ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, AbstractValidator<InteCodeRulesMakeCreateDto> validationMakeCreateRules)
+ AbstractValidator<InteCodeRulesCreateDto> validationCreateRules, AbstractValidator<InteCodeRulesModifyDto> validationModifyRules, IProcMaterialRepository procMaterialRepository, IInteCodeRulesMakeRepository inteCodeRulesMakeRepository, AbstractValidator<InteCodeRulesMakeCreateDto> validationMakeCreateRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
 
             _inteCodeRulesRepository = inteCodeRulesRepository;
-            this._sequenceService = sequenceService;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
 
@@ -104,12 +102,11 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                     throw new CustomerValidationException(nameof(ErrorCode.MES12446));
                 }
 
-                foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
+                foreach (var item in inteCodeRulesCreateDto.CodeRulesMakes
+                    .Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue))
+                    .Where(y=>y.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1)))
                 {
-                    if (item!.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1)) 
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12447));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12447));
                 }
                 
             }
@@ -274,12 +271,11 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                     throw new CustomerValidationException(nameof(ErrorCode.MES12446));
                 }
 
-                foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes.Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue)))
+                foreach (var item in inteCodeRulesModifyDto.CodeRulesMakes
+                    .Where(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue.Trim() == "%MULTIPLE_VARIABLE%" && !string.IsNullOrEmpty(x.CustomValue))
+                    .Where(y=>y.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1)))
                 {
-                    if (item!.CustomValue!.Split(";").GroupBy(x => x).Any(g => g.Count() > 1))
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12447));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12447));
                 }
             }
 
@@ -379,7 +375,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
                 {
                     inteCodeRulesDetailViewDto.MaterialCode = material.MaterialCode;
                     inteCodeRulesDetailViewDto.MaterialName = material.MaterialName;
-                    inteCodeRulesDetailViewDto.MaterialVersion = material.Version;
+                    inteCodeRulesDetailViewDto.MaterialVersion = material.Version??"";
                 }
 
                 //查询关联的编码规则组成
@@ -399,7 +395,7 @@ ISequenceService sequenceService, AbstractValidator<InteCodeRulesCreateDto> vali
 
                 return inteCodeRulesDetailViewDto;
             }
-            return null;
+            return new InteCodeRulesDetailViewDto();
         }
     }
 }

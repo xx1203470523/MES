@@ -171,7 +171,7 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
-        /// 根据资源ID获取工序 
+        /// 根据资源ID获取工序（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

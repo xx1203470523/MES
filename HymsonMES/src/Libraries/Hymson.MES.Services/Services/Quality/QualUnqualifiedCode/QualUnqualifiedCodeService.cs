@@ -61,11 +61,11 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="pram"></param>
+        /// <param name="qualUnqualifiedCodePagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto pram)
+        public async Task<PagedInfo<QualUnqualifiedCodeDto>> GetPageListAsync(QualUnqualifiedCodePagedQueryDto qualUnqualifiedCodePagedQueryDto)
         {
-            var qualUnqualifiedCodePagedQuery = pram.ToQuery<QualUnqualifiedCodePagedQuery>();
+            var qualUnqualifiedCodePagedQuery = qualUnqualifiedCodePagedQueryDto.ToQuery<QualUnqualifiedCodePagedQuery>();
             qualUnqualifiedCodePagedQuery.SiteId = _currentSite.SiteId ?? 0; 
             var pagedInfo = await _qualUnqualifiedCodeRepository.GetPagedInfoAsync(qualUnqualifiedCodePagedQuery);
 

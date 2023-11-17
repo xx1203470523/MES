@@ -237,6 +237,12 @@
         public const string MES10527 = "数据类型不合法";
         public const string MES10528 = "条码不在当前工序";
         public const string MES10529 = "没有当前条码与工序的产品参数收集组";
+        public const string MES10530 = "条码或载具编码不能为空";
+        public const string MES10531 = "条码[{sfc}]没有找到对应的生产信息";
+        public const string MES10532 = "条码[{sfc}]不在当前工序";
+        public const string MES10533 = "条码[{sfc}]不在当前工序活动";
+        public const string MES10534 = "有条码不是同一个产品";
+        public const string MES10535 = "载具没有绑定条码";
 
         #endregion
 
@@ -377,6 +383,7 @@
         public const string MES11312 = "分选规则版本长度为10";
         public const string MES11313 = "分选规则备注长度为255";
         public const string MES11314 = "参数集合中有交集";
+        public const string MES11315 = "查询产品分选条码不能为空";
         #endregion
 
         #region 降级录入/移除 11400
@@ -904,7 +911,10 @@
         public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
-        public const string MES16364= "未找到条码的产品参数信息！";
+        public const string MES16364 = "未找到条码的产品参数信息！";
+        public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
+        public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
+        public const string MES16367 = "条码【{SFC}】所记录的工单不存在";
         #endregion
 
         #region 工单激活 MES16400

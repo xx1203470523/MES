@@ -31,8 +31,13 @@ namespace Hymson.MES.Data.Repositories.Process
         public long? ProcedureId { get; set;}
 
         /// <summary>
-        /// 状态 0-未启用  1-启用
+        /// 是否启用
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 物料Ids
+        /// </summary>
+        public IEnumerable<long>? MaterialIds { get; set; }
     }
 }

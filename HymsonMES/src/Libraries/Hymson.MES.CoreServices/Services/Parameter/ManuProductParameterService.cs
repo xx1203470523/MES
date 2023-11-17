@@ -1,7 +1,6 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Parameter;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
@@ -10,7 +9,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
-using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.CoreServices.Services.Parameter
 {
@@ -77,6 +75,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
 
             List<ManuProductParameterEntity> list = new();
             var errorParameter = new List<string>();
+
             foreach (var parameter in bo.Parameters)
             {
                 var parameterEntity = parameterEntities.FirstOrDefault(x => x.ParameterCode == parameter.ParameterCode);
@@ -85,10 +84,11 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     errorParameter.Add(parameter.ParameterCode);
                     continue;
                 }
-                var entity = new ManuProductParameterEntity
+
+                list.AddRange(bo.SFCs.Select(SFC => new ManuProductParameterEntity
                 {
                     ProcedureId = bo.ProcedureId,
-                    SFC = bo.SFC,
+                    SFC = SFC,
                     ParameterId = parameterEntity.Id,
                     ParameterValue = parameter.ParameterValue,
                     CollectionTime = bo.Time,
@@ -98,8 +98,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                     CreatedOn = bo.Time,
                     UpdatedOn = bo.Time,
                     Id = IdGenProvider.Instance.CreateId()
-                };
-                list.Add(entity);
+                }));
             }
 
             if (errorParameter.Any())
@@ -107,10 +106,12 @@ namespace Hymson.MES.CoreServices.Services.Parameter
                 throw new CustomerValidationException(nameof(ErrorCode.MES19601))
                     .WithData("ParameterCodes", string.Join(",", errorParameter));
             }
+
             using var trans = TransactionHelper.GetTransactionScope();
             var row = await _manuProductParameterRepository.InsertRangeAsync(list);
             trans.Complete();
             return row;
         }
+
     }
 }

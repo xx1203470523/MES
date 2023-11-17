@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -236,6 +237,24 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 产品序列码
         /// </summary>
         public string Sfc { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+    }
+
+    public class ProcProductParameterGroupToParameterCollectionQueryDto
+    {
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public string[] Sfcs { get; set; }
 
         /// <summary>
         /// 工序ID
