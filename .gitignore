@@ -406,3 +406,4 @@ dist-ssr
 *-lock.*
 pnpm-debug
 /HymsonMES/src/Libraries/Hymson.MES.ServicesTests/Hymson.MES.ServicesTests.csproj
+/HymsonMES/src/Presentation/Hymson.MES.Equipment.Api/.config/dotnet-tools.json
