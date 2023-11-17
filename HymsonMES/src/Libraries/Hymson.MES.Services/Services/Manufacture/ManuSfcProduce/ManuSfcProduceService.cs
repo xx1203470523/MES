@@ -1516,6 +1516,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Id = item.Id,
                         Sfc = item.Sfc,
                         Lock = item.Lock,
+                        ProcessRouteId= item.ProcessRouteId,
                         LockProductionId = item.LockProductionId,
                         ProductBOMId = item.ProductBOMId,
                         ProcedureId = item.ProcedureId,
