@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
@@ -72,20 +65,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto);
-
-        /// <summary>
-        /// 进站（接口）
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> InStationAsync(InStationRequestDto dto);
-
-        /// <summary>
-        /// 出站（接口）
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> OutStationAsync(OutStationRequestDto dto);
 
         /// <summary>
         /// 参数收集（点击）

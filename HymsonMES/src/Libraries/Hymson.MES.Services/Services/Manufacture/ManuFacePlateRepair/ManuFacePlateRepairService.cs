@@ -592,25 +592,22 @@ namespace Hymson.MES.Services.Services.Manufacture
                         continue;
                     }
 
-                    if (confirmSubmitDto.ProcedureId == endProcessRouteDetailId)
+                    if (confirmSubmitDto.ProcedureId == endProcessRouteDetailId && item.IsClose == ProductBadRecordStatusEnum.Open)
                     {
-                        if (item.IsClose == ProductBadRecordStatusEnum.Open)
+                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                         {
-                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.UnqualifiedCode}
-                        };
-                            }
-                            else
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.UnqualifiedCode);
-                            }
-                            validationFailure.ErrorCode = nameof(ErrorCode.MES17307);
-                            validationFailures.Add(validationFailure);
-                            continue;
+                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+                                {
+                                    { "CollectionIndex", item.UnqualifiedCode}
+                                };
                         }
-
+                        else
+                        {
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.UnqualifiedCode);
+                        }
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES17307);
+                        validationFailures.Add(validationFailure);
+                        continue;
                     }
 
                     if (item.IsClose == ProductBadRecordStatusEnum.Close)

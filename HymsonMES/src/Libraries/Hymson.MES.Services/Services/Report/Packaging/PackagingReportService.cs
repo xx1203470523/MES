@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Report
                 barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
                 if (barcodeEntity == null)
                 {
-                    return null;
+                    return new ManuContainerBarcodeViewDto();
                 }
             }
             else
@@ -86,13 +86,13 @@ namespace Hymson.MES.Services.Services.Report
                 var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(query);
                 if (containerPackEntity == null)
                 {
-                    return null;
+                    return new ManuContainerBarcodeViewDto();
                 }
 
                 barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId);
                 if (barcodeEntity == null)
                 {
-                    return null;
+                    return new ManuContainerBarcodeViewDto();
                 }
             }
 

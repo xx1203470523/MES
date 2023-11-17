@@ -301,15 +301,12 @@ namespace Hymson.MES.Services.Services.Integrated
                     repeats = hasCodeRulesEntities.Where(x => x.CodeType == CodeRuleCodeTypeEnum.PackagingSeqCode && x.PackType == inteCodeRulesModifyDto.PackType).ToList();
                 }
 
-                if (repeats != null && repeats.Any())
+                if (repeats != null && repeats.Any() && !(repeats.Count() == 1 && repeats.First().Id == inteCodeRulesModifyDto.Id)) //去掉当前修改的数据的
                 {
-                    if (!(repeats.Count() == 1 && repeats.First().Id == inteCodeRulesModifyDto.Id)) //去掉当前修改的数据的
-                    {
-                        if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
-                            throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesModifyDto.ProductId);
-                        else
-                            throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesModifyDto.ProductId);
-                    }
+                    if (inteCodeRulesModifyDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesModifyDto.ProductId);
+                    else
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesModifyDto.ProductId);
                 }
             }
 

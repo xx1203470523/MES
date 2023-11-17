@@ -102,7 +102,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 return inteJobEntity.ToModel<InteJobDto>();
             }
-            return null;
+            return new InteJobDto();
         }
 
         /// <summary>

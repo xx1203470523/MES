@@ -404,7 +404,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             requestBo.InStationRequestBos = inStationRequestBos;
             requestBo.OutStationRequestBos = outStationRequestBos;
 
-            // 执行Job
+            // 执行Job（后面考虑改为调用ManuPassStationService类的封装方法）
             var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), requestBo);
             foreach (var item in jobResponses)
             {
@@ -418,130 +418,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Time = item.Value.Time
                 });
             }
-            return result;
-        }
-
-        /// <summary>
-        /// 进站（接口）
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(InStationRequestDto dto)
-        {
-            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
-
-            var boResult = new Dictionary<string, JobResponseBo> { };
-            switch (dto.Type)
-            {
-                case ManuFacePlateBarcodeTypeEnum.Product:
-                    var sfcCodes = dto.Params;
-                    if (sfcCodes == null || !sfcCodes.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
-                    }
-
-                    boResult = await _manuPassStationService.InStationRangeBySFCAsync(new SFCInStationBo
-                    {
-                        SiteId = _currentSite.SiteId ?? 0,
-                        UserName = _currentUser.UserName,
-                        ProcedureId = dto.ProcedureId,
-                        ResourceId = dto.ResourceId,
-                        SFCs = sfcCodes
-                    });
-                    break;
-                case ManuFacePlateBarcodeTypeEnum.Vehicle:
-                    var vehicleCodes = dto.Params;
-                    if (vehicleCodes == null || !vehicleCodes.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
-                    }
-
-                    boResult = await _manuPassStationService.InStationRangeByVehicleAsync(new VehicleInStationBo
-                    {
-                        SiteId = _currentSite.SiteId ?? 0,
-                        UserName = _currentUser.UserName,
-                        ProcedureId = dto.ProcedureId,
-                        ResourceId = dto.ResourceId,
-                        VehicleCodes = vehicleCodes
-                    });
-                    break;
-                default:
-                    break;
-            }
-
-            foreach (var item in boResult)
-            {
-                result.Add(item.Key, new JobResponseDto
-                {
-                    Rows = item.Value.Rows,
-                    Content = item.Value.Content,
-                    Message = item.Value.Message,
-                    Time = item.Value.Time
-                });
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// 出站（接口）
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(OutStationRequestDto dto)
-        {
-            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
-
-            var boResult = new Dictionary<string, JobResponseBo> { };
-            switch (dto.Type)
-            {
-                case ManuFacePlateBarcodeTypeEnum.Product:
-                    var sfcCodes = dto.Params;
-                    if (sfcCodes == null || !sfcCodes.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", "");
-                    }
-
-                    boResult = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
-                    {
-                        SiteId = _currentSite.SiteId ?? 0,
-                        UserName = _currentUser.UserName,
-                        ProcedureId = dto.ProcedureId,
-                        ResourceId = dto.ResourceId,
-                        SFCs = sfcCodes
-                    });
-                    break;
-                case ManuFacePlateBarcodeTypeEnum.Vehicle:
-                    var vehicleCodes = dto.Params;
-                    if (vehicleCodes == null || !vehicleCodes.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
-                    }
-
-                    boResult = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
-                    {
-                        SiteId = _currentSite.SiteId ?? 0,
-                        UserName = _currentUser.UserName,
-                        ProcedureId = dto.ProcedureId,
-                        ResourceId = dto.ResourceId,
-                        VehicleCodes = vehicleCodes
-                    });
-                    break;
-                default:
-                    break;
-            }
-
-            foreach (var item in boResult)
-            {
-                result.Add(item.Key, new JobResponseDto
-                {
-                    Rows = item.Value.Rows,
-                    Content = item.Value.Content,
-                    Message = item.Value.Message,
-                    Time = item.Value.Time
-                });
-            }
-
             return result;
         }
 

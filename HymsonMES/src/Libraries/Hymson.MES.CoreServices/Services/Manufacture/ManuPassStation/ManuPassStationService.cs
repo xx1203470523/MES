@@ -125,14 +125,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 ResourceId = bo.ResourceId
             };
 
-            List<string> SFCs = new();
-            List<OutStationRequestBo> outStationRequestBos = new();
-
-            SFCs = bo.SFCs.ToList();
-            outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
-
-            requestBo.SFCs = SFCs;  // 这句后面要改
-            requestBo.OutStationRequestBos = outStationRequestBos;
+            requestBo.SFCs = bo.OutStationRequestBos.Select(s => s.SFC);
+            requestBo.OutStationRequestBos = bo.OutStationRequestBos;
 
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "OutStationJobService" });
@@ -158,11 +152,28 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             };
 
             // 根据载具代码获取载具里面的条码
-            var vehicleSFCs = await GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = bo.VehicleCodes });
+            var vehicleCodes = bo.OutStationRequestBos.Select(s => s.VehicleCode ?? "").Where(w => !string.IsNullOrWhiteSpace(w));
+            if (vehicleCodes == null) return new Dictionary<string, JobResponseBo>();
+            var vehicleSFCs = await GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = vehicleCodes });
+
+            List<OutStationRequestBo> outStationRequestBos = new();
+            foreach (var item in vehicleSFCs)
+            {
+                var outStationRequestBo = bo.OutStationRequestBos.FirstOrDefault(f => f.VehicleCode == item.VehicleCode);
+                if (outStationRequestBo == null) continue;
+
+                outStationRequestBos.Add(new OutStationRequestBo
+                {
+                    SFC = item.SFC,
+                    VehicleCode = item.VehicleCode,
+                    IsQualified = outStationRequestBo.IsQualified,
+                    ConsumeList = outStationRequestBo.ConsumeList,
+                    OutStationUnqualifiedList = outStationRequestBo.OutStationUnqualifiedList
+                });
+            }
 
             requestBo.SFCs = vehicleSFCs.Select(s => s.SFC);
-            requestBo.OutStationRequestBos = vehicleSFCs.Select(s => new OutStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode });
-
+            requestBo.OutStationRequestBos = outStationRequestBos;
 
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "OutStationJobService" });
