@@ -196,28 +196,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         }
 
         /// <summary>
-        /// 检查条码是否可以执行某流程
-        /// </summary>
-        /// <param name="bo"></param>
-        /// <param name="sfcCirculationType"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckSFCIsCanDoneStepAsync(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType)
-        {
-            if (bo == null) return false;
-
-            // 读取指定类型的流转信息
-            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new Data.Repositories.Manufacture.ManuSfcCirculation.Query.ManuSfcCirculationQuery
-            {
-                SiteId = _currentSite.SiteId ?? 0,
-                Sfc = bo.SFC,
-                CirculationTypes = new SfcCirculationTypeEnum[] { sfcCirculationType }
-            });
-
-            if (manuSfcCirculationEntities == null || !manuSfcCirculationEntities.Any()) return true;
-            return false;
-        }
-
-        /// <summary>
         /// 获取生产条码信息
         /// </summary>
         /// <param name="sfc"></param>

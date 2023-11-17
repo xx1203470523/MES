@@ -1,4 +1,4 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -83,7 +83,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// <summary>
         /// 条码类型
         /// </summary>
-        public CodeTypeEnum Type { get; set; } = CodeTypeEnum.SFC;
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
 
         /// <summary>
         /// 当前时间
