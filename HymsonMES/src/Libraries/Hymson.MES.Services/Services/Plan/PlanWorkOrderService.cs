@@ -562,6 +562,8 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     planWorkOrderDetailView.MaterialCode = material.MaterialCode;
                     planWorkOrderDetailView.MaterialVersion = material.Version!;
+                    planWorkOrderDetailView.MaterialName = material.MaterialName;
+                    planWorkOrderDetailView.MaterialUnit = material.Unit;
                 }
 
                 //关联BOM

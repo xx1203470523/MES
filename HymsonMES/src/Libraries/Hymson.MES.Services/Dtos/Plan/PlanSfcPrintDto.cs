@@ -1,10 +1,11 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 
 namespace Hymson.MES.Services.Dtos.Plan
 {
     /// <summary>
-    /// 条码表Dto
+    /// 条码分页查询Dto
     /// </summary>
     public class PlanSfcPrintPagedQueryDto : PagerInfo
     {
@@ -22,6 +23,17 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 是否使用
         /// </summary>
         public YesOrNoEnum? IsUsed { get; set; }
+    }
+
+    /// <summary>
+    /// 条码查询Dto
+    /// </summary>
+    public class PlanSfcPrintQueryDto
+    {
+        /// <summary>
+        /// 条码id组
+        /// </summary>
+        public IEnumerable<CreateBarcodeByWorkOrderOutputBo>? Datas { get; set; }
     }
 
     /// <summary>
@@ -93,7 +105,7 @@ namespace Hymson.MES.Services.Dtos.Plan
     }
 
     /// <summary>
-    /// 
+    /// 条码下达且打印Dto
     /// </summary>
     public record PlanSfcPrintCreatePrintDto : BaseEntityDto
     {
