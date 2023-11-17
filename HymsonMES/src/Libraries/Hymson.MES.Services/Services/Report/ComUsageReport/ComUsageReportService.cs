@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Services.Report
                 var product = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
                 var circulationProduct= materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.CirculationProductId) : null;
 
-                var workOrder = materials != null && materials.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
+                var workOrder = materials != null && materials.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
 
                 listDto.Add(new ComUsageReportViewDto()
                 {

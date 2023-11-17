@@ -250,6 +250,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
                     var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduceEntity.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("InProcedure", inProcedureEntity.Code);
                     validationFailure.FormattedMessagePlaceholderValues.Add("OutProcedure", outProcedureEntity.Code);
@@ -269,16 +270,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderIds = sfcProduceEntities.Select(s => s.WorkOrderId)
             });
 
-            /*
-            // 验证BOM主物料数量
-            await _manuCommonService.VerifyBomQtyAsync(new ManuProcedureBomBo
-            {
-                SiteId = commonBo.SiteId,
-                SFCs = commonBo.SFCs,
-                ProcedureId = commonBo.ProcedureId,
-                BomId = firstProduceEntity.ProductBOMId
-            });
-            */
         }
 
         /// <summary>
@@ -384,8 +375,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && !requestBo.IsQualified.Value)
                 {
-                    // 不合格出站（欣世界特有）
-                    //responseBo = await OutStationForUnQualifiedProcedureXinShiJieAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
 
                     // 不合格出站
                     responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
@@ -1332,8 +1321,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     // 因为每次不一定是只产出一个，所以也要*数量
                     item.Usages = consume.ConsumeQty.Value * sfcProduceEntity.Qty;
-                    //item.ConsumeRatio = 100;
-                    //item.Loss = 0;
                 }
 
                 // 如果不保留替代品（如果保留，就删除这句）

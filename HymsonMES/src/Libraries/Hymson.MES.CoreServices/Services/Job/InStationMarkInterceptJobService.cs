@@ -6,17 +6,22 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 
     /// </summary>
-    [Job("进站拦截", JobTypeEnum.Standard)]
-    public class InStationInterceptJobService : IJobService
+    [Job("NG标识拦截", JobTypeEnum.Standard)]
+    public  class InStationMarkInterceptJobService : IJobService
     {
         /// <summary>
         /// 仓储接口（产品不良录入）
@@ -34,7 +39,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
-        public InStationInterceptJobService(IManuProductBadRecordRepository manuProductBadRecordRepository,
+        public InStationMarkInterceptJobService(IManuProductBadRecordRepository manuProductBadRecordRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
@@ -89,7 +94,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
             if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any()) return default;
 
-            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect))
+            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Identification))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
             }

@@ -83,7 +83,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             var sfcs = commonBo.InStationRequestBos.Select(s => s.SFC);
             // 验证DTO
-            if (sfcs == null || sfcs.Count() == 0)
+            if (!sfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
@@ -92,6 +92,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
 
             // 获取生产条码信息
+            if(commonBo.Proxy==null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
+            }
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
@@ -155,7 +159,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             var sfcs = commonBo.InStationRequestBos.Select(s => s.SFC);
             // 验证DTO
-            if (sfcs == null || sfcs.Count() == 0)
+            if (!sfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15400));
             }
@@ -163,6 +167,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
             // 获取条码信息
+            if(commonBo.Proxy==null)
+            {
+                return default;
+            }
             var sfcProduceEntities = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             {
@@ -180,7 +188,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 MaterialIds = productIds
             };
             var procSortingRules = await commonBo.Proxy.GetDataBaseValueAsync(_masterDataService.GetSortingRulesAsync, query);
-            if (procSortingRules == null || procSortingRules.Any() == false)
+            if (procSortingRules == null || !procSortingRules.Any())
             {
                 return default;
             }
@@ -335,7 +343,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //再查找范围在这个范围内的,根据类型取<还是小于等于
-            // procSortingRules = procSortingRules.Where(x => x.MinContainingType.HasValue && x.MaxContainingType.HasValue).ToList();
             if (procSortingRules == null || !procSortingRules.Any())
             {
                 return procSortingRuleDetail;

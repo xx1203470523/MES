@@ -9,7 +9,7 @@ namespace Hymson.MES.Core.Constants.Parameter
     /// <summary>
     /// 设备参数
     /// </summary>
-    public  class EquipmentParameter
+    public static class EquipmentParameter
     {
         /// <summary>
         /// 设备参数表  

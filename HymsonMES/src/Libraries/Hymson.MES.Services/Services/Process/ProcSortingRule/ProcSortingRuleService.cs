@@ -313,6 +313,7 @@ namespace Hymson.MES.Services.Services.Process
             procSortingRuleEntity.Remark = procSortingRuleModifyDto.Remark;
             procSortingRuleEntity.UpdatedBy = _currentUser.UserName;
             procSortingRuleEntity.UpdatedOn = HymsonClock.Now();
+            procSortingRuleEntity.IsDefaultVersion = procSortingRuleModifyDto.IsDefaultVersion;
             ProcSortingRuleEntity? procSortingRuleDefaultEntity = null;
             if (procSortingRuleEntity.IsDefaultVersion ?? false)
             {

@@ -85,6 +85,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
 
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -418,7 +419,7 @@ namespace Hymson.MES.Services.Services.Process
                 });
 
                 sfcs = vehicleFreightStackEntities.Select(s => s.BarCode).ToArray();
-                if (sfcs==null||sfcs.Length == 0) 
+                if (sfcs == null || sfcs.Length == 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10535));
                 }
@@ -434,7 +435,7 @@ namespace Hymson.MES.Services.Services.Process
                 Sfcs = sfcs,
             });
 
-            if (sfcProduces == null || sfcProduces.Count()==0)
+            if (sfcProduces == null || sfcProduces.Count() == 0)
             {
                 throw new CustomerValidationException(ErrorCode.MES16600);
             }
@@ -448,17 +449,17 @@ namespace Hymson.MES.Services.Services.Process
             var notCurrentProcedureSfcproduces = sfcProduces.Where(x => x.ProcedureId != queryDto.ProcedureId);
             if (notCurrentProcedureSfcproduces.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES10532).WithData("sfc", string.Join(",", notCurrentProcedureSfcproduces.Select(x=>x.SFC)));
+                throw new CustomerValidationException(ErrorCode.MES10532).WithData("sfc", string.Join(",", notCurrentProcedureSfcproduces.Select(x => x.SFC)));
             }
             var notActivitySfcs = sfcProduces.Where(x => x.Status != SfcStatusEnum.Activity);
             if (notActivitySfcs.Any())
             {
-                throw new CustomerValidationException(ErrorCode.MES10533).WithData("sfc", string.Join(",", notActivitySfcs.Select(x=>x.SFC)));
+                throw new CustomerValidationException(ErrorCode.MES10533).WithData("sfc", string.Join(",", notActivitySfcs.Select(x => x.SFC)));
             }
 
             //检测这些条码是不是同一个产品
             var sfcsProductGroup = sfcProduces.GroupBy(x => x.ProductId);
-            if (sfcsProductGroup.Count() > 1) 
+            if (sfcsProductGroup.Count() > 1)
             {
                 throw new CustomerValidationException(ErrorCode.MES10534);
             }

@@ -138,7 +138,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 SiteId = multiSFCBo.SiteId,
                 Sfcs = multiSFCBo.SFCs
             });
-            //var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, multiSFCBo);
 
             var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetManuSfcEntitiesAsync, new ManuSfcQuery { SiteId = multiSFCBo.SiteId, SFCs = multiSFCBo.SFCs });
 
@@ -393,14 +392,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 throw new ValidationException(commonBo.LocalizationService.GetResource("SFCError"), validationFailures);
             }
-
-            /*
-            // 手动写进缓存
-            var func = _masterDataService.GetProduceEntitiesBySFCsWithCheckAsync;
-            var paramString = multiSFCBo.ToSerialize();
-            var cacheKey = (uint)$"{func.Method.DeclaringType?.FullName}.{func.Method.Name}{paramString}".GetHashCode();
-            commonBo.Proxy.Set(cacheKey, manuSfcProduceList);
-            */
 
             return new BarcodeSfcReceiveResponseBo
             {

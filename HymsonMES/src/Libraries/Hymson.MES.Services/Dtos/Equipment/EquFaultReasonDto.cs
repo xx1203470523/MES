@@ -23,10 +23,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string FaultReasonName { get; set; }
 
-        ///// <summary>
-        ///// 故障原因状态（字典定义）
-        ///// </summary>
-        //public SysDataStatusEnum? UseStatus { get; set; }
 
         /// <summary>
         /// 说明

@@ -62,7 +62,6 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("ParameterGroupId in @ParameterGroupIds");
             }
 
-            // sqlBuilder.OrderBy("Sort");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProductParameterGroupDetailEntity>(template.RawSql, query);
         }

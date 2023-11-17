@@ -290,12 +290,6 @@ namespace Hymson.MES.Services.Services.Integrated
             #region 处理数据
             if (inteVehicleTypeEntitys.Any()) 
             {
-                //批量查询物料
-                //var materialIds = inteVehicleTypeEntitys.Where(x => x.Type == VehicleTypeVerifyTypeEnum.Material).Select(x => x.VerifyId).Distinct().ToArray();
-                //var materials = new List<ProcMaterialEntity>();
-                //if(materialIds.Any())
-                //    materials = (await _procMaterialRepository.GetByIdsAsync(materialIds)).ToList();
-
                 var materials = await _procMaterialRepository.GetByIdsAsync(inteVehicleTypeEntitys.Where(x => x.Type == VehicleTypeVerifyTypeEnum.Material).Select(x => x.VerifyId).Distinct().ToArray());
 
                 //批量查询物料组

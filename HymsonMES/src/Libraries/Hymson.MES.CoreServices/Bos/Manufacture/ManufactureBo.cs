@@ -34,11 +34,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public long ResourceId { get; set; }
 
-        /// <summary>
-        /// 产品条码
-        /// </summary>
-        public string SFC { get; set; } = "";
-
     }
 
     /// <summary>
@@ -108,7 +103,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 扣料
     /// </summary>
-    public class MaterialDeductResponseSummaryBo 
+    public class MaterialDeductResponseSummaryBo
     {
         /// <summary>
         /// 即将扣料的物料数据
@@ -162,7 +157,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// </summary>
         public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
-
 
     /// <summary>
     /// 容器包装

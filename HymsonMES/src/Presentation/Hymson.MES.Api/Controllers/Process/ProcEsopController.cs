@@ -15,6 +15,7 @@ using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
@@ -38,6 +39,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（ESOP）
         /// </summary>
         /// <param name="procEsopService"></param>
+        /// <param name="logger"></param>
         public ProcEsopController(IProcEsopService procEsopService, ILogger<ProcEsopController> logger)
         {
             _procEsopService = procEsopService;
@@ -55,6 +57,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("pagelist")]
         public async Task<PagedInfo<ProcEsopDto>> QueryPagedProcEsopAsync([FromQuery] ProcEsopPagedQueryDto parm)
         {
+            _logger.LogDebug(parm.ToString());
             return await _procEsopService.GetPagedListAsync(parm);
         }
 
