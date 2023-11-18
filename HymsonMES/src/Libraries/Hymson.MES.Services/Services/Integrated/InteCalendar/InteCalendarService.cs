@@ -108,19 +108,6 @@ namespace Hymson.MES.Services.Services.Integrated.InteCalendar
                     // TODO 错误码
                     return 0;
 
-                    // 判断同一线体、设备只能有一个日历
-                    //var msg = "";
-                    //if (entity.CalendarType == ((int)CalendarTypeEnum.Equipment).ToString())
-                    //{
-                    //    msg = "设备";
-                    //}
-                    //else
-                    //{
-                    //    msg = "线体";
-                    //}
-
-                    //responseDto.Msg = $"选择的{msg}在系统已经有启用的日历存在！";
-                    //return responseDto;
                 }
             }
 
