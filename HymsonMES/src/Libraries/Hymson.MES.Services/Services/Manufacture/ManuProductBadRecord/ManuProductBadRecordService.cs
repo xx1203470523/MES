@@ -225,7 +225,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcScrapEntities = new List<ManuSfcScrapEntity>();
             var manuSfcProduceList = new List<ManuSfcProduceEntity>();
             var scrapByIdCommands = new List<ScrapManuSfcByIdCommand>();
-            var sfcList = new List<string>();
             var updateStatusByBarCodeCommands = new List<UpdateStatusByBarCodeCommand>();
             var updateManuSfcProduceStatusByIdCommands = new List<UpdateManuSfcProduceStatusByIdCommand>();
             bool isScrap = qualUnqualifiedCodes.Any(x => x.UnqualifiedCode.ToUpperInvariant() == ManuProductBadRecord.ScrapCode);
@@ -837,7 +836,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task BadReJudgmentAsync(BadReJudgmentDto badReJudgmentDto)
         {
             if (string.IsNullOrWhiteSpace(badReJudgmentDto.Sfc)) throw new CustomerValidationException(nameof(ErrorCode.MES15400));
-            //if (!badReJudgmentDto.UnqualifiedLists.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15405));
 
             var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery
             {
@@ -951,11 +949,6 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (diffArr.Any())//为全部关闭不合格代码
             {
-                //if (!badReJudgmentDto.BadProcessRouteId.HasValue || badReJudgmentDto.BadProcessRouteId == 0)
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15408));
-                //}
-
                 var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
 
                 if (manuSfcProduceEntity == null)//完成品返修
@@ -1135,7 +1128,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
                 else
                 {
-                    //var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
                     // 末尾工序在制完成
                     if (manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
                     {

@@ -80,8 +80,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="manuPassStationService"></param>
         /// <param name="manuProductParameterService"></param>
         /// <param name="inteJobRepository"></param>
-        /// <param name="inteVehicleRepository"></param>
-        /// <param name="inteVehiceFreightStackRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="executeJobService"></param>
