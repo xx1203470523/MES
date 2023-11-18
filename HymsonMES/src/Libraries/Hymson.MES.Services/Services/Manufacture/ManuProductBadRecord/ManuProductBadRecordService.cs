@@ -40,6 +40,7 @@ using Newtonsoft.Json;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
+using System.Linq;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -846,6 +847,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             );
 
+            var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
+            {
+                Sfc = badReJudgmentDto.Sfc,
+                SiteId = _currentSite.SiteId ?? 0
+            });
+
+            //返修中无需复判
+            if (manuSfcProduceEntity != null && (manuSfcProduceEntity.IsRepair ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15424));
+            }
+
             var badRecordList = await _manuProductBadRecordRepository.GetBadRecordsBySfcAsync(new ManuProductBadRecordQuery
             {
                 SFC = badReJudgmentDto.Sfc,
@@ -857,6 +870,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (badRecordList == null || !badRecordList.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15423));
+            }
+
+            if (badRecordList.Any(o =>! badReJudgmentDto.UnqualifiedLists.Select(x => x.UnqualifiedId).Contains(o.UnqualifiedId)))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15428));
             }
 
             //报废验证
@@ -872,18 +890,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
-
-            var manuSfcProduceEntity = await _manuSfcProduceRepository.GetBySFCAsync(new ManuSfcProduceBySfcQuery
-            {
-                Sfc = badReJudgmentDto.Sfc,
-                SiteId = _currentSite.SiteId ?? 0
-            });
-
-            //返修中无需复判
-            if (manuSfcProduceEntity != null && (manuSfcProduceEntity.IsRepair ?? TrueOrFalseEnum.No) == TrueOrFalseEnum.Yes)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15424));
-            }
 
             //步骤表-复判
             var manuSfcStepEntity = new ManuSfcStepEntity
@@ -904,14 +910,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 CreatedOn = HymsonClock.Now(),
                 CreatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
+                Remark= badReJudgmentDto.Remark,
                 UpdatedBy = _currentUser.UserName,
             };
 
             //判断是否关闭所有不合格信息
-            var allunqualifiedIds = badRecordList.Select(x => x.UnqualifiedId.ParseToLong()).Distinct().ToArray();
-            var closeunqualifiedIds = badReJudgmentDto.UnqualifiedLists.Select(x => x.UnqualifiedId).ToList();
-            var diffArr = allunqualifiedIds.Where(x => !closeunqualifiedIds.Contains(x)).ToArray();
-
             var updateCommandList = new List<ManuProductBadRecordCommand>();
 
             foreach (var unqualified in badReJudgmentDto.UnqualifiedLists)
@@ -931,7 +934,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ReJudgmentOn = HymsonClock.Now()
                 };
 
-                if (closeunqualifiedIds.Contains(unqualified.UnqualifiedId))
+                if (unqualified.IsColsed??false)
+                {
+                    manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Open;
+                    manuProductBadRecordCommand.ReJudgmentResult = ProductBadDisposalResultEnum.ReJudgmentRepair;
+                }
+                else
                 {
                     manuProductBadRecordCommand.ReJudgmentSfcStepId = manuSfcStepEntity.Id;
                     manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Close;
@@ -941,21 +949,108 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuProductBadRecordCommand.ReJudgmentBy = _currentUser.UserName;
                     manuProductBadRecordCommand.ReJudgmentOn = HymsonClock.Now();
                 }
-                else
-                {
-                    manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Open;
-                    manuProductBadRecordCommand.ReJudgmentResult = ProductBadDisposalResultEnum.ReJudgmentRepair;
-                }
                 updateCommandList.Add(manuProductBadRecordCommand);
             }
 
-            if (diffArr.Any())//为全部关闭不合格代码
+            if (badReJudgmentDto.UnqualifiedLists.Any(x=>!(x.IsColsed??false)))//存在未关闭的不合格代码
             {
-                //if (!badReJudgmentDto.BadProcessRouteId.HasValue || badReJudgmentDto.BadProcessRouteId == 0)
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15408));
-                //}
+                if (manuSfcProduceEntity == null)
+                {
+                    using (var trans = TransactionHelper.GetTransactionScope())
+                    {
+                        //处理不合格信息
+                        var row = await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
+                        if (row != updateCommandList.Count)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15425));
+                        }
+                        await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
+                        trans.Complete();
+                    }
+                }
+                else
+                {
+                    //var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
+                    // 末尾工序在制完成
+                    if (manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
+                    {
+                        var manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
+                        {
+                            Id = manuSfcProduceEntity.SFCId,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                            Status = SfcStatusEnum.Complete,
+                            CurrentStatus = manuSfcProduceEntity.Status
+                        };
 
+                        var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
+                        var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcProduceEntity.WorkOrderId);
+                        var whMaterialInventoryEntity = new WhMaterialInventoryEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SupplierId = 0,//自制品 没有
+                            MaterialId = manuSfcProduceEntity.ProductId,
+                            MaterialBarCode = procMaterialEntity.MaterialCode,
+                            Batch = "",//自制品 没有
+                            MaterialType = planWorkOrderEntity.ProductId == procMaterialEntity.Id ? MaterialInventoryMaterialTypeEnum.FinishedParts : MaterialInventoryMaterialTypeEnum.SelfMadeParts,
+                            QuantityResidue = manuSfcProduceEntity.Qty,
+                            Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                            Source = MaterialInventorySourceEnum.Disassembly,
+                            SiteId = manuSfcProduceEntity.SiteId,
+                            CreatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                        };
+                        using (var trans = TransactionHelper.GetTransactionScope())
+                        {
+                            //处理不合格信息
+                            var row = await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
+                            if (row != updateCommandList.Count)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES15425));
+                            }
+                            //条码修改为已完成状态
+                            row = await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
+                            if (row != 1)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES15426));
+                            }
+                            //删除在制品信息
+                            await _manuSfcProduceRepository.DeleteAsync(manuSfcProduceEntity.Id);
+
+                            //记录step信息
+                            await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
+
+                            await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
+                            trans.Complete();
+                        }
+                    }
+                    else
+                    {
+                        var CleanRepeatedCountCommand = new CleanRepeatedCountCommand
+                        {
+                            Id = manuSfcProduceEntity.Id,
+                            UpdatedBy = _currentUser.UserName,
+                            UpdatedOn = HymsonClock.Now(),
+                        };
+                        using (var trans = TransactionHelper.GetTransactionScope())
+                        {
+                            //处理不合格信息
+                            var row = await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
+                            if (row != updateCommandList.Count)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES15425));
+                            }
+                            await _manuSfcProduceRepository.CleanRepeatedCountById(CleanRepeatedCountCommand);
+                            await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
+                            trans.Complete();
+                        }
+                    }
+                }
+            }
+            else
+            {
                 var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
 
                 if (manuSfcProduceEntity == null)//完成品返修
@@ -1114,103 +1209,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                         await _manuSfcProduceRepository.InsertSfcProduceBusinessAsync(manuSfcProduceBusinessEntity);
                         await _manuSfcProduceRepository.UpdateRouteByIdAsync(manuSfcUpdateRouteByIdCommand);
                         trans.Complete();
-                    }
-                }
-            }
-            else
-            {
-                if (manuSfcProduceEntity == null)
-                {
-                    using (var trans = TransactionHelper.GetTransactionScope())
-                    {
-                        //处理不合格信息
-                        var row = await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
-                        if (row != updateCommandList.Count)
-                        {
-                            throw new CustomerValidationException(nameof(ErrorCode.MES15425));
-                        }
-                        await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
-                        trans.Complete();
-                    }
-                }
-                else
-                {
-                    //var isLast = await IsLastProcedureIdAsync(manuSfcProduceEntity.ProcessRouteId, manuSfcProduceEntity.ProcedureId);
-                    // 末尾工序在制完成
-                    if (manuSfcProduceEntity.Status == SfcStatusEnum.InProductionComplete)
-                    {
-                        var manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
-                        {
-                            Id = manuSfcProduceEntity.SFCId,
-                            UpdatedBy = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now(),
-                            Status = SfcStatusEnum.Complete,
-                            CurrentStatus = manuSfcProduceEntity.Status
-                        };
-
-                        var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcProduceEntity.ProductId);
-                        var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcProduceEntity.WorkOrderId);
-                        var whMaterialInventoryEntity = new WhMaterialInventoryEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SupplierId = 0,//自制品 没有
-                            MaterialId = manuSfcProduceEntity.ProductId,
-                            MaterialBarCode = procMaterialEntity.MaterialCode,
-                            Batch = "",//自制品 没有
-                            MaterialType = planWorkOrderEntity.ProductId == procMaterialEntity.Id ? MaterialInventoryMaterialTypeEnum.FinishedParts : MaterialInventoryMaterialTypeEnum.SelfMadeParts,
-                            QuantityResidue = manuSfcProduceEntity.Qty,
-                            Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                            Source = MaterialInventorySourceEnum.Disassembly,
-                            SiteId = manuSfcProduceEntity.SiteId,
-                            CreatedBy = _currentUser.UserName,
-                            CreatedOn = HymsonClock.Now(),
-                            UpdatedBy = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now(),
-                        };
-                        using (var trans = TransactionHelper.GetTransactionScope())
-                        {
-                            //处理不合格信息
-                            var row = await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
-                            if (row != updateCommandList.Count)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES15425));
-                            }
-                            //条码修改为已完成状态
-                            row = await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
-                            if (row != 1)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES15426));
-                            }
-                            //删除在制品信息
-                            await _manuSfcProduceRepository.DeleteAsync(manuSfcProduceEntity.Id);
-
-                            //记录step信息
-                            await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
-
-                            await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
-                            trans.Complete();
-                        }
-                    }
-                    else
-                    {
-                        var CleanRepeatedCountCommand = new CleanRepeatedCountCommand
-                        {
-                            Id = manuSfcProduceEntity.Id,
-                            UpdatedBy = _currentUser.UserName,
-                            UpdatedOn = HymsonClock.Now(),
-                        };
-                        using (var trans = TransactionHelper.GetTransactionScope())
-                        {
-                            //处理不合格信息
-                            var row = await _manuProductBadRecordRepository.UpdateStatusRangeAsync(updateCommandList);
-                            if (row != updateCommandList.Count)
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES15425));
-                            }
-                            await _manuSfcProduceRepository.CleanRepeatedCountById(CleanRepeatedCountCommand);
-                            await _manuSfcStepRepository.InsertAsync(manuSfcStepEntity);
-                            trans.Complete();
-                        }
                     }
                 }
             }
