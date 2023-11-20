@@ -270,7 +270,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var pagedInfo = await _manuSfcProduceRepository.GetPagedInfoAsync(manuSfcProducePagedQuery);
-            
+
             //实体到DTO转换 装载数据
             List<ManuSfcProduceViewDto> manuSfcProduceDtos = new List<ManuSfcProduceViewDto>();
             foreach (var item in pagedInfo.Data)
@@ -1388,6 +1388,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #endregion
+            manuSfcProduceStepList = manuSfcProduceStepList.OrderBy(a=>a.ProcedureCode).ToList();
+
             return manuSfcProduceStepList;
         }
 
@@ -1409,7 +1411,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18001));
             }
 
-            if (manuSfcs.Length != manuSfcInfos.Count())
+            if (manuSfcs.Length != manuSfcInfos.GroupBy(a => a.SFC).Count())
             {
                 var differentSfcs = manuSfcs.Where(it => !manuSfcInfos.Where(info => info.SFC.Contains(it)).Any()).Select(it => it).ToList();
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
@@ -1435,7 +1437,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 获取工艺路线（带验证） 
         /// </summary> 
         /// <returns></returns>
-        private async Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetProcessRouteNode(IEnumerable<ManuSfcView> manuSfcInfos, long processRouteId = 0)
+           private async Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetProcessRouteNode(IEnumerable<ManuSfcView> manuSfcInfos, long processRouteId = 0)
         {
             //获取工单
             var workOrderArr = manuSfcInfos.Select(it => it.WorkOrderId).Distinct().ToArray();
@@ -1757,7 +1759,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             try
             {
-                using var trans = TransactionHelper.GetTransactionScope();
+                //using var trans = TransactionHelper.GetTransactionScope();
 
                 // 写步骤
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
@@ -1847,11 +1849,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                         break;
                 }
 
-                trans.Complete();
+                //trans.Complete();
             }
             catch (Exception ex)
             {
-                _logger.LogError("SaveManuSfcProduceStepAsync,在制品步骤控制保存,写库失败:", ex);
+                _logger.LogError($"SaveManuSfcProduceStepAsync,在制品步骤控制保存,写库失败:{ex.Message}");
                 throw new CustomerValidationException(nameof(ErrorCode.MES18016));
             }
             #endregion
