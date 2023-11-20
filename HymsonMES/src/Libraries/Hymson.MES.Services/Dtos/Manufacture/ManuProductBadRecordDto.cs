@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 
@@ -311,6 +312,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 不合格代码
         /// </summary>
         public long UnqualifiedId { get; set; }
+
+        /// <summary>
+        /// 是否关闭
+        /// </summary>
+        public bool? IsColsed { get; set; }
+
         /// <summary>
         /// 备注
         /// </summary>

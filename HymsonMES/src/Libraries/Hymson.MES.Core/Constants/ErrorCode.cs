@@ -732,7 +732,7 @@
         public const string MES15425 = "不合格信息最新状态,请刷新后再次操作";
         public const string MES15426 = "条码状态不为最新新状态,请刷新后再次操作";
         public const string MES15427 = "条码工单未激活,无法取消报废";
-
+        public const string MES15428 = "数据有变动，请刷新后再操作!";
         public const string MES15430 = "载具编码不能为空";
         #endregion
 

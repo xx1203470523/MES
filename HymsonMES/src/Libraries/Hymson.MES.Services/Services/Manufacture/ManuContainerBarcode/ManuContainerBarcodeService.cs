@@ -689,7 +689,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private async Task<ManuContainerBarcodeView> CreateNewBarcodeAsync(ManuContainerBarcodeEntity manuContainerBarcodeEntity,
            long productId, long workorderId,
-           ProcMaterialEntity material, CreateManuContainerBarcodeDto createManuContainerBarcodeDto, int level = 1, ManuSfcStepEntity sfcStepEntity = null)
+           ProcMaterialEntity material, CreateManuContainerBarcodeDto createManuContainerBarcodeDto, int level = 1, ManuSfcStepEntity? sfcStepEntity = null)
         {
             manuContainerBarcodeEntity.WorkOrderId = workorderId;
             manuContainerBarcodeEntity.MaterialVersion = material.Version ?? "9999—Unknow";
@@ -721,7 +721,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var rows = 0;
                 using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                 {
-                    if (level == 1)
+                    if (level == 1 && sfcStepEntity!=null)
                     {
                         // 记录step信息
                         await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
@@ -733,7 +733,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         trans.Dispose();
                         throw new CustomerValidationException(nameof(ErrorCode.MES16721))
-                            .WithData("sfc", sfcStepEntity.SFC)
+                            .WithData("sfc", sfcStepEntity!.SFC??"")
                             .WithData("barcode", barcode);
                     }
 
@@ -781,7 +781,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var rows = 0;
                         using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                         {
-                            if (level == 1)
+                            if (level == 1 && sfcStepEntity != null)
                             {
                                 // 记录step信息
                                 await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
@@ -793,7 +793,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             {
                                 trans.Dispose();
                                 throw new CustomerValidationException(nameof(ErrorCode.MES16721))
-                                    .WithData("sfc", sfcStepEntity.SFC)
+                                    .WithData("sfc", sfcStepEntity!.SFC ?? "")
                                     .WithData("barcode", manuContainerBarcodeEntity.BarCode);
                             }
 

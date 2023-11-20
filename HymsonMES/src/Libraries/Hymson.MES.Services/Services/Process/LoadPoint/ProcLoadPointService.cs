@@ -657,15 +657,12 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var item in excelImportDtos)
             {
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
-                if (!validationResult.IsValid)
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
                 {
-                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    foreach (var validationFailure in validationResult.Errors)
                     {
-                        foreach (var validationFailure in validationResult.Errors)
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
-                            validationFailures.Add(validationFailure);
-                        }
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
                     }
                 }
                 rows++;

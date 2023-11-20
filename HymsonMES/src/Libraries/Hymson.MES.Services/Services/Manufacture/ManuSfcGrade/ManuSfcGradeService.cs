@@ -100,9 +100,9 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 foreach (var item in manuSfcGradeDetails)
                 {
-                    var procedure = procedures.Where(x => x.Id == item.ProduceId).FirstOrDefault();
+                    var procedure = procedures.FirstOrDefault(x => x.Id == item.ProduceId);
 
-                    var parameter = parameters.Where(x => x.Id == item.ParamId).FirstOrDefault();
+                    var parameter = parameters.FirstOrDefault(x => x.Id == item.ParamId);
 
                     manuSfcDetailViews.Add(new ManuSfcGradeDetailViewDto
                     {

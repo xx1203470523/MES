@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteCodeRulesMakeDto>> GetPageListAsync(InteCodeRulesMakePagedQueryDto inteCodeRulesMakePagedQueryDto)
         {
             var inteCodeRulesMakePagedQuery = inteCodeRulesMakePagedQueryDto.ToQuery<InteCodeRulesMakePagedQuery>();
-            inteCodeRulesMakePagedQuery.SiteId = _currentSite.SiteId.Value;
+            inteCodeRulesMakePagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _inteCodeRulesMakeRepository.GetPagedInfoAsync(inteCodeRulesMakePagedQuery);
 
             //实体到DTO转换 装载数据
@@ -153,7 +153,7 @@ namespace Hymson.MES.Services.Services.Integrated
            {
                return inteCodeRulesMakeEntity.ToModel<InteCodeRulesMakeDto>();
            }
-            return null;
+            return new InteCodeRulesMakeDto();
         }
     }
 }

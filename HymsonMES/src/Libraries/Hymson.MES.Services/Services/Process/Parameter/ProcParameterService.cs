@@ -262,15 +262,12 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var item in excelImportDtos)
             {
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
-                if (!validationResult.IsValid)
+                if (!validationResult.IsValid && validationResult.Errors.Any())
                 {
-                    if (validationResult.Errors.Any())
+                    foreach (var validationFailure in validationResult.Errors)
                     {
-                        foreach (var validationFailure in validationResult.Errors)
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
-                            validationFailures.Add(validationFailure);
-                        }
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
                     }
                 }
                 rows++;
@@ -366,7 +363,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="cuurrentRow"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
         {
             var validationFailure = new ValidationFailure
             {

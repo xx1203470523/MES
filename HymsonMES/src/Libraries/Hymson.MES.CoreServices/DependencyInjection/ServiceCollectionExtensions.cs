@@ -13,7 +13,6 @@ using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Validators;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,6 +62,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, BarcodeReceiveService>();
             services.AddSingleton<IJobService, InStationInterceptJobService>();
             services.AddSingleton<IJobService, InStationJobService>();
+            services.AddSingleton<IJobService, InStationMarkInterceptJobService>();
             services.AddSingleton<IJobService, IOutputModifyService>();
             services.AddSingleton<IJobService, OutStationJobService>();
             services.AddSingleton<IJobService, PackageCloseJobService>();
