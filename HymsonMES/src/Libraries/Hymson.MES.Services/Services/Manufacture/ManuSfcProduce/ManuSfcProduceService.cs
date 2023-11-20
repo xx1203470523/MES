@@ -2927,7 +2927,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var planWorkOrdersTask = _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
             //载具
             var vehicleIds = data.Select(it => it.VehicleId.GetValueOrDefault()).Distinct().ToArray();
-            var vehiclesTask = _inteVehicleRepository.GetByIdsAsync(workOrderIds);
+            var vehiclesTask = _inteVehicleRepository.GetByIdsAsync(vehicleIds);
 
             var procedures = await proceduresTask;
             var products = await productsTask;
