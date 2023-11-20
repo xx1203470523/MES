@@ -319,7 +319,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpGet("getManuSfcSelectPageList")]
+        [HttpGet("geSfcPageList")]
         public async Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync([FromQuery] ManuSfcProduceVehiclePagedQueryDto parm)
         {
             return await _manuSfcProduceService.GetManuSfcPageListAsync(parm);

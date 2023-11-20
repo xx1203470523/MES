@@ -2906,7 +2906,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             List<ManuUpdateViewDto> manuSfcProduceDtos = new List<ManuUpdateViewDto>();
             if (pagedInfo == null || !pagedInfo.Data.Any())
             {
-                return new PagedInfo<ManuUpdateViewDto>(manuSfcProduceDtos, pagedInfo!.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+                return new PagedInfo<ManuUpdateViewDto>(manuSfcProduceDtos, 1, 0, 0);
             }
 
             var data = pagedInfo.Data;
