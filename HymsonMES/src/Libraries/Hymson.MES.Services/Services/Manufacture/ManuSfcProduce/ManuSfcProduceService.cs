@@ -2325,7 +2325,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //验证必须更改了一项
             if (manuUpdateSaveDto.WorkOrderId == 0 && manuUpdateSaveDto.MaterialId == 0 && manuUpdateSaveDto.BomId == 0 && manuUpdateSaveDto.ProcessRouteId == 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18203));
+                throw new CustomerValidationException(nameof(ErrorCode.MES18223));
             }
             //if (manuUpdateSaveDto.WorkOrderId <= 0)
             //{
@@ -2357,20 +2357,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             //老工单
             var workOrderId = manuSfcProduces.First().WorkOrderId;
             var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
-            var workOrderQty = manuSfcProduces.Sum(it => it.Qty);
+
+            var oldWorkOrderQty = 0m;// manuSfcProduces.Sum(it => it.Qty);
+            var newWorkOrderQty = 0m;// manuSfcProduces.Sum(it => it.Qty);
             if (workOrderId == manuUpdateSaveDto.WorkOrderId)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18212)).WithData("Code", planWorkOrderEntity.OrderCode);
             }
 
             var newPlanWorkOrderEntity = new PlanWorkOrderEntity();
-            if (manuUpdateSaveDto.WorkOrderId > 0 && manuUpdateSaveDto.WorkOrderId > 0)
+            if (manuUpdateSaveDto.WorkOrderId > 0)
             {
-                //比对条码的产品和工单的产品是否一致，来决定是否扣钱，条码和老工单产品一致增加老工单可下达数量，否则不增加
-                //条码和馨工单产品一致减少新工单可下达数量，否则不减少
-
                 //新工单
                 newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
+
                 // PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed };
                 PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.SendDown, PlanWorkOrderStatusEnum.InProduction };
                 var workOrdersOrLosck = !statusArr.Contains(newPlanWorkOrderEntity.Status);
@@ -2379,10 +2379,17 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);
                 }
 
+                //比对条码的产品和工单的产品是否一致，来决定是否扣钱，条码和老工单产品一致增加老工单可下达数量，否则不增加
+                //条码和新工单产品一致减少新工单可下达数量，否则不减少
+                var oldProduct = planWorkOrderEntity.ProductId;
+                var newProduct = newPlanWorkOrderEntity.ProductId;
+                oldWorkOrderQty = manuSfcProduces.Where(x => x.ProductId == oldProduct).Sum(x => x.Qty);
+                newWorkOrderQty = manuSfcProduces.Where(x => x.ProductId == newProduct).Sum(x => x.Qty);
+
                 var orderRecord = await _planWorkOrderRepository.GetByWorkOrderIdAsync(newPlanWorkOrderEntity.Id);
                 var PlanQuantity = newPlanWorkOrderEntity.Qty * (1 + newPlanWorkOrderEntity.OverScale / 100);
                 var remainingQuantity = PlanQuantity - orderRecord.PassDownQuantity;
-                if (remainingQuantity < workOrderQty)
+                if (remainingQuantity < newWorkOrderQty)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18207));
                 }
@@ -2476,7 +2483,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         WorkOrderId = newPlanWorkOrderEntity.Id,
                         PlanQuantity = newPlanWorkOrderEntity.Qty * (1 + newPlanWorkOrderEntity.OverScale / 100),
-                        PassDownQuantity = workOrderQty,
+                        PassDownQuantity = newWorkOrderQty,
                         UserName = _currentUser.UserName,
                         UpdateDate = HymsonClock.Now()
                     });
@@ -2486,7 +2493,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         WorkOrderId = workOrderId,
                         PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
-                        PassDownQuantity = -workOrderQty,
+                        PassDownQuantity = -oldWorkOrderQty,
                         UserName = _currentUser.UserName,
                         UpdateDate = HymsonClock.Now()
                     });
