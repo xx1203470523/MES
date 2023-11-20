@@ -60,6 +60,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
 
             services.AddSingleton<IJobService, BadRecordJobService>();
             services.AddSingleton<IJobService, BarcodeReceiveService>();
+            services.AddSingleton<IJobService, EsopOutJobService>();
             services.AddSingleton<IJobService, InStationInterceptJobService>();
             services.AddSingleton<IJobService, InStationJobService>();
             services.AddSingleton<IJobService, InStationMarkInterceptJobService>();
@@ -75,14 +76,15 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IJobService, ProductsSortingJobService>();
             services.AddSingleton<IJobService, RepairEndJobService>();
             services.AddSingleton<IJobService, RepairStartJobService>();
-            services.AddSingleton<IJobService, SmiFinishedJobService>();
             services.AddSingleton<IJobService, SFCRequestJobService>();
+            services.AddSingleton<IJobService, SmiFinishedJobService>();
+            services.AddSingleton<IJobService, StopJobService>();
             services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
             services.AddSingleton(typeof(IExecuteJobService<>), typeof(ExecuteJobService<>));
             services.AddSingleton<IManuEquipmentParameterService, ManuEquipmentParameterService>();
             services.AddSingleton<IManuSfcSummaryService, ManuSfcSummaryService>();
             services.AddSingleton<IManuPassStationService, ManuPassStationService>();
-            services.AddSingleton<IJobService, EsopOutJobService>();
+          
             return services;
         }
 
