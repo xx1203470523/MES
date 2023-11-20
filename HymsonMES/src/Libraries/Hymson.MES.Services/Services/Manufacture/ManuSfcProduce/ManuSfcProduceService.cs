@@ -337,7 +337,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var pagedInfo = await _manuSfcProduceRepository.GetPagedListAsync(manuSfcProducePagedQuery);
             if (pagedInfo == null || !pagedInfo.Data.Any())
             {
-                return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, 1,0,0);
+                return new PagedInfo<ManuSfcProduceViewDto>(manuSfcProduceDtos, 1, 0, 0);
             }
 
             //查询工单
@@ -1043,7 +1043,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.Discard,
                     CurrentStatus = sfcEntity.Status,
-                    Remark = parm.Remark??"",
+                    Remark = parm.Remark ?? "",
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedOn = HymsonClock.Now(),
                     CreatedBy = _currentUser.UserName,
@@ -1648,7 +1648,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //已完成入库数据
             var manuSfcInfoList = manuSfcInfos.Where(it => it.Status == SfcStatusEnum.Complete).ToList();
-            foreach (var item in manuSfcInfoList.Select(x=>x.SFC))
+            foreach (var item in manuSfcInfoList.Select(x => x.SFC))
             {
                 var validationFailure = new ValidationFailure();
                 if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -2379,7 +2379,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES18209)).WithData("Code", newPlanWorkOrderEntity.OrderCode);
                 }
 
-                //比对条码的产品和工单的产品是否一致，来决定是否扣钱，条码和老工单产品一致增加老工单可下达数量，否则不增加
+                //比对条码的产品和工单的产品是否一致，来决定是否扣减，条码和老工单产品一致增加老工单可下达数量，否则不增加
                 //条码和新工单产品一致减少新工单可下达数量，否则不减少
                 var oldProduct = planWorkOrderEntity.ProductId;
                 var newProduct = newPlanWorkOrderEntity.ProductId;
@@ -2417,7 +2417,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SiteId = _currentSite.SiteId ?? 0,
                     SFC = item.SFC,
                     ProductId = item.ProductId,
-                    ProcedureId =item.ProcedureId,
+                    ProcedureId = item.ProcedureId,
                     Remark = manuUpdateSaveDto.Remark,
                     WorkOrderId = item.WorkOrderId,
                     WorkCenterId = item.WorkCenterId,
@@ -2644,7 +2644,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                         if (ManuSfcStatus.sfcStatusInProcess.Contains(item.Status ?? 0))
                         {
-                            viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (item.Status==null ? null:(int)item.Status);
+                            viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (item.Status == null ? null : (int)item.Status);
                         }
                         else
                         {
@@ -2881,6 +2881,82 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             return inteVehicleDtos;
+        }
+
+        /// <summary>
+        /// 分页查询（查询所有在制条码信息，加入载具）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync(ManuSfcProduceVehiclePagedQueryDto queryDto)
+        {
+            var pagedQuery = queryDto.ToQuery<ManuSfcProduceVehiclePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+
+            //查询多个条码
+            if (queryDto.Sfcs != null && queryDto.Sfcs.Any())
+            {
+                pagedQuery.SfcArray = queryDto.Sfcs;
+            }
+
+            var pagedInfo = await _manuSfcProduceRepository.GetManuSfcPageListAsync(pagedQuery);
+
+            //实体到DTO转换 装载数据
+            List<ManuUpdateViewDto> manuSfcProduceDtos = new List<ManuUpdateViewDto>();
+            if (pagedInfo == null || !pagedInfo.Data.Any())
+            {
+                return new PagedInfo<ManuUpdateViewDto>(manuSfcProduceDtos, pagedInfo!.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            }
+
+            var data = pagedInfo.Data;
+            //工序
+            var procedureIds = data.Select(it => it.ProcedureId).Distinct().ToArray();
+            var proceduresTask = _procProcedureRepository.GetByIdsAsync(procedureIds);
+            //产品
+            var productIds = data.Select(it => it.ProductId).Distinct().ToArray();
+            var productsTask = _procMaterialRepository.GetByIdsAsync(productIds);
+            //工艺路线
+            var processRouteIds = data.Select(it => it.ProcessRouteId).Distinct().ToArray();
+            var processRoutesTask = _procProcessRouteRepository.GetByIdsAsync(processRouteIds);
+            //bom
+            var productBOMIds = data.Select(it => it.ProductBOMId.GetValueOrDefault()).Distinct().ToArray();
+            var productBOMsTask = _procBomRepository.GetByIdsAsync(productBOMIds);
+            //工单
+            var workOrderIds = data.Select(it => it.WorkOrderId).Distinct().ToArray();
+            var planWorkOrdersTask = _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            //载具
+            var vehicleIds = data.Select(it => it.VehicleId.GetValueOrDefault()).Distinct().ToArray();
+            var vehiclesTask = _inteVehicleRepository.GetByIdsAsync(workOrderIds);
+
+            var procedures = await proceduresTask;
+            var products = await productsTask;
+            var processRoutes = await processRoutesTask;
+            var productBOMs = await productBOMsTask;
+            var planWorkOrders = await planWorkOrdersTask;
+            var vehicles = await vehiclesTask;
+            foreach (var item in data)
+            {
+                var procedure = procedures.FirstOrDefault(it => it.Id == item.ProcedureId);
+                var product = products.FirstOrDefault(it => it.Id == item.ProductId);
+                var processRoute = processRoutes.FirstOrDefault(it => it.Id == item.ProcessRouteId);
+                var productBOM = productBOMs.FirstOrDefault(it => it.Id == item.ProductBOMId);
+                var workOrder = planWorkOrders.FirstOrDefault(it => it.Id == item.WorkOrderId);
+                var vehicle = vehicles.FirstOrDefault(it => it.Id == item.VehicleId);
+                var manuUpdateViewDto = new ManuUpdateViewDto()
+                {
+                    SFC = item.Sfc,
+                    OrderCode = workOrder?.OrderCode ?? "",
+                    VehicleCode= vehicle?.Code ??"",
+                    Status = item.Status,
+                    ProcedureCode = procedure?.Code ?? "",
+                    MaterialAndVersion = product == null ? "" : product.MaterialCode + " / " + product.Version,
+                    ProcessRouteAndVersion = processRoute == null ? "" : processRoute.Code + " / " + processRoute.Version,
+                    BomAndVersion = productBOM == null ? "" : productBOM.BomCode + " / " + productBOM.Version,
+                };
+                manuSfcProduceDtos.Add(manuUpdateViewDto);
+            }
+
+            return new PagedInfo<ManuUpdateViewDto>(manuSfcProduceDtos, pagedInfo!.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }
 }

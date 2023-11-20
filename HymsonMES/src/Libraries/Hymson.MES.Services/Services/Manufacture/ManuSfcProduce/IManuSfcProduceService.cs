@@ -199,5 +199,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="query"></param>
         /// <returns></returns>
         Task<PagedInfo<InteVehicleViewDto>> GetVehicleLineUpPageByProcedureIdPagedInfoAsync(LineUpVehicleByProcedureIdDto query);
+
+        /// <summary>
+        /// 分页查询（查询所有在制条码信息，加入载具）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync(ManuSfcProduceVehiclePagedQueryDto queryDto);
     }
 }
