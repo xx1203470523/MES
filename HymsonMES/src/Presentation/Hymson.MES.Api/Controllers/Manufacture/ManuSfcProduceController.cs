@@ -315,11 +315,11 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
         /// <summary>
         /// 分页查询列表（条码生产信息:不包含报废的条码）
-        /// 优化
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        [HttpGet("geSfcPageList")]
+        [HttpGet]
+        [Route("geSfcPageList")]
         public async Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync([FromQuery] ManuSfcProduceVehiclePagedQueryDto parm)
         {
             return await _manuSfcProduceService.GetManuSfcPageListAsync(parm);

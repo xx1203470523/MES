@@ -778,7 +778,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Select(@"msp.Id,msp.SFC,msp.WorkOrderId,msp.ProcedureId,msp.ResourceId,msp.Status,msp.ProductId,msp.ProcessRouteId,msp.ProductBOMId,vfs.VehicleId");
 
-            sqlBuilder.LeftJoin("manu_sfc_produce msp left join inte_vehicle_freight_stack vfs on msp.SFC =vfs.BarCode");
+            sqlBuilder.LeftJoin("inte_vehicle_freight_stack vfs on msp.SFC =vfs.BarCode");
 
             //单条码
             if (!string.IsNullOrWhiteSpace(query.Sfc))
