@@ -1004,7 +1004,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = commonBo.SiteId,
                     BadRecordId = badRecordEntity.Id,
-                    UnqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value,
+                    UnqualifiedId = badRecordEntity.UnqualifiedId,
                     NGCode = s,
                     Remark = stepEntity.Remark,
                     CreatedBy = commonBo.UserName,
@@ -1226,7 +1226,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 switch (item.Key)
                 {
                     case RejudgeUnqualifiedCodeEnum.Mark:
-                        procedureRejudgeBo.MarkUnqualifiedId = item.Value.FirstOrDefault()?.Id;
+                        procedureRejudgeBo.MarkUnqualifiedId = item.Value.FirstOrDefault()?.UnqualifiedCodeId;
                         break;
                     case RejudgeUnqualifiedCodeEnum.Last:
                         var lastProcProcedureRejudgeEntity = item.Value.FirstOrDefault();
