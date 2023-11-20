@@ -11,28 +11,21 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
-using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Quality.Query;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using System.Collections.Generic;
-using System.Transactions;
-using System.Xml.Linq;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -54,9 +47,15 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly IProcProcedureRepository _procedureRepository;
+        private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         private readonly AbstractValidator<ProcEsopCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcEsopModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<ProcEsopGetJobQueryDto> _validationEsopGetJobRules;
+
+
 
         public ProcEsopService(ICurrentUser currentUser, ICurrentSite currentSite,
             IProcEsopRepository procEsopRepository,
@@ -65,7 +64,11 @@ namespace Hymson.MES.Services.Services.Process
             IProcMaterialRepository procMaterialRepository,
             IProcProcedureRepository procedureRepository,
             AbstractValidator<ProcEsopCreateDto> validationCreateRules,
-            AbstractValidator<ProcEsopModifyDto> validationModifyRules)
+            AbstractValidator<ProcEsopModifyDto> validationModifyRules, 
+            IInteWorkCenterRepository inteWorkCenterRepository, 
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
+            AbstractValidator<ProcEsopGetJobQueryDto> validationEsopGetJobRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -76,6 +79,10 @@ namespace Hymson.MES.Services.Services.Process
             _procedureRepository = procedureRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+            _validationEsopGetJobRules = validationEsopGetJobRules;
+            _inteWorkCenterRepository = inteWorkCenterRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _planWorkOrderRepository = planWorkOrderRepository;
         }
 
         /// <summary>
@@ -390,6 +397,105 @@ namespace Hymson.MES.Services.Services.Process
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
+        }
+
+        /// <summary>
+        /// ESOP获取Job
+        /// </summary>
+        /// <param name="procEsopGetJobQueryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcEsopGetJobOutputDto>> GetEsopJobAsync(ProcEsopGetJobQueryDto procEsopGetJobQueryDto) 
+        { 
+            await _validationEsopGetJobRules.ValidateAndThrowAsync(procEsopGetJobQueryDto);
+
+            var esopOutPutBoList = new List<ProcEsopGetJobOutputDto>();
+
+            //获取工作中心（线体）
+            var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(new List<long> { procEsopGetJobQueryDto.ResourceId.GetValueOrDefault() });
+            if (workCenterIds == null || !workCenterIds.Any())
+            {
+                return esopOutPutBoList;
+            }
+
+            //获取激活工单
+            var workOrderActivationEntities = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesAsync(new PlanWorkOrderActivationQuery { LineIds = workCenterIds, SiteId = _currentSite.SiteId??0 });
+            if (workOrderActivationEntities == null || !workOrderActivationEntities.Any())
+            {
+                return esopOutPutBoList;
+            }
+
+            //获取工单
+            var workOrderIds = workOrderActivationEntities.Select(a => a.WorkOrderId).Distinct();
+            var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds);
+            if (workOrderEntities == null || !workOrderEntities.Any())
+            {
+                return esopOutPutBoList;
+            }
+
+            //获取物料
+            var materialIds = workOrderEntities.Select(a => a.ProductId).Distinct();
+            var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            if (procMaterialEntities == null || !procMaterialEntities.Any())
+            {
+                return esopOutPutBoList;
+            }
+
+            var procEsopQuery = new ProcEsopQuery();
+            procEsopQuery.ProcedureId = procEsopGetJobQueryDto.ProcedureId;
+            procEsopQuery.MaterialIds = materialIds;
+            procEsopQuery.Status = DisableOrEnableEnum.Enable;
+            procEsopQuery.SiteId = _currentSite.SiteId ?? 0;
+            //获取ESOP数据
+            var procEsopEntities = await _procEsopRepository.GetProcEsopEntitiesAsync(procEsopQuery);
+            if (procEsopEntities == null || !procEsopEntities.Any())
+            {
+                return esopOutPutBoList;
+            }
+
+            //获取ESOPFile
+            var procEsopIds = procEsopEntities.Select(a => a.Id);
+            var procEsopFileEntities = await _esopFileRepository.GetProcEsopFileEntitiesAsync(new ProcEsopFileQuery { EsopIds = procEsopIds });
+            if (procEsopFileEntities == null || !procEsopFileEntities.Any())
+            {
+                return esopOutPutBoList;
+            }
+
+            //获取文件信息
+            var attachmentIds = procEsopFileEntities.Select(a => a.AttachmentId);
+            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(attachmentIds);
+            
+            foreach (var item in procEsopFileEntities)
+            {
+
+                var procEsopEntity = procEsopEntities.FirstOrDefault(a => a.Id == item.EsopId);
+                if (procEsopEntity == null)
+                {
+                    return esopOutPutBoList;
+                }
+
+                var procMaterialEntity = procMaterialEntities.FirstOrDefault(a => a.Id == procEsopEntity.MaterialId);
+                if (procMaterialEntity == null)
+                {
+                    return esopOutPutBoList;
+                }
+
+                var attachmentEntity = attachmentEntities.FirstOrDefault(a => a.Id == item.AttachmentId);
+                if (attachmentEntity == null)
+                {
+                    return esopOutPutBoList;
+                }
+
+                var model = new ProcEsopGetJobOutputDto();
+                model.MaterialCode = procMaterialEntity.MaterialCode;
+                model.MaterialName = procMaterialEntity.MaterialName;
+                model.Version = procMaterialEntity.Version;
+                model.FileName = attachmentEntity.Name;
+                model.Path = attachmentEntity.Path;
+                model.CreatedOn = item.CreatedOn;
+                esopOutPutBoList.Add(model);
+            }
+
+            return esopOutPutBoList;
         }
     }
 }

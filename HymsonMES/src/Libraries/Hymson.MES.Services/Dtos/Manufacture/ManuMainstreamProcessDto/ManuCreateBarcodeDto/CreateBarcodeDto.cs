@@ -1,4 +1,5 @@
-﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto
@@ -27,7 +28,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
         /// 资源Id
         /// </summary>
         public long ResourceId { set; get; }
-    }
+    }    
 
     /// <summary>
     /// 

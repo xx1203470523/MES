@@ -150,6 +150,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdListAsync(long workOrderId);
 
         /// <summary>
+        /// 获取更改生产工序列表数据
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        Task<List<ManuUpdateProcedureViewDto>> GetProcedureByRouteIdListsync(long processRouteId);
+
+        /// <summary>
         /// 保存生产更改
         /// </summary>
         /// <param name="manuUpdateSaveDto"></param>
@@ -192,5 +199,12 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="query"></param>
         /// <returns></returns>
         Task<PagedInfo<InteVehicleViewDto>> GetVehicleLineUpPageByProcedureIdPagedInfoAsync(LineUpVehicleByProcedureIdDto query);
+
+        /// <summary>
+        /// 分页查询（查询所有在制条码信息，加入载具）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync(ManuSfcProduceVehiclePagedQueryDto queryDto);
     }
 }

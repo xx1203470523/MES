@@ -154,4 +154,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public TrueOrFalseEnum? Status { get; set; }
     }
+
+   
 }
