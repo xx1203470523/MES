@@ -150,7 +150,7 @@ namespace Hymson.MES.Services.Services.Manufacture
            {
                return manuBakingRecordEntity.ToModel<ManuBakingRecordDto>();
            }
-            return null;
+            return new ManuBakingRecordDto();
         }
     }
 }

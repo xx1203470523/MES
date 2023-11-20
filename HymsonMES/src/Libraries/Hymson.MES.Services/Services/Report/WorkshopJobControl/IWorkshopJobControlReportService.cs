@@ -21,12 +21,6 @@ namespace Hymson.MES.Services.Services.Report
     /// </summary>
     public interface IWorkshopJobControlReportService
     {
-        ///// <summary>
-        ///// 根据查询条件获取车间作业控制报表分页数据
-        ///// </summary>
-        ///// <param name="param"></param>
-        ///// <returns></returns>
-        //Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param);
 
         /// <summary>
         /// 根据查询条件获取车间作业控制报表分页数据

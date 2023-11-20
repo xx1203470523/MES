@@ -168,7 +168,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 return whMaterialStandingbookEntity.ToModel<WhMaterialStandingbookDto>();
             }
-            return null;
+            return new WhMaterialStandingbookDto();
         }
     }
 }

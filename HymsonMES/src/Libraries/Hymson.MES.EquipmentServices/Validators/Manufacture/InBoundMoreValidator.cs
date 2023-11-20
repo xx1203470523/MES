@@ -21,7 +21,7 @@ namespace Hymson.MES.EquipmentServices.Validators.Manufacture
             RuleFor(x => x.SFCs).Must(list => list.Any(a => string.IsNullOrEmpty(a.SFC.Trim()))).WithErrorCode(ErrorCode.MES19003);
 
             // 条码不允许重复
-            RuleFor(x => x.SFCs).Must(list => list.GroupBy(a => a.SFC.Trim()).Where(c => c.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19007);
+            RuleFor(x => x.SFCs).Must(list => list.GroupBy(a => a.SFC.Trim()).Any(c => c.Count() < 2)).WithErrorCode(ErrorCode.MES19007);
 
         }
     }

@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteContainer
         public async Task<InteContainerDto> GetDetailAsync(long id)
         {
             var inteContainerEntity = await _inteContainerRepository.GetByIdAsync(id);
-            if (inteContainerEntity == null) return null;
+            if (inteContainerEntity == null) return new InteContainerDto();
 
             return inteContainerEntity.ToModel<InteContainerDto>();
         }

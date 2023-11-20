@@ -124,30 +124,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 进站
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("inStation")]
-        [AllowAnonymous]
-        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(InStationRequestDto dto)
-        {
-            return await _manuFacePlateButtonService.InStationAsync(dto);
-        }
-
-        /// <summary>
-        /// 出站
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("outStation")]
-        [AllowAnonymous]
-        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(OutStationRequestDto dto)
-        {
-            return await _manuFacePlateButtonService.OutStationAsync(dto);
-        }
-
-        /// <summary>
         /// 参数收集（点击）
         /// </summary>
         /// <param name="dto"></param>
