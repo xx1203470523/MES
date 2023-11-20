@@ -27,8 +27,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
-                //httpClient.BaseAddress = new Uri("http://10.9.1.57:50892/");
-                //httpClient.BaseAddress = new Uri("http://localhost/NFXBaseService/");
             });
 
             return services;
@@ -44,7 +42,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
             return services;
         }

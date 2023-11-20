@@ -17,19 +17,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteEventRepository : BaseRepository, IInteEventRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly IMemoryCache _memoryCache;
+
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public InteEventRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public InteEventRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _memoryCache = memoryCache;
+   
         }
 
         /// <summary>

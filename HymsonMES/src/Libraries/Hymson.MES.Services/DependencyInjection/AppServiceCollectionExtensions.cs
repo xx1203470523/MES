@@ -183,7 +183,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuFeedingService, ManuFeedingService>();
             services.AddSingleton<IManuSfcService, ManuSfcService>();
             services.AddSingleton<IManuSfcProduceService, ManuSfcProduceService>();
-            //services.AddSingleton<IManuGenerateBarcodeService, ManuGenerateBarcodeService>();
             services.AddSingleton<IManuGenerateBarcodeExampleService, ManuGenerateBarcodeExampleService>();
 
             services.AddSingleton<IManuProductBadRecordService, ManuProductBadRecordService>();
@@ -204,6 +203,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuBakingService, ManuBakingService>();
 
             services.AddSingleton<IManuDowngradingRuleService, ManuDowngradingRuleService>();
+            
+            services.AddSingleton<IManuSfcGradeService, ManuSfcGradeService>();
 
             services.AddSingleton<IManuDowngradingService, ManuDowngradingService>();
             services.AddSingleton<IManuDowngradingRecordService, ManuDowngradingRecordService>();
@@ -272,10 +273,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration"></param>
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
-        {
+        {  
             //数据库连接
-            //services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
 

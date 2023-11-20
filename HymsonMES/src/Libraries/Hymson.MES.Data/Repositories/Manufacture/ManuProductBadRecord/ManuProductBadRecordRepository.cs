@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="stepIds"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long>  stepIds)
+        public async Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long> stepIds)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetBySfcStepIdsSql, new { StepIds = stepIds });
@@ -178,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys)
         {
-            if (manuProductBadRecordEntitys == null || manuProductBadRecordEntitys.Any() == false) return 0;
+            if (manuProductBadRecordEntitys == null || !manuProductBadRecordEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, manuProductBadRecordEntitys);
@@ -259,7 +259,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //        AND rbr.CreatedOn BETWEEN '' and ''
 
             sqlBuilder.Where(" rbr.IsDeleted = 0 ");
-            sqlBuilder.Where(" rbr.SiteId=@SiteId ");
+            sqlBuilder.Where(" rbr.SiteId = @SiteId ");
 
             if (!string.IsNullOrEmpty(pageQuery.MaterialCode))
             {
@@ -288,8 +288,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
             {
-                    sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
-                    sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
+                sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
+                sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
             }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
@@ -456,9 +456,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_product_bad_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_product_bad_record` /**where**/ ";
-        const string GetManuProductBadRecordEntitiesSqlTemplate = @"SELECT 
-                                           `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_product_bad_record`  WHERE SFC = @SFC AND  Status=@Status AND SiteId=@SiteId AND IsDeleted=0";
 
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
@@ -466,17 +463,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateSql = "UPDATE manu_product_bad_record SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, FoundBadResourceId = @FoundBadResourceId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, SfcInfoId = @SfcInfoId, Qty = @Qty, Status = @Status, Source = @Source, DisposalResult = @DisposalResult, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SfcStepId = @SfcStepId, ReJudgmentSfcStepId = @ReJudgmentSfcStepId, ReJudgmentBy = @ReJudgmentBy, ReJudgmentOn = @ReJudgmentOn, ReJudgmentResult = @ReJudgmentResult, CloseBy = @CloseBy, CloseOn = @CloseOn WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_product_bad_record` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`,`Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`, `ReJudgmentRemark`
                             FROM `manu_product_bad_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                 `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`, `ReJudgmentRemark`
                             FROM `manu_product_bad_record`  WHERE Id IN @ids ";
 
         const string GetBySfcStepIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                    `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`, `ReJudgmentRemark`
                             FROM `manu_product_bad_record`  WHERE SfcStepId IN @StepIds";
         const string GetByReJudgmentSfcStepIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `FoundBadOperationId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`,`SfcInfoId`, `Qty`, `Status`, `Source`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                       `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`, `ReJudgmentRemark`
                             FROM `manu_product_bad_record`  WHERE ReJudgmentSfcStepId IN @ReJudgmentSfcStepIds ";
 
         const string UpdateStatusSql = @"UPDATE `manu_product_bad_record` SET Remark=@Remark,Status=@Status,ReJudgmentSfcStepId=@ReJudgmentSfcStepId,ReJudgmentResult=@ReJudgmentResult,ReJudgmentRemark=@ReJudgmentRemark,ReJudgmentOn=@ReJudgmentOn,ReJudgmentBy=@ReJudgmentBy,CloseOn=@CloseOn,CloseBy=@CloseBy,UpdatedBy=@UserId,UpdatedOn=@UpdatedOn ,ReJudgmentSfcStepId=@ReJudgmentSfcStepId 
@@ -523,6 +520,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         r.ResCode,
                         uc.UnqualifiedCode,
                         uc.Type as UnqualifiedType,
+                        rbr.Id,
+                        rbr.UnqualifiedId,
                         rbr.`Status` as BadRecordStatus,
                         rbr.Qty,
                         rbr.CreatedBy,
@@ -544,7 +543,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 LIMIT @Offset,@Rows 
         ";
         const string GetPagedInfoLogReportCountSqlTemplate = @" 
-                SELECT  COUNT(1) 
+                SELECT COUNT(1) 
                 FROM manu_product_bad_record rbr
                 LEFT JOIN proc_procedure p on p.Id=rbr.OutflowOperationId -- 为了查询工序编码
                 LEFT JOIN proc_resource r on r.id=rbr.FoundBadResourceId  -- 为了查询资源

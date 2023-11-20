@@ -237,6 +237,12 @@
         public const string MES10527 = "数据类型不合法";
         public const string MES10528 = "条码不在当前工序";
         public const string MES10529 = "没有当前条码与工序的产品参数收集组";
+        public const string MES10530 = "条码或载具编码不能为空";
+        public const string MES10531 = "条码[{sfc}]没有找到对应的生产信息";
+        public const string MES10532 = "条码[{sfc}]不在当前工序";
+        public const string MES10533 = "条码[{sfc}]不在当前工序活动";
+        public const string MES10534 = "有条码不是同一个产品";
+        public const string MES10535 = "载具没有绑定条码";
 
         #endregion
 
@@ -377,6 +383,7 @@
         public const string MES11312 = "分选规则版本长度为10";
         public const string MES11313 = "分选规则备注长度为255";
         public const string MES11314 = "参数集合中有交集";
+        public const string MES11315 = "查询产品分选条码不能为空";
         #endregion
 
         #region 降级录入/移除 11400
@@ -395,7 +402,7 @@
         #endregion
 
         #region ESOP维护 11500
-        public const string MES11500 = "ESOP已存在同一物料、工序数据";
+        public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
         #endregion
 
         #region 作业12000
@@ -725,7 +732,7 @@
         public const string MES15425 = "不合格信息最新状态,请刷新后再次操作";
         public const string MES15426 = "条码状态不为最新新状态,请刷新后再次操作";
         public const string MES15427 = "条码工单未激活,无法取消报废";
-
+        public const string MES15428 = "数据有变动，请刷新后再操作!";
         public const string MES15430 = "载具编码不能为空";
         #endregion
 
@@ -897,7 +904,6 @@
         public const string MES16353 = "条码{SFC}已被Marking拦截！";
         public const string MES16354 = "当前进站工序【{Current}】，属于应进站工序【{Procedure}】的前面工序，不允许操作。";
         public const string MES16355 = "未找到工序【{ProcedureCode}】关联的资源";
-        //public const string MES16356 = "条码{SFCs}不存在或不是在制品";
         public const string MES16357 = "当前工序是【{Current}】，条码【{SFC}】应在工序【{Procedure}】处排队进站，请检查。";
         public const string MES16358 = "指定的工序【{Procedure}】不存在";
         public const string MES16359 = "条码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
@@ -905,6 +911,10 @@
         public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
         public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
+        public const string MES16364 = "未找到条码的产品参数信息！";
+        public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
+        public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
+        public const string MES16367 = "条码【{SFC}】所记录的工单不存在";
         #endregion
 
         #region 工单激活 MES16400
@@ -1014,7 +1024,6 @@
         public const string MES16900 = "面板操作-生产过站面板错误";
         public const string MES16901 = "没有查找到对应条码的生产信息！";
         public const string MES16902 = "无法将主物料ID转为long类型！";
-        //public const string MES16903 = "当前工序与条码生产信息中的不一致！";
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
 

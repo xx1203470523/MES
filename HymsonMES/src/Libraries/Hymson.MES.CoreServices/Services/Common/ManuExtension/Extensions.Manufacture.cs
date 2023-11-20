@@ -12,7 +12,6 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.Utils;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
 {
@@ -99,20 +98,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 var validationFailures = new List<ValidationFailure>();
                 foreach (var item in sfcProduceEntitiesOfStatus)
                 {
-                    var validationFailure = new ValidationFailure();
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                     validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
                     validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Status));
                     validationFailure.FormattedMessagePlaceholderValues.Add("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
                     validationFailure.ErrorCode = nameof(ErrorCode.MES16361);
                     validationFailures.Add(validationFailure);
-
-                    /*
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16361))
-                        .WithData("SFC", item.SFC)
-                        .WithData("Current", localizationService.GetSFCStatusEnumDescription(item.Status))
-                        .WithData("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
-                    */
                 }
 
                 if (validationFailures.Any())
@@ -134,25 +126,18 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         {
             // 复投次数验证
             var moreThanEntities = sfcProduceEntities.Where(a => a.RepeatedCount >= cycle);
-            if (moreThanEntities.Any() == false) return sfcProduceEntities;
+            if (!moreThanEntities.Any()) return sfcProduceEntities;
 
             var validationFailures = new List<ValidationFailure>();
             foreach (var entity in moreThanEntities)
             {
-                var validationFailure = new ValidationFailure();
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                 validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", entity.SFC);
                 validationFailure.FormattedMessagePlaceholderValues.Add("SFC", entity.SFC);
                 validationFailure.FormattedMessagePlaceholderValues.Add("Current", entity.RepeatedCount);
                 validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", cycle);
                 validationFailure.ErrorCode = nameof(ErrorCode.MES16360);
                 validationFailures.Add(validationFailure);
-
-                /*
-                throw new CustomerValidationException(nameof(ErrorCode.MES16360))
-                    .WithData("Current", entity.RepeatedCount)
-                    .WithData("Cycle", cycle)
-                    .WithData("SFC", entity.SFC);
-                */
             }
 
             if (validationFailures.Any())
@@ -235,7 +220,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         public static IEnumerable<ManuSfcProduceBusinessEntity>? VerifyProcedureLock(this IEnumerable<ManuSfcProduceBusinessEntity> sfcProduceBusinessEntities, IEnumerable<ManuSfcProduceEntity> sfcProduceEntities, ProcProcedureEntity procedureEntity)
         {
             // 是否被锁定
-            if (sfcProduceBusinessEntities == null || sfcProduceBusinessEntities.Any() == false) return sfcProduceBusinessEntities;
+            if (sfcProduceBusinessEntities == null || !sfcProduceBusinessEntities.Any()) return sfcProduceBusinessEntities;
             if (sfcProduceBusinessEntities.Any(a => a.BusinessType != ManuSfcProduceBusinessType.Lock)) return sfcProduceBusinessEntities;
 
             foreach (var sfcProduceBusinessEntity in sfcProduceBusinessEntities)

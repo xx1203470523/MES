@@ -45,49 +45,20 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
 
         /// <summary>
-        /// 仓储接口（工艺路线工序连线）
-        /// </summary>
-        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
-
-        /// <summary>
-        /// 仓储接口（资源维护）
-        /// </summary>
-        private readonly IProcResourceRepository _procResourceRepository;
-
-        /// <summary>
         /// 仓储接口（工序维护）
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
-        /// 仓储接口（BOM明细）
-        /// </summary>
-        private readonly IProcBomDetailRepository _procBomDetailRepository;
-
-        /// <summary>
-        /// 仓储接口（BOM替代料明细）
-        /// </summary>
-        private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
 
         /// <summary>
         /// 仓储接口（物料维护）
         /// </summary>
         private readonly IProcMaterialRepository _procMaterialRepository;
 
-        /// <summary>
-        /// 仓储接口（物料替代料）
-        /// </summary>
-        private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
 
         /// <summary>
         /// 仓储接口（掩码规则维护）
         /// </summary>
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
-
-        /// <summary>
-        /// 仓储接口（物料库存）
-        /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
         /// 
@@ -116,15 +87,11 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
-        /// <param name="procProcessRouteDetailLinkRepository"></param>
-        /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="procReplaceMaterialRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="localizationService"></param>
         /// <param name="jobBusinessRelationRepository"></param>
         /// <param name="jobCommonService"></param>
@@ -134,30 +101,20 @@ namespace Hymson.MES.EquipmentServices.Services.Common
             IPlanWorkOrderRepository planWorkOrderRepository,
             IPlanWorkOrderActivationRepository planWorkOrderActivationRepository,
             IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IProcResourceRepository procResourceRepository,
+
             IProcProcedureRepository procProcedureRepository,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcReplaceMaterialRepository procReplaceMaterialRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-            IWhMaterialInventoryRepository whMaterialInventoryRepository,
             ILocalizationService localizationService, IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IJobCommonService jobCommonService, IInteJobRepository inteJobRepository, ICurrentEquipment currentEquipment)
         {
             _planWorkOrderRepository = planWorkOrderRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
             _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
-            _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
-            _procResourceRepository = procResourceRepository;
+
             _procProcedureRepository = procProcedureRepository;
-            _procBomDetailRepository = procBomDetailRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procMaterialRepository = procMaterialRepository;
-            _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _localizationService = localizationService;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _jobCommonService = jobCommonService;
@@ -301,13 +258,13 @@ namespace Hymson.MES.EquipmentServices.Services.Common
             pagedInfo = await _jobBusinessRelationRepository.GetInteJobBusinessRelationEntitiesAsync(query);
             if (pagedInfo != null && pagedInfo.Any())
             {
-                foreach (var item in pagedInfo)
+                foreach (var item in pagedInfo.Select(x=>x.JobId))
                 {
-                    if (jobIds.Contains(item.JobId))
+                    if (jobIds.Contains(item))
                     {
                             continue;
                     }
-                    jobIds.Add(item.JobId);
+                    jobIds.Add(item);
                 }
             }
             if (jobIds.Any())

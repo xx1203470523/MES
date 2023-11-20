@@ -149,14 +149,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="ManuSfcInfoEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> entities)
+        public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (ManuSfcInfoEntitys == null || !ManuSfcInfoEntitys.Any()) return 0;
 
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, entities);
+            return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);
         }
 
         /// <summary>
@@ -302,9 +302,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where(" si.SiteId = @SiteId ");
             sqlBuilder.Where(" si.IsDeleted = 0 ");
             sqlBuilder.Where(" si.IsUsed = 1 ");
-
-            // 2023.10.17 中越说去掉，克明说可以去掉
-            //sqlBuilder.Where(" s.IsDeleted = 0 ");
 
             if (pageQuery.MaterialId.HasValue)
             {

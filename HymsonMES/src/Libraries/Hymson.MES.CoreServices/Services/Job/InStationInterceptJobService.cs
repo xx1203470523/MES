@@ -71,7 +71,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.InStationRequestBos == null || commonBo.InStationRequestBos.Any() == false) return default;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return default;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
@@ -83,11 +83,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 Sfcs = multiSFCBo.SFCs,
                 Status = ProductBadRecordStatusEnum.Open
             });
-            if (manuProductBadRecordEntities == null || manuProductBadRecordEntities.Any() == false) return default;
+            if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return default;
 
             // 读取存在的不合格代码
             var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
-            if (qualUnqualifiedCodeEntities == null || qualUnqualifiedCodeEntities.Any() == false) return default;
+            if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any()) return default;
 
             if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect))
             {
@@ -105,7 +105,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<JobResponseBo> ExecuteAsync(object obj)
         {
             await Task.CompletedTask;
-            return default;
+            return new JobResponseBo();
         }
 
         /// <summary>

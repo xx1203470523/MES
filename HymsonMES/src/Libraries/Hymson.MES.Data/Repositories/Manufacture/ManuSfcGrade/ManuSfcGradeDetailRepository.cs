@@ -83,11 +83,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
            
             var offSet = (manuSfcGradeDetailPagedQuery.PageIndex - 1) * manuSfcGradeDetailPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -159,6 +154,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, manuSfcGradeDetailEntitys);
         }
+
+        /// <summary>
+        /// 根据档位Id查询明细
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcGradeDetailEntity>> GetByGradeIdAsync(ManuSfcGradeDetailByGradeIdQuery query) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcGradeDetailEntity>(GetByGradeIdSql, query);
+        }
         #endregion
 
     }
@@ -187,6 +193,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `GadeId`, `ProduceId`, `SFC`, `Grade`, `ParamId`, `ParamValue`, `CenterValue`, `MaxValue`, `MinValue`, `MinContainingType`, `MaxContainingType`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_grade_detail`  WHERE Id IN @Ids ";
+
+        const string GetByGradeIdSql = @"SELECT * FROM `manu_sfc_grade_detail` WHERE SiteId = @SiteId AND IsDeleted = 0 AND  GadeId = @GadeId ";
         #endregion
     }
 }

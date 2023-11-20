@@ -83,11 +83,6 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
            
             var offSet = (procEsopFilePagedQuery.PageIndex - 1) * procEsopFilePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -116,6 +111,10 @@ namespace Hymson.MES.Data.Repositories.Process
             if (procEsopFileQuery.EsopId.HasValue)
             {
                 sqlBuilder.Where("EsopId = @EsopId");
+            }
+
+            if (procEsopFileQuery.EsopIds != null && procEsopFileQuery.EsopIds.Any()) {
+                sqlBuilder.Where("EsopId IN @EsopIds");
             }
             using var conn = GetMESDbConnection();
             var procEsopFileEntities = await conn.QueryAsync<ProcEsopFileEntity>(template.RawSql, procEsopFileQuery);

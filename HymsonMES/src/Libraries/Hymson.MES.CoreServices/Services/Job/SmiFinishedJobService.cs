@@ -115,7 +115,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return;
+            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
@@ -129,27 +129,6 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 判断条码锁状态
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
-
-            /*
-            // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Activity)}"))
-            sfcProduceEntities.VerifyProcedure(commonBo.ProcedureId)
-                              .VerifyResource(commonBo.ResourceId);
-            */
-
-            // 验证条码对应的物料ID是否和工单物料ID一致
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.WorkOrderId));
-            foreach (var sfcProduceEntity in sfcProduceEntities)
-            {
-                var planWorkOrderEntity = planWorkOrderEntities.FirstOrDefault(f => f.Id == sfcProduceEntity.WorkOrderId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16301));
-
-                if (sfcProduceEntity.ProductId == planWorkOrderEntity.ProductId)
-                {
-                    // 结束
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18219));
-                }
-            }
 
             // 判断条码状态是否是"完成"
             var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(commonBo.OutStationRequestBos.Select(s => s.SFC))
@@ -182,7 +161,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
-            if (commonBo.OutStationRequestBos == null || commonBo.OutStationRequestBos.Any() == false) return default;
+            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return default;
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
@@ -204,12 +183,21 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 待执行的命令
             SmiFinisheResponseSummaryBo responseSummaryBo = new();
 
+            // 查询条码里面所有的工单信息
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.WorkOrderId));
+
             // 遍历所有条码
             List<long> deleteSFCProduceIds = new();
             foreach (var requestBo in commonBo.OutStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
+
+                var planWorkOrderEntity = planWorkOrderEntities.FirstOrDefault(f => f.Id == sfcProduceEntity.WorkOrderId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16367)).WithData("SFC", requestBo.SFC);
+
+                // 验证条码对应的物料ID是否和工单物料ID一致
+                if (sfcProduceEntity.ProductId == planWorkOrderEntity.ProductId) continue;
 
                 // 读取产品基础信息
                 var procMaterialEntity = await _masterDataService.GetProcMaterialEntityWithNullCheckAsync(sfcProduceEntity.ProductId);
@@ -264,7 +252,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     sfcProduceEntity.RepeatedCount = 0;
 
                     // 标记条码为"在制-完成"
-                    //responseBo.IsCompleted = true;
                     manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
                     sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
                     stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
@@ -349,9 +336,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.Rows += await _manuSfcRepository.UpdateRangeWithStatusCheckAsync(data.SFCEntities);
 
                 // 未更新到全部需更新的数据，事务回滚
-                if (data.SFCEntities.Count() > responseBo.Rows)
+                if (data.SFCEntities.Count > responseBo.Rows)
                 {
-                    responseBo.Rows = -1;
+                    responseBo.IsSuccess = false;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18216), string.Join(',', data.SFCEntities!.Select(s => s.SFC)));
                     return responseBo;
                 }

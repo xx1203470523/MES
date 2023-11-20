@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -293,11 +294,12 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
 
             // 只允许保存一个当前版本
-            if (procProcessRouteEntity.IsCurrentVersion == 1)
+            if (procProcessRouteEntity.IsCurrentVersion)
             {
                 await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
                 {
                     SiteId = procProcessRouteEntity.SiteId,
+                    Code = procProcessRouteDto.Code,
                     UpdatedOn = procProcessRouteEntity.UpdatedOn,
                     UpdatedBy = procProcessRouteEntity.UpdatedBy
                 });
@@ -411,19 +413,20 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 Version = processRoute.Version,
                 Id = processRoute.Id,
             });
-            if (isExistsCode == true) throw new CustomerValidationException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
+            if (isExistsCode) throw new CustomerValidationException(nameof(ErrorCode.MES10437)).WithData("Code", processRoute.Code).WithData("Version", processRoute.Version);
             #endregion
 
             // TODO 现在关联表批量删除批量新增，后面再修改
             using TransactionScope trans = TransactionHelper.GetTransactionScope();
 
             // 只允许保存一个当前版本
-            if (procProcessRouteEntity.IsCurrentVersion == 1)
+            if (procProcessRouteEntity.IsCurrentVersion)
             {
                 // 取消其他记录为"非当前版本"
                 await _procProcessRouteRepository.ResetCurrentVersionAsync(new ResetCurrentVersionCommand
                 {
                     SiteId = processRoute.SiteId,
+                    Code= processRoute.Code,
                     UpdatedOn = procProcessRouteEntity.UpdatedOn,
                     UpdatedBy = procProcessRouteEntity.UpdatedBy
                 });
@@ -609,7 +612,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             IEnumerable<ProcProcessRouteDetailNodeEntity> childNodes)
         {
             var targetNodes = childNodes;
-            if (nodesOfSorted.Any() == false)
+            if (!nodesOfSorted.Any())
             {
                 // 首工序
                 var firstNode = allNodes.FirstOrDefault(f => f.IsFirstProcess == 1);
@@ -635,8 +638,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
                 }
             }
 
-            //childNodes = UpdateNodesSortAndGetChildNodes(ref nodesOfSorted, allNodes, allLinks, targetNodes);
-            if (nextNodes.Any() == false) return;
+            if (!nextNodes.Any()) return;
             if (nodesOfSorted.Count >= allNodes.Count()) return;
 
             SortNodes(ref nodesOfSorted, allNodes, allLinks, nextNodes);

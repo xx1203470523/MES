@@ -175,8 +175,8 @@ namespace Hymson.MES.Services.Services.Process
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
                         MaterialId = material.MaterialId,
-                        Version = material.Version,
-                        ReferencePoint = material.ReferencePoint,
+                        Version = material.Version??"",
+                        ReferencePoint = material.ReferencePoint??"",
                         CreatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now()
                     });
@@ -188,10 +188,10 @@ namespace Hymson.MES.Services.Services.Process
             if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any())
             {
                 int i = 0;
-                foreach (var resource in procLoadPointCreateDto.LinkResources)
+                foreach (var resource in procLoadPointCreateDto.LinkResources.Select(x=>x.ResourceId))
                 {
                     i++;
-                    if (resource.ResourceId <= 0)
+                    if (resource <= 0)
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -213,7 +213,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
-                        ResourceId = resource.ResourceId.ParseToLong(),
+                        ResourceId = resource.ParseToLong(),
                         CreatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now()
                     });
@@ -356,10 +356,10 @@ namespace Hymson.MES.Services.Services.Process
             if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any())
             {
                 int i = 0;
-                foreach (var resource in procLoadPointModifyDto.LinkResources)
+                foreach (var resource in procLoadPointModifyDto.LinkResources.Select(x=>x.ResourceId))
                 {
                     i++;
-                    if (resource.ResourceId <= 0)
+                    if (resource <= 0)
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -381,7 +381,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
-                        ResourceId = resource.ResourceId,
+                        ResourceId = resource,
                         CreatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now()
                     });
@@ -657,15 +657,12 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var item in excelImportDtos)
             {
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
-                if (!validationResult.IsValid)
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
                 {
-                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    foreach (var validationFailure in validationResult.Errors)
                     {
-                        foreach (var validationFailure in validationResult.Errors)
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
-                            validationFailures.Add(validationFailure);
-                        }
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
                     }
                 }
                 rows++;
@@ -754,7 +751,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="cuurrentRow"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
         {
             var validationFailure = new ValidationFailure
             {

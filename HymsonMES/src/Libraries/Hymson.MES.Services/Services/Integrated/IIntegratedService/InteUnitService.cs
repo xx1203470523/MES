@@ -31,11 +31,6 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 参数验证器
-        /// </summary>
-        private readonly AbstractValidator<InteUnitSaveDto> _validationSaveRules;
-
-        /// <summary>
         /// 仓储接口（单位维护）
         /// </summary>
         private readonly IInteUnitRepository _inteUnitRepository;

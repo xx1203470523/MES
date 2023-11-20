@@ -1,4 +1,3 @@
-using Dapper;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure.Exceptions;
@@ -286,7 +285,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             if (queryDto.Source == ManuSFCFeedingSourceEnum.BOM)
             {
-                // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料
+                // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
                 var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
                 {
                     SiteId = _currentSite.SiteId ?? 0,
@@ -332,19 +331,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
 
             // 已加载的物料ID
-            if (manuFeedings != null)
-            {
-                materialIds.AddRange(manuFeedings.Select(s => s.ProductId));
-                manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
+            if (manuFeedings != null) manuFeedingsDictionary = manuFeedings.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
-                materialIds = materialIds.Distinct().AsList();
-            }
+            // 不在集合里面的物料ID
+            var notIncludeIds = manuFeedingsDictionary.Keys.Except(materialIds);
+
+            // 集合
+            var unionMaterialIds = materialIds.Union(notIncludeIds);
 
             // 查询不到物料
             if (materialIds == null || !materialIds.Any()) return Array.Empty<ManuFeedingMaterialDto>();
 
             // 通过物料ID获取物料集合
-            var materials = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            var materials = await _procMaterialRepository.GetByIdsAsync(unionMaterialIds);
 
             // 填充返回集合
             List<ManuFeedingMaterialDto> list = new();
@@ -356,6 +355,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     MaterialCode = item.MaterialCode,
                     MaterialName = item.MaterialName,
                     Version = item.Version ?? "-",
+                    IsHistory = notIncludeIds.Any(a => a == item.Id),
                     Children = new()
                 };
 
@@ -397,21 +397,24 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
             }
 
-            // 根据条件再查询一次主物料（这么查会使参数更加严谨）
+            // 根据条件再查询一次主物料（再次查询一次会更加严谨）
             var manuFeedingMaterialDtos = await GetFeedingMaterialListAsync(new ManuFeedingMaterialQueryDto
             {
                 ResourceId = saveDto.ResourceId,
                 Source = saveDto.Source,
                 FeedingPointId = saveDto.FeedingPointId
             });
-            if (manuFeedingMaterialDtos == null || manuFeedingMaterialDtos.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16914));
+
+            // 过滤掉历史清单
+            manuFeedingMaterialDtos = manuFeedingMaterialDtos.Where(w => !w.IsHistory);
+            if (manuFeedingMaterialDtos == null || !manuFeedingMaterialDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16914));
 
             // 主物料ID集合
             saveDto.MaterialIds = manuFeedingMaterialDtos.Select(s => s.MaterialId);
 
             // 查询物料
             var materials = await _procMaterialRepository.GetByIdsAsync(saveDto.MaterialIds);
-            if (materials == null || materials.Any() == false)
+            if (materials == null || !materials.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15101));
             }
@@ -749,21 +752,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 // 如果不是主物料，就找下替代料
                 var bomDetailEntitiy = bomDetailEntities.FirstOrDefault(w => w.MaterialId == item.Id);
                 if (bomDetailEntitiy == null) continue;
-                //?? throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
 
                 // 填充主物料替代料
                 if (bomDetailEntitiy.IsEnableReplace)
                 {
-                    if (replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces) == false) continue;
-                    if (replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId) == false) continue;
+                    if (!replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces)) continue;
+                    if (!replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId)) continue;
                 }
                 // 填充BOM替代料
                 else
                 {
                     // 检查是否符合替代料
                     var bomDetailReplaceMaterialEntities = await _procBomDetailReplaceMaterialRepository.GetByBomDetailIdAsync(bomDetailEntitiy.Id);
-                    if (bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == bo.InventoryMaterialId) == false) continue;
-                    //throw new CustomerValidationException(nameof(ErrorCode.MES16315)).WithData("barCode", inventory.MaterialBarCode);
+                    if (!bomDetailReplaceMaterialEntities.Any(a => a.ReplaceMaterialId == bo.InventoryMaterialId)) continue;
                 }
 
                 material = item;
@@ -795,8 +796,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 }
 
                 // 如果不是主物料，就找下替代料
-                if (replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces) == false) continue;
-                if (replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId) == false) continue;
+                if (!replaceMaterialsForMainDic.TryGetValue(item.Id, out var replaces)) continue;
+                if (!replaces.Any(a => a.IsEnabled && a.ReplaceMaterialId == bo.InventoryMaterialId)) continue;
 
                 material = item;
             }

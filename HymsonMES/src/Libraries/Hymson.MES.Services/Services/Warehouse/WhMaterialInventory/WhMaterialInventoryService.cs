@@ -231,7 +231,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
                 whMaterialStandingbookEntity.MaterialCode = materialInfo.MaterialCode;
                 whMaterialStandingbookEntity.MaterialName = materialInfo.MaterialName;
-                string version = materialInfo.Version;
+                string version = materialInfo.Version ?? "";
                 if (!string.IsNullOrWhiteSpace(item.Version))
                 {
                     version = item.Version;
@@ -388,7 +388,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 return whMaterialInventoryEntity.ToModel<WhMaterialInventoryDto>();
             }
-            return null;
+            return new WhMaterialInventoryDto();
         }
 
         /// <summary>

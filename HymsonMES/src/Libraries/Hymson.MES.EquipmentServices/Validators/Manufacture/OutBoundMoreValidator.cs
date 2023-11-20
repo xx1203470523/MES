@@ -19,10 +19,10 @@ namespace Hymson.MES.EquipmentServices.Validators.Manufacture
            
             // 每个条码都不允许为空
             RuleFor(x => x.SFCs).Must(list =>
-                list.Where(c => !string.IsNullOrEmpty(c.SFC.Trim())).Any()).WithErrorCode(ErrorCode.MES19003);
+                list.Any(c => !string.IsNullOrEmpty(c.SFC.Trim()))).WithErrorCode(ErrorCode.MES19003);
             
             // 条码不允许重复
-            RuleFor(x => x.SFCs).Must(list => list.GroupBy(c => c.SFC.Trim()).Where(c => c.Count() < 2).Any()).WithErrorCode(ErrorCode.MES19007);
+            RuleFor(x => x.SFCs).Must(list => list.GroupBy(c => c.SFC.Trim()).Any(c => c.Count() < 2)).WithErrorCode(ErrorCode.MES19007);
 
         }
     }

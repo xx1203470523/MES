@@ -161,7 +161,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity>? whMaterialStandingbookEntitys)
         {
-            if (whMaterialStandingbookEntitys == null || whMaterialStandingbookEntitys.Any() == false) return 0;
+            if (whMaterialStandingbookEntitys == null || !whMaterialStandingbookEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, whMaterialStandingbookEntitys);

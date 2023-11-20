@@ -114,6 +114,10 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("SortingRuleId=@SortingRuleId");
             }
+            if (procSortingRuleDetailQuery.SortingRuleIds!=null&& procSortingRuleDetailQuery.SortingRuleIds!.Any())
+            {
+                sqlBuilder.Where("SortingRuleId in @SortingRuleIds");
+            }
 
             var template = sqlBuilder.AddTemplate(GetProcSortingRuleDetailEntitiesSqlTemplate);
             using var conn = GetMESDbConnection();

@@ -17,30 +17,44 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <summary>
         /// 进站
         /// </summary>
-        /// <param name="inBoundDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        Task InBoundAsync(InBoundDto inBoundDto);
+        Task InBoundAsync(InBoundDto request);
 
         /// <summary>
         /// 进站（多个）
         /// </summary>
-        /// <param name="inBoundMoreDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        Task InBoundMoreAsync(InBoundMoreDto inBoundMoreDto);
+        Task InBoundMoreAsync(InBoundMoreDto request);
 
         /// <summary>
         /// 出站
         /// </summary>
-        /// <param name="outBoundDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        Task OutBoundAsync(OutBoundDto outBoundDto);
+        Task OutBoundAsync(OutBoundDto request);
 
         /// <summary>
         /// 出站（多个）
         /// </summary>
-        /// <param name="outBoundMoreDto"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        Task OutBoundMoreAsync(OutBoundMoreDto outBoundMoreDto);
+        Task OutBoundMoreAsync(OutBoundMoreDto request);
+
+        /// <summary>
+        /// 载具进站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task InBoundVehicleAsync(InBoundVehicleDto request);
+
+        /// <summary>
+        /// 载具出站
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task OutBoundVehicleAsync(OutBoundCarrierDto request);
 
     }
 }

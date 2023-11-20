@@ -9,7 +9,7 @@ namespace Hymson.MES.Core.Constants.Parameter
     /// <summary>
     /// 产品参数
     /// </summary>
-    public  class ProductParameter
+    public static class ProductParameter
     {
         /// <summary>
         /// 条码产品参数表  

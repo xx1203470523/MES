@@ -23,6 +23,24 @@ namespace Hymson.MES.Core.Enums
         /// 参数收集
         /// </summary>
         [Description("参数收集")]
-        ParameterCollect = 3
+        ParameterCollect = 3,
+
+        /// <summary>
+        /// 分选规则
+        /// </summary>
+        [Description("分选规则")]
+        ProcSortingRule = 4,
+
+        /// <summary>
+        /// ESOP获取
+        /// </summary>
+        [Description("ESOP获取")]
+        ESOPGet = 5,
+
+        /// <summary>
+        /// 条码请求
+        /// </summary>
+        [Description("条码请求")]
+        SFCRequest = 6
     }
 }

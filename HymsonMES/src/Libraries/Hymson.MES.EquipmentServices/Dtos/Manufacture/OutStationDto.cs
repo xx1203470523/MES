@@ -51,6 +51,47 @@
         public OutBoundDto[] SFCs { get; set; }
     }
 
+    /// <summary>
+    /// 出站（单载具）
+    /// </summary>
+    public record OutBoundCarrierDto : BaseDto
+    {
+        /// <summary>
+        /// 载具编码
+        /// </summary>
+        public string CarrierNo { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 是否合格
+        /// 0不合格,1合格
+        /// </summary>
+        public int? Passed { get; set; }
+
+        /*
+        /// <summary>
+        /// 出站参数
+        /// </summary>
+        public OutBoundParam[]? ParamList { get; set; }
+        */
+
+        /// <summary>
+        /// 绑定的物料批次条码列表
+        /// </summary>
+        public string[]? BindFeedingCodes { get; set; }
+
+        /// <summary>
+        /// Ng代码
+        /// </summary>
+        public NGParameterBo[]? NG { get; set; }
+
+        /// <summary>
+        /// 是否过站
+        /// </summary>
+        public bool IsPassingStation { get; set; } = false;
+
+    }
+    
+
 
     /// <summary>
     /// 

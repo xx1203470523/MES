@@ -11,10 +11,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query
     /// </summary>
     public  class LastManuSfcSummaryByProcedureIdAndSfcsQuery
     {
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        //public long SiteId { get; set; }
 
         /// <summary>
         /// 条码集合

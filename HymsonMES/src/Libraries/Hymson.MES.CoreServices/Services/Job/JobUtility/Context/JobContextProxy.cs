@@ -280,7 +280,8 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                     if (itemPrimaryKeyValue != null)
                     {
                         var itemValue = itemPrimaryKeyValue.GetValue(targetItem);
-                        if (typeof(IEnumerable).IsAssignableFrom(field.Value.GetType()) && field.Value is not string)
+                        //if (typeof(IEnumerable).IsAssignableFrom(field.Value.GetType()) && field.Value is not string)
+                        if (field.Value is IEnumerable and not string)
                         {
                             foreach (var fieldValue in (IEnumerable)field.Value)
                             {
@@ -356,7 +357,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                 if (cacheObj == null) return default;
                 var cacheResult = (IEnumerable<TResult>)cacheObj;
 
-                if (cacheResult == null || cacheResult.Any() == false)
+                if (cacheResult == null || !cacheResult.Any())
                 {
                     try
                     {

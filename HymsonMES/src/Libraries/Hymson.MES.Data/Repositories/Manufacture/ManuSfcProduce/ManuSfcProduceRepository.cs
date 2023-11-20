@@ -58,14 +58,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("msp.Status=@Status");
             }
-            //if (manuSfcProducePagedQuery.Lock.HasValue)
-            //{
-            //    sqlBuilder.Where("msp.Lock=@Lock");
-            //}
-            //if (manuSfcProducePagedQuery.NoLock.HasValue && manuSfcProducePagedQuery.NoLock != 1)
-            //{
-            //    sqlBuilder.Where("(msp.Lock!=@NoLock or `Lock`  is null)");
-            //}
             if (manuSfcProducePagedQuery.IsScrap.HasValue)
             {
                 sqlBuilder.Where("msp.IsScrap=@IsScrap");
@@ -288,14 +280,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="manuSfcProduceEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> entities)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcProduceEntity> manuSfcProduceEntitys)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (manuSfcProduceEntitys == null || !manuSfcProduceEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, entities);
+            return await conn.ExecuteAsync(InsertSql, manuSfcProduceEntitys);
         }
 
         /// <summary>
@@ -338,7 +330,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateRangeWithStatusCheckAsync(IEnumerable<ManuSfcProduceEntity>? entities)
         {
-            if (entities == null || entities.Any() == false) return 0;
+            if (entities == null || !entities.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateWithStatusCheckSql, entities);
@@ -439,7 +431,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeletePhysicalRangeByIdsSqlAsync(PhysicalDeleteSFCProduceByIdsCommand idsCommand)
         {
-            if (idsCommand == null || idsCommand.Ids == null || idsCommand.Ids.Any() == false) return 0;
+            if (idsCommand == null || idsCommand.Ids == null || !idsCommand.Ids.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletePhysicalRangeByIdsSql, idsCommand);
@@ -719,7 +711,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSFCProduceBusinesssByIdsCommand command)
         {
-            if (command == null || command.SfcInfoIds == null || command.SfcInfoIds.Any() == false) return 0;
+            if (command == null || command.SfcInfoIds == null || !command.SfcInfoIds.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteSfcProduceBusinessBySfcInfoIdsSql, command);

@@ -1,13 +1,11 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture
 {
@@ -16,11 +14,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
     /// </summary>
     public class ManuPassStationService : IManuPassStationService
     {
-        /// <summary>
-        /// 日志对象
-        /// </summary>
-        private readonly ILogger<ManuPassStationService> _logger;
-
         /// <summary>
         /// 仓储接口（作业）
         /// </summary>
@@ -39,16 +32,13 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="logger"></param>
         /// <param name="executeJobService"></param>
         /// <param name="inteVehicleRepository"></param>
         /// <param name="inteVehiceFreightStackRepository"></param>
-        public ManuPassStationService(ILogger<ManuPassStationService> logger,
-            IExecuteJobService<JobBaseBo> executeJobService,
+        public ManuPassStationService(IExecuteJobService<JobBaseBo> executeJobService,
             IInteVehicleRepository inteVehicleRepository,
             IInteVehiceFreightStackRepository inteVehiceFreightStackRepository)
         {
-            _logger = logger;
             _executeJobService = executeJobService;
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
@@ -60,12 +50,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFC(SFCInStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFCAsync(SFCInStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
-                Type = CodeTypeEnum.SFC,
+                Type = ManuFacePlateBarcodeTypeEnum.Product,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
@@ -92,59 +82,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicle(VehicleInStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicleAsync(VehicleInStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
-                Type = CodeTypeEnum.Vehicle,
+                Type = ManuFacePlateBarcodeTypeEnum.Vehicle,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId
             };
 
-            List<string> SFCs = new();
-            List<InStationRequestBo> inStationRequestBos = new();
-            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
-            }
+            // 根据载具代码获取载具里面的条码
+            var vehicleSFCs = await GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = bo.VehicleCodes });
 
-            // 读取载具关联的条码
-            var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
-            {
-                SiteId = requestBo.SiteId,
-                Codes = bo.VehicleCodes
-            });
-
-            // 不在系统中的载具代码
-            var notInSystem = bo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
-            if (notInSystem.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18624))
-                    .WithData("Code", string.Join(',', notInSystem));
-            }
-
-            // 查询载具关联的条码明细
-            var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
-            {
-                SiteId = requestBo.SiteId,
-                ParentIds = vehicleEntities.Select(s => s.Id)
-            });
-            var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
-
-            SFCs = vehicleFreightStackEntities.Select(s => s.BarCode).ToList();
-            foreach (var item in vehicleFreightStackDic)
-            {
-                var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
-                if (vehicleEntity == null) continue;
-
-                inStationRequestBos.AddRange(item.Value.Select(s => new InStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-            }
-
-            requestBo.SFCs = SFCs;  // 这句后面要改
-            requestBo.InStationRequestBos = inStationRequestBos;
+            requestBo.SFCs = vehicleSFCs.Select(s => s.SFC);
+            requestBo.InStationRequestBos = vehicleSFCs.Select(s => new InStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode });
 
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "InStationJobService" });
@@ -159,26 +113,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFC(SFCOutStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFCAsync(SFCOutStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
-                Type = CodeTypeEnum.SFC,
+                Type = ManuFacePlateBarcodeTypeEnum.Product,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId
             };
 
-            List<string> SFCs = new();
-            List<OutStationRequestBo> outStationRequestBos = new();
-
-            SFCs = bo.SFCs.ToList();
-            outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
-
-            requestBo.SFCs = SFCs;  // 这句后面要改
-            requestBo.OutStationRequestBos = outStationRequestBos;
+            requestBo.SFCs = bo.OutStationRequestBos.Select(s => s.SFC);
+            requestBo.OutStationRequestBos = bo.OutStationRequestBos;
 
             var jobBos = new List<JobBo> { };
             jobBos.Add(new JobBo { Name = "OutStationJobService" });
@@ -191,21 +139,58 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicle(VehicleOutStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo bo)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
-                Type = CodeTypeEnum.Vehicle,
+                Type = ManuFacePlateBarcodeTypeEnum.Vehicle,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
                 ResourceId = bo.ResourceId
             };
 
-            List<string> SFCs = new();
+            // 根据载具代码获取载具里面的条码
+            var vehicleCodes = bo.OutStationRequestBos.Select(s => s.VehicleCode ?? "").Where(w => !string.IsNullOrWhiteSpace(w));
+            if (vehicleCodes == null) return new Dictionary<string, JobResponseBo>();
+            var vehicleSFCs = await GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = vehicleCodes });
+
             List<OutStationRequestBo> outStationRequestBos = new();
-            if (bo.VehicleCodes == null || bo.VehicleCodes.Any() == false)
+            foreach (var item in vehicleSFCs)
+            {
+                var outStationRequestBo = bo.OutStationRequestBos.FirstOrDefault(f => f.VehicleCode == item.VehicleCode);
+                if (outStationRequestBo == null) continue;
+
+                outStationRequestBos.Add(new OutStationRequestBo
+                {
+                    SFC = item.SFC,
+                    VehicleCode = item.VehicleCode,
+                    IsQualified = outStationRequestBo.IsQualified,
+                    ConsumeList = outStationRequestBo.ConsumeList,
+                    OutStationUnqualifiedList = outStationRequestBo.OutStationUnqualifiedList
+                });
+            }
+
+            requestBo.SFCs = vehicleSFCs.Select(s => s.SFC);
+            requestBo.OutStationRequestBos = outStationRequestBos;
+
+            var jobBos = new List<JobBo> { };
+            jobBos.Add(new JobBo { Name = "OutStationJobService" });
+
+            return await _executeJobService.ExecuteAsync(jobBos, requestBo);
+        }
+        #endregion
+
+        #region 内部方法
+        /// <summary>
+        /// 获取载具里面的条码（带验证）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<VehicleSFCResponseBo>> GetSFCsByVehicleCodesAsync(VehicleSFCRequestBo requestBo)
+        {
+            if (requestBo.VehicleCodes == null || !requestBo.VehicleCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
@@ -214,11 +199,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
             {
                 SiteId = requestBo.SiteId,
-                Codes = bo.VehicleCodes
+                Codes = requestBo.VehicleCodes
             });
 
             // 不在系统中的载具代码
-            var notInSystem = bo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
+            var notInSystem = requestBo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
             if (notInSystem.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18624))
@@ -231,38 +216,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = requestBo.SiteId,
                 ParentIds = vehicleEntities.Select(s => s.Id)
             });
-            var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
 
-            SFCs = vehicleFreightStackEntities.Select(s => s.BarCode).ToList();
+            List<VehicleSFCResponseBo> list = new();
+            var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
             foreach (var item in vehicleFreightStackDic)
             {
                 var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
                 if (vehicleEntity == null) continue;
 
-                outStationRequestBos.AddRange(item.Value.Select(s => new OutStationRequestBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
+                list.AddRange(item.Value.Select(s => new VehicleSFCResponseBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
             }
 
-            requestBo.SFCs = SFCs;  // 这句后面要改
-            requestBo.OutStationRequestBos = outStationRequestBos;
-
-            var jobBos = new List<JobBo> { };
-            jobBos.Add(new JobBo { Name = "OutStationJobService" });
-
-            return await _executeJobService.ExecuteAsync(jobBos, requestBo);
+            return list;
         }
         #endregion
 
-        #region 产品参数收集
-        /// <summary>
-        /// 产品参数收集（出站）
-        /// </summary>
-        /// <param name="bos"></param>
-        /// <returns></returns>
-        public async Task ParameterForOutStation(IEnumerable<OutStationParameterBo> bos)
-        {
-            // TODO
-            await Task.CompletedTask;
-        }
-        #endregion
     }
 }

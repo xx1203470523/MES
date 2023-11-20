@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Job;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
@@ -16,6 +17,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 资源Id
         /// </summary>
         public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
 
         /// <summary>
         /// 载具条码
@@ -39,6 +45,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
         /// 载具条码
         /// </summary>
         public IEnumerable<string> VehicleCodes { get; set; }
@@ -60,9 +71,14 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
         /// 载具条码
         /// </summary>
-        public IEnumerable<string> SFCs { get; set; }
+        public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }
     }
 
     /// <summary>
@@ -81,9 +97,14 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public long ResourceId { get; set; }
 
         /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
         /// 载具条码
         /// </summary>
-        public IEnumerable<string> VehicleCodes { get; set; }
+        public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }
     }
 
 }

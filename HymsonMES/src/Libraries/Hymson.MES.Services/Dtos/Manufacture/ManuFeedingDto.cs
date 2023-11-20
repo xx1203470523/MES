@@ -110,6 +110,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Version { get; set; }
 
         /// <summary>
+        /// 是否历史清单
+        /// </summary>
+        public bool IsHistory { get; set; } = false;
+
+        /// <summary>
         /// 物料库存集合
         /// </summary>
         public List<ManuFeedingMaterialItemDto> Children { get; set; }
@@ -209,7 +214,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProductId { get; set; }
 
         /// <summary>
-        /// 主物料/产品（选中的主物料）
+        /// 主物料编码/产品编码（选中的主物料）
         /// </summary>
         public string ProductCode { get; set; }
 
@@ -229,12 +234,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string Version { get; set; }
 
         /// <summary>
-        /// 物料条码
+        /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
         /// <summary>
-        /// 物料条码
+        /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
     }

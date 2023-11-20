@@ -27,6 +27,6 @@ namespace Hymson.MES.Core.Attribute.Job
         /// <summary>
         /// 作业类型
         /// </summary>
-        public JobTypeEnum Type { get; set; } = JobTypeEnum.Standard;
+        public JobTypeEnum Type { get; set; }
     }
 }

@@ -161,16 +161,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Version { get; set; }
 
-       ///// <summary>
-       // /// 状态
-       // /// </summary>
-       // public SysDataStatusEnum Status { get; set; }
-
-       ///// <summary>
-       // /// 备注
-       // /// </summary>
-       // public string? Remark { get; set; }
-
         public List<ProcEquipmentGroupParamDetailCreateDto> ParamList { get; set; }
     }
 
@@ -214,11 +204,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Version { get; set; }
 
-       ///// <summary>
-       // /// 状态
-       // /// </summary>
-       // public SysDataStatusEnum Status { get; set; }
-
 
         public List<ProcEquipmentGroupParamDetailCreateDto> ParamList { get; set; }
     }
@@ -232,11 +217,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 参数集编码
         /// </summary>
         public string? Code { get; set; }
-
-        ///// <summary>
-        ///// 参数集名称
-        ///// </summary>
-        //public string? Name { get; set; }
 
         /// <summary>
         /// 物料编码

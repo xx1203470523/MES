@@ -74,13 +74,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialInventoryEntity> GetByBarCodeAsync(WhMaterialInventoryBarCodeQuery query)
         {
-            // 因为测试环境容易出缓存问题，所以暂时不使用缓存
-            //var key = $"wh_material_inventory&{query.SiteId}&{query.BarCode}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<WhMaterialInventoryEntity>(GetByBarCodeSql, query);
-            //});
         }
 
         /// <summary>
@@ -224,7 +219,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<WhMaterialInventoryEntity>? whMaterialInventoryEntitys)
         {
-            if (whMaterialInventoryEntitys == null || whMaterialInventoryEntitys.Any() == false) return 0;
+            if (whMaterialInventoryEntitys == null || !whMaterialInventoryEntitys.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, whMaterialInventoryEntitys);

@@ -297,8 +297,6 @@ namespace Hymson.MES.Services.Services.Process
                     UserId = _currentUser.UserName
                 });
 
-                //await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(idsArr);
-
                 await _procMaterialSupplierRelationRepository.DeleteTrueByMaterialIdsAsync(idsArr);
 
                 ts.Complete();
@@ -675,15 +673,12 @@ namespace Hymson.MES.Services.Services.Process
             foreach (var item in excelImportDtos)
             {
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
-                if (!validationResult.IsValid)
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
                 {
-                    if (validationResult.Errors != null && validationResult.Errors.Any())
+                    foreach (var validationFailure in validationResult.Errors)
                     {
-                        foreach (var validationFailure in validationResult.Errors)
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
-                            validationFailures.Add(validationFailure);
-                        }
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
                     }
                 }
                 rows++;
@@ -846,7 +841,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="cuurrentRow"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
         {
             var validationFailure = new ValidationFailure
             {
@@ -859,7 +854,7 @@ namespace Hymson.MES.Services.Services.Process
             };
             return validationFailure;
         }
-        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, string versionFormattedMessage, int cuurrentRow = 1, string codeKey = "code", string versionKey = "version")
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, string versionFormattedMessage, int cuurrentRow = 1, string codeKey = "code", string versionKey = "version")
         {
             var validationFailure = new ValidationFailure
             {
