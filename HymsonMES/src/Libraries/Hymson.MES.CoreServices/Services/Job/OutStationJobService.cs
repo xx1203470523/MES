@@ -375,7 +375,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 是否有传是否合格标识
                 if (requestBo.IsQualified.HasValue && !requestBo.IsQualified.Value)
                 {
-
                     // 不合格出站
                     responseBo = await OutStationForUnQualifiedProcedureAsync(commonBo, requestBo, manuSfcEntity, sfcProduceEntity, procedureRejudgeBo);
                 }
