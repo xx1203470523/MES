@@ -48,7 +48,30 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
+            if (param is not JobRequestBo commonBo) return;
+            if (commonBo == null) return;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
+
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
+
+            // 获取不良记录
+            var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
+            {
+                SiteId = commonBo.SiteId,
+                Sfcs = multiSFCBo.SFCs,
+                Status = ProductBadRecordStatusEnum.Open
+            });
+            if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return;
+
+            // 读取存在的不合格代码
+            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
+            if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any()) return;
+
+            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Identification))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
+            }
         }
 
         /// <summary>
@@ -69,32 +92,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return default;
-            if (commonBo == null) return default;
-            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return default;
-
-            // 临时中转变量
-            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
-
-            // 获取不良记录
-            var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
-            {
-                SiteId = commonBo.SiteId,
-                Sfcs = multiSFCBo.SFCs,
-                Status = ProductBadRecordStatusEnum.Open
-            });
-            if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return default;
-
-            // 读取存在的不合格代码
-            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
-            if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any()) return default;
-
-            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Identification))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
-            }
-
-            return default;
+            return await Task.FromResult(new EmptyRequestBo { });
         }
 
         /// <summary>
