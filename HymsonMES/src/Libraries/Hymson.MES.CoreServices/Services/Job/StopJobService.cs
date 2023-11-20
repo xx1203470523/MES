@@ -118,9 +118,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.SFCProduceEntities = sfcProduceEntities.AsList();
             if (responseBo.SFCProduceEntities == null || !responseBo.SFCProduceEntities.Any()) return default;
 
-            responseBo.FirstSFCProduceEntity = responseBo.SFCProduceEntities.FirstOrDefault()!;
-            if (responseBo.FirstSFCProduceEntity == null) return default;
-
             // 更新时间
             var updatedBy = bo.UserName;
             var updatedOn = HymsonClock.Now();
@@ -130,7 +127,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.UpdatedBy = updatedBy;
                 sfcProduceEntity.UpdatedOn = updatedOn;
-                sfcProduceEntity.RepeatedCount = sfcProduceEntity.RepeatedCount - 1;
+                sfcProduceEntity.RepeatedCount--;
+
                 // 初始化步骤
                 responseBo.SFCStepEntities.Add(new ManuSfcStepEntity
                 {
@@ -193,7 +191,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 面板需要的数据
             List<PanelModuleEnum> panelModules = new();
             responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
-            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16340), data.FirstSFCProduceEntity.SFC);
+            responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16340), string.Join(",", data.SFCProduceEntities.Select(s => s.SFC)));
             return responseBo;
         }
 
