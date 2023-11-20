@@ -45,7 +45,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind
         /// <summary>
         /// 模组绑电芯条码/Pack绑模组条码
         /// </summary>
-        public CirculationBindDto[] BindSFCs { get; set; }
+        public IEnumerable<CirculationBindDto> BindSFCs { get; set; }
     }
 
     /// <summary>

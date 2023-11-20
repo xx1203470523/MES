@@ -934,12 +934,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ReJudgmentOn = HymsonClock.Now()
                 };
 
-                if (unqualified.IsColsed ?? false)
-                {
-                    manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Open;
-                    manuProductBadRecordCommand.ReJudgmentResult = ProductBadDisposalResultEnum.ReJudgmentRepair;
-                }
-                else
+                if (unqualified.IsClosed ?? false)
                 {
                     manuProductBadRecordCommand.ReJudgmentSfcStepId = manuSfcStepEntity.Id;
                     manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Close;
@@ -949,10 +944,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                     manuProductBadRecordCommand.ReJudgmentBy = _currentUser.UserName;
                     manuProductBadRecordCommand.ReJudgmentOn = HymsonClock.Now();
                 }
+                else
+                {
+                    manuProductBadRecordCommand.Status = ProductBadRecordStatusEnum.Open;
+                    manuProductBadRecordCommand.ReJudgmentResult = ProductBadDisposalResultEnum.ReJudgmentRepair;
+                }
                 updateCommandList.Add(manuProductBadRecordCommand);
             }
 
-            if (badReJudgmentDto.UnqualifiedLists.Any(x => !(x.IsColsed ?? false)))//存在未关闭的不合格代码
+            if (badReJudgmentDto.UnqualifiedLists.Any(x => !(x.IsClosed ?? false)))//存在未关闭的不合格代码
             {
                 var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
 
