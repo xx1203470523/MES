@@ -69,7 +69,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
 
         /// <summary>
-        /// 参数上报（条码）
+        /// 参数收集
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
