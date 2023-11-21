@@ -495,7 +495,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public List<MainReplaceMaterial> MainReplaceMaterials { get; set; }
     }
 
-    public class MainReplaceMaterial 
+    public class MainReplaceMaterial
     {
         public long MaterialId { get; set; }
 
@@ -511,7 +511,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
-    public class ManuFacePlateProductionPackageAddDto{
+    public class ManuFacePlateProductionPackageAddDto
+    {
         /// <summary>
         /// SFC 产品条码
         /// </summary>

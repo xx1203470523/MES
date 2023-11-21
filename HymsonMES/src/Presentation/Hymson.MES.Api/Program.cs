@@ -74,6 +74,17 @@ namespace Hymson.MES.Api
                 app.UseSwaggerUI();
             }
             //#endif
+
+#if DEBUG
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .SetPreflightMaxAge(TimeSpan.FromHours(24));
+            });
+#endif
+
             #region snippet_ConfigureLocalization
             var supportedCultures = new List<CultureInfo>
             {

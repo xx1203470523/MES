@@ -97,17 +97,17 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// <summary>
         /// Bom ID
         /// </summary>
-        public long BomId { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
         /// Bom编码
         /// </summary>
-        public string BomCode { get; set; }
+        public string? BomCode { get; set; }
 
         /// <summary>
         /// Bom版本
         /// </summary>
-        public string BomVersion { get; set;}
+        public string? BomVersion { get; set;}
     }
 
     /// <summary>

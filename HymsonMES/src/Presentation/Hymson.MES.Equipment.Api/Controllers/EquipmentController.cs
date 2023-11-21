@@ -1,5 +1,4 @@
-﻿using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
-using Hymson.MES.EquipmentServices.Dtos;
+﻿using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
@@ -31,24 +30,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly ISfcBindingService _sfcBindingService;
 
         /// <summary>
-        /// 仓储接口（设备注册）
-        /// </summary>
-        private readonly IEquEquipmentRepository _equEquipmentRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="manufactureService"></param>
         /// <param name="sfcBindingService"></param>
-        public EquipmentController(ILogger<EquipmentController> logger, IEquEquipmentRepository equEquipmentRepository,
+        public EquipmentController(ILogger<EquipmentController> logger,
             IManufactureService manufactureService,
             ISfcBindingService sfcBindingService)
         {
             _logger = logger;
             _manufactureService = manufactureService;
             _sfcBindingService = sfcBindingService;
-            _equEquipmentRepository=equEquipmentRepository;
         }
 
 
@@ -130,5 +123,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _manufactureService.OutBoundVehicleAsync(request);
         }
+
     }
 }

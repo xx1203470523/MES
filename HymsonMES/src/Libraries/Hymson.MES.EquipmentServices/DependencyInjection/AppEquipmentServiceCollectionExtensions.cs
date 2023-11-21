@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
@@ -50,7 +51,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration"></param>
         private static void AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            
+
         }
 
         /// <summary>
