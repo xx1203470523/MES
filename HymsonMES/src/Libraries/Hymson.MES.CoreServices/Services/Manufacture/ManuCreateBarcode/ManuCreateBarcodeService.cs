@@ -352,7 +352,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             // 开启事务
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
 
-            if (productId == param.ProcedureId)
+            if (productId == planWorkOrderEntity.ProductId)
             {
                 var row = await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
                 {
