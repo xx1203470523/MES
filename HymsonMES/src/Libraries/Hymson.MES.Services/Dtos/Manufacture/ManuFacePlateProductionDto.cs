@@ -54,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 扫描JOBId 多个使用,号分割
         /// </summary>
-        public string ScanJobId { get; set; }
+        public long? ScanJobId { get; set; }
         /// <summary>
         /// 扫描JOBId对应的Code 多个使用,号分割
         /// </summary>
@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 扫描JOBId 多个使用,号分割
         /// </summary>
-        public string? ScanJobId { get; set; }
+        public long? ScanJobId { get; set; }
 
         /// <summary>
         /// 工序id
@@ -325,7 +325,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 扫描JOBId 多个使用,号分割
         /// </summary>
-        public string? ScanJobId { get; set; }
+        public long? ScanJobId { get; set; }
 
         /// <summary>
         /// 工序id

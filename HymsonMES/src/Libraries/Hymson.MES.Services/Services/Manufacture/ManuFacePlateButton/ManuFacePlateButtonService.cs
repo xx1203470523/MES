@@ -45,6 +45,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuFacePlateButtonJobRelationRepository _manuFacePlateButtonJobRelationRepository;
 
         /// <summary>
+        /// 仓储接口（生产过站面板）
+        /// </summary>
+        private readonly IManuFacePlateProductionRepository _manuFacePlateProductionRepository;
+
+        /// <summary>
         /// 服务接口（过站）
         /// </summary>
         private readonly IManuPassStationService _manuPassStationService;
@@ -77,6 +82,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="currentSite"></param>
         /// <param name="manuFacePlateButtonRepository"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
+        /// <param name="manuFacePlateProductionRepository"></param>
         /// <param name="manuPassStationService"></param>
         /// <param name="manuProductParameterService"></param>
         /// <param name="inteJobRepository"></param>
@@ -86,6 +92,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
+            IManuFacePlateProductionRepository manuFacePlateProductionRepository,
             IManuPassStationService manuPassStationService,
             IManuProductParameterService manuProductParameterService,
             IInteJobRepository inteJobRepository,
@@ -97,6 +104,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _currentSite = currentSite;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
+            _manuFacePlateProductionRepository = manuFacePlateProductionRepository;
             _manuPassStationService = manuPassStationService;
             _manuProductParameterService = manuProductParameterService;
             _inteJobRepository = inteJobRepository;
@@ -302,6 +310,21 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuFacePlateButtonDto = manuFacePlateButtonEntity.ToModel<ManuFacePlateButtonDto>();
             manuFacePlateButtonDto.ManuFacePlateButtonJobRelations = manuFacePlateButtonJobRelationDtos.ToArray();
             return manuFacePlateButtonDto;
+        }
+
+        /// <summary>
+        /// 按钮（回车）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, JobResponseDto>> EnterAsync(EnterRequestDto dto)
+        {
+            var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
+
+            // TODO 
+            await Task.CompletedTask;
+
+            return result;
         }
 
         /// <summary>
