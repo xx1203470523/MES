@@ -892,6 +892,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                         manuSfcEntity.Status = SfcStatusEnum.lineUp;
                         sfcProduceEntity.Status = SfcStatusEnum.lineUp;
 
+                        // 更新不合格工艺路线
+                        if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
+                        {
+                            sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
+                        }
+
                         // 更新下一工序
                         sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
 
@@ -951,6 +957,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                         // 条码状态跟在制品状态一致
                         manuSfcEntity.Status = SfcStatusEnum.lineUp;
                         sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+
+                        // 更新不合格工艺路线
+                        if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
+                        {
+                            sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
+                        }
 
                         // 更新下一工序
                         sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
