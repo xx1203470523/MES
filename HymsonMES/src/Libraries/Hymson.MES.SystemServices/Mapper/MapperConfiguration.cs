@@ -4,10 +4,11 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
+using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Dtos.ProductTraceReport;
-using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
 
 namespace Hymson.MES.SystemServices.Mapper
 {
@@ -57,6 +58,13 @@ namespace Hymson.MES.SystemServices.Mapper
             CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
             CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();
             CreateMap<ManuProductParameterView, ManuProductParameterViewDto>();
+
+            #region PACK码追溯SFC
+
+            CreateMap<PackTraceSFCParameterQuery, PackTraceSFCParameterQueryDto>();
+            CreateMap<PackTraceSFCParameterView, PackTraceSFCParameterViewDto>();
+
+            #endregion
         }
     }
 }

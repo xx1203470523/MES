@@ -3,7 +3,8 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
-using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.MES.SystemServices.Services.ProductTrace;
@@ -22,22 +23,27 @@ namespace Hymson.MES.System.Api.Controllers
         private readonly IPlanWorkOrderService _planWorkOrderService;
         private readonly IManuSfcCirculationService _manuSfcCirculationService;
         private readonly IProductTraceReportService _productTraceReportService;
+        private readonly IPackTraceSFCParameterService _packTraceSFCParameterService;
+
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="planWorkOrderService"></param>
         /// <param name="manuSfcCirculationService"></param>
         /// <param name="productTraceReportService"></param>
+        /// <param name="packTraceSFCParameterService"></param>
         public SystemController(ILogger<SystemController> logger, 
             IPlanWorkOrderService planWorkOrderService, 
             IManuSfcCirculationService manuSfcCirculationService,
-            IProductTraceReportService productTraceReportService)
+            IProductTraceReportService productTraceReportService,
+            IPackTraceSFCParameterService packTraceSFCParameterService)
         {
             _logger = logger;
             _planWorkOrderService = planWorkOrderService;
             _manuSfcCirculationService = manuSfcCirculationService;
             _productTraceReportService = productTraceReportService;
+            _packTraceSFCParameterService = packTraceSFCParameterService;
         }
 
         /// <summary>
@@ -176,5 +182,16 @@ namespace Hymson.MES.System.Api.Controllers
             return manuSfcPrameterDtoList;
         }
 
+        /// <summary>
+        /// PACK码追溯电芯码查询设备采集参数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("trace/pack")]
+        public async Task<IEnumerable<PackTraceSFCParameterViewDto>> GetPackTraceSFCParameterAsync(PackTraceSFCParameterQueryDto queryDto)
+        {
+            return await _packTraceSFCParameterService.PackTraceSFCParamterAsync(queryDto);
+        }
     }
 }

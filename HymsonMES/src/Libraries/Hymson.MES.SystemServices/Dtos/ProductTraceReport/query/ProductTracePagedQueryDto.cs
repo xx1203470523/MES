@@ -1,7 +1,7 @@
 ﻿using Hymson.Infrastructure;
  
 
-namespace Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+namespace Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
 
 /// <summary>
 /// 追溯报表查询

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hymson.MES.SystemServices.Dtos.ProductTraceReport;
-using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
 
 namespace Hymson.MES.SystemServices.Services.ProductTrace;
 

@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
-using Hymson.MES.SystemServices.Dtos.ProductTraceReport.query;
+using Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
 using Hymson.MES.SystemServices.Services.ProductTrace;
 using Hymson.MES.SystemServicesTests;
 using Microsoft.Extensions.DependencyInjection;
