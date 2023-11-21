@@ -321,6 +321,14 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             var result = new Dictionary<string, JobResponseDto> { }; // 返回结果
 
+            // 先检查按钮是否存在
+            var facePlateProduction = await _manuFacePlateProductionRepository.GetByFacePlateIdAsync(dto.FacePlateId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17208));
+
+            if (string.IsNullOrWhiteSpace(facePlateProduction.ScanJobId)) return result;
+
+
+
             // TODO 
             await Task.CompletedTask;
 
