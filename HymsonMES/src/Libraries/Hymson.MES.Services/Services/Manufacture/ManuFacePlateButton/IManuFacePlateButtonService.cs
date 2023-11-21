@@ -60,6 +60,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByButtonIdAsync(long buttionId);
 
         /// <summary>
+        /// 按钮（回车）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, JobResponseDto>> EnterAsync(EnterRequestDto dto);
+
+        /// <summary>
         /// 按钮（点击）
         /// </summary>
         /// <param name="dto"></param>

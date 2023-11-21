@@ -112,6 +112,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
 
         /// <summary>
+        /// 按钮（回车）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("enter")]
+        [AllowAnonymous]
+        public async Task<Dictionary<string, JobResponseDto>> EnterAsync(EnterRequestDto dto)
+        {
+            return await _manuFacePlateButtonService.EnterAsync(dto);
+        }
+
+        /// <summary>
         /// 按钮（点击）
         /// </summary>
         /// <param name="dto"></param>

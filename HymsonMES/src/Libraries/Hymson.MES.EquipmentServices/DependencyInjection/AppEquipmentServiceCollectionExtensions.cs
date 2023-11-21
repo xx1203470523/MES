@@ -6,7 +6,6 @@ using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.Manufacture;
-using Hymson.MES.EquipmentServices.Validators.SfcBinding;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
