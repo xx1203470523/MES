@@ -54,12 +54,12 @@
     /// <summary>
     /// 出站（单载具）
     /// </summary>
-    public record OutBoundCarrierDto : BaseDto
+    public record OutBoundVehicleDto : BaseDto
     {
         /// <summary>
         /// 载具编码
         /// </summary>
-        public string CarrierNo { get; set; } = string.Empty;
+        public string VehicleCode { get; set; } = string.Empty;
 
         /// <summary>
         /// 是否合格

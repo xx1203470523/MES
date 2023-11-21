@@ -1,4 +1,6 @@
-﻿using Hymson.MES.EquipmentServices.Dtos;
+﻿using Hymson.MES.CoreServices.Dtos.Parameter;
+using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
@@ -25,6 +27,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IManufactureService _manufactureService;
 
         /// <summary>
+        /// 接口（参数收集）
+        /// </summary>
+        private readonly IManuProductParameterService _manuProductParameterService;
+
+        /// <summary>
         /// 条码绑定
         /// </summary>
         private readonly ISfcBindingService _sfcBindingService;
@@ -34,13 +41,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="manufactureService"></param>
+        /// <param name="manuProductParameterService"></param>
         /// <param name="sfcBindingService"></param>
         public EquipmentController(ILogger<EquipmentController> logger,
             IManufactureService manufactureService,
+            IManuProductParameterService manuProductParameterService,
             ISfcBindingService sfcBindingService)
         {
             _logger = logger;
             _manufactureService = manufactureService;
+            _manuProductParameterService = manuProductParameterService;
             _sfcBindingService = sfcBindingService;
         }
 
@@ -57,6 +67,17 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _sfcBindingService.SfcCirculationBindAsync(sfcBindingDto);
         }
 
+
+        /// <summary>
+        /// 参数上报（条码）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("InParameter")]
+        public async Task InParameterAsync(InParameterDto request)
+        {
+            await _manufactureService.InParameterAsync(request);
+        }
 
         /// <summary>
         /// 进站 HY-MES-EQU-015
@@ -119,7 +140,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBoundVehicle")]
-        public async Task OutBoundVehicleAsync(OutBoundCarrierDto request)
+        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
         {
             await _manufactureService.OutBoundVehicleAsync(request);
         }

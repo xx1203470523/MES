@@ -331,6 +331,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.SFCStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.InStock,  // 状态为 进站
+                    CurrentStatus = SfcStatusEnum.lineUp,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,

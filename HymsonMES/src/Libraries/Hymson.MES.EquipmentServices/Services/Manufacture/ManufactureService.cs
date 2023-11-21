@@ -1,16 +1,19 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos;
+using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Services.Manufacture
@@ -54,6 +57,11 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         private readonly IManuPassStationService _manuPassStationService;
 
         /// <summary>
+        /// 接口（参数收集）
+        /// </summary>
+        private readonly IManuProductParameterService _manuProductParameterService;
+
+        /// <summary>
         /// 业务接口（创建条码服务）
         /// </summary>
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
@@ -71,6 +79,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <param name="procResourceRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="manuPassStationService"></param>
+        /// <param name="manuProductParameterService"></param>
         /// <param name="manuCreateBarcodeService"></param>
         public ManufactureService(ICurrentEquipment currentEquipment,
             AbstractValidator<InBoundDto> validationInBoundDtoRules,
@@ -81,6 +90,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             IProcResourceRepository procResourceRepository,
             IProcProcedureRepository procProcedureRepository,
             IManuPassStationService manuPassStationService,
+            IManuProductParameterService manuProductParameterService,
             IManuCreateBarcodeService manuCreateBarcodeService)
         {
             _currentEquipment = currentEquipment;
@@ -92,6 +102,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             _procResourceRepository = procResourceRepository;
             _procProcedureRepository = procProcedureRepository;
             _manuPassStationService = manuPassStationService;
+            _manuProductParameterService = manuProductParameterService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
         }
 
@@ -309,7 +320,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task OutBoundVehicleAsync(OutBoundCarrierDto request)
+        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
         {
             //await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -324,7 +335,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
 
             var outStationRequestBo = new OutStationRequestBo
             {
-                VehicleCode = request.CarrierNo,
+                VehicleCode = request.VehicleCode,
                 IsQualified = request.Passed == 1
             };
 
@@ -351,6 +362,52 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             });
         }
 
+
+        /// <summary>
+        /// 参数收集（点击）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task InParameterAsync(InParameterDto request)
+        {
+            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            {
+                SiteId = _currentEquipment.SiteId,
+                ResourceCode = request.ResourceCode,
+                EquipmentCode = request.EquipmentCode
+            });
+            if (manuBo == null) return;
+
+            // 根据载具代码获取载具里面的条码
+            if (!request.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16312));
+
+            List<string> SFCs = new();
+            switch (request.Type)
+            {
+                case ManuFacePlateBarcodeTypeEnum.Product:
+                    SFCs = request.SFCs.ToList();
+                    break;
+                case ManuFacePlateBarcodeTypeEnum.Vehicle:
+                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = _currentEquipment.SiteId, VehicleCodes = request.SFCs });
+                    SFCs = vehicleSFCs.Select(s => s.SFC).ToList();
+                    break;
+                default:
+                    break;
+            }
+
+            _ = await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
+            {
+                SiteId = _currentEquipment.SiteId,
+                UserName = _currentEquipment.Name,
+                Time = HymsonClock.Now(),
+                ProcedureId = manuBo.ProcedureId,
+                ResourceId = manuBo.ResourceId,
+                SFCs = SFCs,
+                Parameters = request.Parameters
+            });
+        }
 
 
         #region 内部方法
