@@ -2824,7 +2824,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             }
 
-            return activityVehicleViewDtos;
+            return activityVehicleViewDtos.OrderByDescending(x=>x.StartTime).ToList();
         }
 
 
