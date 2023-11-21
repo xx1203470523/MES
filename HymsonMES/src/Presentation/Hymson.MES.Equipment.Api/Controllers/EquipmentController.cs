@@ -1,6 +1,4 @@
-﻿using Hymson.MES.CoreServices.Dtos.Parameter;
-using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.EquipmentServices.Dtos;
+﻿using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
@@ -17,19 +15,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
     public class EquipmentController : ControllerBase
     {
         /// <summary>
-        /// 日志
-        /// </summary>
-        private readonly ILogger<EquipmentController> _logger;
-
-        /// <summary>
         /// 生产服务接口
         /// </summary>
         private readonly IManufactureService _manufactureService;
-
-        /// <summary>
-        /// 接口（参数收集）
-        /// </summary>
-        private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
         /// 条码绑定
@@ -39,18 +27,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="logger"></param>
         /// <param name="manufactureService"></param>
-        /// <param name="manuProductParameterService"></param>
         /// <param name="sfcBindingService"></param>
-        public EquipmentController(ILogger<EquipmentController> logger,
-            IManufactureService manufactureService,
-            IManuProductParameterService manuProductParameterService,
+        public EquipmentController(IManufactureService manufactureService,
             ISfcBindingService sfcBindingService)
         {
-            _logger = logger;
             _manufactureService = manufactureService;
-            _manuProductParameterService = manuProductParameterService;
             _sfcBindingService = sfcBindingService;
         }
 
@@ -67,17 +49,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             await _sfcBindingService.SfcCirculationBindAsync(sfcBindingDto);
         }
 
-
-        /// <summary>
-        /// 参数收集
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost("InParameter")]
-        public async Task InParameterAsync(InParameterDto request)
-        {
-            await _manufactureService.InParameterAsync(request);
-        }
 
         /// <summary>
         /// 进站 HY-MES-EQU-015

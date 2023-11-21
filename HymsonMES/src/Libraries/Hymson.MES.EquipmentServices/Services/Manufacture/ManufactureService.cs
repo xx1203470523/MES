@@ -1,19 +1,13 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.EquipmentServices.Dtos;
-using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 
 namespace Hymson.MES.EquipmentServices.Services.Manufacture
@@ -37,29 +31,14 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         private readonly AbstractValidator<OutBoundMoreDto> _validationOutBoundMoreDtoRules;
 
         /// <summary>
-        /// 仓储接口（设备注册）
+        /// 服务接口（生产通用）
         /// </summary>
-        private readonly IEquEquipmentRepository _equEquipmentRepository;
-
-        /// <summary>
-        /// 仓储接口（资源维护）
-        /// </summary>
-        private readonly IProcResourceRepository _procResourceRepository;
-
-        /// <summary>
-        /// 仓储接口（工序维护）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
+        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 服务接口（过站）
         /// </summary>
         private readonly IManuPassStationService _manuPassStationService;
-
-        /// <summary>
-        /// 接口（参数收集）
-        /// </summary>
-        private readonly IManuProductParameterService _manuProductParameterService;
 
         /// <summary>
         /// 业务接口（创建条码服务）
@@ -75,22 +54,16 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <param name="validationInBoundMoreDtoRules"></param>
         /// <param name="validationOutBoundDtoRules"></param>
         /// <param name="validationOutBoundMoreDtoRules"></param>
-        /// <param name="equEquipmentRepository"></param>
-        /// <param name="procResourceRepository"></param>
-        /// <param name="procProcedureRepository"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuPassStationService"></param>
-        /// <param name="manuProductParameterService"></param>
         /// <param name="manuCreateBarcodeService"></param>
         public ManufactureService(ICurrentEquipment currentEquipment,
             AbstractValidator<InBoundDto> validationInBoundDtoRules,
             AbstractValidator<InBoundMoreDto> validationInBoundMoreDtoRules,
             AbstractValidator<OutBoundDto> validationOutBoundDtoRules,
             AbstractValidator<OutBoundMoreDto> validationOutBoundMoreDtoRules,
-            IEquEquipmentRepository equEquipmentRepository,
-            IProcResourceRepository procResourceRepository,
-            IProcProcedureRepository procProcedureRepository,
+            IManuCommonService manuCommonService,
             IManuPassStationService manuPassStationService,
-            IManuProductParameterService manuProductParameterService,
             IManuCreateBarcodeService manuCreateBarcodeService)
         {
             _currentEquipment = currentEquipment;
@@ -98,11 +71,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             _validationInBoundMoreDtoRules = validationInBoundMoreDtoRules;
             _validationOutBoundDtoRules = validationOutBoundDtoRules;
             _validationOutBoundMoreDtoRules = validationOutBoundMoreDtoRules;
-            _equEquipmentRepository = equEquipmentRepository;
-            _procResourceRepository = procResourceRepository;
-            _procProcedureRepository = procProcedureRepository;
+            _manuCommonService = manuCommonService;
             _manuPassStationService = manuPassStationService;
-            _manuProductParameterService = manuProductParameterService;
             _manuCreateBarcodeService = manuCreateBarcodeService;
         }
 
@@ -136,7 +106,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             await _validationInBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
@@ -166,7 +136,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             if (!request.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
 
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
@@ -195,7 +165,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
@@ -243,7 +213,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
             if (request.SFCs.Length <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES19101));
 
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
@@ -296,7 +266,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             //await _validationInBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
@@ -325,7 +295,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             //await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
@@ -361,148 +331,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
             });
         }
-
-
-        /// <summary>
-        /// 参数收集（点击）
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public async Task InParameterAsync(InParameterDto request)
-        {
-            if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
-            {
-                SiteId = _currentEquipment.SiteId,
-                ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
-            });
-            if (manuBo == null) return;
-
-            // 根据载具代码获取载具里面的条码
-            if (!request.SFCs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16312));
-
-            List<string> SFCs = new();
-            switch (request.Type)
-            {
-                case ManuFacePlateBarcodeTypeEnum.Product:
-                    SFCs = request.SFCs.ToList();
-                    break;
-                case ManuFacePlateBarcodeTypeEnum.Vehicle:
-                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = _currentEquipment.SiteId, VehicleCodes = request.SFCs });
-                    SFCs = vehicleSFCs.Select(s => s.SFC).ToList();
-                    break;
-                default:
-                    break;
-            }
-
-            _ = await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
-            {
-                SiteId = _currentEquipment.SiteId,
-                UserName = _currentEquipment.Name,
-                Time = HymsonClock.Now(),
-                ProcedureId = manuBo.ProcedureId,
-                ResourceId = manuBo.ResourceId,
-                SFCs = SFCs,
-                Parameters = request.Parameters
-            });
-        }
-
-
-        #region 内部方法
-        /// <summary>
-        /// 获取当前生产对象
-        /// </summary>
-        /// <param name="requestBo"></param>
-        /// <returns></returns>
-        private async Task<ManufactureResponseBo> GetManufactureBoAsync(ManufactureRequestBo requestBo)
-        {
-            // 查询资源
-            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = requestBo.SiteId,
-                Code = requestBo.ResourceCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", requestBo.ResourceCode);
-
-            // 根据设备
-            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = requestBo.SiteId,
-                Code = requestBo.EquipmentCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", requestBo.EquipmentCode);
-
-            // 读取设备绑定的资源
-            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
-            {
-                SiteId = requestBo.SiteId,
-                EquipmentCode = requestBo.EquipmentCode
-            });
-            if (resourceBindEntities == null || !resourceBindEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19131))
-                    .WithData("ResCode", requestBo.ResourceCode)
-                    .WithData("EquCode", requestBo.EquipmentCode);
-            }
-
-            // 读取资源对应的工序
-            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                ResourceId = resourceEntity.Id
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", requestBo.ResourceCode);
-
-            return new ManufactureResponseBo
-            {
-                ResourceId = resourceEntity.Id,
-                ProcedureId = procProcedureEntity.Id,
-                EquipmentId = equipmentEntity.Id
-            };
-        }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// 当前生成对象
-    /// </summary>
-    public class ManufactureRequestBo
-    {
-        /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
-        /// 资源编码
-        /// </summary>
-        public string ResourceCode { get; set; } = "";
-
-        /// <summary>
-        /// 设备编码
-        /// </summary>
-        public string EquipmentCode { get; set; } = "";
-    }
-
-    /// <summary>
-    /// 当前生成对象
-    /// </summary>
-    public class ManufactureResponseBo
-    {
-        /// <summary>
-        /// 资源ID
-        /// </summary>
-        public long ResourceId { get; set; }
-
-        /// <summary>
-        /// 设备ID
-        /// </summary>
-        public long EquipmentId { get; set; }
-
-        /// <summary>
-        /// 工序ID
-        /// </summary>
-        public long ProcedureId { get; set; }
 
     }
 }

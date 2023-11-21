@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.EquipmentServices.Dtos.Parameter
+﻿namespace Hymson.MES.EquipmentServices.Dtos.Parameter
 {
     /// <summary>
     /// 设备过程参数
     /// </summary>
-    public  class EquipmentProductProcessParameterDto
+    public  class EquipmentProcessParameterDto
     {
         /// <summary>
         /// 参数编码

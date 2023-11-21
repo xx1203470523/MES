@@ -17,10 +17,10 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param);
 
         /// <summary>
-        /// 参数采集
+        /// 参数采集（产品过程参数）
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        Task<int> ProductParameterCollectAsync(ProductProcessParameterBo bo);
+        Task<int> ProductProcessCollectAsync(ProductProcessParameterBo bo);
     }
 }

@@ -1,11 +1,8 @@
-﻿using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums.Manufacture;
+﻿using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Integrated;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture
 {
@@ -20,29 +17,22 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         private readonly IExecuteJobService<JobBaseBo> _executeJobService;
 
         /// <summary>
-        /// 仓储接口（载具注册）
+        /// 服务接口（生产通用）
         /// </summary>
-        private readonly IInteVehicleRepository _inteVehicleRepository;
-
-        /// <summary>
-        /// 仓储接口（二维载具条码明细）
-        /// </summary>
-        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
+        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="executeJobService"></param>
-        /// <param name="inteVehicleRepository"></param>
-        /// <param name="inteVehiceFreightStackRepository"></param>
+        /// <param name="manuCommonService"></param>
         public ManuPassStationService(IExecuteJobService<JobBaseBo> executeJobService,
-            IInteVehicleRepository inteVehicleRepository,
-            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository)
+            IManuCommonService manuCommonService)
         {
             _executeJobService = executeJobService;
-            _inteVehicleRepository = inteVehicleRepository;
-            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
+            _manuCommonService = manuCommonService;
         }
+
 
         #region 进站
         /// <summary>
@@ -95,7 +85,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             };
 
             // 根据载具代码获取载具里面的条码
-            var vehicleSFCs = await GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = bo.VehicleCodes });
+            var vehicleSFCs = await _manuCommonService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = bo.VehicleCodes });
 
             requestBo.SFCs = vehicleSFCs.Select(s => s.SFC);
             requestBo.InStationRequestBos = vehicleSFCs.Select(s => new InStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode });
@@ -154,7 +144,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             // 根据载具代码获取载具里面的条码
             var vehicleCodes = bo.OutStationRequestBos.Select(s => s.VehicleCode ?? "").Where(w => !string.IsNullOrWhiteSpace(w));
             if (vehicleCodes == null) return new Dictionary<string, JobResponseBo>();
-            var vehicleSFCs = await GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = vehicleCodes });
+            var vehicleSFCs = await _manuCommonService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = bo.SiteId, VehicleCodes = vehicleCodes });
 
             List<OutStationRequestBo> outStationRequestBos = new();
             foreach (var item in vehicleSFCs)
@@ -179,55 +169,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
             jobBos.Add(new JobBo { Name = "OutStationJobService" });
 
             return await _executeJobService.ExecuteAsync(jobBos, requestBo);
-        }
-        #endregion
-
-        #region 内部方法
-        /// <summary>
-        /// 获取载具里面的条码（带验证）
-        /// </summary>
-        /// <param name="requestBo"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<VehicleSFCResponseBo>> GetSFCsByVehicleCodesAsync(VehicleSFCRequestBo requestBo)
-        {
-            if (requestBo.VehicleCodes == null || !requestBo.VehicleCodes.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
-            }
-
-            // 读取载具关联的条码
-            var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
-            {
-                SiteId = requestBo.SiteId,
-                Codes = requestBo.VehicleCodes
-            });
-
-            // 不在系统中的载具代码
-            var notInSystem = requestBo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
-            if (notInSystem.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18624))
-                    .WithData("Code", string.Join(',', notInSystem));
-            }
-
-            // 查询载具关联的条码明细
-            var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
-            {
-                SiteId = requestBo.SiteId,
-                ParentIds = vehicleEntities.Select(s => s.Id)
-            });
-
-            List<VehicleSFCResponseBo> list = new();
-            var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in vehicleFreightStackDic)
-            {
-                var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
-                if (vehicleEntity == null) continue;
-
-                list.AddRange(item.Value.Select(s => new VehicleSFCResponseBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
-            }
-
-            return list;
         }
         #endregion
 
