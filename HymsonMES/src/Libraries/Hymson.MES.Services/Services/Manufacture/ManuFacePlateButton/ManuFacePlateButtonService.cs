@@ -327,11 +327,95 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (string.IsNullOrWhiteSpace(facePlateProduction.ScanJobId)) return result;
 
+            // 根据 buttonJobs 读取对应的job对象
+            var jobsOfNotSort = await _inteJobRepository.GetEntitiesAsync(new EntityBySiteIdQuery { SiteId = _currentSite.SiteId ?? 0 });
 
+            // 用,分割facePlateProduction.ScanJobId，并转为long数组
+            var jobIds = facePlateProduction.ScanJobId.Split(",");
 
-            // TODO 
-            await Task.CompletedTask;
+            List<InteJobEntity> jobs = new();
+            foreach (var item in jobIds)
+            {
+                var tempJob = jobsOfNotSort.FirstOrDefault(f => f.Id == item.ParseToLong());
+                if (tempJob == null) continue;
 
+                jobs.Add(tempJob);
+            }
+
+            // 如果没有读取到有效作业，就提示错误
+            if (!jobs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17255));
+
+            if (!dto.Param!.ContainsKey("Type")) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "Type");
+            if (!dto.Param!.ContainsKey("SFCs")) throw new CustomerValidationException(nameof(ErrorCode.MES17256)).WithData("Param", "SFCs");
+
+            // 条码类型
+            var codeType = ManuFacePlateBarcodeTypeEnum.Product;
+            if (!dto.Param!.ContainsKey("Type"))
+            {
+                codeType = ManuFacePlateBarcodeTypeEnum.Product;
+            }
+            else
+            {
+                if (!Enum.TryParse(dto.Param["Type"], out codeType)) codeType = ManuFacePlateBarcodeTypeEnum.Product;
+            }
+
+            // 作业请求参数
+            var requestBo = new JobRequestBo
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
+                Type = codeType,
+                ProcedureId = dto.Param!["ProcedureId"].ParseToLong(),
+                ResourceId = dto.Param["ResourceId"].ParseToLong()
+            };
+
+            List<string> SFCs = new();
+            List<PanelRequestBo> panelRequestBos = new();
+            List<InStationRequestBo> inStationRequestBos = new();
+            List<OutStationRequestBo> outStationRequestBos = new();
+            switch (requestBo.Type)
+            {
+                case ManuFacePlateBarcodeTypeEnum.Vehicle:
+                    var vehicleCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", dto.Param!["SFCs"]);
+
+                    // 根据载具代码获取载具里面的条码
+                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = requestBo.SiteId, VehicleCodes = vehicleCodes });
+
+                    SFCs = vehicleSFCs.Select(s => s.SFC).AsList();
+                    panelRequestBos.AddRange(vehicleSFCs.Select(s => new PanelRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
+                    inStationRequestBos.AddRange(vehicleSFCs.Select(s => new InStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
+                    outStationRequestBos.AddRange(vehicleSFCs.Select(s => new OutStationRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
+                    break;
+                case ManuFacePlateBarcodeTypeEnum.Product:
+                default:
+                    var sfcCodes = dto.Param!["SFCs"].ToDeserialize<List<string>>()
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", dto.Param!["SFCs"]);
+
+                    SFCs = sfcCodes;
+                    panelRequestBos.AddRange(SFCs.Select(s => new PanelRequestBo { SFC = s }));
+                    inStationRequestBos.AddRange(SFCs.Select(s => new InStationRequestBo { SFC = s }));
+                    outStationRequestBos.AddRange(SFCs.Select(s => new OutStationRequestBo { SFC = s }));
+                    break;
+            }
+
+            requestBo.SFCs = SFCs;  // 这句后面要改
+            requestBo.PanelRequestBos = panelRequestBos;
+            requestBo.InStationRequestBos = inStationRequestBos;
+            requestBo.OutStationRequestBos = outStationRequestBos;
+
+            // 执行Job（后面考虑改为调用ManuPassStationService类的封装方法）
+            var jobResponses = await _executeJobService.ExecuteAsync(jobs.Select(s => new JobBo { Name = s.ClassProgram }), requestBo);
+            foreach (var item in jobResponses)
+            {
+                result.Add(item.Key, new JobResponseDto
+                {
+                    Rows = item.Value.Rows,
+                    Content = item.Value.Content,
+                    Message = item.Value.Message,
+                    Time = item.Value.Time
+                });
+            }
             return result;
         }
 
