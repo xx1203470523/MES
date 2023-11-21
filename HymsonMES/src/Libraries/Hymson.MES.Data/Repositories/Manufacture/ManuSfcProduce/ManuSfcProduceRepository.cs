@@ -750,13 +750,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListByProcedureIdAndResIdStatusSql);
-            sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Where("ProcedureId = @ProcedureId");
+            sqlBuilder.Where("p.SiteId = @SiteId");
+            sqlBuilder.Where("p.ProcedureId = @ProcedureId");
             if (query.ResourceId.HasValue) 
             {
-                sqlBuilder.Where(" ResourceId = @ResourceId");
+                sqlBuilder.Where(" p.ResourceId = @ResourceId");
             }
-            sqlBuilder.Where("Status = @Status");
+            sqlBuilder.Where("p.Status = @Status");
+
+            if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode))
+            {
+                sqlBuilder.LeftJoin(" proc_material ma  on p.ProductId =ma.id");
+            }
+
+            if (!string.IsNullOrEmpty(query.MaterialCode))
+            {
+                query.MaterialCode = $"%{query.MaterialCode}%";
+                sqlBuilder.Where("ma.MaterialCode like  @MaterialCode");
+            }
+            if (!string.IsNullOrEmpty(query.MaterialVersion))
+            {
+                query.MaterialVersion = $"%{query.MaterialVersion}%";
+                sqlBuilder.Where("ma.Version like @MaterialVersion");
+            }
 
             return await conn.QueryAsync<ManuSfcProduceEntity>(template.RawSql, query);
         }
@@ -917,6 +933,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetListBySfcsSql = @"SELECT * FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
-        const string GetListByProcedureIdAndResIdStatusSql = @"SELECT * FROM manu_sfc_produce /**where**/ ";
+        const string GetListByProcedureIdAndResIdStatusSql = @"SELECT p.* FROM manu_sfc_produce p /**innerjoin**/ /**leftjoin**/ /**where**/ ";
     }
 }
