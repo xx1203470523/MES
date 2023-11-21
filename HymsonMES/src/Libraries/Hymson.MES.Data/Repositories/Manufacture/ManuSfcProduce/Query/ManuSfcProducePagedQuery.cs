@@ -152,6 +152,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string? MaterialCode { get; set; }
 
         /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
         /// 条码状态
         /// </summary>
         public SfcStatusEnum? SfcStatus { get; set; }

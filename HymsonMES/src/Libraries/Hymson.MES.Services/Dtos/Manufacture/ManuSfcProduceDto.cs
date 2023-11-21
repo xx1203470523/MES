@@ -573,6 +573,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 产品编码
         /// </summary>
         public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
     }
 
 
