@@ -1,12 +1,9 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
-using Google.Protobuf;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -28,8 +25,6 @@ using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Security.Policy;
-using System.Transactions;
 
 namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
 {
@@ -51,7 +46,23 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuCommonService _manuCommonService;
 
-        public ManuBindService(IManuSfcProduceRepository manuSfcProduceRepository, PlanWorkOrderRepository planWorkOrderRepository,
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="masterDataService"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="procBomRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuSfcCirculationRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="manuCommonService"></param>
+        public ManuBindService(IManuSfcProduceRepository manuSfcProduceRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository,
             IMasterDataService masterDataService, IProcProcedureRepository procProcedureRepository, IProcBomRepository procBomRepository,
             IProcMaterialRepository procMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository,
             IManuSfcRepository manuSfcRepository, IManuSfcInfoRepository manuSfcInfoRepository,
