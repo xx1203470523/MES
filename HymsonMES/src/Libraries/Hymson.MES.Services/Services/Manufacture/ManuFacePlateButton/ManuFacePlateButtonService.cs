@@ -551,7 +551,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFCs = dto.SFCs.ToList();
                     break;
                 case ManuFacePlateBarcodeTypeEnum.Vehicle:
-                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = dto.SiteId, VehicleCodes = dto.SFCs });
+                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        VehicleCodes = dto.SFCs
+                    });
                     SFCs = vehicleSFCs.Select(s => s.SFC).ToList();
                     break;
                 default:
