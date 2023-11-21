@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 是否关闭
         /// </summary>
-        public bool? IsColsed { get; set; }
+        public bool? IsClosed { get; set; }
 
         /// <summary>
         /// 备注

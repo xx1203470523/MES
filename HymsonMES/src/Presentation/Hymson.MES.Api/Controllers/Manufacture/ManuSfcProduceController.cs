@@ -210,6 +210,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
         #endregion
 
+        #region 更改生产
         /// <summary>
         /// 获取更改生产列表数据
         /// </summary>
@@ -233,6 +234,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 获取更改生产列表数据
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        [HttpGet("getProcedureByRouteId/{processRouteId}")]
+        public async Task<List<ManuUpdateProcedureViewDto>> GetProcedureByRouteIdListsync(long processRouteId)
+        {
+            return await _manuSfcProduceService.GetProcedureByRouteIdListsync(processRouteId);
+        }
+
+        /// <summary>
         /// 保存生产更改
         /// </summary>
         /// <param name="manuUpdateSaveDto"></param>
@@ -244,6 +256,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             await _manuSfcProduceService.SaveManuUpdateListAsync(manuUpdateSaveDto);
         }
+        #endregion
 
         /// <summary>
         /// 获取工艺路线末尾工序
@@ -298,6 +311,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task<PagedInfo<InteVehicleViewDto>> GetVehicleInfoBySfcLineUpPagedInfoAsync([FromQuery] LineUpVehicleByProcedureIdDto query)
         {
             return await _manuSfcProduceService.GetVehicleLineUpPageByProcedureIdPagedInfoAsync(query);
+        }
+
+        /// <summary>
+        /// 分页查询列表（条码生产信息:不包含报废的条码）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("geSfcPageList")]
+        public async Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync([FromQuery] ManuSfcProduceVehiclePagedQueryDto parm)
+        {
+            return await _manuSfcProduceService.GetManuSfcPageListAsync(parm);
         }
     }
 }

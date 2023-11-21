@@ -14,7 +14,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param, ILocalizationService localizationService);
+        Task<List<CreateBarcodeByWorkOrderOutputBo>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderBo param, ILocalizationService localizationService);
 
         /// <summary>
         /// 根据外部条码接收

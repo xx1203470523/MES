@@ -266,12 +266,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     throw new CustomerValidationException(nameof(ErrorCode.MES17407)).WithData("MaterialName", pprocMaterialEntity?.MaterialName ?? "")
                         .WithData("WorkOrder", planWorkOrderEntity?.OrderCode ?? "").WithData("BomName", procBomEntity?.BomName ?? "").WithData("ProcedureName", procProcedureEntity?.Name ?? "");
                 }
-                if ((manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0) + manuSfcProduceList!.Sum(x => x.Qty) > bom.Usages)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17411)).WithData("BindQty", manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0)
-                        .WithData("TreatQty", manuSfcProduceList!.Sum(x => x.Qty))
-                         .WithData("TreatQty", bom.Usages);
-                }
+                //if ((manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0) + manuSfcProduceList!.Sum(x => x.Qty) > bom.Usages)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES17411)).WithData("BindQty", manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0)
+                //        .WithData("TreatQty", manuSfcProduceList!.Sum(x => x.Qty))
+                //         .WithData("TreatQty", bom.Usages);
+                //}
             }
             else
             {

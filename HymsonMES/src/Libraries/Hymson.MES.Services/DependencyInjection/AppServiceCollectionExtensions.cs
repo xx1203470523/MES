@@ -383,6 +383,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Esop
             services.AddSingleton<AbstractValidator<ProcEsopCreateDto>, ProcEsopCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcEsopModifyDto>, ProcEsopModifyValidator>();
+            services.AddSingleton<AbstractValidator<ProcEsopGetJobQueryDto>, ProcEsopGetJobValidator>();
             #endregion
             #endregion
 

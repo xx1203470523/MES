@@ -8,6 +8,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -27,6 +28,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using IdGen;
+using OfficeOpenXml.VBA;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -93,6 +95,7 @@ namespace Hymson.MES.Services.Services.Plan
         private readonly IProcLabelTemplateRepository _procLabelTemplateRepository;
         private readonly ILabelPrintRequest _labelPrintRequest;
         private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 工序-物料-打印模板
         /// </summary>
@@ -348,11 +351,46 @@ namespace Hymson.MES.Services.Services.Plan
         }
 
         /// <summary>
+        /// 在条码下达时获取最新条码状态
+        /// </summary>
+        /// <param name="planSfcPrintQueryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<CreateBarcodeByWorkOrderOutputBo>> GetNewBarCodeOnBarCodeCreatedAsync(PlanSfcPrintQueryDto planSfcPrintQueryDto)
+        {            
+            if(planSfcPrintQueryDto.Datas?.Any() != true)
+            {
+                return new List<CreateBarcodeByWorkOrderOutputBo>();
+            }            
+
+            var pendingDatas = planSfcPrintQueryDto.Datas.ToList();
+
+            var result = new List<CreateBarcodeByWorkOrderOutputBo>(pendingDatas.Count);
+
+            var manuSFCIds = pendingDatas.Select(m => m.ManuSFCId);
+            var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(manuSFCIds);
+
+            foreach (var pendingData in pendingDatas)
+            {
+                var manuSFCEntity = manuSFCEntities.FirstOrDefault(m => m.Id == pendingData.ManuSFCId);
+                if (manuSFCEntity == null)
+                {
+                    continue;
+                }
+
+                pendingData.BarcodeStatus = manuSFCEntity.Status;
+
+                result.Add(pendingData);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 生成条码
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto parm)
+        public async Task<List<CreateBarcodeByWorkOrderOutputBo>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto parm)
         {
             return await _manuCreateBarcodeService.CreateBarcodeByWorkOrderIdAsync(new CreateBarcodeByWorkOrderBo
             {

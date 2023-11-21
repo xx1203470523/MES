@@ -13,8 +13,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// </summary>
         /// <param name="sfcBindingDto"></param>
         /// <returns></returns>
-        Task SfcBindingAsync(SfcBindingDto sfcBindingDto);
-
+        Task SfcCirculationBindAsync(SfcBindingDto sfcBindingDto);
 
     }
 }
