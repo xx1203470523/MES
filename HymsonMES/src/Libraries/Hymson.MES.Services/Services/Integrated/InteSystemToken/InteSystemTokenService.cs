@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 return inteSystemTokenEntity.ToModel<InteSystemTokenDto>();
             }
-            return null;
+            return new InteSystemTokenDto();
 
         }
 

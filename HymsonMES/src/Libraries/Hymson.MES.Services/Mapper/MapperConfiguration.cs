@@ -727,6 +727,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region ManuSfcProduce
             CreateMap<ManuSfcProduceEntity, ManuSfcProduceDto>();
+            CreateMap<ManuSfcProduceVehiclePagedQueryDto, ManuSfcProduceVehiclePagedQuery>();
             #endregion
 
             #region ContainerPack

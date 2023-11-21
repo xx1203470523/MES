@@ -103,12 +103,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public decimal? MinValue { get; set; }
 
         /// <summary>
-        /// 包含最小值类型;1< 2.≤
+        /// 包含最小值类型;1＜ 2.≤
         /// </summary>
         public ContainingTypeEnum? MinContainingType { get; set; }
 
         /// <summary>
-        /// 包含最大值类型;1< 2.≥
+        /// 包含最大值类型;1＜ 2.≥
         /// </summary>
         public ContainingTypeEnum? MaxContainingType { get; set; }
 

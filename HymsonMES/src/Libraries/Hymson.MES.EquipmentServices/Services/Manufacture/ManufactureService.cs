@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Data.Repositories.Common.Query;
@@ -190,6 +192,24 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             });
             if (manuBo == null) return;
 
+            var outStationRequestBo = new OutStationRequestBo
+            {
+                SFC = request.SFC,
+                IsQualified = request.Passed == 1
+            };
+
+            // 消耗条码
+            if (request.BindFeedingCodes != null && request.BindFeedingCodes.Any())
+            {
+                outStationRequestBo.ConsumeList = request.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+            }
+
+            // 不合格代码
+            if (request.NG != null && request.NG.Any())
+            {
+                outStationRequestBo.OutStationUnqualifiedList = request.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
+            }
+
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
             {
                 SiteId = _currentEquipment.SiteId,
@@ -197,7 +217,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                SFCs = new string[] { request.SFC }
+                OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
             });
         }
 
@@ -220,6 +240,30 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             });
             if (manuBo == null) return;
 
+            List<OutStationRequestBo> outStationRequestBos = new();
+            foreach (var item in request.SFCs)
+            {
+                var outStationRequestBo = new OutStationRequestBo
+                {
+                    SFC = item.SFC,
+                    IsQualified = item.Passed == 1
+                };
+
+                // 消耗条码
+                if (item.BindFeedingCodes != null && item.BindFeedingCodes.Any())
+                {
+                    outStationRequestBo.ConsumeList = item.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+                }
+
+                // 不合格代码
+                if (item.NG != null && item.NG.Any())
+                {
+                    outStationRequestBo.OutStationUnqualifiedList = item.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
+                }
+
+                outStationRequestBos.Add(outStationRequestBo);
+            }
+
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
             {
                 SiteId = _currentEquipment.SiteId,
@@ -227,7 +271,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                SFCs = request.SFCs.Select(s => s.SFC)
+                OutStationRequestBos = outStationRequestBos
             });
         }
 
@@ -278,6 +322,24 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             });
             if (manuBo == null) return;
 
+            var outStationRequestBo = new OutStationRequestBo
+            {
+                VehicleCode = request.CarrierNo,
+                IsQualified = request.Passed == 1
+            };
+
+            // 消耗条码
+            if (request.BindFeedingCodes != null && request.BindFeedingCodes.Any())
+            {
+                outStationRequestBo.ConsumeList = request.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+            }
+
+            // 不合格代码
+            if (request.NG != null && request.NG.Any())
+            {
+                outStationRequestBo.OutStationUnqualifiedList = request.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
+            }
+
             _ = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
             {
                 SiteId = _currentEquipment.SiteId,
@@ -285,7 +347,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                VehicleCodes = new string[] { request.CarrierNo }
+                OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
             });
         }
 

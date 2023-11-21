@@ -693,6 +693,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long? LockProductionId { get; set; }
 
         /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
         /// BOMId
         /// </summary>
         public long? ProductBOMId { get; set; }
@@ -905,6 +910,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 工单
         /// </summary>
         public string OrderCode { get; set; }
+
+        /// <summary>
+        /// 载具
+        /// </summary>
+        public string VehicleCode { get; set; }
 
         /// <summary>
         /// 工序Code
@@ -1227,4 +1237,61 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public DateTime StartTime { get; set; }
     }
 
+    public class ManuSfcProduceVehiclePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        ///产品条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 条码列表
+        /// </summary>
+        public string[]? Sfcs { get; set; }
+
+        /// <summary>
+        /// 产品id
+        /// </summary>
+        public long? ProductId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// BOMId
+        /// </summary>
+        public long? ProductBOMId { get; set; }
+
+        /// <summary>
+        /// 当前工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 载具Id
+        /// </summary>
+        public long? VehicleId { get; set; }
+
+        /// <summary>
+        /// 状态;1：排队；2：活动；
+        /// </summary>
+        public SfcStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 是否报废
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.CoreServices.Bos.Job;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
@@ -77,7 +78,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 载具条码
         /// </summary>
-        public IEnumerable<string> SFCs { get; set; }
+        public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }
     }
 
     /// <summary>
@@ -103,7 +104,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 载具条码
         /// </summary>
-        public IEnumerable<string> VehicleCodes { get; set; }
+        public IEnumerable<OutStationRequestBo> OutStationRequestBos { get; set; }
     }
 
 }
