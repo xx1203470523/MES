@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Process.LabelTemplate
@@ -57,5 +58,20 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <param name="labelTemplateId"></param>
         /// <returns></returns>
         Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long labelTemplateId);
+
+        /// <summary>
+        /// 获取打印类对应的选项
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<PrintClassOptionDto>> GetPrintClassListAsync();
+
+
+        /// <summary>
+        /// 获取测试模型对应的打印数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<TestPrintPrintDataDto> GetAboutPrintDataAsync(string id);
     }
 }
