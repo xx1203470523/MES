@@ -341,9 +341,9 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         ProcessRouteId = processRouteEntity.Id,
                         ProcessRouteCode = processRouteEntity.Code,
                         ProcessRouteVersion = processRouteEntity.Version,
-                        BomId = procBomEntity.Id,
-                        BomCode = procBomEntity.BomCode,
-                        BomVersion = procBomEntity.Version
+                        BomId = procBomEntity?.Id,
+                        BomCode = procBomEntity?.BomCode,
+                        BomVersion = procBomEntity?.Version
                     };
                     result.Add(resultItem);
                 }
