@@ -1439,7 +1439,7 @@
         public const string MES19932 = "条码：{SFC}已报废";
         public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
         public const string MES19934 = "设备{EquipmentCode}不存在";
-
+        public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
 
 
         #endregion

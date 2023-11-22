@@ -15,7 +15,6 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -30,9 +29,7 @@ using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
-using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
-using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -834,7 +831,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 {
                     var procedureIds = processRouteDetail.ProcedureIds.ToList();
                     int index = 1;
-                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList.Select(x=>x.ProcessRouteDetailId))
+                    foreach (var item in procProcessRouteDetailLinkByprocedureIdList.Select(x => x.ProcessRouteDetailId))
                     {
                         if (item != ProcessRoute.LastProcedureId)
                         {
@@ -1275,56 +1272,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
         }
 
-        /// <summary>
-        /// 获取当前生产对象
-        /// </summary>
-        /// <param name="requestBo"></param>
-        /// <returns></returns>
-        public async Task<ManufactureProcedureBo> GetManufactureEquipmentAsync(ManufactureEquipmentBo param)
-        {
-            // 根据设备
-            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = param.SiteId,
-                Code = param.EquipmentCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", param.EquipmentCode);
-
-            // 查询资源
-            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = param.SiteId,
-                Code = param.ResourceCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", param.ResourceCode);
-
-            // 读取设备绑定的资源
-            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
-            {
-                SiteId = param.SiteId,
-                EquipmentCode = param.EquipmentCode
-            });
-            if (resourceBindEntities == null || !resourceBindEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19910))
-                    .WithData("ResCode", param.ResourceCode)
-                    .WithData("EquCode", param.EquipmentCode);
-            }
-
-            // 读取资源对应的工序
-            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
-            {
-                SiteId = param.SiteId,
-                ResourceId = resourceEntity.Id
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", param.ResourceCode);
-
-            return new ManufactureProcedureBo
-            {
-                ResourceId = resourceEntity.Id,
-                ProcedureId = procProcedureEntity.Id,
-                EquipmentId = equipmentEntity.Id
-            };
-        }
-
-
+        
         /// <summary>
         /// 转换数量
         /// </summary>
@@ -1359,5 +1307,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(parameterBySfcQuery);
             return parameterList;
         }
+
     }
 }
