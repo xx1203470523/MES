@@ -123,6 +123,9 @@ namespace Hymson.MES.CoreServices.Services.Job
             var updatedOn = HymsonClock.Now();
             responseBo.SFCProduceEntities.ForEach(sfcProduceEntity =>
             {
+                // 条码状态（当前状态）
+                var currentStatus = sfcProduceEntity.Status;
+
                 // 更改状态，将条码由"活动"改为"排队"
                 sfcProduceEntity.Status = SfcStatusEnum.lineUp;
                 sfcProduceEntity.UpdatedBy = updatedBy;
@@ -134,6 +137,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     // 插入 manu_sfc_step 状态为 停止
                     Operatetype = ManuSfcStepTypeEnum.Stop,
+                    CurrentStatus = currentStatus,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,

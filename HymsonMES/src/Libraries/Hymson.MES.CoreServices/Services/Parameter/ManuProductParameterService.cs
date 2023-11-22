@@ -3,6 +3,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -18,6 +19,11 @@ namespace Hymson.MES.CoreServices.Services.Parameter
     public class ManuProductParameterService : IManuProductParameterService
     {
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 产品参数
         /// </summary>
         private readonly IManuProductParameterRepository _manuProductParameterRepository;
@@ -28,22 +34,22 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         private readonly IProcParameterRepository _procParameterRepository;
 
         /// <summary>
-        /// 仓储接口（工序维护）
+        /// 构造函数
         /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
-        /// 参数采集
-        /// </summary>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuProductParameterRepository"></param>
-        /// <param name="parameterOptions"></param>
+        /// <param name="procParameterRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        public ManuProductParameterService(IManuProductParameterRepository manuProductParameterRepository, IProcParameterRepository procParameterRepository, IProcProcedureRepository procProcedureRepository)
+        public ManuProductParameterService(IManuCommonService manuCommonService,
+            IManuProductParameterRepository manuProductParameterRepository,
+            IProcParameterRepository procParameterRepository,
+            IProcProcedureRepository procProcedureRepository)
         {
+            _manuCommonService = manuCommonService;
             _manuProductParameterRepository = manuProductParameterRepository;
             _procParameterRepository = procParameterRepository;
-            _procProcedureRepository = procProcedureRepository;
         }
+
 
         /// <summary>
         /// 根据工序参数信息
@@ -61,11 +67,11 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         }
 
         /// <summary>
-        /// 参数采集
+        /// 参数采集（产品过程参数）
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        public async Task<int> ProductParameterCollectAsync(ProductProcessParameterBo bo)
+        public async Task<int> ProductProcessCollectAsync(ProductProcessParameterBo bo)
         {
             var parameterEntities = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
             {
@@ -112,6 +118,8 @@ namespace Hymson.MES.CoreServices.Services.Parameter
             trans.Complete();
             return row;
         }
+
+
 
     }
 }

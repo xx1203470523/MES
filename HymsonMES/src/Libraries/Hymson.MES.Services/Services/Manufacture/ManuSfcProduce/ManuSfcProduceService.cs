@@ -2824,7 +2824,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             }
 
-            return activityVehicleViewDtos;
+            return activityVehicleViewDtos.OrderByDescending(x=>x.StartTime).ToList();
         }
 
 
@@ -2842,7 +2842,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 //ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.lineUp
+                Status = SfcProduceStatusEnum.lineUp,
+
+                MaterialCode=query.MaterialCode,
+                MaterialVersion=query.MaterialVersion,
             });
 
             if (!sfcProduceList.Any()) return resultPaged;

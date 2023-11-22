@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -23,6 +24,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -204,6 +206,18 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 foreach (var sfcProduce in sfcProduceEntitiesOfNoMatchProcedure)
                 {
+                    var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduce.ProcedureId);
+
+                    // 如果存在工序不一致，且复投次数大于0时，抛出异常
+                    if (sfcProduce.RepeatedCount > 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16368))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Procedure", currentProcedureEntity.Code)
+                            .WithData("Cycle", sfcProduce.RepeatedCount);
+                    }
+
                     // 如果有性能问题，可以考虑将这个两个集合先分组，然后再进行判断
                     var processRouteDetailLinks = allProcessRouteDetailLinks.Where(w => w.ProcessRouteId == sfcProduce.ProcessRouteId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
@@ -223,9 +237,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     if (!isAllRandomProcedureBetween)
                     {
                         _logger.LogWarning($"条码{sfcProduce.SFC}，工艺路线:{sfcProduce.ProcessRouteId}，应进站工序{sfcProduce.ProcedureId}和实际进站工序{commonBo.ProcedureId}之间不是全部都是随机工序");
-
-                        var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
-                            ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduce.ProcedureId);
 
                         throw new CustomerValidationException(nameof(ErrorCode.MES16357))
                             .WithData("SFC", sfcProduce.SFC)
@@ -331,6 +342,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.SFCStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.InStock,  // 状态为 进站
+                    CurrentStatus = SfcStatusEnum.lineUp,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,

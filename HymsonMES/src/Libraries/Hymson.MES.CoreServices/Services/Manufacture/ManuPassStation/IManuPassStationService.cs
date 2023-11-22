@@ -37,15 +37,5 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// <returns></returns>
         Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo bo);
 
-
-
-        #region 内部方法
-        /// <summary>
-        /// 获取载具里面的条码（带验证）
-        /// </summary>
-        /// <param name="requestBo"></param>
-        /// <returns></returns>
-        Task<IEnumerable<VehicleSFCResponseBo>> GetSFCsByVehicleCodesAsync(VehicleSFCRequestBo requestBo);
-        #endregion
     }
 }

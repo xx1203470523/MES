@@ -221,6 +221,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
 
+
+            if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode)) 
+            {
+                sqlBuilder.LeftJoin(" proc_material ma  on msi.ProductId =ma.id");
+            }
+
+            if (!string.IsNullOrEmpty(query.MaterialCode)) 
+            {
+                query.MaterialCode = $"%{query.MaterialCode}%";
+                sqlBuilder.Where("ma.MaterialCode like  @MaterialCode");
+            }
+            if (!string.IsNullOrEmpty(query.MaterialVersion))
+            {
+                query.MaterialVersion = $"%{query.MaterialVersion}%";
+                sqlBuilder.Where("ma.Version like @MaterialVersion");
+            }
+
             //sfc条码状态
             if (query.SfcStatus.HasValue)
             {

@@ -96,7 +96,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             return await Task.FromResult(new JobResponseBo
             {
                 Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } },
-                Message = _localizationService.GetResource(nameof(ErrorCode.MES16363))
+                Message = "" //_localizationService.GetResource(nameof(ErrorCode.MES16363))
             });
         }
 

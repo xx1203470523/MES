@@ -11,14 +11,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// </summary>
     [ApiController]
     //[AllowAnonymous]
-    [Route("EquipmentService/api/v1/[controller]")]
+    [Route("EquipmentService/api/v1")]
     public class EquipmentController : ControllerBase
     {
-        /// <summary>
-        /// 日志
-        /// </summary>
-        private readonly ILogger<EquipmentController> _logger;
-
         /// <summary>
         /// 生产服务接口
         /// </summary>
@@ -32,14 +27,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="logger"></param>
         /// <param name="manufactureService"></param>
         /// <param name="sfcBindingService"></param>
-        public EquipmentController(ILogger<EquipmentController> logger,
-            IManufactureService manufactureService,
+        public EquipmentController(IManufactureService manufactureService,
             ISfcBindingService sfcBindingService)
         {
-            _logger = logger;
             _manufactureService = manufactureService;
             _sfcBindingService = sfcBindingService;
         }
@@ -119,7 +111,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("OutBoundVehicle")]
-        public async Task OutBoundVehicleAsync(OutBoundCarrierDto request)
+        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
         {
             await _manufactureService.OutBoundVehicleAsync(request);
         }

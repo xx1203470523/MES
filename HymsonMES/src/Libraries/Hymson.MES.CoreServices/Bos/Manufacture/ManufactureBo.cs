@@ -37,6 +37,49 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     }
 
     /// <summary>
+    /// 当前生成对象
+    /// </summary>
+    public class ManufactureRequestBo
+    {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; } = "";
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; } = "";
+    }
+
+    /// <summary>
+    /// 当前生成对象
+    /// </summary>
+    public class ManufactureResponseBo
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+    }
+
+    /// <summary>
     /// 在制维修出站
     /// </summary>
     public class ManufactureRepairBo

@@ -1,31 +1,16 @@
 ﻿using FluentValidation;
-using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
-using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
-using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.MES.EquipmentServices.Services.Manufacture;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcBinding
 {
@@ -85,6 +70,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         private readonly IProcProductSetRepository _procProductSetRepository;
 
         /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
+
+        /// <summary>
         /// 仓储接口（公共方法）
         /// </summary>
         private readonly ICommonService _manuCommonOldService;
@@ -108,7 +98,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         private readonly AbstractValidator<SfcBindingDto> _validationSfcBindingDtoRules;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="currentEquipment"></param>
         /// <param name="manuSfcProduceRepository"></param>
@@ -120,12 +110,13 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcInfoRepository"></param>
         /// <param name="procProductSetRepository"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="equEquipmentRepository"></param>
         /// <param name="manuBindService"></param>
         /// <param name="localizationService"></param>
-        public SfcBindingService(
-            ICurrentEquipment currentEquipment,
+        /// <param name="validationSfcBindingDtoRules"></param>
+        public SfcBindingService(ICurrentEquipment currentEquipment,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -135,12 +126,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IProcProductSetRepository procProductSetRepository,
+            IManuCommonService manuCommonService,
             ICommonService manuCommonOldService,
             IEquEquipmentRepository equEquipmentRepository,
             IManuBindService manuBindService,
             ILocalizationService localizationService,
-            AbstractValidator<SfcBindingDto> validationSfcBindingDtoRules
-            )
+            AbstractValidator<SfcBindingDto> validationSfcBindingDtoRules)
         {
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
@@ -152,10 +143,11 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             _manuSfcRepository = manuSfcRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _procProductSetRepository = procProductSetRepository;
+            _manuCommonService = manuCommonService;
             _manuCommonOldService = manuCommonOldService;
-            _equEquipmentRepository= equEquipmentRepository;
-            _manuBindService= manuBindService;
-            _localizationService= localizationService;
+            _equEquipmentRepository = equEquipmentRepository;
+            _manuBindService = manuBindService;
+            _localizationService = localizationService;
             _validationSfcBindingDtoRules = validationSfcBindingDtoRules;
         }
 
@@ -417,7 +409,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
         public async Task SfcCirculationBindAsync(SfcBindingDto sfcBindingDto)
         {
             await _validationSfcBindingDtoRules.ValidateAndThrowAsync(sfcBindingDto);
-            var manuBo = await GetManufactureBoAsync(new ManufactureRequestBo
+            var manuBo = await _manuCommonService.GetManufactureBoAsync(new ManufactureRequestBo
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = sfcBindingDto.ResourceCode,
@@ -438,56 +430,5 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             , _localizationService);
         }
 
-        #region 内部方法
-        /// <summary>
-        /// 获取当前生产对象
-        /// </summary>
-        /// <param name="requestBo"></param>
-        /// <returns></returns>
-        private async Task<ManufactureResponseBo> GetManufactureBoAsync(ManufactureRequestBo requestBo)
-        {
-            // 查询资源
-            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = requestBo.SiteId,
-                Code = requestBo.ResourceCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", requestBo.ResourceCode);
-
-            // 根据设备
-            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
-            {
-                Site = requestBo.SiteId,
-                Code = requestBo.EquipmentCode
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", requestBo.EquipmentCode);
-
-            // 读取设备绑定的资源
-            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
-            {
-                SiteId = requestBo.SiteId,
-                EquipmentCode = requestBo.EquipmentCode
-            });
-            if (resourceBindEntities == null || !resourceBindEntities.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19131))
-                    .WithData("ResCode", requestBo.ResourceCode)
-                    .WithData("EquCode", requestBo.EquipmentCode);
-            }
-
-            // 读取资源对应的工序
-            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                ResourceId = resourceEntity.Id
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", requestBo.ResourceCode);
-
-            return new ManufactureResponseBo
-            {
-                ResourceId = resourceEntity.Id,
-                ProcedureId = procProcedureEntity.Id,
-                EquipmentId = equipmentEntity.Id
-            };
-        }
-
-        #endregion
     }
 }

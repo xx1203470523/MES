@@ -27,6 +27,7 @@
 	<ItemGroup>
 	  <Folder Include="Bos\Manufacture\" />
 	  <Folder Include="Services\Bootup\" />
+	  <Folder Include="Validators\EquipmentCollect\" />
 	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>
 

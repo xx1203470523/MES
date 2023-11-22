@@ -36,5 +36,20 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="materialId"></param>
         /// <returns></returns>
         Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId);
+
+        /// <summary>
+        /// 获取载具里面的条码（带验证）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<VehicleSFCResponseBo>> GetSFCsByVehicleCodesAsync(VehicleSFCRequestBo requestBo);
+
+        /// <summary>
+        /// 获取当前生产对象
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<ManufactureResponseBo> GetManufactureBoAsync(ManufactureRequestBo requestBo);
+
     }
 }

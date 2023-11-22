@@ -13,6 +13,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Parameter;
@@ -33,6 +34,11 @@ namespace Hymson.MES.Services.Services.Manufacture
     {
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 服务接口（生产通用）
+        /// </summary>
+        private readonly IManuCommonService _manuCommonService;
 
         /// <summary>
         /// 操作面板按钮 仓储
@@ -80,6 +86,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuCommonService"></param>
         /// <param name="manuFacePlateButtonRepository"></param>
         /// <param name="manuFacePlateButtonJobRelationRepository"></param>
         /// <param name="manuFacePlateProductionRepository"></param>
@@ -90,6 +97,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="validationModifyRules"></param>
         /// <param name="executeJobService"></param>
         public ManuFacePlateButtonService(ICurrentUser currentUser, ICurrentSite currentSite,
+            IManuCommonService manuCommonService,
             IManuFacePlateButtonRepository manuFacePlateButtonRepository,
             IManuFacePlateButtonJobRelationRepository manuFacePlateButtonJobRelationRepository,
             IManuFacePlateProductionRepository manuFacePlateProductionRepository,
@@ -102,6 +110,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _manuCommonService = manuCommonService;
             _manuFacePlateButtonRepository = manuFacePlateButtonRepository;
             _manuFacePlateButtonJobRelationRepository = manuFacePlateButtonJobRelationRepository;
             _manuFacePlateProductionRepository = manuFacePlateProductionRepository;
@@ -380,7 +389,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", dto.Param!["SFCs"]);
 
                     // 根据载具代码获取载具里面的条码
-                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = requestBo.SiteId, VehicleCodes = vehicleCodes });
+                    var vehicleSFCs = await _manuCommonService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = requestBo.SiteId, VehicleCodes = vehicleCodes });
 
                     SFCs = vehicleSFCs.Select(s => s.SFC).AsList();
                     panelRequestBos.AddRange(vehicleSFCs.Select(s => new PanelRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
@@ -493,7 +502,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", dto.Param!["SFCs"]);
 
                     // 根据载具代码获取载具里面的条码
-                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = requestBo.SiteId, VehicleCodes = vehicleCodes });
+                    var vehicleSFCs = await _manuCommonService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = requestBo.SiteId, VehicleCodes = vehicleCodes });
 
                     SFCs = vehicleSFCs.Select(s => s.SFC).AsList();
                     panelRequestBos.AddRange(vehicleSFCs.Select(s => new PanelRequestBo { SFC = s.SFC, VehicleCode = s.VehicleCode }));
@@ -551,14 +560,18 @@ namespace Hymson.MES.Services.Services.Manufacture
                     SFCs = dto.SFCs.ToList();
                     break;
                 case ManuFacePlateBarcodeTypeEnum.Vehicle:
-                    var vehicleSFCs = await _manuPassStationService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo { SiteId = dto.SiteId, VehicleCodes = dto.SFCs });
+                    var vehicleSFCs = await _manuCommonService.GetSFCsByVehicleCodesAsync(new VehicleSFCRequestBo
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        VehicleCodes = dto.SFCs
+                    });
                     SFCs = vehicleSFCs.Select(s => s.SFC).ToList();
                     break;
                 default:
                     break;
             }
 
-            return await _manuProductParameterService.ProductParameterCollectAsync(new ProductProcessParameterBo
+            return await _manuProductParameterService.ProductProcessCollectAsync(new ProductProcessParameterBo
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
