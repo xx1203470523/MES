@@ -24,6 +24,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -205,6 +206,18 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 foreach (var sfcProduce in sfcProduceEntitiesOfNoMatchProcedure)
                 {
+                    var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduce.ProcedureId);
+
+                    // 如果存在工序不一致，且复投次数大于0时，抛出异常
+                    if (sfcProduce.RepeatedCount > 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16368))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Procedure", currentProcedureEntity.Code)
+                            .WithData("Cycle", sfcProduce.RepeatedCount);
+                    }
+
                     // 如果有性能问题，可以考虑将这个两个集合先分组，然后再进行判断
                     var processRouteDetailLinks = allProcessRouteDetailLinks.Where(w => w.ProcessRouteId == sfcProduce.ProcessRouteId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18213));
@@ -225,38 +238,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                     {
                         _logger.LogWarning($"条码{sfcProduce.SFC}，工艺路线:{sfcProduce.ProcessRouteId}，应进站工序{sfcProduce.ProcedureId}和实际进站工序{commonBo.ProcedureId}之间不是全部都是随机工序");
 
-                        var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
-                            ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduce.ProcedureId);
-
                         throw new CustomerValidationException(nameof(ErrorCode.MES16357))
                             .WithData("SFC", sfcProduce.SFC)
                             .WithData("Current", procedureEntity.Code)
                             .WithData("Procedure", currentProcedureEntity.Code);
                     }
                 }
-            }
-
-            // 如果存在工序不一致，且复投次数大于0时，抛出异常
-            var validationFailures = new List<ValidationFailure>();
-            var notAllowEntities = sfcProduceEntities.Where(w => w.ProcedureId != procedureEntity.Id && w.RepeatedCount > 0);
-            foreach (var entity in notAllowEntities)
-            {
-                // 条码记录的工序信息
-                var preProcedureEntity = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", entity.ProcedureId);
-
-                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
-                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", entity.SFC);
-                validationFailure.FormattedMessagePlaceholderValues.Add("SFC", entity.SFC);
-                validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", preProcedureEntity.Code);
-                validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", procedureEntity.Cycle);
-                validationFailure.ErrorCode = nameof(ErrorCode.MES16368);
-                validationFailures.Add(validationFailure);
-            }
-
-            if (validationFailures.Any())
-            {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
 
             // 循环次数验证（复投次数）
