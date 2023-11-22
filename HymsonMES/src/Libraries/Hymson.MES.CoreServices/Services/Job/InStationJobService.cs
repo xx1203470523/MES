@@ -207,7 +207,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 foreach (var sfcProduce in sfcProduceEntitiesOfNoMatchProcedure)
                 {
                     var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
-                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduce.ProcedureId);
+                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16369))
+                        .WithData("SFC", sfcProduce.SFC)
+                        .WithData("Procedure", sfcProduce.ProcedureId);
 
                     // 如果存在工序不一致，且复投次数大于0时，抛出异常
                     if (sfcProduce.RepeatedCount > 0)

@@ -916,6 +916,7 @@
         public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
         public const string MES16367 = "条码【{SFC}】所记录的工单不存在";
         public const string MES16368 = "条码【{SFC}】已在原工序【{Procedure}】处不合格出站【{Cycle}】次，请继续复投。";
+        public const string MES16369 = "条码【{SFC}】指定的工序【{Procedure}】不存在";
         #endregion
 
         #region 工单激活 MES16400

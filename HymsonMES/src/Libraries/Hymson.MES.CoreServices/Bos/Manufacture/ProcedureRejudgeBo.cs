@@ -24,7 +24,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public string ProcedureCode { get; set; }
 
         /// <summary>
-        /// ID（下工序）
+        /// 是否有设置不合格工艺路线
+        /// </summary>
+        public bool IsHasUnQualifiedProcessRoute { get; set; } = false;
+
+        /// <summary>
+        /// ID（下工序）（当值是0时，大多情况是因为未找到不合格工艺路线）
         /// </summary>
         public long NextProcedureId { get; set; }
 

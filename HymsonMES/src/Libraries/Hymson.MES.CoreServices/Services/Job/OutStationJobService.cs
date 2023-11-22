@@ -883,6 +883,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     }
 
                     // 更新下一工序
+                    if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
                     sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
 
                     // 一旦切换工序，复投次数重置
@@ -970,6 +971,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         }
 
                         // 更新下一工序
+                        if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
                         sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
 
                         // 一旦切换工序，复投次数重置
@@ -1268,6 +1270,9 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (!procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17116))
                     .WithData("Code", procedureRejudgeBo.LastUnqualified.UnqualifiedCode);
+
+            // 填充工艺路线值
+            procedureRejudgeBo.IsHasUnQualifiedProcessRoute = true;
 
             // 取得不合格工艺路线首工序
             var processRouteProcedureDto = await _masterDataService.GetFirstProcedureAsync(procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value)
