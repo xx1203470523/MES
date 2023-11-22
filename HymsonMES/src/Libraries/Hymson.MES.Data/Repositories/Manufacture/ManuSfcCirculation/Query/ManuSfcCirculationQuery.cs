@@ -98,6 +98,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         public string CirculationBarCode { get; set; }
 
         /// <summary>
+        /// 转换后条码
+        /// </summary>
+        public IEnumerable<string>? CirculationBarCodes { get; set; }
+
+        /// <summary>
         /// 流转类型
         /// </summary>
         public SfcCirculationTypeEnum[] CirculationTypes { get; set; }

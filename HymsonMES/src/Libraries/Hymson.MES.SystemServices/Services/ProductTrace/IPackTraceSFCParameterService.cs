@@ -18,5 +18,5 @@ public interface IPackTraceSFCParameterService
     /// </summary>
     /// <param name="queryDto"></param>
     /// <returns></returns>
-    public Task<IEnumerable<PackTraceSFCParameterViewDto>> PackTraceSFCParamterAsync(PackTraceSFCParameterQueryDto queryDto);
+    public Task<IEnumerable<PackTraceSFCParameterViewOutput>> PackTraceSFCParamterAsync(PackTraceSFCParameterQueryDto queryDto);
 }

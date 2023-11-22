@@ -27,6 +27,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 条码
         /// </summary>
         public string SFC { get; set; }
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string>? SFCs { get; set; }
 
         /// <summary>
         /// 工序Id

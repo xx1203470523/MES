@@ -120,12 +120,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Select("*");
 
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Where("IsDeleted = 0");
 
             if (!string.IsNullOrWhiteSpace(query.SFC))
             {
-                sqlBuilder.Where("SFC = @Sfc");
+                sqlBuilder.Where("SFC = @SFC");
             }
+
+            if (query.SFCs?.Any() == true)
+            {
+                string sfcstr = string.Join("','", query.SFCs);
+                sqlBuilder.Where($"SFC IN ('{sfcstr}')");
+            }
+
+            sqlBuilder.Where("IsDeleted = 0");
 
             sqlBuilder.AddParameters(query);
 
@@ -290,9 +297,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuProductParameterRepository
     {
-        const string GetManuProductParameterEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `manu_product_parameter` /**where**/  ";
+        const string GetManuProductParameterEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_product_parameter` /**where**/  ";
 
         const string InsertSql = @"INSERT INTO `manu_product_parameter`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `ParameterId`, `ParamValue`, StandardUpperLimit, StandardLowerLimit, JudgmentResult, TestDuration, TestTime, TestResult,`LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `StepId`) 
                         VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @SFC, @WorkOrderId, @ProductId, @ParameterId, @ParamValue, @StandardUpperLimit, @StandardLowerLimit, @JudgmentResult, @TestDuration, @TestTime, @TestResult, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @StepId )  ";

@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
+namespace Hymson.MES.SystemServices.Dtos.Api;
 
 /// <summary>
-/// Pack追溯电芯码查询参数
+/// 条码信息查询参数
 /// </summary>
-public class PackTraceSFCParameterQueryDto
+public class GetSFCInfoQueryDto
 {
     /// <summary>
-    /// 查询PACK码
+    /// SFCs
     /// </summary>
     public IEnumerable<string>? SFC { get; set; }
 }

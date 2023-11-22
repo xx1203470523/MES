@@ -2,6 +2,7 @@
 
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
+using Hymson.MES.SystemServices.Services.Api;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.MES.SystemServices.Services.ProductTrace;
@@ -48,6 +49,10 @@ namespace Hymson.MES.SystemServices.DependencyInjection
             services.AddSingleton<IManuSfcCirculationService, ManuSfcCirculationService>();
 
             services.AddSingleton<IProductTraceReportService, ProductTraceReportService>();
+
+            services.AddSingleton<IPackTraceSFCParameterService, PackTraceSFCParameterService>();
+
+            services.AddSingleton<ISystemApiService, SystemApiService>();
 
             #endregion
 

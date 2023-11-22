@@ -1,10 +1,12 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.SystemServices.Dtos.Api;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Dtos.ProductTraceReport;
 using Hymson.MES.SystemServices.Dtos.ProductTraceReport.Query;
+using Hymson.MES.SystemServices.Services.Api;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
 using Hymson.MES.SystemServices.Services.ProductTrace;
@@ -24,6 +26,7 @@ namespace Hymson.MES.System.Api.Controllers
         private readonly IManuSfcCirculationService _manuSfcCirculationService;
         private readonly IProductTraceReportService _productTraceReportService;
         private readonly IPackTraceSFCParameterService _packTraceSFCParameterService;
+        private readonly ISystemApiService _systemApiService;
 
         /// <summary>
         /// 构造函数
@@ -33,17 +36,20 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="manuSfcCirculationService"></param>
         /// <param name="productTraceReportService"></param>
         /// <param name="packTraceSFCParameterService"></param>
-        public SystemController(ILogger<SystemController> logger, 
-            IPlanWorkOrderService planWorkOrderService, 
+        /// <param name="systemApiService"></param>
+        public SystemController(ILogger<SystemController> logger,
+            IPlanWorkOrderService planWorkOrderService,
             IManuSfcCirculationService manuSfcCirculationService,
             IProductTraceReportService productTraceReportService,
-            IPackTraceSFCParameterService packTraceSFCParameterService)
+            IPackTraceSFCParameterService packTraceSFCParameterService,
+            ISystemApiService systemApiService)
         {
             _logger = logger;
             _planWorkOrderService = planWorkOrderService;
             _manuSfcCirculationService = manuSfcCirculationService;
             _productTraceReportService = productTraceReportService;
             _packTraceSFCParameterService = packTraceSFCParameterService;
+            _systemApiService = systemApiService;
         }
 
         /// <summary>
@@ -111,7 +117,7 @@ namespace Hymson.MES.System.Api.Controllers
         [Route("productprameter")]
         public async Task<IEnumerable<ManuSfcPrameterDto>> GetProductPrameterPagedListAsync(ManuSfcPrameterQueryDto manuSfcPrameterQueryDto)
         {
-           if (string.IsNullOrEmpty(manuSfcPrameterQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
+            if (string.IsNullOrEmpty(manuSfcPrameterQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             ManuProductPrameterPagedQueryDto param = new ManuProductPrameterPagedQueryDto()
             {
                 SFC = manuSfcPrameterQueryDto.SFC,
@@ -119,7 +125,7 @@ namespace Hymson.MES.System.Api.Controllers
                 PageSize = 2000,
                 PageIndex = 1
             };
-            var manuProductParameterViewDtoList =  await _productTraceReportService.GetProductPrameterPagedListAsync(param);
+            var manuProductParameterViewDtoList = await _productTraceReportService.GetProductPrameterPagedListAsync(param);
 
             List<ManuSfcPrameterDto> manuSfcPrameterDtoList = new List<ManuSfcPrameterDto>();
             foreach (var ManuSfcCirculationViewDto in manuProductParameterViewDtoList.Data)
@@ -189,9 +195,30 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("trace/pack")]
-        public async Task<IEnumerable<PackTraceSFCParameterViewDto>> GetPackTraceSFCParameterAsync(PackTraceSFCParameterQueryDto queryDto)
+        public async Task<IEnumerable<PackTraceSFCParameterViewOutput>> GetPackTraceSFCParameterAsync([FromBody] PackTraceSFCParameterQueryDto queryDto)
         {
             return await _packTraceSFCParameterService.PackTraceSFCParamterAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 批量查询pack码/模组条码的信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("sfc/info")]
+        public async Task<IEnumerable<GetSFCInfoViewDto>> GetSFCInfo([FromBody] GetSFCInfoQueryDto queryDto)
+        {
+            return await _systemApiService.GetSFCInfoAsync(queryDto);
+        }
+
+
+        [HttpGet]
+        [Route("produce/status/update")]
+        public async Task UpdateManuSFCProduceStatus(string? isNext, string SFC)
+        {
+            await _systemApiService.UpdateManuSFCProduceStatus("", SFC);
+
         }
     }
 }

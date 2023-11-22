@@ -17,5 +17,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品条码
         /// </summary>
         public string SFC { get; set; }
+
+        /// <summary>
+        /// 产品条码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
     }
 }

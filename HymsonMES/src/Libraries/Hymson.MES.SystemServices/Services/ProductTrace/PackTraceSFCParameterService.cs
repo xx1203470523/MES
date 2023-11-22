@@ -34,7 +34,7 @@ public class PackTraceSFCParameterService : IPackTraceSFCParameterService
     /// <param name="queryDto"></param>
     /// <returns></returns>
     /// <exception cref="CustomerValidationException"></exception>
-    public async Task<IEnumerable<PackTraceSFCParameterViewDto>> PackTraceSFCParamterAsync(PackTraceSFCParameterQueryDto queryDto)
+    public async Task<IEnumerable<PackTraceSFCParameterViewOutput>> PackTraceSFCParamterAsync(PackTraceSFCParameterQueryDto queryDto)
     {
         if (queryDto.SFC?.Any() == false)
         {
@@ -48,7 +48,8 @@ public class PackTraceSFCParameterService : IPackTraceSFCParameterService
         List<PackTraceSFCParameterViewDto> result = new();
         foreach (var item in list)
         {
-            result.Add(new() { 
+            result.Add(new()
+            {
                 EquipmentName = item.EquipmentName,
                 JudgmentResult = item.JudgmentResult,
                 LocalTime = item.LocalTime,
@@ -64,7 +65,20 @@ public class PackTraceSFCParameterService : IPackTraceSFCParameterService
             });
         }
 
-        return result;
+        List<PackTraceSFCParameterViewOutput> outputResult = new();
+        foreach (var item in queryDto.SFC)
+        {
+            var paramdetail = result.Where(a=>a.Pack == item);
+
+            PackTraceSFCParameterViewOutput detail = new()
+            {
+                Pack = item,
+                TestRecordlist = paramdetail
+            };
+            outputResult.Add(detail);
+        }
+
+        return outputResult;
     }
 
 

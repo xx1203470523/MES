@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.SystemServices.Dtos.ProductTraceReport;
 
+/// <summary>
+/// Pack追溯电芯码查询设备采集参数
+/// </summary>
 public record PackTraceSFCParameterViewDto : BaseEntityDto
 {
     /// <summary>
@@ -70,3 +73,18 @@ public record PackTraceSFCParameterViewDto : BaseEntityDto
     public string? StandardUpperLimit { get; set; }
 }
 
+/// <summary>
+/// Pack追溯电芯码查询设备采集参数输出图
+/// </summary>
+public record PackTraceSFCParameterViewOutput
+{
+    /// <summary>
+    /// PACK模组码
+    /// </summary>
+    public string? Pack { get; set; }
+
+    /// <summary>
+    /// 测试参数数据集
+    /// </summary>
+    public IEnumerable<PackTraceSFCParameterViewDto>? TestRecordlist { get; set; }
+}

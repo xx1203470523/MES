@@ -12,5 +12,5 @@ public record PackTraceSFCParameterQuery
     /// <summary>
     /// 批量查询Pack码
     /// </summary>
-    public IEnumerable<long>? SFC { get; set; }
+    public IEnumerable<string>? SFC { get; set; }
 }

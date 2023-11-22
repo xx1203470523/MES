@@ -99,6 +99,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("SFC=@SFC");
             }
+            if (manuSfcStepQuery?.SFCs?.Any() == true)
+            {
+                string sfcstr = string.Join("','", manuSfcStepQuery.SFC);
+                sqlBuilder.Where($"SFC IN ('{sfcstr}')");
+            }
             if (manuSfcStepQuery.ProcedureId.HasValue)
             {
                 sqlBuilder.Where("ProcedureId=@ProcedureId");
