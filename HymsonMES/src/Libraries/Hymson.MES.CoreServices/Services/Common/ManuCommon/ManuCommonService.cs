@@ -257,6 +257,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="barCode"></param>
         /// <param name="materialId"></param>
         /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
         {
             var material = await _procMaterialRepository.GetByIdAsync(materialId)

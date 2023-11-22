@@ -1,6 +1,7 @@
 ﻿using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,7 +110,9 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 
         /// </summary>
         public IEnumerable<ManuSfcStepEntity> ManuSfcStepList { get; set; } = new List<ManuSfcStepEntity>();
-    }
+
+        public IEnumerable<UpdateWhMaterialInventoryEmptyByIdCommand>  updateWhMaterialInventoryEmptyByIdCommands{ get; set; } =new  List<UpdateWhMaterialInventoryEmptyByIdCommand>();
+}
 
     /// <summary>
     /// 更新
