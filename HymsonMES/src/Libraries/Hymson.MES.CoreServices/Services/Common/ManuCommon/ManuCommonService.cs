@@ -354,12 +354,15 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     .WithData("EquCode", requestBo.EquipmentCode);
             }
 
-            // 读取资源对应的工序
-            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
+            // 读取资源对应的工序（只查询启用状态）
+            var procProcedureEntities = await _procProcedureRepository.GetProcProduresByResourceIdAsync(new ProcProdureByResourceIdQuery
             {
                 SiteId = requestBo.SiteId,
                 ResourceId = resourceEntity.Id
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", requestBo.ResourceCode);
+
+            var procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Status == SysDataStatusEnum.Enable || f.Status == SysDataStatusEnum.Retain)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19935)).WithData("ResCode", requestBo.ResourceCode);
 
             return new ManufactureResponseBo
             {

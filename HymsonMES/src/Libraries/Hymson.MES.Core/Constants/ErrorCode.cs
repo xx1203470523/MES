@@ -915,6 +915,7 @@
         public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
         public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
         public const string MES16367 = "条码【{SFC}】所记录的工单不存在";
+        public const string MES16368 = "条码【{SFC}】已在原工序【{Procedure}】处不合格出站【{Cycle}】次，请前往继续复投。";
         #endregion
 
         #region 工单激活 MES16400
@@ -1439,7 +1440,7 @@
         public const string MES19932 = "条码：{SFC}已报废";
         public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
         public const string MES19934 = "设备{EquipmentCode}不存在";
-
+        public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
 
 
         #endregion

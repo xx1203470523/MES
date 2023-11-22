@@ -650,7 +650,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         {
                             SiteId = _currentSite.SiteId ?? 0,
                             Id = item.BadRecordId,
-                            DisposalResult = ProductBadDisposalResultEnum.repair,
+                            DisposalResult = ProductBadDisposalResultEnum.Repair,
                             Remark = confirmSubmitDto.Remark ?? "",
                             Status = item.IsClose,// ProductBadRecordStatusEnum.Close,
                             UserId = _currentUser.UserName,

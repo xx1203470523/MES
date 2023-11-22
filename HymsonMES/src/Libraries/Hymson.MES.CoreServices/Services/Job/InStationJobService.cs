@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -233,6 +234,29 @@ namespace Hymson.MES.CoreServices.Services.Job
                             .WithData("Procedure", currentProcedureEntity.Code);
                     }
                 }
+            }
+
+            // 如果存在工序不一致，且复投次数大于0时，抛出异常
+            var validationFailures = new List<ValidationFailure>();
+            var notAllowEntities = sfcProduceEntities.Where(w => w.ProcedureId != procedureEntity.Id && w.RepeatedCount > 0);
+            foreach (var entity in notAllowEntities)
+            {
+                // 条码记录的工序信息
+                var preProcedureEntity = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", entity.ProcedureId);
+
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", entity.SFC);
+                validationFailure.FormattedMessagePlaceholderValues.Add("SFC", entity.SFC);
+                validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", preProcedureEntity.Code);
+                validationFailure.FormattedMessagePlaceholderValues.Add("Cycle", procedureEntity.Cycle);
+                validationFailure.ErrorCode = nameof(ErrorCode.MES16368);
+                validationFailures.Add(validationFailure);
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
             }
 
             // 循环次数验证（复投次数）
