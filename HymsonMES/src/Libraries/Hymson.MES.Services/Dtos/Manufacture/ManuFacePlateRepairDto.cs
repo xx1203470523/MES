@@ -378,6 +378,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public bool IsShowProductList { get; set; }
 
         /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
@@ -445,6 +450,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否显示产品列表
         /// </summary>
         public bool? IsShowProductList { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>
@@ -491,6 +501,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否显示产品列表
         /// </summary>
         public bool? IsShowProductList { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>
