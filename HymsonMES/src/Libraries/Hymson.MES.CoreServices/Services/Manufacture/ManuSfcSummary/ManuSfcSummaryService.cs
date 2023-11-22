@@ -143,10 +143,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                             case ManuSfcStepTypeEnum.BadEntry:
                                 //录入不良
                                 var manuProductBadRecords = manuProductBadRecordList.Where(x => x.SfcStepId == item.Id);
-                                if (manuProductBadRecords.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.repair || x.DisposalResult == ProductBadDisposalResultEnum.scrap))
+                                if (manuProductBadRecords.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.Repair || x.DisposalResult == ProductBadDisposalResultEnum.Scrap))
                                 {
-                                    var manuProductBadRecord = manuProductBadRecords.FirstOrDefault(x => x.DisposalResult == ProductBadDisposalResultEnum.repair ||
-                                                                                                         x.DisposalResult == ProductBadDisposalResultEnum.scrap);
+                                    var manuProductBadRecord = manuProductBadRecords.FirstOrDefault(x => x.DisposalResult == ProductBadDisposalResultEnum.Repair ||
+                                                                                                         x.DisposalResult == ProductBadDisposalResultEnum.Scrap);
                                     if (manuProductBadRecord != null)
                                     {
                                         if (item.ProcedureId == manuProductBadRecord.FoundBadOperationId && item.CurrentStatus == SfcStatusEnum.Activity)
@@ -258,7 +258,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                             case ManuSfcStepTypeEnum.BadRejudgment:
                                 //复判暂定一个工序的异常
                                 var reJudgmentSfcStepIdsProductBadRecord = reJudgmentSfcStepIdsProductBadRecordList.FirstOrDefault(x => x.ReJudgmentSfcStepId == item.Id &&
-                                (x.ReJudgmentResult == ProductBadDisposalResultEnum.repair || x.ReJudgmentResult == ProductBadDisposalResultEnum.scrap));
+                                (x.ReJudgmentResult == ProductBadDisposalResultEnum.Repair || x.ReJudgmentResult == ProductBadDisposalResultEnum.Scrap));
                                 if (reJudgmentSfcStepIdsProductBadRecord != null)
                                 {
                                     var badRejudgmentLastmanuSfcSummary = GetLastManuSfcSummary(manuSfcSummaryProcedureLastList, manuSfcSummaryList, groupItem.Key, reJudgmentSfcStepIdsProductBadRecord.FoundBadOperationId);

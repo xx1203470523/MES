@@ -860,6 +860,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             sfcProduceEntity.UpdatedOn = commonBo.Time;
 
             var isMoreThanCycle = sfcProduceEntity.RepeatedCount >= procedureRejudgeBo.Cycle;
+            var disposalResult = ProductBadDisposalResultEnum.AutoHandle;
 
             #region 如果超过复投次数
             if (isMoreThanCycle)
@@ -867,6 +868,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 #region 无需复判（置于不合格工艺路线首工序排队）
                 if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.No)
                 {
+                    disposalResult = ProductBadDisposalResultEnum.Repair;
                     responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
                     // 条码状态跟在制品状态一致
@@ -910,6 +912,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     // 未完工（置于下工序排队）
                     else
                     {
+                        disposalResult = ProductBadDisposalResultEnum.WaitingJudge;
                         responseBo.NextProcedureCode = nextProcedure.Code;
 
                         // 条码状态跟在制品状态一致
@@ -1003,7 +1006,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
                     Remark = stepEntity.Remark,
-                    DisposalResult = isMoreThanCycle ? ProductBadDisposalResultEnum.WaitingJudge : ProductBadDisposalResultEnum.AutoHandle,
+                    DisposalResult = disposalResult,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 };
