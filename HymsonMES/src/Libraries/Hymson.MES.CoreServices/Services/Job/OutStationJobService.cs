@@ -861,6 +861,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             var isMoreThanCycle = sfcProduceEntity.RepeatedCount >= procedureRejudgeBo.Cycle;
             var disposalResult = ProductBadDisposalResultEnum.AutoHandle;
+            var productBadRecordStatus = ProductBadRecordStatusEnum.Close;
 
             #region 如果超过复投次数
             if (isMoreThanCycle)
@@ -895,6 +896,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 #region 需要复判
                 else
                 {
+                    productBadRecordStatus = ProductBadRecordStatusEnum.Open;
+
                     // 已完工（置于在制完成）
                     if (nextProcedure == null)
                     {
@@ -1003,7 +1006,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
                     Qty = stepEntity.Qty,
-                    Status = isMoreThanCycle ? ProductBadRecordStatusEnum.Open : ProductBadRecordStatusEnum.Close,
+                    Status = productBadRecordStatus,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
                     Remark = stepEntity.Remark,
                     DisposalResult = disposalResult,
