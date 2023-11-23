@@ -14,7 +14,7 @@
         /// 是否合格
         /// 0不合格,1合格
         /// </summary>
-        public int? Passed { get; set; }
+        public int? IsQualified { get; set; }
 
         /*
         /// <summary>
@@ -24,14 +24,14 @@
         */
 
         /// <summary>
-        /// 绑定的物料批次条码列表
+        /// 绑定的物料批次条码列表（消耗条码）
         /// </summary>
-        public string[]? BindFeedingCodes { get; set; }
+        public string[]? ConsumeCodes { get; set; }
 
         /// <summary>
         /// Ng代码
         /// </summary>
-        public NGParameterBo[]? NG { get; set; }
+        public NGParameterBo[]? FailInfo { get; set; }
 
         /// <summary>
         /// 是否过站
@@ -71,7 +71,7 @@
         /// <summary>
         /// Ng代码
         /// </summary>
-        public NGParameterBo[]? NG { get; set; }
+        public NGParameterBo[]? FailInfo { get; set; }
 
         /// <summary>
         /// 是否过站
@@ -94,18 +94,18 @@
     /// <summary>
     /// 出站（单载具）
     /// </summary>
-    public record OutBoundVehicleDto : BaseDto
+    public record OutBoundCarrierDto : BaseDto
     {
         /// <summary>
         /// 载具编码
         /// </summary>
-        public string VehicleCode { get; set; } = string.Empty;
+        public string CarrierNo { get; set; } = string.Empty;
 
         /// <summary>
         /// 是否合格
         /// 0不合格,1合格
         /// </summary>
-        public int? Passed { get; set; }
+        public int? IsQualified { get; set; }
 
         /*
         /// <summary>
@@ -115,14 +115,14 @@
         */
 
         /// <summary>
-        /// 绑定的物料批次条码列表
+        /// 绑定的物料批次条码列表（消耗条码）
         /// </summary>
-        public string[]? BindFeedingCodes { get; set; }
+        public string[]? ConsumeCodes { get; set; }
 
         /// <summary>
         /// Ng代码
         /// </summary>
-        public NGParameterBo[]? NG { get; set; }
+        public NGParameterBo[]? FailInfo { get; set; }
 
         /// <summary>
         /// 是否过站
@@ -141,7 +141,7 @@
         /// <summary>
         /// NG代码
         /// </summary>
-        public string NGCode { get; set; } = string.Empty;
+        public string NCCode { get; set; } = string.Empty;
     }
 
 }

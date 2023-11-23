@@ -22,5 +22,4 @@ namespace Hymson.MES.EquipmentServices
         /// </summary>
         public DateTime LocalTime { get; set; }
     }
-
 }

@@ -99,10 +99,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("InBoundVehicle")]
-        public async Task InBoundVehicleAsync(InBoundVehicleDto request)
+        [HttpPost("InBoundCarrier")]
+        public async Task InBoundCarrierAsync(InBoundCarrierDto request)
         {
-            await _manufactureService.InBoundVehicleAsync(request);
+            await _manufactureService.InBoundCarrierAsync(request);
         }
 
         /// <summary>
@@ -110,10 +110,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost("OutBoundVehicle")]
-        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
+        [HttpPost("OutBoundCarrier")]
+        public async Task OutBoundCarrierAsync(OutBoundCarrierDto request)
         {
-            await _manufactureService.OutBoundVehicleAsync(request);
+            await _manufactureService.OutBoundCarrierAsync(request);
         }
 
     }

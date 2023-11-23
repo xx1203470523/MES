@@ -36,12 +36,12 @@
     /// <summary>
     /// 进站（单载具）
     /// </summary>
-    public record InBoundVehicleDto : BaseDto
+    public record InBoundCarrierDto : BaseDto
     {
         /// <summary>
         /// 载具编码
         /// </summary>
-        public string VehicleCode { get; set; } = "";
+        public string CarrierNo { get; set; } = string.Empty;
     }
 
 }
