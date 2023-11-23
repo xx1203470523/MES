@@ -138,6 +138,8 @@
         public const string MES10371 = "IP最大长度为50";
 
         public const string MES10372 = "模板没有打印设计!";
+        public const string MES10373 = "不存在[{class}打印类]";
+        public const string MES10374 = "获取打印数据ID为空";
 
         #endregion
 

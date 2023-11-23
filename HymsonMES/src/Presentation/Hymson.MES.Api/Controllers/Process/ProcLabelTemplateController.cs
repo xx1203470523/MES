@@ -120,5 +120,26 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procLabelTemplateService.QueryProcLabelTemplateRelationByLabelTemplateIdAsync(id);
         }
 
+        /// <summary>
+        /// 获取打印类对应的选项
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getPrintClassList")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<PrintClassOptionDto>> GetPrintClassListAsync() 
+        {
+            return await _procLabelTemplateService.GetPrintClassListAsync();
+        }
+
+        /// <summary>
+        /// 获取测试打印模型对应的数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getTestPrintData/{id}")]
+        [AllowAnonymous]
+        public async Task<TestPrintPrintDataDto> GetTestPrintDataAsync(string id)
+        {
+            return await _procLabelTemplateService.GetAboutPrintDataAsync(id);
+        }
     }
 }
