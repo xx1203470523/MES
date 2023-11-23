@@ -181,6 +181,17 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetProcProdureByResourceIdSql, param);
         }
 
+        /// <summary>
+        /// 根据资源ID获取工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>> GetProcProduresByResourceIdAsync(ProcProdureByResourceIdQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcProcedureEntity>(GetProcProdureByResourceIdSql, param);
+        }
+
 
         /// <summary>
         /// 判断工序是否存在
@@ -199,7 +210,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(IEnumerable<long>  ids)
+        public async Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             if (!ids.Any())
             {
@@ -303,7 +314,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM `proc_procedure`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_procedure`  WHERE Id IN @ids and IsDeleted=0  ";
 
-        const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId  WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";
+        const string GetProcProdureByResourceIdSql = "SELECT P.* FROM proc_procedure P INNER JOIN  proc_resource R ON R.ResTypeId = P.ResourceTypeId WHERE R.IsDeleted = 0 AND P.IsDeleted = 0 AND R.SiteId = @SiteId AND P.SiteId = @SiteId AND R.Id = @ResourceId";
 
         const string UpdateStatusSql = "UPDATE `proc_procedure` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 

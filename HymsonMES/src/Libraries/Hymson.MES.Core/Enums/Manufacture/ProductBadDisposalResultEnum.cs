@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 报废
         /// </summary>
         [Description("报废")]
-        scrap = 4,
+        Scrap = 4,
 
         /// <summary>
         /// 自动处理
@@ -41,7 +41,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 维修
         /// </summary>
         [Description("维修")]
-        repair = 6,
+        Repair = 6,
 
         /// <summary>
         /// 等待判定

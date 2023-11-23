@@ -360,14 +360,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                         manuProductBadRecordEntity.CloseOn = HymsonClock.Now();
                         manuProductBadRecordEntity.CloseBy = _currentUser.UserName;
                         manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Close;
-                        manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.scrap;
+                        manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.Scrap;
                     }
                     else
                     {
                         manuProductBadRecordEntity.Status = ProductBadRecordStatusEnum.Open;
                         if (unqualified.Type == QualUnqualifiedCodeTypeEnum.Defect)
                         {
-                            manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.repair;
+                            manuProductBadRecordEntity.DisposalResult = ProductBadDisposalResultEnum.Repair;
                         }
                     }
 

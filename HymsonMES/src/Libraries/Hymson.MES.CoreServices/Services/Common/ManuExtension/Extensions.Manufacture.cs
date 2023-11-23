@@ -142,7 +142,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
 
             if (validationFailures.Any())
             {
-                throw new ValidationException(localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
             }
 
             return moreThanEntities;

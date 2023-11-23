@@ -49,7 +49,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             List<string> SFCs = new();
@@ -81,7 +82,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             // 根据载具代码获取载具里面的条码
@@ -112,7 +114,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             requestBo.SFCs = bo.OutStationRequestBos.Select(s => s.SFC);
@@ -138,7 +141,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             // 根据载具代码获取载具里面的条码

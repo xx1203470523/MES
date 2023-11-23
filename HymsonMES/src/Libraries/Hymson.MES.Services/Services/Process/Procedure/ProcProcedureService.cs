@@ -889,6 +889,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
                 ids.Add(RejudgeUnqualifiedCodeEnum.Block);
             }
+            else
+            {
+                ids.Add(RejudgeUnqualifiedCodeEnum.Block);
+            }
             if (procProcedureModifyDto.Procedure.MarkId.HasValue && procProcedureModifyDto.Procedure.MarkId > 0)
             {
                 ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
@@ -902,6 +906,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 procProcedureRejudgeList.Add(procedureRejudgeEntity);
                 ids.Add(RejudgeUnqualifiedCodeEnum.Mark);
             }
+            else
+            {
+                ids.Add(RejudgeUnqualifiedCodeEnum.Mark);
+            }
             if (procProcedureModifyDto.Procedure.DefectId.HasValue && procProcedureModifyDto.Procedure.DefectId > 0)
             {
                 ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
@@ -913,6 +921,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 procedureRejudgeEntity.CreatedBy = userName;
                 procedureRejudgeEntity.UpdatedBy = userName;
                 procProcedureRejudgeList.Add(procedureRejudgeEntity);
+                ids.Add(RejudgeUnqualifiedCodeEnum.Last);
+            }
+            else
+            {
                 ids.Add(RejudgeUnqualifiedCodeEnum.Last);
             }
 

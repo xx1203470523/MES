@@ -138,6 +138,8 @@
         public const string MES10371 = "IP最大长度为50";
 
         public const string MES10372 = "模板没有打印设计!";
+        public const string MES10373 = "不存在[{class}打印类]";
+        public const string MES10374 = "获取打印数据ID为空";
 
         #endregion
 
@@ -905,20 +907,22 @@
         public const string MES16350 = "工单状态为完工，不允许再对工单投入！";
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
         public const string MES16352 = "工序不存在";
-        public const string MES16353 = "条码{SFC}已被Marking拦截！";
+        public const string MES16353 = "产品序列码【{SFC}】已被Marking拦截！";
         public const string MES16354 = "当前进站工序【{Current}】，属于应进站工序【{Procedure}】的前面工序，不允许操作。";
         public const string MES16355 = "未找到工序【{ProcedureCode}】关联的资源";
         public const string MES16357 = "当前工序是【{Current}】，条码【{SFC}】应在工序【{Procedure}】处排队进站，请检查。";
         public const string MES16358 = "指定的工序【{Procedure}】不存在";
-        public const string MES16359 = "条码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
-        public const string MES16360 = "条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
-        public const string MES16361 = "条码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
-        public const string MES16362 = "条码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
+        public const string MES16359 = "产品序列码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
+        public const string MES16360 = "产品序列码【{SFC}】循环次数【{Current}】不允许启动！";//"条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";
+        public const string MES16361 = "产品序列码【{SFC}】当前状态【{Current}】，不是【{Status}】状态，不允许操作。";
+        public const string MES16362 = "产品序列码【{SFC}】已被将来锁锁定，锁定工序【{Procedure}】，不允许操作。";
         public const string MES16363 = "参数收集开始！";
         public const string MES16364 = "未找到条码的产品参数信息！";
         public const string MES16365 = "获取不到条码【{SFC}】的等级信息";
         public const string MES16366 = "获取不到条码【{SFC}】的最终档次信息";
-        public const string MES16367 = "条码【{SFC}】所记录的工单不存在";
+        public const string MES16367 = "产品序列码【{SFC}】所记录的工单不存在";
+        public const string MES16368 = "产品序列码【{SFC}】已在原工序【{Procedure}】处不合格出站【{Cycle}】次，请继续复投。";
+        public const string MES16369 = "产品序列码【{SFC}】指定的工序【{Procedure}】不存在";
         #endregion
 
         #region 工单激活 MES16400
@@ -1302,6 +1306,8 @@
         public const string MES18622 = "载具待解盘条码不能为空！";
         public const string MES18623 = "载具编码【{Code}】读取失败！";
         public const string MES18624 = "载具编码【{Code}】不存在，具体请查看【载具注册】！";
+        public const string MES18625 = "载具编码【{Code}】已禁用，具体请查看【载具注册】！";
+        public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
         #endregion
 
         #region Recipe参数 18700
@@ -1443,7 +1449,7 @@
         public const string MES19932 = "条码：{SFC}已报废";
         public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
         public const string MES19934 = "设备{EquipmentCode}不存在";
-
+        public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
 
 
         #endregion

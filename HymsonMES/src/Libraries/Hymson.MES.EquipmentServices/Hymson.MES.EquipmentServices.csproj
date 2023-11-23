@@ -18,15 +18,16 @@
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Crc32.NET" Version="1.2.0" />
-		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.103" />
-		<PackageReference Include="Hymson.Snowflake" Version="2.1.103" />
-		<PackageReference Include="Hymson.Web.Framework" Version="2.1.103" />
+		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.106" />
+		<PackageReference Include="Hymson.Snowflake" Version="2.1.106" />
+		<PackageReference Include="Hymson.Web.Framework" Version="2.1.106" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Bos\Manufacture\" />
 	  <Folder Include="Services\Bootup\" />
+	  <Folder Include="Validators\EquipmentCollect\" />
 	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>
 

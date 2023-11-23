@@ -257,6 +257,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="barCode"></param>
         /// <param name="materialId"></param>
         /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
         {
             var material = await _procMaterialRepository.GetByIdAsync(materialId)
@@ -284,7 +285,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
 
-            // 读取载具关联的条码
+            // 读取载具信息
             var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
             {
                 SiteId = requestBo.SiteId,
@@ -299,12 +300,26 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     .WithData("Code", string.Join(',', notInSystem));
             }
 
+            // 检查是否有禁用的载具
+            var disabledVehicles = vehicleEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicles.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18625))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
+
             // 查询载具关联的条码明细
             var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
             {
                 SiteId = requestBo.SiteId,
                 ParentIds = vehicleEntities.Select(s => s.Id)
             });
+
+            if (!vehicleFreightStackEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18626))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
 
             List<VehicleSFCResponseBo> list = new();
             var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
@@ -353,12 +368,15 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     .WithData("EquCode", requestBo.EquipmentCode);
             }
 
-            // 读取资源对应的工序
-            var procProcedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery
+            // 读取资源对应的工序（只查询启用状态）
+            var procProcedureEntities = await _procProcedureRepository.GetProcProduresByResourceIdAsync(new ProcProdureByResourceIdQuery
             {
                 SiteId = requestBo.SiteId,
                 ResourceId = resourceEntity.Id
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", requestBo.ResourceCode);
+
+            var procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Status == SysDataStatusEnum.Enable || f.Status == SysDataStatusEnum.Retain)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19935)).WithData("ResCode", requestBo.ResourceCode);
 
             return new ManufactureResponseBo
             {
