@@ -293,6 +293,17 @@ namespace Hymson.MES.Data.Repositories.Plan
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationEntitys);
         }
+
+        /// <summary>
+        /// 通过bomID查找激活的工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesByBomIdAsync(PlanWorkOrderActivationByBomIdQuery query) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetPlanWorkOrderActivationEntitiesByBomIdSql, query);
+        }
     }
 
     /// <summary>
@@ -347,5 +358,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
         const string DeletesTrueSql = @"DELETE FROM  plan_work_order_activation where Id in @Ids ";
         const string DeletesTrueByWorkOrderIdsSql = @"DELETE FROM  plan_work_order_activation where WorkOrderId in @WorkOrderIds ";
+
+        const string GetPlanWorkOrderActivationEntitiesByBomIdSql = @"SELECT woa.* 
+                        FROM plan_work_order_activation woa 
+                        LEFT JOIN plan_work_order wo on wo.Id=woa.WorkOrderId
+                        WHERE woa.IsDeleted=0 AND  woa.SiteId=@SiteId AND wo.ProductBOMId=@BomId ";
     }
 }

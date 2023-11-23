@@ -271,6 +271,10 @@
         public const string MES10619 = "用量不能为空";
         public const string MES10620 = "收集方式不合法，请检查！";
 
+        public const string MES10621 = "激活工单已绑定该bom,该bom不允许修改物料清单行数";
+        public const string MES10622 = "激活工单已绑定该bom,该bom不允许修改物料清单物料与工序";
+        public const string MES10623 = "激活工单已绑定该bom,该bom不允许修改物料清单序号";
+
         #endregion
 
         #region 上料点 10700
