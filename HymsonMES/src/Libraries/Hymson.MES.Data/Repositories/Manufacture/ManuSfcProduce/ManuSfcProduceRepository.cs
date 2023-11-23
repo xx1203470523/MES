@@ -799,7 +799,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (!string.IsNullOrWhiteSpace(query.Sfc))
             {
                 query.Sfc = $"%{query.Sfc}%";
-                sqlBuilder.Where("ms.Sfc like @Sfc");
+                sqlBuilder.Where("msp.Sfc like @Sfc");
             }
 
            //多条码
@@ -827,7 +827,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //工单
             if (query.WorkOrderId.HasValue && query.WorkOrderId > 0)
             {
-                sqlBuilder.Where(" msp.WorkOrderId = @OrderId ");
+                sqlBuilder.Where(" msp.WorkOrderId = @WorkOrderId ");
             }
             //工艺路线
             if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0)
@@ -852,7 +852,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //载具
             if (query.VehicleId.HasValue && query.VehicleId > 0)
             {
-                sqlBuilder.Where("  msp.VehicleId = @VehicleId ");
+                sqlBuilder.Where("  vfs.VehicleId = @VehicleId ");
             }
 
             var offSet = (query.PageIndex - 1) * query.PageSize;
