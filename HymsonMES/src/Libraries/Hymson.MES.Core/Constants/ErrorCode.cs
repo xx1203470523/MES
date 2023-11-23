@@ -405,6 +405,7 @@
 
         #region ESOP维护 11500
         public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
+        public const string MES11501 = "不能删除启用状态的数据";
         #endregion
 
         #region 作业12000
