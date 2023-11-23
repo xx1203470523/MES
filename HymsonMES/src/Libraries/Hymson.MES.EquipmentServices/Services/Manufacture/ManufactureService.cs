@@ -227,13 +227,13 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 var outStationRequestBo = new OutStationRequestBo
                 {
                     SFC = item.SFC,
-                    IsQualified = item.Passed == 1
+                    IsQualified = item.IsQualified == 1
                 };
 
                 // 消耗条码
-                if (item.BindFeedingCodes != null && item.BindFeedingCodes.Any())
+                if (item.ConsumeCodes != null && item.ConsumeCodes.Any())
                 {
-                    outStationRequestBo.ConsumeList = item.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+                    outStationRequestBo.ConsumeList = item.ConsumeCodes.Select(s => new OutStationConsumeBo { BarCode = s });
                 }
 
                 // 不合格代码

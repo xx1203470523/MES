@@ -54,7 +54,7 @@
         /// 是否合格
         /// 0不合格,1合格
         /// </summary>
-        public int? Passed { get; set; }
+        public int? IsQualified { get; set; }
 
         /*
         /// <summary>
@@ -64,9 +64,9 @@
         */
 
         /// <summary>
-        /// 绑定的物料批次条码列表
+        /// 绑定的物料批次条码列表（消耗条码）
         /// </summary>
-        public string[]? BindFeedingCodes { get; set; }
+        public string[]? ConsumeCodes { get; set; }
 
         /// <summary>
         /// Ng代码
