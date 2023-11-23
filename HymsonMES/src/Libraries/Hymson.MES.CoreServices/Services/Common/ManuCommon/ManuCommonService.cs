@@ -300,6 +300,14 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     .WithData("Code", string.Join(',', notInSystem));
             }
 
+            // 检查是否有禁用的载具
+            var disabledVehicles = vehicleEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicles.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18625))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
+
             // 查询载具关联的条码明细
             var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
             {
