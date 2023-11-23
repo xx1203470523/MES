@@ -259,7 +259,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (validationFailures.Any())
                 {
-                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                    throw new ValidationException("", validationFailures);
                 }
             }
 
@@ -954,8 +954,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var blockUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
 
                     // 判断NGCode中是否含有首次不良工序
-                    var ngCodeInBlock = unqualifiedCodes.Intersect(qualUnqualifiedCodeEntities.Select(s => s.UnqualifiedCode));
-                    if (ngCodeNotInSystem.Any())
+                    var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
+                    if (ngCodeInBlock.Any())
                     {
                         #region 出现首次不良代码（置于不合格工艺路线首工序排队）
                         responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
