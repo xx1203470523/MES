@@ -259,7 +259,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 if (validationFailures.Any())
                 {
-                    throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                    throw new ValidationException("", validationFailures);
                 }
             }
 
