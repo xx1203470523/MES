@@ -7,6 +7,8 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.Print.Abstractions;
+using System.ComponentModel;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -161,4 +163,89 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcLabelTemplateRelationPagedQueryDto : PagerInfo
     {
     }
+
+    /// <summary>
+    /// 打印测试类
+    /// </summary>
+    [Description("打印测试类")]
+    public record ProcPrintTestPrintDto : BasePrintData
+    {
+        /// <summary>
+        /// id
+        /// </summary>
+        [Description("ID")]
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 采购单号
+        /// </summary>
+        [Description("采购单号")]
+        public string ProcureCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        [Description("供应商名称")]
+        public string SupplierName { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public double Num { get; set; }
+
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        [Description("工单类型")]
+        public string WorkOrderType { get; set; }
+
+        /// <summary>
+        /// 出货时间
+        /// </summary>
+        [Description("出货时间")]
+        public string OutTime { get; set; }
+    }
+
+    /// <summary>
+    /// 打印测试类2
+    /// </summary>
+    [Description("打印测试类2")]
+    public record ProcPrintTestPrintTDto : BasePrintData
+    {
+        /// <summary>
+        /// id2
+        /// </summary>
+        [Description("ID2")]
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 采购单号2
+        /// </summary>
+        [Description("采购单号2")]
+        public string ProcureCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称2
+        /// </summary>
+        [Description("供应商名称2")]
+        public string SupplierName { get; set; }
+
+        ///// <summary>
+        ///// 数量2
+        ///// </summary>
+        //public double Num { get; set; }
+
+        /// <summary>
+        /// 工单类型2
+        /// </summary>
+        [Description("工单类型2")]
+        public string WorkOrderType { get; set; }
+
+        /// <summary>
+        /// 出货时间2
+        /// </summary>
+        [Description("出货时间2")]
+        public DateTime OutTime { get; set; }
+    }
+
 }

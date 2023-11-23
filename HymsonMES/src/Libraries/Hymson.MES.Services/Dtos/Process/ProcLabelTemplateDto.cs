@@ -111,7 +111,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 模板打印配置信息
         /// </summary>
-        public ProcLabelTemplateRelationCreateDto procLabelTemplateRelationCreateDto { get; set; }
+        public ProcLabelTemplateRelationCreateDto ProcLabelTemplateRelationCreateDto { get; set; }
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 模板打印配置信息
         /// </summary>
-        public ProcLabelTemplateRelationCreateDto procLabelTemplateRelationCreateDto { get; set; }
+        public ProcLabelTemplateRelationCreateDto ProcLabelTemplateRelationCreateDto { get; set; }
     }
 
     /// <summary>
@@ -188,5 +188,19 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 标签名称
         /// </summary>
         public string? Name { get; set; }
+    }
+
+    public record TestPrintPrintDataDto 
+    {
+        /// <summary>
+        /// 打印模板打印设计信息
+        /// </summary>
+        public ProcLabelTemplateRelationDto ProcLabelTemplateRelationDto { get; set; }
+
+        /// <summary>
+        /// 打印模型的数据
+        /// </summary>
+        public ProcPrintTestPrintDto ProcPrintTestPrintDto { get; set; }
+
     }
 }
