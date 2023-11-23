@@ -106,21 +106,4 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public ProductBadRecordStatusEnum? BadRecordStatus { get; set; }
     }
 
-    /// <summary>
-    /// 不良报告日志
-    /// </summary>
-    public class ManuProductBadRecordLogReportQuery
-    {
-        /// <summary>
-        /// Id
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 不合格代码Id
-        /// </summary>
-        public long UnqualifiedId { get; set; }
-
-    }
-
 }

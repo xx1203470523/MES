@@ -350,8 +350,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ProcedureId = procProcedureEntity.Id,
                 ProcedureCode = procProcedureEntity.Code,
                 Cycle = procProcedureEntity.Cycle ?? 1,
-                IsRejudge = procProcedureEntity.IsRejudge,
-                IsValidNGCode = procProcedureEntity.IsValidNGCode
+                IsRejudge = procProcedureEntity.IsRejudge ?? TrueOrFalseEnum.No,
+                IsValidNGCode = procProcedureEntity.IsValidNGCode ?? TrueOrFalseEnum.No
             };
 
             // 填充其他设置
