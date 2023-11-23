@@ -670,7 +670,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeBySemiProductId param)
-        {
+        {            
             // 查询资源
             var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
             {
