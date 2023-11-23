@@ -44,4 +44,11 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         public IEnumerable<long>? LineIds { get; set; }
     }
+
+    public class PlanWorkOrderActivationByBomIdQuery 
+    {
+        public long BomId { get; set; }
+
+        public long SiteId { get; set; }
+    }
 }
