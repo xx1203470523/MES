@@ -16,17 +16,15 @@ namespace Hymson.MES.Data.Repositories.Plan
     public partial class PlanWorkOrderActivationRepository : IPlanWorkOrderActivationRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
         /// <summary>

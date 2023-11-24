@@ -1,12 +1,5 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -70,6 +63,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public decimal Qty { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class WorkshopJobControlReportOptimizeView : BaseEntity
     {
         /// <summary>
@@ -82,7 +78,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public SfcStatusEnum SFCStatus { get; set; }
 
-        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public SfcStatusEnum SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 物料Id

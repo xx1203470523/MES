@@ -128,6 +128,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class OutStationResponseSummaryBo
     {
         /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
+
+        /// <summary>
         /// 条码信息
         /// </summary>
         public IEnumerable<ManuSfcEntity>? SFCEntities { get; set; }

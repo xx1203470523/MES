@@ -292,14 +292,14 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`  WHERE Id IN @Ids ";
-        public string GetByCodeAndVersionSql = @"SELECT 
+        const string GetByCodeAndVersionSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`  WHERE Code = @Code AND  Version=@Version AND SiteId=@SiteId AND  IsDeleted = 0";
-        public string GetByCodeAndMaterialIdSql = @"SELECT 
+        const string GetByCodeAndMaterialIdSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`   WHERE  MaterialId=@MaterialId AND SiteId=@SiteId  AND  IsDeleted = 0 ";
 
-        public string GetByGetByDefaultVersionSql = @"SELECT 
+        const string GetByGetByDefaultVersionSql = @"SELECT 
                                           `Id`, `SiteId`, `Code`, `Name`, `Version`, `IsDefaultVersion`, `MaterialId`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_sorting_rule`   WHERE  IsDefaultVersion=1 AND Code=@Code  AND SiteId=@SiteId  AND  IsDeleted = 0 ";
         #endregion

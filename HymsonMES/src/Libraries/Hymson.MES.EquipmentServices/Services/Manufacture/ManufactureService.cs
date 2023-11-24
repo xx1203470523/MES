@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
@@ -122,7 +123,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 SFCs = new string[] { request.SFC }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -152,7 +153,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 SFCs = request.SFCs.Select(s => s.SFC)
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -199,7 +200,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -253,7 +254,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = outStationRequestBos
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -282,7 +283,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 VehicleCodes = new string[] { request.CarrierNo }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -329,7 +330,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
     }

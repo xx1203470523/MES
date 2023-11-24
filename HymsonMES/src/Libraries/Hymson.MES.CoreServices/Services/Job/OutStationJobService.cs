@@ -216,7 +216,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return;
+            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16370));
+            }
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
@@ -497,6 +500,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
             }
 
+            responseSummaryBo.Source = commonBo.Source;
             return responseSummaryBo;
         }
 
@@ -566,7 +570,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
 
-            // 单条码过站时（面板过站）
+            // 后面的代码是面板业务
+            if (data.Source != RequestSourceEnum.Panel) return responseBo;
+
+            // 面板需要的数据
             if (data.SFCEntities!.Count() == 1)
             {
                 var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
@@ -863,35 +870,17 @@ namespace Hymson.MES.CoreServices.Services.Job
             var disposalResult = ProductBadDisposalResultEnum.AutoHandle;
             var productBadRecordStatus = ProductBadRecordStatusEnum.Close;
 
+            // 是否置于不合格工艺路线首工序排队
+            var isLinkToUnQualifiedProcessRoute = false;
+
+            // 默认标记编码
+            var unqualifiedId = procedureRejudgeBo.MarkUnqualifiedId;
+
             #region 如果超过复投次数
             if (isMoreThanCycle)
             {
                 #region 无需复判（置于不合格工艺路线首工序排队）
-                if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.No)
-                {
-                    disposalResult = ProductBadDisposalResultEnum.Repair;
-                    responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
-
-                    // 条码状态跟在制品状态一致
-                    manuSfcEntity.Status = SfcStatusEnum.lineUp;
-                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
-
-                    // 更新不合格工艺路线
-                    if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
-                    {
-                        sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
-                    }
-
-                    // 更新下一工序
-                    if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
-                    sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
-
-                    // 一旦切换工序，复投次数重置
-                    sfcProduceEntity.RepeatedCount = 0;
-
-                    // 不置空的话，进站时，可能校验不通过
-                    sfcProduceEntity.ResourceId = null;
-                }
+                if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.No) isLinkToUnQualifiedProcessRoute = true;
                 #endregion
 
                 #region 需要复判
@@ -947,41 +936,48 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 更新下一工序（默认情况，如果下面的含有首次不良工序命中，会更新该值）
                 sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
                 sfcProduceEntity.ResourceId = commonBo.ResourceId;
+            }
+            #endregion
 
-                // 判断是否含有设置首次不良工序（不良复判相关逻辑）
-                if (procedureRejudgeBo.BlockUnqualifiedIds != null && procedureRejudgeBo.BlockUnqualifiedIds.Any())
+            #region 匹配首次不良代码
+            // 判断是否含有设置首次不良工序（不良复判相关逻辑）
+            if (procedureRejudgeBo.BlockUnqualifiedIds != null && procedureRejudgeBo.BlockUnqualifiedIds.Any())
+            {
+                var blockUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
+
+                // 判断NGCode中是否含有首次不良工序
+                var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
+                if (ngCodeInBlock.Any()) isLinkToUnQualifiedProcessRoute = true;
+            }
+            #endregion
+
+            #region 置于不合格工艺路线首工序排队
+            if (isLinkToUnQualifiedProcessRoute)
+            {
+                if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
+
+                disposalResult = ProductBadDisposalResultEnum.Repair;
+                responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
+
+                // 条码状态跟在制品状态一致
+                manuSfcEntity.Status = SfcStatusEnum.lineUp;
+                sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+
+                // 更新不合格工艺路线
+                if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
                 {
-                    var blockUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
-
-                    // 判断NGCode中是否含有首次不良工序
-                    var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
-                    if (ngCodeInBlock.Any())
-                    {
-                        #region 出现首次不良代码（置于不合格工艺路线首工序排队）
-                        responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
-
-                        // 条码状态跟在制品状态一致
-                        manuSfcEntity.Status = SfcStatusEnum.lineUp;
-                        sfcProduceEntity.Status = SfcStatusEnum.lineUp;
-
-                        // 更新不合格工艺路线
-                        if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
-                        {
-                            sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
-                        }
-
-                        // 更新下一工序
-                        if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
-                        sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
-
-                        // 一旦切换工序，复投次数重置
-                        sfcProduceEntity.RepeatedCount = 0;
-
-                        // 不置空的话，进站时，可能校验不通过
-                        sfcProduceEntity.ResourceId = null;
-                        #endregion
-                    }
+                    sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
                 }
+
+                // 更新下一工序
+                if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
+                sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
+
+                // 一旦切换工序，复投次数重置
+                sfcProduceEntity.RepeatedCount = 0;
+
+                // 不置空的话，进站时，可能校验不通过
+                sfcProduceEntity.ResourceId = null;
             }
             #endregion
 
@@ -990,11 +986,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
             // 如果有标记缺陷
-            if (procedureRejudgeBo.MarkUnqualifiedId.HasValue)
+            if (unqualifiedId.HasValue)
             {
-                var unqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value;
-                if (isMoreThanCycle && procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
-
                 // 添加不良记录
                 var badRecordEntity = new ManuProductBadRecordEntity
                 {
@@ -1003,7 +996,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     FoundBadOperationId = commonBo.ProcedureId,
                     FoundBadResourceId = commonBo.ResourceId,
                     OutflowOperationId = commonBo.ProcedureId,
-                    UnqualifiedId = unqualifiedId,
+                    UnqualifiedId = unqualifiedId.Value,
                     SfcStepId = stepEntity.Id,
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
@@ -1261,8 +1254,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
             }
 
-            // 检查工序是否有设置"缺陷编码"
-            if (procedureRejudgeBo.LastUnqualified == null)
+            // 检查工序是否有设置"标记编码"和"缺陷编码"
+            if (!procedureRejudgeBo.MarkUnqualifiedId.HasValue || procedureRejudgeBo.LastUnqualified == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17115))
                     .WithData("Procedure", procedureRejudgeBo.ProcedureCode);
 

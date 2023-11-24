@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums.Manufacture;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -40,6 +41,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class JobRequestBo : JobBaseBo
     {
+        /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
+
         /// <summary>
         /// 用户名
         /// </summary>

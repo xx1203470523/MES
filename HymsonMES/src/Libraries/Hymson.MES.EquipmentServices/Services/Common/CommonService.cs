@@ -88,8 +88,6 @@ namespace Hymson.MES.EquipmentServices.Services.Common
         /// <param name="planWorkOrderActivationRepository"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        /// <param name="procBomDetailRepository"></param>
-        /// <param name="procBomDetailReplaceMaterialRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="localizationService"></param>
