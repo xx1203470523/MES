@@ -1070,9 +1070,8 @@
         public const string MES17112 = "工单【{Ids}】信息读取失败！";
         public const string MES17113 = "消耗条码{BarCodes}不属于已上料清单！";
         public const string MES17114 = "获取工序基本信息失败，请检查工序参数【{Procedure}】！";
-        public const string MES17115 = "工序【{Procedure}】未设置【缺陷编码】参数项，具体请查看【工序维护】！";
+        public const string MES17115 = "工序【{Procedure}】未设置【标记编码/缺陷编码】参数项，具体请查看【工序维护】！";
         public const string MES17116 = "不合格代码【{Code}】未设置【不合格工艺路线】参数项，具体请查看【不合格代码】！";
-        public const string MES17117 = "工序【{Procedure}】未设置【标记编码】参数项，具体请查看【工序维护】！";
 
         #endregion
 
