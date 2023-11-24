@@ -959,43 +959,45 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 更新下一工序（默认情况，如果下面的含有首次不良工序命中，会更新该值）
                 sfcProduceEntity.ProcedureId = commonBo.ProcedureId;
                 sfcProduceEntity.ResourceId = commonBo.ResourceId;
+            }
+            #endregion
 
-                // 判断是否含有设置首次不良工序（不良复判相关逻辑）
-                if (procedureRejudgeBo.BlockUnqualifiedIds != null && procedureRejudgeBo.BlockUnqualifiedIds.Any())
+            #region 首次不良工序
+            // 判断是否含有设置首次不良工序（不良复判相关逻辑）
+            if (procedureRejudgeBo.BlockUnqualifiedIds != null && procedureRejudgeBo.BlockUnqualifiedIds.Any())
+            {
+                var blockUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
+
+                // 判断NGCode中是否含有首次不良工序
+                var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
+                if (ngCodeInBlock.Any())
                 {
-                    var blockUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
+                    if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
 
-                    // 判断NGCode中是否含有首次不良工序
-                    var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
-                    if (ngCodeInBlock.Any())
+                    #region 出现首次不良代码（置于不合格工艺路线首工序排队）
+                    disposalResult = ProductBadDisposalResultEnum.Repair;
+                    responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
+
+                    // 条码状态跟在制品状态一致
+                    manuSfcEntity.Status = SfcStatusEnum.lineUp;
+                    sfcProduceEntity.Status = SfcStatusEnum.lineUp;
+
+                    // 更新不合格工艺路线
+                    if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
                     {
-                        if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
-
-                        #region 出现首次不良代码（置于不合格工艺路线首工序排队）
-                        disposalResult = ProductBadDisposalResultEnum.Repair;
-                        responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
-
-                        // 条码状态跟在制品状态一致
-                        manuSfcEntity.Status = SfcStatusEnum.lineUp;
-                        sfcProduceEntity.Status = SfcStatusEnum.lineUp;
-
-                        // 更新不合格工艺路线
-                        if (procedureRejudgeBo.LastUnqualified != null && procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
-                        {
-                            sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
-                        }
-
-                        // 更新下一工序
-                        if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
-                        sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
-
-                        // 一旦切换工序，复投次数重置
-                        sfcProduceEntity.RepeatedCount = 0;
-
-                        // 不置空的话，进站时，可能校验不通过
-                        sfcProduceEntity.ResourceId = null;
-                        #endregion
+                        sfcProduceEntity.ProcessRouteId = procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value;
                     }
+
+                    // 更新下一工序
+                    if (!procedureRejudgeBo.IsHasUnQualifiedProcessRoute) throw new CustomerValidationException(nameof(ErrorCode.MES17115)).WithData("Procedure", procedureRejudgeBo.ProcedureCode);
+                    sfcProduceEntity.ProcedureId = procedureRejudgeBo.NextProcedureId;
+
+                    // 一旦切换工序，复投次数重置
+                    sfcProduceEntity.RepeatedCount = 0;
+
+                    // 不置空的话，进站时，可能校验不通过
+                    sfcProduceEntity.ResourceId = null;
+                    #endregion
                 }
             }
             #endregion
