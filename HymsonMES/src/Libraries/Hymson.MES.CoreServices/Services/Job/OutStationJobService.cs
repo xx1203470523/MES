@@ -972,6 +972,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
 
                         #region 出现首次不良代码（置于不合格工艺路线首工序排队）
+                        disposalResult = ProductBadDisposalResultEnum.Repair;
                         responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
                         // 条码状态跟在制品状态一致
