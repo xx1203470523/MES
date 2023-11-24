@@ -863,9 +863,14 @@ namespace Hymson.MES.CoreServices.Services.Job
             var disposalResult = ProductBadDisposalResultEnum.AutoHandle;
             var productBadRecordStatus = ProductBadRecordStatusEnum.Close;
 
+            // 默认标记编码
+            var unqualifiedId = procedureRejudgeBo.MarkUnqualifiedId;
+
             #region 如果超过复投次数
             if (isMoreThanCycle)
             {
+                if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
+
                 #region 无需复判（置于不合格工艺路线首工序排队）
                 if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.No)
                 {
@@ -957,6 +962,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
                     if (ngCodeInBlock.Any())
                     {
+                        if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
+
                         #region 出现首次不良代码（置于不合格工艺路线首工序排队）
                         responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
@@ -990,11 +997,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
 
             // 如果有标记缺陷
-            if (procedureRejudgeBo.MarkUnqualifiedId.HasValue)
+            if (unqualifiedId.HasValue)
             {
-                var unqualifiedId = procedureRejudgeBo.MarkUnqualifiedId.Value;
-                if (isMoreThanCycle && procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
-
                 // 添加不良记录
                 var badRecordEntity = new ManuProductBadRecordEntity
                 {
@@ -1003,7 +1007,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     FoundBadOperationId = commonBo.ProcedureId,
                     FoundBadResourceId = commonBo.ResourceId,
                     OutflowOperationId = commonBo.ProcedureId,
-                    UnqualifiedId = unqualifiedId,
+                    UnqualifiedId = unqualifiedId.Value,
                     SfcStepId = stepEntity.Id,
                     SFC = stepEntity.SFC,
                     SfcInfoId = stepEntity.SFCInfoId,
