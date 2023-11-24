@@ -300,6 +300,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                         UpdatedOn = commonBo.Time
                     });
                 }
+
+                responseSummaryBo.SFCEntities.Add(manuSfcEntity);
+                responseSummaryBo.SFCStepEntities.Add(stepEntity);
             }
 
             // 删除 manu_sfc_produce_business
