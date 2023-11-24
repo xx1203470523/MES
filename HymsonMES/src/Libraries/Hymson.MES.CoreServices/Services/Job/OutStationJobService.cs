@@ -1272,6 +1272,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
             }
 
+            // 检查工序是否有设置"标记编码"
+            if (procedureRejudgeBo.MarkUnqualifiedId == null)
+                throw new CustomerValidationException(nameof(ErrorCode.MES17117))
+                    .WithData("Procedure", procedureRejudgeBo.ProcedureCode);
+
             // 检查工序是否有设置"缺陷编码"
             if (procedureRejudgeBo.LastUnqualified == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17115))
