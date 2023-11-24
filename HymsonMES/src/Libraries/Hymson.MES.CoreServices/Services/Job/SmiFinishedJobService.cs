@@ -302,6 +302,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
 
                 responseSummaryBo.SFCEntities.Add(manuSfcEntity);
+                responseSummaryBo.SFCProduceEntities.Add(sfcProduceEntity);
                 responseSummaryBo.SFCStepEntities.Add(stepEntity);
             }
 
@@ -350,6 +351,9 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 更新数据
             List<Task<int>> tasks = new()
             {
+                // 修改 manu_sfc_produce
+                _manuSfcProduceRepository.UpdateRangeWithStatusCheckAsync(data.SFCProduceEntities),
+
                 // 删除 manu_sfc_produce
                 _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(data.PhysicalDeleteSFCProduceByIdsCommand),
 
