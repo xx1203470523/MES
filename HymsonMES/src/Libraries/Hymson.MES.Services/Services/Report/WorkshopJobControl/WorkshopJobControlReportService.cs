@@ -95,20 +95,24 @@ namespace Hymson.MES.Services.Services.Report
             pagedQuery.SiteId = _currentSite.SiteId;
             var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportOptimizeAsync(pagedQuery);
 
-            List<WorkshopJobControlReportViewDto> listDto = new List<WorkshopJobControlReportViewDto>();
+            List<WorkshopJobControlReportViewDto> listDto = new();
             if (pagedInfo.Data.Any())
             {
-                //查询物料
-                var materials = await _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId).ToArray());
+                // 查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.WorkOrderId));
 
-                //查询工单
-                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.WorkOrderId).ToArray());
+                // 查询bom
+                var procBomsTask = _procBomRepository.GetByIdsAsync(workOrders.Select(x => x.ProductBOMId));
 
-                //查询工序
-                var procProcedures = await _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId).ToArray());
+                // 查询物料
+                var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
 
-                //查询bom
-                var procBoms = await _procBomRepository.GetByIdsAsync(workOrders.Select(x => x.ProductBOMId).ToArray());
+                // 查询工序
+                var procProceduresTask = _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId));
+
+                var procBoms = await procBomsTask;
+                var materials = await materialsTask;
+                var procProcedures = await procProceduresTask;
 
                 foreach (var item in pagedInfo.Data)
                 {
@@ -117,13 +121,12 @@ namespace Hymson.MES.Services.Services.Report
                     var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
                     var bom = procBoms.FirstOrDefault(x => x.Id == workOrder?.ProductBOMId);
 
-                    listDto.Add(new WorkshopJobControlReportViewDto()
+                    listDto.Add(new WorkshopJobControlReportViewDto
                     {
                         SFC = item.SFC,
                         SFCStatus = item.SFCStatus,
-                        SFCProduceStatus = item.SFCProduceStatus,
+                        SFCProduceStatus = item.SFCStatus,
                         Qty = item.Qty,
-
                         MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
                         MaterialName = material?.MaterialName ?? "",
                         OrderCode = workOrder?.OrderCode ?? "",
@@ -131,8 +134,7 @@ namespace Hymson.MES.Services.Services.Report
                         ProcedureCode = procedure?.Code ?? "",
                         ProcedureName = procedure?.Name ?? "",
                         BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
-                        BomName = procedure?.Name ?? ""
-
+                        BomName = bom != null ? bom.BomName : ""
                     });
                 }
 

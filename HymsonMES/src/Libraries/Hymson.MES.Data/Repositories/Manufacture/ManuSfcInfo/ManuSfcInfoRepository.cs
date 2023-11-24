@@ -429,7 +429,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         select 
                             s.SFC,
                             s.`Status` as SFCStatus,
-                            sp.`Status` as SFCProduceStatus,
                             si.ProductId,
                             si.WorkOrderId,
                             sp.ProcedureId,
