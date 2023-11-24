@@ -94,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         }
 
         /// <summary>
-        /// 更具条码获取参数信息
+        /// 根据条码获取参数信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
