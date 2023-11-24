@@ -216,7 +216,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return;
+            if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16370));
+            }
 
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
@@ -497,6 +500,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
             }
 
+            responseSummaryBo.Source = commonBo.Source;
             return responseSummaryBo;
         }
 
@@ -566,7 +570,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
 
-            // 单条码过站时（面板过站）
+            // 后面的代码是面板业务
+            if (data.Source != RequestSourceEnum.Panel) return responseBo;
+
+            // 面板需要的数据
             if (data.SFCEntities!.Count() == 1)
             {
                 var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
