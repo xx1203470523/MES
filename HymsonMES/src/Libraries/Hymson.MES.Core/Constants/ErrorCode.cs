@@ -687,6 +687,7 @@
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
 
         public const string MES16352 = "采集数据导入模板不正确!";
+        public const string MES16353 = "按工艺路线生产，条码{SFC}进站资源对应的工序与在制品工序不一致，无法进站！";
         #endregion
 
         #region 生产

@@ -21,6 +21,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
 using Microsoft.Extensions.Logging;
+using System.Runtime.Versioning;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound
 {
@@ -269,15 +270,11 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
                 if (sfcProduceEntity != null)
                 {
-                    // 工艺路线管控,校验工序和资源是否对应,后续改为批量
-                    var resources = resourceEntities.Where(a => a.Id == sfcProduceEntity.ProcedureId);
-                    if (!resources.Any(x => x.ResCode == procResource.ResCode))
+                    // 校验设备资源对应的工序和在制工序是否一直
+                    if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
                     {
-                        var resourcesCode = resources.FirstOrDefault()?.ResCode;
-
-                        //20231114 清安增加日志记录，观察卡控是否流程影响生产
-                        //throw new CustomerValidationException(nameof(ErrorCode.MES16317));
-                        _logger.LogError($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源时资源编码：{resourcesCode}，在制品资源编码：{procResource.ResCode}");
+                        //_logger.LogError($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源对应工序：在制品工序不一致");
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("SFC", inBoundMoreDto.SFCs);
                     }
 
                     //进站修改为激活
