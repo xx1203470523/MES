@@ -86,5 +86,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task<BomExportResultDto> ExprotBomPageListAsync(ProcBomPagedQuery param);
 
+        /// <summary>
+        /// 判断bom是否被激活工单引用
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long bomId);
     }
 }

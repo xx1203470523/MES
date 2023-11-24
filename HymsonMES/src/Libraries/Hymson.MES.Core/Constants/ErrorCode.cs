@@ -271,6 +271,10 @@
         public const string MES10619 = "用量不能为空";
         public const string MES10620 = "收集方式不合法，请检查！";
 
+        public const string MES10621 = "激活工单已绑定该bom,该bom不允许修改物料清单行数";
+        public const string MES10622 = "激活工单已绑定该bom,该bom不允许修改物料清单物料与工序";
+        public const string MES10623 = "激活工单已绑定该bom,该bom不允许修改物料清单序号";
+
         #endregion
 
         #region 上料点 10700
@@ -405,6 +409,7 @@
 
         #region ESOP维护 11500
         public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
+        public const string MES11501 = "不能删除启用状态的数据";
         #endregion
 
         #region 作业12000
@@ -919,6 +924,8 @@
         public const string MES16367 = "产品序列码【{SFC}】所记录的工单不存在";
         public const string MES16368 = "产品序列码【{SFC}】已在原工序【{Procedure}】处不合格出站【{Cycle}】次，请继续复投。";
         public const string MES16369 = "产品序列码【{SFC}】指定的工序【{Procedure}】不存在";
+        public const string MES16370 = "产品序列码不能为空，请检查参数";
+        public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
         #endregion
 
         #region 工单激活 MES16400
@@ -1063,8 +1070,9 @@
         public const string MES17112 = "工单【{Ids}】信息读取失败！";
         public const string MES17113 = "消耗条码{BarCodes}不属于已上料清单！";
         public const string MES17114 = "获取工序基本信息失败，请检查工序参数【{Procedure}】！";
-        public const string MES17115 = "工序【{Procedure}】未设置【缺陷编码】参数项，具体请查看【工序维护】！";
+        public const string MES17115 = "工序【{Procedure}】未设置【标记编码/缺陷编码】参数项，具体请查看【工序维护】！";
         public const string MES17116 = "不合格代码【{Code}】未设置【不合格工艺路线】参数项，具体请查看【不合格代码】！";
+
         #endregion
 
         #region 面板维护 MES17200
@@ -1303,6 +1311,7 @@
         public const string MES18623 = "载具编码【{Code}】读取失败！";
         public const string MES18624 = "载具编码【{Code}】不存在，具体请查看【载具注册】！";
         public const string MES18625 = "载具编码【{Code}】已禁用，具体请查看【载具注册】！";
+        public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
         #endregion
 
         #region Recipe参数 18700

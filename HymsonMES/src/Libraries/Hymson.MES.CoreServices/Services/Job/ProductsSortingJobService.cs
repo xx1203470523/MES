@@ -92,7 +92,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
 
             // 获取生产条码信息
-            if(commonBo.Proxy==null)
+            if (commonBo.Proxy == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
@@ -167,7 +167,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = sfcs };
             // 获取条码信息
-            if(commonBo.Proxy==null)
+            if (commonBo.Proxy == null)
             {
                 return default;
             }
@@ -220,6 +220,9 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             var insertGrades = new List<ManuSfcGradeEntity>();
             var gradeDetailEntities = new List<ManuSfcGradeDetailEntity>();
+            var sfcGradeDetails = new List<ManuSfcGradeDetailEntity>();
+            var ruleDetailIds = new List<long>();
+            var gradeId = IdGenProvider.Instance.CreateId();
 
             foreach (var sfc in sfcs)
             {
@@ -232,51 +235,54 @@ namespace Hymson.MES.CoreServices.Services.Job
                     continue;
                 }
 
-                //根据参数筛选过滤拿到最新的参数信息
-                var parameterIds = new List<long> { };
-                parameterIds.AddRange(sortingRuleDetails.Select(a => a.ParameterId).Distinct().ToArray());
-                //条码的产品参数
-                var sfcParameterList = parameterList.Where(x => x.SFC == sfc && parameterIds.Contains(x.ParameterId));
-                if (sfcParameterList == null || !sfcParameterList.Any())
+                var procedureIds = sortingRuleDetails.Select(x => x.ProcedureId).Distinct().ToList();
+                foreach (var procedureId in procedureIds)
                 {
-                    continue;
-                }
+                    //根据参数筛选过滤拿到最新的参数信息
+                    var parameterIds = new List<long> { };
+                    var procedureSortingRuleDetails = sortingRuleDetails.Where(X => X.ProcedureId == procedureId).ToList();
+                    parameterIds.AddRange(procedureSortingRuleDetails.Select(a => a.ParameterId).Distinct().ToArray());
 
-                var gradeId = IdGenProvider.Instance.CreateId();
-                var sfcGradeDetails = new List<ManuSfcGradeDetailEntity>();
-                var ruleDetailIds = new List<long>();
-
-                //根据参数筛选过滤拿到最新的参数信息
-                var parameterEntities = sfcParameterList.GroupBy(x => x.ParameterId).Select(x => x.OrderByDescending(x => x.CreatedOn).First()).ToList();
-                foreach (var parameter in parameterEntities)
-                {
-                    var ruleDetail = GetParameterRating(parameter, sortingRuleDetails);
-                    if (ruleDetail == null)
+                    //条码的产品参数
+                    //var sfcParameterList = parameterList.Where(x => x.SFC == sfc && parameterIds.Contains(x.ParameterId));
+                    var procedureParameterList = parameterList.Where(x => x.SFC == sfc && x.ProcedureId == procedureId && parameterIds.Contains(x.ParameterId));
+                    if (procedureParameterList == null || !procedureParameterList.Any())
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16365)).WithData("SFC", sfc);
-                    }
-                    if (ruleDetail != null && !ruleDetailIds.Contains(ruleDetail.Id))
-                    {
-                        ruleDetailIds.Add(ruleDetail.Id);
+                        continue;
                     }
 
-                    sfcGradeDetails.Add(new ManuSfcGradeDetailEntity
+                    //根据参数筛选过滤拿到最新的参数信息
+                    var parameterEntities = procedureParameterList.GroupBy(x => x.ParameterId).Select(x => x.OrderByDescending(x => x.CreatedOn).First()).ToList();
+                    foreach (var parameter in parameterEntities)
                     {
-                        Id = IdGenProvider.Instance.CreateId(),
-                        SiteId = commonBo.SiteId,
-                        GadeId = gradeId,
-                        ProduceId = parameter.ProcedureId,
-                        SFC = sfc,
-                        Grade = ruleDetail?.Rating ?? "",
-                        ParamId = parameter.ParameterId,
-                        ParamValue = parameter.ParameterValue,
-                        MaxValue = ruleDetail?.MaxValue ?? 0,
-                        MinValue = ruleDetail?.MinValue ?? 0,
-                        MinContainingType = ruleDetail?.MinContainingType,
-                        MaxContainingType = ruleDetail?.MaxContainingType,
-                        CreatedBy = commonBo.UserName,
-                        UpdatedBy = commonBo.UserName,
-                    });
+                        var ruleDetail = GetParameterRating(parameter, sortingRuleDetails);
+                        if (ruleDetail == null)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16365)).WithData("SFC", sfc);
+                        }
+                        if (ruleDetail != null && !ruleDetailIds.Contains(ruleDetail.Id))
+                        {
+                            ruleDetailIds.Add(ruleDetail.Id);
+                        }
+
+                        sfcGradeDetails.Add(new ManuSfcGradeDetailEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = commonBo.SiteId,
+                            GadeId = gradeId,
+                            ProduceId = parameter.ProcedureId,
+                            SFC = sfc,
+                            Grade = ruleDetail?.Rating ?? "",
+                            ParamId = parameter.ParameterId,
+                            ParamValue = parameter.ParameterValue,
+                            MaxValue = ruleDetail?.MaxValue ?? 0,
+                            MinValue = ruleDetail?.MinValue ?? 0,
+                            MinContainingType = ruleDetail?.MinContainingType,
+                            MaxContainingType = ruleDetail?.MaxContainingType,
+                            CreatedBy = commonBo.UserName,
+                            UpdatedBy = commonBo.UserName,
+                        });
+                    }
                 }
 
                 string finalGrade = "";

@@ -24,6 +24,7 @@ using System.Transactions;
 using Minio.DataModel;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Data.Repositories.Plan;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -57,6 +58,8 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IExcelService _excelService;
         private readonly IMinioService _minioService;
 
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -71,6 +74,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="excelService"></param>
         /// <param name="minioService"></param>
         /// <param name="validationImportRules"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
         public ProcBomService(ICurrentSite currentSite, ICurrentUser currentUser,
             IProcBomRepository procBomRepository,
             AbstractValidator<ProcBomCreateDto> validationCreateRules,
@@ -80,7 +84,8 @@ namespace Hymson.MES.Services.Services.Process
             IExcelService excelService,
             IMinioService minioService,
         IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
-            ,ILocalizationService localizationService)
+            ,ILocalizationService localizationService,
+        IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
@@ -93,6 +98,8 @@ namespace Hymson.MES.Services.Services.Process
             _localizationService = localizationService;
             _excelService= excelService;
             _minioService= minioService;
+
+            _planWorkOrderActivationRepository= planWorkOrderActivationRepository;
         }
 
         /// <summary>
@@ -477,6 +484,58 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            #region 当BOM被工单引用并激活时 
+            //需要做一些判断：不允许增删BOM的行项目数，顺序，不允许修改行项目中的物料编码和工序编码; (替代物料不做顺序考虑)
+            if (await JudgeBomIsReferencedByActivatedWorkOrder(procBomEntity.Id)) 
+            {
+                //获取到所有的旧bom的物料清单
+                var oldMainBomDetails = await _procBomDetailRepository.GetListMainAsync(procBomEntity.Id);
+                var oldReplaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(procBomEntity.Id);
+
+                //比对总行数
+                if (oldMainBomDetails.Count() != bomDetails.Count()|| oldReplaceBomDetails.Count()!= bomReplaceDetails.Count()) 
+                {
+                    throw new CustomerValidationException(ErrorCode.MES10621);
+                }
+
+                //比对新旧物料清单
+                foreach (var item in oldMainBomDetails)
+                {
+                    //找到新的物料里对应的 物料+工序
+                    var newBomDetail= bomDetails.Where(x => x.MaterialId.ToString() == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
+                    if (newBomDetail == null) 
+                    {
+                        throw new CustomerValidationException(ErrorCode.MES10622);
+                    }
+                    if (newBomDetail.Seq != item.Seq) 
+                    {
+                        throw new CustomerValidationException(ErrorCode.MES10623);
+                    }
+
+                    //当前旧主物料下的旧替代物料
+                    var oldReplaceBomDetailsByMain = oldReplaceBomDetails.Where(x => x.BomDetailId == item.Id);
+
+                    //当前新主物料下的新替代物料
+                    var newReplaceBomDetailsByMain = bomReplaceDetails.Where(x => x.BomDetailId == newBomDetail.Id);
+
+                    if (oldReplaceBomDetailsByMain.Count() != newReplaceBomDetailsByMain.Count()) 
+                    {
+                        throw new CustomerValidationException(ErrorCode.MES10621);
+                    }
+
+                    foreach (var replaceItem in oldReplaceBomDetailsByMain)
+                    {
+                        //找到新的替代物料里对应的 物料
+                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId.ToString() == replaceItem.ReplaceMaterialId ).FirstOrDefault();
+                        if (newBomDetailReplace == null)
+                        {
+                            throw new CustomerValidationException(ErrorCode.MES10622);
+                        }
+                    }
+                }
+            }
+            #endregion
+
             #region 操作数据库
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
@@ -830,5 +889,24 @@ namespace Hymson.MES.Services.Services.Process
 
         }
 
+
+        /// <summary>
+        /// 判断bom是否被激活工单引用
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long bomId) 
+        {
+            
+             var planWorkOrderActivations= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId??0, BomId = bomId });
+            if (planWorkOrderActivations.Any())
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
     }
 }

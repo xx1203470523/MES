@@ -1,19 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: BOM表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-14 10:04:25
- */
-
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -70,12 +59,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
-            if (ids.Length <= 0)
-            {
-                return new List<ProcBomEntity>();
-            }
+            if (!ids.Any()) return new List<ProcBomEntity>();
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcBomEntity>(GetByIdsSql, new { ids = ids });
@@ -253,7 +239,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT * FROM `proc_bom`  WHERE Id IN @ids ";
 
         const string UpdateStatusSql = "UPDATE `proc_bom` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
-        
+
         const string GetByCodesSql = @"SELECT * FROM `proc_bom` WHERE BomCode IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

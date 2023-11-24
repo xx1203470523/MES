@@ -1,16 +1,12 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public record WorkshopJobControlReportViewDto:BaseEntityDto
     {
         /// <summary>
@@ -23,7 +19,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public SfcStatusEnum SFCStatus { get; set; }
 
-        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public SfcStatusEnum SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 物料编码/版本

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Microsoft.AspNetCore.Authorization;
@@ -24,17 +25,20 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 服务接口（条码档位表）
         /// </summary>
         private readonly IManuSfcGradeService _manuSfcGradeService;
-
+        private readonly IManuProductParameterService _productParameterService;
 
         /// <summary>
         /// 构造函数（条码档位表）
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="manuSfcGradeService"></param>
-        public ManuSfcGradeController(ILogger<ManuSfcGradeController> logger, IManuSfcGradeService manuSfcGradeService)
+        /// <param name="productParameterService"></param>
+        public ManuSfcGradeController(ILogger<ManuSfcGradeController> logger, IManuSfcGradeService manuSfcGradeService,
+                  IManuProductParameterService productParameterService)
         {
             _logger = logger;
             _manuSfcGradeService = manuSfcGradeService;
+            _productParameterService = productParameterService;
         }
 
         
@@ -48,5 +52,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcGradeService.GetBySFCAsync(sfc);
         }
+
+        ///// <summary>
+        ///// 查询详情（条码档位表）
+        ///// </summary>
+        ///// <param name="sfc"></param>
+        ///// <returns></returns>
+        //[HttpGet("getList")]
+        //public async Task<ManuSfcGradeViewDto?> GetListBySFCAsync()
+        //{
+        //    return await _productParameterService.GetBySFCAsync(sfc);
+        //}
     }
 }

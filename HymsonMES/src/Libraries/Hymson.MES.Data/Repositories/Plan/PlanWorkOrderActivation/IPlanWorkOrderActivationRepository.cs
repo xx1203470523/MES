@@ -120,5 +120,12 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <param name="planWorkOrderActivationPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<PlanWorkOrderActivationListDetailView>> GetPagedInfoAsync(PlanWorkOrderActivationPagedQuery planWorkOrderActivationPagedQuery);
+
+        /// <summary>
+        /// 通过bomID查找激活的工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesByBomIdAsync(PlanWorkOrderActivationByBomIdQuery query);
     }
 }

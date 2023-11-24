@@ -1,4 +1,5 @@
-﻿using Hymson.MES.Core.Enums.Manufacture;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
@@ -39,17 +40,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 批量进站（条码进站）
         /// </summary>
         /// <param name="bo"></param>
+        /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFCAsync(SFCInStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeBySFCAsync(SFCInStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
+                Source = source,
                 Type = ManuFacePlateBarcodeTypeEnum.Product,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             List<string> SFCs = new();
@@ -71,17 +75,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 批量进站（托盘进站）
         /// </summary>
         /// <param name="bo"></param>
+        /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicleAsync(VehicleInStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> InStationRangeByVehicleAsync(VehicleInStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
+                Source = source,
                 Type = ManuFacePlateBarcodeTypeEnum.Vehicle,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             // 根据载具代码获取载具里面的条码
@@ -102,17 +109,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 批量出站（条码出站）
         /// </summary>
         /// <param name="bo"></param>
+        /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFCAsync(SFCOutStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeBySFCAsync(SFCOutStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
+                Source = source,
                 Type = ManuFacePlateBarcodeTypeEnum.Product,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             requestBo.SFCs = bo.OutStationRequestBos.Select(s => s.SFC);
@@ -128,17 +138,20 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
         /// 批量出站（托盘出站）
         /// </summary>
         /// <param name="bo"></param>
+        /// <param name="source"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo bo)
+        public async Task<Dictionary<string, JobResponseBo>> OutStationRangeByVehicleAsync(VehicleOutStationBo bo, RequestSourceEnum source = RequestSourceEnum.EquipmentApi)
         {
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
+                Source = source,
                 Type = ManuFacePlateBarcodeTypeEnum.Vehicle,
                 SiteId = bo.SiteId,
                 UserName = bo.UserName,
                 ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId
+                ResourceId = bo.ResourceId,
+                EquipmentId = bo.EquipmentId
             };
 
             // 根据载具代码获取载具里面的条码

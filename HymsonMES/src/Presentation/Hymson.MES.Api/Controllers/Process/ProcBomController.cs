@@ -207,5 +207,17 @@ namespace Hymson.MES.Api.Controllers.Process
         {
             return await _procBomService.ExprotBomPageListAsync(param);
         }
+
+        /// <summary>
+        /// 判断bom是否被激活工单引用
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("judgeBomIdIsUsedByActivatedOrder/{id}")]
+        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long id) 
+        {
+            return await _procBomService.JudgeBomIsReferencedByActivatedWorkOrder(id);
+        }
     }
 }

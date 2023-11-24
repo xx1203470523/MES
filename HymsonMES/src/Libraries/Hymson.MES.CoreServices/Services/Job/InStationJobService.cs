@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -24,7 +23,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
-using static Dapper.SqlMapper;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -138,7 +136,10 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16370));
+            }
 
             // 进站工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
@@ -412,6 +413,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 });
             }
 
+            responseSummaryBo.Source = commonBo.Source;
             return responseSummaryBo;
         }
 
@@ -455,17 +457,18 @@ namespace Hymson.MES.CoreServices.Services.Job
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
 
-            // 单条码过站时（面板过站）
-            if (data.SFCProduceEntities.Count() == 1)
+            // 后面的代码是面板业务
+            if (data.Source != RequestSourceEnum.Panel) return responseBo;
+
+            // 面板需要的数据
+            List<PanelModuleEnum> panelModules = new();
+            responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
+
+            var count = data.SFCProduceEntities.Count();
+            if (count == 1)
             {
                 var SFCProduceEntity = data.SFCProduceEntities.FirstOrDefault();
-                if (SFCProduceEntity != null)
-                {
-                    // 面板需要的数据
-                    List<PanelModuleEnum> panelModules = new();
-                    responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
-                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), SFCProduceEntity.SFC);
-                }
+                if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), SFCProduceEntity.SFC);
             }
 
             return responseBo;

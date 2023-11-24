@@ -285,7 +285,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
             }
 
-            // 读取载具关联的条码
+            // 读取载具信息
             var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
             {
                 SiteId = requestBo.SiteId,
@@ -314,6 +314,12 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 SiteId = requestBo.SiteId,
                 ParentIds = vehicleEntities.Select(s => s.Id)
             });
+
+            if (!vehicleFreightStackEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18626))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
 
             List<VehicleSFCResponseBo> list = new();
             var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);

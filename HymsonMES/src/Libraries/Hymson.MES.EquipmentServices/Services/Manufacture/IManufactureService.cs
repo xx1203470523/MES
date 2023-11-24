@@ -47,14 +47,14 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task InBoundVehicleAsync(InBoundVehicleDto request);
+        Task InBoundCarrierAsync(InBoundCarrierDto request);
 
         /// <summary>
         /// 载具出站
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        Task OutBoundVehicleAsync(OutBoundVehicleDto request);
+        Task OutBoundCarrierAsync(OutBoundCarrierDto request);
 
 
     }

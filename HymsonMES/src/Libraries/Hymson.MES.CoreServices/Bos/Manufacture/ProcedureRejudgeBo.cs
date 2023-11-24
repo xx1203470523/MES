@@ -46,12 +46,12 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 是否复判
         /// </summary>
-        public TrueOrFalseEnum? IsRejudge { get; set; }
+        public TrueOrFalseEnum IsRejudge { get; set; }
 
         /// <summary>
         /// 是否校验NG信息
         /// </summary>
-        public TrueOrFalseEnum? IsValidNGCode { get; set; }
+        public TrueOrFalseEnum IsValidNGCode { get; set; }
 
         /// <summary>
         /// 标记缺陷编码

@@ -119,7 +119,19 @@ namespace Hymson.MES.CoreServices.Services.Parameter
             return row;
         }
 
-
+        /// <summary>
+        /// 根据条码获取参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCListAsync(QueryParameterByProcedureDto param)
+        {
+            return await _manuProductParameterRepository.GetProductParameterBySFCEntities(new ManuProductParameterBySfcQuery
+            {
+                SiteId = param.SiteId,
+                SFCs = param.SFCs
+            });
+        }
 
     }
 }

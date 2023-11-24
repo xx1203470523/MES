@@ -26,6 +26,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -179,6 +180,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesProcEsopAsync(long[] ids)
         {
+            var entitys = await _procEsopRepository.GetByIdsAsync(ids);
+            if (entitys != null && entitys.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11501));
+            }
             return await _procEsopRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

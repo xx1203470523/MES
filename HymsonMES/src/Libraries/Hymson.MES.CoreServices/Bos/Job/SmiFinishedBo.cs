@@ -31,6 +31,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public List<ManuSfcEntity> SFCEntities { get; set; } = new();
 
         /// <summary>
+        /// 在制品信息
+        /// </summary>
+        public List<ManuSfcProduceEntity> SFCProduceEntities { get; set; } = new();
+
+        /// <summary>
         /// 
         /// </summary>
         public List<ManuSfcStepEntity> SFCStepEntities { get; set; } = new();

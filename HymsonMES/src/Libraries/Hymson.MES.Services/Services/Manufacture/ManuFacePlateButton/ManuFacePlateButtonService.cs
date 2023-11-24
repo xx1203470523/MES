@@ -8,6 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -371,6 +372,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
+                Source = RequestSourceEnum.Panel,
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 Type = codeType,
@@ -484,6 +486,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 作业请求参数
             var requestBo = new JobRequestBo
             {
+                Source = RequestSourceEnum.Panel,
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
                 Type = codeType,

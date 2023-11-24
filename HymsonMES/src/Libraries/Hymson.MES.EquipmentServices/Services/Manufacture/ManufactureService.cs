@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
@@ -122,7 +123,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 SFCs = new string[] { request.SFC }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -152,7 +153,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 SFCs = request.SFCs.Select(s => s.SFC)
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -176,19 +177,19 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             var outStationRequestBo = new OutStationRequestBo
             {
                 SFC = request.SFC,
-                IsQualified = request.Passed == 1
+                IsQualified = request.IsQualified == 1
             };
 
             // 消耗条码
-            if (request.BindFeedingCodes != null && request.BindFeedingCodes.Any())
+            if (request.ConsumeCodes != null && request.ConsumeCodes.Any())
             {
-                outStationRequestBo.ConsumeList = request.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+                outStationRequestBo.ConsumeList = request.ConsumeCodes.Select(s => new OutStationConsumeBo { BarCode = s });
             }
 
             // 不合格代码
-            if (request.NG != null && request.NG.Any())
+            if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
             }
 
             _ = await _manuPassStationService.OutStationRangeBySFCAsync(new SFCOutStationBo
@@ -199,7 +200,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -227,19 +228,19 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 var outStationRequestBo = new OutStationRequestBo
                 {
                     SFC = item.SFC,
-                    IsQualified = item.Passed == 1
+                    IsQualified = item.IsQualified == 1
                 };
 
                 // 消耗条码
-                if (item.BindFeedingCodes != null && item.BindFeedingCodes.Any())
+                if (item.ConsumeCodes != null && item.ConsumeCodes.Any())
                 {
-                    outStationRequestBo.ConsumeList = item.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+                    outStationRequestBo.ConsumeList = item.ConsumeCodes.Select(s => new OutStationConsumeBo { BarCode = s });
                 }
 
                 // 不合格代码
-                if (item.NG != null && item.NG.Any())
+                if (item.FailInfo != null && item.FailInfo.Any())
                 {
-                    outStationRequestBo.OutStationUnqualifiedList = item.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
+                    outStationRequestBo.OutStationUnqualifiedList = item.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
                 }
 
                 outStationRequestBos.Add(outStationRequestBo);
@@ -253,7 +254,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = outStationRequestBos
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -261,7 +262,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task InBoundVehicleAsync(InBoundVehicleDto request)
+        public async Task InBoundCarrierAsync(InBoundCarrierDto request)
         {
             //await _validationInBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -281,8 +282,8 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ProcedureId = manuBo.ProcedureId,
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
-                VehicleCodes = new string[] { request.VehicleCode }
-            });
+                VehicleCodes = new string[] { request.CarrierNo }
+            }, RequestSourceEnum.EquipmentApi);
         }
 
         /// <summary>
@@ -290,7 +291,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task OutBoundVehicleAsync(OutBoundVehicleDto request)
+        public async Task OutBoundCarrierAsync(OutBoundCarrierDto request)
         {
             //await _validationOutBoundDtoRules.ValidateAndThrowAsync(request);
             if (request == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -305,20 +306,20 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
 
             var outStationRequestBo = new OutStationRequestBo
             {
-                VehicleCode = request.VehicleCode,
-                IsQualified = request.Passed == 1
+                VehicleCode = request.CarrierNo,
+                IsQualified = request.IsQualified == 1
             };
 
             // 消耗条码
-            if (request.BindFeedingCodes != null && request.BindFeedingCodes.Any())
+            if (request.ConsumeCodes != null && request.ConsumeCodes.Any())
             {
-                outStationRequestBo.ConsumeList = request.BindFeedingCodes.Select(s => new OutStationConsumeBo { BarCode = s });
+                outStationRequestBo.ConsumeList = request.ConsumeCodes.Select(s => new OutStationConsumeBo { BarCode = s });
             }
 
             // 不合格代码
-            if (request.NG != null && request.NG.Any())
+            if (request.FailInfo != null && request.FailInfo.Any())
             {
-                outStationRequestBo.OutStationUnqualifiedList = request.NG.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NGCode });
+                outStationRequestBo.OutStationUnqualifiedList = request.FailInfo.Select(s => new OutStationUnqualifiedBo { UnqualifiedCode = s.NCCode });
             }
 
             _ = await _manuPassStationService.OutStationRangeByVehicleAsync(new VehicleOutStationBo
@@ -329,7 +330,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
                 ResourceId = manuBo.ResourceId,
                 EquipmentId = manuBo.EquipmentId,
                 OutStationRequestBos = new List<OutStationRequestBo> { outStationRequestBo }
-            });
+            }, RequestSourceEnum.EquipmentApi);
         }
 
     }
