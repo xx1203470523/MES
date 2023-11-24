@@ -248,7 +248,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var procedureParameterList = parameterList.Where(x => x.SFC == sfc && x.ProcedureId == procedureId && parameterIds.Contains(x.ParameterId));
                     if (procedureParameterList == null || !procedureParameterList.Any())
                     {
-                        continue;
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16365)).WithData("SFC", sfc);
                     }
 
                     //根据参数筛选过滤拿到最新的参数信息
