@@ -67,11 +67,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
 
 
         /// <summary>
-        /// 获取测试模型对应的打印数据
+        /// 获取对应任务的打印数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        Task<TestPrintPrintDataDto> GetAboutPrintDataAsync(string id);
+        Task<PrintDataResultDto> GetAboutPrintDataAsync(long id);
     }
 }

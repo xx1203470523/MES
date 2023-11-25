@@ -132,12 +132,12 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
-        /// 获取测试打印模型对应的数据
+        /// 获取打印任务对应的数据
         /// </summary>
         /// <returns></returns>
-        [HttpGet("getTestPrintData/{id}")]
+        [HttpGet("getPrintData/{id}")]
         [AllowAnonymous]
-        public async Task<TestPrintPrintDataDto> GetTestPrintDataAsync(string id)
+        public async Task<PrintDataResultDto> GetPrintDataAsync(long id)
         {
             return await _procLabelTemplateService.GetAboutPrintDataAsync(id);
         }

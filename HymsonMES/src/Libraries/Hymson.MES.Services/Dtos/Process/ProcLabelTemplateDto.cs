@@ -33,7 +33,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 模板内容
@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 备注
@@ -132,12 +132,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         /// <summary>
         /// 模板内容
         /// </summary>
@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? Name { get; set; }
     }
 
-    public record TestPrintPrintDataDto 
+    public record PrintDataResultDto
     {
         /// <summary>
         /// 打印模板打印设计信息
@@ -198,9 +198,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public ProcLabelTemplateRelationDto ProcLabelTemplateRelationDto { get; set; }
 
         /// <summary>
-        /// 打印模型的数据
+        /// 打印模型的数据 对应的数据
         /// </summary>
-        public ProcPrintTestPrintDto ProcPrintTestPrintDto { get; set; }
+        public string PrintBodies { get; set; }
 
     }
 }

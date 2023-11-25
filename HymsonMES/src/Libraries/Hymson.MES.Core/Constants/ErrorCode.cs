@@ -140,6 +140,10 @@
         public const string MES10372 = "模板没有打印设计!";
         public const string MES10373 = "不存在[{class}打印类]";
         public const string MES10374 = "获取打印数据ID为空";
+        public const string MES10375 = "没有获取到对应打印任务数据或打印模板";
+        public const string MES10376 = "没有获取对应打印任务的打印模板信息";
+        public const string MES10377 = "打印任务的模板名称无法转为ID";
+
 
         #endregion
 
