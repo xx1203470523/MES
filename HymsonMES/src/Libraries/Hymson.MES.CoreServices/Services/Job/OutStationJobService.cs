@@ -886,6 +886,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 #region 需要复判
                 else
                 {
+                    if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
                     productBadRecordStatus = ProductBadRecordStatusEnum.Open;
 
                     // 已完工（置于在制完成）
