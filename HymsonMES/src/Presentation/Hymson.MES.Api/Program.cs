@@ -54,7 +54,7 @@ namespace Hymson.MES.Api
             builder.Services.AddEventBusRabbitMQService(builder.Configuration);
             builder.Services.AddLocalization();
             builder.Services.AddHealthChecks();
-
+            builder.Services.AddPrintService(builder.Configuration);
             // 注入nlog日志服务
             builder.AddNLogWeb(builder.Configuration);
             AddAutoMapper();

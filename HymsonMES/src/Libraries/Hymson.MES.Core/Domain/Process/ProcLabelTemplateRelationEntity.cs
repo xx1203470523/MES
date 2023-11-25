@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 打印模板地址
         /// </summary>
-        public string PrintTemplatePath { get; set; }
+        public string? PrintTemplatePath { get; set; }
 
        
     }

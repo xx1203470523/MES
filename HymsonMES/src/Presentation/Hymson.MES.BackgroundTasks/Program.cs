@@ -3,11 +3,13 @@ using Hymson.MES.BackgroundTasks.HostedServices;
 using Hymson.MES.BackgroundTasks.Jobs;
 using Hymson.MES.BackgroundTasks.Manufacture;
 using Hymson.MES.CoreServices.DependencyInjection;
+using Hymson.Print.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
+using System.Configuration;
 using System.Reflection;
 
 try
@@ -30,10 +32,12 @@ IHostBuilder CreateHostBuilder(string[] args) =>
 Host.CreateDefaultBuilder(args)
    .ConfigureServices((hostContext, services) =>
    {
+       services.Configure<PrintOptions>(hostContext.Configuration.GetSection(nameof(PrintOptions)));
        services.AddLocalization();
        services.AddSqlLocalization(hostContext.Configuration);
        services.AddBackgroundServices(hostContext.Configuration);
        services.AddMemoryCache();
+       services.AddPrintBackgroundService(hostContext.Configuration);
        services.AddClearCacheService(hostContext.Configuration);
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
        // Add the required Quartz.NET services
@@ -45,6 +49,7 @@ Host.CreateDefaultBuilder(args)
 
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
            q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<PrintExecuteJob>(hostContext.Configuration);
            #endregion
 
            #region 生产

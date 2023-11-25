@@ -65,7 +65,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 打印模板地址
         /// </summary>
-        public string PrintTemplatePath { get; set; }
+        public string? PrintTemplatePath { get; set; }
 
     }
 
@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 打印模板地址
         /// </summary>
-        public string PrintTemplatePath { get; set; }
+        public string? PrintTemplatePath { get; set; }
 
        
     }
@@ -151,7 +151,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 打印模板地址
         /// </summary>
-        public string PrintTemplatePath { get; set; }
+        public string? PrintTemplatePath { get; set; }
 
        
 
