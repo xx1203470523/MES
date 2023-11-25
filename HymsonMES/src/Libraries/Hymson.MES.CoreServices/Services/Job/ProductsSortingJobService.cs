@@ -46,19 +46,19 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IProcSortingRuleDetailRepository _sortingRuleDetailRepository;
         private readonly IProcSortingRuleGradeRepository _sortingRuleGradeRepository;
         private readonly IProcSortingRuleGradeDetailsRepository _ruleGradeDetailsRepository;
+        /// <summary>
+        ///工序
+        /// </summary>
+        private readonly IProcProcedureRepository _procedureRepository;
 
         private readonly IMasterDataService _masterDataService;
-        /// <summary>
-        ///产品参数采集
-        /// </summary>
-        private readonly IManuProductParameterRepository _productParameterRepository;
 
         public ProductsSortingJobService(IManuSfcGradeRepository manuSfcGradeRepository,
             IManuSfcGradeDetailRepository gradeDetailRepository,
             IProcSortingRuleDetailRepository sortingRuleDetailRepository,
             IProcSortingRuleGradeRepository sortingRuleGradeRepository,
             IProcSortingRuleGradeDetailsRepository ruleGradeDetailsRepository,
-            IManuProductParameterRepository productParameterRepository,
+            IProcProcedureRepository procedureRepository,
             IMasterDataService masterDataService)
         {
             _manuSfcGradeRepository = manuSfcGradeRepository;
@@ -66,7 +66,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             _sortingRuleDetailRepository = sortingRuleDetailRepository;
             _sortingRuleGradeRepository = sortingRuleGradeRepository;
             _ruleGradeDetailsRepository = ruleGradeDetailsRepository;
-            _productParameterRepository = productParameterRepository;
+            _procedureRepository = procedureRepository;
             _masterDataService = masterDataService;
         }
 
@@ -224,6 +224,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             var ruleDetailIds = new List<long>();
             var gradeId = IdGenProvider.Instance.CreateId();
 
+            var procedureIdList = sortingRuleDetailEntities.Select(x => x.ProcedureId).Distinct().ToList();
+            var procProcedures = await _procedureRepository.GetByIdsAsync(procedureIdList);
             foreach (var sfc in sfcs)
             {
                 //条码的分选规则
@@ -248,13 +250,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var procedureParameterList = parameterList.Where(x => x.SFC == sfc && x.ProcedureId == procedureId && parameterIds.Contains(x.ParameterId));
                     if (procedureParameterList == null || !procedureParameterList.Any())
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16365)).WithData("SFC", sfc);
+                        var code= procProcedures.FirstOrDefault(x=>x.Id== procedureId)?.Code??"";
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16372)).WithData("SFC", sfc).WithData("code", code);
                     }
 
                     //根据参数筛选过滤拿到最新的参数信息
                     var parameterEntities = procedureParameterList.GroupBy(x => x.ParameterId).Select(x => x.OrderByDescending(x => x.CreatedOn).First()).ToList();
-                    foreach (var parameter in parameterEntities)
+                    foreach (var parameterId in parameterIds)
                     {
+                        var parameter = parameterEntities.FirstOrDefault(x => x.ParameterId == parameterId);
                         var ruleDetail = GetParameterRating(parameter, sortingRuleDetails);
                         if (ruleDetail == null)
                         {
@@ -329,7 +333,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 Rating = ""
             };
 
-            if (string.IsNullOrWhiteSpace(parameter.ParameterValue))
+            if (parameter == null || string.IsNullOrWhiteSpace(parameter?.ParameterValue))
             {
                 return procSortingRuleDetail;
             }
