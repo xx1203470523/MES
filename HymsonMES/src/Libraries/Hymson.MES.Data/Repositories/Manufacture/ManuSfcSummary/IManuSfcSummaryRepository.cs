@@ -94,12 +94,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcSummaryPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcSummaryEntity>> GetPagedInfoAsync(ManuSfcSummaryPagedQuery manuSfcSummaryPagedQuery);
+
         /// <summary>
         /// 存在更新，不存在新增
         /// </summary>
         /// <param name="manuSfcSummaryEntitys"></param>
         /// <returns></returns>
         Task<int> InsertOrUpdateRangeAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys);
+
+        /// <summary>
+        /// NG补料
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> UpdateIsReplenish(List<ManuSfcSummaryEntity> entities);
         #endregion
     }
 }

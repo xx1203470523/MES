@@ -1078,6 +1078,8 @@
         public const string MES19153 = "{SFC}流转查不到数据";
 
         public const string MES19154 = "补料确认：更新{SFC}是否补料状态失败！";
+        public const string MES19155 = "该电芯码{SFCs}已绑定模组，不可重复绑定模组！";
+        public const string MES19156 = "该模组码{BindSFC}已存在绑定关系，请先解绑！";
         #endregion
 
         #region 系统对接 MES19201

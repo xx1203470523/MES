@@ -192,8 +192,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(InsertsRecordSql, manuSfcSummaryEntitys);
         }
 
-
-
         /// <summary>
         /// 更新
         /// </summary>
