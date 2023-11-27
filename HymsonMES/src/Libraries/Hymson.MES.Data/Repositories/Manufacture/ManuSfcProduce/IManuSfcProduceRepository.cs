@@ -278,7 +278,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity>? entities);
+        Task<int> InsertSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity> entities);
 
         /// <summary>
         /// 更新在制品业务
