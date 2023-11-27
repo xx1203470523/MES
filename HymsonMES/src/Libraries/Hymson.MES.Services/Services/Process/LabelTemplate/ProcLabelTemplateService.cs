@@ -393,7 +393,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
 
             var printExecuteTask= await _printExecuteTaskRepository.GetByIdAsync(id);
             ProcLabelTemplateRelationEntity? procLabelTemplateRelationEntity = null;
-            if (printExecuteTask == null) 
+            if (printExecuteTask == null || printExecuteTask.Id==0) 
             {
                 //则去获取打印模板
                 procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(id);//15528011388198912
