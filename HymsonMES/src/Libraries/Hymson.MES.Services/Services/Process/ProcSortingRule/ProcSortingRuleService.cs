@@ -538,7 +538,8 @@ namespace Hymson.MES.Services.Services.Process
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 MaterialId = queryDto.MaterialId.Value,
-                Status = Core.Enums.SysDataStatusEnum.Enable
+                Status = SysDataStatusEnum.Enable,
+                IsDefaultVersion = true
             };
             var procSortingRules = await _procSortingRuleRepository.GetProcSortingRuleEntitiesAsync(query);
 
