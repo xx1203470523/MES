@@ -304,7 +304,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 var loadPointMaterials = await _procLoadPointLinkMaterialRepository.GetByResourceIdAsync(queryDto.ResourceId);
                 if (loadPointMaterials != null && loadPointMaterials.Any())
                 {
-                    if (queryDto.FeedingPointId.HasValue)
+                    if (queryDto.FeedingPointId.HasValue && queryDto.FeedingPointId.Value > 0)
                     {
                         loadSource = 2;
                         loadPointMaterials = loadPointMaterials.Where(w => w.LoadPointId == queryDto.FeedingPointId.Value);
