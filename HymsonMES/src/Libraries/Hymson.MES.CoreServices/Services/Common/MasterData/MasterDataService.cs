@@ -673,44 +673,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         }
 
         /// <summary>
-        /// 比较两个工序之间是否均是随机工序
-        /// </summary>
-        /// <param name="routeProcedureRandomCompareBo"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>?> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
-        {
-            // TODO 目前只支持单线路的工艺路线
-
-            var beginNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.BeginProcedureId);
-            if (beginNode == null) return default;
-
-            var endNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.EndProcedureId);
-            if (endNode == null) return default;
-
-            var nodesOfOrdered = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
-                .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
-
-            // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
-            if (!nodesOfOrdered.Any())
-            {
-                // 当前工序
-                var currentEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.EndProcedureId);
-                // 条码对应工序
-                var procedureEntity = await _procProcedureRepository.GetByIdAsync(routeProcedureRandomCompareBo.BeginProcedureId);
-
-                _logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{routeProcedureRandomCompareBo.ProcessRouteId}，条码工序ID：{routeProcedureRandomCompareBo.BeginProcedureId}，进站工序ID：{routeProcedureRandomCompareBo.EndProcedureId}");
-                throw new CustomerValidationException(nameof(ErrorCode.MES16354))
-                    .WithData("Current", currentEntity!.Code)
-                    .WithData("Procedure", procedureEntity!.Code);
-            }
-
-            // 如果中间的工序存在不是随机工序的话，就返回false
-            if (nodesOfOrdered.Any(a => a.CheckType != ProcessRouteInspectTypeEnum.RandomInspection)) return false;
-
-            return await Task.FromResult(true);
-        }
-
-        /// <summary>
         /// 判断是否首工序
         /// </summary>
         /// <param name="routeProcedureBo"></param>
