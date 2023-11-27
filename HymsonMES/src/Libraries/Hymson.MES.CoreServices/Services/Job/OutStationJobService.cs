@@ -903,7 +903,11 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (isMoreThanCycle)
             {
                 #region 无需复判（置于不合格工艺路线首工序排队）
-                if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.No) isLinkToUnQualifiedProcessRoute = true;
+                if (procedureRejudgeBo.IsRejudge == TrueOrFalseEnum.No)
+                {
+                    isLinkToUnQualifiedProcessRoute = true;
+                    productBadRecordStatus = ProductBadRecordStatusEnum.Open;
+                }
                 #endregion
 
                 #region 需要复判
