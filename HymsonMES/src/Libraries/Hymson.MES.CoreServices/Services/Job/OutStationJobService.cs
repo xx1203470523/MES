@@ -956,7 +956,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (isLinkToUnQualifiedProcessRoute)
             {
                 if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
-                productBadRecordStatus = ProductBadRecordStatusEnum.Open;
+                //productBadRecordStatus = ProductBadRecordStatusEnum.Open;
                 disposalResult = ProductBadDisposalResultEnum.Repair;
                 responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
