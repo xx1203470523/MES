@@ -1318,7 +1318,7 @@
         public const string MES18620 = "载具位置Id不能为0！";
         public const string MES18621 = "载具SFC信息不能为空！";
         public const string MES18622 = "载具待解盘条码不能为空！";
-        public const string MES18623 = "载具编码【{Code}】读取失败！";
+        public const string MES18623 = "载具编码获取失败！";
         public const string MES18624 = "载具编码【{Code}】不存在，具体请查看【载具注册】！";
         public const string MES18625 = "载具编码【{Code}】已禁用，具体请查看【载具注册】！";
         public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
