@@ -450,15 +450,15 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseSummaryBo.SFCEntities = responseBos.Select(s => s.SFCEntity);
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
-            responseSummaryBo.SFCProduceBusinessEntities = responseBos.Where(w => w.SFCProduceBusinessEntity != null).Select(s => s.SFCProduceBusinessEntity);
             responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.MaterialInventoryEntity != null).Select(s => s.MaterialInventoryEntity);
             responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.MaterialStandingbookEntity != null).Select(s => s.MaterialStandingbookEntity);
             responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
             responseSummaryBo.ManuSfcCirculationEntities = responseBos.SelectMany(s => s.ManuSfcCirculationEntities);
             responseSummaryBo.DowngradingEntities = responseBos.Where(w => w.DowngradingEntities != null).SelectMany(s => s.DowngradingEntities);
             responseSummaryBo.DowngradingRecordEntities = responseBos.Where(w => w.DowngradingRecordEntities != null).SelectMany(s => s.DowngradingRecordEntities);
-            responseSummaryBo.ProductBadRecordEntities = responseBos.Where(w => w.ProductBadRecordEntities != null).SelectMany(s => s.ProductBadRecordEntities);
+            responseSummaryBo.ProductBadRecordEntities = responseBos.Where(w => w.ProductBadRecordEntity != null).Select(s => s.ProductBadRecordEntity);
             responseSummaryBo.ProductNgRecordEntities = responseBos.Where(w => w.ProductNgRecordEntities != null).SelectMany(s => s.ProductNgRecordEntities);
+            responseSummaryBo.SFCProduceBusinessEntities = responseBos.Where(w => w.SFCProduceBusinessEntity != null).Select(s => s.SFCProduceBusinessEntity);
 
             // 删除 manu_sfc_produce
             responseSummaryBo.DeletePhysicalByProduceIdsCommand = new PhysicalDeleteSFCProduceByIdsCommand
@@ -544,9 +544,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 更新完工数量
                 _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdsAsync(data.UpdateQtyByWorkOrderIdCommands),
                 
-                // 添加在制维修业务
-                _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.SFCProduceBusinessEntities),
-
                 // 入库 / 台账
                 _whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities),
                 _whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities),
@@ -568,7 +565,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 _manuProductBadRecordRepository.InsertRangeAsync(data.ProductBadRecordEntities),
 
                 // 插入NG记录
-                _manuProductNgRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities)
+                _manuProductNgRecordRepository.InsertRangeAsync(data.ProductNgRecordEntities),
+                
+                // 添加在制维修业务
+                _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.SFCProduceBusinessEntities)
             };
 
             var rowArray = await Task.WhenAll(tasks);
@@ -1036,7 +1036,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 };
-                responseBo.ProductBadRecordEntities = new List<ManuProductBadRecordEntity> { badRecordEntity };
+                responseBo.ProductBadRecordEntity = badRecordEntity;
 
                 // 添加NG记录
                 responseBo.ProductNgRecordEntities = unqualifiedCodes.Select(s => new ManuProductNgRecordEntity
