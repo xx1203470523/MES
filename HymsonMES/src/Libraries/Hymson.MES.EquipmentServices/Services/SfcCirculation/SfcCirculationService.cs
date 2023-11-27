@@ -437,7 +437,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             }
         }
 
-
         public async Task PDASfcCirculationUnBindAsync(SfcCirculationUnBindDto sfcCirculationUnBindDto, SfcCirculationTypeEnum sfcCirculationTypeEnum)
         {
             if (sfcCirculationUnBindDto == null)
@@ -483,7 +482,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             }
         }
 
-
         /// <summary>
         /// 流转表解绑，并返回流转信息 PDA复投
         /// </summary>
@@ -525,9 +523,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
 
             return circulationBarCodeEntities;
         }
-
-
-
 
         /// <summary>
         /// 组件添加

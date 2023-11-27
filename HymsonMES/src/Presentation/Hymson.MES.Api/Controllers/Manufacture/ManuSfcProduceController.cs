@@ -243,5 +243,22 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuSfcProduceService.GetLastProcedureAsync(processRouteId);
         }
+
+        #region PDA
+
+        /// <summary>
+        /// 根据SFC获取在制信息
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pda/getProcessInfo")]
+        public async Task<ManuSFCProdureInfoOutputDto> GetProcessInfoAsync([FromQuery]string SFC)
+        {
+            return await _manuSfcProduceService.GetProcessInfoAsync(SFC);
+        }
+
+
+        #endregion
     }
 }

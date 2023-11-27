@@ -915,4 +915,32 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string Remark { get; set; }
     }
+
+
+
+    #region PDA
+
+    /// <summary>
+    /// 条码当前在制信息
+    /// </summary>
+    public record ManuSFCProdureInfoOutputDto
+    {
+        /// <summary>
+        /// 在制工序Id
+        /// </summary>
+        public long? ProdureId { get; set; }
+
+        /// <summary>
+        /// 在制工序名称
+        /// </summary>
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
+        /// 在制工序状态
+        /// </summary>
+        public SfcProduceStatusEnum? ProcessStatus { get; set; }
+
+    } 
+
+    #endregion
 }

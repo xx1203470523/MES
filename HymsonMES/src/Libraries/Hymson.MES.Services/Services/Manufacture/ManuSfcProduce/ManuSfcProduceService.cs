@@ -1388,7 +1388,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #endregion
-            manuSfcProduceStepList = manuSfcProduceStepList.OrderBy(a=>a.ProcedureCode).ToList();
+            manuSfcProduceStepList = manuSfcProduceStepList.OrderBy(a => a.ProcedureCode).ToList();
 
             return manuSfcProduceStepList;
         }
@@ -1437,7 +1437,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// 获取工艺路线（带验证） 
         /// </summary> 
         /// <returns></returns>
-           private async Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetProcessRouteNode(IEnumerable<ManuSfcView> manuSfcInfos, long processRouteId = 0)
+        private async Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetProcessRouteNode(IEnumerable<ManuSfcView> manuSfcInfos, long processRouteId = 0)
         {
             //获取工单
             var workOrderArr = manuSfcInfos.Select(it => it.WorkOrderId).Distinct().ToArray();
@@ -2261,5 +2261,30 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
         }
 
+        #region PDA
+
+        /// <summary>
+        /// 获取条码在制信息
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
+        public async Task<ManuSFCProdureInfoOutputDto> GetProcessInfoAsync(string SFC)
+        {
+            var manuSfcProcedureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = SFC })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18023)) ;
+
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(manuSfcProcedureEntity.ProcedureId);
+
+            ManuSFCProdureInfoOutputDto result = new()
+            {
+                ProcedureName = procedureEntity?.Name,
+                ProdureId = procedureEntity?.Id,
+                ProcessStatus = manuSfcProcedureEntity?.Status
+            };
+
+            return result;
+        }
+
+        #endregion
     }
 }

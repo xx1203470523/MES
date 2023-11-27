@@ -152,5 +152,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="processRouteId"></param>
         /// <returns></returns>
         Task<long> GetLastProcedureAsync(long processRouteId);
+
+        #region PDA
+        Task<ManuSFCProdureInfoOutputDto> GetProcessInfoAsync(string SFC);
+
+        #endregion
     }
 }

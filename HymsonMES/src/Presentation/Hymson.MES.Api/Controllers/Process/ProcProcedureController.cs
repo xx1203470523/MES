@@ -49,17 +49,6 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// 获取所有工序
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("pda/list")]
-        public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDA()
-        {
-            return await _procProcedureService.GetProcProcedurePDAAsync();
-        }
-
-        /// <summary>
         /// 查询详情（工序表）
         /// </summary>
         /// <param name="id"></param>
@@ -145,5 +134,19 @@ namespace Hymson.MES.Api.Controllers
             await _procProcedureService.DeleteProcProcedureAsync(deleteDto.Ids);
         }
 
+        #region PDA
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pda/list")]
+        public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDA()
+        {
+            return await _procProcedureService.GetProcProcedurePDAAsync();
+        }
+
+        #endregion
     }
 }

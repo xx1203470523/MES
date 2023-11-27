@@ -1,6 +1,8 @@
 ﻿using Hymson.Authentication.JwtBearer;
 using Hymson.ClearCache;
 using Hymson.Infrastructure.Enums;
+using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Equipment.Api
@@ -12,6 +14,7 @@ namespace Hymson.MES.Equipment.Api
     {
         private readonly JwtOptions _jwtOptions;
         private readonly IClearCacheService _clearCacheService;
+        private readonly IResourceService _resourceService;
         private readonly ILogger<HostedService> _logger;
 
         /// <summary>
@@ -20,11 +23,14 @@ namespace Hymson.MES.Equipment.Api
         /// <param name="jwtOptions"></param>
         /// <param name="clearCacheService"></param>
         /// <param name="logger"></param>
-        public HostedService(IOptions<JwtOptions> jwtOptions, IClearCacheService clearCacheService,ILogger<HostedService> logger)
+        /// <param name="resourceService"></param>
+        public HostedService(IOptions<JwtOptions> jwtOptions, IClearCacheService clearCacheService,ILogger<HostedService> logger,
+            IResourceService resourceService)
         {
             _jwtOptions = jwtOptions.Value;
             _clearCacheService = clearCacheService;
             _logger = logger;
+            _resourceService = resourceService;
         }
         /// <summary>
         /// 启动时运行
@@ -39,11 +45,13 @@ namespace Hymson.MES.Equipment.Api
                  ServiceTypeEnum.User,
                  ServiceTypeEnum.MES
                 }, cancellationToken);
+                
+                //初始化错误提示
+                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
 
             }
             catch (Exception e)
             {
-
                 _logger.LogError(e, "初始化失败");
             }
 #if DEBUG
