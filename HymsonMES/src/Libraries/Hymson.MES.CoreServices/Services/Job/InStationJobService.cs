@@ -325,6 +325,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", string.Join(',', multiSFCBo.SFCs));
             }
 
+            // 进站工序信息
+            var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
+
             // 遍历所有条码
             var responseBos = new List<InStationResponseBo>();
             var responseSummaryBo = new InStationResponseSummaryBo();
@@ -447,6 +451,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             responseSummaryBo.Source = commonBo.Source;
+            responseSummaryBo.Type = commonBo.Type;
+            responseSummaryBo.Count = responseBos.Count;
+            responseSummaryBo.ProcedureCode = currentProcedureEntity.Code;
+            responseSummaryBo.Status = SfcStatusEnum.Activity;
             return responseSummaryBo;
         }
 
@@ -497,11 +505,22 @@ namespace Hymson.MES.CoreServices.Services.Job
             List<PanelModuleEnum> panelModules = new();
             responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
 
-            var count = data.SFCProduceEntities.Count();
-            if (count == 1)
+            if (data.Count == 1)
             {
                 var SFCProduceEntity = data.SFCProduceEntities.FirstOrDefault();
-                if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18215), SFCProduceEntity.SFC);
+                if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
+                    data.Type.GetDescription(),
+                    SFCProduceEntity.SFC,
+                    data.ProcedureCode,
+                    data.Status.GetDescription());
+            }
+            else if (data.Count > 1)
+            {
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18225),
+                    data.Count,
+                    data.Type.GetDescription(),
+                    data.ProcedureCode,
+                    data.Status.GetDescription());
             }
 
             return responseBo;

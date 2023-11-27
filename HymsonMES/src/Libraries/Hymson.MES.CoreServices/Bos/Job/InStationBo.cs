@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -58,13 +59,8 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class InStationResponseSummaryBo
+    public class InStationResponseSummaryBo : CommonResponseBo
     {
-        /// <summary>
-        /// 请求源
-        /// </summary>
-        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
-
         /// <summary>
         /// 在制品信息
         /// </summary>

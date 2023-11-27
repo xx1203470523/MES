@@ -130,13 +130,8 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
-    public class OutStationResponseSummaryBo
+    public class OutStationResponseSummaryBo : CommonResponseBo
     {
-        /// <summary>
-        /// 请求源
-        /// </summary>
-        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
-
         /// <summary>
         /// 条码信息
         /// </summary>
@@ -217,7 +212,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyByWorkOrderIdCommands { get; set; } = new();
 
-
+        /*
         // 额外给面板用来显示的参数
         /// <summary>
         /// 是否尾工序
@@ -227,6 +222,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 下一工序编码
         /// </summary>
         public string NextProcedureCode { get; set; } = "";
+        */
     }
 
     /// <summary>

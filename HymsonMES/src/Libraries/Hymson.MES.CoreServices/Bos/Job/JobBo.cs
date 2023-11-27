@@ -34,6 +34,42 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 
     /// </summary>
+    public class CommonResponseBo
+    {
+        /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
+
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
+
+        /// <summary>
+        /// 条码/载具数量
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// 是否尾工序
+        /// </summary>
+        public bool IsLastProcedure { get; set; } = true;
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class EmptyRequestBo { }
 
     /// <summary>
@@ -41,11 +77,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class JobRequestBo : JobBaseBo
     {
-        /// <summary>
-        /// 请求源
-        /// </summary>
-        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
-
         /// <summary>
         /// 用户名
         /// </summary>
@@ -85,6 +116,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 设备ID
         /// </summary>
         public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
 
         /// <summary>
         /// 条码类型

@@ -442,6 +442,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 #endregion
 
+                responseSummaryBo.IsLastProcedure = responseBo.IsLastProcedure;
+                responseSummaryBo.ProcedureCode = responseBo.NextProcedureCode;
+                responseSummaryBo.Status = responseBo.SFCEntity.Status;
+
                 responseBos.Add(responseBo);
             }
 
@@ -490,18 +494,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 });
             }
 
-            // 额外给面板用来显示的参数
-            if (responseBos.Count == 1)
-            {
-                var firstResponseBo = responseBos.FirstOrDefault();
-                if (firstResponseBo != null)
-                {
-                    responseSummaryBo.IsLastProcedure = firstResponseBo.IsLastProcedure;
-                    responseSummaryBo.NextProcedureCode = firstResponseBo.NextProcedureCode;
-                }
-            }
-
             responseSummaryBo.Source = commonBo.Source;
+            responseSummaryBo.Type = commonBo.Type;
+            responseSummaryBo.Count = responseBos.Count;
             return responseSummaryBo;
         }
 
@@ -578,29 +573,30 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (data.Source != RequestSourceEnum.Panel) return responseBo;
 
             // 面板需要的数据
-            if (data.SFCEntities!.Count() == 1)
-            {
-                var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
-                if (SFCProduceEntity != null)
-                {
-                    // 面板需要的数据
-                    List<PanelModuleEnum> panelModules = new();
-                    responseBo.Content = new Dictionary<string, string> {
+            List<PanelModuleEnum> panelModules = new();
+            responseBo.Content = new Dictionary<string, string> {
                         { "PanelModules", panelModules.ToSerialize() },
-                        { "Qty", "1" },
+                        { "Qty", $"{data.Count}" },
                         { "IsLastProcedure", $"{data.IsLastProcedure}" },
-                        { "NextProcedureCode", $"{data.NextProcedureCode}" }
+                        { "NextProcedureCode", $"{data.ProcedureCode}" }
                     };
 
-                    if (data.IsLastProcedure)
-                    {
-                        responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16349), SFCProduceEntity.SFC);
-                    }
-                    else
-                    {
-                        responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES16351), SFCProduceEntity.SFC, data.NextProcedureCode);
-                    }
-                }
+            if (data.Count == 1)
+            {
+                var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
+                if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
+                    data.Type.GetDescription(),
+                    SFCProduceEntity.SFC,
+                    data.ProcedureCode,
+                    data.Status.GetDescription());
+            }
+            else if (data.Count > 1)
+            {
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18225),
+                    data.Count,
+                    data.Type.GetDescription(),
+                    data.ProcedureCode,
+                    data.Status.GetDescription());
             }
 
             return responseBo;
