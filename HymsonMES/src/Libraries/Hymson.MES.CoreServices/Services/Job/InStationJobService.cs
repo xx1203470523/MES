@@ -338,7 +338,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
 
                 // 单条码返回值
-                var responseBo = new InStationResponseBo();
+                InStationResponseBo responseBo = new();
 
                 // 检查是否首工序
                 responseBo.IsFirstProcedure = await commonBo.Proxy.GetValueAsync(_masterDataService.IsFirstProcedureAsync, new ManuRouteProcedureBo
@@ -424,6 +424,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                     UpdatedBy = sfcProduceEntity.UpdatedBy,
                     UpdatedOn = sfcProduceEntity.UpdatedOn
                 };
+
+                responseSummaryBo.Code = requestBo.SFC;
+                if (commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle) responseSummaryBo.Code = requestBo.VehicleCode ?? "";
+
                 responseBos.Add(responseBo);
             }
 
@@ -505,12 +509,12 @@ namespace Hymson.MES.CoreServices.Services.Job
             List<PanelModuleEnum> panelModules = new();
             responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
 
+            // 面板需要的提示信息
             if (data.Count == 1)
             {
-                var SFCProduceEntity = data.SFCProduceEntities.FirstOrDefault();
-                if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
+                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
                     data.Type.GetDescription(),
-                    SFCProduceEntity.SFC,
+                    data.Code,
                     data.ProcedureCode,
                     data.Status.GetDescription());
             }

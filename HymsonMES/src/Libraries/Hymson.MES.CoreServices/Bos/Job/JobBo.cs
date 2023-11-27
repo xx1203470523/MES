@@ -52,6 +52,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public int Count { get; set; }
 
         /// <summary>
+        /// 产品序列码/载具编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
         /// 是否尾工序
         /// </summary>
         public bool IsLastProcedure { get; set; } = true;

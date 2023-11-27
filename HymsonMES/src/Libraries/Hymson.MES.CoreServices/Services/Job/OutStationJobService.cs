@@ -442,6 +442,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 #endregion
 
+                responseSummaryBo.Code = requestBo.SFC;
+                if (commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle) responseSummaryBo.Code = requestBo.VehicleCode ?? "";
+
                 responseSummaryBo.IsLastProcedure = responseBo.IsLastProcedure;
                 responseSummaryBo.ProcedureCode = responseBo.NextProcedureCode;
                 responseSummaryBo.Status = responseBo.SFCEntity.Status;
@@ -581,22 +584,42 @@ namespace Hymson.MES.CoreServices.Services.Job
                         { "NextProcedureCode", $"{data.ProcedureCode}" }
                     };
 
-            if (data.Count == 1)
+            // 面板需要的提示信息
+            if (data.IsLastProcedure)
             {
-                var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
-                if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
-                    data.Type.GetDescription(),
-                    SFCProduceEntity.SFC,
-                    data.ProcedureCode,
-                    data.Status.GetDescription());
+                if (data.Count == 1)
+                {
+                    var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
+                    if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18226),
+                        data.Type.GetDescription(),
+                        data.Code);
+                }
+                else if (data.Count > 1)
+                {
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18227),
+                        data.Count,
+                        data.Type.GetDescription());
+                }
             }
-            else if (data.Count > 1)
+            else
             {
-                responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18225),
-                    data.Count,
-                    data.Type.GetDescription(),
-                    data.ProcedureCode,
-                    data.Status.GetDescription());
+                if (data.Count == 1)
+                {
+                    var SFCProduceEntity = data.SFCProduceEntities!.FirstOrDefault();
+                    if (SFCProduceEntity != null) responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18224),
+                        data.Type.GetDescription(),
+                        data.Code,
+                        data.ProcedureCode,
+                        data.Status.GetDescription());
+                }
+                else if (data.Count > 1)
+                {
+                    responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18225),
+                        data.Count,
+                        data.Type.GetDescription(),
+                        data.ProcedureCode,
+                        data.Status.GetDescription());
+                }
             }
 
             return responseBo;

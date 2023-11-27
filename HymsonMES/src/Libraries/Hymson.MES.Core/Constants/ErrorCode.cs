@@ -1239,6 +1239,8 @@
         public const string MES18223 = "请选择您要更改的工单/物料/Bom/工艺路线";
         public const string MES18224 = "已成功将{0}【{1}】置于工序【{2}】，状态为{3}！";
         public const string MES18225 = "已成功将【{0}】（个数）{1}置于工序【{2}】，状态为{3}！";
+        public const string MES18226 = "{0}【{1}】已完成所有工序！";
+        public const string MES18227 = "【{0}】（个数）{1}已完成所有工序！";
 
         #endregion
 
