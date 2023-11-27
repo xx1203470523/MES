@@ -913,9 +913,9 @@
         public const string MES16351 = "条码{0}完成，已于{1}排队！";
         public const string MES16352 = "工序不存在";
         public const string MES16353 = "产品序列码【{SFC}】已被Marking拦截！";
-        public const string MES16354 = "当前进站工序【{Current}】，属于应进站工序【{Procedure}】的前面工序，不允许操作。";
+        public const string MES16354 = "产品序列码【{SFC}】当前进站工序【{Current}】，属于应进站工序【{Procedure}】的前面工序，不允许操作。";
         public const string MES16355 = "未找到工序【{ProcedureCode}】关联的资源";
-        public const string MES16357 = "当前工序是【{Current}】，条码【{SFC}】应在工序【{Procedure}】处排队进站，请检查。";
+        public const string MES16357 = "当前工序是【{Current}】，产品序列码【{SFC}】应在工序【{Procedure}】处排队进站，请检查。";
         public const string MES16358 = "指定的工序【{Procedure}】不存在";
         public const string MES16359 = "产品序列码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
         public const string MES16360 = "产品序列码【{SFC}】循环次数【{Current}】不允许启动！";//"条码【{SFC}】当前循环次数【{Current}】已达到当前工序的循环次数上限【{Cycle}】，不允许操作。";

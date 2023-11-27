@@ -677,15 +677,15 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="routeProcedureRandomCompareBo"></param>
         /// <returns></returns>
-        public async Task<bool> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
+        public async Task<IEnumerable<ProcProcessRouteDetailNodeEntity>?> IsAllRandomProcedureBetweenAsync(ManuRouteProcedureRandomCompareBo routeProcedureRandomCompareBo)
         {
             // TODO 目前只支持单线路的工艺路线
 
             var beginNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.BeginProcedureId);
-            if (beginNode == null) return false;
+            if (beginNode == null) return default;
 
             var endNode = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == routeProcedureRandomCompareBo.EndProcedureId);
-            if (endNode == null) return false;
+            if (endNode == null) return default;
 
             var nodesOfOrdered = routeProcedureRandomCompareBo.ProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
                 .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());

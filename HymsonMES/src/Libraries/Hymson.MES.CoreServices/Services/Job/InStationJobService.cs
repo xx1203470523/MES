@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
@@ -7,6 +8,7 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
@@ -205,6 +207,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var allProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetListAsync(query);
                 var allProcessRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetListAsync(query);
 
+                var validationFailures = new List<ValidationFailure>();
                 foreach (var sfcProduce in sfcProduceEntitiesOfNoMatchProcedure)
                 {
                     var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
@@ -229,23 +232,52 @@ namespace Hymson.MES.CoreServices.Services.Job
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES18208));
 
                     // 判断条码应进站工序和实际进站工序之间是否全部都是随机工序（因为随机工序可以跳过）
-                    var isAllRandomProcedureBetween = await commonBo.Proxy.GetValueAsync(_masterDataService.IsAllRandomProcedureBetweenAsync, new ManuRouteProcedureRandomCompareBo
-                    {
-                        ProcessRouteDetailLinks = processRouteDetailLinks,
-                        ProcessRouteDetailNodes = processRouteDetailNodes,
-                        ProcessRouteId = sfcProduce.ProcessRouteId,
-                        BeginProcedureId = sfcProduce.ProcedureId,
-                        EndProcedureId = commonBo.ProcedureId
-                    });
-                    if (!isAllRandomProcedureBetween)
-                    {
-                        _logger.LogWarning($"条码{sfcProduce.SFC}，工艺路线:{sfcProduce.ProcessRouteId}，应进站工序{sfcProduce.ProcedureId}和实际进站工序{commonBo.ProcedureId}之间不是全部都是随机工序");
+                    var beginNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == sfcProduce.ProcedureId);
+                    var endNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == commonBo.ProcedureId);
 
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16357))
-                            .WithData("SFC", sfcProduce.SFC)
-                            .WithData("Current", procedureEntity.Code)
-                            .WithData("Procedure", currentProcedureEntity.Code);
+                    if (beginNode != null && endNode != null)
+                    {
+                        var nodesOfOrdered = allProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
+                            .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
+
+                        // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
+                        if (!nodesOfOrdered.Any())
+                        {
+                            // 条码对应工序
+                            var benginProcedureEntity = await _procProcedureRepository.GetByIdAsync(beginNode.ProcedureId);
+
+                            // 当前工序
+                            var currentEntity = await _procProcedureRepository.GetByIdAsync(endNode.ProcedureId);
+
+                            var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduce.SFC);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduce.SFC);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("Current", procedureEntity.Code);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", currentProcedureEntity.Code);
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES16354);
+                            validationFailures.Add(validationFailure);
+
+                            _logger.LogWarning($"工艺路线工序节点数据异常，工艺路线ID：{sfcProduce.ProcessRouteId}，条码工序ID：{beginNode.ProcedureId}，进站工序ID：{endNode.ProcedureId}");
+                            continue;
+                        }
+
+                        // 如果中间的工序存在不是随机工序的话，就返回false
+                        if (nodesOfOrdered.Any(a => a.CheckType != ProcessRouteInspectTypeEnum.RandomInspection))
+                        {
+                            var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduce.SFC);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("SFC", sfcProduce.SFC);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("Current", procedureEntity.Code);
+                            validationFailure.FormattedMessagePlaceholderValues.Add("Procedure", currentProcedureEntity.Code);
+                            validationFailure.ErrorCode = nameof(ErrorCode.MES16357);
+                            validationFailures.Add(validationFailure);
+                        }
                     }
+                }
+
+                if (validationFailures.Any())
+                {
+                    throw new ValidationException("", validationFailures);
                 }
             }
 
