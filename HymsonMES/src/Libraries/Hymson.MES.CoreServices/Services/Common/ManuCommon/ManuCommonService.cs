@@ -88,6 +88,11 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
 
         /// <summary>
+        /// 仓储接口（载具类型）
+        /// </summary>
+        private readonly IInteVehicleTypeRepository _inteVehicleTypeRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="localizationService"></param>
@@ -102,6 +107,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="inteVehicleRepository"></param>
         /// <param name="inteVehiceFreightStackRepository"></param>
+        /// <param name="inteVehicleTypeRepository"></param>
         public ManuCommonService(ILocalizationService localizationService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -113,7 +119,8 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             IProcMaterialRepository procMaterialRepository,
             IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
             IInteVehicleRepository inteVehicleRepository,
-            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository)
+            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+            IInteVehicleTypeRepository inteVehicleTypeRepository)
         {
             _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -127,6 +134,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
+            _inteVehicleTypeRepository = inteVehicleTypeRepository;
         }
 
 
@@ -300,12 +308,21 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     .WithData("Code", string.Join(',', notInSystem));
             }
 
-            // 检查是否有"禁用"状态的载具
+            // 检查是否是"禁用"状态的载具
             var disabledVehicles = vehicleEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
             if (disabledVehicles.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18625))
                     .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
+
+            // 检查是否是"禁用"状态的载具类型
+            var vehicleTypeEntities = await _inteVehicleTypeRepository.GetByIdsAsync(vehicleEntities.Select(s => s.VehicleTypeId));
+            var disabledVehicleTypes = vehicleTypeEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicleTypes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18627))
+                    .WithData("Code", string.Join(',', disabledVehicleTypes.Select(s => s.Code)));
             }
 
             // 查询载具关联的条码明细

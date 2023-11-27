@@ -12,17 +12,16 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 载具类型维护仓储
     /// </summary>
-    public partial class InteVehicleTypeRepository :BaseRepository, IInteVehicleTypeRepository
+    public partial class InteVehicleTypeRepository : BaseRepository, IInteVehicleTypeRepository
     {
 
-        public InteVehicleTypeRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public InteVehicleTypeRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -68,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteVehicleTypeEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehicleTypeEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleTypeEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -76,10 +75,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteVehicleTypeEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<InteVehicleTypeEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>

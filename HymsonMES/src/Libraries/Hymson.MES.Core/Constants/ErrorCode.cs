@@ -1317,6 +1317,7 @@
         public const string MES18624 = "载具编码【{Code}】不存在，具体请查看【载具注册】！";
         public const string MES18625 = "载具编码【{Code}】已禁用，具体请查看【载具注册】！";
         public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
+        public const string MES18627 = "载具类型【{Code}】已禁用，具体请查看【载具类型】！";
         #endregion
 
         #region Recipe参数 18700

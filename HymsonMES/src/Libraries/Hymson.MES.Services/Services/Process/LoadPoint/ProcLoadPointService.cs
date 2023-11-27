@@ -8,11 +8,9 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
@@ -21,8 +19,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
-using MimeKit.Cryptography;
-using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -68,7 +64,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="excelService"></param>
         /// <param name="localizationService"></param>
         /// <param name="validationImportRules"></param>
-        public ProcLoadPointService(ICurrentUser currentUser, IMinioService minioService, IExcelService excelService, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, AbstractValidator<ImportLoadPointDto> validationImportRules,IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite, ILocalizationService localizationService)
+        public ProcLoadPointService(ICurrentUser currentUser, IMinioService minioService, IExcelService excelService, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, AbstractValidator<ImportLoadPointDto> validationImportRules, IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -175,8 +171,8 @@ namespace Hymson.MES.Services.Services.Process
                         SiteId = procLoadPointEntity.SiteId,
                         LoadPointId = procLoadPointEntity.Id,
                         MaterialId = material.MaterialId,
-                        Version = material.Version??"",
-                        ReferencePoint = material.ReferencePoint??"",
+                        Version = material.Version ?? "",
+                        ReferencePoint = material.ReferencePoint ?? "",
                         CreatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now()
                     });
@@ -188,7 +184,7 @@ namespace Hymson.MES.Services.Services.Process
             if (procLoadPointCreateDto.LinkResources != null && procLoadPointCreateDto.LinkResources.Any())
             {
                 int i = 0;
-                foreach (var resource in procLoadPointCreateDto.LinkResources.Select(x=>x.ResourceId))
+                foreach (var resource in procLoadPointCreateDto.LinkResources.Select(x => x.ResourceId))
                 {
                     i++;
                     if (resource <= 0)
@@ -255,13 +251,6 @@ namespace Hymson.MES.Services.Services.Process
             trans.Complete();
         }
 
-        private static void PrepareProcLoadPointCreateDto(ProcLoadPointCreateDto procLoadPointCreateDto)
-        {
-            procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
-            procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
-            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
-        }
-
         /// <summary>
         /// 修改
         /// </summary>
@@ -274,7 +263,7 @@ namespace Hymson.MES.Services.Services.Process
             procLoadPointModifyDto.LoadPointName = procLoadPointModifyDto.LoadPointName.Trim();
             procLoadPointModifyDto.Remark = procLoadPointModifyDto?.Remark ?? "".Trim();
 
-            //验证DTO
+            // 验证DTO
             await _validationModifyRules!.ValidateAndThrowAsync(procLoadPointModifyDto);
             if (procLoadPointModifyDto!.LinkMaterials != null)
             {
@@ -292,7 +281,7 @@ namespace Hymson.MES.Services.Services.Process
                 if (procLoadPointModifyDto.LinkResources.GroupBy(x => x.ResourceId).Any(g => g.Count() >= 2)) throw new CustomerValidationException(nameof(ErrorCode.MES10711));
             }
 
-            //DTO转换实体
+            // DTO转换实体
             var procLoadPointEntity = procLoadPointModifyDto.ToEntity<ProcLoadPointEntity>();
             procLoadPointEntity.UpdatedBy = _currentUser.UserName;
             procLoadPointEntity.UpdatedOn = HymsonClock.Now();
@@ -300,8 +289,8 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 数据库验证
             var modelOrigin = await _procLoadPointRepository.GetByIdAsync(procLoadPointModifyDto.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10705));
-           
-            //验证某些状态是不能编辑的
+
+            // 验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {
@@ -310,7 +299,6 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             #region 组装数据
-
             var validationFailures = new List<ValidationFailure>();
             //上料点关联物料列表
             var linkMaterials = new List<ProcLoadPointLinkMaterialEntity>();
@@ -356,7 +344,7 @@ namespace Hymson.MES.Services.Services.Process
             if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any())
             {
                 int i = 0;
-                foreach (var resource in procLoadPointModifyDto.LinkResources.Select(x=>x.ResourceId))
+                foreach (var resource in procLoadPointModifyDto.LinkResources.Select(x => x.ResourceId))
                 {
                     i++;
                     if (resource <= 0)
@@ -553,6 +541,19 @@ namespace Hymson.MES.Services.Services.Process
             return loadPointDto;
         }
 
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="procLoadPointCreateDto"></param>
+        private static void PrepareProcLoadPointCreateDto(ProcLoadPointCreateDto procLoadPointCreateDto)
+        {
+            procLoadPointCreateDto.LoadPoint = procLoadPointCreateDto.LoadPoint.ToTrimSpace().ToUpperInvariant();
+            procLoadPointCreateDto.LoadPointName = procLoadPointCreateDto.LoadPointName.Trim();
+            procLoadPointCreateDto.Remark = procLoadPointCreateDto?.Remark ?? "".Trim();
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -571,7 +572,6 @@ namespace Hymson.MES.Services.Services.Process
             return toTs;
         }
 
-        #region 状态变更
         /// <summary>
         /// 状态变更
         /// </summary>
@@ -621,8 +621,6 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
         }
 
-        #endregion
-
         /// <summary>
         /// 下载导入模板
         /// </summary>
@@ -652,7 +650,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             #region 验证基础数据
-                var validationFailures = new List<ValidationFailure>();
+            var validationFailures = new List<ValidationFailure>();
             var rows = 1;
             foreach (var item in excelImportDtos)
             {
@@ -689,21 +687,21 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException("上料点{repeats}重复").WithData("repeats", string.Join(",", repeats));
             }
 
-            List <ProcLoadPointEntity> loadPointList = new();
+            List<ProcLoadPointEntity> loadPointList = new();
             #endregion
 
             #region  验证数据库中是否存在数据，且组装数据
             var currentRow = 0;
-            foreach(var item in excelImportDtos)
+            foreach (var item in excelImportDtos)
             {
                 currentRow++;
                 var loadPoints = await _procLoadPointRepository.GetProcLoadPointEntitiesAsync(new ProcLoadPointQuery
                 {
                     SiteId = _currentSite.SiteId ?? 0,
-                    LoadPoint =item.LoadPoint
-                  });
+                    LoadPoint = item.LoadPoint
+                });
 
-                 if (loadPoints.Any(x => x.LoadPoint == item.LoadPoint))
+                if (loadPoints.Any(x => x.LoadPoint == item.LoadPoint))
                 {
                     validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10701), item.LoadPoint, currentRow, "LoadPoint"));
                 }
@@ -813,5 +811,6 @@ namespace Hymson.MES.Services.Services.Process
             };
 
         }
+
     }
 }
