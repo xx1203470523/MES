@@ -948,7 +948,11 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 判断NGCode中是否含有首次不良工序
                 var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
-                if (ngCodeInBlock.Any()) isLinkToUnQualifiedProcessRoute = true;
+                if (ngCodeInBlock.Any())
+                {
+                    isLinkToUnQualifiedProcessRoute = true;
+                    productBadRecordStatus = ProductBadRecordStatusEnum.Open;
+                }
             }
             #endregion
 
@@ -956,7 +960,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (isLinkToUnQualifiedProcessRoute)
             {
                 if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
-                //productBadRecordStatus = ProductBadRecordStatusEnum.Open;
+
                 disposalResult = ProductBadDisposalResultEnum.Repair;
                 responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
