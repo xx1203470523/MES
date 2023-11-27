@@ -596,12 +596,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增在制品业务
         /// </summary>
-        /// <param name="manuSfcProduceBusinessEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity> manuSfcProduceBusinessEntitys)
+        public async Task<int> InsertSfcProduceBusinessRangeAsync(IEnumerable<ManuSfcProduceBusinessEntity>? entities)
         {
+            if (entities == null || !entities.Any()) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSfcProduceBusinessSql, manuSfcProduceBusinessEntitys);
+            return await conn.ExecuteAsync(InsertSfcProduceBusinessSql, entities);
         }
 
         /// <summary>
@@ -625,7 +627,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateSfcProduceBusinessSql, manuSfcProduceBusinessEntity);
         }
-
 
         /// <summary>
         /// 批量更新在制品业务

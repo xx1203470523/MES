@@ -450,6 +450,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseSummaryBo.SFCEntities = responseBos.Select(s => s.SFCEntity);
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
+            responseSummaryBo.SFCProduceBusinessEntities = responseBos.Where(w => w.SFCProduceBusinessEntity != null).Select(s => s.SFCProduceBusinessEntity);
             responseSummaryBo.WhMaterialInventoryEntities = responseBos.Where(w => w.MaterialInventoryEntity != null).Select(s => s.MaterialInventoryEntity);
             responseSummaryBo.WhMaterialStandingbookEntities = responseBos.Where(w => w.MaterialStandingbookEntity != null).Select(s => s.MaterialStandingbookEntity);
             responseSummaryBo.UpdateFeedingQtyByIdCommands = responseBos.SelectMany(s => s.UpdateFeedingQtyByIdCommands);
@@ -542,6 +543,9 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 更新完工数量
                 _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdsAsync(data.UpdateQtyByWorkOrderIdCommands),
+                
+                // 添加在制维修业务
+                _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.SFCProduceBusinessEntities),
 
                 // 入库 / 台账
                 _whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities),
@@ -961,7 +965,26 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
 
+                // 添加维修业务
                 disposalResult = ProductBadDisposalResultEnum.Repair;
+                responseBo.SFCProduceBusinessEntity = new ManuSfcProduceBusinessEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = commonBo.SiteId,
+                    SfcProduceId = sfcProduceEntity.Id,
+                    BusinessType = ManuSfcProduceBusinessType.Repair,
+                    BusinessContent = new SfcProduceRepairBo
+                    {
+                        ProcessRouteId = sfcProduceEntity.ProcessRouteId,
+                        ProcedureId = sfcProduceEntity.ProcedureId
+                    }.ToSerialize(),
+                    CreatedBy = commonBo.UserName,
+                    CreatedOn = commonBo.Time,
+                    UpdatedBy = commonBo.UserName,
+                    UpdatedOn = commonBo.Time
+                };
+
+                // 修改下工序
                 responseBo.NextProcedureCode = procedureRejudgeBo.NextProcedureCode;
 
                 // 条码状态跟在制品状态一致

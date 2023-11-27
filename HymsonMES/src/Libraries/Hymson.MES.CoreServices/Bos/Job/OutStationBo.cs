@@ -71,6 +71,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public ManuSfcStepEntity SFCStepEntity { get; set; }
 
         /// <summary>
+        /// 在制维修业务
+        /// </summary>
+        public ManuSfcProduceBusinessEntity SFCProduceBusinessEntity { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public WhMaterialInventoryEntity MaterialInventoryEntity { get; set; }
@@ -191,6 +196,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 产品NG记录对象
         /// </summary>
         public IEnumerable<ManuProductNgRecordEntity> ProductNgRecordEntities { get; set; }
+
+        /// <summary>
+        /// 在制品业务
+        /// </summary>
+        public IEnumerable<ManuSfcProduceBusinessEntity> SFCProduceBusinessEntities { get; set; }
 
         /// <summary>
         /// 
