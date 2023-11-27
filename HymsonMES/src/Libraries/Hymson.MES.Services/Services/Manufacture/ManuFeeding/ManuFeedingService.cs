@@ -320,6 +320,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 // 通过资源ID获取物料库存信息
                 manuFeedings = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsAsync(new GetByResourceIdAndMaterialIdsQuery
                 {
+                    LoadSource = queryDto.Source,
                     ResourceId = queryDto.ResourceId,
                     FeedingPointId = queryDto.FeedingPointId
                 });
@@ -327,7 +328,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             else
             {
                 // 通过上料点ID获取物料库存信息
-                manuFeedings = await _manuFeedingRepository.GetByFeedingPointIdAndMaterialIdsAsync(new GetByFeedingPointIdAndMaterialIdsQuery { FeedingPointId = queryDto.FeedingPointId!.Value });
+                manuFeedings = await _manuFeedingRepository.GetByFeedingPointIdAndMaterialIdsAsync(new GetByFeedingPointIdAndMaterialIdsQuery
+                {
+                    LoadSource = queryDto.Source,
+                    FeedingPointId = queryDto.FeedingPointId!.Value
+                });
             }
 
             // 已加载的物料ID
@@ -432,6 +437,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             entity.SupplierId = inventory.SupplierId;
             entity.MaterialType = inventory.MaterialType;
             entity.WorkOrderId = inventory.WorkOrderId;
+            entity.LoadSource = saveDto.Source;
 
             // 一次性上完料
             entity.InitQty = inventory.QuantityResidue;
@@ -647,7 +653,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 IsDeleted = entity.IsDeleted,
                 SiteId = entity.SiteId,
                 MaterialType = entity.MaterialType,
-                WorkOrderId = entity.WorkOrderId
+                WorkOrderId = entity.WorkOrderId,
+                LoadSource = entity.LoadSource
             };
         }
 

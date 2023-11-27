@@ -1,3 +1,5 @@
+using Hymson.MES.Core.Enums;
+
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
 {
     /// <summary>
@@ -22,6 +24,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
     public class GetByResourceIdAndMaterialIdsQuery
     {
         /// <summary>
+        /// 物料加载来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum? LoadSource { get; set; }
+
+        /// <summary>
         /// ID（资源）
         /// </summary>
         public long ResourceId { get; set; }
@@ -42,6 +49,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
     /// </summary>
     public class GetByFeedingPointIdAndMaterialIdsQuery
     {
+        /// <summary>
+        /// 物料加载来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum? LoadSource { get; set; }
+
         /// <summary>
         /// 上料点ID
         /// </summary>
