@@ -11,6 +11,8 @@ using Hymson.Utils;
 using System.Collections;
 using System.Data;
 using System.Dynamic;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 {
@@ -291,23 +293,44 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             });
             //完成数量
             decimal completedQty = 0;
-            //查询工单完工数量
-            var processCompletedDataQuery = new ProcessCompletedDataQueryDto { SiteId = siteId, WorkOrderId = planWorkOrderEntity.Id, ProcedureCode = procedureCode };
-            var processCompletedData = await GetProcessCompletedDataAsync(processCompletedDataQuery);
-            if (processCompletedData != null)
+
+            ////查询工单完工数量
+            //var processCompletedDataQuery = new ProcessCompletedDataQueryDto { SiteId = siteId, WorkOrderId = planWorkOrderEntity.Id, ProcedureCode = procedureCode };
+            //var processCompletedData = await GetProcessCompletedDataAsync(processCompletedDataQuery);
+            //if (processCompletedData != null)
+            //{
+            //    completedQty = processCompletedData.CompletedQty;
+            //}
+
+            //TODO 完工数量统计Pack段 模组入箱的数量（暂时这样处理）
+            completedQty = await _manuSfcSummaryRepository.GetSumQtyAsync(new()
             {
-                completedQty = processCompletedData.CompletedQty;
-            }
+                QualityStatus = 1,
+                ProcedureIds = new long[]{ 20033620040740864 },
+                SiteId = siteId
+            });
+
             //当天投入量(当前班次)
-            decimal dayConsume = firstProcedureSummaryEntities.Count();
+            //decimal dayConsume = firstProcedureSummaryEntities.Count();
+            decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal()/13/4,0);
+
             //投入数
-            decimal inputQty = workOrderRecord?.InputQty ?? 0;
+            //decimal inputQty = workOrderRecord?.InputQty ?? 0;
+            //TODO 计算逻辑变更，取电芯OCV工序数量/13/4 （暂时这样处理）
+            decimal inputQty = await _manuSfcSummaryRepository.GetSumQtyAsync(new()
+            {
+                QualityStatus = 1,
+                ProcedureIds = new long[] { 20033299167047680 },
+                SiteId= siteId
+            });
+            inputQty = Math.Round(inputQty / 13 / 4,0);
+
             //完成率
             decimal completedRate = decimal.Parse((completedQty / (inputQty == 0 ? 1 : inputQty) * 100).ToString("#0.00"));
             //计划数量
             decimal planQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100);
             //计划达成率
-            decimal planAchievingRate = completedQty / (planQuantity == 0 ? 1 : planQuantity) * 100;
+            decimal planAchievingRate = decimal.Parse((completedQty / (planQuantity == 0 ? 1 : planQuantity) * 100).ToString("#0.00"));
             //Ng数量
             decimal summaryNoPassQty = manuSfcSummaryEntities.Count();
             //录入报废数量
@@ -315,7 +338,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             //不良数量
             decimal unqualifiedQty = summaryNoPassQty + unqualifiedQuantity;
             //不良率
-            decimal unqualifiedRate = decimal.Parse((unqualifiedQty / (completedQty == 0 ? 1 : completedQty) * 100).ToString("#0.00"));
+            decimal unqualifiedRate = Math.Round(unqualifiedQty / (completedQty == 0 ? 1 : completedQty) * 100, 2);
 
             var managePanelReportDto = new ProductionManagePanelReportDto()
             {
@@ -331,7 +354,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 ProductCode = procMaterialEntity?.MaterialCode,
                 ProductName = procMaterialEntity?.MaterialName,
                 UnqualifiedQty = unqualifiedQty,
-                UnqualifiedRate = unqualifiedRate,
+                UnqualifiedRate = unqualifiedRate > 100 ? 100 : unqualifiedRate,
                 WorkLineName = inteWorkCenterEntity?.Name,
                 WorkOrderCode = planWorkOrderEntity?.OrderCode,
                 WorkOrderDownTime = planWorkOrderEntity?.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty,

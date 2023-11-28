@@ -66,6 +66,11 @@ public class ProcductTraceViewDto
 public class SFCStepViewDto
 {
     /// <summary>
+    /// 设备名称
+    /// </summary>
+    public string? EquipmentName { get; set; }
+
+    /// <summary>
     /// 工序编码
     /// </summary>
     public string? ProcedureCode { get; set; }

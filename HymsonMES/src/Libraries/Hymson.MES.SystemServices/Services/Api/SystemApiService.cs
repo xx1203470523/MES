@@ -176,11 +176,13 @@ public class SystemApiService : ISystemApiService
             var resource = resourceEntities.FirstOrDefault(a => a.Id == item.ResourceId);
             var product = productEntities.FirstOrDefault(a => a.Id == item.ProductId);
             var workOrder = workOrderEntities.FirstOrDefault(a => a.Id == item.WorkOrderId);
+            var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
 
             steplist.Add(new()
             {
                 CreateOn = item.CreatedOn,
                 Passed = item.Passed,
+                EquipmentName = equipment?.EquipmentName,
                 ProcedureCode = procdure?.Code,
                 ProcedureName = procdure?.Name,
                 ProcedureType = procdure?.Type,

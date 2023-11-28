@@ -234,6 +234,63 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertOrUpdateSql, manuSfcSummaryEntitys);
         }
+
+        /// <summary>
+        /// 获取汇总数
+        /// </summary>
+        /// <param name="manuSfcSummaryQuery"></param>
+        /// <returns></returns>
+        public async Task<decimal> GetSumQtyAsync(ManuSfcSummaryQuery manuSfcSummaryQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetManuSfcSummaryEntitiesSqlTemplate);
+            sqlBuilder.Select("SUM(qty)");
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            if (manuSfcSummaryQuery.ProcedureIds != null && manuSfcSummaryQuery.ProcedureIds.Any())
+            {
+                sqlBuilder.Where("ProcedureId in @ProcedureIds");
+            }
+            if (manuSfcSummaryQuery.EquipmentId.HasValue)
+            {
+                sqlBuilder.Where("EquipmentId = @EquipmentId");
+            }
+            if (manuSfcSummaryQuery.EquipmentIds != null && manuSfcSummaryQuery.EquipmentIds.Length > 0)
+            {
+                sqlBuilder.Where("EquipmentId IN @EquipmentIds");
+            }
+            if (manuSfcSummaryQuery.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+            }
+            if (manuSfcSummaryQuery.SFCS != null && manuSfcSummaryQuery.SFCS.Any())
+            {
+                sqlBuilder.Where("SFC IN @SFCS");
+            }
+            if (manuSfcSummaryQuery.FirstQualityStatus.HasValue)
+            {
+                sqlBuilder.Where("FirstQualityStatus = @FirstQualityStatus");
+            }
+            if (manuSfcSummaryQuery.QualityStatus.HasValue)
+            {
+                sqlBuilder.Where("QualityStatus = @QualityStatus");
+            }
+
+            if (manuSfcSummaryQuery.IsReplenish.HasValue)
+            {
+                sqlBuilder.Where("IsReplenish = @IsReplenish");
+            }
+            if (manuSfcSummaryQuery.StartTime.HasValue)
+            {
+                sqlBuilder.Where("EndTime >= @StartTime");
+            }
+            if (manuSfcSummaryQuery.EndTime.HasValue)
+            {
+                sqlBuilder.Where("EndTime < @EndTime");
+            }
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstAsync<decimal>(template.RawSql, manuSfcSummaryQuery);
+        }
         #endregion
 
     }
