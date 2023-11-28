@@ -1033,6 +1033,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (isLinkToQualifiedProcessRouteQueuing)
             {
                 productBadRecordStatus = ProductBadRecordStatusEnum.Open;
+                if (procedureRejudgeBo.LastUnqualified != null) unqualifiedId = procedureRejudgeBo.LastUnqualified.Id;
 
                 // 已完工（置于在制完成）
                 if (nextProcedure == null)
