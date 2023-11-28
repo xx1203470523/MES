@@ -210,14 +210,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
             };
 
-            var sfcs = new List<string>() { manuFacePlateRepairExJobDto.SFC };
             JobRequestBo bo = new()
             {
-                SFCs = sfcs,
+                SiteId = _currentSite.SiteId ?? 0,
+                UserName = _currentUser.UserName,
                 ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
                 ResourceId = manuFacePlateRepairExJobDto.ResourceId,
-                SiteId = _currentSite.SiteId ?? 0,
-                UserName = _currentUser.UserName
+                SFCs = new string[] { manuFacePlateRepairExJobDto.SFC },   // 这句后面要改
+                InStationRequestBos = new List<InStationRequestBo> { new InStationRequestBo { SFC = manuFacePlateRepairExJobDto.SFC } },
+                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = manuFacePlateRepairExJobDto.SFC } }
             };
 
             var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
