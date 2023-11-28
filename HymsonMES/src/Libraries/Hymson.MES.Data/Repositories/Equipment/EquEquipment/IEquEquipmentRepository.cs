@@ -1,11 +1,9 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {

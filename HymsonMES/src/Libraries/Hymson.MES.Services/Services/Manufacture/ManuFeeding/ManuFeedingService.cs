@@ -11,6 +11,8 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
@@ -25,6 +27,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
@@ -47,6 +50,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// 当前对象（站点）
         /// </summary>
         private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        ///  仓储（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
 
         /// <summary>
         ///  仓储（工作中心资源关联）
@@ -130,6 +138,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="logger"></param>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="equEquipmentRepository"></param>
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="procLoadPointRepository"></param>
@@ -147,6 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         /// <param name="whMaterialStandingbookRepository"></param>
         public ManuFeedingService(ILogger<ManuFeedingService> logger,
             ICurrentUser currentUser, ICurrentSite currentSite,
+            IEquEquipmentRepository equEquipmentRepository,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcResourceRepository procResourceRepository,
             IProcLoadPointRepository procLoadPointRepository,
@@ -166,6 +176,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             _logger = logger;
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _equEquipmentRepository = equEquipmentRepository;
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procResourceRepository = procResourceRepository;
             _procLoadPointRepository = procLoadPointRepository;
@@ -195,10 +206,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             switch (queryDto.Source)
             {
                 case FeedingSourceEnum.Equipment:
+                    var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
+                    {
+                        Site = _currentSite.SiteId ?? 0,
+                        Code = queryDto.Code
+                    }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", queryDto.Code);
+
+                    // 这个方法后面可以改为通过设备ID查询
                     resources.AddRange(await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
                     {
                         SiteId = _currentSite.SiteId ?? 0,
-                        EquipmentCode = queryDto.Code
+                        EquipmentCode = equipmentEntity.EquipmentCode
                     }));
                     break;
                 case FeedingSourceEnum.Resource:
@@ -206,9 +224,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                     {
                         SiteId = _currentSite.SiteId ?? 0,
                         ResCode = queryDto.Code
-                    });
+                    }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19109)).WithData("Code", queryDto.Code);
 
-                    if (resource != null) resources.Add(resource);
+                    resources.Add(resource);
                     break;
             }
 

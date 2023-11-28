@@ -170,8 +170,8 @@
         public const string MES10436 = $"只允许设置一个首工序！";
         public const string MES10437 = "此工艺路线{Code}+{Version}在系统已经存在！";
         public const string MES10438 = "此工艺路线不存在！";
-        public const string MES10439 = $"此工艺路线在系统中不存在!";
-        public const string MES10440 = $"获取下一工序失败!";
+        public const string MES10439 = $"此工艺路线在系统中不存在！";
+        public const string MES10440 = $"获取下一工序失败！";
         public const string MES10441 = $"下一工序不存在空值类型工序!";
         public const string MES10442 = $"工序不匹配或前工序不是随机工序!";
         public const string MES10443 = $"启用状态或保留状态不可删除!";
@@ -1378,7 +1378,7 @@
         public const string MES19002 = "资源编码不能为空";
         public const string MES19003 = "SFC条码不能为空";
         public const string MES19004 = "调用本地时间不能为空";
-        public const string MES19005 = "设备编码：{Code}不存在";
+        public const string MES19005 = "设备编码【{Code}】不存在！";
         public const string MES19006 = "资源编码不存在";
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
@@ -1391,8 +1391,8 @@
         public const string MES19105 = "此托盘未装载任何信息";
         public const string MES19106 = "不存在任何绑定关系不需要解绑";
         public const string MES19107 = "参数列表不能为空";
-        public const string MES19108 = "参数编码{Code}不存在";
-        public const string MES19109 = "资源编码{Code}不存在";
+        public const string MES19108 = "参数编码【{Code}】不存在！";
+        public const string MES19109 = "资源编码【{Code}】不存在！";
         public const string MES19110 = "产品条码参数列表不能为空";
         public const string MES19111 = "托盘条码不能为空";
         public const string MES19112 = "上传SFC信息不能为空";
