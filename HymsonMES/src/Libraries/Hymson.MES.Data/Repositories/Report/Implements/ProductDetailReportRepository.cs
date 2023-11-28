@@ -108,28 +108,20 @@ public partial class ProductDetailReportRepository : BaseRepository, IProductDet
         }
             
 
-        var templateData = sqlBuilder.AddTemplate(GetPageInfoSqlReplace);
-        var templateCount = sqlBuilder.AddTemplate(GetPageInfoCountSqlReplace);
+            var templateData = sqlBuilder.AddTemplate(GetPageInfoSqlReplace);
+            var templateCount = sqlBuilder.AddTemplate(GetPageInfoCountSqlReplace);
 
-        var offSet = (query.PageIndex - 1) * query.PageSize;
-        sqlBuilder.AddParameters(new { OffSet = offSet });
-        sqlBuilder.AddParameters(new { Rows = query.PageSize });
-        sqlBuilder.AddParameters(query);
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
 
-        try
-        {
             using var conn = GetMESDbConnection();
             var pageData = await conn.QueryAsync<ProductDetailReportView>(templateData.RawSql, templateData.Parameters);
             var pageCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<ProductDetailReportView>(pageData, query.PageIndex, query.PageSize, pageCount);
-        }
-        catch (Exception EX)
-        {
+        
 
-            throw EX;
-        }
-
-        return default;
     }
 
     /// <summary>
@@ -200,7 +192,7 @@ AND (WorkOrderId  @OrderId)
 GROUP BY mss.WorkOrderId ,mss.ProductId,mss.ProcedureId,LEFT(EndTime,@Type),LEFT(date_add(EndTime,interval 1 @SearchType),@Type)
 )
 SELECT t1.workOrderId,t1.ProductId,t1.startDate,t1.ProcedureId,t1.EndDate,t1.OutputQty FeedingQty,IFNULL(t2.OutputQty,0) OutputQty FROM T1
-LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.workorderid = t2.workorderid AND t1.productId = t2.productId
+LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.workorderid = t2.workorderid AND t1.productId = t2.productId and t1.ProcedureId=t2.ProcedureId
 /**where**/
 ORDER BY T1.startDate
 LIMIT @offSet,@Rows
