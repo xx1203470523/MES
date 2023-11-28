@@ -399,7 +399,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
                 PassDownQuantity = manuSfcProduceList.Sum(x => x.Qty),
                 UserName = commonBo.UserName,
-                IsProductSame = productIdOfSet.HasValue && productIdOfSet.Value == planWorkOrderEntity.ProductId,
+                IsProductSame = productId == planWorkOrderEntity.ProductId,
                 ManuSfcInfoUpdateIsUsed = manuSfcInfoUpdateIsUsedBo,
                 ManuSfcList = manuSfcList,
                 UpdateManuSfcList = updateManuSfcList,

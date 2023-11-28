@@ -145,13 +145,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 isCreate = true;
                 //获取产出设置
                 var outputProductId = await _masterDataService.GetProductSetIdAsync(new ProductSetBo { SiteId = param.SiteId, ProductId = planWorkOrderEntity.ProductId, ProcedureId = param.ProcedureId, ResourceId = param.ResourceId }) ?? planWorkOrderEntity.ProductId;
-
-                //掩码校验
-                await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(param.SFC, outputProductId);
-
                 //获取 物料批次大小
                 var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(productId);
                 var qty = procMaterialEntity.Batch;
+                //掩码校验
+                if (!await _manuCommonService.CheckBarCodeByMaskCodeRuleAsync(param.SFC, outputProductId))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17425)).WithData("SFC", param.SFC).WithData("MaterialName", procMaterialEntity.MaterialName);
+                }
 
                 //插入生产一套表
                 manuSfc = new ManuSfcEntity

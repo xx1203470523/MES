@@ -1162,9 +1162,9 @@
         public const string MES17420 = "绑定条码【SFCs】不是完成进入线边仓，具体请查看【物料库存】。";
         public const string MES17421 = "与【{SFC}】无绑定关系，无法进行解绑，具体请查看【原建汇总】。";
         public const string MES17422 = "条码【{SFC}】无绑定条码，无法进行解绑，具体请查看【原建汇总】。";
-
         public const string MES17423 = "条码【{SFC}】不存在，无法进行解绑，具体请查看【产品序列码报告】。";
         public const string MES17424 = "条码无法识别，无法绑定，具体请查看【BOM维护】【掩码维护】。";
+        public const string MES17425 = "条码【{SFC}】不符合物料【MaterialName】掩码规则，具体请查看【物料维护】";
         #endregion
 
         #region 在制品步骤控制 MES18000
