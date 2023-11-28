@@ -25,6 +25,7 @@ namespace Hymson.MES.Core.Domain.Plan
     /// </summary>
     public class PlanWorkOrderEntity : BaseEntity
     {
+
         /// <summary>
         /// 工单号
         /// </summary>

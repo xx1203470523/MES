@@ -90,6 +90,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         Task<PlanWorkOrderEntity> GetByCodeAsync(PlanWorkOrderQuery query);
 
         /// <summary>
+        /// 根据Code获取批量数据（模糊查询）
+        /// </summary>
+        /// <param name="workOrderCode"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetsByCodeAsync(PlanWorkOrderQuery query);
+
+        /// <summary>
         /// 根据IDs批量获取数据  含有物料信息
         /// </summary>
         /// <param name="ids"></param>
