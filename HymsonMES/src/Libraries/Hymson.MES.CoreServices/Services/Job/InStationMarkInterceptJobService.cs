@@ -16,7 +16,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// 
     /// </summary>
     [Job("NG标识拦截", JobTypeEnum.Standard)]
-    public  class InStationMarkInterceptJobService : IJobService
+    public class InStationMarkInterceptJobService : IJobService
     {
         /// <summary>
         /// 仓储接口（产品不良录入）
@@ -59,7 +59,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
                 SiteId = commonBo.SiteId,
-                Sfcs = multiSFCBo.SFCs,
+                SFCs = multiSFCBo.SFCs,
                 Status = ProductBadRecordStatusEnum.Open
             });
             if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return;

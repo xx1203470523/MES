@@ -130,7 +130,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             //已经存在的不合格信息不允许重复录入
             var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
-                Sfcs = bo.SFCs.ToArray(),
+                SFCs = bo.SFCs,
                 Status = ProductBadRecordStatusEnum.Open,
                 SiteId = bo.SiteId
             });

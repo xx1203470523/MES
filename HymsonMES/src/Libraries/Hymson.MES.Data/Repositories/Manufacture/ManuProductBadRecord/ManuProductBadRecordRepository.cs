@@ -143,18 +143,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("br.*");
             sqlBuilder.Where("br.SiteId = @SiteId");
-            sqlBuilder.Where("br.IsDeleted =0");
+            sqlBuilder.Where("br.IsDeleted = 0");
+
             if (!string.IsNullOrWhiteSpace(query.SFC))
             {
-                sqlBuilder.Where("SFC=@SFC");
+                sqlBuilder.Where("SFC = @SFC");
             }
             if (query.Status.HasValue)
             {
-                sqlBuilder.Where("Status=@Status");
+                sqlBuilder.Where("Status = @Status");
             }
-            if (query.Sfcs != null && query.Sfcs.Any())
+            if (query.SFCs != null && query.SFCs.Any())
             {
-                sqlBuilder.Where("SFC in @Sfcs");
+                sqlBuilder.Where("SFC IN @SFCs");
             }
             var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(template.RawSql, query);
             return manuProductBadRecordEntities;

@@ -80,7 +80,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
             {
                 SiteId = commonBo.SiteId,
-                Sfcs = multiSFCBo.SFCs,
+                SFCs = multiSFCBo.SFCs,
                 Status = ProductBadRecordStatusEnum.Open
             });
             if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return default;

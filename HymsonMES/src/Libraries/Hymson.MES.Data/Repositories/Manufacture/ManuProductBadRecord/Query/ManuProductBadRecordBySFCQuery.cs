@@ -1,13 +1,10 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public  class ManuProductBadRecordBySfcQuery
     {
         /// <summary>
@@ -28,6 +25,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
         /// <summary>
         /// 条码列表
         /// </summary>
-        public IEnumerable<string> Sfcs { get; set; }
+        public IEnumerable<string> SFCs { get; set; }
     }
 }

@@ -1069,7 +1069,7 @@
         public const string MES17105 = "存在不在BOM消耗清单里面的消耗条码！";
         public const string MES17106 = "产品【{Ids}】信息读取失败！";
         public const string MES17107 = "消耗条码{BarCodes}不属于BOM消耗清单！";
-        public const string MES17108 = "条码【{SFCs}】存在物未关闭的不合格信息，请去【不合格报告】查看详细信息";
+        public const string MES17108 = "条码【{SFCs}】存在未关闭的不合格信息，具体请查看【不合格报告】";
         public const string MES17109 = "条码【{SFC}】对应的不合代码集合为空，请检查！";
         public const string MES17110 = "条码【{SFC}】处有不属于系统的不合格代码【{NGCode}】，请检查！";
         public const string MES17111 = "工艺路线【{Ids}】信息读取失败！";
