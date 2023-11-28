@@ -54,6 +54,7 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport
 
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("QualityStatus is not null");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (pagedQuery.WorkOrderIds != null && pagedQuery.WorkOrderIds.Any())
             {
