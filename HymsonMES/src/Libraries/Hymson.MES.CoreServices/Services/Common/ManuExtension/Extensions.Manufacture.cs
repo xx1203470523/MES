@@ -96,12 +96,13 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
             if (sfcProduceEntitiesOfStatus.Any())
             {
                 var validationFailures = new List<ValidationFailure>();
-                foreach (var item in sfcProduceEntitiesOfStatus)
+                var sfcProduceEntitiesOfStatusDic = sfcProduceEntitiesOfStatus.ToLookup(w => w.Status).ToDictionary(d => d.Key, d => d);
+                foreach (var item in sfcProduceEntitiesOfStatusDic)
                 {
                     var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
-                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
-                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
-                    validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Status));
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.Key);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("SFC", string.Join(",", item.Value.Select(s => s.SFC)));
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Current", localizationService.GetSFCStatusEnumDescription(item.Key));
                     validationFailure.FormattedMessagePlaceholderValues.Add("Status", localizationService.GetSFCStatusEnumDescription(sfcStatus));
                     validationFailure.ErrorCode = nameof(ErrorCode.MES16361);
                     validationFailures.Add(validationFailure);

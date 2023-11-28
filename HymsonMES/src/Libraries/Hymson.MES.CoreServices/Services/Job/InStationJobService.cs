@@ -239,9 +239,20 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var beginNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == sfcProduce.ProcedureId);
                     var endNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == commonBo.ProcedureId);
 
-                    if (beginNode == null || endNode == null) continue;
+                    if (beginNode == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18228))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Procedure", sfcProcedureEntity.Code);
+                    }
+                    if (endNode == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18229))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Current", procedureEntity.Code);
+                    }
 
-                    var nodesOfOrdered = allProcessRouteDetailNodes.OrderBy(o => o.SerialNo)
+                    var nodesOfOrdered = processRouteDetailNodes.OrderBy(o => o.SerialNo)
                         .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());
 
                     // 两个工序之间没有工序，即表示当前实际进站的工序，处于条码记录的应进站工序前面
