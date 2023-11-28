@@ -311,7 +311,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                     }
                     validationFailure.FormattedMessagePlaceholderValues.Add("Location", item.Location);
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES17406);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES17410);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
