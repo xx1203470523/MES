@@ -239,7 +239,18 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var beginNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == sfcProduce.ProcedureId);
                     var endNode = processRouteDetailNodes.FirstOrDefault(f => f.ProcedureId == commonBo.ProcedureId);
 
-                    if (beginNode == null || endNode == null) continue;
+                    if (beginNode == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18228))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Procedure", sfcProcedureEntity.Code);
+                    }
+                    if (endNode == null)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES18229))
+                            .WithData("SFC", sfcProduce.SFC)
+                            .WithData("Current", procedureEntity.Code);
+                    }
 
                     var nodesOfOrdered = processRouteDetailNodes.OrderBy(o => o.SerialNo)
                         .Where(w => w.SerialNo.ParseToInt() >= beginNode.SerialNo.ParseToInt() && w.SerialNo.ParseToInt() < endNode.SerialNo.ParseToInt());

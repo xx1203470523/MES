@@ -1242,7 +1242,8 @@
         public const string MES18225 = "已成功将【{0}】（个数）{1}置于工序【{2}】，状态为{3}！";
         public const string MES18226 = "{0}【{1}】已完成所有工序！";
         public const string MES18227 = "【{0}】（个数）{1}已完成所有工序！";
-
+        public const string MES18228 = "产品序列码【{SFC}】应进站工序【{Procedure}】不属于所处的工艺路线！";
+        public const string MES18229 = "产品序列码【{SFC}】当前进站工序【{Current}】不属于所处的工艺路线！";
         #endregion
 
         #region 系统Token MES18300
