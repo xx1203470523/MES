@@ -15,8 +15,8 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// <summary>
     /// 
     /// </summary>
-    [Job("NG标识拦截", JobTypeEnum.Standard)]
-    public class InStationMarkInterceptJobService : IJobService
+    [Job("不合格缺陷拦截", JobTypeEnum.Standard)]
+    public class UnqualifiedDefectInterceptJobService : IJobService
     {
         /// <summary>
         /// 仓储接口（产品不良录入）
@@ -34,7 +34,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
-        public InStationMarkInterceptJobService(IManuProductBadRecordRepository manuProductBadRecordRepository,
+        public UnqualifiedDefectInterceptJobService(IManuProductBadRecordRepository manuProductBadRecordRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository)
         {
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
@@ -48,30 +48,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task VerifyParamAsync<T>(T param) where T : JobBaseBo
         {
-            if (param is not JobRequestBo commonBo) return;
-            if (commonBo == null) return;
-            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
-
-            // 临时中转变量
-            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
-
-            // 获取不良记录
-            var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
-            {
-                SiteId = commonBo.SiteId,
-                SFCs = multiSFCBo.SFCs,
-                Status = ProductBadRecordStatusEnum.Open
-            });
-            if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return;
-
-            // 读取存在的不合格代码
-            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
-            if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any()) return;
-
-            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Identification))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
-            }
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -92,7 +69,32 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<object?> DataAssemblingAsync<T>(T param) where T : JobBaseBo
         {
-            return await Task.FromResult(new EmptyRequestBo { });
+            if (param is not JobRequestBo commonBo) return default;
+            if (commonBo == null) return default;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return default;
+
+            // 临时中转变量
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
+
+            // 获取不良记录
+            var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery
+            {
+                SiteId = commonBo.SiteId,
+                SFCs = multiSFCBo.SFCs,
+                Status = ProductBadRecordStatusEnum.Open
+            });
+            if (manuProductBadRecordEntities == null || !manuProductBadRecordEntities.Any()) return default;
+
+            // 读取存在的不合格代码
+            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(manuProductBadRecordEntities.Select(x => x.UnqualifiedId));
+            if (qualUnqualifiedCodeEntities == null || !qualUnqualifiedCodeEntities.Any()) return default;
+
+            if (qualUnqualifiedCodeEntities.Any(x => x.Type == QualUnqualifiedCodeTypeEnum.Defect))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17108)).WithData("SFCs", string.Join(",", manuProductBadRecordEntities.Select(x => x.SFC).Distinct()));
+            }
+
+            return default;
         }
 
         /// <summary>
