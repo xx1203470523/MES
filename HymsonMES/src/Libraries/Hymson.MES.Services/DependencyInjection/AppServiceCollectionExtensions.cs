@@ -39,6 +39,7 @@ using Hymson.MES.Services.Services.Process.Procedure;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
 using Hymson.MES.Services.Services.Process.Resource;
 using Hymson.MES.Services.Services.Process.ResourceType;
+using Hymson.MES.Services.Services.QualificationRateReport;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.IQualityService;
 using Hymson.MES.Services.Services.Report;
@@ -285,6 +286,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region ProductDetailReport
             services.AddSingleton<IProductDetailService, ProductDetailService>();
+            #endregion
+
+            #region QualificationRateReport
+            services.AddSingleton<IQualificationRateReportService, QualificationRateReportService>();
             #endregion
 
             #endregion

@@ -36,6 +36,7 @@ using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
+using Hymson.MES.Data.Repositories.QualificationRateReport.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Report;
@@ -46,6 +47,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.QualificationRateReport;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -645,6 +647,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProductDetailReportOutputDto, ProductDetailReportView>();
             CreateMap<ProductDetailReportView, ProductDetailReportOutputDto>();
 
+            #endregion
+
+            #region QualificationRateReport
+            CreateMap<QualificationRateReportPagedQueryDto, QualificationRateReportPagedQuery>();
             #endregion
         }
 

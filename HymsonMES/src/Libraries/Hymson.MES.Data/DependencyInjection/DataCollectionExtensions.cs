@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Data.Repositories.QualificationRateReport;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Report;
@@ -254,6 +255,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region Report
             services.AddSingleton<IProductDetailReportRepository, ProductDetailReportRepository>();
+            services.AddSingleton<IQualificationRateReportRepository, QualificationRateReportRepository>();
             #endregion
 
             return services;
