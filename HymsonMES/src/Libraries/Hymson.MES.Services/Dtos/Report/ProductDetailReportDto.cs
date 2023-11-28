@@ -18,10 +18,16 @@ public record ProductDetailReportDto : BaseEntityDto
     /// 物料编码
     /// </summary>
     public string? MaterialCode { get; set; }
+
     /// <summary>
     /// 物料名称
     /// </summary>
     public string? MaterialName { get; set; }
+
+    /// <summary>
+    /// 工序名称
+    /// </summary>
+    public string? ProcedureName { get; set; }
 
     /// <summary>
     /// 查询类型
@@ -76,6 +82,11 @@ public class ProductDetailReportPageQueryDto : PagerInfo
     public string? MaterialName { get; set; }
 
     /// <summary>
+    /// 工序Id
+    /// </summary>
+    public long[]? ProcedureId { get; set; }
+
+    /// <summary>
     /// 产线Id
     /// </summary>
     public string? WorkCenterId { get; set; }
@@ -93,7 +104,7 @@ public class ProductDetailReportPageQueryDto : PagerInfo
     /// <summary>
     /// 工单
     /// </summary>
-    public long? OrderId { get; set; }
+    public long[]? OrderId { get; set; }
 
     /// <summary>
     /// 查询日期类型（日月年）

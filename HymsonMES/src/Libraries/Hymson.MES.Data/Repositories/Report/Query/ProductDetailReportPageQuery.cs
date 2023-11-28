@@ -20,6 +20,11 @@ namespace Hymson.MES.Data.Repositories.Report
         public string? WorkCenterCode { get; set; }
 
         /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long[]? ProcedureId { get; set; }
+
+        /// <summary>
         /// 工单
         /// </summary>
         public string? OrderCode { get; set; }
@@ -27,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Report
         /// <summary>
         /// 工单
         /// </summary>
-        public long? OrderId { get; set; }
+        public long[]? OrderId { get; set; }
 
         /// <summary>
         /// 查询日期类型（日月年）

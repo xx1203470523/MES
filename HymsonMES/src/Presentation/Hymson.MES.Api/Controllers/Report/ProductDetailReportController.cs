@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
@@ -68,5 +69,16 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _productDetailService.GetOutputQtyAsync(query);
         }
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("shops")]
+        public async Task<IEnumerable<SelectOptionDto>> GetProcShopListAsync()
+        {
+            return await _productDetailService.GetProcdureListAsync();
+        }
+
     }
 }

@@ -15,6 +15,9 @@ using Hymson.Excel.Abstractions;
 using Hymson.Minio;
 using Hymson.MES.Services.Dtos.Report.Excel;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Services.Report
 {
@@ -32,6 +35,7 @@ namespace Hymson.MES.Services.Services.Report
         private readonly IProductDetailReportRepository _productDetailRepository;
         private readonly IEquEquipmentRepository _equEquipmentRepository;
         private readonly IProcResourceRepository _procResourceRepository;
+        private readonly IProcProcedureRepository _procProcedureRepository;
         #endregion
 
 
@@ -43,6 +47,7 @@ namespace Hymson.MES.Services.Services.Report
             IManuSfcSummaryRepository manuSfcSummaryRepository,
             IProductDetailReportRepository productDetailRepository,
             IEquEquipmentRepository equEquipmentRepository,
+            IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository procResourceRepository)
         {
             _minioService = minioService;
@@ -54,6 +59,7 @@ namespace Hymson.MES.Services.Services.Report
             _productDetailRepository = productDetailRepository;
             _equEquipmentRepository = equEquipmentRepository;
             _procResourceRepository = procResourceRepository;
+            _procProcedureRepository= procProcedureRepository;
         }
 
         /// <summary>
@@ -67,9 +73,9 @@ namespace Hymson.MES.Services.Services.Report
 
             if (!string.IsNullOrEmpty(queryDto.OrderCode))
             {
-                var searchPlanWorkOrderEntity = await _planWorkOrderRepository.GetByCodeAsync(new() { OrderCode = queryDto.OrderCode })
+                var searchPlanWorkOrderEntitys = await _planWorkOrderRepository.GetsByCodeAsync(new() { OrderCode = queryDto.OrderCode,SiteId= _currentSite .SiteId??0 })
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17313));
-                queryDto.OrderId = searchPlanWorkOrderEntity.Id;
+                queryDto.OrderId = searchPlanWorkOrderEntitys.Select(a => a.Id).ToArray();
             }
 
             var query = queryDto.ToQuery<ProductDetailReportPageQuery>();
@@ -79,19 +85,28 @@ namespace Hymson.MES.Services.Services.Report
             var productIds = pageData.Data.Select(a => a.ProductId);
             var productEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
 
+            var procedureIds=pageData.Data.Select(a => a.ProcedureId).ToArray();
+            var proceduretEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds);
+
             var workOrderIds = pageData.Data.Select(a => a.WorkOrderId.GetValueOrDefault());
             var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.ToArray());
+
+
 
             List<ProductDetailReportOutputDto> list = new List<ProductDetailReportOutputDto>();
             foreach (var item in pageData.Data)
             {
                 var product = productEntities.FirstOrDefault(a => a.Id == item.ProductId);
 
+                var procedure = proceduretEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
+
                 var planWorkOrder = workOrderEntities.FirstOrDefault(a => a.Id == item.WorkOrderId);
 
                 item.MaterialCode = product?.MaterialCode;
                 item.MaterialName = product?.MaterialName;
                 item.OrderCode = planWorkOrder?.OrderCode;
+                item.ProcedureName = procedure?.Name;
+                
 
                 item.Type = query.Type switch
                 {
@@ -143,10 +158,9 @@ namespace Hymson.MES.Services.Services.Report
             var pageData = await GetPageInfoAsync(queryDto);
 
             List<ProductDetailExportDto> exportExcels = new List<ProductDetailExportDto>();
+            ProductDetailExportDto exportExcel = new ProductDetailExportDto();
             foreach (var item in pageData.Data)
             {
-                ProductDetailExportDto exportExcel = new ProductDetailExportDto();
-
                 exportExcel.StartDate = item.StartDate;
                 exportExcel.EndDate = item.EndDate;
                 exportExcel.OutputQty = item.OutputQty;
@@ -155,6 +169,7 @@ namespace Hymson.MES.Services.Services.Report
                 exportExcel.MaterialName = item.MaterialName;
                 exportExcel.OrderCode = item.OrderCode;
                 exportExcel.Type = item.Type;
+                exportExcel.ProcedureName = item.ProcedureName;
 
                 exportExcels.Add(exportExcel);
             }
@@ -206,5 +221,22 @@ namespace Hymson.MES.Services.Services.Report
 
             return outputQty;
         }
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> GetProcdureListAsync()
+        {
+            var procducesInfo = await _productDetailRepository.GetProcdureInfoAsync();
+
+            return procducesInfo.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"【{s.Code}】 {s.Name}",
+                Value = $"{s.Id}"
+            });
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using Microsoft.AspNetCore.Mvc;
@@ -32,5 +33,11 @@ namespace Hymson.MES.Services.Services.Report
         /// <param name="queryDto"></param>
         /// <returns></returns>
         public Task<decimal> GetOutputQtyAsync([FromQuery] ProductDetailReportQueryDto queryDto);
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<SelectOptionDto>> GetProcdureListAsync();
     }
 }

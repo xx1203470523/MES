@@ -34,33 +34,39 @@ namespace Hymson.MES.Services.Dtos.Report.Excel
         public string? MaterialName { get; set; }
 
         /// <summary>
+        /// 物料名称
+        /// </summary>
+        [EpplusTableColumn(Header = "工序名称", Order = 4)]
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
         /// 查询类型
         /// </summary>
-        [EpplusTableColumn(Header = "查询类型", Order = 4)]
+        [EpplusTableColumn(Header = "查询类型", Order = 5)]
         public string? Type { get; set; }
 
         /// <summary>
         /// 开始时间
         /// </summary>
-        [EpplusTableColumn(Header = "开始时间", Order = 5)]
+        [EpplusTableColumn(Header = "开始时间", Order = 6)]
         public string? StartDate { get; set; }
 
         /// <summary>
         /// 截至时间
         /// </summary>
-        [EpplusTableColumn(Header = "截止时间", Order = 6)]
+        [EpplusTableColumn(Header = "截止时间", Order = 7)]
         public string? EndDate { get; set; }
 
         /// <summary>
         /// 投入
         /// </summary>
-        [EpplusTableColumn(Header = "投入数量", Order = 7)]
+        [EpplusTableColumn(Header = "投入数量", Order = 8)]
         public decimal? FeedingQty { get; set; }
 
         /// <summary>
         /// 产出
         /// </summary>
-        [EpplusTableColumn(Header = "产出数", Order = 8)]
+        [EpplusTableColumn(Header = "产出数", Order = 9)]
         public decimal? OutputQty { get; set; }
     }
 }

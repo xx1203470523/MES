@@ -26,6 +26,17 @@ namespace Hymson.MES.Data.Repositories.Report
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? ProcedureName { get; set; }
+
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string? MaterialCode { get; set; }
