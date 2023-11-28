@@ -19,10 +19,12 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -193,6 +195,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             List<ManuSfcInfoEntity> manuSfcInfoList = new List<ManuSfcInfoEntity>();
             List<ManuSfcProduceEntity> manuSfcProduceList = new List<ManuSfcProduceEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new List<ManuSfcStepEntity>();
+            List<UpdateWhMaterialInventoryEmptyByIdCommand> updateWhMaterialInventoryEmptyByIdCommands = new List<UpdateWhMaterialInventoryEmptyByIdCommand>();
             ManuSfcInfoUpdateIsUsedBo manuSfcInfoUpdateIsUsedBo = new ManuSfcInfoUpdateIsUsedBo()
             {
                 UserId = commonBo.UserName,
@@ -280,6 +283,13 @@ namespace Hymson.MES.CoreServices.Services.Job
                             continue;
                         }
                     }
+                    updateWhMaterialInventoryEmptyByIdCommands.Add(new UpdateWhMaterialInventoryEmptyByIdCommand
+                    {
+                        Id = whMaterialInventory.Id,
+                        UpdatedBy = commonBo.UserName,
+                        UpdatedOn = commonBo.Time
+                    });
+
                 }
 
                 if (material == null)
@@ -406,6 +416,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ManuSfcInfoList = manuSfcInfoList,
                 ManuSfcProduceList = manuSfcProduceList,
                 ManuSfcStepList = manuSfcStepList,
+                updateWhMaterialInventoryEmptyByIdCommands = updateWhMaterialInventoryEmptyByIdCommands
             };
         }
 
@@ -441,7 +452,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 _manuSfcRepository.UpdateRangeAsync(data.UpdateManuSfcList),
                 _manuSfcInfoRepository.InsertsAsync(data.ManuSfcInfoList),
                 _manuSfcProduceRepository.InsertRangeAsync(data.ManuSfcProduceList),
-                _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList)
+                _manuSfcStepRepository.InsertRangeAsync(data.ManuSfcStepList),
+                _whMaterialInventoryRepository.UpdateWhMaterialInventoryEmptyByIdRangeAync(data.updateWhMaterialInventoryEmptyByIdCommands)
             };
 
             // 等待所有任务完成
