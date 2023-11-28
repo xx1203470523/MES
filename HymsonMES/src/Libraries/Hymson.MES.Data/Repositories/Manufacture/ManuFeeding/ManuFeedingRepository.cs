@@ -187,6 +187,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
 
+        /// <summary>
+        /// 根据上料点Id与资源IDs获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByLoadIdAndResourceIdsSqlAsync(GetByLoadIdAndResourceIdsQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(GetByLoadIdAndResourceIdsSql, query);
+        }
+
     }
 
 
@@ -202,5 +213,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         const string GetByBarCodeAndMaterialIdSql = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND FeedingPointId = @FeedingPointId AND ProductId = @ProductId AND BarCode = @BarCode;";
         const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";
         const string GetByResourceIdAndMaterialId = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId = @MaterialId; ";
+
+        const string GetByLoadIdAndResourceIdsSql= "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId in @ResourceIds AND FeedingPointId = @FeedingPointId ";
     }
 }

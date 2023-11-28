@@ -136,6 +136,18 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcLoadPointLinkResourceEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
+
+            if (procLoadPointLinkResourceQuery.SiteId.HasValue) 
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+            if (procLoadPointLinkResourceQuery.LoadPointId.HasValue)
+            {
+                sqlBuilder.Where("LoadPointId = @LoadPointId");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procLoadPointLinkResourceEntities = await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(template.RawSql, procLoadPointLinkResourceQuery);
             return procLoadPointLinkResourceEntities;

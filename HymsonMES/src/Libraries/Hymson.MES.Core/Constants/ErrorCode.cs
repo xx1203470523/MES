@@ -303,6 +303,7 @@
 
         public const string MES10718 = "关联物料不能为空，请检查!";
         public const string MES10719 = "关联资源不能为空，请检查!";
+        public const string MES10720 = "请移除上料点对应资源的已加载物料！";
         #endregion
 
         #region 掩码维护 10800

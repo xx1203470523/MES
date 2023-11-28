@@ -19,5 +19,14 @@ namespace Hymson.MES.Data.Repositories.Process.LoadPointLink.Query
     /// </summary>
     public class ProcLoadPointLinkResourceQuery
     {
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 上料点ID
+        /// </summary>
+        public long? LoadPointId {  get; set; }
     }
 }

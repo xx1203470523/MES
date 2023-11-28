@@ -94,5 +94,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <returns></returns>
         Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdWithOutZeroAsync(GetByFeedingPointIdsQuery query);
 
+        /// <summary>
+        /// 根据上料点Id与资源IDs获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByLoadIdAndResourceIdsSqlAsync(GetByLoadIdAndResourceIdsQuery query);
+
     }
 }
