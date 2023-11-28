@@ -813,11 +813,19 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 检查不合格代码信息是否为空
             if (requestBo.OutStationUnqualifiedList == null || !requestBo.OutStationUnqualifiedList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17109)).WithData("SFC", requestBo.SFC);
+                throw new CustomerValidationException(nameof(ErrorCode.MES17109))
+                    .WithData("SFC", requestBo.SFC);
+            }
+
+            // 如果有传不合格代码，进行校验是否为空字符
+            var unqualifiedCodes = requestBo.OutStationUnqualifiedList!.Select(s => s.UnqualifiedCode).Distinct();
+            if (unqualifiedCodes.Any(a => string.IsNullOrWhiteSpace(a)))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17117))
+                    .WithData("SFC", requestBo.SFC);
             }
 
             // 如果有传不合格代码，进行校验是否存在
-            var unqualifiedCodes = requestBo.OutStationUnqualifiedList!.Select(s => s.UnqualifiedCode).Distinct();
             var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
             {
                 SiteId = commonBo.SiteId,
