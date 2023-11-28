@@ -247,6 +247,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             }
             else
             {
+                if (manuSfcProduceEntity.Status!= SfcStatusEnum.lineUp)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17426)).WithData("SFC", param.SFC);
+                }
                 var unmanuSfcProduceWorkOrders = manuSfcProduceList.Where(x => x.WorkOrderId != manuSfcProduceEntity.WorkOrderId);
                 if (unmanuSfcProduceWorkOrders.Any())
                 {

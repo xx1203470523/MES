@@ -246,7 +246,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     var whMaterial = bomMaterials.FirstOrDefault(x => x.MaterialId == whMaterialInventory.MaterialId);
                     if (whMaterial != null)
                     {
-                        if (whMaterial.DataCollectionWay == MaterialSerialNumberEnum.Inside)
+                        if (whMaterial.DataCollectionWay == MaterialSerialNumberEnum.Outside)
                         {
                             // 报错 内部条码  bom属性为外部
                             var validationFailure = new ValidationFailure();

@@ -1165,6 +1165,7 @@
         public const string MES17423 = "条码【{SFC}】不存在，无法进行解绑，具体请查看【产品序列码报告】。";
         public const string MES17424 = "条码无法识别，无法绑定，具体请查看【BOM维护】【掩码维护】。";
         public const string MES17425 = "条码【{SFC}】不符合物料【MaterialName】掩码规则，具体请查看【物料维护】";
+        public const string MES17426 = "条码【{SFC}】不为活动中状态，具体请查看【产品序列码报告】。";
         #endregion
 
         #region 在制品步骤控制 MES18000
