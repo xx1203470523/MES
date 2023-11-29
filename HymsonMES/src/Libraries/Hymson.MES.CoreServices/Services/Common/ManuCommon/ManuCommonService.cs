@@ -338,14 +338,42 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                     .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
             }
 
+            // 查询载具里面所有的条码
+            var allProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            {
+                SiteId = requestBo.SiteId,
+                Sfcs = vehicleFreightStackEntities.Select(s => s.BarCode)
+            });
+
             List<VehicleSFCResponseBo> list = new();
+            var validationFailures = new List<ValidationFailure>();
             var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
             foreach (var item in vehicleFreightStackDic)
             {
                 var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
                 if (vehicleEntity == null) continue;
 
-                list.AddRange(item.Value.Select(s => new VehicleSFCResponseBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
+                // 验证产品序列码的编码/版本是否一致
+                var sfcProduceEntities = allProduceEntities.Where(w => item.Value.Select(s => s.BarCode).Contains(w.SFC));
+                var productIds = sfcProduceEntities.Select(s => s.ProductId).Distinct();
+                if (productIds.Count() > 1)
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", vehicleEntity.Code);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Code", vehicleEntity.Code);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES18628);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                else
+                {
+                    list.AddRange(item.Value.Select(s => new VehicleSFCResponseBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
+                }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException("", validationFailures);
             }
 
             return list;

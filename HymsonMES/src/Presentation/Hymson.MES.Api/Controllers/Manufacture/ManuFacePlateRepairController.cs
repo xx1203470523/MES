@@ -1,23 +1,6 @@
-/*
- *creator: Karl
- *
- *describe: 在制品维修    控制器 | 代码由框架生成  
- *builder:  pengxin
- *build datetime: 2023-04-12 10:32:46
- */
-using Hymson.Infrastructure;
-using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Hymson.Snowflake;
-using Hymson.Utils.Tools;
-using Hymson.Utils;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -27,7 +10,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// @author pengxin
     /// @date 2023-04-12 10:32:46
     /// </summary>
-    
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateRepairController : ControllerBase
@@ -74,7 +57,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuFacePlateRepairService.BeginManuFacePlateRepairAsync(beginRepairDto);
         }
 
-
         /// <summary>
         /// 结束维修
         /// </summary>
@@ -111,5 +93,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         {
             return await _manuFacePlateRepairService.GetInitialInfoManuFacePlateRepairAsync(facePlateId);
         }
+
     }
 }

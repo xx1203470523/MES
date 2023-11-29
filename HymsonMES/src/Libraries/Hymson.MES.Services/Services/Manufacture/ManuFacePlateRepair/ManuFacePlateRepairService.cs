@@ -225,7 +225,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (resJob == null || !resJob.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17320));
 
             var list = new List<ManuFacePlateRepairButJobReturnTypeEnum>();
-            foreach (var item in resJob.Select(x=>x.Key))
+            foreach (var item in resJob.Select(x => x.Key))
             {
                 if (item == ManuFacePlateRepairButJobReturnTypeEnum.RepairStartJobService.ToString())
                 {
@@ -322,6 +322,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
             };
+
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
@@ -443,7 +444,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             List<ManuFacePlateRepairReturnProcedureDto> manuFacePlateRepairReturnProcedureList = new();
             var procProcedureEntities = await _procProcedureRepository.GetByIdsAsync(procProcessRouteNodeList.Select(s => s.ProcedureId).ToArray());
-            foreach (var itemNode in procProcessRouteNodeList.Select(x=>x.ProcedureId))
+            foreach (var itemNode in procProcessRouteNodeList.Select(x => x.ProcedureId))
             {
                 procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Id == itemNode);
                 if (procProcedureEntity == null) continue;
