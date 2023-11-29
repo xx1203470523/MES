@@ -283,6 +283,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
+            // 当前条码是否是已报废
+            if (sfcProduceEntity.IsScrap == TrueOrFalseEnum.Yes) throw new CustomerValidationException(nameof(ErrorCode.MES16322)).WithData("SFC", sfcProduceEntity.SFC);
+
             // 这方法里面包含有验证
             var manuFacePlateRepairOpenInfoDto = await GetManuFacePlateRepairOpenInfoDtoAsync(sfcProduceEntity);
 

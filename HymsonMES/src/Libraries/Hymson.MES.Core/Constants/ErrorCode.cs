@@ -884,7 +884,7 @@
         public const string MES16319 = "SFC条码{SFC}已存在返修信息，不允许操作。";
         public const string MES16320 = "工单{ordercode}状态不为已下达|生产中，无法继续操作。";
         public const string MES16321 = "物料{Code}未添加组件，请检查";
-        public const string MES16322 = "SFC条码{SFC}已报废，不允许操作。";
+        public const string MES16322 = "产品序列码【{SFC}】已报废，不允许操作。";
         public const string MES16323 = "物料未添加组件，请检查";
         public const string MES16324 = "存在已报废SFC条码，不允许操作。";
         public const string MES16325 = "存在已锁定SFC条码，不允许操作。";
