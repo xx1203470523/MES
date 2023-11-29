@@ -246,10 +246,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         {
             // 通过资源->上料点
             var loadPoints = await _procLoadPointRepository.GetByResourceIdAsync(queryDto.ResourceId);
-
             if (loadPoints == null) return Array.Empty<SelectOptionDto>();
 
-            // 只用"启用"和"保留"
+            // 只显示"启用"和"保留"
             loadPoints = loadPoints.Where(w => w.Status == SysDataStatusEnum.Enable || w.Status == SysDataStatusEnum.Retain);
 
             return loadPoints.Select(s => new SelectOptionDto
@@ -321,17 +320,25 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             }
             else
             {
-                // 通过资源->上料点->物料
-                var loadPointMaterials = await _procLoadPointLinkMaterialRepository.GetByResourceIdAsync(queryDto.ResourceId);
-                if (loadPointMaterials != null && loadPointMaterials.Any())
+                // 通过资源->上料点
+                var loadPoints = await _procLoadPointRepository.GetByResourceIdAsync(queryDto.ResourceId);
+                if (loadPoints != null && loadPoints.Any())
                 {
-                    if (queryDto.FeedingPointId.HasValue && queryDto.FeedingPointId.Value > 0)
-                    {
-                        loadSource = 2;
-                        loadPointMaterials = loadPointMaterials.Where(w => w.LoadPointId == queryDto.FeedingPointId.Value);
-                    }
+                    // 只显示"启用"和"保留"
+                    loadPoints = loadPoints.Where(w => w.Status == SysDataStatusEnum.Enable || w.Status == SysDataStatusEnum.Retain);
 
-                    materialIds.AddRange(loadPointMaterials.Select(s => s.MaterialId).Distinct());
+                    // 通过上料点->物料
+                    var loadPointMaterials = await _procLoadPointLinkMaterialRepository.GetByLoadPointIdAsync(loadPoints.Select(s => s.Id));
+                    if (loadPointMaterials != null && loadPointMaterials.Any())
+                    {
+                        if (queryDto.FeedingPointId.HasValue && queryDto.FeedingPointId.Value > 0)
+                        {
+                            loadSource = 2;
+                            loadPointMaterials = loadPointMaterials.Where(w => w.LoadPointId == queryDto.FeedingPointId.Value);
+                        }
+
+                        materialIds.AddRange(loadPointMaterials.Select(s => s.MaterialId).Distinct());
+                    }
                 }
             }
 

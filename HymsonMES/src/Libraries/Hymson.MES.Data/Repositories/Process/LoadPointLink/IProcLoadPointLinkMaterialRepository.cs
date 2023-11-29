@@ -100,6 +100,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByResourceIdAsync(long resourceId);
 
         /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="loadPointIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByLoadPointIdAsync(IEnumerable<long> loadPointIds);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="procLoadPointLinkMaterialQuery"></param>
