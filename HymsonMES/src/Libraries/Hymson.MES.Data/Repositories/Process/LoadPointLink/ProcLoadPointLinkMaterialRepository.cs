@@ -154,9 +154,20 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcLoadPointLinkMaterialEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
+
+            if (procLoadPointLinkMaterialQuery.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+            if (procLoadPointLinkMaterialQuery.LoadPointId.HasValue)
+            {
+                sqlBuilder.Where("LoadPointId = @LoadPointId");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procLoadPointLinkMaterialEntities = await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(template.RawSql, procLoadPointLinkMaterialQuery);
-            return procLoadPointLinkMaterialEntities;
+            return await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(template.RawSql, procLoadPointLinkMaterialQuery);
         }
 
         /// <summary>

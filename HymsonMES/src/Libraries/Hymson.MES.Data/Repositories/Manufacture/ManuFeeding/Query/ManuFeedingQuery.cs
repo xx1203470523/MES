@@ -97,13 +97,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
         public string BarCode { get; set; }
     }
 
-    public class GetByLoadIdAndResourceIdsQuery 
+    /// <summary>
+    /// 
+    /// </summary>
+    public class GetByFeedingPointIdAndResourceIdsQuery
     {
         /// <summary>
         /// 上料点ID
         /// </summary>
         public long FeedingPointId { get; set; }
 
-        public long[] ResourceIds {  get; set; } 
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<long> ResourceIds { get; set; }
     }
+
 }

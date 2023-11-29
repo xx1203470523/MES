@@ -192,11 +192,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFeedingEntity>> GetByLoadIdAndResourceIdsSqlAsync(GetByLoadIdAndResourceIdsQuery query)
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndResourceIdsAsync(GetByFeedingPointIdAndResourceIdsQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuFeedingEntity>(GetByLoadIdAndResourceIdsSql, query);
+            return await conn.QueryAsync<ManuFeedingEntity>(GetByFeedingPointIdAndResourceIdsSql, query);
         }
+
 
     }
 
@@ -214,6 +215,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";
         const string GetByResourceIdAndMaterialId = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId = @MaterialId; ";
 
-        const string GetByLoadIdAndResourceIdsSql= "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId in @ResourceIds AND FeedingPointId = @FeedingPointId ";
+        const string GetByFeedingPointIdAndResourceIdsSql= "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId in @ResourceIds AND FeedingPointId = @FeedingPointId ";
     }
 }

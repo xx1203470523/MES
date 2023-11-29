@@ -12,6 +12,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MES.Services.Dtos.Common;
@@ -69,7 +70,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="localizationService"></param>
         /// <param name="validationImportRules"></param>
         /// <param name="manuFeedingRepository"></param>
-        public ProcLoadPointService(ICurrentUser currentUser, IMinioService minioService, IExcelService excelService, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, AbstractValidator<ImportLoadPointDto> validationImportRules, IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite, ILocalizationService localizationService , IManuFeedingRepository manuFeedingRepository)
+        public ProcLoadPointService(ICurrentUser currentUser, IMinioService minioService, IExcelService excelService, IProcLoadPointRepository procLoadPointRepository, AbstractValidator<ProcLoadPointCreateDto> validationCreateRules, AbstractValidator<ProcLoadPointModifyDto> validationModifyRules, AbstractValidator<ImportLoadPointDto> validationImportRules, IProcLoadPointLinkMaterialRepository procLoadPointLinkMaterialRepository, IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository, ICurrentSite currentSite, ILocalizationService localizationService, IManuFeedingRepository manuFeedingRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -299,44 +300,76 @@ namespace Hymson.MES.Services.Services.Process
 
             // 验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
-            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
-            }
+            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES10129));
 
-            #region 验证物料加载是否有关联该上料点的资源
-            //获取到需要删除的资源
-            var deleteLinkResourceIds= new List<long>();
-
-            var oldLinkResourceIds= (await _procLoadPointLinkResourceRepository.GetProcLoadPointLinkResourceEntitiesAsync(new ProcLoadPointLinkResourceQuery { SiteId = _currentSite.SiteId, LoadPointId = procLoadPointModifyDto.Id })).Select(x=>x.ResourceId).ToList();
-            if (oldLinkResourceIds != null&& oldLinkResourceIds.Any()) 
+            #region 解绑上料点
+            // 验证物料加载是否有关联该上料点的资源
+            var procLoadPointLinkResourceEntities = await _procLoadPointLinkResourceRepository.GetProcLoadPointLinkResourceEntitiesAsync(new ProcLoadPointLinkResourceQuery
             {
+                SiteId = _currentSite.SiteId,
+                LoadPointId = procLoadPointModifyDto.Id
+            });
+            var oldLinkResourceIds = procLoadPointLinkResourceEntities.Select(x => x.ResourceId);
+            if (oldLinkResourceIds != null && oldLinkResourceIds.Any())
+            {
+                // 获取到需要删除的资源
+                var deleteLinkResourceIds = new List<long>();
                 if (procLoadPointModifyDto.LinkResources != null && procLoadPointModifyDto.LinkResources.Any())
                 {
                     var modifyResourceIds = procLoadPointModifyDto.LinkResources.Select(x => x.ResourceId);
-
-                    deleteLinkResourceIds = oldLinkResourceIds.Where(x => !modifyResourceIds.Contains(x)).ToList();
+                    deleteLinkResourceIds.AddRange(oldLinkResourceIds.Except(modifyResourceIds));
                 }
-                else 
+                else
                 {
-                    deleteLinkResourceIds = oldLinkResourceIds;
+                    deleteLinkResourceIds.AddRange(oldLinkResourceIds);
                 }
 
-                if (deleteLinkResourceIds != null && deleteLinkResourceIds.Any()) 
+                if (deleteLinkResourceIds != null && deleteLinkResourceIds.Any())
                 {
-                    //查询
-                    var hasFeedings = await _manuFeedingRepository.GetByLoadIdAndResourceIdsSqlAsync(new Data.Repositories.Manufacture.ManuFeeding.Query.GetByLoadIdAndResourceIdsQuery
+                    var hasFeedings = await _manuFeedingRepository.GetByFeedingPointIdAndResourceIdsAsync(new GetByFeedingPointIdAndResourceIdsQuery
                     {
                         FeedingPointId = procLoadPointModifyDto.Id,
-                        ResourceIds = deleteLinkResourceIds?.ToArray() ?? new long[] { }
+                        ResourceIds = deleteLinkResourceIds
                     });
-                    if (hasFeedings != null && hasFeedings.Any())
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10720));
-                    }
+
+                    if (hasFeedings != null && hasFeedings.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10720));
                 }
             }
+            #endregion
 
+            #region 删除上料点物料
+            // 验证物料加载是否有关联该上料点的物料
+            var procLoadPointLinkMaterialEntities = await _procLoadPointLinkMaterialRepository.GetProcLoadPointLinkMaterialEntitiesAsync(new ProcLoadPointLinkMaterialQuery
+            {
+                SiteId = _currentSite.SiteId,
+                LoadPointId = procLoadPointModifyDto.Id
+            });
+            var oldLinkMaterialIds = procLoadPointLinkMaterialEntities.Select(x => x.MaterialId);
+            if (oldLinkMaterialIds != null && oldLinkMaterialIds.Any())
+            {
+                // 获取到需要删除的物料
+                var deleteLinkMaterialIds = new List<long>();
+                if (procLoadPointModifyDto.LinkMaterials != null && procLoadPointModifyDto.LinkMaterials.Any())
+                {
+                    var modifyMaterialIds = procLoadPointModifyDto.LinkMaterials.Select(x => x.MaterialId);
+                    deleteLinkMaterialIds.AddRange(oldLinkMaterialIds.Except(modifyMaterialIds));
+                }
+                else
+                {
+                    deleteLinkMaterialIds.AddRange(oldLinkMaterialIds);
+                }
+
+                if (deleteLinkMaterialIds != null && deleteLinkMaterialIds.Any())
+                {
+                    var hasFeedings = await _manuFeedingRepository.GetByFeedingPointIdAndMaterialIdsAsync(new GetByFeedingPointIdAndMaterialIdsQuery
+                    {
+                        FeedingPointId = procLoadPointModifyDto.Id,
+                        MaterialIds = deleteLinkMaterialIds
+                    });
+
+                    if (hasFeedings != null && hasFeedings.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10720));
+                }
+            }
             #endregion
 
             #endregion
@@ -357,8 +390,9 @@ namespace Hymson.MES.Services.Services.Process
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
                         {
                             validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", i}
-                        };
+                            { "CollectionIndex", i
+    }
+};
                         }
                         else
                         {
@@ -425,39 +459,27 @@ namespace Hymson.MES.Services.Services.Process
             }
             #endregion
 
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+            int rows = 0;
+            // 入库
+            rows = await _procLoadPointRepository.UpdateAsync(procLoadPointEntity);
+            if (rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10706));
+
+            await _procLoadPointLinkMaterialRepository.DeletesByLoadPointIdTrueAsync(new long[] { procLoadPointEntity.Id });
+            if (linkMaterials.Count > 0)
             {
-                int response = 0;
-                //入库
-                response = await _procLoadPointRepository.UpdateAsync(procLoadPointEntity);
-
-                if (response == 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES10706));
-                }
-
-                await _procLoadPointLinkMaterialRepository.DeletesByLoadPointIdTrueAsync(new long[] { procLoadPointEntity.Id });
-                if (linkMaterials.Count > 0)
-                {
-                    response = await _procLoadPointLinkMaterialRepository.InsertsAsync(linkMaterials);
-
-                    if (response <= 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10706));
-                    }
-                }
-                await _procLoadPointLinkResourceRepository.DeletesByLoadPointIdTrueAsync(new long[] { procLoadPointEntity.Id });
-                if (linkResources.Count > 0)
-                {
-                    await _procLoadPointLinkResourceRepository.InsertsAsync(linkResources);
-
-                    if (response <= 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10706));
-                    }
-                }
-                ts.Complete();
+                rows = await _procLoadPointLinkMaterialRepository.InsertsAsync(linkMaterials);
+                if (rows <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES10706));
             }
+
+            await _procLoadPointLinkResourceRepository.DeletesByLoadPointIdTrueAsync(new long[] { procLoadPointEntity.Id });
+            if (linkResources.Count > 0)
+            {
+                await _procLoadPointLinkResourceRepository.InsertsAsync(linkResources);
+                if (rows <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES10706));
+            }
+
+            ts.Complete();
         }
 
         /// <summary>

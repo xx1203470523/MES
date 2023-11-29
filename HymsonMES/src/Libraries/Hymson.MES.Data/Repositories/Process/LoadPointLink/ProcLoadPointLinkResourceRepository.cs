@@ -139,7 +139,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
 
-            if (procLoadPointLinkResourceQuery.SiteId.HasValue) 
+            if (procLoadPointLinkResourceQuery.SiteId.HasValue)
             {
                 sqlBuilder.Where("SiteId = @SiteId");
             }
@@ -149,8 +149,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procLoadPointLinkResourceEntities = await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(template.RawSql, procLoadPointLinkResourceQuery);
-            return procLoadPointLinkResourceEntities;
+            return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(template.RawSql, procLoadPointLinkResourceQuery);
         }
 
         /// <summary>
