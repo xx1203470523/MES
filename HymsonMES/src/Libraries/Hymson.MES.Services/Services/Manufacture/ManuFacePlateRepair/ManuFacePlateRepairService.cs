@@ -309,6 +309,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 UpdatedOn = HymsonClock.Now(),
             };
 
+            // 当前状态
+            var currentStatus = sfcProduceEntity.Status;
+
             // 更改状态，将条码由"排队"改为"活动"
             sfcProduceEntity.Status = SfcStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
@@ -317,7 +320,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             ManuSfcUpdateStatusByIdCommand manuSfcUpdateStatusByIdCommand = new ManuSfcUpdateStatusByIdCommand
             {
                 Id = sfcProduceEntity.SFCId,
-                CurrentStatus = sfcProduceEntity.Status,
+                CurrentStatus = currentStatus,
                 Status = SfcStatusEnum.Activity,
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now(),
@@ -325,11 +328,11 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                _ = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
+                var rows = await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);
 
-                await _manuSfcStepRepository.InsertAsync(sfcStep);
+                rows += await _manuSfcStepRepository.InsertAsync(sfcStep);
 
-                await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
+                rows += await _manuSfcRepository.ManuSfcUpdateStatuByIdAsync(manuSfcUpdateStatusByIdCommand);
 
                 trans.Complete();
             }
