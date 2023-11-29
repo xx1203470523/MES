@@ -499,7 +499,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             responseSummaryBo.Source = commonBo.Source;
             responseSummaryBo.Type = commonBo.Type;
-            responseSummaryBo.Count = responseBos.Count;
+            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.OutStationRequestBos.Select(s => s.VehicleCode).Count() : responseBos.Count;
             return responseSummaryBo;
         }
 
