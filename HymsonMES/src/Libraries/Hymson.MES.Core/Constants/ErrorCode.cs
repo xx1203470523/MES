@@ -1166,8 +1166,9 @@
         public const string MES17422 = "条码【{SFC}】无绑定条码，无法进行解绑，具体请查看【原建汇总】。";
         public const string MES17423 = "条码【{SFC}】不存在，无法进行解绑，具体请查看【产品序列码报告】。";
         public const string MES17424 = "条码无法识别，无法绑定，具体请查看【BOM维护】【掩码维护】。";
-        public const string MES17425 = "条码【{SFC}】不符合物料【MaterialName】掩码规则，具体请查看【物料维护】";
-        public const string MES17426 = "条码【{SFC}】不为活动中状态，具体请查看【产品序列码报告】。";
+        public const string MES17425 = "产品序列码【{SFC}】不符合物料【MaterialName】掩码规则，具体请查看【物料维护】";
+        public const string MES17426 = "产品序列码【{SFC}】不为活动中状态，具体请查看【产品序列码报告】。";
+        public const string MES17427 = "产品序列码【{SFC}】包含不合格信息，无法进行半成品入库，请检查传入参数。";
         #endregion
 
         #region 在制品步骤控制 MES18000
@@ -1246,6 +1247,7 @@
         public const string MES18227 = "【{0}】（个数）{1}已完成所有工序！";
         public const string MES18228 = "产品序列码【{SFC}】应进站工序【{Procedure}】不属于所处的工艺路线！";
         public const string MES18229 = "产品序列码【{SFC}】当前进站工序【{Current}】不属于所处的工艺路线！";
+        public const string MES18230 = "作业【{Job}】出现重复，请检查作业设置！";
         #endregion
 
         #region 系统Token MES18300

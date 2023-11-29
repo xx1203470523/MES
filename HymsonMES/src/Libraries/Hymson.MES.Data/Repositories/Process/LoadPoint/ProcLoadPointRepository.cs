@@ -82,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcLoadPointEntity>> GetByResourceIdAsync(long resourceId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcLoadPointEntity>(GetByResourceId, new { resourceId, Status= SysDataStatusEnum.Enable });
+            return await conn.QueryAsync<ProcLoadPointEntity>(GetByResourceIdSql, new { resourceId });
         }
 
         /// <summary>
@@ -232,9 +232,9 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `LoadPoint`, `LoadPointName`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `proc_load_point`  WHERE Id IN @ids ";
-        const string GetByResourceId = @"SELECT PLP.* FROM proc_load_point PLP
+        const string GetByResourceIdSql = @"SELECT PLP.* FROM proc_load_point PLP
                                 LEFT JOIN proc_load_point_link_resource PLPLR ON PLPLR.LoadPointId = PLP.Id
-                                WHERE PLPLR.ResourceId = @resourceId AND PLP.Status=@Status AND   PLP.IsDeleted=0";
+                                WHERE PLPLR.ResourceId = @resourceId AND PLP.IsDeleted = 0";
 
 
         const string UpdateStatusSql = "UPDATE `proc_load_point` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";

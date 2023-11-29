@@ -27,7 +27,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 {
@@ -247,7 +246,11 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
         {
             // 通过资源->上料点
             var loadPoints = await _procLoadPointRepository.GetByResourceIdAsync(queryDto.ResourceId);
+
             if (loadPoints == null) return Array.Empty<SelectOptionDto>();
+
+            // 只用"启用"和"保留"
+            loadPoints = loadPoints.Where(w => w.Status == SysDataStatusEnum.Enable || w.Status == SysDataStatusEnum.Retain);
 
             return loadPoints.Select(s => new SelectOptionDto
             {

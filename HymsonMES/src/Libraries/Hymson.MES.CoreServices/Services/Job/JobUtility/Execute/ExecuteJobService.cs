@@ -1,4 +1,6 @@
-﻿using Hymson.Localization.Services;
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.Localization.Services;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.Utils.Tools;
@@ -66,6 +68,16 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 {
                     execJobBos.AddRange(afterJobs);
                 }
+            }
+
+            // 检查重复的作业
+            var duplicateNames = execJobBos.GroupBy(g => g.Name)
+                .Where(w => w.Count() > 1)
+                .Select(s => s.Key);
+            if (duplicateNames != null && duplicateNames.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18230))
+                    .WithData("Job", string.Join(",", duplicateNames));
             }
 
             foreach (var job in execJobBos)

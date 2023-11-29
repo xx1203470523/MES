@@ -117,12 +117,13 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (commonBo == null) return;
             if (commonBo.OutStationRequestBos == null || !commonBo.OutStationRequestBos.Any()) return;
 
-            // 取得合格的条码
-            var qualifiedBos = commonBo.OutStationRequestBos.Where(w => w.IsQualified == true);
-            if (!qualifiedBos.Any()) return;
+            // 取得不合格的条码
+            var unQualifiedBos = commonBo.OutStationRequestBos.Where(w => w.IsQualified == false);
+            if (unQualifiedBos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES17427))
+                    .WithData("SFC", string.Join(',', unQualifiedBos.Select(s => s.SFC)));
 
             // 临时中转变量
-            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = qualifiedBos.Select(s => s.SFC) };
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
             // 获取生产条码信息
             var sfcProduceEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_masterDataService.GetProduceEntitiesBySFCsAsync, multiSFCBo);
@@ -135,7 +136,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             await commonBo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, multiSFCBo);
 
             // 判断条码状态是否是"完成"
-            var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(qualifiedBos.Select(s => s.SFC))
+            var sfcEntities = await _manuSfcRepository.GetBySFCsAsync(multiSFCBo.SFCs)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17104));
 
             if (sfcEntities.Any(a => a.Status == SfcStatusEnum.Complete))
