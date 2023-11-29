@@ -265,6 +265,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                             validationFailures.Add(validationFailure);
                             continue;
                         }
+                        material = whMaterial;
                         qty = whMaterialInventory.QuantityResidue;
 
                         if (qty == 0)
