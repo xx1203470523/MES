@@ -247,7 +247,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             }
             else
             {
-                if (manuSfcProduceEntity.Status!= SfcStatusEnum.lineUp)
+                if (manuSfcProduceEntity.Status!= SfcStatusEnum.Activity)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17426)).WithData("SFC", param.SFC);
                 }
