@@ -194,7 +194,8 @@ GROUP BY mss.WorkOrderId ,mss.ProductId,mss.ProcedureId,LEFT(EndTime,@Type),LEFT
 SELECT t1.workOrderId,t1.ProductId,t1.startDate,t1.ProcedureId,t1.EndDate,t1.OutputQty FeedingQty,IFNULL(t2.OutputQty,0) OutputQty FROM T1
 LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.workorderid = t2.workorderid AND t1.productId = t2.productId and t1.ProcedureId=t2.ProcedureId
 /**where**/
-ORDER BY T1.startDate
+ORDER BY T1.startDate DESC
+
 LIMIT @offSet,@Rows
 ";
 
@@ -215,7 +216,7 @@ GROUP BY mss.WorkOrderId ,mss.ProductId,mss.ProcedureId,LEFT(EndTime,@Type),LEFT
 SELECT COUNT(1) FROM T1
 LEFT JOIN T2 ON t1.startDate = t2.startDate AND t1.EndDate = t2.EndDate AND t1.workorderid = t2.workorderid AND t1.productId = t2.productId AND t1.procedureId=t2.procedureId
 /**where**/
-ORDER BY T1.startDate
+ORDER BY T1.startDate DESC
 ";
 
     private readonly string GetSumQtySql = "SELECT ifnull(SUM(ifnull(Qty,0)),0) FROM manu_sfc_summary mss  /**where**/";
