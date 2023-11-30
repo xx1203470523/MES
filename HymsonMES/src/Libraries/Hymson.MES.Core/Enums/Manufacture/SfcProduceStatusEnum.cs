@@ -23,13 +23,19 @@ namespace Hymson.MES.Core.Enums
         /// 完成
         /// </summary>
         [Description("完成")]
-        Complete = 3,
+        InProductionComplete = 3,
+
+        /// <summary>
+        /// 已完成
+        /// </summary>
+        [Description("已完成")]
+        Complete = 4,
 
         /// <summary>
         /// 锁定
         /// </summary>
         [Description("锁定")]
-        Locked = 4
+        Locked = 5,
     }
 
     public enum SfcProduceStatusDisplayEnum : sbyte

@@ -20,15 +20,15 @@ namespace Hymson.MES.Core.Enums
         Activity = 2,
 
         /// <summary>
-        /// 完成-在制
-        /// </summary>
-        [Description("完成-在制")]
-        InProductionComplete = 3,
-
-        /// <summary>
         /// 完成
         /// </summary>
         [Description("完成")]
+        InProductionComplete = 3,
+
+        /// <summary>
+        /// 已完成
+        /// </summary>
+        [Description("已完成")]
         Complete = 4,
 
         /// <summary>

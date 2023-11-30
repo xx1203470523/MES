@@ -454,6 +454,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
                 });
             }
+
             // 更新数据
             List<Task<int>> tasks = new()
             {
@@ -468,8 +469,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 等待所有任务完成
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
-
-        
 
             return responseBo;
         }
