@@ -121,7 +121,7 @@
         public const string MES10388 = "资源不存在！";
         #endregion
 
-        #region 标签模板 MES10340
+        #region 标签模板 10340
         public const string MES10340 = "模板名称已经存在!";
         public const string MES10341 = "打印机名称重复!";
         public const string MES10342 = "模板名称最大长度为50";
