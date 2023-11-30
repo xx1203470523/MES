@@ -290,7 +290,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                         UpdatedBy = commonBo.UserName,
                         UpdatedOn = commonBo.Time
                     });
-
                 }
 
                 if (material == null)
@@ -446,6 +445,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (responseBo.Rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.OrderCode);
             }
 
+            if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
+            {
+                responseBo.Rows += await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
+                {
+                    UpdatedOn = data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
+                    SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
+                    UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
+                });
+            }
             // 更新数据
             List<Task<int>> tasks = new()
             {
@@ -461,15 +469,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var rowArray = await Task.WhenAll(tasks);
             responseBo.Rows += rowArray.Sum();
 
-            if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
-            {
-                responseBo.Rows += await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
-                {
-                    UpdatedOn = data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
-                    SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
-                    UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
-                });
-            }
+        
 
             return responseBo;
         }

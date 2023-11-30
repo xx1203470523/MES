@@ -14,7 +14,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// <summary>
     /// 包装（打开）
     /// </summary>
-    [Job("包装", JobTypeEnum.Standard)]
+    [Job(" 包装（打开）", JobTypeEnum.Standard)]
     public class PackageOpenJobService : IJobService
     {
         /// <summary>

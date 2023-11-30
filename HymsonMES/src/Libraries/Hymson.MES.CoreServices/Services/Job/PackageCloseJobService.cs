@@ -15,7 +15,7 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// <summary>
     /// 包装（关闭）
     /// </summary>
-    [Job("包装", JobTypeEnum.Standard)]
+    [Job("包装（关闭）", JobTypeEnum.Standard)]
     public class PackageCloseJobService : IJobService
     {
         /// <summary>
