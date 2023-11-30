@@ -429,7 +429,15 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             JobResponseBo responseBo = new();
             if (obj is not BarcodeSfcReceiveResponseBo data) return responseBo;
-
+            if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
+            {
+                responseBo.Rows += await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
+                {
+                    UpdatedOn = data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
+                    SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
+                    UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
+                });
+            }
             // 当产出设置的产品和工单对应的产品一致时，才更新工单的下达数量
             if (data.IsProductSame)
             {
@@ -445,15 +453,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (responseBo.Rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.OrderCode);
             }
 
-            if (data.ManuSfcInfoUpdateIsUsed.SfcIds != null && data.ManuSfcInfoUpdateIsUsed.SfcIds.Any())
-            {
-                responseBo.Rows += await _manuSfcInfoRepository.UpdatesIsUsedAsync(new ManuSfcInfoUpdateIsUsedCommand()
-                {
-                    UpdatedOn = data.ManuSfcInfoUpdateIsUsed.UpdatedOn,
-                    SfcIds = data.ManuSfcInfoUpdateIsUsed.SfcIds,
-                    UserId = data.ManuSfcInfoUpdateIsUsed.UserId,
-                });
-            }
+          
 
             // 更新数据
             List<Task<int>> tasks = new()
