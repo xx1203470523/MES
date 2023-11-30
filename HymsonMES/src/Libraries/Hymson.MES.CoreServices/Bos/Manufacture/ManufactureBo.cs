@@ -149,7 +149,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     public class MaterialDeductResponseSummaryBo
     {
         /// <summary>
-        /// 即将扣料的物料数据
+        /// 属于半成品的物料
         /// </summary>
         public IEnumerable<ProcBomDetailEntity> SmiFinisheds { get; set; }
 

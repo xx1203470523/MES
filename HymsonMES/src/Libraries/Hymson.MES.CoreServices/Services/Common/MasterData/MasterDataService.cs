@@ -1234,7 +1234,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
         }
 
-        
+
         /// <summary>
         /// 转换数量
         /// </summary>

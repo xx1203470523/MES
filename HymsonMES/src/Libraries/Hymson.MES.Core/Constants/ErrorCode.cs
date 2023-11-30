@@ -750,7 +750,8 @@
 
         #region 物料加载 15500
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
-        // MES15502-MES15503 已被占用
+        public const string MES15502 = "条码{Code}已被使用！";
+        public const string MES15503 = "条码{Code}不存在！";
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
