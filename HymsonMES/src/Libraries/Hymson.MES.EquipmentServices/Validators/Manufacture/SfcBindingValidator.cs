@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 
 namespace Hymson.MES.EquipmentServices.Validators.Manufacture
@@ -20,9 +19,6 @@ namespace Hymson.MES.EquipmentServices.Validators.Manufacture
 
             //资源编码不能为空
             RuleFor(x => x.ResourceCode).NotEmpty().WithErrorCode(ErrorCode.MES19002);
-
-            //设备编码不能为空
-            RuleFor(x => x.EquipmentCode).NotEmpty().WithErrorCode(ErrorCode.MES19001);
 
             ////条码列表不允许为空 
             RuleFor(x => x.BindSfcs).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES19926);

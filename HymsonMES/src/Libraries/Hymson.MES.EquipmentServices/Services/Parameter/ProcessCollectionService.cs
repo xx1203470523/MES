@@ -91,7 +91,7 @@ namespace Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 

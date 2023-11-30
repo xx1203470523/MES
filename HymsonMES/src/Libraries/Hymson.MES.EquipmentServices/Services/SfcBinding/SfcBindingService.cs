@@ -413,7 +413,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcBinding
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = sfcBindingDto.ResourceCode,
-                EquipmentCode = sfcBindingDto.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 

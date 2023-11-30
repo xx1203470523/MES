@@ -111,7 +111,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 
@@ -141,7 +141,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 
@@ -170,7 +170,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 
@@ -218,7 +218,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 
@@ -271,7 +271,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 
@@ -300,7 +300,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             {
                 SiteId = _currentEquipment.SiteId,
                 ResourceCode = request.ResourceCode,
-                EquipmentCode = request.EquipmentCode
+                EquipmentCode = _currentEquipment.Code
             });
             if (manuBo == null) return;
 
