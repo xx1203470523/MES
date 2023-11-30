@@ -109,8 +109,8 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                 listDto.Add(new QualificationRateReportDto
                 {
                     OrderCode= workOrderInfo!=null ? workOrderInfo.OrderCode : "",
-                    MaterialName= productInfo!.MaterialName??"",
-                    ProcedureName=procedureInfo!.Name??"",
+                    MaterialName= productInfo!=null ? productInfo.MaterialName : "",
+                    ProcedureName=procedureInfo != null ? procedureInfo.Name : "",
                     StartOn= pagedQueryDto.Type==1?
                         (item.StartOn.Year+"-"+ item.StartOn.Month+"-"+ item.StartOn.Day).ToString()
                         :(item.StartOn.Year + "-" + item.StartOn.Month + "-" + item.StartOn.Day + "  "+item.StartHour).ToString(),
