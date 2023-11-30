@@ -310,7 +310,9 @@ namespace Hymson.MES.Services.Services.Process
                 LoadPointId = procLoadPointModifyDto.Id
             });
             var oldLinkResourceIds = procLoadPointLinkResourceEntities.Select(x => x.ResourceId);
-            if (oldLinkResourceIds != null && oldLinkResourceIds.Any())
+
+            // 因为上料点被多个资源引用时，即使移除了当前资源，也可以通过其他资源查询出关联的上料点，所以这里只验证仅剩一个资源时
+            if (oldLinkResourceIds != null && oldLinkResourceIds.Any() && oldLinkResourceIds.Count() == 1)
             {
                 // 获取到需要删除的资源
                 var deleteLinkResourceIds = new List<long>();
