@@ -138,34 +138,37 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         /// 验证绑定是否重复并触发异常提醒
         /// </summary>
         /// <param name="sfcCirculationBindDto"></param>
+        /// <param name="bindType"></param>
         /// <returns></returns>
-        private async Task VerifyDuplicate(SfcCirculationBindDto sfcCirculationBindDto)
+        private async Task VerifyDuplicate(SfcCirculationBindDto sfcCirculationBindDto, SfcCirculationTypeEnum bindType = SfcCirculationTypeEnum.Merge)
         {
-            //查找当前已有的绑定记录
-            var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                Sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray(),
-                IsDisassemble = TrueOrFalseEnum.No
-            });
-            if (sfcCirculationEntities.Any())
-            {
-                //条码：{SFCS}已经存在绑定记录
-                throw new CustomerValidationException(nameof(ErrorCode.MES19155)).WithData("SFCs", string.Join(",", sfcCirculationEntities.Select(c => c.SFC)));
-            }
+            ////查找当前已有的绑定记录
+            //var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            //{
+            //    SiteId = _currentEquipment.SiteId,
+            //    Sfcs = sfcCirculationBindDto.BindSFCs.Select(c => c.SFC).ToArray(),
+            //    IsDisassemble = TrueOrFalseEnum.No,
+            //    CirculationType = bindType
+            //});
+            //if (sfcCirculationEntities.Any())
+            //{
+            //    //条码：{SFCS}已经存在绑定记录
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19155)).WithData("SFCs", string.Join(",", sfcCirculationEntities.Select(c => c.SFC)));
+            //}
 
-            //查找当前已有的绑定记录
-            var bindSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                CirculationBarCode = sfcCirculationBindDto.SFC,
-                IsDisassemble = TrueOrFalseEnum.No
-            });
-            if (bindSfcCirculationEntities.Any())
-            {
-                //条码：{SFCS}已经存在绑定记录
-                throw new CustomerValidationException(nameof(ErrorCode.MES19156)).WithData("BindSFC", string.Join(",", bindSfcCirculationEntities.Select(c => c.CirculationBarCode)));
-            }
+            ////查找当前已有的绑定记录
+            //var bindSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new ManuSfcCirculationBarCodeQuery
+            //{
+            //    SiteId = _currentEquipment.SiteId,
+            //    CirculationBarCode = sfcCirculationBindDto.SFC,
+            //    IsDisassemble = TrueOrFalseEnum.No,
+            //    CirculationType = bindType
+            //});
+            //if (bindSfcCirculationEntities.Any())
+            //{
+            //    //条码：{SFCS}已经存在绑定记录
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES19156)).WithData("BindSFC", sfcCirculationBindDto.SFC);
+            //}
         }
 
         /// <summary>
@@ -538,7 +541,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 throw new CustomerValidationException(nameof(ErrorCode.MES19133));
             }
             //验证是否已经存在绑定关系
-            await VerifyDuplicate(sfcCirculationBindDto);
+            await VerifyDuplicate(sfcCirculationBindDto, SfcCirculationTypeEnum.BindCCS);
             //如果为虚拟条码
             if (sfcCirculationBindDto.IsVirtualSFC == true)
             {
@@ -789,7 +792,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (manuSfcCirculationEntities.Any())
             {
                 var manuSfcCirculation = manuSfcCirculationEntities.First();
-
 
                 var summaryQuery = new ManuSfcSummaryQuery()
                 {

@@ -272,29 +272,32 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
             decimal firstProcedureQty = 0;//首工序进站数量
             foreach (var sfc in inBoundMoreDto.SFCs)
             {
+                //只用校验电芯码是否导入过系统
                 //电芯校验同属批次
                 if (validateBatch)
                 {
-                    var currenWorkBatch = bindSFCbox.FirstOrDefault()?.BatchNo;
-                    if (currenWorkBatch != null)
+                    //var currenWorkBatch = bindSFCbox.FirstOrDefault()?.BatchNo;
+                    //if (currenWorkBatch != null)
+                    //{
+                    var sfcBatch = sfcBoxInfo.Where(x => x.SFC == sfc).FirstOrDefault();
+                    if (sfcBatch != null)
                     {
-                        var sfcBatch = sfcBoxInfo.Where(x => x.SFC == sfc).FirstOrDefault();
-                        if (sfcBatch != null)
-                        {
-                            if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
-                            {
-                                throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
-                            }
-                        }
-                        else
-                        {
-                            //未查到条码{sfc}批次信息,无法正常校验电芯批次
-                        }
+                        //if (!currenWorkBatch.Equals(sfcBatch.BatchNo))
+                        //{
+                        //    throw new CustomerValidationException(nameof(ErrorCode.MES19149)).WithData("SFC", sfc).WithData("sfcBatchNo", sfcBatch.BatchNo).WithData("workBatchNo", currenWorkBatch);
+                        //}
                     }
                     else
                     {
-                        //未查到当前工单{planWorkOrder.code}批次信息,无法正常校验电芯批次
+                        //未查到条码{sfc}批次信息,无法正常校验电芯批次
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19157)).WithData("SFC", sfc);
                     }
+                    //}
+                    //else
+                    //{
+                    //    //未查到当前工单{planWorkOrder.code}批次信息,无法正常校验电芯批次
+                    //    throw new CustomerValidationException(nameof(ErrorCode.MES19157)).WithData("SFC", sfc);
+                    //}
                 }
 
                 //汇总信息
