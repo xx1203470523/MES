@@ -1141,16 +1141,16 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 通过物料分组
             var manuFeedingsDictionary = feedings?.ToLookup(w => w.ProductId).ToDictionary(d => d.Key, d => d);
 
+            // 取得半成品的总数量
+            var smiFinishedUsages = 1m;
+            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
             List<ManuSfcCirculationEntity> adds = new();
             foreach (var materialBo in summaryBo.InitialMaterials)
             {
                 if (manuFeedingsDictionary == null) continue;
-
-                // 取得半成品的总数量
-                var smiFinishedUsages = 1m;
-                if (summaryBo.SmiFinisheds.Any(a => a.MaterialId == materialBo.MaterialId)) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
 
                 // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
