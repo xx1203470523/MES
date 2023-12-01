@@ -421,7 +421,7 @@ namespace Hymson.MES.Services.Services.Process
                     ParameterCode = item.ParameterCode??"",
                     ParameterName = item.ParameterName??"",
                     ParameterUnit = item.ParameterUnit ?? "",
-                    DataType = item.DataType,
+                    DataType = Enum.IsDefined(typeof(DataTypeEnum), item.DataType) ? item.DataType.GetDescription() : "",
                     Remark = item.Remark ?? ""
                 });
             }

@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public string? ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 
@@ -222,7 +222,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 数据类型（字典定义） 
         /// </summary>
         [EpplusTableColumn(Header = "数据类型(必填)", Order = 4)]
-        public DataTypeEnum DataType { get; set; }
+        public string DataType { get; set; }
 
         /// <summary>
         /// 备注

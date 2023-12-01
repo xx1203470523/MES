@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     dto.Code = parameterEntity.ParameterCode;
                     dto.Name = parameterEntity.ParameterName;
-                    dto.Unit = parameterEntity.ParameterUnit;
+                    dto.Unit = parameterEntity.ParameterUnit ?? "";
                     dto.DataType = parameterEntity.DataType;
                 }
 
