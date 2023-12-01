@@ -371,6 +371,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var manuSfcEntity = manuSFCEntities.FirstOrDefault(s => s.Id == sfcProduceEntity.SFCId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
 
+                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcProduceEntity.WorkOrderId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16373)).WithData("SFC", requestBo.SFC);
+
                 // 单条码返回值
                 var responseBo = new OutStationResponseBo();
 
@@ -390,13 +393,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (responseBo == null) continue;
 
                 #region 物料消耗明细数据
+                // 判断是否半成品
+                var isSmiFinished = sfcProduceEntity.ProductId != workOrderEntity.ProductId;
+
                 // 组合物料数据（放缓存）
                 var initialMaterialSummary = await commonBo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsWithSmiFinishedAsync, new MaterialDeductRequestBo
                 {
                     SiteId = commonBo.SiteId,
                     ProcedureId = commonBo.ProcedureId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
-                    ProductId = sfcProduceEntity.ProductId
+                    ProductId = isSmiFinished ? sfcProduceEntity.ProductId : 0
                 });
                 if (initialMaterialSummary == null) continue;
 

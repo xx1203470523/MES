@@ -932,7 +932,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(requestBo.ProductBOMId);
 
             // 半成品清单
-            responseSummaryBo.SmiFinisheds = mainMaterials.Where(w => w.MaterialId == requestBo.ProductId);
+            if (requestBo.ProductId > 0) responseSummaryBo.SmiFinisheds = mainMaterials.Where(w => w.MaterialId == requestBo.ProductId);
 
             // 未设置物料（克明说化成和返工的是没有投料的）
             if (mainMaterials == null || !mainMaterials.Any()) return responseSummaryBo;

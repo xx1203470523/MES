@@ -594,7 +594,6 @@
         #endregion
 
         #region 首检 13200
-
         public const string MES13201 = "生成条件不合法！";
         public const string MES13202 = "工单不能为空！";
         public const string MES13203 = "工序不能为空！";
@@ -934,7 +933,7 @@
         public const string MES16370 = "产品序列码不能为空，请检查参数";
         public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
         public const string MES16372 = "获取不到条码【{SFC}】工序【{code}】的产品参数信息";
-        public const string MES16373 = "TODO";
+        public const string MES16373 = "产品序列码【{SFC}】指定的工单不存在！";
         public const string MES16374 = "TODO";
         public const string MES16375 = "TODO";
         public const string MES16376 = "TODO";
