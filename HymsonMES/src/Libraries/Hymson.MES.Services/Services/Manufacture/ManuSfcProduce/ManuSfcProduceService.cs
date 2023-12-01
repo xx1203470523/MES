@@ -1632,13 +1632,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 switch (item.Status)
                 {
                     case SfcStatusEnum.lineUp:
-                        manuSfcProduceStep.lineUpNumber += 1;
+                        manuSfcProduceStep.LineUpNumber += 1;
                         break;
                     case SfcStatusEnum.Activity:
-                        manuSfcProduceStep.activityNumber += 1;
+                        manuSfcProduceStep.ActivityNumber += 1;
                         break;
                     case SfcStatusEnum.Complete:
-                        manuSfcProduceStep.completeNumber += 1;
+                        manuSfcProduceStep.CompleteNumber += 1;
                         break;
                     default:
                         validationFailure.ErrorCode = nameof(ErrorCode.MES18008);
@@ -1669,7 +1669,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                manuSfcProduceStep.completeNumber += 1;
+                manuSfcProduceStep.CompleteNumber += 1;
             }
 
             //是否存在错误
