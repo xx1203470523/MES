@@ -112,6 +112,7 @@ namespace Hymson.MES.Services.Services.Report
                 {
                     13 => "按每日查询",
                     10 => "按每月查询",
+                    7 => "按每年查询",
                     _ => ""
                 };
 
@@ -119,6 +120,7 @@ namespace Hymson.MES.Services.Services.Report
                 {
                     13 => item.StartDate,
                     10 => item.StartDate?.Substring(0, 7),
+                    7 => item.StartDate?.Substring(0, 4),
                     _ => item.StartDate,
                 };
 
@@ -126,6 +128,7 @@ namespace Hymson.MES.Services.Services.Report
                 {
                     13 => item.StartDate?.Substring(11, 2) + ":00",
                     10 => item.StartDate,
+                    7 => item.StartDate?.Substring(0,7),
                     _ => ""
                 };
 
@@ -133,6 +136,7 @@ namespace Hymson.MES.Services.Services.Report
                 {
                     13 => item.EndDate?.Substring(11, 2) + ":00",
                     10 => item.EndDate,
+                    7 => item.StartDate?.Substring(0, 7),
                     _ => ""
                 };
 

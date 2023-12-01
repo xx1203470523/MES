@@ -47,11 +47,13 @@ public partial class ProductDetailReportRepository : BaseRepository, IProductDet
 
         query.SearchType = "hour";
         if (query.Type == 1) query.SearchType = "day";
+        if (query.Type == 2) query.SearchType = "month";
 
         query.Type = query.Type switch
         {
             0 => 13,
             1 => 10,
+            2 => 7,
             _ => 13
         };
 
