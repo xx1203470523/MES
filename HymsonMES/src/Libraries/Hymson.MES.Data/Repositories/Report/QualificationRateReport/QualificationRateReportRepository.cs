@@ -32,7 +32,19 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
 
-            if(pagedQuery.Type==1)//按月
+            if (pagedQuery.Type == 2)//按年
+            {
+                sqlBuilder.Select("WorkOrderId,ProductId,ProcedureId," +
+                    "YEAR(EndTime) AS StartYear," +
+                    "MONTH(EndTime) AS StartMonth," +
+                    "SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity," +
+                    "SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
+
+                sqlBuilder.GroupBy("WorkOrderId,ProductId,ProcedureId,YEAR(EndTime),MONTH(EndTime)");
+                sqlBuilder.OrderBy("YEAR(EndTime) DESC,MONTH(EndTime) DESC");
+            }
+            else
+            if (pagedQuery.Type==1)//按月
             {
                 sqlBuilder.Select("WorkOrderId,ProductId,ProcedureId,DATE(EndTime) AS StartOn, " +
                     "SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity," +

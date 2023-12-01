@@ -106,17 +106,43 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                 var procedureInfo = procedureInfos.FirstOrDefault(x => x.Id == item.ProcedureId);
                 var workOrderInfo = workOrderInfos.FirstOrDefault(x => x.Id == item.WorkOrderId);
                 var productInfo = productInfos.FirstOrDefault(x => x.Id == item.ProductId);
+
+                string startOn = "";
+                string endOn="";
+                if (pagedQueryDto.Type == 1)//月
+                {
+                    var date = Convert.ToDateTime(item.StartOn.ToString());
+
+                    startOn = date.Year + "-" + date.Month + "-" + date.Day;
+                    endOn = date.Year + "-" + date.Month + "-" + date.AddDays(1).Day;
+                }
+                else
+                if (pagedQueryDto.Type == 2)//年
+                {
+                    startOn = item.StartYear + "-" + item.StartMonth;
+                    if(item.StartMonth.HasValue && item.StartMonth==12) 
+                    {
+                        endOn=(item.StartYear+1) + "-1";
+                    }
+                    else
+                    {
+                        endOn = item.StartYear + "-" + (item.StartMonth + 1);
+                    }
+                }
+                else//日
+                {
+                    var date = Convert.ToDateTime(item.StartOn.ToString());
+
+                    startOn = date.Year + "-" + date.Month + "-" + date.Day + "  " + item.StartHour;
+                    endOn = date.Year + "-" + date.Month + "-" + date.Day + "  " + (item.StartHour + 1);
+                }
                 listDto.Add(new QualificationRateReportDto
                 {
                     OrderCode= workOrderInfo!=null ? workOrderInfo.OrderCode : "",
                     MaterialName= productInfo!=null ? productInfo.MaterialName : "",
                     ProcedureName=procedureInfo != null ? procedureInfo.Name : "",
-                    StartOn= pagedQueryDto.Type==1?
-                        (item.StartOn.Year+"-"+ item.StartOn.Month+"-"+ item.StartOn.Day).ToString()
-                        :(item.StartOn.Year + "-" + item.StartOn.Month + "-" + item.StartOn.Day + "  "+item.StartHour).ToString(),
-                    EndOn= pagedQueryDto.Type == 1 ?
-                        (item.StartOn.Year + "-" + item.StartOn.Month + "-" + item.StartOn.AddDays(1).Day).ToString()
-                        : (item.StartOn.Year + "-" + item.StartOn.Month + "-" + item.StartOn.Day + "  " + (item.StartHour+1).ToString()).ToString(),
+                    StartOn=startOn,
+                    EndOn= endOn,
                     QualifiedQuantity =item.QualifiedQuantity,
                     UnQualifiedQuantity=item.UnQualifiedQuantity,
                     QualifiedRate=item.QualifiedQuantity/(item.QualifiedQuantity+item.UnQualifiedQuantity)*100,

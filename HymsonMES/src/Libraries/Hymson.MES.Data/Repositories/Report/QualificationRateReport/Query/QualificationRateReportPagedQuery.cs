@@ -53,12 +53,22 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport.Query
         /// <summary>
         /// 开始时间
         /// </summary>
-        public DateTime StartOn { get; set; }
+        public DateTime? StartOn { get; set; }
 
         /// <summary>
         /// 开始小时
         /// </summary>
         public int? StartHour { get; set; }
+
+        /// <summary>
+        /// 开始月
+        /// </summary>
+        public int? StartMonth { get; set; }
+
+        /// <summary>
+        /// 开始月
+        /// </summary>
+        public int? StartYear { get; set; }
 
         /// <summary>
         /// 合格数
