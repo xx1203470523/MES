@@ -1152,11 +1152,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var smiFinishedUsages = 1m;
                 if (summaryBo.SmiFinisheds.Any(a => a.MaterialId == materialBo.MaterialId)) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
 
-                // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
-                // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
+                // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100)
+                // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
                 decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value / 100);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 /*

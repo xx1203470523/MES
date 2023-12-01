@@ -1143,7 +1143,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
             decimal originQty = currentBo.Usages;
-            if (currentBo.Loss.HasValue && currentBo.Loss > 0) originQty *= currentBo.Loss.Value;
+            if (currentBo.Loss.HasValue && currentBo.Loss > 0) originQty *= (1 + currentBo.Loss.Value / 100);
             if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
