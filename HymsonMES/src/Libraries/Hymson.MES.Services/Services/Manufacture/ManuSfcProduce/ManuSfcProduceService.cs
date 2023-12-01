@@ -11,7 +11,6 @@ using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -41,8 +40,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -1519,7 +1516,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         Id = item.Id,
                         Sfc = item.Sfc,
                         Lock = item.Lock,
-                        ProcessRouteId= item.ProcessRouteId,
+                        ProcessRouteId = item.ProcessRouteId,
                         LockProductionId = item.LockProductionId,
                         ProductBOMId = item.ProductBOMId,
                         ProcedureId = item.ProcedureId,
@@ -2673,7 +2670,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.Activity
+                Status = SfcStatusEnum.Activity
             });
 
             //实体到DTO转换 装载数据
@@ -2749,7 +2746,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.Activity
+                Status = SfcStatusEnum.Activity
             });
 
             if (!sfcProduceList.Any()) return activityVehicleViewDtos;
@@ -2824,7 +2821,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             }
 
-            return activityVehicleViewDtos.OrderByDescending(x=>x.StartTime).ToList();
+            return activityVehicleViewDtos.OrderByDescending(x => x.StartTime).ToList();
         }
 
 
@@ -2842,10 +2839,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 //ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.lineUp,
+                Status = SfcStatusEnum.lineUp,
 
-                MaterialCode=query.MaterialCode,
-                MaterialVersion=query.MaterialVersion,
+                MaterialCode = query.MaterialCode,
+                MaterialVersion = query.MaterialVersion,
             });
 
             if (!sfcProduceList.Any()) return resultPaged;
@@ -2950,7 +2947,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     SFC = item.Sfc,
                     OrderCode = workOrder?.OrderCode ?? "",
-                    VehicleCode= vehicle?.Code ??"",
+                    VehicleCode = vehicle?.Code ?? "",
                     Status = item.Status,
                     ProcedureCode = procedure?.Code ?? "",
                     MaterialAndVersion = product == null ? "" : product.MaterialCode + " / " + product.Version,

@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     dto.Code = parameterEntity.ParameterCode;
                     dto.Name = parameterEntity.ParameterName;
-                    dto.Unit = parameterEntity.ParameterUnit;
+                    dto.Unit = parameterEntity.ParameterUnit==null?"": parameterEntity.ParameterUnit;
                     dto.DataType = parameterEntity.DataType;
                 }
 

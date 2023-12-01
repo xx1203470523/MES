@@ -58,9 +58,10 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> CreateInteUnitAsync(InteUnitSaveDto saveDto)
         {
-
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             // 验证DTO
-            if(saveDto.Code.Contains(' '))
+            if (saveDto.Code.Contains(' '))
                 throw new CustomerValidationException(nameof(ErrorCode.MES18800));
             
             saveDto.Name = saveDto.Name.ToTrimSpace();
@@ -78,6 +79,7 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 编码唯一性验证
             var checkEntity = await _inteUnitRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -111,6 +113,7 @@ namespace Hymson.MES.Services.Services.Integrated
             var entity = saveDto.ToEntity<InteUnitEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             return await _inteUnitRepository.UpdateAsync(entity);
         }
 

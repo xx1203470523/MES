@@ -55,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 条码状态
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
 
         /// <summary>

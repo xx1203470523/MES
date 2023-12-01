@@ -7,11 +7,6 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query
 {
@@ -53,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query
         /// <summary>
         /// 条码在制状态
         /// </summary>
-        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
+        public SfcStatusEnum? SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 工序编码
