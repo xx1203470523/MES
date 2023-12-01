@@ -77,5 +77,16 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// <param name="idsAr"></param>
         /// <returns></returns>
         Task<int> DeleteProcProcedureAsync(long[] idsAr);
+
+        #region PDA
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureSelectDto>> GetAllProcProcedurePDAAsync();
+
+        #endregion
+
     }
 }

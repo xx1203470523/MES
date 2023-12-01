@@ -185,12 +185,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcCirculationQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationEntitiesAsync(ManuSfcCirculationQuery manuSfcCirculationQuery)
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationEntitiesAsync(ManuSfcCirculationQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (query.Sfc != null)
+            {
+                sqlBuilder.Where("SFC = @Sfc");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(template.RawSql, manuSfcCirculationQuery);
+            var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(template.RawSql, query);
             return manuSfcCirculationEntities;
         }
 

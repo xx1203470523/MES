@@ -181,8 +181,6 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             return dto;
         }
 
-
-
         /// <summary>
         /// 分页实体转换
         /// </summary>
@@ -791,6 +789,26 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 ts.Complete();
             }
             return rows;
+        }
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureSelectDto>> GetAllProcProcedurePDAAsync()
+        {
+            long site = _currentSite.SiteId ?? 123456;
+            var list = await _procProcedureRepository.GetAllAsync( site);
+            var dto = new List<ProcProcedureSelectDto>();
+            foreach (var item in list)
+            {
+                dto.Add(new ProcProcedureSelectDto()
+                {
+                    Text = item.Name,
+                    Value = item.Id,
+                });
+            }
+            return dto;
         }
     }
 }

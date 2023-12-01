@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.View;
@@ -278,5 +279,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfcInfoIds"></param>
         /// <returns></returns>
         Task<int> DeleteSfcProduceBusinesssAsync(DeleteSfcProduceBusinesssCommand command);
+
+        #region PDA
+
+        /// <summary>
+        /// PDA更新在制品状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateProduceStatusAsync(UpdateProduceStatusCommand command);
+
+        #endregion
     }
 }

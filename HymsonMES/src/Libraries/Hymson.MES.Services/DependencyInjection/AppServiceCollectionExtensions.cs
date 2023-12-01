@@ -58,6 +58,7 @@ using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
 using Hymson.Minio;
 using Microsoft.Extensions.Configuration;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -201,6 +202,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcBindService, ManuSfcBindService>();
             services.AddSingleton<IManuSfcBindRecordService, ManuSfcBindRecordService>();
             services.AddSingleton<IManuSfcStepMaterialService, ManuSfcStepMaterialService>();
+
+            services.AddSingleton<IManuSfcCirculationService, ManuSfcCirculationService>();
 
             #endregion
 

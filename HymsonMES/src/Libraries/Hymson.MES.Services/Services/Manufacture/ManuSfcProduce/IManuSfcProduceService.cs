@@ -18,6 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
+using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {
@@ -154,7 +155,19 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task<long> GetLastProcedureAsync(long processRouteId);
 
         #region PDA
+
+        /// <summary>
+        /// 获取SFC在制信息
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
         Task<ManuSFCProdureInfoOutputDto> GetProcessInfoAsync(string SFC);
+
+        /// <summary>
+        /// 更新在制信息
+        /// </summary>
+        /// <returns></returns>
+        Task<int> UpdateProcedureStatusAsync(UpdateManuSFCProdureStatusDto update);
 
         #endregion
     }

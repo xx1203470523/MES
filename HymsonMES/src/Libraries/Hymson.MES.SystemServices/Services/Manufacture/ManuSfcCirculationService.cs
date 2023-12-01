@@ -172,5 +172,46 @@ namespace Hymson.MES.SystemServices.Services.Manufacture
                 }
             }
         }
+
+        /// <summary>
+        /// 获取条码绑定关系
+        /// </summary>
+        /// <param name="Sfc"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcCirculationOutputDto>> GetSfcCirculationBySFCAsync(string Sfc)
+        {
+            var result = new List<ManuSfcCirculationOutputDto>();
+
+            //获取条码绑定的条码
+            var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationEntitiesAsync(new() { Sfc = Sfc });
+
+            //获取条码绑定的主条码
+            var barCodeCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new() { CirculationBarCode = Sfc });
+
+            foreach (var item in sfcCirculationEntities)
+            {
+                result.Add(new() {
+                    Id = item.Id,
+                    BindSFC = item.SFC,
+                    SFC = item.CirculationBarCode,
+                    UpdatedBy = item.UpdatedBy,
+                    UpdatedOn = item.UpdatedOn,
+                });
+            }
+
+            foreach (var item in barCodeCirculationEntities)
+            {
+                result.Add(new()
+                {
+                    Id = item.Id,
+                    BindSFC = item.CirculationBarCode,
+                    SFC = item.SFC ,
+                    UpdatedBy = item.UpdatedBy,
+                    UpdatedOn = item.UpdatedOn,
+                });
+            }
+
+            return result;
+        }
     }
 }

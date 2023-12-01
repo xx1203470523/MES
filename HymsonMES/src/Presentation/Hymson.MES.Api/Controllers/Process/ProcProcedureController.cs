@@ -142,9 +142,20 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("pda/list")]
-        public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDA()
+        public async Task<IEnumerable<ProcProcedureViewPDADto>> GetProcProcedurePDAAsync()
         {
             return await _procProcedureService.GetProcProcedurePDAAsync();
+        }
+
+        /// <summary>
+        /// 获取所有工序
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pda/procedure/list")]
+        public async Task<IEnumerable<ProcProcedureSelectDto>> GetAllProcProcedurePDAAsync()
+        {
+            return await _procProcedureService.GetAllProcProcedurePDAAsync();
         }
 
         #endregion

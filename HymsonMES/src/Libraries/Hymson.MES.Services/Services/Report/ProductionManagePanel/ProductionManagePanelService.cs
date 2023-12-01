@@ -287,7 +287,8 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
             var firstProcedureSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(new ManuSfcSummaryQuery
             {
                 SiteId = siteId,
-                ProcedureIds = new long[] { processRouteDetailNodeEntity.ProcedureId },
+                //ProcedureIds = new long[] { processRouteDetailNodeEntity.ProcedureId },
+                ProcedureIds = new long[] { 20033620040740864 },
                 StartTime = DayStartTime,
                 EndTime = DayEndTime,
             });
@@ -312,7 +313,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
 
             //当天投入量(当前班次)
             //decimal dayConsume = firstProcedureSummaryEntities.Count();
-            decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal()/13/4,0);
+            decimal dayConsume = Math.Round(firstProcedureSummaryEntities.Count().ParseToDecimal(),0);
 
             //投入数
             //decimal inputQty = workOrderRecord?.InputQty ?? 0;
@@ -348,7 +349,7 @@ namespace Hymson.MES.Services.Services.Report.ProductionManagePanel
                 DayShift = IsDayShift() ? 1 : 0,
                 InputQty = workOrderRecord?.InputQty,
                 OverallPlanAchievingRate = planAchievingRate < 0 ? 0 : planAchievingRate,
-                OverallYieldRate = 100 - (unqualifiedRate > 100 ? 100 : unqualifiedRate),//不良率太低
+                OverallYieldRate = (100 - (unqualifiedRate > 100 ? 100 : unqualifiedRate)) == 0 ? 100 : (100 - (unqualifiedRate > 100 ? 100 : unqualifiedRate)),//不良率太低
                 ProcessRouteCode = processRouteEntity?.Code,
                 ProcessRouteName = processRouteEntity?.Name,
                 ProductCode = procMaterialEntity?.MaterialCode,

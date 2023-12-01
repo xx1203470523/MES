@@ -212,7 +212,12 @@ namespace Hymson.MES.System.Api.Controllers
             return await _systemApiService.GetSFCInfoAsync(queryDto);
         }
 
-
+        /// <summary>
+        /// 更新在制状态
+        /// </summary>
+        /// <param name="isNext"></param>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("produce/status/update")]
         public async Task UpdateManuSFCProduceStatus(string? isNext, string SFC)

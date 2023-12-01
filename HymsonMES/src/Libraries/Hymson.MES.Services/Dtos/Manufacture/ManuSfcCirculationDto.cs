@@ -187,7 +187,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
        /// <summary>
         /// 流转后条码信息
         /// </summary>
-        public long CirculationBarCode { get; set; }
+        public string CirculationBarCode { get; set; }
 
        /// <summary>
         /// 流转后工单id
@@ -376,9 +376,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
-
-       
-
     }
 
     /// <summary>

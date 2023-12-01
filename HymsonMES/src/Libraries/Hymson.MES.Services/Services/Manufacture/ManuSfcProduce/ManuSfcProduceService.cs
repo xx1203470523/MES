@@ -18,6 +18,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -2269,9 +2270,9 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="SFC"></param>
         /// <returns></returns>
         public async Task<ManuSFCProdureInfoOutputDto> GetProcessInfoAsync(string SFC)
-        {
-            var manuSfcProcedureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = SFC })
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18023)) ;
+        { 
+            var manuSfcProcedureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = SFC, SiteId = _currentSite.SiteId ?? 123456 })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", SFC);
 
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(manuSfcProcedureEntity.ProcedureId);
 
@@ -2285,6 +2286,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             return result;
         }
 
+        public async Task<int> UpdateProcedureStatusAsync(UpdateManuSFCProdureStatusDto updateDto)
+        {
+            var updateCommand = new UpdateProduceStatusCommand()
+            {
+                SFC = updateDto.Sfc,
+                ProcedureId = updateDto.ProcedureId,
+                Status = updateDto.ProcduceStatus,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = DateTime.Now
+            };
+
+
+            return await _manuSfcProduceRepository.UpdateProduceStatusAsync(updateCommand);
+        }
         #endregion
     }
 }

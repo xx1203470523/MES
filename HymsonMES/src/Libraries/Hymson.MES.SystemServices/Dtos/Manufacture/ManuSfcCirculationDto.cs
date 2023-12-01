@@ -25,8 +25,8 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         public string SFC { get; set; }
     }
     /// <summary>
-     /// 流转记录层级关系查询Dto
-     /// </summary>
+    /// 流转记录层级关系查询Dto
+    /// </summary>
     public class ManuSfcPrameterQueryDto
     {
         /// <summary>
@@ -35,8 +35,8 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         public string SFC { get; set; }
     }
     /// <summary>
-     /// 流转记录层级关系查询Dto
-     /// </summary>
+    /// 流转记录层级关系查询Dto
+    /// </summary>
     public class ManuSfcStepQueryDto
     {
         /// <summary>
@@ -240,7 +240,7 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         /// 工序名称
         /// </summary>
         public string ProcedureName { get; set; }
-        
+
         /// <summary>
         /// 资源名称
         /// </summary>
@@ -301,7 +301,7 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         /// 检测工序名称
         /// </summary>
         public string ProcedureName { get; set; }
-        
+
         /// <summary>
         /// 检测时间
         /// </summary>
@@ -311,5 +311,36 @@ namespace Hymson.MES.SystemServices.Dtos.Manufacture
         /// 设备名称
         /// </summary>
         public string? EquipmentName { get; set; }
+    }
+
+    /// <summary>
+    /// 条码绑定关系
+    /// </summary>
+    public class ManuSfcCirculationOutputDto
+    {
+        /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 主条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 绑定条码
+        /// </summary>
+        public string? BindSFC { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string? UpdatedBy { get; set; }
     }
 }

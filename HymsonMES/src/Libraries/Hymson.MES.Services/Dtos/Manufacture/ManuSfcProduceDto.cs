@@ -940,7 +940,25 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public SfcProduceStatusEnum? ProcessStatus { get; set; }
 
-    } 
+    }
 
+    public record UpdateManuSFCProdureStatusDto
+    {
+        /// <summary>
+        /// 更新的条码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 更新的工序
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 更新的状态
+        /// </summary>
+        public SfcProduceStatusEnum ProcduceStatus { get; set; }
+
+    }
     #endregion
 }

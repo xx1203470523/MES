@@ -258,6 +258,17 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuSfcProduceService.GetProcessInfoAsync(SFC);
         }
 
+        /// <summary>
+        /// 更新在制状态
+        /// </summary>
+        /// <param name="updateDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("pda/produce/updatestatus")]
+        public async Task<int> UpdateProduceStatusAsync([FromBody]UpdateManuSFCProdureStatusDto updateDto)
+        {
+            return await _manuSfcProduceService.UpdateProcedureStatusAsync(updateDto);
+        }
 
         #endregion
     }
