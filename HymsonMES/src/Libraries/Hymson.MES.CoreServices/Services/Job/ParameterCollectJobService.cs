@@ -1,6 +1,5 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Common;

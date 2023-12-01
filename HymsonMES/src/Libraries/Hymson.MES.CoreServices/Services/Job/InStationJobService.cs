@@ -346,7 +346,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             foreach (var requestBo in commonBo.InStationRequestBos)
             {
                 var sfcProduceEntity = sfcProduceEntities.FirstOrDefault(s => s.SFC == requestBo.SFC)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES17415)).WithData("SFC", requestBo.SFC);
 
                 // 单条码返回值
                 InStationResponseBo responseBo = new();
@@ -358,19 +358,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                     ProcedureId = commonBo.ProcedureId
                 });
 
-                // 获取当前工序信息
-                var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
-                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
-
                 // 检查是否测试工序
-                if (procedureEntity.Type == ProcedureTypeEnum.Test)
+                if (currentProcedureEntity.Type == ProcedureTypeEnum.Test)
                 {
                     // 超过复投次数，标识为NG
-                    if (sfcProduceEntity.RepeatedCount > procedureEntity.Cycle)
+                    if (sfcProduceEntity.RepeatedCount > currentProcedureEntity.Cycle)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16047))
                             .WithData("SFC", sfcProduceEntity.SFC)
-                            .WithData("Cycle", procedureEntity.Cycle)
+                            .WithData("Cycle", currentProcedureEntity.Cycle)
                             .WithData("RepeatedCount", sfcProduceEntity.RepeatedCount);
                     }
                 }
@@ -393,7 +389,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBo.SFCStepEntity = new ManuSfcStepEntity
                 {
                     Operatetype = ManuSfcStepTypeEnum.InStock,  // 状态为 进站
-                    CurrentStatus = SfcStatusEnum.lineUp,
+                    CurrentStatus = currentStatus,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,
@@ -442,7 +438,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBos.Add(responseBo);
             }
 
-            // 归集每个条码的出站结果
+            // 归集每个条码的结果
             if (!responseBos.Any()) return responseSummaryBo;
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
             responseSummaryBo.SFCStepEntities = responseBos.Select(s => s.SFCStepEntity);
