@@ -1155,7 +1155,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 取得半成品的总数量
             var smiFinishedUsages = 1m;
-            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+            if (summaryBo.SmiFinisheds != null && summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
 
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
