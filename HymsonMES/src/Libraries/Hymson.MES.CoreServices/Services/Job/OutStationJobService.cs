@@ -1114,7 +1114,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Qty = stepEntity.Qty,
                     Status = productBadRecordStatus,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = remark,
+                    Remark = remark.ToString(),
                     DisposalResult = disposalResult,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
@@ -1129,7 +1129,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     BadRecordId = badRecordEntity.Id,
                     UnqualifiedId = badRecordEntity.UnqualifiedId,
                     NGCode = s,
-                    Remark = remark,
+                    Remark = remark.ToString(),
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
