@@ -27,7 +27,6 @@ namespace Hymson.MES.CoreServices.Services.Job
     /// 不良录入
     /// </summary>
     [Job("产品不良录入", JobTypeEnum.Standard)]
-    /// </summary>
     public class ProductBadRecordJobService : IJobService
     {
         /// <summary>
@@ -302,6 +301,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 updateCommand = new ManuSfcUpdateCommand
                 {
+                    SiteId = bo.SiteId,
                     Sfcs = sfcs,
                     UserId = bo.UserName,
                     UpdatedOn = HymsonClock.Now(),
@@ -345,14 +345,15 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             if (data.IsScrapCode)
             {
-                //修改在制品状态
+                // 修改在制品状态
                 responseBo.Rows += await _manuSfcProduceRepository.UpdateIsScrapAsync(data.IsScrapCommand);
-                //修改条码状态
+
+                // 修改条码状态
                 responseBo.Rows += await _manuSfcRepository.UpdateStatusAsync(data.UpdateCommand);
 
                 if (data.ManuProductBadRecords.Any())
                 {
-                    //入库
+                    // 入库
                     responseBo.Rows += await _manuProductBadRecordRepository.InsertRangeAsync(data.ManuProductBadRecords);
                 }
 
@@ -362,10 +363,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 if (data.ManuSfcProduceList.Any())
                 {
-                    //添加维修业务
+                    // 添加维修业务
                     await _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.ManuSfcProduceList);
 
-                    //修改在制品工艺路线和工序信息
+                    // 修改在制品工艺路线和工序信息
                     await _manuSfcProduceRepository.UpdateRouteAsync(data.UpdateRouteCommand);
                 }
             }
@@ -373,7 +374,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 if (data.ManuProductBadRecords.Any())
                 {
-                    //入库
+                    // 入库
                     responseBo.Rows += await _manuProductBadRecordRepository.InsertRangeAsync(data.ManuProductBadRecords);
                 }
                 if (data.SfcStepList.Any())
@@ -382,10 +383,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 }
                 if (data.ManuSfcProduceList.Any())
                 {
-                    //添加维修业务
+                    // 添加维修业务
                     await _manuSfcProduceRepository.InsertSfcProduceBusinessRangeAsync(data.ManuSfcProduceList);
 
-                    //修改在制品工艺路线和工序信息
+                    // 修改在制品工艺路线和工序信息
                     await _manuSfcProduceRepository.UpdateRouteAsync(data.UpdateRouteCommand);
                 }
             }
@@ -404,5 +405,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             await Task.CompletedTask;
             return null;
         }
+
     }
 }

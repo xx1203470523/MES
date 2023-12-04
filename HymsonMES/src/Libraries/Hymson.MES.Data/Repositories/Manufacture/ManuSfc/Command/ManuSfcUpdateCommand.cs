@@ -9,6 +9,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
     public class ManuSfcUpdateCommand
     {
         /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
         /// 产品条码列表
         /// </summary>
         public string[] Sfcs { get; set; }
