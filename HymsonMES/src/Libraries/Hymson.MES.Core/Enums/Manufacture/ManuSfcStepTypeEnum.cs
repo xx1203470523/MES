@@ -177,6 +177,6 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 供应商条码接收
         /// </summary>
         [Description("供应商条码接收")]
-        SupplierReceive = 2,
+        SupplierReceive = 34,
     }
 }
