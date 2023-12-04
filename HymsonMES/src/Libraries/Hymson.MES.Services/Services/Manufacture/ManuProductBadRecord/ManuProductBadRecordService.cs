@@ -1153,12 +1153,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                             Id = IdGenProvider.Instance.CreateId(),
                             SupplierId = 0,//自制品 没有
                             MaterialId = manuSfcProduceEntity.ProductId,
-                            MaterialBarCode = procMaterialEntity.MaterialCode,
+                            MaterialBarCode = manuSfcProduceEntity.SFC,
                             Batch = "",//自制品 没有
                             MaterialType = planWorkOrderEntity.ProductId == procMaterialEntity.Id ? MaterialInventoryMaterialTypeEnum.FinishedParts : MaterialInventoryMaterialTypeEnum.SelfMadeParts,
                             QuantityResidue = manuSfcProduceEntity.Qty,
                             Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                            Source = MaterialInventorySourceEnum.Disassembly,
+                            Source = MaterialInventorySourceEnum.ManuComplete,
                             SiteId = manuSfcProduceEntity.SiteId,
                             CreatedBy = _currentUser.UserName,
                             CreatedOn = HymsonClock.Now(),
