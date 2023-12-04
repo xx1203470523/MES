@@ -31,6 +31,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -359,6 +360,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 填充其他设置
             procedureRejudgeBo = await FillingProcedureRejudgeBoAsync(procedureRejudgeBo);
+            _logger.LogInformation($"FillingProcedureRejudgeBoAsync -> ", procedureRejudgeBo.ToSerialize());
 
             // 遍历所有条码
             var responseBos = new List<OutStationResponseBo>();
@@ -1090,6 +1092,13 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 如果有标记缺陷
             if (unqualifiedId.HasValue)
             {
+                // 记录下复判相关参数
+                var remark = new StringBuilder();
+                remark.Append($"Cycle:{procedureRejudgeBo.Cycle};");
+                remark.Append($"IsRejudge: {procedureRejudgeBo.IsRejudge};");
+                remark.Append($"IsValidNGCode:{procedureRejudgeBo.IsValidNGCode};");
+                remark.Append($"MarkUnqualifiedId:{procedureRejudgeBo.MarkUnqualifiedId};");
+
                 // 添加不良记录
                 var badRecordEntity = new ManuProductBadRecordEntity
                 {
@@ -1105,7 +1114,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Qty = stepEntity.Qty,
                     Status = productBadRecordStatus,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = stepEntity.Remark,
+                    Remark = remark,
                     DisposalResult = disposalResult,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
@@ -1120,7 +1129,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     BadRecordId = badRecordEntity.Id,
                     UnqualifiedId = badRecordEntity.UnqualifiedId,
                     NGCode = s,
-                    Remark = stepEntity.Remark,
+                    Remark = remark,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
