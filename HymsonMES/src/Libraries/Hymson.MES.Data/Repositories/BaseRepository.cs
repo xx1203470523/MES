@@ -15,6 +15,7 @@ namespace Hymson.MES.Data.Repositories
         {
             _connectionOptions = connectionOptions.Value;
         }
+
         /// <summary>
         /// MES库连接
         /// </summary>
@@ -22,6 +23,26 @@ namespace Hymson.MES.Data.Repositories
         protected IDbConnection GetMESDbConnection()
         {
             var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return conn;
+        }
+
+        /// <summary>
+        /// MESParamter库连接
+        /// </summary>
+        /// <returns></returns>
+        protected IDbConnection GetMESParamterDbConnection()
+        {
+            var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
+            return conn;
+        }
+
+        /// <summary>
+        /// DorisParamter库连接
+        /// </summary>
+        /// <returns></returns>
+        protected IDbConnection GetDorisParamterDbConnection()
+        {
+            var conn = new MySqlConnection(_connectionOptions.DorisParamterConnectionString);
             return conn;
         }
 
