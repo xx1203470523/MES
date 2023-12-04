@@ -390,6 +390,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     Operatetype = ManuSfcStepTypeEnum.InStock,  // 状态为 进站
                     CurrentStatus = currentStatus,
+                    AfterOperationStatus = sfcProduceEntity.Status,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,

@@ -736,7 +736,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 manuSfcEntity.Status = SfcStatusEnum.Complete;
 
                 stepEntity.Operatetype = responseBo.ProcessRouteType == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                stepEntity.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
 
                 // 生产主工艺路线才进行入库
                 if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
@@ -800,6 +799,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 sfcProduceEntity.ResourceId = null;
             }
 
+            // 保存操作后的状态
+            stepEntity.AfterOperationStatus = sfcProduceEntity.Status;
+
+            // 更新信息
             responseBo.SFCEntity = manuSfcEntity;
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
@@ -1061,7 +1064,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     //responseBo.IsCompleted = true;
                     manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
                     sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
-                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
                 }
                 // 未完工（置于下工序排队）
                 else
@@ -1085,6 +1087,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             #endregion
 
+            // 保存操作后的状态
+            stepEntity.AfterOperationStatus = sfcProduceEntity.Status;
+
+            // 更新信息
             responseBo.SFCEntity = manuSfcEntity;
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
