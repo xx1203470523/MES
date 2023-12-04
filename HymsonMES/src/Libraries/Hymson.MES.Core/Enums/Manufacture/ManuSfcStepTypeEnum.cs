@@ -172,6 +172,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 产出上报
         /// </summary>
         [Description("产出上报")]
-        OutputReport = 33
+        OutputReport = 33,
+        /// <summary>
+        /// 供应商条码接收
+        /// </summary>
+        [Description("供应商条码接收")]
+        SupplierReceive = 2,
     }
 }

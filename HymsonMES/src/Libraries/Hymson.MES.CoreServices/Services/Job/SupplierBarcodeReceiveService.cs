@@ -351,7 +351,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                     Qty = qty,
                     ProcedureId = commonBo.ProcedureId,
-                    Operatetype = ManuSfcStepTypeEnum.Receive,
+                    Operatetype = ManuSfcStepTypeEnum.SupplierReceive,
                     CurrentStatus = SfcStatusEnum.lineUp,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,
