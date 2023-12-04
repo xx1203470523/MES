@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartwaterMarkIdAsync(ManuSfcStepStatisticQuery query)
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(ManuSfcStepStatisticQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuSfcStepEntity>(GetListByStartwaterMarkIdSql, query);

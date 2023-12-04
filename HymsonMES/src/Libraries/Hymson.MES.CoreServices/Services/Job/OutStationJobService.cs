@@ -23,7 +23,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
@@ -360,7 +359,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 填充其他设置
             procedureRejudgeBo = await FillingProcedureRejudgeBoAsync(procedureRejudgeBo);
-            _logger.LogInformation($"FillingProcedureRejudgeBoAsync -> ", procedureRejudgeBo.ToSerialize());
+            _logger.LogInformation($"工序中关于复判的相关参数 -> ", procedureRejudgeBo.ToSerialize());
 
             // 遍历所有条码
             var responseBos = new List<OutStationResponseBo>();
@@ -489,22 +488,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 SfcInfoIds = responseBos.Where(w => w.IsLastProcedure).Select(s => s.SFCProduceEntitiy.Id)
             };
 
-            var responseBosByWorkOrderId = responseBos
-                .Where(w => w.IsLastProcedure)
-                .Select(s => s.SFCProduceEntitiy)
-                .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in responseBosByWorkOrderId)
-            {
-                // 更新完工数量
-                responseSummaryBo.UpdateQtyByWorkOrderIdCommands.Add(new UpdateQtyByWorkOrderIdCommand
-                {
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time,
-                    WorkOrderId = item.Key,
-                    Qty = item.Value.Count()
-                });
-            }
-
             responseSummaryBo.Source = commonBo.Source;
             responseSummaryBo.Type = commonBo.Type;
             responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.OutStationRequestBos.Select(s => s.VehicleCode).Count() : responseBos.Count;
@@ -547,9 +530,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 删除 manu_sfc_produce_business
                 _manuSfcProduceRepository.DeleteSfcProduceBusinessBySfcInfoIdsAsync(data.DeleteSfcProduceBusinesssBySfcInfoIdsCommand),
 
-                // 更新完工数量
-                _planWorkOrderRepository.UpdateFinishProductQuantityByWorkOrderIdsAsync(data.UpdateQtyByWorkOrderIdCommands),
-                
                 // 入库 / 台账
                 _whMaterialInventoryRepository.InsertsAsync(data.WhMaterialInventoryEntities),
                 _whMaterialStandingbookRepository.InsertsAsync(data.WhMaterialStandingbookEntities),
@@ -801,6 +781,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 保存操作后的状态
             stepEntity.AfterOperationStatus = sfcProduceEntity.Status;
+            stepEntity.Remark = responseBo.IsLastProcedure ? "LastProcedureOutStation" : "";
 
             // 更新信息
             responseBo.SFCEntity = manuSfcEntity;

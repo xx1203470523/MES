@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Core.Constants.Manufacture
+﻿namespace Hymson.MES.Core.Constants.Manufacture
 {
 
     /// <summary>
@@ -13,8 +7,13 @@ namespace Hymson.MES.Core.Constants.Manufacture
     public static class BusinessKey
     {
         /// <summary>
+        /// 工单统计业务标识
+        /// </summary>
+        public const string WorkOrderStatistic = "WorkOrderStatistic";
+
+        /// <summary>
         /// 生产统计业务标识
         /// </summary>
-        public const string ManuSfcSummaryBusinessKey = "ManuSfcSummaryStatistic";
+        public const string ManuSfcSummary = "ManuSfcSummaryStatistic";
     }
 }

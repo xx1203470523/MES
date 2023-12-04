@@ -20,7 +20,6 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -403,6 +402,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Qty = sfcProduceEntity.Qty,
                     VehicleCode = requestBo.VehicleCode,
                     EquipmentId = commonBo.EquipmentId,
+                    Remark = responseBo.IsFirstProcedure ? "FirstProcedureInStation" : "",
                     SiteId = commonBo.SiteId,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,
@@ -446,22 +446,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             responseSummaryBo.InStationManuSfcByIdCommands = responseBos.Select(s => s.InStationManuSfcByIdCommand);
             responseSummaryBo.UpdateProduceInStationSFCCommands = responseBos.Select(s => s.UpdateProduceInStationSFCCommand);
 
-            var responseBosByWorkOrderId = responseBos
-                .Where(w => w.IsFirstProcedure)
-                .Select(s => s.SFCProduceEntitiy)
-                .ToLookup(w => w.WorkOrderId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in responseBosByWorkOrderId)
-            {
-                // 更新工单的InputQty
-                responseSummaryBo.UpdateQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
-                {
-                    UpdatedBy = commonBo.UserName,
-                    UpdatedOn = commonBo.Time,
-                    WorkOrderId = item.Key,
-                    Qty = item.Value.Count()
-                });
-            }
-
             responseSummaryBo.Source = commonBo.Source;
             responseSummaryBo.Type = commonBo.Type;
             responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.InStationRequestBos.Select(s => s.VehicleCode).Count() : responseBos.Count;
@@ -500,10 +484,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                  _manuSfcRepository.InStationManuSfcByIdAsync(data.InStationManuSfcByIdCommands),
 
                 // 插入 manu_sfc_step 状态为 进站
-                _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities),
-
-                // 更新工单的 InputQty
-                _planWorkOrderRepository.UpdateInputQtyByWorkOrderIdsAsync(data.UpdateQtyCommands)
+                _manuSfcStepRepository.InsertRangeAsync(data.SFCStepEntities)
             };
 
             // 等待所有任务完成

@@ -1,9 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -70,11 +67,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 
         /// </summary>
         public IEnumerable<ManuSfcStepEntity>? SFCStepEntities { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyCommands { get; set; } = new();
 
         /// <summary>
         /// 更新条码表
