@@ -1129,7 +1129,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     BadRecordId = badRecordEntity.Id,
                     UnqualifiedId = badRecordEntity.UnqualifiedId,
                     NGCode = s,
-                    Remark = remark.ToString(),
+                    Remark = "",
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
