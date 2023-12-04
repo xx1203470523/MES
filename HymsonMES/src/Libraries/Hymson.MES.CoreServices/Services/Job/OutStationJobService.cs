@@ -353,6 +353,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ProcedureId = procProcedureEntity.Id,
                 ProcedureCode = procProcedureEntity.Code,
                 Cycle = procProcedureEntity.Cycle ?? 1,
+                Type = procProcedureEntity.Type,
                 IsRejudge = procProcedureEntity.IsRejudge ?? TrueOrFalseEnum.No,
                 IsValidNGCode = procProcedureEntity.IsValidNGCode ?? TrueOrFalseEnum.No
             };
@@ -804,6 +805,14 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
+
+            //只有【测试】类型工序才允许不合格出站，请检查【工序维护】！
+            if (procedureRejudgeBo.Type != ProcedureTypeEnum.Test)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES17118))
+                    .WithData("Procedure", procedureRejudgeBo.ProcedureCode)
+                    .WithData("Type", procedureRejudgeBo.Type.GetDescription());
+            }
 
             // 检查不合格代码信息是否为空
             if (requestBo.OutStationUnqualifiedList == null || !requestBo.OutStationUnqualifiedList.Any())

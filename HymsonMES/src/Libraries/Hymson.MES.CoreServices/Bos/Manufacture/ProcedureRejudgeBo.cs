@@ -44,6 +44,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         public int Cycle { get; set; }
 
         /// <summary>
+        /// 类型
+        /// </summary>
+        public ProcedureTypeEnum Type { get; set; }
+
+        /// <summary>
         /// 是否复判
         /// </summary>
         public TrueOrFalseEnum IsRejudge { get; set; }
