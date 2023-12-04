@@ -14,6 +14,12 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using System.Security.Policy;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Report.Excel;
+using Hymson.MES.Services.Dtos.Report;
+using Hymson.Excel.Abstractions;
+using Hymson.Minio;
+using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.QualificationRateReport
 {
@@ -51,6 +57,9 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
+        private readonly IMinioService _minioService;
+        private readonly IExcelService _excelService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -60,11 +69,15 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
         /// <param name="planWorkOrderRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
+        /// <param name="minioService"></param>
+        /// <param name="excelService"></param>
         public QualificationRateReportService(ICurrentUser currentUser, ICurrentSite currentSite, 
             IQualificationRateReportRepository qualificationRateReportRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcMaterialRepository procMaterialRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IProcProcedureRepository procProcedureRepository,
+            IMinioService minioService,
+            IExcelService excelService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -72,6 +85,8 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
             _planWorkOrderRepository = planWorkOrderRepository;
             _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
+            _minioService = minioService;
+            _excelService = excelService;
         }
 
         /// <summary>
@@ -165,6 +180,49 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                 Label = $"【{s.Code}】 {s.Name}",
                 Value = $"{s.Id}"
             });
+        }
+
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<ExportResultDto> ExportExcelAsync(QualificationRateReportPagedQueryDto queryDto)
+        {
+            string fileName = string.Format("({0})合格率报表", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            queryDto.PageIndex = 1;
+            queryDto.PageSize = 1000000;
+
+            var pageData = await GetPagedListAsync(queryDto);
+
+            List<QualificationRateExportDto> exportExcels = new();
+
+            foreach (var item in pageData.Data)
+            {
+                QualificationRateExportDto exportExcel = new()
+                {
+                    OrderCode = item.OrderCode,
+                    MaterialName = item.MaterialName,
+                    ProcedureName = item.ProcedureName,
+                    StartOn = item.StartOn,
+                    EndOn = item.EndOn,
+                    QualifiedQuantity = Math.Round(item.QualifiedQuantity),
+                    UnQualifiedQuantity = Math.Round(item.UnQualifiedQuantity),
+                    QualifiedRate = Math.Round(item.QualifiedRate, 2)
+                };
+
+                exportExcels.Add(exportExcel);
+            }
+
+            var filePath = await _excelService.ExportAsync(exportExcels, fileName);
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ExportResultDto
+            {
+                FileName = fileName,
+                Path = uploadResult.AbsoluteUrl,
+                RelativePath = uploadResult.RelativeUrl
+            };
         }
     }
 }

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.QualificationRateReport;
 
 namespace Hymson.MES.Services.Services.QualificationRateReport
@@ -21,5 +22,12 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<SelectOptionDto>> GetProcdureListAsync();
+
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<ExportResultDto> ExportExcelAsync(QualificationRateReportPagedQueryDto queryDto);
     }
 }

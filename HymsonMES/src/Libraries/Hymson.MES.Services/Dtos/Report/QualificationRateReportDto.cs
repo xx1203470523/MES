@@ -1,4 +1,8 @@
+using Confluent.Kafka;
+using Hymson.Excel.Abstractions.Attributes;
 using Hymson.Infrastructure;
+using Mysqlx.Crud;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.QualificationRateReport
 {
@@ -74,4 +78,59 @@ namespace Hymson.MES.Services.Dtos.QualificationRateReport
         public DateTime[]? Date { get; set;}
     }
 
+    /// <summary>
+    /// 合格率报表导出
+    /// </summary>
+    [SheetDescription("合格率报表")]
+    public record QualificationRateExportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 工单号
+        /// </summary>
+        [EpplusTableColumn(Header = "工单号", Order = 1)]
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        [EpplusTableColumn(Header = "物料名称", Order = 2)]
+        public string? MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        [EpplusTableColumn(Header = "工序名称", Order = 3)]
+        public string? ProcedureName { get; set; }
+
+        /// <summary>
+        /// 开始时间
+        /// </summary>
+        [EpplusTableColumn(Header = "开始时间", Order = 4)]
+        public string? StartOn { get; set; }
+
+        /// <summary>
+        /// 截至时间
+        /// </summary>
+        [EpplusTableColumn(Header = "结束时间", Order = 5)]
+        public string? EndOn { get; set; }
+
+        /// <summary>
+        /// 合格数
+        /// </summary>
+        [EpplusTableColumn(Header = "合格数", Order = 6)]
+        public decimal? QualifiedQuantity { get; set; }
+
+        /// <summary>
+        /// 不合格数
+        /// </summary>
+        [EpplusTableColumn(Header = "不合格数", Order = 7)]
+        public decimal? UnQualifiedQuantity { get; set; }
+
+        /// <summary>
+        /// 合格率
+        /// </summary>
+        [EpplusTableColumn(Header = "合格率", Order = 8)]
+        public decimal? QualifiedRate { get; set; }
+
+    }
 }

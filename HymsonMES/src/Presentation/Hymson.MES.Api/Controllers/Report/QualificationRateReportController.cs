@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.QualificationRateReport;
+using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.QualificationRateReport;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +61,17 @@ namespace Hymson.MES.Api.Controllers.QualificationRateReport
         public async Task<IEnumerable<SelectOptionDto>> GetProcdureInfoAsync()
         {
             return await _qualificationRateReportService.GetProcdureListAsync();
+        }
+
+        /// <summary>
+        /// 报表-产能报表：导出
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        public async Task<ExportResultDto> ExportExcelAsync([FromQuery] QualificationRateReportPagedQueryDto pageQueryDto)
+        {
+            return await _qualificationRateReportService.ExportExcelAsync(pageQueryDto);
         }
     }
 }
