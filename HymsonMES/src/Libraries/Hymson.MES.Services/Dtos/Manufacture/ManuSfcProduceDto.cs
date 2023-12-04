@@ -720,7 +720,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public int Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工单
@@ -815,7 +815,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 操作类型
         /// </summary>
-        public SfcStatusEnum Type { get; set; }
+        public SfcStepControlEnum Type { get; set; }
 
         /// <summary>
         /// 备注

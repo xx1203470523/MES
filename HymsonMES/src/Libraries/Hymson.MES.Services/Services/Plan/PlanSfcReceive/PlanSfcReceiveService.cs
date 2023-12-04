@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Plan
                         }
                         qty = whMaterialInventoryEntity.QuantityResidue;
                     }
-                    if (manuSfcEntity != null &&  ManuSfcStatus.sfcStatusInProcess.Contains(manuSfcEntity.Status))
+                    if (manuSfcEntity != null &&  ManuSfcStatus.SfcStatusInProcess.Contains(manuSfcEntity.Status))
                     {
                         var validationFailure = new ValidationFailure();
                         if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -371,7 +371,7 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16128)).WithData("sfc", param.SFC);
 
                 }
-                if (ManuSfcStatus.sfcStatusInProcess.Contains(manuSfcEntity.Status))
+                if (ManuSfcStatus.SfcStatusInProcess.Contains(manuSfcEntity.Status))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16123)).WithData("sfc", param.SFC);
                 }

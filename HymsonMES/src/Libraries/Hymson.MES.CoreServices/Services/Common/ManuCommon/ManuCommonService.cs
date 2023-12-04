@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.Resource;
@@ -25,7 +26,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
     /// <summary>
     /// 生产公共类
     /// </summary>
-    public class ManuCommonService : IManuCommonService
+    public partial class ManuCommonService : IManuCommonService
     {
         /// <summary>
         /// 
@@ -93,6 +94,21 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IInteVehicleTypeRepository _inteVehicleTypeRepository;
 
         /// <summary>
+        /// 条码仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 条码信息仓储
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="localizationService"></param>
@@ -109,18 +125,22 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="inteVehiceFreightStackRepository"></param>
         /// <param name="inteVehicleTypeRepository"></param>
         public ManuCommonService(ILocalizationService localizationService,
-            IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IManuContainerPackRepository manuContainerPackRepository,
-            IEquEquipmentRepository equEquipmentRepository,
-            IProcResourceRepository procResourceRepository,
-            IProcProcedureRepository procProcedureRepository,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcMaterialRepository procMaterialRepository,
-            IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-            IInteVehicleRepository inteVehicleRepository,
-            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
-            IInteVehicleTypeRepository inteVehicleTypeRepository)
+                           IManuSfcProduceRepository manuSfcProduceRepository,
+                           IManuSfcCirculationRepository manuSfcCirculationRepository,
+                           IManuContainerPackRepository manuContainerPackRepository,
+                           IEquEquipmentRepository equEquipmentRepository,
+                           IProcResourceRepository procResourceRepository,
+                           IProcProcedureRepository procProcedureRepository,
+                           IProcBomDetailRepository procBomDetailRepository,
+                           IProcMaterialRepository procMaterialRepository,
+                           IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
+                           IInteVehicleRepository inteVehicleRepository,
+                           IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+                           IInteVehicleTypeRepository inteVehicleTypeRepository,
+                           IManuSfcInfoRepository manuSfcInfoRepository,
+                           IPlanWorkOrderRepository planWorkOrderRepository,
+                           IManuSfcRepository manuSfcRepository
+                           )
         {
             _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -135,8 +155,10 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _inteVehicleTypeRepository = inteVehicleTypeRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _planWorkOrderRepository= planWorkOrderRepository;
+            _manuSfcRepository= manuSfcRepository;
         }
-
 
         /// <summary>
         /// 批量验证条码是否锁定

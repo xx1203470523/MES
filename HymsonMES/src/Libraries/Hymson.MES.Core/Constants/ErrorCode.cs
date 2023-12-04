@@ -932,6 +932,9 @@
         public const string MES16370 = "产品序列码不能为空，请检查参数";
         public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
         public const string MES16372 = "获取不到条码【{SFC}】工序【{code}】的产品参数信息";
+        public const string MES16373 = "产品序列码状态为【{Status}】，不允许操作。";
+        public const string MES16374 = "产品序列码已经被装箱，不允许操作。";
+        public const string MES16375 = "条码不存在。";
         #endregion
 
         #region 工单激活 MES16400

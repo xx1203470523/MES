@@ -453,8 +453,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (responseBo.Rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES16503)).WithData("workorder", data.OrderCode);
             }
 
-          
-
             // 更新数据
             List<Task<int>> tasks = new()
             {

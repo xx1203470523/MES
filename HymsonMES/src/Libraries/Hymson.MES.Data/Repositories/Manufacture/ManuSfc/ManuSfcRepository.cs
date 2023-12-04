@@ -215,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
-            sqlBuilder.Select(@"msp.ProductBOMId,msp.IsScrap,msp.Id,msp.`Lock`,msp.ProcedureId,msp.ProcessRouteId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status
+            sqlBuilder.Select(@"msp.ProductBOMId,msp.IsScrap,msp.Id,msp.`Lock`,msp.ProcedureId,msp.ProcessRouteId,ms.Sfc,msp.LockProductionId,ms.Status 
                                 , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
@@ -525,12 +525,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 获取SFC
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcEntity> GetBySFCAsync(GetBySfcQuery command)
+        public async Task<ManuSfcEntity> GetBySFCAsync(GetBySfcQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, command);
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, query);
         }
 
         /// <summary>

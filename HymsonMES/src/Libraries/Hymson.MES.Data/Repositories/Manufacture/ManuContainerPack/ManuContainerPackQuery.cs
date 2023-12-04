@@ -13,7 +13,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 条码s
         /// </summary>
-        public string?[] LadeBarCodes { get; set; }
+        public IEnumerable<string>  LadeBarCodes { get; set; }
 
         /// <summary>
         /// 站点id

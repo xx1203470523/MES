@@ -191,7 +191,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <param name="sfcs"></param>
         /// <returns></returns>
         [HttpPost("getManuSfcProduceStep")]
-        public async Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)
+        public async Task<IEnumerable<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs)
         {
             return await _manuSfcProduceService.QueryManuSfcProduceStepBySFCsAsync(sfcs);
         }
