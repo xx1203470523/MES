@@ -82,7 +82,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 updateFinishQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Where(w => w.AfterOperationStatus == SfcStatusEnum.Complete).Count(),
+                    Qty = item.Value.Where(w => w.AfterOperationStatus == SfcStatusEnum.Complete && w.Remark == "LastProcedureOutStation").Count(),
                     UpdatedBy = user,
                     UpdatedOn = time
                 });
