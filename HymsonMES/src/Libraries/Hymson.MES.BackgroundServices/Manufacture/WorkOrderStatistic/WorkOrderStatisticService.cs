@@ -4,7 +4,6 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
-using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 
@@ -63,7 +62,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             if (manuSfcStepList == null || !manuSfcStepList.Any()) return;
 
             var user = "WorkOrderStatisticService";
-            var time = HymsonClock.Now();
             List<UpdateQtyByWorkOrderIdCommand> updateInputQtyCommands = new();
             List<UpdateQtyByWorkOrderIdCommand> updateFinishQtyCommands = new();
             var manuSfcStepDic = manuSfcStepList.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
@@ -75,7 +73,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     WorkOrderId = item.Key,
                     Qty = item.Value.Where(w => w.CurrentStatus == SfcStatusEnum.lineUp && w.Remark == "FirstProcedureInStation").Count(),
                     UpdatedBy = user,
-                    UpdatedOn = time
+                    UpdatedOn = item.Value.Min(w => w.CreatedOn)
                 });
 
                 // 产出数量（重复尾工序出站时，要注意数量扣减）
@@ -84,7 +82,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     WorkOrderId = item.Key,
                     Qty = item.Value.Where(w => w.AfterOperationStatus == SfcStatusEnum.Complete && w.Remark == "LastProcedureOutStation").Count(),
                     UpdatedBy = user,
-                    UpdatedOn = time
+                    UpdatedOn = item.Value.Max(w => w.CreatedOn)
                 });
             }
 
