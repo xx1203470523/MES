@@ -3,7 +3,7 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// manu_sfc_info条码状态枚举
+    /// 条码状态枚举
     /// </summary>
     public enum SfcStatusEnum : sbyte
     {

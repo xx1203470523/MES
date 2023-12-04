@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 序号
         /// </summary>
-        public string OrderNumber { get; set; }
+        public int OrderNumber { get; set; }
 
         /// <summary>
         /// 关联点

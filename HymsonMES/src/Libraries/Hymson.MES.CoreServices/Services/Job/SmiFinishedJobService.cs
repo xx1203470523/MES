@@ -215,6 +215,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var manuSfcEntity = manuSFCEntities.FirstOrDefault(s => s.Id == sfcProduceEntity.SFCId);
                 if (manuSfcEntity == null) continue;
 
+                // 条码状态（当前状态）
+                var currentStatus = sfcProduceEntity.Status;
+
                 // 更新条码信息
                 sfcProduceEntity.Status = SfcStatusEnum.Complete;
                 sfcProduceEntity.UpdatedBy = commonBo.UserName;
@@ -230,7 +233,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                 {
                     // 插入 manu_sfc_step 状态为出站（默认值）
                     Operatetype = ManuSfcStepTypeEnum.OutStock,
-                    CurrentStatus = SfcStatusEnum.Complete,
+                    CurrentStatus = currentStatus,
+                    AfterOperationStatus = sfcProduceEntity.Status,
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfcProduceEntity.SFC,
                     ProductId = sfcProduceEntity.ProductId,
@@ -263,7 +267,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     // 标记条码为"在制-完成"
                     manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
                     sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
-                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
                 }
                 else
                 {

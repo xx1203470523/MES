@@ -577,6 +577,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
             if (procProcedureCreateDto.ProcedureJobList != null && procProcedureCreateDto.ProcedureJobList.Count > 0)
             {
+                int index = 1;
                 int i = 0;
                 foreach (var item in procProcedureCreateDto.ProcedureJobList)
                 {
@@ -622,7 +623,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         Id = IdGenProvider.Instance.CreateId(),
                         BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
                         BusinessId = procProcedureEntity.Id,
-                        OrderNumber = "",
+                        OrderNumber = index,
                         LinkPoint = (int)item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
@@ -632,6 +633,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
+                    index++;
                     procedureConfigJobList.Add(relationEntity);
                 }
             }
@@ -788,6 +790,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             List<InteJobBusinessRelationEntity> procedureConfigJobList = new List<InteJobBusinessRelationEntity>();
             if (procProcedureModifyDto.ProcedureJobList != null && procProcedureModifyDto.ProcedureJobList.Count > 0)
             {
+                int index = 1;
                 int i = 0;
                 foreach (var item in procProcedureModifyDto.ProcedureJobList)
                 {
@@ -834,7 +837,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         Id = IdGenProvider.Instance.CreateId(),
                         BusinessType = (int)InteJobBusinessTypeEnum.Procedure,
                         BusinessId = procProcedureEntity.Id,
-                        OrderNumber = "",
+                        OrderNumber = index,
                         LinkPoint = (int)item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
@@ -844,6 +847,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
+                    index++;
                     procedureConfigJobList.Add(relationEntity);
                 }
             }

@@ -52,6 +52,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         }
 
         /// <summary>
+        /// 根据载具Id批量删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByVehicleIdsAsync(long[] vehicleIds)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByVehicleIdsSql, new { VehicleIds = vehicleIds });
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -235,6 +246,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string DeleteSql = "DELETE from `inte_vehicle_freight_stack`  WHERE Id = @Id ";
         const string DeletesSql = "DELETE from `inte_vehicle_freight_stack`  WHERE Id IN @Ids";
+        const string DeleteByVehicleIdsSql = "DELETE from `inte_vehicle_freight_stack`  WHERE VehicleId IN @VehicleIds";
 
         const string GetByIdSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE Id = @Id ";
         const string GetBySFCSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE BarCode = @BarCode ";

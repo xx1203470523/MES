@@ -932,7 +932,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             var mainMaterials = await _procBomDetailRepository.GetByBomIdAsync(requestBo.ProductBOMId);
 
             // 半成品清单
-            responseSummaryBo.SmiFinisheds = mainMaterials.Where(w => w.MaterialId == requestBo.ProductId);
+            if (requestBo.ProductId > 0) responseSummaryBo.SmiFinisheds = mainMaterials.Where(w => w.MaterialId == requestBo.ProductId);
 
             // 未设置物料（克明说化成和返工的是没有投料的）
             if (mainMaterials == null || !mainMaterials.Any()) return responseSummaryBo;
@@ -1143,7 +1143,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             // 需扣减数量 = 用量 * 损耗 * 消耗系数 ÷ 100
             decimal originQty = currentBo.Usages;
-            if (currentBo.Loss.HasValue && currentBo.Loss > 0) originQty *= currentBo.Loss.Value;
+            if (currentBo.Loss.HasValue && currentBo.Loss > 0) originQty *= (1 + currentBo.Loss.Value / 100);
             if (currentBo.ConsumeRatio > 0) originQty *= (currentBo.ConsumeRatio / 100);
 
             // 遍历当前物料的所有的物料库存
@@ -1234,7 +1234,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             }
         }
 
-        
+
         /// <summary>
         /// 转换数量
         /// </summary>

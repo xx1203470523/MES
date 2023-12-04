@@ -697,6 +697,7 @@ namespace Hymson.MES.Services.Services.Process
             if (param.JobList != null && param.JobList.Count > 0)
             {
                 int i = 0;
+                int index = 1;
                 foreach (var item in param.JobList)
                 {
                     i++;
@@ -758,7 +759,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         BusinessId = entity.Id,
                         BusinessType = (int)InteJobBusinessTypeEnum.Resource,
-                        OrderNumber = "",
+                        OrderNumber = index,
                         LinkPoint = (int)item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
@@ -768,6 +769,7 @@ namespace Hymson.MES.Services.Services.Process
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
+                    index++;
                     jobList.Add(job);
                 }
             }
@@ -1055,6 +1057,7 @@ namespace Hymson.MES.Services.Services.Process
             if (param.JobList != null && param.JobList.Count > 0)
             {
                 int i = 0;
+                int index = 1;
                 foreach (var item in param.JobList)
                 {
 
@@ -1117,7 +1120,7 @@ namespace Hymson.MES.Services.Services.Process
                         Id = IdGenProvider.Instance.CreateId(),
                         BusinessId = param.Id,
                         BusinessType = (int)InteJobBusinessTypeEnum.Resource,
-                        OrderNumber = "",
+                        OrderNumber = index,
                         LinkPoint = (int)item.LinkPoint,
                         JobId = item.JobId,
                         IsUse = item.IsUse,
@@ -1127,6 +1130,7 @@ namespace Hymson.MES.Services.Services.Process
                         CreatedBy = userName,
                         UpdatedBy = userName
                     };
+                    index++;
                     addJobList.Add(job);
                 }
             }

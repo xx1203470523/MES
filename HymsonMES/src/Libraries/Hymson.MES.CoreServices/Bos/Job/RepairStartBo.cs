@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
@@ -8,7 +9,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class RepairStartRequestBo : JobBaseBo
     {
-
         /// <summary>
         /// 工序ID
         /// </summary>
@@ -30,10 +30,52 @@ namespace Hymson.MES.CoreServices.Bos.Job
     public class RepairStartResponseBo
     {
         /// <summary>
-        /// 在制
+        /// 在制品信息
         /// </summary>
-        public UpdateProcedureAndResourceCommand UpdateResourceCommand { get; set; } = new UpdateProcedureAndResourceCommand();
+        public ManuSfcProduceEntity SFCProduceEntitiy { get; set; }
 
+        /// <summary>
+        /// 步骤
+        /// </summary>
+        public ManuSfcStepEntity SFCStepEntity { get; set; }
+
+        /// <summary>
+        /// 更新条码表
+        /// </summary>
+        public InStationManuSfcByIdCommand InStationManuSfcByIdCommand { get; set; }
+
+        /// <summary>  
+        /// 更新在制品表
+        /// </summary>
+        public UpdateProduceInStationSFCCommand UpdateProduceInStationSFCCommand { get; set; }
+
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class RepairStartResponseSummaryBo : CommonResponseBo
+    {
+        /// <summary>
+        /// 在制品信息
+        /// </summary>
+        public IEnumerable<ManuSfcProduceEntity>? SFCProduceEntities { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<ManuSfcStepEntity>? SFCStepEntities { get; set; }
+
+        /// <summary>
+        /// 更新条码表
+        /// </summary>
+        public IEnumerable<InStationManuSfcByIdCommand> InStationManuSfcByIdCommands { get; set; } = new List<InStationManuSfcByIdCommand>();
+
+        /// <summary>  
+        /// 更新在制品表
+        /// </summary>
+        public IEnumerable<UpdateProduceInStationSFCCommand> UpdateProduceInStationSFCCommands { get; set; } = new List<UpdateProduceInStationSFCCommand>();
     }
 
 }

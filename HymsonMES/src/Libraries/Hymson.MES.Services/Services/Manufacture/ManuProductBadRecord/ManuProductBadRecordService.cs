@@ -1089,7 +1089,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     var manuSfcUpdateRouteByIdCommand = new ManuSfcUpdateRouteByIdCommand
                     {
                         Id = manuSfcProduceEntity.Id,
-                        Status = manuSfcEntity.Status,
+                        Status = SfcStatusEnum.lineUp,
                         ProcessRouteId = badReJudgmentDto.BadProcessRouteId ?? 0,
                         ProcedureId = processRouteProcedure.ProcedureId,
                         IsRepair = TrueOrFalseEnum.Yes,

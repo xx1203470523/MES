@@ -110,7 +110,6 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<RepairStartRequestBo>, RepairStartJobValidator>();
             services.AddSingleton<AbstractValidator<RepairEndRequestBo>, RepairEndJobValidator>();
             services.AddSingleton<AbstractValidator<PackageIngRequestBo>, PackageIngJobValidator>();
             services.AddSingleton<AbstractValidator<PackageOpenRequestBo>, PackageOpenJobValidator>();

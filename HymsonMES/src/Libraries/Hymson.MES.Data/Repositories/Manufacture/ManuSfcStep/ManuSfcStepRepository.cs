@@ -57,10 +57,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GeListtByStartwaterMarkIdAsync(ManuSfcStepStatisticQuery query)
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartwaterMarkIdAsync(ManuSfcStepStatisticQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ManuSfcStepEntity>(GeListtByStartwaterMarkIdSql, query);
+            return await conn.QueryAsync<ManuSfcStepEntity>(GetListByStartwaterMarkIdSql, query);
         }
 
         /// <summary>
@@ -118,14 +118,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
+        /// <param name="manuSfcStepEntities"></param>
         /// <returns></returns>
-        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntitys)
+        public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities)
         {
-            if (manuSfcStepEntitys == null || !manuSfcStepEntitys.Any()) return 0;
+            if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return 0;
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, manuSfcStepEntitys);
+            return await conn.ExecuteAsync(InsertSql, manuSfcStepEntities);
         }
 
         /// <summary>
@@ -251,38 +251,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
-        const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `manu_sfc_step` /**where**/  ";
-        const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(  `Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertSql = "INSERT INTO manu_sfc_step(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus,Remark,CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string UpdateSql = "UPDATE `manu_sfc_step` SET   SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**where**/  ";
+        const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(`Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO manu_sfc_step(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus, @AfterOperationStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string UpdateSql = "UPDATE `manu_sfc_step` SET SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Operatetype`, `CurrentStatus`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `manu_sfc_step`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Operatetype`, `CurrentStatus`, `Lock`, `IsMultiplex`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `manu_sfc_step`  WHERE Id IN @ids ";
-        const string GeListtByStartwaterMarkIdSql = @"SELECT 
-                                                                 `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                            FROM `manu_sfc_step`  WHERE Id > @StartwaterMarkId    ORDER BY CreatedOn ASC  LIMIT @Rows";
-        const string GetSFCInOutStepSql = @" 
-                        SELECT 
-                           `Id`, `SFC`, `ProductId`, `WorkOrderId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `CurrentStatus`, `Operatetype`, `IsRepair`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
-                        FROM `manu_sfc_step` 
-                        WHERE IsDeleted=0
-                        AND Operatetype in (3,4)
-                        and SFC=@Sfc
-                        AND SiteId=@SiteId 
-                        ORDER BY CreatedOn asc
-                        ";
-        const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY CreatedOn desc LIMIT @Offset,@Rows ";
+        const string GetByIdSql = @"SELECT * FROM `manu_sfc_step`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT *  FROM `manu_sfc_step`  WHERE Id IN @ids ";
+        const string GetListByStartwaterMarkIdSql = @"SELECT * FROM `manu_sfc_step` WHERE Id > @StartwaterMarkId ORDER BY Id ASC LIMIT @Rows";
+        const string GetSFCInOutStepSql = @"SELECT * FROM `manu_sfc_step` 
+                        WHERE IsDeleted = 0
+                        AND Operatetype IN (3, 4)
+                        and SFC = @Sfc
+                        AND SiteId = @SiteId 
+                        ORDER BY Id ASC ";
+        const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY Id desc LIMIT @Offset, @Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
 
         /// <summary>
         /// 获取条码的进站信息
         /// </summary>
-        const string GetSfcsInStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted=0 AND SiteId=@SiteId   AND  Operatetype=3 AND sfc IN @sfcs ";
+        const string GetSfcsInStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 3 AND sfc IN @sfcs ";
+
     }
 }

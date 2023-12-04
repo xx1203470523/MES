@@ -3,7 +3,7 @@
     /// <summary>
     /// 错误码
     /// </summary>
-    public static class ErrorCode
+    public static partial class ErrorCode
     {
         #region  用户端错误 
         public const string MES10100 = "请求实体不能为空";
@@ -121,7 +121,7 @@
         public const string MES10388 = "资源不存在！";
         #endregion
 
-        #region 标签模板 MES10340
+        #region 标签模板 10340
         public const string MES10340 = "模板名称已经存在!";
         public const string MES10341 = "打印机名称重复!";
         public const string MES10342 = "模板名称最大长度为50";
@@ -594,7 +594,6 @@
         #endregion
 
         #region 首检 13200
-
         public const string MES13201 = "生成条件不合法！";
         public const string MES13202 = "工单不能为空！";
         public const string MES13203 = "工序不能为空！";
@@ -686,8 +685,8 @@
         public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
         public const string MES152015 = " 供应商不能为空";
         public const string MES152016 = " 条码：{MaterialCode}已存在！";
-
-
+        public const string MES152017 = " 物料条码【{Code}】不存在！";
+        public const string MES152018 = "只有【待使用】的库存才能上料！";
         #endregion
 
         #region 质量锁定 15300
@@ -750,7 +749,8 @@
 
         #region 物料加载 15500
         public const string MES15501 = "当前线体无激活工单，请先激活工单！";
-        // MES15502-MES15503 已被占用
+        public const string MES15502 = "条码{Code}已被使用！";
+        public const string MES15503 = "条码{Code}不存在！";
         public const string MES15504 = "未找到资源关联的产线！";
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
@@ -916,6 +916,7 @@
         public const string MES16353 = "产品序列码【{SFC}】已被Marking拦截！";
         public const string MES16354 = "产品序列码【{SFC}】当前进站工序【{Current}】，属于应进站工序【{Procedure}】的前面工序，不允许操作。";
         public const string MES16355 = "未找到工序【{ProcedureCode}】关联的资源";
+        public const string MES16356 = "TODO";
         public const string MES16357 = "当前工序是【{Current}】，产品序列码【{SFC}】应在工序【{Procedure}】处排队进站，请检查。";
         public const string MES16358 = "指定的工序【{Procedure}】不存在";
         public const string MES16359 = "产品序列码【{SFC}】由工序【{InProcedure}】进站，与当前出站工序【{OutProcedure}】不一致，不允许出站操作。";
@@ -932,9 +933,18 @@
         public const string MES16370 = "产品序列码不能为空，请检查参数";
         public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
         public const string MES16372 = "获取不到条码【{SFC}】工序【{code}】的产品参数信息";
-        public const string MES16373 = "产品序列码状态为【{Status}】，不允许操作。";
-        public const string MES16374 = "产品序列码已经被装箱，不允许操作。";
-        public const string MES16375 = "条码不存在。";
+
+
+
+        public const string MES16373 = "产品序列码【{SFC}】指定的工单不存在！";
+        public const string MES16374 = "TODO";
+        public const string MES16375 = "TODO";
+        public const string MES16376 = "TODO";
+        public const string MES16377 = "SFC条码{SFC}循环次数超过当前工序的循环次数，不允许操作。";
+        public const string MES16378 = "产品序列码状态为【{Status}】，不允许操作。";
+        public const string MES16379 = "产品序列码已经被装箱，不允许操作。";
+        public const string MES16380 = "条码不存在。";
+        public const string MES16381 = "数据状态不是最新的,请刷新！";
         #endregion
 
         #region 工单激活 MES16400
@@ -1044,6 +1054,7 @@
         public const string MES16900 = "面板操作-生产过站面板错误";
         public const string MES16901 = "没有查找到对应条码的生产信息！";
         public const string MES16902 = "无法将主物料ID转为long类型！";
+        public const string MES16903 = "当前工序与条码生产信息中的不一致！";
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
 
@@ -1333,6 +1344,11 @@
         public const string MES18626 = "载具编码【{Code}】未绑定任何条码，具体请查看【载具绑定解绑】！";
         public const string MES18627 = "载具类型【{Code}】已禁用，具体请查看【载具类型】！";
         public const string MES18628 = "载具编码【{Code}】装载的产品序列码物料编码/版本不一致，具体请查看【载具绑定解绑】！";
+
+        // MES18629 - MES18641
+
+        public const string MES18642 = "存在不符合要求的条码，解绑失败！";
+        public const string MES18643 = "载具条码列表为空，解绑失败！";
         #endregion
 
         #region Recipe参数 18700
@@ -1369,14 +1385,18 @@
         public const string MES18801 = "单位名称不能为空";
         #endregion
 
+        #region 配方维护 18850
+        public const string MES18851 = "工艺配方编码已存在";
+        public const string MES18852 = "工艺配方已存在同一的产品、工序、工艺设备组数据";
+        #endregion
+
         #region 工艺设备组 18900
         public const string MES18900 = "此编码{Code}在系统已经存在!";
         public const string MES18901 = "工艺设备组编码不允许有空格";
         public const string MES18902 = "工艺设备组名称不能为空";
-        public const string MES18903 = "请求实体不能为空！";
+        public const string MES18903 = "工艺设备组：未找到指定的工艺设备组！";
         public const string MES18904 = "工序与设备组对应关系不唯一";
         #endregion
-
 
         #region 设备对接错误
 
@@ -1389,6 +1409,7 @@
         public const string MES19006 = "资源编码不存在";
         public const string MES19007 = "SFC条码不允许重复";
         public const string MES19008 = "资源不匹配";
+        public const string MES19009 = "产品序列码【{SFC}】已经存在";
         #endregion
 
         public const string MES19101 = "条码列表不能为空";
@@ -1437,6 +1458,10 @@
         public const string MES19144 = "Location不能为空";
         public const string MES19145 = "模组对应型号编码ModelCode不能为空";
         public const string MES19146 = "条码：{SFCS}已被绑过其他条码";
+        public const string MES19147 = "资源：{ResourceCode}未找到激活的工单信息";
+        public const string MES19148 = "配方上传：配方集合不能为空";
+        public const string MES19149 = "配方校验：存在未接收的配方,校验失败，上位机请停止生产。";
+        public const string MES19150 = "配方校验：未找到指定配方,校验失败，上位机请停止生产。";
 
         #region 产品参数采集
         public const string MES19600 = "产品参数采集异常";
@@ -1448,7 +1473,7 @@
         public const string MES19606 = "参数{ParameterCodes}不存在";
         #endregion
 
-
+        #region 设备对接错误
         public const string MES19910 = "资源：{ResCode}和设备：{EquCode}不存在绑定关系，请检查配置";
         public const string MES19911 = "资源：{ResourceCode}未找到关联的产线信息";
         public const string MES19912 = "产线：{WorkCenterCode}未找到激活的工单信息";
@@ -1475,6 +1500,8 @@
         public const string MES19933 = "条码：{SFC}在{Procedure}工序状态为{Status}，不允许操作";
         public const string MES19934 = "设备{EquipmentCode}不存在";
         public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
+        public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
+        #endregion
 
 
         #endregion

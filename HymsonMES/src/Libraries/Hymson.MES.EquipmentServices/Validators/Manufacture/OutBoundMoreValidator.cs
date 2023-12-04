@@ -16,11 +16,10 @@ namespace Hymson.MES.EquipmentServices.Validators.Manufacture
         {
             // 条码列表不允许为空
             RuleFor(x => x.SFCs).NotEmpty().Must(list => list.Any()).WithErrorCode(ErrorCode.MES19101);
-           
+
             // 每个条码都不允许为空
-            RuleFor(x => x.SFCs).Must(list =>
-                list.Any(c => !string.IsNullOrEmpty(c.SFC.Trim()))).WithErrorCode(ErrorCode.MES19003);
-            
+            RuleFor(x => x.SFCs).Must(list => list.Any(c => !string.IsNullOrEmpty(c.SFC.Trim()))).WithErrorCode(ErrorCode.MES19003);
+
             // 条码不允许重复
             RuleFor(x => x.SFCs).Must(list => list.GroupBy(c => c.SFC.Trim()).Any(c => c.Count() < 2)).WithErrorCode(ErrorCode.MES19007);
 

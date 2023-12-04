@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GeListtByStartwaterMarkIdAsync(ManuSfcStepStatisticQuery query);
+        Task<IEnumerable<ManuSfcStepEntity>> GetListByStartwaterMarkIdAsync(ManuSfcStepStatisticQuery query);
 
         /// <summary>
         /// 获取List
@@ -67,9 +67,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
+        /// <param name="manuSfcStepEntities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities);
 
         /// <summary>
         /// 更新

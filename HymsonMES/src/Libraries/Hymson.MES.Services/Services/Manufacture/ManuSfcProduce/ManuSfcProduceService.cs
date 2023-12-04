@@ -1627,13 +1627,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     switch (item.Status)
                     {
                         case SfcStatusEnum.lineUp:
-                            manuSfcProduceStep.lineUpNumber += 1;
+                            manuSfcProduceStep.LineUpNumber += 1;
                             break;
                         case SfcStatusEnum.Activity:
-                            manuSfcProduceStep.activityNumber += 1;
+                            manuSfcProduceStep.ActivityNumber += 1;
                             break;
                         case SfcStatusEnum.InProductionComplete:
-                            manuSfcProduceStep.completeNumber += 1;
+                            manuSfcProduceStep.CompleteNumber += 1;
                             break;
                         default:
                             validationFailure.ErrorCode = nameof(ErrorCode.MES18001);
@@ -1661,7 +1661,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         validationFailures.Add(validationFailure);
                         continue;
                     }
-                    manuSfcProduceStep.completeNumber += 1;
+                    manuSfcProduceStep.CompleteNumber += 1;
                 }
             }
 
@@ -1733,7 +1733,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item);
                     }
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES16375);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16380);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
@@ -1750,7 +1750,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", manuSfcEntity.SFC);
                     }
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES16373);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16378);
                     validationFailure.FormattedMessagePlaceholderValues.Add("Status", _localizationService.GetResource($"Hymson.MES.Core.Enums.manu.SfcStatusEnum.{SfcStatusEnum.GetName(manuSfcEntity.Status)}"));
                     validationFailures.Add(validationFailure);
                     continue;
@@ -1768,7 +1768,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", manuSfcEntity.SFC);
                     }
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES16374);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES16379);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
@@ -1981,8 +1981,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 var row = await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
                 if (row != manuSfcUpdateStatusByIdCommands.Count)
-                { 
-                
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16381));
                 }
             }
 
@@ -2566,7 +2566,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.Activity
+                Status = SfcStatusEnum.Activity
             });
 
             //实体到DTO转换 装载数据
@@ -2642,7 +2642,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.Activity
+                Status = SfcStatusEnum.Activity
             });
 
             if (!sfcProduceList.Any()) return activityVehicleViewDtos;
@@ -2735,7 +2735,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 ProcedureId = query.ProcedureId,
                 //ResourceId = query.ResourceId,
-                Status = SfcProduceStatusEnum.lineUp,
+                Status = SfcStatusEnum.lineUp,
 
                 MaterialCode = query.MaterialCode,
                 MaterialVersion = query.MaterialVersion,

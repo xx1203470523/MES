@@ -54,6 +54,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
+        /// 根据载具Id批量删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<int> DeleteByVehicleIdsAsync(long[] vehicleIds);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>

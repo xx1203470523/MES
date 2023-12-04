@@ -857,15 +857,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 排队数量
         /// </summary>
-        public int lineUpNumber { get; set; }
+        public int LineUpNumber { get; set; }
         /// <summary>
         /// 活动数量
         /// </summary>
-        public int activityNumber { get; set; }
+        public int ActivityNumber { get; set; }
         /// <summary>
         /// 完工数量
         /// </summary>
-        public int completeNumber { get; set; }
+        public int CompleteNumber { get; set; }
     }
 
     /// <summary>

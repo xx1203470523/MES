@@ -6,7 +6,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 工序复投
     /// </summary>
-    public class ProcedureRejudgeBo
+    public record ProcedureRejudgeBo
     {
         /// <summary>
         /// 工厂Id

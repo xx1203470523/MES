@@ -31,6 +31,7 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -359,6 +360,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 填充其他设置
             procedureRejudgeBo = await FillingProcedureRejudgeBoAsync(procedureRejudgeBo);
+            _logger.LogInformation($"FillingProcedureRejudgeBoAsync -> ", procedureRejudgeBo.ToSerialize());
 
             // 遍历所有条码
             var responseBos = new List<OutStationResponseBo>();
@@ -370,6 +372,9 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 var manuSfcEntity = manuSFCEntities.FirstOrDefault(s => s.Id == sfcProduceEntity.SFCId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
+
+                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcProduceEntity.WorkOrderId)
+                    ?? throw new CustomerValidationException(nameof(ErrorCode.MES16373)).WithData("SFC", requestBo.SFC);
 
                 // 单条码返回值
                 var responseBo = new OutStationResponseBo();
@@ -390,13 +395,16 @@ namespace Hymson.MES.CoreServices.Services.Job
                 if (responseBo == null) continue;
 
                 #region 物料消耗明细数据
+                // 判断是否半成品
+                var isSmiFinished = sfcProduceEntity.ProductId != workOrderEntity.ProductId;
+
                 // 组合物料数据（放缓存）
                 var initialMaterialSummary = await commonBo.Proxy.GetValueAsync(_masterDataService.GetInitialMaterialsWithSmiFinishedAsync, new MaterialDeductRequestBo
                 {
                     SiteId = commonBo.SiteId,
                     ProcedureId = commonBo.ProcedureId,
                     ProductBOMId = sfcProduceEntity.ProductBOMId,
-                    ProductId = sfcProduceEntity.ProductId
+                    ProductId = isSmiFinished ? sfcProduceEntity.ProductId : 0
                 });
                 if (initialMaterialSummary == null) continue;
 
@@ -452,7 +460,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 responseBos.Add(responseBo);
             }
 
-            // 归集每个条码的出站结果
+            // 归集每个条码的结果
             if (!responseBos.Any()) return responseSummaryBo;
             responseSummaryBo.SFCEntities = responseBos.Select(s => s.SFCEntity);
             responseSummaryBo.SFCProduceEntities = responseBos.Select(s => s.SFCProduceEntitiy);
@@ -683,12 +691,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ProcedureId = commonBo.ProcedureId,
             });
 
+            // 条码状态（当前状态）
+            var currentStatus = sfcProduceEntity.Status;
+
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
             {
                 // 插入 manu_sfc_step 状态为出站（默认值）
                 Operatetype = ManuSfcStepTypeEnum.OutStock,
-                CurrentStatus = SfcStatusEnum.Activity,
+                CurrentStatus = currentStatus,
                 Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
@@ -725,7 +736,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                 manuSfcEntity.Status = SfcStatusEnum.Complete;
 
                 stepEntity.Operatetype = responseBo.ProcessRouteType == ProcessRouteTypeEnum.UnqualifiedRoute ? ManuSfcStepTypeEnum.RepairComplete : ManuSfcStepTypeEnum.OutStock;    // TODO 这里的状态？？
-                stepEntity.CurrentStatus = SfcStatusEnum.Complete;  // TODO 这里的状态？？
 
                 // 生产主工艺路线才进行入库
                 if (responseBo.ProcessRouteType == ProcessRouteTypeEnum.ProductionRoute)
@@ -789,6 +799,10 @@ namespace Hymson.MES.CoreServices.Services.Job
                 sfcProduceEntity.ResourceId = null;
             }
 
+            // 保存操作后的状态
+            stepEntity.AfterOperationStatus = sfcProduceEntity.Status;
+
+            // 更新信息
             responseBo.SFCEntity = manuSfcEntity;
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
@@ -864,12 +878,15 @@ namespace Hymson.MES.CoreServices.Services.Job
                 ProcedureId = commonBo.ProcedureId,
             });
 
+            // 条码状态（当前状态）
+            var currentStatus = sfcProduceEntity.Status;
+
             // 初始化步骤
             var stepEntity = new ManuSfcStepEntity
             {
                 // 插入 manu_sfc_step 状态为出站（默认值）
                 Operatetype = ManuSfcStepTypeEnum.OutStock,
-                CurrentStatus = SfcStatusEnum.Activity,
+                CurrentStatus = currentStatus,
                 Id = IdGenProvider.Instance.CreateId(),
                 SFC = sfcProduceEntity.SFC,
                 ProductId = sfcProduceEntity.ProductId,
@@ -1047,7 +1064,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     //responseBo.IsCompleted = true;
                     manuSfcEntity.Status = SfcStatusEnum.InProductionComplete;
                     sfcProduceEntity.Status = SfcStatusEnum.InProductionComplete;
-                    stepEntity.CurrentStatus = SfcStatusEnum.InProductionComplete;
                 }
                 // 未完工（置于下工序排队）
                 else
@@ -1071,6 +1087,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
             #endregion
 
+            // 保存操作后的状态
+            stepEntity.AfterOperationStatus = sfcProduceEntity.Status;
+
+            // 更新信息
             responseBo.SFCEntity = manuSfcEntity;
             responseBo.SFCStepEntity = stepEntity;
             responseBo.SFCProduceEntitiy = sfcProduceEntity;
@@ -1078,6 +1098,13 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 如果有标记缺陷
             if (unqualifiedId.HasValue)
             {
+                // 记录下复判相关参数
+                var remark = new StringBuilder();
+                remark.Append($"Cycle:{procedureRejudgeBo.Cycle};");
+                remark.Append($"IsRejudge: {procedureRejudgeBo.IsRejudge};");
+                remark.Append($"IsValidNGCode:{procedureRejudgeBo.IsValidNGCode};");
+                remark.Append($"MarkUnqualifiedId:{procedureRejudgeBo.MarkUnqualifiedId};");
+
                 // 添加不良记录
                 var badRecordEntity = new ManuProductBadRecordEntity
                 {
@@ -1093,7 +1120,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Qty = stepEntity.Qty,
                     Status = productBadRecordStatus,
                     Source = ProductBadRecordSourceEnum.EquipmentReBad,
-                    Remark = stepEntity.Remark,
+                    Remark = remark.ToString(),
                     DisposalResult = disposalResult,
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
@@ -1108,7 +1135,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     BadRecordId = badRecordEntity.Id,
                     UnqualifiedId = badRecordEntity.UnqualifiedId,
                     NGCode = s,
-                    Remark = stepEntity.Remark,
+                    Remark = "",
                     CreatedBy = commonBo.UserName,
                     UpdatedBy = commonBo.UserName
                 });
@@ -1143,7 +1170,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 取得半成品的总数量
             var smiFinishedUsages = 1m;
-            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+            if (summaryBo.SmiFinisheds != null && summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
 
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
@@ -1152,11 +1179,11 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 if (manuFeedingsDictionary == null) continue;
 
-                // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
-                // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
+                // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100)
+                // 需扣减数量 = 产出数量 * 物料用量 * (1 + 物料损耗%) * 物料消耗系数 ÷ 100（因为每次不一定是只产出一个，所以也要*数量）
                 decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value / 100);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 /*

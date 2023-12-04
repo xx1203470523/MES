@@ -191,34 +191,29 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <summary>
         /// 执行作业
         /// </summary>
-        /// <param name="manuFacePlateRepairExJobDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="CustomerValidationException"></exception>
-        public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteJobAsync(ManuFacePlateRepairExJobDto manuFacePlateRepairExJobDto)
+        public async Task<List<ManuFacePlateRepairButJobReturnTypeEnum>> ExecuteJobAsync(ManuFacePlateRepairExJobDto dto)
         {
-            #region  验证数据
-            if (string.IsNullOrWhiteSpace(manuFacePlateRepairExJobDto.SFC))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17303));
-            }
-            #endregion
+            if (string.IsNullOrWhiteSpace(dto.SFC)) throw new CustomerValidationException(nameof(ErrorCode.MES17303));
 
             #region 调用作业
             var jobDto = new ButtonRequestDto
             {
-                FacePlateId = manuFacePlateRepairExJobDto.FacePlateId,
-                FacePlateButtonId = manuFacePlateRepairExJobDto.FacePlateButtonId
+                FacePlateId = dto.FacePlateId,
+                FacePlateButtonId = dto.FacePlateButtonId
             };
 
             JobRequestBo bo = new()
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 UserName = _currentUser.UserName,
-                ProcedureId = manuFacePlateRepairExJobDto.ProcedureId,
-                ResourceId = manuFacePlateRepairExJobDto.ResourceId,
-                SFCs = new string[] { manuFacePlateRepairExJobDto.SFC },   // 这句后面要改
-                InStationRequestBos = new List<InStationRequestBo> { new InStationRequestBo { SFC = manuFacePlateRepairExJobDto.SFC } },
-                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = manuFacePlateRepairExJobDto.SFC } }
+                ProcedureId = dto.ProcedureId,
+                ResourceId = dto.ResourceId,
+                SFCs = new string[] { dto.SFC },   // 这句后面要改
+                PanelRequestBos = new List<PanelRequestBo> { new PanelRequestBo { SFC = dto.SFC } },
+                InStationRequestBos = new List<InStationRequestBo> { new InStationRequestBo { SFC = dto.SFC } },
+                OutStationRequestBos = new List<OutStationRequestBo> { new OutStationRequestBo { SFC = dto.SFC } }
             };
 
             var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
