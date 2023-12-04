@@ -806,7 +806,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (commonBo == null) return default;
             if (commonBo.Proxy == null) return default;
 
-            //只有【测试】类型工序才允许不合格出站，请检查【工序维护】！
+            // 只有【测试】类型工序才允许不合格出站，请检查【工序维护】！
             if (procedureRejudgeBo.Type != ProcedureTypeEnum.Test)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17118))

@@ -21,7 +21,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 编码（工序）
         /// </summary>
-        public string ProcedureCode { get; set; }
+        public string ProcedureCode { get; set; } = "";
 
         /// <summary>
         /// 是否有设置不合格工艺路线
@@ -36,7 +36,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// <summary>
         /// 编码（下工序）
         /// </summary>
-        public string NextProcedureCode { get; set; }
+        public string NextProcedureCode { get; set; } = "";
 
         /// <summary>
         /// 循环次数 
