@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码步骤表    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  zhaoqing
- *build datetime: 2023-03-22 05:17:57
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
@@ -78,6 +71,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 当前状态
         /// </summary>
         public SfcStatusEnum CurrentStatus { get; set; }
+
+        /// <summary>
+        /// 操作后状态
+        /// </summary>
+        public SfcStatusEnum AfterOperationStatus { get; set; }
 
         /// <summary>
         /// 复投次数
