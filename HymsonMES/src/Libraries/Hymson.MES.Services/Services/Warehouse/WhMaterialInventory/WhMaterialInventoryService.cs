@@ -27,7 +27,6 @@ using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -211,7 +210,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 whMaterialInventoryEntity.MaterialId = materialInfo.Id;
                 whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
                 whMaterialInventoryEntity.Batch = item.Batch;
-                whMaterialInventoryEntity. MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts;
+                whMaterialInventoryEntity.MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts;
                 whMaterialInventoryEntity.QuantityResidue = item.QuantityResidue;
                 whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
                 whMaterialInventoryEntity.DueDate = item.DueDate;
@@ -398,8 +397,14 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialInventoryDto?> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
         {
-            var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = barCode });
-            if (entity == null) return null;
+            var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+            {
+                SiteId = _currentSite.SiteId,
+                BarCode = barCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES152017)).WithData("Code", barCode);
+
+            // 只有【待使用】的库存才能上料！
+            if (entity.Status != WhMaterialInventoryStatusEnum.ToBeUsed) throw new CustomerValidationException(nameof(ErrorCode.MES152018));
 
             return entity.ToModel<WhMaterialInventoryDto>();
         }

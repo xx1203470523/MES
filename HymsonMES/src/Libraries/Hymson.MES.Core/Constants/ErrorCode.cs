@@ -685,8 +685,8 @@
         public const string MES152014 = " 条码：{MaterialCode}在车间库存中已存在！";
         public const string MES152015 = " 供应商不能为空";
         public const string MES152016 = " 条码：{MaterialCode}已存在！";
-
-
+        public const string MES152017 = " 物料条码【{Code}】不存在！";
+        public const string MES152018 = "只有【待使用】的库存才能上料！";
         #endregion
 
         #region 质量锁定 15300
