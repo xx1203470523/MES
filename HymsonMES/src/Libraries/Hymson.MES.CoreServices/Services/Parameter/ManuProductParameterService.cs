@@ -58,7 +58,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param)
         {
-            return await _manuProductParameterRepository.GetProductParameterByProcedureIdEntities(new ManuProductParameterByProcedureIdQuery
+            return await _manuProductParameterRepository.GetProductParameterByProcedureIdEntitiesAsync(new ManuProductParameterByProcedureIdQuery
             {
                 ProcedureId = param.ProcedureId,
                 SiteId = param.SiteId,
@@ -126,7 +126,7 @@ namespace Hymson.MES.CoreServices.Services.Parameter
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCListAsync(QueryParameterByProcedureDto param)
         {
-            return await _manuProductParameterRepository.GetProductParameterBySFCEntities(new ManuProductParameterBySfcQuery
+            return await _manuProductParameterRepository.GetProductParameterBySFCEntitiesAsync(new ManuProductParameterBySfcQuery
             {
                 SiteId = param.SiteId,
                 SFCs = param.SFCs

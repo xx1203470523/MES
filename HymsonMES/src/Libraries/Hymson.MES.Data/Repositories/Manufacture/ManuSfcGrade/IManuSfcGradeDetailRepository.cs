@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 条码档位明细表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-07-27 01:54:27
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;

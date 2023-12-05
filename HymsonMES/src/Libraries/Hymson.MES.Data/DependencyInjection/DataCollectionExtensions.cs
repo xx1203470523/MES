@@ -32,9 +32,9 @@ using Microsoft.Extensions.Configuration;
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// 
+    /// 依赖注入服务类
     /// </summary>
-    public static class DataCollectionExtensions
+    public static partial class DataCollectionExtensions
     {
         /// <summary>
         /// 数据层依赖服务注入
@@ -47,6 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddCore();
             AddConfig(services, configuration);
             AddRepository(services);
+            AddRepositoryForXinShiJie(services);
             return services;
         }
 
@@ -293,7 +294,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuSfcGradeRepository, ManuSfcGradeRepository>();
             services.AddSingleton<IManuSfcGradeDetailRepository, ManuSfcGradeDetailRepository>();
-            
+
             #endregion
 
             #region Warehouse 
@@ -346,7 +347,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
+            // 数据库连接
             services.Configure<ConnectionOptions>(configuration.GetSection(nameof(ConnectionOptions)));
             services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
             return services;

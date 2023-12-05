@@ -1,18 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: esop 文件 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-11-02 02:41:09
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {

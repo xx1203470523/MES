@@ -1,18 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 标准模板打印配置信息 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-10-09 09:13:47
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {

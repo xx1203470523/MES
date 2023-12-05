@@ -43,7 +43,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class ProductBadRecordResponseBo
     {
-
         public bool IsScrapCode { get; set; }
         public List<ManuProductBadRecordEntity> ManuProductBadRecords { get; set; } = new List<ManuProductBadRecordEntity>();
         public List<ManuSfcStepEntity> SfcStepList { get; set; } = new List<ManuSfcStepEntity>();

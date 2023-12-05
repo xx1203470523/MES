@@ -1,18 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 条码档位明细表 仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-07-27 01:54:27
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {

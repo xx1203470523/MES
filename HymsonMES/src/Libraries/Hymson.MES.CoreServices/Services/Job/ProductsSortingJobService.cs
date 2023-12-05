@@ -456,11 +456,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return string.Empty;
             }
 
-            List<SortingRuleGradeDto> list = new();
+            List<SortingRuleGradeBo> list = new();
             foreach (var item in ruleGradeEntities)
             {
                 var gradeDetails = ruleGradeDetailsEntities.Where(x => x.SortingRuleGradeId == item.Id);
-                list.Add(new SortingRuleGradeDto
+                list.Add(new SortingRuleGradeBo
                 {
                     Grade = item.Grade,
                     Remark = item.Remark,

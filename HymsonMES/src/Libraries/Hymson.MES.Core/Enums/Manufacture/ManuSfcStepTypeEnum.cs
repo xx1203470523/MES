@@ -163,20 +163,42 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("录入等级")]
         EnterDowngrading = 31,
+
         /// <summary>
         /// 移除降级
         /// </summary>
         [Description("移除降级")]
         RemoveDowngrading = 32,
+
+        /// <summary>
+        /// Marking
+        /// </summary>
+        [Description("Marking录入")]
+        Marking = 33,
+
+        /// <summary>
+        /// 关闭Marking
+        /// </summary>
+        [Description("关闭Marking")]
+        CloseMarking = 34,
+
         /// <summary>
         /// 产出上报
         /// </summary>
         [Description("产出上报")]
-        OutputReport = 33,
+        OutputReport = 35,
+
         /// <summary>
         /// 供应商条码接收
         /// </summary>
         [Description("供应商条码接收")]
-        SupplierReceive = 34,
+        SupplierReceive = 36,
+
+        /// <summary>
+        /// 部分报废
+        /// </summary>
+        [Description("部分报废")]
+        PartialScrap = 37
+
     }
 }

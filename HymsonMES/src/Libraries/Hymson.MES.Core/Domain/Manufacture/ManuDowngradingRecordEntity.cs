@@ -1,12 +1,4 @@
-/*
- *creator: Karl
- *
- *describe: 降级品录入记录    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  Karl
- *build datetime: 2023-08-10 10:15:49
- */
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
@@ -43,5 +35,20 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 备注
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int SerialNumber { get; set; } = 0;
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 条码信息ID
+        /// </summary>
+        public long? SfcInfoId { get; set; }
     }
 }

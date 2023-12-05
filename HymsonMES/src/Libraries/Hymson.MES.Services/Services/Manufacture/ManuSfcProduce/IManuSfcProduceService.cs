@@ -1,24 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 条码生产信息（物理删除）    服务接口 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Manufacture;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {

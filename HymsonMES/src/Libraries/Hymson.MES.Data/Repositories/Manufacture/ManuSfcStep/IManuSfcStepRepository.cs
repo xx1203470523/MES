@@ -1,26 +1,14 @@
-/*
- *creator: Karl
- *
- *describe: 条码步骤表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-22 05:17:57
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码步骤表仓储接口
     /// </summary>
-    public interface IManuSfcStepRepository
+    public partial interface IManuSfcStepRepository
     {
         /// <summary>
         /// 根据ID获取数据
@@ -78,19 +66,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcStepEntity manuSfcStepEntity);
 
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys);
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        Task<int> DeleteRangeAsync(DeleteCommand command);
+        
 
         /// <summary>
         /// 插入步骤业务表

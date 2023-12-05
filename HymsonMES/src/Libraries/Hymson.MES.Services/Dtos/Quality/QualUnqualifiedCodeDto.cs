@@ -50,6 +50,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long ProcessRouteId { get; set; }
 
         /// <summary>
+        /// 拦截工序Id
+        /// </summary>
+        public long? InterceptProcedureId { get; set; }
+
+        /// <summary>
+        /// 拦截工序编码
+        /// </summary>
+        public string? InterceptProcedureCode { get; set; }
+
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
