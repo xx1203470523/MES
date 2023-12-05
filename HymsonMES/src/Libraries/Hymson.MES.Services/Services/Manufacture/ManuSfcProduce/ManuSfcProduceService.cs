@@ -1834,7 +1834,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Status = SfcStatusEnum.Complete,
                                 CurrentStatus = manuSfcEntity.Status,
                                 UpdatedOn = HymsonClock.Now(),
-                                UpdatedBy = _currentSite.Name
+                                UpdatedBy = _currentUser.UserName
                             });
                             deleteIds.Add(manuSfcProduceEntity.Id);
                         }
@@ -1934,7 +1934,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 Qty = manuSfcEntity.Qty,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
                                 Status = status,
-                                RepeatedCount = 0,
+                                RepeatedCount = status == SfcStatusEnum.lineUp ? 0 : 1,
                                 IsScrap = TrueOrFalseEnum.No,
                                 CreatedBy = _currentUser.UserName,
                                 UpdatedBy = _currentUser.UserName
@@ -1957,11 +1957,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                             updateProduceInStationSFCCommands.Add(new UpdateProduceInStationSFCCommand
                             {
                                 Id = manuSfcProduceEntity.Id,
+                                CurrentStatus = manuSfcEntity.Status,
                                 Status = status,
                                 ProcedureId = sfcProduceStepDto.ProcedureId,
                                 RepeatedCount = 0,
                                 UpdatedOn = HymsonClock.Now(),
-                                UpdatedBy = _currentSite.Name
+                                UpdatedBy = _currentUser.UserName
                             });
                         }
                         break;
