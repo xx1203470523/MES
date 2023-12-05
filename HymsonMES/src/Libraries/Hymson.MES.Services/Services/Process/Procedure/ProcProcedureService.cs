@@ -38,7 +38,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
     /// <summary>
     /// 工序表 服务
     /// </summary>
-    public class ProcProcedureService : IProcProcedureService
+    public partial class ProcProcedureService : IProcProcedureService
     {
         /// <summary>
         /// 当前登录用户对象
@@ -52,6 +52,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// 工序表 仓储
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
+        /// <summary>
+        /// 资源仓储
+        /// </summary>
+        private readonly IProcResourceRepository _resourceRepository;
         /// <summary>
         /// 资源类型仓储
         /// </summary>
@@ -111,6 +115,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         public ProcProcedureService(
             ICurrentUser currentUser, ICurrentSite currentSite,
             IProcProcedureRepository procProcedureRepository,
+            IProcResourceRepository resourceRepository,
             IProcResourceTypeRepository resourceTypeRepository,
             IInteJobBusinessRelationRepository jobBusinessRelationRepository,
             IProcProcedurePrintRelationRepository procedurePrintRelationRepository,
@@ -127,6 +132,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _currentUser = currentUser;
             _currentSite = currentSite;
             _procProcedureRepository = procProcedureRepository;
+            _resourceRepository = resourceRepository;
             _resourceTypeRepository = resourceTypeRepository;
             _jobBusinessRelationRepository = jobBusinessRelationRepository;
             _procedurePrintRelationRepository = procedurePrintRelationRepository;
@@ -236,11 +242,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                         ResTypeName = procResourceType?.ResTypeName ?? ""
                     };
                 }
-               var procProceduresList= await _procProcedureRejudgeRepository.GetEntitiesAsync(new Data.Repositories.Common.Query.EntityByParentIdQuery
-               {
-                   SiteId = _currentSite.SiteId ?? 0,
-                   ParentId = id
-               });
+                var procProceduresList = await _procProcedureRejudgeRepository.GetEntitiesAsync(new Data.Repositories.Common.Query.EntityByParentIdQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    ParentId = id
+                });
                 if (procProceduresList.Any())
                 {
                     var markProcProcedure = procProceduresList.FirstOrDefault(x => x.ProcedureId == id && x.DefectType == RejudgeUnqualifiedCodeEnum.Mark);
@@ -498,10 +504,10 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 foreach (var item in firstUndesirableList)
                 {
                     ProcProcedureRejudgeEntity procedureRejudgeEntity = new ProcProcedureRejudgeEntity();
-                    procedureRejudgeEntity.ProcedureId= procProcedureEntity.Id;
+                    procedureRejudgeEntity.ProcedureId = procProcedureEntity.Id;
                     procedureRejudgeEntity.Id = IdGenProvider.Instance.CreateId();
                     procedureRejudgeEntity.UnqualifiedCodeId = item.Id;
-                    procedureRejudgeEntity.SiteId= siteId;
+                    procedureRejudgeEntity.SiteId = siteId;
                     procedureRejudgeEntity.DefectType = RejudgeUnqualifiedCodeEnum.Block;
                     procedureRejudgeEntity.CreatedBy = userName;
                     procedureRejudgeEntity.UpdatedBy = userName;
@@ -687,7 +693,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 {
                     await _procProcedureRejudgeRepository.InsertRangeAsync(procProcedureRejudgeList);
                 }
-                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql,userName);
+                await _sqlExecuteTaskService.AddTaskAsync(DbName.MES_MASTER_PARAMETER, createProductParameterProcedureCodeTableSql, userName);
                 //提交
                 ts.Complete();
             }
@@ -873,7 +879,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 }
             }
 
-            List<RejudgeUnqualifiedCodeEnum> ids= new List<RejudgeUnqualifiedCodeEnum>();
+            List<RejudgeUnqualifiedCodeEnum> ids = new List<RejudgeUnqualifiedCodeEnum>();
             //工序复判设置
             List<ProcProcedureRejudgeEntity> procProcedureRejudgeList = new List<ProcProcedureRejudgeEntity>();
             var firstUndesirableList = procProcedureModifyDto.Procedure.FirstUndesirableId;
