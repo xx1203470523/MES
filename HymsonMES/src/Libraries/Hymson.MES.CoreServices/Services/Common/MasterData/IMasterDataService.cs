@@ -19,7 +19,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
     /// <summary>
     /// 
     /// </summary>
-    public interface IMasterDataService
+    public partial interface IMasterDataService
     {
         /// <summary>
         /// 获取物料基础信息（带空检查）
@@ -140,6 +140,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="procedureId"></param>
         /// <returns></returns>
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
+
+        /// <summary>
+        /// 获取资源关联的工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>?> GetProcProcedureIdByResourceIdAsync(QueryByIdBo query);
 
         /// <summary>
         /// 获取生产配置中产品id

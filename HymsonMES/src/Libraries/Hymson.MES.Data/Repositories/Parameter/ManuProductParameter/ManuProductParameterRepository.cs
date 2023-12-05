@@ -86,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="param"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntities(ManuProductParameterBySfcQuery param, string tableName)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntitiesAsync(ManuProductParameterBySfcQuery param, string tableName)
         {
             string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {tableName}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
             using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
@@ -98,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCEntities(ManuProductParameterBySfcQuery param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCEntitiesAsync(ManuProductParameterBySfcQuery param)
         {
             var list = new List<ManuProductParameterEntity>();
             var dic = new Dictionary<string, List<string>>();
@@ -133,7 +133,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterByProcedureIdEntities(ManuProductParameterByProcedureIdQuery param)
+        public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterByProcedureIdEntitiesAsync(ManuProductParameterByProcedureIdQuery param)
         {
             var tableNameByProcedureId = GetTableNameByProcedureId(param.SiteId, param.ProcedureId);
             var sqlBuilder = new SqlBuilder();

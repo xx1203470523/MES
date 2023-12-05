@@ -1,11 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Command;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
 {
@@ -14,7 +9,6 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
     /// </summary>
     public interface IManuProductParameterRepository
     {
-
         /// <summary>
         /// 新增
         /// </summary>
@@ -35,21 +29,21 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntities(ManuProductParameterBySfcQuery param, string tableName);
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntitiesAsync(ManuProductParameterBySfcQuery param, string tableName);
 
         /// <summary>
         /// 更具条码获取参数信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCEntities(ManuProductParameterBySfcQuery param);
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySFCEntitiesAsync(ManuProductParameterBySfcQuery param);
 
         /// <summary>
         /// 更具工序获取参数信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterByProcedureIdEntities(ManuProductParameterByProcedureIdQuery param);
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterByProcedureIdEntitiesAsync(ManuProductParameterByProcedureIdQuery param);
 
         /// <summary>
         /// 修改参数值
@@ -65,6 +59,7 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="list"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<ManuProductParameterUpdateCommand> list, string tableName);
+
         /// <summary>
         /// 准备工序维度创建数据库表sql语句
         /// </summary>
@@ -72,5 +67,6 @@ namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
         /// <param name="procedureId"></param>
         /// <returns></returns>
         string PrepareProductParameterProcedureIdTableSql(long siteId, long procedureId);
+
     }
 }

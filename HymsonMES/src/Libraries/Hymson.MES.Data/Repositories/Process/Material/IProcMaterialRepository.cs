@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;

@@ -11,6 +11,11 @@ namespace Hymson.MES.Data.Repositories
     public abstract class BaseRepository
     {
         private readonly ConnectionOptions _connectionOptions;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         protected BaseRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
@@ -57,19 +62,30 @@ namespace Hymson.MES.Data.Repositories
         private readonly Lazy<MySqlConnection> _connection;
         private readonly IOptions<ConnectionOptions> _connectionOptions;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
         public BaseRepositorySingleton(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions;
             _connection = new Lazy<MySqlConnection>(() => new MySqlConnection(_connectionOptions.Value.MESConnectionString));
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         protected async Task<IDbConnection> GetDbConnectionAsync()
         {
             await OpenAsync();
             return _connection.Value;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private async Task OpenAsync()
         {
             if (_connection.Value.State == ConnectionState.Closed)
@@ -78,10 +94,13 @@ namespace Hymson.MES.Data.Repositories
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             GC.SuppressFinalize(this);
         }
-    }
 
+    }
 }

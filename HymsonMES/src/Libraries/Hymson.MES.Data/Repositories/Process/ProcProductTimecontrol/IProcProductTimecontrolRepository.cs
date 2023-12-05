@@ -1,42 +1,50 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
-    /// esop 文件仓储接口
+    /// 产品工序时间仓储接口
     /// </summary>
-    public interface IProcEsopFileRepository
+    public interface IProcProductTimecontrolRepository
     {
         #region 
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procEsopFileEntity"></param>
+        /// <param name="procProductTimecontrolEntity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(ProcEsopFileEntity procEsopFileEntity);
-        
+        Task<int> InsertAsync(ProcProductTimecontrolEntity procProductTimecontrolEntity);
+
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="procEsopFileEntitys"></param>
+        /// <param name="procProductTimecontrolEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ProcEsopFileEntity> procEsopFileEntitys);
+        Task<int> InsertsAsync(List<ProcProductTimecontrolEntity> procProductTimecontrolEntitys);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procEsopFileEntity"></param>
+        /// <param name="procProductTimecontrolEntity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(ProcEsopFileEntity procEsopFileEntity);
-        
+        Task<int> UpdateAsync(ProcProductTimecontrolEntity procProductTimecontrolEntity);
+
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="procEsopFileEntitys"></param>
+        /// <param name="procProductTimecontrolEntitys"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(List<ProcEsopFileEntity> procEsopFileEntitys);
+        Task<int> UpdatesAsync(List<ProcProductTimecontrolEntity> procProductTimecontrolEntitys);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
         /// <summary>
         /// 删除  
@@ -45,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -58,28 +66,28 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcEsopFileEntity> GetByIdAsync(long id);
-    
+        Task<ProcProductTimecontrolEntity> GetByIdAsync(long id);
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcEsopFileEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ProcProductTimecontrolEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
         /// 获取List
         /// </summary>
-        /// <param name="procEsopFileQuery"></param>
+        /// <param name="procProductTimecontrolQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcEsopFileEntity>> GetProcEsopFileEntitiesAsync(ProcEsopFileQuery procEsopFileQuery);
-        
+        Task<IEnumerable<ProcProductTimecontrolEntity>> GetProcProductTimecontrolEntitiesAsync(ProcProductTimecontrolQuery procProductTimecontrolQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="procEsopFilePagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcEsopFileEntity>> GetPagedInfoAsync(ProcEsopFilePagedQuery procEsopFilePagedQuery);
+        Task<PagedInfo<ProcProductTimecontrolView>> GetPagedInfoAsync(ProcProductTimecontrolPagedQuery pagedQuery);
         #endregion
     }
 }

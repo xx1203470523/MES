@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具装载记录仓储类 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-07-24 04:45:45
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;

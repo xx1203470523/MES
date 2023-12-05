@@ -1,10 +1,4 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcGrade.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -28,7 +22,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     /// 档位
     /// </summary>
-    public class SortingRuleGradeDto
+    public class SortingRuleGradeBo
     {
         /// <summary>
         /// 等级

@@ -42,7 +42,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
     /// @author wangkeming
     /// @date 2023-06-06
     /// </summary>
-    public class MasterDataService : IMasterDataService
+    public partial class MasterDataService : IMasterDataService
     {
         /// <summary>
         /// 日志对象
@@ -143,16 +143,31 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// 不合格代码仓储
         /// </summary>
         private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
+        /// <summary>
+        /// 仓储接口（分选规则）
+        /// </summary>
         private readonly IProcSortingRuleRepository _sortingRuleRepository;
+
+        /// <summary>
+        /// 仓储接口（分选规则详情）
+        /// </summary>
+        private readonly IProcSortingRuleDetailRepository _sortingRuleDetailRepository;
 
         /// <summary>
         /// 仓储接口（设备注册）
         /// </summary>
         private readonly IEquEquipmentRepository _equEquipmentRepository;
+
         /// <summary>
         ///产品参数采集
         /// </summary>
         private readonly IManuProductParameterRepository _productParameterRepository;
+
+        /// <summary>
+        /// 仓储接口（产品工序时间）
+        /// </summary>
+        private readonly IProcProductTimecontrolRepository _procProductTimecontrolRepository;
 
         /// <summary>
         /// 构造函数
@@ -177,6 +192,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="inteJobRepository"></param>
         /// <param name="inteJobBusinessRelationRepository"></param>
         /// <param name="qualUnqualifiedCodeRepository"></param>
+        /// <param name="sortingRuleRepository"></param>
+        /// <param name="sortingRuleDetailRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
+        /// <param name="productParameterRepository"></param>
+        /// <param name="procProductTimecontrolRepository"></param>
         public MasterDataService(ILogger<MasterDataService> logger,
             ISequenceService sequenceService,
             IManuSfcRepository manuSfcRepository,
@@ -197,9 +217,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             IInteJobRepository inteJobRepository,
             IInteJobBusinessRelationRepository inteJobBusinessRelationRepository,
             IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
-            IEquEquipmentRepository equEquipmentRepository,
             IProcSortingRuleRepository sortingRuleRepository,
-            IManuProductParameterRepository productParameterRepository)
+            IProcSortingRuleDetailRepository sortingRuleDetailRepository,
+            IEquEquipmentRepository equEquipmentRepository,
+            IManuProductParameterRepository productParameterRepository,
+            IProcProductTimecontrolRepository procProductTimecontrolRepository)
         {
             _logger = logger;
             _sequenceService = sequenceService;
@@ -221,9 +243,11 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
             _inteJobRepository = inteJobRepository;
             _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _equEquipmentRepository = equEquipmentRepository;
             _sortingRuleRepository = sortingRuleRepository;
+            _sortingRuleDetailRepository = sortingRuleDetailRepository;
+            _equEquipmentRepository = equEquipmentRepository;
             _productParameterRepository = productParameterRepository;
+            _procProductTimecontrolRepository = procProductTimecontrolRepository;
         }
 
 
@@ -717,6 +741,23 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
 
             if (resources == null || !resources.Any()) return Array.Empty<long>();
             return resources.Select(s => s.Id);
+        }
+
+        /// <summary>
+        /// 获取资源关联的工序
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>?> GetProcProcedureIdByResourceIdAsync(QueryByIdBo query)
+        {
+            var resourceEntity = await _procResourceRepository.GetByIdAsync(query.QueryId);
+            if (resourceEntity == null) return null;
+
+            return await _procProcedureRepository.GetProcProduresByResourceIdAsync(new ProcProdureByResourceIdQuery
+            {
+                SiteId = query.SiteId,
+                ResourceId = resourceEntity.Id,
+            });
         }
 
         /// <summary>
@@ -1266,7 +1307,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery)
         {
             //获取到条码的参数信息
-            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntities(parameterBySfcQuery);
+            var parameterList = await _productParameterRepository.GetProductParameterBySFCEntitiesAsync(parameterBySfcQuery);
             return parameterList;
         }
 

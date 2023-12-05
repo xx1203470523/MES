@@ -5,7 +5,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
     /// <summary>
     /// 
     /// </summary>
-    public  class ManuProductBadRecordBySfcQuery
+    public partial class ManuProductBadRecordBySfcQuery
     {
         /// <summary>
         /// 不合格记录开关;1、开启  2、关闭
