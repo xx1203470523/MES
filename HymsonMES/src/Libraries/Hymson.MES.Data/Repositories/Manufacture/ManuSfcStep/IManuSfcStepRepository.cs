@@ -78,19 +78,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcStepEntity manuSfcStepEntity);
 
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys);
-
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        Task<int> DeleteRangeAsync(DeleteCommand command);
+        
 
         /// <summary>
         /// 插入步骤业务表

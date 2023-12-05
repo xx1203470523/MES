@@ -1,32 +1,30 @@
 using Dapper;
+using Force.Crc32;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
+using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码步骤表仓储
+    /// 有总表 有按条码分表
     /// </summary>
     public partial class ManuSfcStepRepository : BaseRepository, IManuSfcStepRepository
     {
-        /// <summary>
-        /// 数据库连接
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
 
+        
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions,IOptions<ManuSfcStepTableOptions> options) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
+            _options = options;
         }
 
         /// <summary>
@@ -36,7 +34,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuSfcStepEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcStepEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -47,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcStepEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcStepEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -59,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(ManuSfcStepStatisticQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcStepEntity>(GetListByStartwaterMarkIdSql, query);
         }
 
@@ -82,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = manuSfcStepPagedQuery.PageSize });
             sqlBuilder.AddParameters(manuSfcStepPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuSfcStepEntitiesTask = conn.QueryAsync<ManuSfcStepEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcStepEntities = await manuSfcStepEntitiesTask;
@@ -99,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcStepEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(template.RawSql, manuSfcStepQuery);
             return manuSfcStepEntities;
         }
@@ -111,8 +109,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertAsync(ManuSfcStepEntity manuSfcStepEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, manuSfcStepEntity);
+            using var conn = GetMESDbConnection();
+            //插入主表数据
+            await conn.ExecuteAsync(string.Format(InsertSql, PrepareTableName(manuSfcStepEntity)), manuSfcStepEntity);
+            //插入分表数据
+            return await conn.ExecuteAsync(string.Format(InsertSql, PrepareTableName(manuSfcStepEntity, false)), manuSfcStepEntity);
+
         }
 
         /// <summary>
@@ -123,9 +125,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities)
         {
             if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return 0;
-
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, manuSfcStepEntities);
+            var  keyValuePairs = TableGrouping(manuSfcStepEntities);
+            using var conn = GetMESDbConnection();
+            //插入分表数据
+            foreach (var item in keyValuePairs)
+            {
+                await conn.ExecuteAsync(string.Format(InsertSql, item.Key), item.Value);
+            }
+            //插入主表数据
+            return await conn.ExecuteAsync(string.Format(InsertSql, TEMPLATETABLENAME), manuSfcStepEntities);
         }
 
         /// <summary>
@@ -135,31 +143,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateAsync(ManuSfcStepEntity manuSfcStepEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, manuSfcStepEntity);
+            using var conn = GetMESDbConnection();
+            //插入分表数据
+            await conn.ExecuteAsync(string.Format(UpdateSql, PrepareTableName(manuSfcStepEntity, false)), manuSfcStepEntity);
+            //插入主表数据
+            return await conn.ExecuteAsync(string.Format(UpdateSql, PrepareTableName(manuSfcStepEntity)), manuSfcStepEntity);
         }
 
-        /// <summary>
-        /// 批量更新
-        /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, manuSfcStepEntitys);
-        }
-
-        /// <summary>
-        /// 批量删除（软删除）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteRangeAsync(DeleteCommand command)
-        {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, command);
-        }
+       
 
         #region 业务表
         /// <summary>
@@ -169,7 +160,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertSfcStepBusinessAsync(MaunSfcStepBusinessEntity maunSfcStepBusinessEntitie)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSfcStepBusinessSql, maunSfcStepBusinessEntitie);
         }
 
@@ -180,7 +171,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertSfcStepBusinessRangeAsync(IEnumerable<MaunSfcStepBusinessEntity> maunSfcStepBusinessEntities)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSfcStepBusinessSql, maunSfcStepBusinessEntities);
         }
         #endregion
@@ -192,8 +183,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SfcInOutStepQuery sfcQuery)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSFCInOutStepSql, sfcQuery);
+            using var conn = GetMESDbConnection();
+            //走分表查询
+            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetSFCInOutStepSql, PrepareTableName(sfcQuery.SiteId, sfcQuery.Sfc, false)), sfcQuery);
             return manuSfcStepEntities;
 
         }
@@ -222,7 +214,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = queryParam.PageSize });
             sqlBuilder.AddParameters(queryParam);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuSfcStepEntitiesTask = conn.QueryAsync<ManuSfcStepEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuSfcStepEntities = await manuSfcStepEntitiesTask;
@@ -237,11 +229,85 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInStepAsync(SfcInStepQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(GetSfcsInStepSql, query);
             return manuSfcStepEntities;
 
         }
+        #region private
+        /// <summary>
+        /// 模板表名称
+        /// </summary>
+        public const string TEMPLATETABLENAME = "manu_sfc_step";
+        private readonly IOptions<ManuSfcStepTableOptions> _options;
+
+        /// <summary>
+        /// 根据站点id和条码计算分表索引值
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        private uint CalculateTableIndex(long siteId, string sfc)
+        {
+            var crc32 = CalculateCrc32($"{siteId}{sfc}");
+            return crc32 % _options.Value.Divides;
+        }
+        /// <summary>
+        /// 根据实体列表对数据进行按表名分组
+        /// </summary>
+        /// <param name="manuSfcStepEntities"></param>
+        /// <returns></returns>
+        private Dictionary<string, IEnumerable<ManuSfcStepEntity>> TableGrouping(IEnumerable<ManuSfcStepEntity> manuSfcStepEntities)
+        {
+            Dictionary<string, IEnumerable<ManuSfcStepEntity>> keyValuePairs = new Dictionary<string, IEnumerable<ManuSfcStepEntity>>();
+            foreach (var  manuSfcStepEntity in manuSfcStepEntities)
+            {
+                var tableName = PrepareTableName(manuSfcStepEntity,false);
+                if (!keyValuePairs.TryAdd(tableName, new List<ManuSfcStepEntity>() { manuSfcStepEntity }))
+                {
+                    keyValuePairs[tableName].Append(manuSfcStepEntity);
+                }
+            }
+            return keyValuePairs;
+        }
+        /// <summary>
+        /// 根据主表和分表拼接表名
+        /// </summary>
+        /// <param name="manuSfcStepEntity"></param>
+        /// <param name="isMaster"></param>
+        /// <returns></returns>
+        private string PrepareTableName(ManuSfcStepEntity manuSfcStepEntity, bool isMaster=true)
+        {
+            if (isMaster)
+                return TEMPLATETABLENAME;
+            var tableIndex = CalculateTableIndex(manuSfcStepEntity.SiteId, manuSfcStepEntity.SFC);
+            return $"{TEMPLATETABLENAME}_{tableIndex}";
+        }
+        /// <summary>
+        /// 根据站点id和条码组装表名
+        /// </summary>
+        /// <param name="siteId"></param>
+        /// <param name="sfc"></param>
+        /// <param name="isMaster"></param>
+        /// <returns></returns>
+        private string PrepareTableName(long siteId,string sfc, bool isMaster = true)
+        {
+            if (isMaster)
+                return TEMPLATETABLENAME;
+            var tableIndex = CalculateTableIndex(siteId, sfc);
+            return $"{TEMPLATETABLENAME}_{tableIndex}";
+        }
+        /// <summary>
+        /// crc32算法
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        private uint CalculateCrc32(string input)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            return Crc32Algorithm.Compute(bytes);
+        }
+        #endregion
     }
 
     /// <summary>
@@ -253,13 +319,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
         const string GetManuSfcStepEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**where**/  ";
         const string InsertSfcStepBusinessSql = "INSERT INTO `manu_sfc_step_business`(`Id`, `SiteId`, `SfcStepId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcStepId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertSql = "INSERT INTO manu_sfc_step(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus, @AfterOperationStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string UpdateSql = "UPDATE `manu_sfc_step` SET SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `{0}`(Id, SFC, ProductId, WorkOrderId, WorkCenterId, ProductBOMId, Qty, EquipmentId, VehicleCode, ResourceId, ProcedureId, Operatetype, CurrentStatus, AfterOperationStatus, Remark, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted, SiteId) VALUES (   @Id, @SFC, @ProductId, @WorkOrderId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @VehicleCode, @ResourceId, @ProcedureId, @Operatetype, @CurrentStatus, @AfterOperationStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string UpdateSql = "UPDATE `{0}` SET SFC = @SFC, ProductId = @ProductId, WorkOrdeId = @WorkOrdeId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, Qty = @Qty, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Type = @Type, Status = @Status, Lock = @Lock, IsMultiplex = @IsMultiplex, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_step`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT *  FROM `manu_sfc_step`  WHERE Id IN @ids ";
         const string GetListByStartwaterMarkIdSql = @"SELECT * FROM `manu_sfc_step` WHERE Id > @StartwaterMarkId ORDER BY Id ASC LIMIT @Rows";
-        const string GetSFCInOutStepSql = @"SELECT * FROM `manu_sfc_step` 
+        const string GetSFCInOutStepSql = @"SELECT * FROM `{0}` 
                         WHERE IsDeleted = 0
                         AND Operatetype IN (3, 4)
                         and SFC = @Sfc
