@@ -1,9 +1,8 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 
-namespace Hymson.MES.Services.Validators.Equipment
+namespace Hymson.MES.CoreServices.Validators
 {
     /// <summary>
     /// 条码转换 验证

@@ -14,7 +14,6 @@ using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.CoreServices.Validators;
-using Hymson.MES.Services.Validators.Equipment;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +22,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
     /// <summary>
     /// 依赖注入项配置
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static partial class ServiceCollectionExtensions
     {
         /// <summary>
         /// 业务逻辑层依赖服务添加
@@ -36,9 +35,15 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSequenceService(configuration);
             services.AddMessagePushService(configuration);
             services.AddData(configuration);
+
             AddManuServices(services);
+            AddManuServicesForXinShiJie(services);
+
             AddIntegratedServices(services);
+
             AddValidators(services);
+            AddValidatorsForXinShiJie(services);
+
             AddConfig(services, configuration);
             return services;
         }
