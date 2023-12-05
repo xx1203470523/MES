@@ -1,5 +1,6 @@
 ﻿using Hymson.EventBus.Abstractions;
 using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.BackgroundServices.Manufacture;
 using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         static void AddServices(IServiceCollection services)
         {
             services.AddSingleton<IProductionstatisticService, ProductionstatisticService>();
+            services.AddSingleton<IWorkOrderStatisticService, WorkOrderStatisticService>();
         }
     }
 }

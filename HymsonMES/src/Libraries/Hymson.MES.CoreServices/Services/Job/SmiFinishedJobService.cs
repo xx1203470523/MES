@@ -247,6 +247,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     Qty = sfcProduceEntity.Qty,
                     VehicleCode = requestBo.VehicleCode,
                     EquipmentId = commonBo.EquipmentId,
+                    Remark = "SmiFinishedLastProcedureOutStation",
                     SiteId = commonBo.SiteId,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,

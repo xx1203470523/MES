@@ -5,7 +5,6 @@ using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
-using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -158,11 +157,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         public IEnumerable<WhMaterialStandingbookEntity>? WhMaterialStandingbookEntities { get; set; }
 
         /// <summary>
-        /// 汇总表更新对象
-        /// </summary>
-        public IEnumerable<UpdateOutputQtySummaryCommand>? UpdateOutputQtySummaryCommands { get; set; }
-
-        /// <summary>
         /// 
         /// </summary>
         public IEnumerable<UpdateFeedingQtyByIdCommand>? UpdateFeedingQtyByIdCommands { get; set; }
@@ -207,38 +201,6 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// </summary>
         public PhysicalDeleteSFCProduceByIdsCommand DeletePhysicalByProduceIdsCommand { get; set; } = new();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<UpdateQtyByWorkOrderIdCommand> UpdateQtyByWorkOrderIdCommands { get; set; } = new();
-
-        /*
-        // 额外给面板用来显示的参数
-        /// <summary>
-        /// 是否尾工序
-        /// </summary>
-        public bool IsLastProcedure { get; set; } = true;
-        /// <summary>
-        /// 下一工序编码
-        /// </summary>
-        public string NextProcedureCode { get; set; } = "";
-        */
-    }
-
-    /// <summary>
-    /// 半成品的消耗
-    /// </summary>
-    public class SmiFinishedConsumptionBo
-    {
-        /// <summary>
-        /// 物料ID
-        /// </summary>
-        public long MaterialId { get; set; }
-
-        /// <summary>
-        /// 用量
-        /// </summary>
-        public decimal Usages { get; set; }
     }
 
     /// <summary>

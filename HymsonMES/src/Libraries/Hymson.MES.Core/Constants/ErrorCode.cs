@@ -1093,6 +1093,7 @@
         public const string MES17115 = "工序【{Procedure}】未设置【标记编码/缺陷编码】参数项，具体请查看【工序维护】！";
         public const string MES17116 = "不合格代码【{Code}】未设置【不合格工艺路线】参数项，具体请查看【不合格代码】！";
         public const string MES17117 = "条码【{SFC}】对应的不合代码内容存在空字符，请检查！";
+        public const string MES17118 = "当前工序【Procedure】类型为【{Type}】，只有【测试】类型工序才允许不合格出站，请检查【工序维护】！";
 
         #endregion
 

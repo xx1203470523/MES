@@ -1,12 +1,5 @@
 ﻿using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
-using Hymson.MessagePush.Services;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.BackgroundTasks.Manufacture
 {

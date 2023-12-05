@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Quartz;
-using System.Configuration;
 using System.Reflection;
 
 try
@@ -45,15 +44,16 @@ Host.CreateDefaultBuilder(args)
        {
            // Use a Scoped container to create jobs. I'll touch on this later
            q.UseMicrosoftDependencyInjectionJobFactory();
-           #region jobs
 
+           #region jobs
            q.AddJobAndTrigger<MessagePushJob>(hostContext.Configuration);
-           q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
            q.AddJobAndTrigger<PrintExecuteJob>(hostContext.Configuration);
+           q.AddJobAndTrigger<SqlExecuteJob>(hostContext.Configuration);
            #endregion
 
            #region 生产
            q.AddJobAndTrigger<Productionstatistic>(hostContext.Configuration);
+           q.AddJobAndTrigger<WorkOrderStatisticJob>(hostContext.Configuration);
            #endregion
 
            q.UsePersistentStore((persistentStoreOptions) =>

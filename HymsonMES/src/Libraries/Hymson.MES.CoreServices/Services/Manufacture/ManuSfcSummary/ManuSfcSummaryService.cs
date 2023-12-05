@@ -57,10 +57,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
         /// <returns></returns>
         public async Task ExecutStatisticAsync(string userId)
         {
-            var startwaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.ManuSfcSummaryBusinessKey);
+            var startwaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.ManuSfcSummary);
 
             //获取步骤表数据
-            var manuSfcStepList = await _manuSfcStepRepository.GetListByStartwaterMarkIdAsync(new ManuSfcStepStatisticQuery
+            var manuSfcStepList = await _manuSfcStepRepository.GetListByStartWaterMarkIdAsync(new ManuSfcStepStatisticQuery
             {
                 StartwaterMarkId = startwaterMarkId,
                 Rows = 500
@@ -360,7 +360,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
                 {
                     await _manuSfcSummaryRepository.MergeRangeAsync(manuSfcSummaryList);
                 }
-                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.ManuSfcSummaryBusinessKey, manuSfcStepList.Max(x => x.Id));
+                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.ManuSfcSummary, manuSfcStepList.Max(x => x.Id));
                 trans.Complete();
             }
         }
