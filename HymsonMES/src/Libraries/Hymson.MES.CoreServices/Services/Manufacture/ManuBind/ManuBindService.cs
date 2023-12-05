@@ -15,6 +15,7 @@ using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
@@ -120,6 +121,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 CirculationBarCodes = param.BindSFCs.Select(x => x.SFC)
             });
 
+
             if (manuSfcCirculationByBindEntits != null && manuSfcCirculationByBindEntits.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES17409)).WithData("SFCs", string.Join(",", manuSfcCirculationByBindEntits.Select(x => x.CirculationBarCode)));
@@ -129,7 +131,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             List<ManuSfcStepEntity> manuSfcStepList = new();
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new();
-
+            List<ManuSfcUpdateStatusByIdCommand> manuSfcUpdateStatusByIdCommands = new List<ManuSfcUpdateStatusByIdCommand>();
             //绑定条码工单 和 产品信息
             long workOrderId = manuSfcProduceList!.FirstOrDefault()?.WorkOrderId ?? 0;
             long productId = manuSfcProduceList!.FirstOrDefault()?.ProductId ?? 0;
@@ -467,6 +469,15 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 };
                 manuSfcStepList.Add(manuSfcStep);
 
+                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                {
+                    UpdatedBy = param.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    Id = itemManuSfcProduce.SFCId,
+                    Status = SfcStatusEnum.Complete,
+                    CurrentStatus = itemManuSfcProduce.Status,
+                });
+
                 //删除在制品
                 deleteIds.Add(itemManuSfcProduce.Id);
             }
@@ -485,7 +496,6 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             using var trans = TransactionHelper.GetTransactionScope();
             if (isCreate)
             {
-
                 await _manuSfcProduceRepository.InsertAsync(manuSfcProduceEntity);
                 await _manuSfcRepository.InsertAsync(manuSfc);
                 await _manuSfcInfoRepository.InsertAsync(manuSfcInfo);
@@ -501,6 +511,10 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 await _manuSfcCirculationRepository.InsertRangeAsync(manuSfcCirculationEntities);
             }
 
+            if (manuSfcUpdateStatusByIdCommands != null && manuSfcUpdateStatusByIdCommands.Any())
+            {
+                await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
+            }
             await _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(deletePhysicalByProduceIdsCommand);
             trans.Complete();
         }

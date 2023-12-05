@@ -46,7 +46,7 @@ namespace Hymson.MES.Core.Enums
         /// <summary>
         /// 删除
         /// </summary>
-        [Description("无效")]
+        [Description("删除")]
         Delete = 7,
         /// <summary>
         /// 无效
