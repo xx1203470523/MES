@@ -18,7 +18,7 @@ namespace Hymson.MES.BackgroundTasks.HostedServices
     /// <summary>
     /// 
     /// </summary>
-    public class SubHostedService : IHostedService
+    public partial class SubHostedService : IHostedService
     {
         /// <summary>
         /// 

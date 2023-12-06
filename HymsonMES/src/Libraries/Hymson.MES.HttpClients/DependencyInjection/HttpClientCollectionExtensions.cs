@@ -2,14 +2,13 @@
 using Hymson.MES.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.NetworkInformation;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// 
     /// </summary>
-    public static class HttpClientCollectionExtensions
+    public static partial class HttpClientCollectionExtensions
     {
         /// <summary>
         /// 业务逻辑层依赖服务添加
