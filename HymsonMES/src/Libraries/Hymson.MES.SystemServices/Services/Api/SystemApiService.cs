@@ -243,7 +243,16 @@ public class SystemApiService : ISystemApiService
 
         foreach (var item in queryDto.SFC)
         {
-            var trace = tracelist.Where(a => a.CirculationBarCode == item);
+            List<ProcductTraceViewDto> trace = new List<ProcductTraceViewDto>();
+            //绑定的模组
+            var modelTrace = tracelist.Where(a => a.CirculationBarCode == item);
+
+            //绑定的电芯
+            var modelSfc = modelTrace.Select(a=>a.SFC);
+            var sfcTrace = tracelist.Where(a => modelSfc.Contains(a.CirculationBarCode));
+
+            trace.AddRange(modelTrace);
+            trace.AddRange(sfcTrace);
 
             GetSFCInfoViewDto view = new GetSFCInfoViewDto()
             {
