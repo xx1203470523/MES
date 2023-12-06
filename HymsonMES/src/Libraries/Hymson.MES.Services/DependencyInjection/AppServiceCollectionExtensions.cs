@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// 
     /// </summary>
-    public static class AppServiceCollectionExtensions
+    public static partial class AppServiceCollectionExtensions
     {
         /// <summary>
         /// 业务逻辑层依赖服务添加
@@ -71,8 +71,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddMinioService(configuration);
             services.AddData(configuration);
             AddConfig(services, configuration);
+
             AddServices(services);
+            AddServicesForXinShiJie(services);
+
             AddValidators(services);
+            AddValidatorsForXinShiJie(services);
+
             return services;
         }
 
@@ -203,7 +208,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuBakingService, ManuBakingService>();
 
             services.AddSingleton<IManuDowngradingRuleService, ManuDowngradingRuleService>();
-            
+
             services.AddSingleton<IManuSfcGradeService, ManuSfcGradeService>();
 
             services.AddSingleton<IManuDowngradingService, ManuDowngradingService>();
@@ -273,7 +278,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration"></param>
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
-        {  
+        {
             //数据库连接
             return services;
         }

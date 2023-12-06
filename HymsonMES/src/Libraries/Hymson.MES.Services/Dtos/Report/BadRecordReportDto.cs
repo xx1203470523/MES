@@ -7,7 +7,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 
     /// </summary>
-    public class BadRecordReportDto : PagerInfo
+    public partial class BadRecordReportDto : PagerInfo
     {
         /// <summary>
         /// 物料编码
@@ -43,7 +43,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 
     /// </summary>
-    public class ManuProductBadRecordReportViewDto
+    public partial class ManuProductBadRecordReportViewDto
     {
         /// <summary>
         /// 不合格代码Id
@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 不良报告日志 分页参数
     /// </summary>
-    public class ManuProductBadRecordLogReportPagedQueryDto : PagerInfo
+    public partial class ManuProductBadRecordLogReportPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 站点id
@@ -132,7 +132,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 
     /// </summary>
-    public record ManuProductBadRecordLogReportViewDto : BaseEntityDto
+    public partial record ManuProductBadRecordLogReportViewDto : BaseEntityDto
     {
         /// <summary>
         /// Id

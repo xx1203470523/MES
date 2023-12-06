@@ -4,7 +4,7 @@
     /// <summary>
     /// 业务标识
     /// </summary>
-    public static class BusinessKey
+    public static partial class BusinessKey
     {
         /// <summary>
         /// 工单统计业务标识
