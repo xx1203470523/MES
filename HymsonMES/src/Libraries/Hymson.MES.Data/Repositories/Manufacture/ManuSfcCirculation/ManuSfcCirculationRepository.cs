@@ -111,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
             }
 
-            if (query.CirculationBarCodes?.Any() == true)
+            if (query.CirculationBarCodes != null)
             {
                 string barcodestr = string.Join("','",query.CirculationBarCodes);
                 sqlBuilder.Where($"CirculationBarCode IN ('{barcodestr}')");

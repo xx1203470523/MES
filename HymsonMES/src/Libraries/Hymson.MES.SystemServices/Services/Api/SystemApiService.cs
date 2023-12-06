@@ -19,6 +19,8 @@ using Hymson.Utils;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Authentication;
 using Hymson.MES.Core.Constants.Process;
+using System.Collections;
+using Hymson.MES.Core.Domain.Manufacture;
 
 namespace Hymson.MES.SystemServices.Services.Api;
 
@@ -107,8 +109,16 @@ public class SystemApiService : ISystemApiService
 
         if (queryDto.SFC?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19003));
 
-        //获取条码绑定信息
-        var manuSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, CirculationBarCodes = queryDto.SFC });
+        //获取模组码绑定信息
+        var modelSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, CirculationBarCodes = queryDto.SFC });
+
+        //获取电芯码绑定信息
+        var modelsfcs = modelSfcCirculationEntities.Select(a=>a.SFC);
+        var cellSfcCirculationEntities = Enumerable.Empty<ManuSfcCirculationEntity>();
+        if (modelsfcs.Any())
+        {
+            cellSfcCirculationEntities = await _manuCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery() { SiteId = 123456, CirculationBarCodes = modelsfcs });
+        }
 
         //获取条码履历信息
         var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new() { SiteId = 123456, SFCs = queryDto.SFC });
@@ -119,31 +129,32 @@ public class SystemApiService : ISystemApiService
         #region 基础信息
 
         var equipmentIds = new List<long>();
-        equipmentIds.AddRange(manuSfcCirculationEntities.Select(a => a.EquipmentId.GetValueOrDefault()));
+        equipmentIds.AddRange(modelSfcCirculationEntities.Select(a => a.EquipmentId.GetValueOrDefault()));
+        equipmentIds.AddRange(cellSfcCirculationEntities.Select(a => a.EquipmentId.GetValueOrDefault()));
         equipmentIds.AddRange(manuSfcStepEntities.Select(a => a.EquipmentId.GetValueOrDefault()));
         equipmentIds.AddRange(manuSfcParameterEntities.Select(a => a.EquipmentId));
         var equipmentEntities = await _equEquipmentRepository.GetByIdsAsync(equipmentIds.ToArray());
 
         var procdureIds = new List<long>();
-        procdureIds.AddRange(manuSfcCirculationEntities.Select(a => a.ProcedureId));
+        procdureIds.AddRange(modelSfcCirculationEntities.Select(a => a.ProcedureId));
         procdureIds.AddRange(manuSfcStepEntities.Select(a => a.ProcedureId.GetValueOrDefault()));
         procdureIds.AddRange(manuSfcParameterEntities.Select(a => a.ProcedureId.GetValueOrDefault()));
         var procdureEntities = await _procProcedureRepository.GetByIdsAsync(procdureIds.ToArray());
 
         var resourceIds = new List<long>();
-        resourceIds.AddRange(manuSfcCirculationEntities.Select(a => a.ResourceId.GetValueOrDefault()));
+        resourceIds.AddRange(modelSfcCirculationEntities.Select(a => a.ResourceId.GetValueOrDefault()));
         resourceIds.AddRange(manuSfcStepEntities.Select(a => a.ResourceId.GetValueOrDefault()));
         resourceIds.AddRange(manuSfcParameterEntities.Select(a => a.ResourceId.GetValueOrDefault()));
         var resourceEntities = await _procResourceRepository.GetByIdsAsync(new() { IdsArr = resourceIds.ToArray(), Status = 1 });
 
         var productIds = new List<long>();
-        productIds.AddRange(manuSfcCirculationEntities.Select(a => a.ProductId));
+        productIds.AddRange(modelSfcCirculationEntities.Select(a => a.ProductId));
         productIds.AddRange(manuSfcStepEntities.Select(a => a.ProductId));
         productIds.AddRange(manuSfcParameterEntities.Select(a => a.ProductId.GetValueOrDefault()));
         var productEntities = await _procMaterialRepository.GetByIdsAsync(productIds);
 
         var workOrderIds = new List<long>();
-        workOrderIds.AddRange(manuSfcCirculationEntities.Select(a => a.WorkOrderId));
+        workOrderIds.AddRange(modelSfcCirculationEntities.Select(a => a.WorkOrderId));
         workOrderIds.AddRange(manuSfcStepEntities.Select(a => a.WorkOrderId));
         workOrderIds.AddRange(manuSfcParameterEntities.Select(a => a.WorkOrderId.GetValueOrDefault()));
         var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.ToArray());
@@ -154,14 +165,29 @@ public class SystemApiService : ISystemApiService
         #endregion
 
         List<ProcductTraceViewDto> tracelist = new();
-        foreach (var item in manuSfcCirculationEntities)
+        foreach (var item in modelSfcCirculationEntities)
         {
             var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
 
             ProcductTraceViewDto trace = new()
             {
                 SFC = item.SFC,
-                Level = 0,
+                Level = 1,
+                CirculationBarCode = item.CirculationBarCode,
+                EquipmentCode = equipment?.EquipmentCode
+            };
+
+            tracelist.Add(trace);
+        }
+
+        foreach (var item in cellSfcCirculationEntities)
+        {
+            var equipment = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
+
+            ProcductTraceViewDto trace = new()
+            {
+                SFC = item.SFC,
+                Level = 2,
                 CirculationBarCode = item.CirculationBarCode,
                 EquipmentCode = equipment?.EquipmentCode
             };
