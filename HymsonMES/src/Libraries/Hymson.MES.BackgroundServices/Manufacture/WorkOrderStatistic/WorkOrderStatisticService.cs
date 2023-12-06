@@ -71,7 +71,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 updateInputQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Where(w => w.CurrentStatus == SfcStatusEnum.lineUp && w.Remark == "FirstProcedureInStation").Count(),
+                    Qty = item.Value.Count(w => w.CurrentStatus == SfcStatusEnum.lineUp && w.Remark == "FirstProcedureInStation"),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Min(w => w.CreatedOn)
                 });
@@ -80,7 +80,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 updateFinishQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Where(w => w.AfterOperationStatus == SfcStatusEnum.Complete && w.Remark == "LastProcedureOutStation").Count(),
+                    Qty = item.Value.Count(w => w.AfterOperationStatus == SfcStatusEnum.Complete && w.Remark == "LastProcedureOutStation"),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Max(w => w.CreatedOn)
                 });
