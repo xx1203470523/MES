@@ -424,7 +424,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
             {
                 SiteId = _currentSite.SiteId,
                 BarCode = saveDto.BarCode
-            });
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16908)).WithData("barCode", saveDto.BarCode);
+
             if (inventory.QuantityResidue <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
