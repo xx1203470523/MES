@@ -491,7 +491,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             responseSummaryBo.Source = commonBo.Source;
             responseSummaryBo.Type = commonBo.Type;
-            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.OutStationRequestBos.Select(s => s.VehicleCode).Count() : responseBos.Count;
+            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.OutStationRequestBos.Select(s => s.VehicleCode).Distinct().Count() : responseBos.Count;
             return responseSummaryBo;
         }
 
@@ -687,11 +687,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
-                ProcedureId = sfcProduceEntity.ProcedureId,
-                ResourceId = sfcProduceEntity.ResourceId,
                 SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                 Qty = sfcProduceEntity.Qty,
                 VehicleCode = requestBo.VehicleCode,
+                ProcedureId = commonBo.ProcedureId,
+                ResourceId = commonBo.ResourceId,
                 EquipmentId = commonBo.EquipmentId,
                 SiteId = commonBo.SiteId,
                 CreatedBy = commonBo.UserName,
@@ -883,11 +883,11 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = sfcProduceEntity.WorkOrderId,
                 WorkCenterId = sfcProduceEntity.WorkCenterId,
                 ProductBOMId = sfcProduceEntity.ProductBOMId,
-                ProcedureId = sfcProduceEntity.ProcedureId,
-                ResourceId = sfcProduceEntity.ResourceId,
                 SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                 Qty = sfcProduceEntity.Qty,
                 VehicleCode = requestBo.VehicleCode,
+                ProcedureId = commonBo.ProcedureId,
+                ResourceId = commonBo.ResourceId,
                 EquipmentId = commonBo.EquipmentId,
                 SiteId = commonBo.SiteId,
                 CreatedBy = commonBo.UserName,
@@ -1367,7 +1367,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     .WithData("Procedure", procedureRejudgeBo.ProcedureCode);
 
             // 检查不合格代码是否有设置"不合格工艺路线"
-            if (!procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
+            if (!procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue || procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value == 0)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17116))
                     .WithData("Code", procedureRejudgeBo.LastUnqualified.UnqualifiedCode);
 

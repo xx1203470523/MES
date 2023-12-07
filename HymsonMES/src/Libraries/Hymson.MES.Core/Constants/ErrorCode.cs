@@ -1058,8 +1058,8 @@
         public const string MES16904 = "找不到实际使用的物料信息!";
         public const string MES16905 = "找不到实际物料{materialCode}对应的数据收集方式!";
 
-        public const string MES16908 = "物料条码{barCode}库存不存在!";
-        public const string MES16909 = "物料条码{barCode}库存不足,请检查!";
+        public const string MES16908 = "物料条码【{barCode}】库存不存在!";
+        public const string MES16909 = "物料条码【{barCode}】库存不足,请检查!";
         public const string MES16910 = "实际使用的物料为空!";
         public const string MES16911 = "实际使用的物料与条码不合!";
 

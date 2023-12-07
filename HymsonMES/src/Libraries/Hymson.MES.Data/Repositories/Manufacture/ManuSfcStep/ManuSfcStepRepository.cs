@@ -97,6 +97,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuSfcStepEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted =0");
+            sqlBuilder.Where("SiteId =@SiteId");
+            if (manuSfcStepQuery.SFCs != null && manuSfcStepQuery.SFCs.Any())
+            {
+                sqlBuilder.Where("SFC  in @SFCs");
+            }
+            if (manuSfcStepQuery.Operatetype.HasValue)
+            {
+                sqlBuilder.Where("Operatetype=@Operatetype");
+            }
+
             using var conn = GetMESDbConnection();
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(template.RawSql, manuSfcStepQuery);
             return manuSfcStepEntities;
