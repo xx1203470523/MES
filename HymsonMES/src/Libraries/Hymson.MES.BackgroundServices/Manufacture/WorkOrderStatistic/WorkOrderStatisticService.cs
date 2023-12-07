@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -67,29 +67,15 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             List<UpdateQtyByWorkOrderIdCommand> updateInputQtyCommands = new();
             List<UpdateQtyByWorkOrderIdCommand> updateFinishQtyCommands = new();
 
-            // 取得集合里面条码对应的表名
-            var tableNameList = _manuSfcStepRepository.GetTableNames(manuSfcStepList);
+            // 取得通过站点和条码分组的数据
+            var singleSFCBos = manuSfcStepList.GroupBy(g => new SingleSFCBo { SiteId = g.SiteId, SFC = g.SFC }).Select(s => s.Key);
 
-            // 通过站点分组（如果是单站点项目，只会一条记录）
-            var manuSfcStepForSiteIdDic = manuSfcStepList.ToLookup(x => x.SiteId).ToDictionary(d => d.Key, d => d);
-
-            // 查询步骤时需要站点，因为相同的条码不一定是同一站点
-            List<Task<IEnumerable<ManuSfcStepEntity>>> tasks = new();
-            foreach (var siteId in manuSfcStepForSiteIdDic)
+            List<ManuSfcStepEntity> allStepEntities = new();
+            foreach (var item in singleSFCBos)
             {
-                foreach (var table in tableNameList)
-                {
-                    tasks.Add(_manuSfcStepRepository.GetInOutStationStepsBySFCsAsync(table.Key, new EntityBySFCsQuery
-                    {
-                        SiteId = siteId.Key,
-                        SFCs = table.Value.Where(w => w.SiteId == siteId.Key).Select(s => s.SFC)
-                    }));
-                }
+                var stepEntities = await _manuSfcStepRepository.GetSFCInOutStepAsync(new SfcInOutStepQuery { SiteId = item.SiteId, Sfc = item.SFC });
+                allStepEntities.AddRange(stepEntities);
             }
-
-            // 取得所有的条码步骤（条码是在水位处取得）
-            var allStepArray = await Task.WhenAll(tasks);
-            var allStepEntities = allStepArray.SelectMany(s => s);
 
             // 通过工单对条码进行分组
             var manuSfcStepForWorkOrderDic = allStepEntities.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
