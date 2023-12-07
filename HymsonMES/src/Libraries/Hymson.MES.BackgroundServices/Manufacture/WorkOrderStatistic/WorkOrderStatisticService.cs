@@ -73,7 +73,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             // 通过站点分组（如果是单站点项目，只会一条记录）
             var manuSfcStepForSiteIdDic = manuSfcStepList.ToLookup(x => x.SiteId).ToDictionary(d => d.Key, d => d);
 
-            // 查询步骤时需要站点，因为相同的条码不一定是同一站点（即使是同一个表）
+            // 查询步骤时需要站点，因为相同的条码不一定是同一站点
             List<Task<IEnumerable<ManuSfcStepEntity>>> tasks = new();
             foreach (var siteId in manuSfcStepForSiteIdDic)
             {
