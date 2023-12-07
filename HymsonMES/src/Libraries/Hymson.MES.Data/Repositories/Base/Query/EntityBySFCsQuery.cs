@@ -1,17 +1,24 @@
 ﻿namespace Hymson.MES.Data.Repositories.Common.Query
 {
     /// <summary>
-    /// 查询实体
+    /// SFC查询实体
     /// </summary>
-    public class EntityBySFCsQuery
+    public class EntityBySFCQuery : EntityBySiteIdQuery
     {
         /// <summary>
-        /// 工厂
+        /// 条码
         /// </summary>
-        public long SiteId { get; set; }
+        public string SFC { get; set; }
 
+    }
+
+    /// <summary>
+    /// SFC查询实体
+    /// </summary>
+    public class EntityBySFCsQuery : EntityBySiteIdQuery
+    {
         /// <summary>
-        /// 产品序列码
+        /// 条码
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
 
