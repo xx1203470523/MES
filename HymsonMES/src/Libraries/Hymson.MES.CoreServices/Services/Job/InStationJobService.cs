@@ -399,7 +399,6 @@ namespace Hymson.MES.CoreServices.Services.Job
                     SFCInfoId = sfcProduceEntity.BarCodeInfoId,
                     Qty = sfcProduceEntity.Qty,
                     VehicleCode = requestBo.VehicleCode,
-                    Remark = responseBo.IsFirstProcedure ? "FirstProcedureInStation" : "",
                     ProcedureId = commonBo.ProcedureId,
                     ResourceId = commonBo.ResourceId,
                     EquipmentId = commonBo.EquipmentId,

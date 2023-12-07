@@ -782,7 +782,6 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 保存操作后的状态
             stepEntity.AfterOperationStatus = sfcProduceEntity.Status;
-            stepEntity.Remark = responseBo.IsLastProcedure ? "LastProcedureOutStation" : "";
 
             // 更新信息
             responseBo.SFCEntity = manuSfcEntity;

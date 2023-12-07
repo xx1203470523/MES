@@ -1,5 +1,7 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -49,7 +51,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         /// </summary>
         /// <param name="limitCount"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(int limitCount = 500)
+        public async Task ExecuteAsync(int limitCount = 1000)
         {
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.WorkOrderStatistic);
 
@@ -61,26 +63,52 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             });
             if (manuSfcStepList == null || !manuSfcStepList.Any()) return;
 
-            var user = "WorkOrderStatisticService";
+            var user = $"{BusinessKey.WorkOrderStatistic}作业";
             List<UpdateQtyByWorkOrderIdCommand> updateInputQtyCommands = new();
             List<UpdateQtyByWorkOrderIdCommand> updateFinishQtyCommands = new();
-            var manuSfcStepDic = manuSfcStepList.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
-            foreach (var item in manuSfcStepDic)
+
+            // 取得集合里面条码对应的表名
+            var tableNameList = _manuSfcStepRepository.GetTableNames(manuSfcStepList);
+
+            // 通过站点分组（如果是单站点项目，只会一条记录）
+            var manuSfcStepForSiteIdDic = manuSfcStepList.ToLookup(x => x.SiteId).ToDictionary(d => d.Key, d => d);
+
+            // 为什么要循环站点：查询步骤时需要站点，因为相同的条码不一定是同一站点（即使是同一个表）
+            List<Task<IEnumerable<ManuSfcStepEntity>>> tasks = new();
+            foreach (var siteId in manuSfcStepForSiteIdDic)
             {
-                // 投入数量（重复首工序进站时，要注意数量扣减）
+                foreach (var table in tableNameList)
+                {
+                    tasks.Add(_manuSfcStepRepository.GetInOutStationStepsBySFCsAsync(table.Key, new EntityBySFCsQuery
+                    {
+                        SiteId = siteId.Key,
+                        SFCs = table.Value.Where(w => w.SiteId == siteId.Key).Select(s => s.SFC)
+                    }));
+                }
+            }
+
+            // 取得所有的条码步骤（条码是在水位处取得）
+            var allStepArray = await Task.WhenAll(tasks);
+            var allStepEntities = allStepArray.SelectMany(s => s);
+
+            // 通过工单对条码进行分组
+            var manuSfcStepForWorkOrderDic = allStepEntities.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
+            foreach (var item in manuSfcStepForWorkOrderDic)
+            {
+                // 投入数量（数量那里分组，只是为了去掉重复进站）
                 updateInputQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Count(w => w.CurrentStatus == SfcStatusEnum.lineUp && w.Remark == "FirstProcedureInStation"),
-                    UpdatedBy = user,
+                    Qty = item.Value.Where(w => w.CurrentStatus == SfcStatusEnum.lineUp).DistinctBy(d => d.SFCInfoId).Count(),
+                    UpdatedBy = BusinessKey.WorkOrderStatistic,
                     UpdatedOn = item.Value.Min(w => w.CreatedOn)
                 });
 
-                // 产出数量（重复尾工序出站时，要注意数量扣减）
+                // 产出数量（数量那里分组，只是为了去掉重复出站）
                 updateFinishQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Count(w => w.AfterOperationStatus == SfcStatusEnum.Complete && w.Remark == "LastProcedureOutStation"),
+                    Qty = item.Value.Where(w => w.AfterOperationStatus == SfcStatusEnum.Complete).DistinctBy(d => d.SFCInfoId).Count(),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Max(w => w.CreatedOn)
                 });
@@ -99,7 +127,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             trans.Complete();
 
         }
-
 
     }
 }

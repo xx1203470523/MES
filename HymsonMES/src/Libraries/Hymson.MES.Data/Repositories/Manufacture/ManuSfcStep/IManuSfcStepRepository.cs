@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcStepEntity manuSfcStepEntity);
 
-        
+
 
         /// <summary>
         /// 插入步骤业务表
@@ -102,5 +102,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfc"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetSFCInStepAsync(SfcInStepQuery query);
+
+        /// <summary>
+        /// 根据实体列表对数据进行按表名分组
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Dictionary<string, IGrouping<string, ManuSfcStepEntity>> GetTableNames(IEnumerable<ManuSfcStepEntity> entities);
+
+        /// <summary>
+        /// 指定表情查询条码的进出站步骤
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCsAsync(string tableName, EntityBySFCsQuery query);
+
     }
 }

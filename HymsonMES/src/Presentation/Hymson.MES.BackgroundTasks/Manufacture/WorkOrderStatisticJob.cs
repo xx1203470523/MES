@@ -34,7 +34,7 @@ namespace Hymson.MES.BackgroundTasks.Manufacture
         {
             try
             {
-                await _workOrderStatisticService.ExecuteAsync(500);
+                await _workOrderStatisticService.ExecuteAsync(1000);
             }
             catch (Exception ex)
             {

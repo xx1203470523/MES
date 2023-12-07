@@ -1,6 +1,5 @@
 ﻿namespace Hymson.MES.Core.Constants.Manufacture
 {
-
     /// <summary>
     /// 业务标识
     /// </summary>

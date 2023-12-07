@@ -3,6 +3,7 @@ using Force.Crc32;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Microsoft.Extensions.Options;
 using System.Text;
@@ -16,13 +17,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcStepRepository : BaseRepository, IManuSfcStepRepository
     {
 
-        
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions,IOptions<ManuSfcStepTableOptions> options) : base(connectionOptions)
+        public ManuSfcStepRepository(IOptions<ConnectionOptions> connectionOptions, IOptions<ManuSfcStepTableOptions> options) : base(connectionOptions)
         {
             _options = options;
         }
@@ -137,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities)
         {
             if (manuSfcStepEntities == null || !manuSfcStepEntities.Any()) return 0;
-            var  keyValuePairs = TableGrouping(manuSfcStepEntities);
+            var keyValuePairs = TableGrouping(manuSfcStepEntities);
             using var conn = GetMESDbConnection();
             //插入分表数据
             foreach (var item in keyValuePairs)
@@ -162,9 +163,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(string.Format(UpdateSql, PrepareTableName(manuSfcStepEntity)), manuSfcStepEntity);
         }
 
-       
+
 
         #region 业务表
+        /// <summary>
+        /// 根据实体列表对数据进行按表名分组
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public Dictionary<string, IGrouping<string, ManuSfcStepEntity>> GetTableNames(IEnumerable<ManuSfcStepEntity> entities)
+        {
+            return entities.ToLookup(x => PrepareTableName(x, false)).ToDictionary(d => d.Key, d => d);
+        }
+
+        /// <summary>
+        /// 指定表情查询条码的进出站步骤
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCsAsync(string tableName, EntityBySFCsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetInOutStepBySFCsSql, tableName), query);
+        }
+
         /// <summary>
         /// 插入步骤业务表
         /// </summary>
@@ -199,7 +222,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             //走分表查询
             var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetSFCInOutStepSql, PrepareTableName(sfcQuery.SiteId, sfcQuery.Sfc, false)), sfcQuery);
             return manuSfcStepEntities;
-
         }
 
         /// <summary>
@@ -246,6 +268,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return manuSfcStepEntities;
 
         }
+
         #region private
         /// <summary>
         /// 模板表名称
@@ -264,6 +287,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var crc32 = CalculateCrc32($"{siteId}{sfc}");
             return crc32 % _options.Value.Divides;
         }
+
         /// <summary>
         /// 根据实体列表对数据进行按表名分组
         /// </summary>
@@ -272,9 +296,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         private Dictionary<string, IEnumerable<ManuSfcStepEntity>> TableGrouping(IEnumerable<ManuSfcStepEntity> manuSfcStepEntities)
         {
             Dictionary<string, IEnumerable<ManuSfcStepEntity>> keyValuePairs = new Dictionary<string, IEnumerable<ManuSfcStepEntity>>();
-            foreach (var  manuSfcStepEntity in manuSfcStepEntities)
+            foreach (var manuSfcStepEntity in manuSfcStepEntities)
             {
-                var tableName = PrepareTableName(manuSfcStepEntity,false);
+                var tableName = PrepareTableName(manuSfcStepEntity, false);
                 if (!keyValuePairs.TryAdd(tableName, new List<ManuSfcStepEntity>() { manuSfcStepEntity }))
                 {
                     keyValuePairs[tableName].Append(manuSfcStepEntity);
@@ -282,19 +306,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             return keyValuePairs;
         }
+
         /// <summary>
         /// 根据主表和分表拼接表名
         /// </summary>
         /// <param name="manuSfcStepEntity"></param>
         /// <param name="isMaster"></param>
         /// <returns></returns>
-        private string PrepareTableName(ManuSfcStepEntity manuSfcStepEntity, bool isMaster=true)
+        private string PrepareTableName(ManuSfcStepEntity manuSfcStepEntity, bool isMaster = true)
         {
             if (isMaster)
                 return TEMPLATETABLENAME;
             var tableIndex = CalculateTableIndex(manuSfcStepEntity.SiteId, manuSfcStepEntity.SFC);
             return $"{TEMPLATETABLENAME}_{tableIndex}";
         }
+
         /// <summary>
         /// 根据站点id和条码组装表名
         /// </summary>
@@ -302,13 +328,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="sfc"></param>
         /// <param name="isMaster"></param>
         /// <returns></returns>
-        private string PrepareTableName(long siteId,string sfc, bool isMaster = true)
+        private string PrepareTableName(long siteId, string sfc, bool isMaster = true)
         {
             if (isMaster)
                 return TEMPLATETABLENAME;
             var tableIndex = CalculateTableIndex(siteId, sfc);
             return $"{TEMPLATETABLENAME}_{tableIndex}";
         }
+
         /// <summary>
         /// crc32算法
         /// </summary>
@@ -320,6 +347,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return Crc32Algorithm.Compute(bytes);
         }
         #endregion
+
     }
 
     /// <summary>
@@ -343,6 +371,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         and SFC = @Sfc
                         AND SiteId = @SiteId 
                         ORDER BY Id ASC ";
+        const string GetInOutStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC IN @SFCs ORDER BY Id ASC ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY Id desc LIMIT @Offset, @Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";
 
@@ -352,4 +381,5 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetSfcsInStepSql = @"SELECT * FROM  manu_sfc_step WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 3 AND sfc IN @sfcs ";
 
     }
+
 }
