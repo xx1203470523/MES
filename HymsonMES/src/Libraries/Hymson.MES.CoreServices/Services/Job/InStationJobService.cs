@@ -448,7 +448,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             responseSummaryBo.Source = commonBo.Source;
             responseSummaryBo.Type = commonBo.Type;
-            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.InStationRequestBos.Select(s => s.VehicleCode).Count() : responseBos.Count;
+            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.InStationRequestBos.Select(s => s.VehicleCode).Distinct().Count() : responseBos.Count;
             responseSummaryBo.ProcedureCode = currentProcedureEntity.Code;
             responseSummaryBo.Status = SfcStatusEnum.Activity;
             return responseSummaryBo;
