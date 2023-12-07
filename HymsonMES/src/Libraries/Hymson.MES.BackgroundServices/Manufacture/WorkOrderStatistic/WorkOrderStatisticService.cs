@@ -100,7 +100,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 {
                     WorkOrderId = item.Key,
                     Qty = item.Value.Where(w => w.CurrentStatus == SfcStatusEnum.lineUp).DistinctBy(d => d.SFCInfoId).Count(),
-                    UpdatedBy = BusinessKey.WorkOrderStatistic,
+                    UpdatedBy = user,
                     UpdatedOn = item.Value.Min(w => w.CreatedOn)
                 });
 
