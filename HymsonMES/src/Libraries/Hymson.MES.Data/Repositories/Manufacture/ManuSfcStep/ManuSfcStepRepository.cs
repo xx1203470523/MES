@@ -58,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(ManuSfcStepStatisticQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuSfcStepEntity>(GetListByStartwaterMarkIdSql, query);
+            return await conn.QueryAsync<ManuSfcStepEntity>(GetListByStartWaterMarkIdSql, query);
         }
 
         /// <summary>
@@ -336,7 +336,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeleteSql = "UPDATE `manu_sfc_step` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_step`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT *  FROM `manu_sfc_step`  WHERE Id IN @ids ";
-        const string GetListByStartwaterMarkIdSql = @"SELECT * FROM `manu_sfc_step` WHERE Id > @StartwaterMarkId ORDER BY Id ASC LIMIT @Rows";
+        const string GetListByStartWaterMarkIdSql = @"SELECT * FROM `manu_sfc_step` WHERE Id > @StartWaterMarkId ORDER BY Id ASC LIMIT @Rows";
         const string GetSFCInOutStepSql = @"SELECT * FROM `{0}` 
                         WHERE IsDeleted = 0
                         AND Operatetype IN (3, 4)

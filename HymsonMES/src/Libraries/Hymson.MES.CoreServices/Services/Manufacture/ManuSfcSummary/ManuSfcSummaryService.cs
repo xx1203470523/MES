@@ -57,12 +57,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary
         /// <returns></returns>
         public async Task ExecutStatisticAsync(string userId)
         {
-            var startwaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.ManuSfcSummary);
+            var startWaterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.ManuSfcSummary);
 
             //获取步骤表数据
             var manuSfcStepList = await _manuSfcStepRepository.GetListByStartWaterMarkIdAsync(new ManuSfcStepStatisticQuery
             {
-                StartwaterMarkId = startwaterMarkId,
+                StartWaterMarkId = startWaterMarkId,
                 Rows = 500
             });
 

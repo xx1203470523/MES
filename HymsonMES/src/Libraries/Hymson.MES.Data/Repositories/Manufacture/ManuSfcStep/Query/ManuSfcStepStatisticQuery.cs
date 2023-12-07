@@ -11,7 +11,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query
         /// <summary>
         /// 水位id
         /// </summary>
-        public long StartwaterMarkId { set; get; }
+        public long StartWaterMarkId { set; get; }
 
         /// <summary>
         /// 条数
