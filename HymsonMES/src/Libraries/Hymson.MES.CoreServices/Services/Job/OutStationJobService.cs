@@ -491,7 +491,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             responseSummaryBo.Source = commonBo.Source;
             responseSummaryBo.Type = commonBo.Type;
-            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.OutStationRequestBos.Select(s => s.VehicleCode).Count() : responseBos.Count;
+            responseSummaryBo.Count = commonBo.Type == ManuFacePlateBarcodeTypeEnum.Vehicle ? commonBo.OutStationRequestBos.Select(s => s.VehicleCode).Distinct().Count() : responseBos.Count;
             return responseSummaryBo;
         }
 
@@ -1367,7 +1367,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     .WithData("Procedure", procedureRejudgeBo.ProcedureCode);
 
             // 检查不合格代码是否有设置"不合格工艺路线"
-            if (!procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue)
+            if (!procedureRejudgeBo.LastUnqualified.ProcessRouteId.HasValue || procedureRejudgeBo.LastUnqualified.ProcessRouteId.Value == 0)
                 throw new CustomerValidationException(nameof(ErrorCode.MES17116))
                     .WithData("Code", procedureRejudgeBo.LastUnqualified.UnqualifiedCode);
 
