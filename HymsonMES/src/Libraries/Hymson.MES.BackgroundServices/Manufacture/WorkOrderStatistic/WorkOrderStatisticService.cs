@@ -74,6 +74,8 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             if (manuSfcStepList == null || !manuSfcStepList.Any()) return;
 
             var user = $"{BusinessKey.WorkOrderStatistic}作业";
+
+            // 相同工单和条码的数据只记录一条记录
             var manuSfcStepDic = manuSfcStepList.ToLookup(x => new SingleWorkOrderSFCBo
             {
                 SiteId = x.SiteId,
@@ -120,13 +122,14 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             await _manuWorkOrderSFCRepository.InsertRangeAsync(inStationSteps);
             await _manuWorkOrderSFCRepository.RepalceRangeAsync(outStationSteps);
 
-            // 通过工单对条码进行分组
+            // 通过工单对条码进行分组，看哪些工单需要更新
             var manuSfcStepForWorkOrderDic = manuSfcStepList.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
 
             List<UpdateQtyByWorkOrderIdCommand> updateInputQtyCommands = new();
             List<UpdateQtyByWorkOrderIdCommand> updateFinishQtyCommands = new();
             foreach (var item in manuSfcStepForWorkOrderDic)
             {
+                // 根据工单取得记录表的所有条码数据
                 var records = await _manuWorkOrderSFCRepository.GetEntitiesAsync(new EntityByWorkOrderIdQuery { WorkOrderId = item.Key });
 
                 // 投入数量（数量那里分组，只是为了去掉重复进站）
