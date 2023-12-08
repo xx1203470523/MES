@@ -17,4 +17,16 @@
         public string SFC { get; set; } = "";
 
     }
+
+    /// <summary>
+    /// 单条码
+    /// </summary>
+    public class SingleWorkOrderSFCBo : SingleSFCBo
+    {
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+    }
 }

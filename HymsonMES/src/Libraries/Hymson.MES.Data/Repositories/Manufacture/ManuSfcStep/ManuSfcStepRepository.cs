@@ -177,6 +177,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 获取SFC的进出站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCAsync(EntityBySFCQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetInOutStepBySFCSql, PrepareTableName(query.SiteId, query.SFC, false)), query);
+        }
+
+        /// <summary>
         /// 指定表情查询条码的进出站步骤
         /// </summary>
         /// <param name="tableName"></param>
@@ -211,18 +222,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
         #endregion
 
-        /// <summary>
-        /// 获取SFC的进出站步骤
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SfcInOutStepQuery sfcQuery)
-        {
-            using var conn = GetMESDbConnection();
-            //走分表查询
-            var manuSfcStepEntities = await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetSFCInOutStepSql, PrepareTableName(sfcQuery.SiteId, sfcQuery.Sfc, false)), sfcQuery);
-            return manuSfcStepEntities;
-        }
 
         /// <summary>
         /// 分页查询 根据SFC
@@ -371,6 +370,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         and SFC = @Sfc
                         AND SiteId = @SiteId 
                         ORDER BY Id ASC ";
+        const string GetInOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC IN @SFCs ORDER BY Id ASC ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY Id desc LIMIT @Offset, @Rows ";
         const string GetBySFCPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step` /**where**/ ";

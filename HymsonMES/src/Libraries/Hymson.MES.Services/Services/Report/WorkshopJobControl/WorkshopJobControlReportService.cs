@@ -8,6 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -157,7 +158,7 @@ namespace Hymson.MES.Services.Services.Report
                 throw new CustomerValidationException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
             }
 
-            var sfcSteps = await _manuSfcStepRepository.GetSFCInOutStepAsync(new SfcInOutStepQuery() { SiteId = _currentSite.SiteId ?? 0, Sfc = sfc });
+            var sfcSteps = await _manuSfcStepRepository.GetInOutStationStepsBySFCAsync(new EntityBySFCQuery() { SiteId = _currentSite.SiteId ?? 0, SFC = sfc });
 
             if (sfcSteps == null || !sfcSteps.Any())
             {

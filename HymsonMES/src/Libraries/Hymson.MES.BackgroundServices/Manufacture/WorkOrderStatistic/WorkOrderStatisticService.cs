@@ -4,8 +4,10 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
+using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
+using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 using Hymson.WaterMark;
 
@@ -27,6 +29,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
+        /// 仓储接口（工单条码记录）
+        /// </summary>
+        private readonly IManuWorkOrderSFCRepository _manuWorkOrderSFCRepository;
+
+        /// <summary>
         /// 统计服务
         /// </summary>
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -36,13 +43,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         /// </summary>
         /// <param name="waterMarkService"></param>
         /// <param name="manuSfcStepRepository"></param>
+        /// <param name="manuWorkOrderSFCRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
         public WorkOrderStatisticService(IWaterMarkService waterMarkService,
             IManuSfcStepRepository manuSfcStepRepository,
+            IManuWorkOrderSFCRepository manuWorkOrderSFCRepository,
             IPlanWorkOrderRepository planWorkOrderRepository)
         {
             _waterMarkService = waterMarkService;
             _manuSfcStepRepository = manuSfcStepRepository;
+            _manuWorkOrderSFCRepository = manuWorkOrderSFCRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
         }
 
@@ -64,28 +74,66 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             if (manuSfcStepList == null || !manuSfcStepList.Any()) return;
 
             var user = $"{BusinessKey.WorkOrderStatistic}作业";
-            List<UpdateQtyByWorkOrderIdCommand> updateInputQtyCommands = new();
-            List<UpdateQtyByWorkOrderIdCommand> updateFinishQtyCommands = new();
-
-            // 取得通过站点和条码分组的数据
-            var singleSFCBos = manuSfcStepList.GroupBy(g => new SingleSFCBo { SiteId = g.SiteId, SFC = g.SFC }).Select(s => s.Key);
-
-            List<ManuSfcStepEntity> allStepEntities = new();
-            foreach (var item in singleSFCBos)
+            var manuSfcStepDic = manuSfcStepList.ToLookup(x => new SingleWorkOrderSFCBo
             {
-                var stepEntities = await _manuSfcStepRepository.GetSFCInOutStepAsync(new SfcInOutStepQuery { SiteId = item.SiteId, Sfc = item.SFC });
-                allStepEntities.AddRange(stepEntities);
+                SiteId = x.SiteId,
+                WorkOrderId = x.WorkOrderId,
+                SFC = x.SFC
+            }).ToDictionary(d => d.Key, d => d);
+
+            List<ManuWorkOrderSFCEntity> inStationSteps = new();
+            List<ManuWorkOrderSFCEntity> outStationSteps = new();
+            foreach (var item in manuSfcStepDic)
+            {
+                var entity = new ManuWorkOrderSFCEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = item.Key.SiteId,
+                    WorkOrderId = item.Key.WorkOrderId,
+                    SFC = item.Key.SFC,
+                    CreatedBy = user,
+                    UpdatedBy = user
+                };
+
+                // 进站
+                var stepsOfLineUp = item.Value.Where(a => a.CurrentStatus == SfcStatusEnum.lineUp);
+                if (stepsOfLineUp.Any())
+                {
+                    entity.Status = SfcStatusEnum.lineUp;
+                    entity.CreatedOn = stepsOfLineUp.Min(m => m.CreatedOn);
+                    entity.UpdatedOn = entity.CreatedOn;
+                    inStationSteps.Add(entity);
+                }
+
+                // 出站
+                var stepsOfComplete = item.Value.Where(a => a.AfterOperationStatus == SfcStatusEnum.Complete);
+                if (stepsOfComplete.Any())
+                {
+                    entity.Status = SfcStatusEnum.Complete;
+                    entity.CreatedOn = stepsOfComplete.Max(m => m.CreatedOn);
+                    entity.UpdatedOn = entity.CreatedOn;
+                    outStationSteps.Add(entity);
+                }
             }
 
+            // 保存工单条码记录
+            await _manuWorkOrderSFCRepository.InsertRangeAsync(inStationSteps);
+            await _manuWorkOrderSFCRepository.RepalceRangeAsync(outStationSteps);
+
             // 通过工单对条码进行分组
-            var manuSfcStepForWorkOrderDic = allStepEntities.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
+            var manuSfcStepForWorkOrderDic = manuSfcStepList.ToLookup(x => x.WorkOrderId).ToDictionary(d => d.Key, d => d);
+
+            List<UpdateQtyByWorkOrderIdCommand> updateInputQtyCommands = new();
+            List<UpdateQtyByWorkOrderIdCommand> updateFinishQtyCommands = new();
             foreach (var item in manuSfcStepForWorkOrderDic)
             {
+                var records = await _manuWorkOrderSFCRepository.GetEntitiesAsync(new EntityByWorkOrderIdQuery { WorkOrderId = item.Key });
+
                 // 投入数量（数量那里分组，只是为了去掉重复进站）
                 updateInputQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Where(w => w.CurrentStatus == SfcStatusEnum.lineUp).DistinctBy(d => d.SFCInfoId).Count(),
+                    Qty = records.Count(w => w.Status == SfcStatusEnum.lineUp),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Min(w => w.CreatedOn)
                 });
@@ -94,7 +142,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 updateFinishQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = item.Value.Where(w => w.AfterOperationStatus == SfcStatusEnum.Complete).DistinctBy(d => d.SFCInfoId).Count(),
+                    Qty = records.Count(w => w.Status == SfcStatusEnum.Complete),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Max(w => w.CreatedOn)
                 });

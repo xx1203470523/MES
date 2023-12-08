@@ -83,13 +83,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertSfcStepBusinessRangeAsync(IEnumerable<MaunSfcStepBusinessEntity> maunSfcStepBusinessEntities);
 
         /// <summary>
-        /// 获取SFC的进出站步骤
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SfcInOutStepQuery sfcQuery);
-
-        /// <summary>
         /// 分页查询 根据SFC
         /// </summary>
         /// <param name="queryParam"></param>
@@ -109,6 +102,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entities"></param>
         /// <returns></returns>
         Dictionary<string, IGrouping<string, ManuSfcStepEntity>> GetTableNames(IEnumerable<ManuSfcStepEntity> entities);
+
+        /// <summary>
+        /// 获取SFC的进出站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCAsync(EntityBySFCQuery query);
 
         /// <summary>
         /// 指定表情查询条码的进出站步骤
