@@ -431,6 +431,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
                 throw new CustomerValidationException(nameof(ErrorCode.MES16909)).WithData("barCode", saveDto.BarCode);
             }
 
+            // 当是上料点类型时，一定要选择具体挂载的上料点
+            if (saveDto.Source == ManuSFCFeedingSourceEnum.FeedingPoint
+                && (!saveDto.FeedingPointId.HasValue || saveDto.FeedingPointId == 0))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16915)).WithData("barCode", saveDto.BarCode);
+            }
+
             // 根据条件再查询一次主物料（再次查询一次会更加严谨）
             var manuFeedingMaterialDtos = await GetFeedingMaterialListAsync(new ManuFeedingMaterialQueryDto
             {

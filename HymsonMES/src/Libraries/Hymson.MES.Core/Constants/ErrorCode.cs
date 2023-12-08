@@ -1065,6 +1065,7 @@
 
         public const string MES16913 = "不能删除启用或保留的记录！";
         public const string MES16914 = "未找到能挂载物料条码的主物料!";
+        public const string MES16915 = "物料条码【{barCode}】需选择要挂载的上料点！";
         #endregion
 
         #region 条码打印 MES17000
