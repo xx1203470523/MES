@@ -27,9 +27,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public string SFC { get; set; }
 
         /// <summary>
-        /// 因为用Status，添加表时审核平台不允许，因此改名为SFCStatus，等同于步骤表的Status
+        /// 状态：等同于步骤表的Status
         /// </summary>
-        public SfcStatusEnum SFCStatus { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
 
     }

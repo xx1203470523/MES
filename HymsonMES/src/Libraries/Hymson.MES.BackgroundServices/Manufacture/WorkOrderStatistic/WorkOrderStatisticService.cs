@@ -99,7 +99,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 var stepsOfLineUp = item.Value.Where(a => a.CurrentStatus == SfcStatusEnum.lineUp);
                 if (stepsOfLineUp.Any())
                 {
-                    entity.SFCStatus = SfcStatusEnum.lineUp;
+                    entity.Status = SfcStatusEnum.lineUp;
                     entity.CreatedOn = stepsOfLineUp.Min(m => m.CreatedOn);
                     entity.UpdatedOn = entity.CreatedOn;
                     inStationSteps.Add(entity);
@@ -109,7 +109,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 var stepsOfComplete = item.Value.Where(a => a.AfterOperationStatus == SfcStatusEnum.Complete);
                 if (stepsOfComplete.Any())
                 {
-                    entity.SFCStatus = SfcStatusEnum.Complete;
+                    entity.Status = SfcStatusEnum.Complete;
                     entity.CreatedOn = stepsOfComplete.Max(m => m.CreatedOn);
                     entity.UpdatedOn = entity.CreatedOn;
                     outStationSteps.Add(entity);
@@ -133,7 +133,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 updateInputQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = records.Count(w => w.SFCStatus == SfcStatusEnum.lineUp),
+                    Qty = records.Count(w => w.Status == SfcStatusEnum.lineUp),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Min(w => w.CreatedOn)
                 });
@@ -142,7 +142,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 updateFinishQtyCommands.Add(new UpdateQtyByWorkOrderIdCommand
                 {
                     WorkOrderId = item.Key,
-                    Qty = records.Count(w => w.SFCStatus == SfcStatusEnum.Complete),
+                    Qty = records.Count(w => w.Status == SfcStatusEnum.Complete),
                     UpdatedBy = user,
                     UpdatedOn = item.Value.Max(w => w.CreatedOn)
                 });
