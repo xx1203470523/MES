@@ -1,4 +1,5 @@
-﻿using Hymson.MES.EquipmentServices.Dtos;
+﻿using Hymson.MES.EquipmentServices;
+using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +27,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _manufactureService = manufactureService;
         }
 
+
+        /// <summary>
+        /// 创建条码
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CreateBarCode")]
+        public async Task<IEnumerable<string>> CreateBarCodeBySemiProductAsync(BaseDto dto)
+        {
+            return await _manufactureService.CreateBarcodeBySemiProductIdAsync(dto);
+        }
 
         /// <summary>
         /// 进站 HY-MES-EQU-015

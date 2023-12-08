@@ -17,9 +17,11 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
+using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -272,7 +274,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         CreatedBy = param.UserName!,
                         UpdatedBy = param.UserName
                     };
-                    manuSfcList.Add(manuSfcEntity);                    
+                    manuSfcList.Add(manuSfcEntity);
 
                     var manuSfcInfoEntity = new ManuSfcInfoEntity
                     {
@@ -670,57 +672,65 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
         /// <param name="param"></param>
         /// <returns></returns>
         public async Task<List<ManuSfcEntity>> CreateBarcodeBySemiProductIdAsync(CreateBarcodeBySemiProductId param)
-        {            
+        {
             // 查询资源
             var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
             {
                 Site = param.SiteId,
                 Code = param.ResourceCode,
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19603)).WithData("Code", param.ResourceCode);
-            //半成品生成条码 通过上料记录来查询资源绑定的工单
-            var fr = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync(new Data.Repositories.Manufacture.ManuFeeding.Query.GetByResourceIdAndMaterialIdsQuery()
+
+            // 半成品生成条码 通过上料记录来查询资源绑定的工单
+            var feedingEntities = await _manuFeedingRepository.GetByResourceIdAndMaterialIdsWithOutZeroAsync(new GetByResourceIdAndMaterialIdsQuery
             {
                 ResourceId = resourceEntity.Id,
                 MaterialIds = null
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19604)).WithData("ResourceCode", param.ResourceCode);
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19607)).WithData("Code", param.ResourceCode);
 
-            var foo = fr.FirstOrDefault(f => f.WorkOrderId != null && f.WorkOrderId != 0) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19604)).WithData("ResourceCode", param.ResourceCode);
+            var feedingEntity = feedingEntities.FirstOrDefault(f => f.WorkOrderId != null && f.WorkOrderId != 0)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19608)).WithData("Code", param.ResourceCode);
 
-            var wo = await _planWorkOrderRepository.GetByIdAsync(foo.WorkOrderId ?? 0) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19929));
-            var proc = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new ProcProdureByResourceIdQuery()
+            // 工单检查
+            var workOrderId = feedingEntity.WorkOrderId ?? 0;
+            if (workOrderId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", workOrderId);
+
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16016)).WithData("WorkOrder", workOrderId);
+
+            var procedureEntity = await _procProcedureRepository.GetProcProcedureByResourceIdAsync(new ProcProdureByResourceIdQuery
             {
                 SiteId = param.SiteId,
                 ResourceId = resourceEntity.Id,
             });
-            var psr1 = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new Data.Repositories.Process.ProductSet.Query.GetByProcedureIdAndProductIdQuery()
+
+            // 产出设置
+            var productSetEntity = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery
             {
-                ProductId = wo.ProductId,
+                ProductId = workOrderEntity.ProductId,
                 SetPointId = resourceEntity.Id,
                 SiteId = param.SiteId,
             });
-            if (psr1 == null)
+            productSetEntity ??= await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new GetByProcedureIdAndProductIdQuery
             {
-                psr1 = await _procProductSetRepository.GetByProcedureIdAndProductIdAsync(new Data.Repositories.Process.ProductSet.Query.GetByProcedureIdAndProductIdQuery()
-                {
-                    ProductId = wo.ProductId,
-                    SetPointId = proc.Id,
-                    SiteId = param.SiteId,
-                });
-                if (psr1 == null)
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19605));
-            }
-            var mo = await _procMaterialRepository.GetByIdAsync(psr1.SemiProductId);
+                ProductId = workOrderEntity.ProductId,
+                SetPointId = procedureEntity.Id,
+                SiteId = param.SiteId,
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19605));
+
+
+            // 下面的代码等有时间了再整理。
+            var mo = await _procMaterialRepository.GetByIdAsync(productSetEntity.SemiProductId);
 
             var planWorkOrderEntity = await _masterDataService.GetProduceWorkOrderByIdAsync(new WorkOrderIdBo
             {
-                WorkOrderId = wo.Id,
+                WorkOrderId = workOrderEntity.Id,
                 IsVerifyActivation = false
             });
 
 
             var inteCodeRulesEntity = await _inteCodeRulesRepository.GetInteCodeRulesByProductIdAsync(new InteCodeRulesByProductQuery
             {
-                ProductId = psr1.SemiProductId,
+                ProductId = productSetEntity.SemiProductId,
                 CodeType = CodeRuleCodeTypeEnum.ProcessControlSeqCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", mo.MaterialCode);
 
@@ -793,7 +803,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         SiteId = param.SiteId,
                         SfcId = sfcId,
                         WorkOrderId = planWorkOrderEntity.Id,
-                        ProductId = psr1.SemiProductId,
+                        ProductId = productSetEntity.SemiProductId,
                         IsUsed = true,
                         CreatedBy = param.UserName,
                         UpdatedBy = param.UserName
@@ -805,14 +815,14 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         SiteId = param.SiteId,
                         SFC = sfc,
                         SFCId = sfcId,
-                        ProductId = psr1.SemiProductId,
+                        ProductId = productSetEntity.SemiProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
                         BarCodeInfoId = sfcInfoId,
                         ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         Qty = mo.Batch,
-                        ProcedureId = proc.Id,
+                        ProcedureId = procedureEntity.Id,
                         Status = SfcStatusEnum.lineUp,
                         RepeatedCount = 0,
                         IsScrap = TrueOrFalseEnum.No,
@@ -825,12 +835,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = param.SiteId,
                         SFC = sfc,
-                        ProductId = psr1.SemiProductId,
+                        ProductId = productSetEntity.SemiProductId,
                         WorkOrderId = planWorkOrderEntity.Id,
                         ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         WorkCenterId = planWorkOrderEntity.WorkCenterId ?? 0,
                         Qty = mo.Batch,
-                        ProcedureId = proc.Id,
+                        ProcedureId = procedureEntity.Id,
                         Operatetype = ManuSfcStepTypeEnum.Create,
                         CurrentStatus = SfcStatusEnum.lineUp,
                         CreatedBy = param.UserName,

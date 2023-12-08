@@ -4,6 +4,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Manufacture;
@@ -85,7 +86,7 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<string>> CreateBarcodeBySemiProductIdAsync(BaseDto baseDto)
         {
-            var manuSFCEntities = await _manuCreateBarcodeService.CreateBarcodeBySemiProductIdAsync(new CoreServices.Bos.Manufacture.ManuCreateBarcode.CreateBarcodeBySemiProductId
+            var manuSFCEntities = await _manuCreateBarcodeService.CreateBarcodeBySemiProductIdAsync(new CreateBarcodeBySemiProductId
             {
                 SiteId = _currentEquipment.SiteId,
                 UserName = _currentEquipment.Name,

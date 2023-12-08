@@ -774,6 +774,7 @@
         public const string MES16013 = "工单状态不为未开始,不允许删除";
         public const string MES16014 = "有工单不存在";
         public const string MES16015 = "工单没有锁定前的状态，无法解锁";
+        public const string MES16016 = "工单【{WorkOrder}】不存在，具体请查看【生产工单】。";
 
         public const string MES16020 = "工单号 不能为空！";
         public const string MES16021 = "物料编码 不能为空！";
@@ -1469,10 +1470,12 @@
         public const string MES19600 = "产品参数采集异常";
         public const string MES19601 = "未找到资源{ResCode}对应工序";
         public const string MES19602 = "参数{ResCode}不存在";
-        public const string MES19603 = "资源编码{Code}不存在";
+        public const string MES19603 = "资源编码【{Code}】不存在，具体请查看【资源维护】";
         public const string MES19604 = "资源：{ResourceCode}未找到激活的工单信息";
         public const string MES19605 = "条码生成失败,半成品记录未找到！";
         public const string MES19606 = "参数{ParameterCodes}不存在";
+        public const string MES19607 = "通过资源【{Code}】未找到相应的上料数据！";
+        public const string MES19608 = "通过资源【{Code}】找到的上料数据未包含工单信息！";
         #endregion
 
         #region 设备对接错误

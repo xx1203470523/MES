@@ -175,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param)
+        public async Task<ProcProcedureEntity> GetProcProcedureByResourceIdAsync(ProcProdureByResourceIdQuery param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetProcProdureByResourceIdSql, param);

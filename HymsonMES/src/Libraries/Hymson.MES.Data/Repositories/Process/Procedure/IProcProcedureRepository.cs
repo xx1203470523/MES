@@ -42,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param);
+        Task<ProcProcedureEntity> GetProcProcedureByResourceIdAsync(ProcProdureByResourceIdQuery param);
 
         /// <summary>
         /// 根据资源ID获取工序
