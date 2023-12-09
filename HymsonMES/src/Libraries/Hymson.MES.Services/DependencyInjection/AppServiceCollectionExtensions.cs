@@ -6,6 +6,10 @@ using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.MES.Services.Dtos.WhWareHouse;
+using Hymson.MES.Services.Dtos.WhWarehouseLocation;
+using Hymson.MES.Services.Dtos.WhWarehouseRegion;
+using Hymson.MES.Services.Dtos.WhWarehouseShelf;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
@@ -41,6 +45,10 @@ using Hymson.MES.Services.Services.Quality.QualUnqualifiedCode;
 using Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Services.Services.Report;
 using Hymson.MES.Services.Services.Warehouse;
+using Hymson.MES.Services.Services.WhWareHouse;
+using Hymson.MES.Services.Services.WhWarehouseLocation;
+using Hymson.MES.Services.Services.WhWarehouseRegion;
+using Hymson.MES.Services.Services.WhWarehouseShelf;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
 using Hymson.MES.Services.Validators.Manufacture;
@@ -48,6 +56,10 @@ using Hymson.MES.Services.Validators.Plan;
 using Hymson.MES.Services.Validators.Process;
 using Hymson.MES.Services.Validators.Quality;
 using Hymson.MES.Services.Validators.Warehouse;
+using Hymson.MES.Services.Validators.WhWareHouse;
+using Hymson.MES.Services.Validators.WhWarehouseLocation;
+using Hymson.MES.Services.Validators.WhWarehouseRegion;
+using Hymson.MES.Services.Validators.WhWarehouseShelf;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -214,13 +226,18 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuDowngradingService, ManuDowngradingService>();
             services.AddSingleton<IManuDowngradingRecordService, ManuDowngradingRecordService>();
 
+            services.AddSingleton<IManuBarcodeAdjustService, ManuBarcodeAdjustService>();
+
             #endregion
 
             #region Warehouse 
             services.AddSingleton<IWhSupplierService, WhSupplierService>();
             services.AddSingleton<IWhMaterialInventoryService, WhMaterialInventoryService>();
             services.AddSingleton<IWhMaterialStandingbookService, WhMaterialStandingbookService>();
-
+            services.AddSingleton<IWhWarehouseService, WhWarehouseService>();
+            services.AddSingleton<IWhWarehouseRegionService, WhWarehouseRegionService>();
+            services.AddSingleton<IWhWarehouseShelfService, WhWarehouseShelfService>();
+            services.AddSingleton<IWhWarehouseLocationService, WhWarehouseLocationService>();
             #endregion
 
             #region Plan
@@ -490,7 +507,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleCreateDto>, ManuDowngradingRuleCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleModifyDto>, ManuDowngradingRuleModifyValidator>();
-
+           
+            services.AddSingleton<AbstractValidator<ManuBarcodeSplitAdjustDto>, ManusBarcodeSplitAdjustValidator>();
             #endregion
 
             #region Warehouse 
@@ -505,7 +523,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<WhMaterialStandingbookCreateDto>, WhMaterialStandingbookCreateValidator>();
             services.AddSingleton<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
 
+            services.AddSingleton<AbstractValidator<WhWarehouseSaveDto>, WhWarehouseSaveValidator>();
 
+            services.AddSingleton<AbstractValidator<WhWarehouseRegionSaveDto>, WhWarehouseRegionSaveValidator>();
+
+            services.AddSingleton<AbstractValidator<WhWarehouseShelfSaveDto>, WhWarehouseShelfSaveValidator>();
+
+            services.AddSingleton<AbstractValidator<WhWarehouseLocationSaveDto>, WhWarehouseLocationSaveValidator>();
             #endregion
 
             #region Plan

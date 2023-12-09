@@ -187,6 +187,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var template = sqlBuilder.AddTemplate(GetWhMaterialInventoryEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
             if (!string.IsNullOrWhiteSpace(whMaterialInventoryQuery.MaterialBarCode))
             {
@@ -368,6 +369,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         }
 
         /// <summary>
+        /// 更新库存数量(减少库存)
+        /// </summary>
+        /// <param name="Command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityRangeCommand Command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateReduceQuantityResidueRangeSql, Command);
+        }
+
+        /// <summary>
         /// 根据物料编码获取物料数据
         /// </summary>
         /// <param name="materialId"></param>
@@ -421,6 +433,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateOutsideWhMaterilInventorySql, whMaterialInventoryEntity);
         }
+
+        /// <summary>
+        /// 根据条码修改库存数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQuantityResidueBySfcsAsync(UpdateQuantityResidueBySfcsCommand command) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateQuantityResidueBySfcsSql, command);
+        }
     }
 
     /// <summary>
@@ -463,5 +486,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         const string UpdateReduceQuantityResidueRangeSql = "UPDATE wh_material_inventory SET QuantityResidue=QuantityResidue- @QuantityResidue, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE MaterialBarCode = @BarCode; ";
 
         const string UpdateOutsideWhMaterilInventorySql = "UPDATE wh_material_inventory SET  MaterialId=@MaterialId, QuantityResidue =@QuantityResidue, Batch=@Batch, SupplierId=@SupplierId,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id; ";
+
+        const string UpdateQuantityResidueBySfcsSql = "UPDATE wh_material_inventory SET QuantityResidue = @QuantityResidue, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE SiteId=@SiteId AND MaterialBarCode IN @Sfcs AND QuantityResidue >0  ";
     }
 }

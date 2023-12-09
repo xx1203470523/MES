@@ -521,7 +521,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES19918)).WithData("SFC", dto.SFC);
             }
             //绑盘前校验 该条码是否已绑盘
-            var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(dto.SFC);
+            var check1 = await _inteVehiceFreightStackRepository.GetBySFCAsync(new InteVehiceFreightStackBySfcQuery() { SiteId=_currentSite.SiteId??0, BarCode = dto.SFC });
             if (check1 != null)
             {
                 var v1 = await _inteVehicleRepository.GetByIdAsync(check1.VehicleId);

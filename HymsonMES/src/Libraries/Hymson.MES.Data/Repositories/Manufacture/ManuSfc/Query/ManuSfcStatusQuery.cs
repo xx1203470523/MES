@@ -15,6 +15,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
     /// </summary>
     public class ManuSfcStatusQuery
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 条码列表
         /// </summary>

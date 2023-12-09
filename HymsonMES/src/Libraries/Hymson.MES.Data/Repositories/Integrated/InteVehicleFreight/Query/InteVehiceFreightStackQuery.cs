@@ -38,4 +38,11 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         public long SiteId { get; set; }
     }
+
+    public class InteVehiceFreightStackBySfcQuery 
+    { 
+        public long SiteId { get; set; }
+
+        public string BarCode { get; set; }
+    }
 }

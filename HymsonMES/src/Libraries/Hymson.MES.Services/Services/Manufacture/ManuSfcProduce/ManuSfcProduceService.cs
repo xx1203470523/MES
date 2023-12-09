@@ -2004,7 +2004,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 await _whMaterialInventoryRepository.UpdateReduceQuantityResidueRangeAsync(updateReduceInventoryQuantityList);
             }
 
-
             if (updateAddInventoryQuantityList != null && updateAddInventoryQuantityList.Any())
             {
                 await _whMaterialInventoryRepository.UpdateIncreaseQuantityResidueRangeAsync(updateAddInventoryQuantityList);

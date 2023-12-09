@@ -112,6 +112,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <summary>
         /// 更新库存数量(减少库存)
         /// </summary>
+        /// <param name="Command"></param>
+        /// <returns></returns>
+         Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityRangeCommand Command);
+
+        /// <summary>
+        /// 更新库存数量(减少库存)
+        /// </summary>
         /// <param name="updateQuantityCommand"></param>
         /// <returns></returns>
         Task<int> UpdateReduceQuantityResidueAsync(UpdateQuantityCommand updateQuantityCommand);
@@ -209,5 +216,12 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="whMaterialInventoryEntity"></param>
         /// <returns></returns>
         Task<int> UpdateOutsideWhMaterilInventoryAsync(WhMaterialInventoryEntity whMaterialInventoryEntity);
+
+        /// <summary>
+        /// 根据条码修改库存数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQuantityResidueBySfcsAsync(UpdateQuantityResidueBySfcsCommand command);
     }
 }

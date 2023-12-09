@@ -198,4 +198,76 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         /// </summary>
         public long Id { get; set; }
     }
+
+    /// <summary>
+    /// 条码状态更新 
+    /// </summary>
+    public class UpdateStatusAndQtyBySfcsCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 产品条码列表
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+    }
+
+    public class UpdateStatusAndQtyByIdCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 条码在制品id列表
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 条码当前状态
+        /// </summary>
+        public SfcStatusEnum CurrentStatus { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 当前数量
+        /// </summary>
+        public decimal CurrentQty { get; set; }
+    }
+
+    public class UpdateManuSfcQtyAndCurrentQtyVerifyByIdCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 条码在制品id列表
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+
+        /// <summary>
+        /// 当前数量
+        /// </summary>
+        public decimal CurrentQty { get; set; }
+    }
 }

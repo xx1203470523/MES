@@ -118,4 +118,36 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// </summary>
         public int RepeatedCount { get; set; }
     }
+
+    public class UpdateStatusAndQtyBySfcsCommand: UpdateCommand
+    {
+        public long SiteId {  get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 更改为的状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+    }
+    public class UpdateManuSfcProduceQtyByIdCommand : UpdateCommand
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; }
+    }
 }

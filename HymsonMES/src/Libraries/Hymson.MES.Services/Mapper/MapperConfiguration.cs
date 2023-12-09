@@ -7,6 +7,10 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
+using Hymson.MES.Core.Domain.WhWareHouse;
+using Hymson.MES.Core.Domain.WhWarehouseLocation;
+using Hymson.MES.Core.Domain.WhWarehouseRegion;
+using Hymson.MES.Core.Domain.WhWarehouseShelf;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -48,6 +52,10 @@ using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
+using Hymson.MES.Data.Repositories.WhWareHouse.Query;
+using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
+using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
+using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -56,6 +64,10 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.MES.Services.Dtos.WhWareHouse;
+using Hymson.MES.Services.Dtos.WhWarehouseLocation;
+using Hymson.MES.Services.Dtos.WhWarehouseRegion;
+using Hymson.MES.Services.Dtos.WhWarehouseShelf;
 
 namespace Hymson.MES.Services.Mapper
 {
@@ -585,6 +597,39 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhMaterialStandingbookEntity, WhMaterialStandingbookDto>();
             #endregion
 
+            #region WhWareHouse
+
+            CreateMap<WhWarehousePagedQueryDto, WhWarehousePagedQuery>();
+            CreateMap<WhWarehouseSaveDto, WhWarehouseEntity>();
+            CreateMap<WhWarehouseEntity, WhWarehouseDto>();
+
+            #endregion
+
+            #region WhWareHouseRegion
+
+            CreateMap<WhWarehouseRegionPagedQueryDto, WhWarehouseRegionPagedQuery>();
+            CreateMap<WhWarehouseRegionSaveDto, WhWarehouseRegionEntity>();
+            CreateMap<WhWarehouseRegionEntity, WhWarehouseRegionDto>(); 
+
+            #endregion
+
+            #region WhWareHouseShelf
+
+            CreateMap<WhWarehouseShelfPagedQueryDto, WhWarehouseShelfPagedQuery>();
+            CreateMap<WhWarehouseShelfSaveDto, WhWarehouseShelfEntity>();
+            CreateMap<WhWarehouseShelfEntity, WhWarehouseShelfDto>();
+
+            #endregion
+
+            #region WhWareHouseLocation
+
+            CreateMap<WhWarehouseLocationPagedQueryDto, WhWarehouseLocationPagedQuery>();
+            CreateMap<WhWarehouseLocationSaveDto, WhWarehouseLocationEntity>();
+            CreateMap<WhWarehouseLocationEntity, WhWarehouseLocationDto>();
+            CreateMap<WhWarehouseLocationQueryDto, WhWarehouseLocationQuery>();
+
+            #endregion
+
         }
 
         /// <summary>
@@ -776,6 +821,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuDowngradingEntity, ManuDowngradingDto>();
             CreateMap<ManuDowngradingRecordEntity, ManuDowngradingRecordDto>();
             CreateMap<ManuDowngradingRecordPagedQueryDto, ManuDowngradingRecordPagedQuery>();
+            #endregion
+
+            #region ManuSfc
+            CreateMap<ManuSfcAboutInfoPagedQueryDto, ManuSfcAboutInfoPagedQuery>();
+            CreateMap<ManuSfcAboutInfoView, ManuSfcAboutInfoViewDto>();
             #endregion
         }
 
