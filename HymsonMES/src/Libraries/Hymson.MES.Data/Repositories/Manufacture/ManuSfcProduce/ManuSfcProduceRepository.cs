@@ -203,6 +203,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("Sfc in @Sfcs");
             }
+
+            if (query.ResourceId.HasValue)
+            {
+                sqlBuilder.Where("ResourceId = @ResourceId");
+            }
+            if (query.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where("ProcedureId = @ProcedureId");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var manuSfcProduceEntities = await conn.QueryAsync<ManuSfcProduceEntity>(template.RawSql, query);
             return manuSfcProduceEntities;
@@ -435,6 +445,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeletePhysicalRangeByIdsSql, idsCommand);
+        }
+
+        /// <summary>
+        /// 物理删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<int> DeletePhysicalByIdSqlAsync(long id)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeletePhysicalRangeByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -746,14 +767,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdStatusAsync(ManuSfcProduceByProcedureIdStatusQuery query) 
+        public async Task<IEnumerable<ManuSfcProduceEntity>> GetActivityListByProcedureIdStatusAsync(ManuSfcProduceByProcedureIdStatusQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetListByProcedureIdAndResIdStatusSql);
             sqlBuilder.Where("p.SiteId = @SiteId");
             sqlBuilder.Where("p.ProcedureId = @ProcedureId");
-            if (query.ResourceId.HasValue) 
+            if (query.ResourceId.HasValue)
             {
                 sqlBuilder.Where(" p.ResourceId = @ResourceId");
             }
@@ -803,7 +824,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 sqlBuilder.Where("msp.Sfc like @Sfc");
             }
 
-           //多条码
+            //多条码
             if (query.SfcArray != null && query.SfcArray.Length > 0)
             {
                 sqlBuilder.Where("msp.Sfc in @SfcArray");
@@ -868,6 +889,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var totalCount = await totalCountTask;
             return new PagedInfo<ManuSfcProduceVehicleView>(manuSfcProduceEntities, query.PageIndex, query.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 根据条码更改条码状态与数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAndQtyBySfcsAsync(ManuSfcProduce.Command.UpdateStatusAndQtyBySfcsCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusAndQtyBySfcsSql, command);
+        }
+
+        /// <summary>
+        /// 根据id更改数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateQtyByIdAsync(UpdateManuSfcProduceQtyByIdCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
+        }
     }
 
     /// <summary>
@@ -887,7 +930,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string UpdateWithStatusCheckUseInSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id IN @Ids; ";
         const string UpdateProduceInStationSFCSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id AND (Status = @CurrentStatus OR CreatedOn = UpdatedOn); ";
         const string UpdateSfcProduceBusinessSql = "UPDATE `manu_sfc_produce_business` SET BusinessType = @BusinessType, BusinessContent = @BusinessContent, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdateQtySql = "UPDATE `manu_sfc_produce` SET    Qty = @Qty,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = 0  WHERE Id = @Id ";
+        const string UpdateQtySql = "UPDATE `manu_sfc_produce` SET    Qty = @Qty,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string DeleteSql = "delete from manu_sfc_produce where Id = @Id  ";
         const string DeleteRangeSql = "UPDATE `manu_sfc_produce` SET IsDeleted = Id ,UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids";
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_produce`  WHERE Id = @Id ";
@@ -907,6 +950,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeletePhysicalSql = "DELETE FROM manu_sfc_produce WHERE SFC = @Sfc and SiteId=@SiteId ";
         const string DeletePhysicalRangeSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND SFC IN @Sfcs ";
         const string DeletePhysicalRangeByIdsSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND Id IN @Ids ";
+        const string DeletePhysicalRangeByIdSql = "DELETE FROM manu_sfc_produce WHERE Id = @Id ";
         const string DeleteSfcProduceBusinessBySfcInfoIdSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId = @SfcInfoId";
         const string DeleteSfcProduceBusinessBySfcInfoIdsSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId IN @SfcInfoIds";
         const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds AND BusinessType=@BusinessType";
@@ -935,5 +979,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetListBySfcsSql = @"SELECT * FROM manu_sfc_produce WHERE SFC in @Sfcs and SiteId=@SiteId ";
 
         const string GetListByProcedureIdAndResIdStatusSql = @"SELECT p.* FROM manu_sfc_produce p /**innerjoin**/ /**leftjoin**/ /**where**/ ";
+
+        const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc_produce` SET Status=@Status, Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SFC in  @Sfcs AND SiteId=@SiteId ";
+        const string UpdateQtyByIdSql= @"UPDATE `manu_sfc_produce` SET  Qty = @Qty ,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id in  @Id  ";
     }
 }

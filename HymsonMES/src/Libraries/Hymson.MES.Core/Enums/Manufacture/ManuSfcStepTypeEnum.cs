@@ -198,7 +198,32 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// 部分报废
         /// </summary>
         [Description("部分报废")]
-        PartialScrap = 37
+        PartialScrap = 37,
 
+        /// <summary>
+        /// 条码合并
+        /// </summary>
+        [Description("条码合并")]
+        SfcMerge = 38,
+        /// <summary>
+        /// 条码合并-新增
+        /// </summary>
+        [Description("条码合并-新增")]
+        SfcMergeAdd = 39,
+        /// <summary>
+        /// 条码合并-新增
+        /// </summary>
+        [Description("条码数量调整")]
+        SfcQtyAdjust = 40,
+        /// <summary>
+        /// 条码拆分
+        /// </summary>
+        [Description("条码拆分")]
+        Split = 41,
+        /// <summary>
+        /// 条码拆分-新增
+        /// </summary>
+        [Description("条码拆分-新增")]
+        SplitCreate = 42
     }
 }

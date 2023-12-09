@@ -161,4 +161,56 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public SfcStatusEnum? SfcStatus { get; set; }
     }
+
+    public class ManuSfcAboutInfoPagedQuery : PagerInfo 
+    {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? Sfc { get; set; }
+
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SfcStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 物料ID
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工艺路线ID
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 批量的条码
+        /// </summary>
+        public IEnumerable<string> Sfcs { get; set; }
+
+    }
+
+    public class ManuSfcAboutInfoBySfcQuery : PagerInfo
+    {
+        /// <summary>
+        /// 站点
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; }
+    }
 }

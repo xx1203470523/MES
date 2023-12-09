@@ -14,5 +14,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 资源
+        /// </summary>
+        public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
     }
 }

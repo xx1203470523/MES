@@ -65,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<InteVehicleFreightStackEntity> GetBySFCAsync(string sfc);
+        Task<InteVehicleFreightStackEntity> GetBySFCAsync(InteVehiceFreightStackBySfcQuery query);
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>

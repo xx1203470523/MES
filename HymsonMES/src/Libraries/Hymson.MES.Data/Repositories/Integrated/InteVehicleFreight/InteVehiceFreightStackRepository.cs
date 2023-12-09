@@ -211,10 +211,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<InteVehicleFreightStackEntity> GetBySFCAsync(string sfc)
+        public async Task<InteVehicleFreightStackEntity> GetBySFCAsync(InteVehiceFreightStackBySfcQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightStackEntity>(GetBySFCSql, new { BarCode = sfc });
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleFreightStackEntity>(GetBySFCSql,query);
         }
         #endregion
 
@@ -241,7 +241,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string DeleteByVehicleIdsSql = "DELETE from `inte_vehicle_freight_stack`  WHERE VehicleId IN @VehicleIds";
 
         const string GetByIdSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE Id = @Id ";
-        const string GetBySFCSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE BarCode = @BarCode ";
+        const string GetBySFCSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE SiteId=@SiteId and BarCode = @BarCode ";
         const string GetByIdsSql = @"SELECT * FROM `inte_vehicle_freight_stack`  WHERE Id IN @Ids ";
         #endregion
     }

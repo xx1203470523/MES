@@ -35,4 +35,13 @@ namespace Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command
         public WhMaterialInventoryStatusEnum Status { get; set; }
 
     }
+
+    public class UpdateQuantityResidueBySfcsCommand : UpdateCommand
+    {
+        public long SiteId {  get; set; }
+
+        public decimal QuantityResidue { get; set;}
+
+        public string[] Sfcs { get; set; }
+    }
 }

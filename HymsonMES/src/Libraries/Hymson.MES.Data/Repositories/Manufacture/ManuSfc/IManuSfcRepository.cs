@@ -156,6 +156,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuSfcProduceSelectView>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQuery query);
 
         /// <summary>
+        /// 分页查询（查询所有条码信息-不查询在制表）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcAboutInfoView>> GetManuSfcAboutInfoPagedAsync(ManuSfcAboutInfoPagedQuery query);
+
+        /// <summary>
+        /// 根据SFC查询条码信息-不查询在制表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcAboutInfoView> GetManSfcAboutInfoBySfcAsync(ManuSfcAboutInfoBySfcQuery query);
+
+        /// <summary>
         /// 批量更新条码（条码状态与使用状态）
         /// </summary>
         /// <param name="command"></param>
@@ -217,6 +231,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="commands"></param>
         /// <returns></returns>
         Task<int> UpdateManuSfcQtyByIdRangeAsync(IEnumerable<UpdateManuSfcQtyByIdCommand> commands);
+
+        /// <summary>
+        /// 根据SFCs设置条码状态与数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAndQtyBySfcsAsync(UpdateStatusAndQtyBySfcsCommand command);
+
+        /// <summary>
+        /// 根据Id条码状态与数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAndQtyByIdAsync(UpdateStatusAndQtyByIdCommand command);
+
+        /// <summary>
+        /// 根据Id条码数量
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateManuSfcQtyAndCurrentQtyVerifyByIdAsync(UpdateManuSfcQtyAndCurrentQtyVerifyByIdCommand command);
         #endregion
     }
 }

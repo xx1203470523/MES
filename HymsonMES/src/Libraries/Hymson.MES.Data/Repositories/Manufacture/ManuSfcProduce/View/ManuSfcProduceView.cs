@@ -174,4 +174,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         public long SfcInfoId { get; set; }
     }
+
+    public class ManuSfcAboutInfoView : ManuSfcEntity 
+    {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 产品ID
+        /// </summary>
+        public long ProductId { get; set;}
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set;}
+
+        /// <summary>
+        /// BomId
+        /// </summary>
+        public long ProductBomId {  get; set; }
+    }
 }

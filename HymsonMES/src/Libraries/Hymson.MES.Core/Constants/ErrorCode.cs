@@ -543,6 +543,45 @@
         public const string MES12703 = "请求实体不能为空！";
         #endregion
 
+        #region 条码调整(合并、拆分、调整数量)
+        public const string MES12800 = "条码调整(合并、拆分、调整数量)错误";
+        public const string MES12801 = "条码为空";
+        public const string MES12802 = "条码【{sfc}】不存在";
+        public const string MES12803 = "条码【{sfc}】在载具中已绑定，如需操作请先去解绑";
+        public const string MES12804 = "条码【{sfc}】在容器中，不允许操作";
+        public const string MES12805 = "产品序列码【{SFC}】当前状态【{Current}】，不允许操作。";
+        public const string MES12806 = "条码[{sfc}]有不合格记录开启，不允许操作";
+        public const string MES12807 = "产品序列码【{SFC}】对应工单【{WorkOrderCode}】【{WorkOrderStatus}】，不允许操作。";
+        public const string MES12808 = "产品序列码对应工单不是相同的，不允许操作。";
+        public const string MES12809 = "产品序列码对应物料不是相同的，不允许操作。";
+        public const string MES12810 = "产品序列码对应物料清单不是相同的，不允许操作。";
+        public const string MES12811 = "产品序列码对应工艺路线不是相同的，不允许操作。";
+        public const string MES12812 = "产品序列码没有对应工单，无法进行工单相关验证";
+        public const string MES12813 = "产品序列码对应状态不是相同的，不允许操作";
+        public const string MES12814 = "产品序列码只有一条，无法进行合并操作";
+        public const string MES12815 = "产品序列码不是全部是在制条码，无法进行合并操作";
+        public const string MES12816 = "产品序列码没有状态，无法进行合并操作";
+        public const string MES12817 = "产品序列码全部在制时，工序不同，不允许操作";
+        public const string MES12818 = "产品序列码全部在制时，资源不同，不允许操作";
+        public const string MES12819 = "条码没有物料信息";
+        public const string MES12820 = "产品没有编码规则信息，无法生成条码";
+        public const string MES12821 = "没有编码规则组成信息，无法生成条码";
+        public const string MES12822 = "编码规则生成多个条码，不允许合并";
+        public const string MES12823 = "条码更改数量，参数需要符合要求";
+        public const string MES12824 = "没有查找到条码【{sfc}】的工单";
+        public const string MES12825 = "工单可下达数量不足";
+        public const string MES12826 = "数量没有变化";
+        public const string MES12827 = "备注字符不允许超过255个字符";
+        public const string MES12828 = "拆分数量必须大于0";
+        public const string MES12829 = "条码[{sfc}]数量为【{Qty}】，小于拆分数量【{SplitQty}】,无法执行操作";
+        public const string MES12830 = "产品【{ProductCode}】规则生成条码失败，请查看【编码规则】";
+        public const string MES12831 = "产品【{ProductCode}】生成多个条码，当前功能无法实现，请联系管理员";
+        public const string MES12832 = "数据不为最新，请刷新后再操作";
+        public const string MES12833 = "产品序列码【{sfc}】带有NG标识、复判标识，不允许提作!";
+        public const string MES12834 = "“产品序列码【{sfc}】在不合格工艺路线【{ProcedureCode}】工序，不允许损作!";
+        public const string MES12835 = "“产品序列码{sfc}】对应工单状志为【{WorkOrder}】，不允许据作作!";
+        #endregion
+
         #region 故障现象 12900
         public const string MES12900 = "此编码{Code}在系统已经存在!";
         public const string MES12901 = "故障现象编码不能为空";
@@ -1509,6 +1548,27 @@
         #endregion
 
 
+        #endregion
+
+        #region 仓库 19200
+        public const string MES19201 = "仓库编码不能为空!";
+        public const string MES19202 = "仓库名称不能为空!";
+        public const string MES19203 = "仓库编码【{code}】已存在!";
+        public const string MES19204 = "库区编码不能为空!";
+        public const string MES19205 = "库区名称不能为空!";
+        public const string MES19206 = "库区编码【{code}】已存在!";
+        public const string MES19207 = "货架编码【{code}】已存在!";
+        public const string MES19208 = "货架编码不能为空!";
+        public const string MES19209 = "货架名称不能为空!";
+        public const string MES19210 = "仓库不能为空!";
+        public const string MES19211 = "库区不能为空!";
+        public const string MES19212 = "库区信息为空!";
+        public const string MES19213 = "库位新增失败!";
+        public const string MES19214 = "自定义库位编码【{code}】在【{shelfcode}】货架中已存在!";
+        public const string MES19215 = "货架不能为空!";
+        public const string MES19216 = "仓库下已绑定库区,请解绑!";
+        public const string MES19217 = "库区下已绑定货架,请解绑!";
+        public const string MES19218 = "货架下已绑定库位,请解绑!";
         #endregion
 
         #endregion

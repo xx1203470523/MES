@@ -27,6 +27,10 @@ using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Data.Repositories.WhWareHouse;
+using Hymson.MES.Data.Repositories.WhWarehouseLocation;
+using Hymson.MES.Data.Repositories.WhWarehouseRegion;
+using Hymson.MES.Data.Repositories.WhWarehouseShelf;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -299,10 +303,14 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Warehouse 
+
             services.AddSingleton<IWhSupplierRepository, WhSupplierRepository>();
             services.AddSingleton<IWhMaterialInventoryRepository, WhMaterialInventoryRepository>();
             services.AddSingleton<IWhMaterialStandingbookRepository, WhMaterialStandingbookRepository>();
-
+            services.AddSingleton<IWhWarehouseRepository, WhWarehouseRepository>();
+            services.AddSingleton<IWhWarehouseRegionRepository, WhWarehouseRegionRepository>();
+            services.AddSingleton<IWhWarehouseShelfRepository, WhWarehouseShelfRepository>();
+            services.AddSingleton<IWhWarehouseLocationRepository, WhWarehouseLocationRepository>();
 
             #endregion
 

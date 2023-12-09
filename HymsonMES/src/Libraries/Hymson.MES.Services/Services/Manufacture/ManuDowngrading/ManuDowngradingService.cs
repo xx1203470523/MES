@@ -114,7 +114,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = manuDowngradingSaveDto.Sfcs });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery 
+            { 
+                SiteId = _currentSite.SiteId ??0,
+                Sfcs = manuDowngradingSaveDto.Sfcs 
+            });
 
             var noFindSfcs = new List<string>();
             foreach (var item in manuDowngradingSaveDto.Sfcs)
@@ -318,7 +322,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
 
             var noFindSfcs = new List<string>();
             foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
