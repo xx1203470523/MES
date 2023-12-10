@@ -293,7 +293,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         {
             return await VerifySfcsAsync(sfcs, new ManuSfcsVerifyConditions
             {
-                NotAllowStatus = new SfcStatusEnum[] { SfcStatusEnum.Scrapping, SfcStatusEnum.Delete, SfcStatusEnum.Locked, SfcStatusEnum.Activity, SfcStatusEnum.Complete, SfcStatusEnum.Invalid },
+                NotAllowStatus = new SfcStatusEnum[] { SfcStatusEnum.Scrapping, SfcStatusEnum.Delete, SfcStatusEnum.Locked, SfcStatusEnum.Complete, SfcStatusEnum.Invalid },
                 IsBanNgSfc = true,
                 NotAllowWorkOrderStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed },
             });
