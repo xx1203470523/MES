@@ -10,11 +10,6 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -45,8 +40,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuSfcScrapRepository _manuSfcScrapRepository;
 
-        public PartialScrapJobService(IMasterDataService masterDataService, IManuSfcRepository manuSfcRepository,
-            ,IManuSfcScrapRepository manuSfcScrapRepository,
+        public PartialScrapJobService(IMasterDataService masterDataService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcScrapRepository manuSfcScrapRepository,
             IManuSfcProduceRepository manuSfcProduceRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
@@ -92,7 +88,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 中越反馈 部分报废的数量需要记录下来 TODO:
             //await _manuSfcScrapRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuSfcScrapQuery
             //{
-                
+
             //})
             List<ManuSfcStepEntity> manuSfcStepEnties = new();
             List<UpdateSfcProcedureQtyByIdCommand> updateSfcProcedureQtyCommands = new();
