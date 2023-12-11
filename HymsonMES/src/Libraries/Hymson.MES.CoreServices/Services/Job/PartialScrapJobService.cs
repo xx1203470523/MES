@@ -43,14 +43,17 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 仓储接口（条码步骤）
         /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        private readonly IManuSfcScrapRepository _manuSfcScrapRepository;
 
         public PartialScrapJobService(IMasterDataService masterDataService, IManuSfcRepository manuSfcRepository,
+            ,IManuSfcScrapRepository manuSfcScrapRepository,
             IManuSfcProduceRepository manuSfcProduceRepository, IManuSfcStepRepository manuSfcStepRepository)
         {
             _masterDataService = masterDataService;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
+            _manuSfcScrapRepository = manuSfcScrapRepository;
         }
 
         /// <summary>
@@ -86,7 +89,11 @@ namespace Hymson.MES.CoreServices.Services.Job
             // 获取生产条码信息
             var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
             if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return default;
-
+            // 中越反馈 部分报废的数量需要记录下来 TODO:
+            //await _manuSfcScrapRepository.GetEntitiesAsync(new Data.Repositories.Manufacture.Query.ManuSfcScrapQuery
+            //{
+                
+            //})
             List<ManuSfcStepEntity> manuSfcStepEnties = new();
             List<UpdateSfcProcedureQtyByIdCommand> updateSfcProcedureQtyCommands = new();
             List<UpdateManuSfcQtyByIdCommand> updateManuSfcQtyByIdCommands = new();
