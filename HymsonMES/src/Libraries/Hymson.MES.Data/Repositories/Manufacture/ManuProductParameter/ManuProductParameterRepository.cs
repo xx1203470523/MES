@@ -117,22 +117,36 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetManuProductParameterEntitiesSqlTemplate);
-            sqlBuilder.Select("*");
+            sqlBuilder.Select("T1.*");
 
-            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("T1.SiteId = @SiteId");
 
+            sqlBuilder.LeftJoin("proc_parameter_link_type T3 ON T3.ParameterID=T1.ParameterId  AND T3.SiteId=T1.SiteId AND T3.IsDeleted=0");
+
+            if (query.ParameterType.HasValue)
+            {
+                //如果为产品参数，把未关联参数类型的上报参数也展示出来
+                if (query.ParameterType == ParameterTypeEnum.Product)
+                {
+                    sqlBuilder.Where(" (T3.ParameterType = @ParameterType or  T3.ParameterType  IS NULL )");
+                }
+                else
+                {
+                    sqlBuilder.Where("T3.ParameterType = @ParameterType ");
+                }
+            }
             if (!string.IsNullOrWhiteSpace(query.SFC))
             {
-                sqlBuilder.Where("SFC = @SFC");
+                sqlBuilder.Where("T1.SFC = @SFC");
             }
 
             if (query.SFCs?.Any() == true)
             {
                 string sfcstr = string.Join("','", query.SFCs);
-                sqlBuilder.Where($"SFC IN ('{sfcstr}')");
+                sqlBuilder.Where($"T1.SFC IN ('{sfcstr}')");
             }
 
-            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("T1.IsDeleted = 0");
 
             sqlBuilder.AddParameters(query);
 
@@ -297,7 +311,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuProductParameterRepository
     {
-        const string GetManuProductParameterEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_product_parameter` /**where**/  ";
+        const string GetManuProductParameterEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_product_parameter` T1 /**leftjoin**/ /**where**/  ";
 
         const string InsertSql = @"INSERT INTO `manu_product_parameter`(  `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `ParameterId`, `ParamValue`, StandardUpperLimit, StandardLowerLimit, JudgmentResult, TestDuration, TestTime, TestResult,`LocalTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `StepId`) 
                         VALUES (   @Id, @SiteId, @ProcedureId, @ResourceId, @EquipmentId, @SFC, @WorkOrderId, @ProductId, @ParameterId, @ParamValue, @StandardUpperLimit, @StandardLowerLimit, @JudgmentResult, @TestDuration, @TestTime, @TestResult, @LocalTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @StepId )  ";

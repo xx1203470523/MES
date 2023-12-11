@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,5 +23,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品条码
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// 参数类型
+        /// </summary>
+        public ParameterTypeEnum? ParameterType { get; set; } = ParameterTypeEnum.Product;
     }
 }

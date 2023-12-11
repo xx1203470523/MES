@@ -124,7 +124,7 @@ public class SystemApiService : ISystemApiService
         var manuSfcStepEntities = await _manuSfcStepRepository.GetManuSfcStepEntitiesAsync(new() { SiteId = 123456, SFCs = queryDto.SFC });
 
         //根据条码获取设备采集参数
-        var manuSfcParameterEntities = await _manuProductParameterRepository.GetManuProductParameterAsync(new() { SiteId = 123456, SFCs = queryDto.SFC });
+        var manuSfcParameterEntities = await _manuProductParameterRepository.GetManuProductParameterAsync(new() { SiteId = 123456, SFCs = queryDto.SFC  });
 
         #region 基础信息
 
