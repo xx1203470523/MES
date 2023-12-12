@@ -7,7 +7,7 @@ using System.Net;
 namespace Hymson.MES.Equipment.Api.Controllers
 {
     /// <summary>
-    /// 
+    /// 通用接口
     /// </summary>
     [Route("api/v1/[controller]")]
     [ApiController]
