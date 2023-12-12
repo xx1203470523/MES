@@ -222,6 +222,11 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                 CodeRulesId = inteCodeRulesEntity.Id
             });
 
+            if (codeRulesMakeList == null || !codeRulesMakeList.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16501));
+            }
+
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
             {
                 IsTest = false,
