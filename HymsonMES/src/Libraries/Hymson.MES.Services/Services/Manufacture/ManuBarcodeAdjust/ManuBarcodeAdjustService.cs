@@ -909,7 +909,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     updateManuSfcProduceQtyByIdCommand = new UpdateManuSfcProduceQtyByIdCommand
                     {
-                        Id = manuSfcEntity.Id,
+                        Id = manuSfcProduceEntity?.Id??0,
                         Qty = manuSfcEntity.Qty - param.Qty,
                         UpdatedBy = _currentUser.UserName,
                         UpdatedOn = HymsonClock.Now()
