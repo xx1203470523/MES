@@ -900,6 +900,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Id = manuSfcEntity.Id,
                     Qty = manuSfcEntity.Qty - param.Qty,
                     CurrentQty = manuSfcEntity.Qty,
+                    CurrentStatus= manuSfcEntity.Status,
                     UpdatedBy = _currentUser.UserName,
                     UpdatedOn = HymsonClock.Now()
                 };
