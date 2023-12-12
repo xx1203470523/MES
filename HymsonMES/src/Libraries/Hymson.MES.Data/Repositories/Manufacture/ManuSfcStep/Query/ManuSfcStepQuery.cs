@@ -39,4 +39,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public string[] Sfcs { get; set; }
 
     }
+
+    public class SfcMergeOrSplitAddStepQuery
+    {
+        public long SiteId { get; set; }
+
+        public string Sfc { get; set; }
+
+    }
 }

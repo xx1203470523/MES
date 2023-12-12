@@ -2588,11 +2588,23 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                     var sfcStepTemps = sfcSteps.Where(x => x.SFC == item.SFC);
 
+                    var lastNewInStepTime= DateTime.Now;
                     if (!sfcStepTemps.Any())
                     {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES15321)).WithData("sfc", item.SFC);
+                        //加入需求：合并新增或者拆分新增的条码是没有入站步骤的，现在需要查询该条码是否是合并新增或者拆分新增的，是则取生成时间
+                        var mergeOrSplitAddStep = await _manuSfcStepRepository.GetSfcMergeOrSplitAddStepAsync(new SfcMergeOrSplitAddStepQuery()
+                        {
+                            SiteId = _currentSite.SiteId ?? 0,
+                            Sfc = item.SFC
+                        });
+                        if (mergeOrSplitAddStep == null)
+                        {
+                            throw new CustomerValidationException(nameof(ErrorCode.MES15321)).WithData("sfc", item.SFC);
+                        }
+                        lastNewInStepTime = mergeOrSplitAddStep.CreatedOn;
+
                     }
-                    var lastNewInStepTime = sfcStepTemps.Max(x => x.CreatedOn);
+                    else lastNewInStepTime = sfcStepTemps.Max(x => x.CreatedOn);
 
                     manuSfcProduceDtos.Add(new ActivityManuSfcProduceViewDto
                     {
@@ -2607,7 +2619,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                         MaterialCode = material != null ? material.MaterialCode : "",
                         MaterialName = material != null ? material.MaterialName : "",
                         Version = material != null ? material.Version ?? "" : "",
-
 
                     });
                 }
@@ -2673,7 +2684,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var itemVehiceFreightStacks = vehiceFreightStackGroups.FirstOrDefault(x => x.Key == item.Id)?.ToList();
                 if (itemVehiceFreightStacks == null || !itemVehiceFreightStacks.Any())
                 {
-                    throw new CustomerValidationException("载具内没有条码");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15322));
                 }
 
                 var sfcStepTemps = sfcSteps.Where(x => itemVehiceFreightStacks.Select(y => y.BarCode).Contains(x.SFC));

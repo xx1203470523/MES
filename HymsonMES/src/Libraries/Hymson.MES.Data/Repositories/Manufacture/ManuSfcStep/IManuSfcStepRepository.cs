@@ -118,5 +118,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCsAsync(string tableName, EntityBySFCsQuery query);
 
+
+        /// <summary>
+        /// 获取一个条码的合并新增或拆分新增步骤记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query);
     }
 }
