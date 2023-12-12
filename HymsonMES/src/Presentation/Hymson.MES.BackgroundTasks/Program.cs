@@ -53,6 +53,7 @@ Host.CreateDefaultBuilder(args)
 
            #region 生产
            q.AddJobAndTrigger<Productionstatistic>(hostContext.Configuration);
+           q.AddJobAndTrigger<TracingSourceSFCJob>(hostContext.Configuration);
            q.AddJobAndTrigger<WorkOrderStatisticJob>(hostContext.Configuration);
            #endregion
 
@@ -74,8 +75,6 @@ Host.CreateDefaultBuilder(args)
        services.AddSqlExecuteTaskService(hostContext.Configuration);
        services.AddNLog(hostContext.Configuration);
        services.AddEventBusRabbitMQService(hostContext.Configuration);
-
-
 
    });
 

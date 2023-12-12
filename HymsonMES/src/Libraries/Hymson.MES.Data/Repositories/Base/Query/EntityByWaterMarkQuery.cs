@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query
+﻿namespace Hymson.MES.Data.Repositories.Common.Query
 {
-    public   class ManuSfcStepStatisticQuery
+    /// <summary>
+    /// 水位查询实体
+    /// </summary>
+    public class EntityByWaterMarkQuery
     {
         /// <summary>
         /// 水位id
@@ -17,5 +14,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query
         /// 条数
         /// </summary>
         public int Rows { set; get; }
+
     }
 }
