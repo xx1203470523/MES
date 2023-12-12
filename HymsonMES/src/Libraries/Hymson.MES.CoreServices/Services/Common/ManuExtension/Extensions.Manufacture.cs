@@ -295,6 +295,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         /// <returns></returns>
         public static string GetSFCStatusEnumDescription(this ILocalizationService localizationService, SfcStatusEnum statusEnum)
         {
+            return localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{statusEnum.ToString()}");
+
+            /*
             return statusEnum switch
             {
                 SfcStatusEnum.lineUp => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"),
@@ -305,6 +308,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 SfcStatusEnum.Scrapping => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Scrapping)}"),
                 _ => ""
             };
+            */
         }
 
     }
