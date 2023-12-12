@@ -224,7 +224,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
 
             if (codeRulesMakeList == null || !codeRulesMakeList.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16501));
+                throw new CustomerValidationException(nameof(ErrorCode.MES16501)).WithData("product", procMaterialEntity.MaterialCode);
             }
 
             var barcodeList = await _manuGenerateBarcodeService.GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(new BarCodeSerialNumberBo
