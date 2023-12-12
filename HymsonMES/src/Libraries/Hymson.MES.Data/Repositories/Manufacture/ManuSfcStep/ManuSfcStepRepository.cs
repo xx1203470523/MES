@@ -4,7 +4,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -56,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(ManuSfcStepStatisticQuery query)
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcStepEntity>(GetListByStartWaterMarkIdSql, query);
