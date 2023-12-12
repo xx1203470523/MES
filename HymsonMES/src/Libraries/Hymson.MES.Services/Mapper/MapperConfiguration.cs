@@ -431,6 +431,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteUnitPagedQueryDto, InteUnitPagedQuery>();
             CreateMap<InteUnitEntity, InteUnitDto>();
             #endregion
+
+            #region Esop 
+            CreateMap<ProcEsopView, ProcEsopDto>();
+            CreateMap<ProcEsopPagedQueryDto, ProcEsopPagedQuery>();
+            #endregion
         }
 
         /// <summary>

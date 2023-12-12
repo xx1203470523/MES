@@ -245,6 +245,10 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" LineId = @LineId ");
             }
+            if (planWorkOrderActivationQuery.LineIds != null && planWorkOrderActivationQuery.LineIds.Any())
+            {
+                sqlBuilder.Where(" LineId IN @LineIds ");
+            }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var planWorkOrderActivationEntities = await conn.QueryAsync<PlanWorkOrderActivationEntity>(template.RawSql, planWorkOrderActivationQuery);

@@ -168,6 +168,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
+
+            //ESOP
+            services.AddSingleton<IProcEsopService, ProcEsopService>();
+
             #endregion
 
             #region Quality
@@ -406,6 +410,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupSaveDto>, ProcProcessEquipmentGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
+
+            #region Esop
+            services.AddSingleton<AbstractValidator<ProcEsopCreateDto>, ProcEsopCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcEsopModifyDto>, ProcEsopModifyValidator>();
+            services.AddSingleton<AbstractValidator<ProcEsopGetJobQueryDto>, ProcEsopGetJobValidator>();
+            #endregion
             #endregion
 
             #region Integrated

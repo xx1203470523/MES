@@ -77,6 +77,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+            services.AddSingleton<IInteAttachmentRepository, InteAttachmentRepository>();
             services.AddSingleton<IInteCalendarDateDetailRepository, InteCalendarDateDetailRepository>();
             services.AddSingleton<IInteCalendarDateRepository, InteCalendarDateRepository>();
             services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();
@@ -183,6 +184,12 @@ namespace Microsoft.Extensions.DependencyInjection
             #region printConfig
             services.AddSingleton<IProcPrintConfigRepository, ProcPrintConfigRepository>();
             #endregion
+
+            #region ESOP 
+            services.AddSingleton<IProcEsopFileRepository, ProcEsopFileRepository>();
+            services.AddSingleton<IProcEsopRepository, ProcEsopRepository>();
+            #endregion
+
             #endregion
 
             #region Quality
