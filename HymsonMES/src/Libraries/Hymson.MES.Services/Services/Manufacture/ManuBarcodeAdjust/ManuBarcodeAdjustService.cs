@@ -28,6 +28,7 @@ using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
@@ -586,7 +587,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SFC = oneNewSfc,
                 Qty = qty,
                 IsUsed = YesOrNoEnum.Yes,
-                Status = oneManuSfc!.Status ?? SfcStatusEnum.lineUp,
+                Status = oneManuSfc!.Status,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName
             });
@@ -678,7 +679,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Qty = qty,
                 ProcedureId = isProduce ? sfcProduces?.FirstOrDefault()?.ProcedureId : null,
                 Operatetype = ManuSfcStepTypeEnum.SfcMergeAdd,
-                CurrentStatus = oneManuSfc.Status ?? 0,
+                CurrentStatus = oneManuSfc.Status,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
                 Remark = adjustDto.Remark
@@ -1297,7 +1298,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                         //validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.SFC);
                         validationFailure.FormattedMessagePlaceholderValues.Add("SFC", item.SFC);
-                        validationFailure.FormattedMessagePlaceholderValues.Add("Current", _localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{item.Status.ToString()}"));
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Current", _localizationService.GetSFCStatusEnumDescription(item.Status));
                         validationFailure.ErrorCode = nameof(ErrorCode.MES12805);
                         validationFailures.Add(validationFailure);
                     }

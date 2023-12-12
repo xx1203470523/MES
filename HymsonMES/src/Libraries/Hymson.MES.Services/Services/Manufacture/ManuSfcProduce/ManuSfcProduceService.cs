@@ -2525,17 +2525,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                     };
 
                     //找到对应的状态
-                    if (item.Status.HasValue)
+                    if (ManuSfcStatus.SfcStatusInProcess.Contains(item.Status))
                     {
-
-                        if (ManuSfcStatus.SfcStatusInProcess.Contains(item.Status ?? 0))
-                        {
-                            viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (item.Status == null ? null : (int)item.Status);
-                        }
-                        else
-                        {
-                            viewDto.Status = item.Status == null ? null : (int)item.Status;
-                        }
+                        viewDto.Status = sfcProduce != null ? (int)sfcProduce.Status : (int)item.Status;
+                    }
+                    else
+                    {
+                        viewDto.Status = (int)item.Status;
                     }
 
                     manuSfcProduceAboutDowngradingDtos.Add(viewDto);
