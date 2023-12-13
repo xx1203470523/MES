@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Core.Constants.Manufacture
+﻿namespace Hymson.MES.Core.Constants.Manufacture
 {
     /// <summary>
     /// 生成条码通配符
     /// </summary>
     public static class GenerateBarcodeWildcard
     {
-       /// <summary>
-       /// 流水
-       /// </summary>
+        /// <summary>
+        /// 流水
+        /// </summary>
         public const string Activity = "%ACTIVITY%";
 
         /// <summary>
@@ -30,5 +24,10 @@ namespace Hymson.MES.Core.Constants.Manufacture
         /// 年月日通配符
         /// </summary>
         public const string YMDWildcard = "%YMD_WILDCARD%";
+
+        /// <summary>
+        /// 线别通配符
+        /// </summary>
+        public const string LINETYPE = "%LINE_TYPE%";
     }
 }
