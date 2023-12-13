@@ -25,6 +25,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（条码调整）
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="manuBarcodeAdjustService"></param>
         public ManuBarcodeAdjustController(ILogger<ManuDowngradingController> logger, IManuBarcodeAdjustService manuBarcodeAdjustService)
         {
             _logger = logger;
