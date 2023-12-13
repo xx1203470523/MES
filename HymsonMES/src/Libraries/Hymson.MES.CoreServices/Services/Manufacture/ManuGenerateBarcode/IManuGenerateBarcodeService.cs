@@ -17,6 +17,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
         Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo);
 
         /// <summary>
+        /// 生成流水号
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo, BarCodeExtendBo? barCodeExtendBo = null);
+
+        /// <summary>
         /// 条码生成
         /// </summary>
         /// <param name="param"></param>
