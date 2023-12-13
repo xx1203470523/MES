@@ -47,7 +47,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
         /// </summary>
         private readonly IManuCreateBarcodeService _manuCreateBarcodeService;
 
-
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -78,7 +77,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             _manuCreateBarcodeService = manuCreateBarcodeService;
         }
 
-
         /// <summary>
         /// 创建条码
         /// </summary>
@@ -96,7 +94,6 @@ namespace Hymson.MES.EquipmentServices.Services.Manufacture
             if (manuSFCEntities == null || !manuSFCEntities.Any()) return Enumerable.Empty<string>();
             return manuSFCEntities.Select(s => s.SFC);
         }
-
 
         /// <summary>
         /// 进站
