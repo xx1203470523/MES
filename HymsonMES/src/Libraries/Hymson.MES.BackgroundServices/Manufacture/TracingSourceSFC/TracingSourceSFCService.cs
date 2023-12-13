@@ -65,7 +65,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             // TODO 业务待实现
 
             // 更新水位
-            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.WorkOrderStatistic, manuSfcCirculationList.Max(x => x.Id));
+            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, manuSfcCirculationList.Max(x => x.Id));
             trans.Complete();
 
         }
