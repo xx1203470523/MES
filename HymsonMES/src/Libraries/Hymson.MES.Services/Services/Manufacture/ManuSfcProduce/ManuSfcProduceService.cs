@@ -2471,7 +2471,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetManuSfcAboutManuDowngradingBySfcsAsync(string[] sfcs)
         {
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = sfcs });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { SiteId = _currentSite.SiteId ?? 0, Sfcs = sfcs });
 
             //实体到DTO转换 装载数据
             List<ManuSfcProduceAboutDowngradingViewDto> manuSfcProduceAboutDowngradingDtos = new List<ManuSfcProduceAboutDowngradingViewDto>();
