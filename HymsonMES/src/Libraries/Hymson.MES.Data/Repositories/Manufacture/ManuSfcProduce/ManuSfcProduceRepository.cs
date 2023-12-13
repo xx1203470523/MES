@@ -581,6 +581,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             return await conn.ExecuteAsync(UpdateProduceStatusSql, command);
         }
 
+        /// <summary>
+        /// 更新NG数量
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
+        public async Task UpdateNgNumAsync(string SFC)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            await conn.ExecuteAsync(UpdateNGNumSql.Replace("@SFC", "'" + SFC +"'"));
+        }
+
         #endregion
     }
 
@@ -640,6 +651,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #region PDA
 
         const string UpdateProduceStatusSql = "UPDATE `manu_sfc_produce` SET ProcedureId=@ProcedureId,Status=@Status,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE SFC = @SFC";
+
+        //TODO 临时救火小工具，应该放在其他类中，后续优化
+        const string UpdateNGNumSql = "UPDATE manu_sfc_summary SET QualityStatus = 1,NgNum = 0 WHERE sfc = @SFC";
 
         #endregion
     }

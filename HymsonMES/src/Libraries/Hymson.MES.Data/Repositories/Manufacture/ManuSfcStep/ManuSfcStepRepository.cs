@@ -64,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Where("SiteId=@SiteId");
             sqlBuilder.Select("*");
-            sqlBuilder.OrderBy("ProcedureId,CreatedOn");
+            sqlBuilder.OrderBy("CreatedOn");
 
             if (!string.IsNullOrWhiteSpace(manuSfcStepPagedQuery.SFC))
             {

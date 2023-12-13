@@ -289,6 +289,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateProduceStatusAsync(UpdateProduceStatusCommand command);
 
+        /// <summary>
+        /// 更新NG数量
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
+        Task UpdateNgNumAsync(string SFC);
+
         #endregion
     }
 }

@@ -66,7 +66,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         {
             string resourceCode = "YTLPACK01ER004";
             string equipmentCode = "YTLPACK01AE004";
-            string prefix = "TEST111111";
+            string prefix = "YTLSM202312130134A";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto

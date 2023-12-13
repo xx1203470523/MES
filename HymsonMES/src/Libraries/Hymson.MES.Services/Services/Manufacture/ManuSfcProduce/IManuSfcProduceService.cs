@@ -169,6 +169,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <returns></returns>
         Task<int> UpdateProcedureStatusAsync(UpdateManuSFCProdureStatusDto update);
 
+        /// <summary>
+        /// 清除NG信息
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
+        Task UpdateNgNumAsync(string SFC);
+
         #endregion
     }
 }

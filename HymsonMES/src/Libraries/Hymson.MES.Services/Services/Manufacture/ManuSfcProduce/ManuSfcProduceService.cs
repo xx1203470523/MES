@@ -14,6 +14,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
@@ -1490,10 +1491,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (sfcProduceStepDto.ProcedureId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES18012));
             if (sfcProduceStepDto.Sfcs == null || !sfcProduceStepDto.Sfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES18014));
 
-
             var manuSfcs = sfcProduceStepDto.Sfcs.Select(it => it.Sfc).ToArray();
-
-
 
             long processRouteId = 0;
             //在制数据
@@ -1751,7 +1749,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 ResourceId = item.ResourceId,
                 Operatetype = ManuSfcStepTypeEnum.StepControl,
                 CurrentStatus = sfcProduceStepDto.Type,
-
+                Passed = 1,
                 CreatedBy = _currentUser.UserName,
                 CreatedOn = HymsonClock.Now(),
                 UpdatedBy = _currentUser.UserName,
@@ -2270,7 +2268,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="SFC"></param>
         /// <returns></returns>
         public async Task<ManuSFCProdureInfoOutputDto> GetProcessInfoAsync(string SFC)
-        { 
+        {
             var manuSfcProcedureEntity = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = SFC, SiteId = _currentSite.SiteId ?? 123456 })
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC", SFC);
 
@@ -2300,6 +2298,20 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             return await _manuSfcProduceRepository.UpdateProduceStatusAsync(updateCommand);
         }
+
+        /// <summary>
+        /// 更新NG数量
+        /// </summary>
+        /// <param name="SFC"></param>
+        /// <returns></returns>
+        public async Task UpdateNgNumAsync(string SFC)
+        {
+            var info = await _manuSfcProduceRepository.GetBySFCAsync(new() { Sfc = SFC,SiteId = 123456 });
+            if (info == null) throw new CustomerValidationException(nameof(ErrorCode.MES18023)).WithData("SFC",SFC);
+
+            await _manuSfcProduceRepository.UpdateNgNumAsync(SFC);
+        }
+
         #endregion
     }
 }

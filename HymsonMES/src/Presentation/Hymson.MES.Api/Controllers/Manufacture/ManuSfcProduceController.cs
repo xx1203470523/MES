@@ -270,6 +270,13 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuSfcProduceService.UpdateProcedureStatusAsync(updateDto);
         }
 
+        [HttpGet]
+        [Route("updateNg")]
+        public async Task DelNgInfo(string sfc)
+        {
+            await _manuSfcProduceService.UpdateNgNumAsync(sfc);
+        }
+
         #endregion
     }
 }
