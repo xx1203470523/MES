@@ -2,8 +2,8 @@
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
@@ -66,7 +66,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.WorkOrderStatistic);
 
             // 获取步骤表数据
-            var manuSfcStepList = await _manuSfcStepRepository.GetListByStartWaterMarkIdAsync(new ManuSfcStepStatisticQuery
+            var manuSfcStepList = await _manuSfcStepRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
             {
                 StartWaterMarkId = waterMarkId,
                 Rows = limitCount

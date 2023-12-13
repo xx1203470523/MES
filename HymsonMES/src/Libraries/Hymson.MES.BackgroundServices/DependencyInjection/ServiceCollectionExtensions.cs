@@ -64,6 +64,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         static void AddServices(IServiceCollection services)
         {
             services.AddSingleton<IProductionstatisticService, ProductionstatisticService>();
+            services.AddSingleton<ITracingSourceSFCService, TracingSourceSFCService>();
             services.AddSingleton<IWorkOrderStatisticService, WorkOrderStatisticService>();
         }
 
