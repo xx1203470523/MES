@@ -486,6 +486,7 @@ namespace Hymson.MES.Services.Services.Process
                     UpdatedBy = procMaterialEntity.UpdatedBy,
                     UpdatedOn = procMaterialEntity.UpdatedOn,
                     ConsumeRatio = procMaterialEntity.ConsumeRatio,
+                    QuantityLimit = procMaterialEntity.QuantityLimit,
                 });
 
                 if (response == 0)
