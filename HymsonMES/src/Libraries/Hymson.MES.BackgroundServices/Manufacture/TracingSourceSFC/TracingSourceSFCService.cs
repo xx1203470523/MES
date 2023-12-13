@@ -64,6 +64,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             // TODO 业务待实现
 
+            // 根据条码递归读取所有父级条码
+
+            // 根据条码递归读取所有子级条码
+
+            // 生成链路JSON数据
+
             // 更新水位
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, manuSfcCirculationList.Max(x => x.Id));
             trans.Complete();

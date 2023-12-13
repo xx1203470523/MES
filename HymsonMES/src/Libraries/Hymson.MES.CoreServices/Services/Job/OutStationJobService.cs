@@ -221,6 +221,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES16370));
             }
 
+            // 判断条码是否为空
+            if (commonBo.OutStationRequestBos.Any(a => a.SFC == null))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16382));
+            }
+
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
