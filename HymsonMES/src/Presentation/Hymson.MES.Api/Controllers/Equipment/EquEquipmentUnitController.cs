@@ -1,9 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
@@ -11,7 +9,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
     /// <summary>
     /// 控制器（单位维护）
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentUnitController : ControllerBase

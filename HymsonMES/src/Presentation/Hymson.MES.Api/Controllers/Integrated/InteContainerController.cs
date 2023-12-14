@@ -4,7 +4,6 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Integrated
@@ -12,7 +11,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
     /// <summary>
     /// ¿ØÖÆÆ÷£¨ÈÝÆ÷Î¬»¤£©
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InteContainerController : ControllerBase

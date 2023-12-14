@@ -8,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 下达条码控制器
-    /// @author wangkeming
-    /// @date 2023-02-11 04:45:25
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]

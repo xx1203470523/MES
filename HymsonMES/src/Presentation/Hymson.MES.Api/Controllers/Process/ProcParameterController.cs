@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（标准参数表）
-    /// @author Karl
-    /// @date 2023-02-13 02:50:20
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterController : ControllerBase

@@ -9,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 控制器（巡检检验单）
-    /// @author xiaofei
-    /// @date 2023-08-24 10:46:38
     /// </summary>
     [Authorize]
     [ApiController]

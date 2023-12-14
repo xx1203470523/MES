@@ -8,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（工艺设备组）
-    /// @author Hjy
-    /// @date 2023-07-25 10:22:45
     /// </summary>
     [Authorize]
     [ApiController]

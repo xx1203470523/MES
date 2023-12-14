@@ -5,16 +5,12 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using Minio.DataModel;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（工艺路线表）
-    /// @author zhaoqing
-    /// @date 2023-02-14 10:07:11
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcessRouteController : ControllerBase

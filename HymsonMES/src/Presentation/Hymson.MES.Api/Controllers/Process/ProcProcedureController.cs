@@ -2,22 +2,16 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Procedure;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Minio.DataModel;
 
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
     /// 控制器（工序表）
-    /// @author zhaoqing
-    /// @date 2023-02-13 09:06:05
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcedureController : ControllerBase
