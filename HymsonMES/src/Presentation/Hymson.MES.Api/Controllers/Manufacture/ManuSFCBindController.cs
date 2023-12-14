@@ -116,11 +116,10 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         [HttpPost]
-        [Route("pda/bindsfc/add")]
-        public async Task AddManuSfcCirculationAsync([FromBody] ManuSfcCirculationCreateDto createDto)
+        [Route("pda/bindsfc")]
+        public async Task AddManuSfcCirculationAsync([FromBody] ManuSfcCirculationBindDto createDto)
         {
-            //TODO 绑定涉及几个场景，需要增加查询条件
-            await Task.CompletedTask;
+            await _manuSfcCirculationService.CreateManuSfcCirculationAsync(createDto);
         }
     }
 }

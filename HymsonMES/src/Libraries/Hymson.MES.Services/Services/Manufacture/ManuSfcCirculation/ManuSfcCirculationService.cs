@@ -9,6 +9,7 @@ using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
@@ -42,6 +43,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IEquEquipmentRepository _equipmentRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IProcProcedureRepository _procProcedureRepository;
+        private readonly IProcResourceRepository _procResourceRepository;
+        private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
+
         public ManuSfcCirculationService(ICurrentSystem currentSystem,
             ICurrentUser currentUser,
             ICurrentEquipment currentEquipment,
@@ -49,7 +55,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             IPlanWorkOrderRepository planWorkOrderRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository,
             IEquEquipmentRepository equipmentRepository,
-            IManuSfcProduceRepository manuSfcProduceRepository)
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcRepository manuSfcRepository,
+            IProcProcedureRepository procProcedureRepository,
+            IProcResourceRepository procResourceRepository,
+            IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
         {
             _currentSystem = currentSystem;
             _currentUser = currentUser;
@@ -59,6 +69,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _equipmentRepository = equipmentRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _procResourceRepository = procResourceRepository;
+            _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         }
 
         /// <summary>
@@ -155,6 +169,41 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             return await _manuSfcCirculationRepository.InsertAsync(createCommand);
+
+        }
+
+        /// <summary>
+        /// 绑定条码关系
+        /// </summary>
+        /// <param name="bindDto"></param>
+        /// <returns></returns>
+        public async Task CreateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto)
+        {
+            //获取条码信息
+            var bindSfcInfo = await _manuSfcRepository.GetBySFCAsync(new() { SFC = bindDto.BindSFC })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
+
+            var procedureEntities = await _procProcedureRepository.GetByIdAsync(bindDto.procedureId)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17311));
+
+            //根据工序获取资源跟设备
+            var resourceEntities = await _procResourceRepository.GetByResTypeIdsAsync(new() { IdsArr = new long[] { procedureEntities.ResourceTypeId.GetValueOrDefault() } });
+            var resourceEntity = resourceEntities.FirstOrDefault();
+            var equEuipmentEntity = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(new() { ResourceId = resourceEntity.Id });
+
+
+            //目前绑定只添加绑定关系，不增加条码信息和在制信息
+            ManuSfcCirculationCreateDto bindData = new ManuSfcCirculationCreateDto()
+            {
+                
+            };
+
+            //添加绑定条码信息
+            ManuSfcCirculationBindDto sfcData = new ManuSfcCirculationBindDto()
+            {
+
+            };
+
 
         }
     }

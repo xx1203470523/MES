@@ -137,7 +137,7 @@ namespace Hymson.MES.Api.Controllers
         #region PDA
 
         /// <summary>
-        /// 获取所有工序
+        /// PDA：获取所有工序
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -148,7 +148,7 @@ namespace Hymson.MES.Api.Controllers
         }
 
         /// <summary>
-        /// 获取所有工序
+        /// PDA：获取所有工序
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -156,6 +156,30 @@ namespace Hymson.MES.Api.Controllers
         public async Task<IEnumerable<ProcProcedureSelectDto>> GetAllProcProcedurePDAAsync()
         {
             return await _procProcedureService.GetAllProcProcedurePDAAsync();
+        }
+
+        /// <summary>
+        /// PDA：根据编码获取工序
+        /// </summary>
+        /// <param name="procedureCodes"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pda/procedure/get")]
+        public async Task<IEnumerable<ProcProcedureSelectDto>> GetProducedureByCodeAsync([FromQuery]string procedureCodes)
+        {
+            string[] query = procedureCodes.Split(',');
+            var result = await _procProcedureService.GetProcProcedureByCodeAsync(query);
+
+            List<ProcProcedureSelectDto> list = new List<ProcProcedureSelectDto>();
+            foreach (var item in result)
+            {
+                list.Add(new() { 
+                    Text = item.Name,
+                    Value = item.Id
+                });
+            }
+
+            return list;
         }
 
         #endregion

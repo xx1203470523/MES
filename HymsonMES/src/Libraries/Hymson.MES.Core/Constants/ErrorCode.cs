@@ -715,6 +715,9 @@
         public const string MES16353 = "导入文件名未正常获取，检查导入的文件名是否规范!";
         public const string MES16354 = "电芯条码{SFC}已经存在！不允许重复导入！";
         public const string MES16355 = "箱码{BoxCode}已经存在于其它批次！不允许导入当前批次！";
+
+        //绑定解绑 MES16370
+        public const string MES16371 = "绑定的条码{BindSFC}信息不存在！";
         #endregion
 
         #region 生产

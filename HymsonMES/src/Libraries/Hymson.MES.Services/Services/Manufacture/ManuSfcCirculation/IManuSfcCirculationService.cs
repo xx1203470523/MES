@@ -31,6 +31,6 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="craeteDto"></param>
         /// <returns></returns>
-        Task<int> CreateManuSfcCirculationAsync(ManuSfcCirculationCreateDto craeteDto);
+        Task CreateManuSfcCirculationAsync(ManuSfcCirculationBindDto craeteDto);
     }
 }
