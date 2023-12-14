@@ -1289,7 +1289,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 需扣减数量 = 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100
                 decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;// materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value / 100);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 /*
