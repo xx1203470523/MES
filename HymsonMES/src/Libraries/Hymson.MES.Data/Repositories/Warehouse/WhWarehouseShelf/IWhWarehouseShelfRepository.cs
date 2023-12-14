@@ -59,19 +59,26 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseShelf
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
 
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<WhWarehouseShelfEntity> GetByIdAsync(long id);
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //Task<WhWarehouseShelfEntity> GetByIdAsync(long id);
     
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //Task<IEnumerable<WhWarehouseShelfEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
         /// <summary>
-        /// 根据IDs获取数据（批量）
+        /// 获取单条
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="whWarehouseShelfQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhWarehouseShelfEntity>> GetByIdsAsync(IEnumerable<long> ids);
+        Task<WhWarehouseShelfEntity> GetOneAsync(WhWarehouseShelfQuery whWarehouseShelfQuery);
 
         /// <summary>
         /// 获取List

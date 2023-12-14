@@ -8,10 +8,10 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseShelf
     /// </summary>
     public record WhWarehouseShelfSaveDto : BaseEntityDto
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long Id { get; set; }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public long Id { get; set; }
 
        /// <summary>
         /// 货架编码
@@ -23,15 +23,25 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseShelf
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
-        /// 仓库id
-        /// </summary>
-        public long? WarehouseId { get; set; }
+       ///// <summary>
+       // /// 仓库id
+       // /// </summary>
+       // public long? WarehouseId { get; set; }
 
-       /// <summary>
-        /// 库区id
+        /// <summary>
+        /// 仓库编码
         /// </summary>
-        public long? WarehouseRegionId { get; set; }
+        public string? WarehouseCode { get; set; }
+
+        /// <summary>
+        /// 库区编码
+        /// </summary>
+        public string? WarehouseRegionCode { get; set; }
+
+        ///// <summary>
+        ///// 库区id
+        ///// </summary>
+        //public long? WarehouseRegionId { get; set; }
 
        /// <summary>
         /// 库位行列
@@ -224,4 +234,38 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseShelf
         public DisableOrEnableEnum? Status { get; set; }
     }
 
+    /// <summary>
+    /// 更新Dto
+    /// </summary>
+    public record WhWarehouseShelfModifyDto : BaseEntityDto {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 货架名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 库位行列
+        /// </summary>
+        public int? Column { get; set; }
+
+        /// <summary>
+        /// 库位列数
+        /// </summary>
+        public int? Row { get; set; }
+
+        /// <summary>
+        /// 状态;1、启用  2、未启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
+    }
 }

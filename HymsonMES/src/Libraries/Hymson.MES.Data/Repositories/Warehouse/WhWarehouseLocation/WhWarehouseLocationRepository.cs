@@ -1,9 +1,11 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.WhWarehouseLocation;
+using Hymson.MES.Core.Domain.WhWarehouseShelf;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
+using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.WhWarehouseLocation
@@ -107,26 +109,54 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseLocation
             return await conn.ExecuteAsync(DeletesSql, command);
         }
 
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<WhWarehouseLocationEntity> GetByIdAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<WhWarehouseLocationEntity>(GetByIdSql, new { Id = id });
-        }
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //public async Task<WhWarehouseLocationEntity> GetByIdAsync(long id)
+        //{
+        //    using var conn = GetMESDbConnection();
+        //    return await conn.QueryFirstOrDefaultAsync<WhWarehouseLocationEntity>(GetByIdSql, new { Id = id });
+        //}
+
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<WhWarehouseLocationEntity>> GetByIdsAsync(long[] ids) 
+        //{
+        //    using var conn = GetMESDbConnection();
+        //    return await conn.QueryAsync<WhWarehouseLocationEntity>(GetByIdsSql, new { Ids = ids });
+        //}
 
         /// <summary>
-        /// 根据IDs获取数据（批量）
+        /// 获取单条
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="whWarehouseLocationQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhWarehouseLocationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<WhWarehouseLocationEntity> GetOneAsync(WhWarehouseLocationQuery whWarehouseLocationQuery)
         {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetOneSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (!string.IsNullOrWhiteSpace(whWarehouseLocationQuery.Code))
+            {
+                sqlBuilder.Where("Code=@Code");
+            }
+
+            if (whWarehouseLocationQuery.Id.HasValue)
+            {
+                sqlBuilder.Where("Id=@Id");
+            }
+
+            sqlBuilder.AddParameters(whWarehouseLocationQuery);
+
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WhWarehouseLocationEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryFirstOrDefaultAsync<WhWarehouseLocationEntity>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -139,8 +169,11 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseLocation
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.OrderBy("UpdatedOn,Code DESC");
+            //sqlBuilder.Where("SiteId = @SiteId");
 
-            if (query.WarehouseShelfId != null) {
+            if (query.WarehouseShelfId.HasValue) {
                 sqlBuilder.Where("WarehouseShelfId = @WarehouseShelfId");
             }
 
@@ -149,9 +182,19 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseLocation
                 sqlBuilder.Where("WarehouseShelfId IN @WarehouseShelfIds");
             }
 
-            if (query.SiteId != null)
+            if (query.SiteId.HasValue)
             {
                 sqlBuilder.Where("SiteId = @SiteId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CodeLike))
+            {
+                query.CodeLike = $"%{query.CodeLike}%";
+                sqlBuilder.Where("Code like @CodeLike");
+            }
+
+            if (query.Status.HasValue) {
+                sqlBuilder.Where("Status = @Status");
             }
 
             using var conn = GetMESDbConnection();
@@ -205,21 +248,23 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseLocation
                                             /**select**/
                                            FROM wh_warehouse_location /**where**/  ";
 
+        const string GetByIdSql = @"SELECT * FROM wh_warehouse_location WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM wh_warehouse_location WHERE Id IN @Ids ";
+
+        const string GetOneSqlTemplate = "SELECT * FROM `wh_warehouse_location` /**where**/ LIMIT 1;";
+
         const string InsertSql = "INSERT INTO wh_warehouse_location(  `Id`, `WarehouseShelfId`, `Code`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @WarehouseShelfId, @Code, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO wh_warehouse_location(  `Id`, `WarehouseShelfId`, `Code`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @WarehouseShelfId, @Code, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string InsertsIgnoreSql = "INSERT IGNORE INTO wh_warehouse_location(  `Id`, `WarehouseShelfId`, `Code`, `Type`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @WarehouseShelfId, @Code, @Type, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE wh_warehouse_location SET   Status = @Status, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE wh_warehouse_location SET   Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE wh_warehouse_location SET   Status = @Status, Remark = @Remark,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE wh_warehouse_location SET   Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE wh_warehouse_location SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE wh_warehouse_location SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string DeletePhysicsSql = "DELETE FROM  wh_warehouse_location WHERE Id IN @Ids ";
-
-        const string GetByIdSql = @"SELECT * FROM wh_warehouse_location WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM wh_warehouse_location WHERE Id IN @Ids ";
 
     }
 }

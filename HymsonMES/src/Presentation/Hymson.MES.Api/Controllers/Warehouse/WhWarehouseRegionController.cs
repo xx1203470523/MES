@@ -8,6 +8,8 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseRegion
 {
     /// <summary>
     /// 控制器（库区）
+    /// @author zsj
+    /// @date 2023-11-30 04:17:35
     /// </summary>
     [Authorize]
     [ApiController]
@@ -50,13 +52,13 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseRegion
         /// <summary>
         /// 更新（库区）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateAsync([FromBody] WhWarehouseRegionSaveDto saveDto)
+        public async Task UpdateAsync([FromBody] WhWarehouseRegionModifyDto modifyDto)
         {
-             await _whWarehouseRegionService.ModifyAsync(saveDto);
+             await _whWarehouseRegionService.ModifyAsync(modifyDto);
         }
 
         /// <summary>
