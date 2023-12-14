@@ -327,7 +327,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 条码信息
-            var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
+            //var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
+            var manuSFCEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetByIdsAsync, sfcProduceEntities.Select(s => s.SFCId));
             if (manuSFCEntities == null || !manuSFCEntities.Any()) return default;
 
             // 全部物料加载数据
