@@ -1,4 +1,3 @@
-using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
@@ -9,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（条码档位表）
-    /// @author Karl
-    /// @date 2023-11-14 02:20:31
     /// </summary>
     [Authorize]
     [ApiController]

@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -18,6 +19,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         public readonly IWaterMarkService _waterMarkService;
 
         /// <summary>
+        /// 仓储接口（条码信息）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 仓储接口（条码生产信息）
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
         /// 仓储接口（条码流转）
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
@@ -26,11 +37,17 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         public TracingSourceSFCService(IWaterMarkService waterMarkService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
             _waterMarkService = waterMarkService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
 
@@ -53,12 +70,50 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             var user = $"{BusinessKey.TracingSourceSFC}作业";
 
+            // 流转前后的条码各记录一条记录
+            List<SingleSFCBo> sfcList = new();
+            sfcList.AddRange(manuSfcCirculationList.Select(s => new SingleSFCBo { SiteId = s.SiteId, SFC = s.SFC }));
+            sfcList.AddRange(manuSfcCirculationList.Select(s => new SingleSFCBo { SiteId = s.SiteId, SFC = s.CirculationBarCode }));
+
             // 相同条码的数据只记录一条记录
-            var manuSfcStepDic = manuSfcCirculationList.ToLookup(x => new SingleSFCBo
+            var sfcDsitinctList = sfcList.DistinctBy(x => x);
+            foreach (var sfcItem in sfcDsitinctList)
             {
-                SiteId = x.SiteId,
-                SFC = x.SFC
-            }).ToDictionary(d => d.Key, d => d);
+                // 查询条码信息
+                var sfcInfoEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+                {
+                    SiteId = sfcItem.SiteId,
+                    SFC = sfcItem.SFC
+                });
+                if (sfcInfoEntity == null) continue;
+
+                // 读取条码之前的流转组装记录
+                var node = new NodeSFCBo { Id = sfcInfoEntity.Id, SFC = sfcInfoEntity.SFC };
+
+                var circulations = manuSfcCirculationList.Where(x => x.SiteId == sfcItem.SiteId && (x.SFC == sfcItem.SFC || x.CirculationBarCode == sfcItem.SFC));
+                foreach (var item in circulations)
+                {
+                    switch (item.CirculationType)
+                    {
+                        case SfcCirculationTypeEnum.Split:
+                            break;
+                        case SfcCirculationTypeEnum.Merge:
+                            break;
+                        case SfcCirculationTypeEnum.Change:
+                            break;
+                        case SfcCirculationTypeEnum.Consume:
+                            break;
+                        case SfcCirculationTypeEnum.Disassembly:
+                            break;
+                        case SfcCirculationTypeEnum.ModuleAdd:
+                            break;
+                        case SfcCirculationTypeEnum.ModuleReplace:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
 
             using var trans = TransactionHelper.GetTransactionScope();
 

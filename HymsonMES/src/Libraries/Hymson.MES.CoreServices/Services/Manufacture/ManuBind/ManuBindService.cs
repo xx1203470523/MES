@@ -14,9 +14,9 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
@@ -249,7 +249,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             }
             else
             {
-                if (manuSfcProduceEntity.Status!= SfcStatusEnum.Activity)
+                if (manuSfcProduceEntity.Status != SfcStatusEnum.Activity)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17426)).WithData("SFC", param.SFC);
                 }
@@ -926,11 +926,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             var validationFailures = new List<ValidationFailure>();
             List<ManuSfcStepEntity> manuSfcStepList = new();
             List<WhMaterialInventoryEntity> whMaterialInventoryEntities = new();
-            var sfc = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SiteId = param.SiteId });
-            if (sfc == null)
+            var sfc = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
-            }
+                SiteId = param.SiteId,
+                SFC = param.SFC
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
+
             var manuSfc = await _manuSfcInfoRepository.GetBySFCAsync(sfc.Id);
             if (manuSfc == null)
             {

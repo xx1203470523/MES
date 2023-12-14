@@ -8,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseLocation
 {
     /// <summary>
     /// 控制器（库位）
-    /// @author zsj
-    /// @date 2023-11-30 07:52:28
     /// </summary>
     [Authorize]
     [ApiController]

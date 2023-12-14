@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（容器条码表）
-    /// @author wxk
-    /// @date 2023-04-12 02:29:23
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerBarcodeController : ControllerBase

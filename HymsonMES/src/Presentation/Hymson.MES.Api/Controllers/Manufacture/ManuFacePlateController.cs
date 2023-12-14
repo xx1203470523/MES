@@ -1,28 +1,16 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-04-01 02:05:24
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（操作面板）
-    /// @author Karl
-    /// @date 2023-04-01 02:05:24
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateController : ControllerBase

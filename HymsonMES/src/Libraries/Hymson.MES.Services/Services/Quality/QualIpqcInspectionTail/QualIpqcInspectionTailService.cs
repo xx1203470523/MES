@@ -12,6 +12,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
@@ -201,7 +202,7 @@ namespace Hymson.MES.Services.Services.Quality
                 UpdatedBy = updatedBy,
                 UpdatedOn = updatedOn
             };
- 
+
             // 保存
             return await _qualIpqcInspectionTailRepository.InsertAsync(entity);
         }
@@ -244,7 +245,7 @@ namespace Hymson.MES.Services.Services.Quality
             var procedureTask = _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
             var resourceTask = _procResourceRepository.GetByIdAsync(entity.ResourceId);
             var equipmentTask = _equEquipmentRepository.GetByIdAsync(entity.EquipmentId);
-            var qualIpqcInspectionTask =  _qualIpqcInspectionRepository.GetByIdAsync(entity.IpqcInspectionId);
+            var qualIpqcInspectionTask = _qualIpqcInspectionRepository.GetByIdAsync(entity.IpqcInspectionId);
             var workOrder = await workOrderTask;
             var material = await materialTask;
             var procedure = await procedureTask;
@@ -367,7 +368,7 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Status = InspectionStatusEnum.Inspecting;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-            entity.ExecuteBy= _currentUser.UserName;
+            entity.ExecuteBy = _currentUser.UserName;
             entity.ExecuteOn = HymsonClock.Now();
 
             // 保存
@@ -462,7 +463,7 @@ namespace Hymson.MES.Services.Services.Quality
             entity.Status = entity.IsQualified == TrueOrFalseEnum.Yes ? InspectionStatusEnum.Closed : InspectionStatusEnum.Completed;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-            entity.CompleteOn= HymsonClock.Now();
+            entity.CompleteOn = HymsonClock.Now();
             if (entity.IsQualified == TrueOrFalseEnum.Yes)
             {
                 entity.CloseOn = HymsonClock.Now();
@@ -582,7 +583,7 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new ValidationException(nameof(ErrorCode.MES10104));
             }
 
-            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySfcQuery { SFC = query.SampleCode, SiteId = _currentSite.SiteId });
+            var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = query.SampleCode, SiteId = _currentSite.SiteId ?? 0 });
             if (manuSfcEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13235)).WithData("SampleCode", query.SampleCode);
@@ -593,9 +594,9 @@ namespace Hymson.MES.Services.Services.Quality
                 throw new CustomerValidationException(nameof(ErrorCode.MES13236)).WithData("SampleCode", query.SampleCode);
             }
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
-            if (manuSfcInfoEntity != null&& entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
+            if (manuSfcInfoEntity != null && entity.WorkOrderId != manuSfcInfoEntity.WorkOrderId)
             {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES13237));
+                throw new CustomerValidationException(nameof(ErrorCode.MES13237));
             }
 
 

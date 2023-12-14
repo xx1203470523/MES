@@ -8,7 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// <summary>
     /// 在制品拆解
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InProductDismantleController : ControllerBase

@@ -1,14 +1,6 @@
-/*
- *creator: Karl
- *
- *describe: 设备参数组    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-08-02 01:48:35
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
@@ -19,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（设备参数组）
-    /// @author Karl
-    /// @date 2023-08-02 01:48:35
     /// </summary>
     [Authorize]
     [ApiController]

@@ -8,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.WhWarehouseShelf
 {
     /// <summary>
     /// 控制器（货架）
-    /// @author zsj
-    /// @date 2023-11-30 07:52:12
     /// </summary>
     [Authorize]
     [ApiController]

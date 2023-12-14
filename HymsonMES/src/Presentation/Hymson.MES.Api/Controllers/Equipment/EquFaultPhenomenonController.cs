@@ -3,19 +3,14 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（设备故障现象）
-    /// @author Czhipu
-    /// @date 2023-02-15 08:56:34
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquFaultPhenomenonController : ControllerBase

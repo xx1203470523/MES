@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具注册表    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-07-14 10:03:53
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
@@ -16,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（载具注册表）
-    /// @author Karl
-    /// @date 2023-07-14 10:03:53
     /// </summary>
     [Authorize]
     [ApiController]

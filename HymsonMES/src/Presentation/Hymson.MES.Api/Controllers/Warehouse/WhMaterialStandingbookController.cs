@@ -1,26 +1,14 @@
-/*
- *creator: Karl
- *
- *describe: 物料台账    控制器 | 代码由框架生成  
- *builder:  pengxin
- *build datetime: 2023-03-13 10:03:29
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Warehouse
 {
     /// <summary>
     /// 控制器（物料台账）
-    /// @author pengxin
-    /// @date 2023-03-13 10:03:29
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class WhMaterialStandingbookController : ControllerBase
