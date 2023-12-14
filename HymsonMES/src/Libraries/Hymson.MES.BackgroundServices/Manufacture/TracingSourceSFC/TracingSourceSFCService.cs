@@ -19,6 +19,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         public readonly IWaterMarkService _waterMarkService;
 
         /// <summary>
+        /// 仓储接口（条码信息）
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 仓储接口（条码生产信息）
+        /// </summary>
+        private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
+
+        /// <summary>
         /// 仓储接口（条码流转）
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
@@ -27,11 +37,17 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         /// 构造函数
         /// </summary>
         /// <param name="waterMarkService"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         public TracingSourceSFCService(IWaterMarkService waterMarkService,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
             _waterMarkService = waterMarkService;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
 
@@ -63,7 +79,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             var sfcDsitinctList = sfcList.DistinctBy(x => x);
             foreach (var sfcItem in sfcDsitinctList)
             {
+                // 查询条码信息
+                var sfcInfoEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+                {
+                    SiteId = sfcItem.SiteId,
+                    SFC = sfcItem.SFC
+                });
+                if (sfcInfoEntity == null) continue;
+
                 // 读取条码之前的流转组装记录
+                var node = new NodeSFCBo { Id = sfcInfoEntity.Id, SFC = sfcInfoEntity.SFC };
 
                 var circulations = manuSfcCirculationList.Where(x => x.SiteId == sfcItem.SiteId && (x.SFC == sfcItem.SFC || x.CirculationBarCode == sfcItem.SFC));
                 foreach (var item in circulations)
