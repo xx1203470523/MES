@@ -755,7 +755,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         MaterialVersion = procMaterialEntity.Version ?? "",
                         MaterialBarCode = sfcProduceEntity.SFC,
                         Batch = "",//自制品 没有
-                        Quantity = procMaterialEntity.Batch,
+                        Quantity = sfcProduceEntity.Qty,
                         Unit = procMaterialEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.ManuComplete,
                         Source = MaterialInventorySourceEnum.ManuComplete,
@@ -1275,7 +1275,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 取得半成品的总数量
             var smiFinishedUsages = 1m;
-            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+            if (summaryBo.SmiFinisheds != null && summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
 
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
@@ -1286,7 +1286,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100
-                decimal residue = materialBo.Usages / smiFinishedUsages;
+                decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;// materialBo.Usages / smiFinishedUsages;
 
                 if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);

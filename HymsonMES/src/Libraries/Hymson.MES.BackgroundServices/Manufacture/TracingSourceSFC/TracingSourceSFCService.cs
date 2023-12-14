@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -53,12 +54,41 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             var user = $"{BusinessKey.TracingSourceSFC}作业";
 
+            // 流转前后的条码各记录一条记录
+            List<SingleSFCBo> sfcList = new();
+            sfcList.AddRange(manuSfcCirculationList.Select(s => new SingleSFCBo { SiteId = s.SiteId, SFC = s.SFC }));
+            sfcList.AddRange(manuSfcCirculationList.Select(s => new SingleSFCBo { SiteId = s.SiteId, SFC = s.CirculationBarCode }));
+
             // 相同条码的数据只记录一条记录
-            var manuSfcStepDic = manuSfcCirculationList.ToLookup(x => new SingleSFCBo
+            var sfcDsitinctList = sfcList.DistinctBy(x => x);
+            foreach (var sfcItem in sfcDsitinctList)
             {
-                SiteId = x.SiteId,
-                SFC = x.SFC
-            }).ToDictionary(d => d.Key, d => d);
+                // 读取条码之前的流转组装记录
+
+                var circulations = manuSfcCirculationList.Where(x => x.SiteId == sfcItem.SiteId && (x.SFC == sfcItem.SFC || x.CirculationBarCode == sfcItem.SFC));
+                foreach (var item in circulations)
+                {
+                    switch (item.CirculationType)
+                    {
+                        case SfcCirculationTypeEnum.Split:
+                            break;
+                        case SfcCirculationTypeEnum.Merge:
+                            break;
+                        case SfcCirculationTypeEnum.Change:
+                            break;
+                        case SfcCirculationTypeEnum.Consume:
+                            break;
+                        case SfcCirculationTypeEnum.Disassembly:
+                            break;
+                        case SfcCirculationTypeEnum.ModuleAdd:
+                            break;
+                        case SfcCirculationTypeEnum.ModuleReplace:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
 
             using var trans = TransactionHelper.GetTransactionScope();
 
