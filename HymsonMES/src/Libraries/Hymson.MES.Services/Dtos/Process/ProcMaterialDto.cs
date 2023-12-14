@@ -470,6 +470,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 采购类型 数组
         /// </summary>
         public MaterialBuyTypeEnum[]? BuyTypes { get; set; }
+
+        /// <summary>
+        /// 物料组编码
+        /// </summary>
+        public string? MaterialGroupCode {  get; set; }
     }
 
     /// <summary>
