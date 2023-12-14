@@ -297,6 +297,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 NotAllowStatus = new SfcStatusEnum[] { SfcStatusEnum.Scrapping, SfcStatusEnum.Delete, SfcStatusEnum.Locked, SfcStatusEnum.Complete, SfcStatusEnum.Invalid },
                 IsBanNgSfc = true,
                 NotAllowWorkOrderStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed },
+                IsVerifyMaterialQuantityLimit=true
             });
         }
 
@@ -314,6 +315,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 IsBanNgSfc = true,
                 IsVerifyBindContainer = true,
                 NotAllowWorkOrderStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Pending },
+                IsVerifyMaterialQuantityLimit = true,
 
                 IsVerifySameWorkOrder = true,
                 IsVerifySameMaterial = true,
@@ -813,9 +815,11 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (manuProductBadRecordEntities != null && manuProductBadRecordEntities.Any())
             {
-
                 throw new CustomerValidationException(nameof(ErrorCode.MES12833)).WithData("sfc", param.SFC);
             }
+
+            var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity?.ProductId ?? 0);
+            if (procMaterialEntitity.QuantityLimit == MaterialQuantityLimitEnum.OnlyOne) throw new CustomerValidationException(nameof(ErrorCode.MES12836));
 
             if (param.Qty > manuSfcEntity.Qty)
             {
@@ -832,23 +836,20 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
 
-            var barCodeList = await GenerateBarcodeByproductId(manuSfcInfoEntity.ProductId);
+            var barCodeList = await GenerateBarcodeByproductId(manuSfcInfoEntity?.ProductId??0);
             if (barCodeList == null || !barCodeList.Any())
             {
-                var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity?.ProductId ?? 0);
-                throw new CustomerValidationException(nameof(ErrorCode.MES12829)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12830)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
             }
 
             if (barCodeList.Count() > 1)
             {
-                var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity?.ProductId ?? 0);
                 throw new CustomerValidationException(nameof(ErrorCode.MES12831)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
             }
             string? newSplitSFC = barCodeList.SelectMany(x => x.BarCodes.Select(x => x)).FirstOrDefault();
             if (newSplitSFC == null)
             {
-                var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity?.ProductId ?? 0);
-                throw new CustomerValidationException(nameof(ErrorCode.MES12829)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12837)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
             }
 
             var sfcStepList = new List<ManuSfcStepEntity>();
@@ -864,8 +865,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Id = IdGenProvider.Instance.CreateId(),
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = param.SFC,
-                ProductId = manuSfcInfoEntity.ProductId,
-                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
+                ProductId = manuSfcInfoEntity?.ProductId??0,
+                WorkOrderId = manuSfcInfoEntity?.WorkOrderId??0,
                 WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
                 ProcedureId = manuSfcProduceEntity?.ProcedureId,
@@ -936,10 +937,10 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuSfcInfo = new ManuSfcInfoEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
-                SiteId = manuSfcInfoEntity.SiteId,
+                SiteId = manuSfcInfoEntity?.SiteId ?? 0,
                 SfcId = manuSfc.Id,
-                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
-                ProductId = manuSfcInfoEntity.ProductId,
+                WorkOrderId = manuSfcInfoEntity?.WorkOrderId ?? 0,
+                ProductId = manuSfcInfoEntity?.ProductId ?? 0,
                 IsUsed = true,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,
@@ -1015,7 +1016,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                     CreatedOn = HymsonClock.Now(),
                     UpdatedOn = HymsonClock.Now()
                 };
-                var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfo?.ProductId ?? 0);
                 whMaterialStandingbookEntity = new WhMaterialStandingbookEntity
                 {
                     MaterialCode = procMaterialEntitity?.MaterialCode ?? "",
@@ -1127,6 +1127,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 NotAllowStatus = new SfcStatusEnum[] { SfcStatusEnum.Scrapping, SfcStatusEnum.Delete, SfcStatusEnum.Locked, SfcStatusEnum.Complete, SfcStatusEnum.Invalid },
                 IsBanNgSfc = true,
                 NotAllowWorkOrderStatus = new PlanWorkOrderStatusEnum[] { PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed },
+
+                IsVerifyMaterialQuantityLimit = true
             });
 
             //查询数据
@@ -1321,7 +1323,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
                 if (ngSfcs != null && ngSfcs.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES12806)).WithData("sfc", string.Join(",", ngSfcs.Select(x => x.SFC)));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12833)).WithData("sfc", string.Join(",", ngSfcs.Select(x => x.SFC).Distinct()));
+                }
+
+                var sfcProduces = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery() { SiteId = _currentSite.SiteId ?? 0, Sfcs = distinctSfcs });
+
+                var repairsSfcProduces = sfcProduces.Where(x => x.IsRepair == TrueOrFalseEnum.Yes);
+                if (sfcProduces != null && repairsSfcProduces != null&& repairsSfcProduces.Any())
+                {
+                    var procProcedureEntitys = await _procProcedureRepository.GetByIdsAsync(repairsSfcProduces.Select(x=>x.ProcedureId));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12834)).WithData("sfc",  string.Join(",", repairsSfcProduces.Select(x=>x.SFC)) ).WithData("ProcedureCode", string.Join(",", procProcedureEntitys.Select(x => x.Code)) );
                 }
             }
 
@@ -1383,6 +1394,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12803)).WithData("sfc", string.Join(",", vehicleFreightStacks.Select(x => x.BarCode)));
                 }
+            }
+
+            //检查物料的 数量限制 是否是 仅1.0
+            if (verifyConditions.IsVerifyMaterialQuantityLimit) 
+            {
+                var materials = await _procMaterialRepository.GetByIdsAsync(manuSfcs.Select(x => x.ProductId).ToList());
+                if (materials.Any(x => x.QuantityLimit == MaterialQuantityLimitEnum.OnlyOne)) throw new CustomerValidationException(nameof(ErrorCode.MES12836));
             }
 
             //是否验证 工单必相同

@@ -208,6 +208,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public bool IsVerifyBindVehicle {  get; set; }=false;
 
         /// <summary>
+        /// 是否验证物料的数量限制
+        /// </summary>
+        public bool IsVerifyMaterialQuantityLimit { get; set; } = false;
+
+        /// <summary>
         /// 是否绑定容器
         /// </summary>
         public bool IsVerifyBindContainer { get; set; }=false;

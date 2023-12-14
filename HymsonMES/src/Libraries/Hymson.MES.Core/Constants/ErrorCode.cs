@@ -577,9 +577,11 @@
         public const string MES12830 = "产品【{ProductCode}】规则生成条码失败，请查看【编码规则】";
         public const string MES12831 = "产品【{ProductCode}】生成多个条码，当前功能无法实现，请联系管理员";
         public const string MES12832 = "数据不为最新，请刷新后再操作";
-        public const string MES12833 = "产品序列码【{sfc}】带有NG标识、复判标识，不允许提作!";
-        public const string MES12834 = "“产品序列码【{sfc}】在不合格工艺路线【{ProcedureCode}】工序，不允许损作!";
-        public const string MES12835 = "“产品序列码{sfc}】对应工单状志为【{WorkOrder}】，不允许据作作!";
+        public const string MES12833 = "产品序列码【{sfc}】带有NG标识、复判标识，不允许操作!";
+        public const string MES12834 = "产品序列码【{sfc}】在不合格工艺路线【{ProcedureCode}】工序，不允许操作!";
+        public const string MES12835 = "产品序列码【{sfc}】对应工单状志为【{WorkOrder}】，不允许操作!";
+        public const string MES12836 = "产品序列码对应物料的数量限制为仅为1.0，不允许操作";
+        public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
         #endregion
 
         #region 故障现象 12900
