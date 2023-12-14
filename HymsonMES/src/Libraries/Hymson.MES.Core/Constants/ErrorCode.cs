@@ -1556,7 +1556,7 @@
         #endregion
 
         #region 仓库 19200
-        public const string MES19201 = "仓库编码不能为空!";
+     public const string MES19201 = "仓库编码不能为空!";
         public const string MES19202 = "仓库名称不能为空!";
         public const string MES19203 = "仓库编码【{code}】已存在!";
         public const string MES19204 = "库区编码不能为空!";
@@ -1574,6 +1574,14 @@
         public const string MES19216 = "仓库下已绑定库区,请解绑!";
         public const string MES19217 = "库区下已绑定货架,请解绑!";
         public const string MES19218 = "货架下已绑定库位,请解绑!";
+        public const string MES19219 = "状态不能为空!";
+        public const string MES19220 = "参数不能为空!";
+        public const string MES19221 = "货架行/列不能为空!";
+        public const string MES19222 = "库位生成类型不能为空!";
+        public const string MES19223 = "库位编码不能为空!";
+        public const string MES19224 = "仓库不存在,请确认仓库编码!";
+        public const string MES19225 = "库区不存在,请确认库区编码!";
+        public const string MES19226 = "货架不存在,请确认货架编码!";
         #endregion
 
         #endregion

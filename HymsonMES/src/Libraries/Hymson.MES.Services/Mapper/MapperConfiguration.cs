@@ -602,6 +602,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhWarehousePagedQueryDto, WhWarehousePagedQuery>();
             CreateMap<WhWarehouseSaveDto, WhWarehouseEntity>();
             CreateMap<WhWarehouseEntity, WhWarehouseDto>();
+            CreateMap<WhWarehouseModifyDto, WhWarehouseEntity>();
 
             #endregion
 
@@ -609,7 +610,8 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<WhWarehouseRegionPagedQueryDto, WhWarehouseRegionPagedQuery>();
             CreateMap<WhWarehouseRegionSaveDto, WhWarehouseRegionEntity>();
-            CreateMap<WhWarehouseRegionEntity, WhWarehouseRegionDto>(); 
+            CreateMap<WhWarehouseRegionEntity, WhWarehouseRegionDto>();
+            CreateMap<WhWarehouseRegionModifyDto, WhWarehouseRegionEntity>();
 
             #endregion
 
@@ -618,6 +620,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhWarehouseShelfPagedQueryDto, WhWarehouseShelfPagedQuery>();
             CreateMap<WhWarehouseShelfSaveDto, WhWarehouseShelfEntity>();
             CreateMap<WhWarehouseShelfEntity, WhWarehouseShelfDto>();
+            CreateMap<WhWarehouseShelfModifyDto, WhWarehouseShelfEntity>(); 
 
             #endregion
 
@@ -627,6 +630,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhWarehouseLocationSaveDto, WhWarehouseLocationEntity>();
             CreateMap<WhWarehouseLocationEntity, WhWarehouseLocationDto>();
             CreateMap<WhWarehouseLocationQueryDto, WhWarehouseLocationQuery>();
+            CreateMap<WhWarehouseLocationModifyDto, WhWarehouseLocationEntity>();
 
             #endregion
 

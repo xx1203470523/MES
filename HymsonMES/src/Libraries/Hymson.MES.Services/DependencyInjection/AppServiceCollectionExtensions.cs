@@ -524,12 +524,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseSaveDto>, WhWarehouseSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseModifyDto>, WhWarehouseModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseRegionSaveDto>, WhWarehouseRegionSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseRegionModifyDto>, WhWarehouseRegionModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseShelfSaveDto>, WhWarehouseShelfSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseShelfModifyDto>, WhWarehouseShelfModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseLocationSaveDto>, WhWarehouseLocationSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseLocationModifyDto>, WhWarehouseLocationModifyValidator>();
+
             #endregion
 
             #region Plan

@@ -10,19 +10,33 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
     /// </summary>
     public interface IWhWarehouseRepository
     {
+        #region 新增
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(WhWarehouseEntity entity);
-        
+
+        /// <summary>
+        /// 新增忽略重复
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> InsertIgnoreAsync(WhWarehouseEntity entity);
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
         Task<int> InsertRangeAsync(IEnumerable<WhWarehouseEntity> entities);
+
+        #endregion
+
+
+        #region 更新
 
         /// <summary>
         /// 更新
@@ -52,19 +66,30 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
 
+        #endregion
+
+        #region 查询
+
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //Task<WhWarehouseEntity> GetByIdAsync(long id);
+
         /// <summary>
-        /// 根据ID获取数据
+        /// 获取单条
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<WhWarehouseEntity> GetByIdAsync(long id);
-    
-        /// <summary>
-        /// 根据IDs获取数据（批量）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<WhWarehouseEntity>> GetByIdsAsync(IEnumerable<long> ids);
+        Task<WhWarehouseEntity> GetOneAsync(WhWarehouseQuery query);
+
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //Task<IEnumerable<WhWarehouseEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -79,6 +104,8 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<WhWarehouseEntity>> GetPagedListAsync(WhWarehousePagedQuery pagedQuery);
+
+        #endregion
 
     }
 }

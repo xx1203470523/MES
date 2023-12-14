@@ -40,6 +40,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<WhWarehouseShelfSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<WhWarehouseShelfModifyDto> _validationModifyRules;
 
         /// <summary>
         /// 仓储接口（货架）
@@ -59,8 +60,9 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
         /// <param name="whWarehouseRepository"></param>
         /// <param name="whWarehouseRegionRepository"></param>
         /// <param name="whWarehouseLocationRepository"></param>
+        /// <param name="validationModifyRules"></param>
         public WhWarehouseShelfService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<WhWarehouseShelfSaveDto> validationSaveRules,
-            IWhWarehouseShelfRepository whWarehouseShelfRepository, IWhWarehouseRepository whWarehouseRepository, IWhWarehouseRegionRepository whWarehouseRegionRepository, IWhWarehouseLocationRepository whWarehouseLocationRepository)
+            IWhWarehouseShelfRepository whWarehouseShelfRepository, IWhWarehouseRepository whWarehouseRepository, IWhWarehouseRegionRepository whWarehouseRegionRepository, IWhWarehouseLocationRepository whWarehouseLocationRepository, AbstractValidator<WhWarehouseShelfModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -69,6 +71,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
             _whWarehouseRepository = whWarehouseRepository;
             _whWarehouseRegionRepository = whWarehouseRegionRepository;
             _whWarehouseLocationRepository = whWarehouseLocationRepository;
+            _validationModifyRules = validationModifyRules;
         }
 
 
@@ -80,10 +83,26 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
         public async Task<int> CreateAsync(WhWarehouseShelfSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            //获取仓库
+            var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Code = saveDto.WarehouseCode,SiteId= _currentSite.SiteId??0 });
+            if (warehouseEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19224));
+            }
+
+            //获取库区
+            var warehouseRegionEntity = await _whWarehouseRegionRepository.GetOneAsync(new WhWarehouseRegionQuery { Code = saveDto.WarehouseRegionCode,SiteId= _currentSite.SiteId });
+            if (warehouseRegionEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19225));
+            }
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -96,6 +115,8 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.WarehouseId= warehouseEntity.Id;
+            entity.WarehouseRegionId= warehouseRegionEntity.Id;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 保存
@@ -109,9 +130,9 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(WhWarehouseShelfSaveDto saveDto)
+        public async Task<int> ModifyAsync(WhWarehouseShelfModifyDto modifyDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
@@ -120,10 +141,10 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
             }
 
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<WhWarehouseShelfEntity>();
+            var entity = modifyDto.ToEntity<WhWarehouseShelfEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
             entity.SiteId = _currentSite.SiteId ?? 0;
@@ -168,18 +189,18 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
         /// <returns></returns>
         public async Task<WhWarehouseShelfDto?> QueryByIdAsync(long id)
         {
-            var whWarehouseShelfEntity = await _whWarehouseShelfRepository.GetByIdAsync(id);
+            var whWarehouseShelfEntity = await _whWarehouseShelfRepository.GetOneAsync(new WhWarehouseShelfQuery { Id = id, SiteId = _currentSite.SiteId ?? 0 });
             if (whWarehouseShelfEntity == null)
             {
                 return null;
             }
             var result = whWarehouseShelfEntity.ToModel<WhWarehouseShelfDto>();
 
-            var wareHouseEntity = await _whWarehouseRepository.GetByIdAsync(whWarehouseShelfEntity.WarehouseId);
+            var wareHouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = whWarehouseShelfEntity.WarehouseId, SiteId = _currentSite.SiteId ?? 0 });
             result.WarehouseCode = wareHouseEntity?.Code;
             result.WarehouseName= wareHouseEntity?.Name;
 
-            var wareHouseRegionEntity = await _whWarehouseRegionRepository.GetByIdAsync(whWarehouseShelfEntity.WarehouseRegionId);
+            var wareHouseRegionEntity = await _whWarehouseRegionRepository.GetOneAsync(new WhWarehouseRegionQuery { Id = whWarehouseShelfEntity.WarehouseRegionId, SiteId = _currentSite.SiteId??0 });
             result.WarehouseRegionCode= wareHouseRegionEntity?.Code;
             result.WarehouseRegionName= wareHouseRegionEntity?.Name;
 
