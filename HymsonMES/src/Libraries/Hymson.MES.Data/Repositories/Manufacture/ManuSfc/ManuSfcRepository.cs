@@ -223,12 +223,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
 
 
-            if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode)) 
+            if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode))
             {
                 sqlBuilder.LeftJoin(" proc_material ma  on msi.ProductId =ma.id");
             }
 
-            if (!string.IsNullOrEmpty(query.MaterialCode)) 
+            if (!string.IsNullOrEmpty(query.MaterialCode))
             {
                 query.MaterialCode = $"%{query.MaterialCode}%";
                 sqlBuilder.Where("ma.MaterialCode like  @MaterialCode");
@@ -301,7 +301,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<PagedInfo<ManuSfcAboutInfoView>> GetManuSfcAboutInfoPagedAsync(ManuSfcAboutInfoPagedQuery query)
-        {                              
+        {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
@@ -323,23 +323,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 query.Sfc = $"%{query.Sfc}%";
                 sqlBuilder.Where("ms.Sfc like  @Sfc");
             }
-            if (query.WorkOrderId.HasValue&& query.WorkOrderId>0)
+            if (query.WorkOrderId.HasValue && query.WorkOrderId > 0)
             {
                 sqlBuilder.Where("msi.WorkOrderId = @WorkOrderId");
             }
-            if (query.Status.HasValue) 
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where("ms.Status = @Status");
             }
-            if (query.MaterialId.HasValue&&query.MaterialId>0)
+            if (query.MaterialId.HasValue && query.MaterialId > 0)
             {
                 sqlBuilder.Where("msi.ProductId = @MaterialId");
             }
-            if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0) 
+            if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0)
             {
                 sqlBuilder.Where("pwo.ProcessRouteId = @ProcessRouteId");
             }
-            if (query.Sfcs != null && query.Sfcs.Any()) 
+            if (query.Sfcs != null && query.Sfcs.Any())
             {
                 sqlBuilder.Where("ms.Sfc in  @Sfcs");
             }
@@ -362,7 +362,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcAboutInfoView> GetManSfcAboutInfoBySfcAsync(ManuSfcAboutInfoBySfcQuery query) 
+        public async Task<ManuSfcAboutInfoView> GetManSfcAboutInfoBySfcAsync(ManuSfcAboutInfoBySfcQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcAboutInfoView>(GetManSfcAboutInfoBySfcSql, query);
@@ -608,6 +608,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 获取SFC（批量）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(EntityBySFCsQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcEntity>(GetBySFCsNewSql, query);
+        }
+
+        /// <summary>
         /// 根据sfc 获取条码信息
         /// </summary>
         /// <param name="sfc"></param>
@@ -690,6 +701,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
         const string GetBySFCSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC = @SFC";
+        const string GetBySFCsNewSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs";
         const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
         const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs; ";
 
