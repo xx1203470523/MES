@@ -24,6 +24,7 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Linq;
 using System.Security.Policy;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.WhWarehouseLocation
 {
@@ -123,14 +124,18 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            var warehouseLocationEntities = await _whWarehouseLocationRepository.GetEntitiesAsync(new WhWarehouseLocationQuery { WarehouseShelfId = warehouseRegionEntity.Id, SiteId = _currentSite.SiteId ?? 0 });
+            var warehouseLocationEntities = await _whWarehouseLocationRepository.GetEntitiesAsync(new WhWarehouseLocationQuery { WarehouseShelfId = warehouseShelfEntity.Id, SiteId = _currentSite.SiteId ?? 0 });
 
             //获取货架下的最大库位
-            var maxColumn = 1;
-            if (warehouseLocationEntities != null && warehouseLocationEntities.Any())
+            var maxColumn = 0;
+            if (warehouseLocationEntities != null && warehouseLocationEntities.Any()&& saveDto.Type== WhWarehouseLocationTypeEnum.SpecifyRow)
             {
-                var warehouseLocationMaxInfo = warehouseLocationEntities.Where(a => a.Code.Split('-')[1] == saveDto.Row.ToString()).OrderByDescending(a => a.Code.Last()).First();
-                maxColumn = int.Parse(warehouseLocationMaxInfo.Code.Last().ToString());
+                //int number = 0;
+                var code = $"{warehouseShelfEntity.Code}-{saveDto.Row}-";
+                var warehouseLocationList = warehouseLocationEntities.Where(a=>a.Code.Contains(code));
+                Regex regex = new Regex(@"^[0-9]+$");
+                warehouseLocationList = warehouseLocationList.Where(a => regex.IsMatch(a.Code.Split('-').Last().ToString()));
+                maxColumn = warehouseLocationList.Max(a => int.Parse(a.Code.Split('-').Last()));
             }
 
             //获取库位编码
@@ -167,7 +172,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
             var result= await _whWarehouseLocationRepository.InsertIgnoreRangeAsync(entitys);
             if (result != entitys.Count) {
                 if (saveDto.Type == WhWarehouseLocationTypeEnum.Customize) {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First()).WithData("shelfcode", warehouseRegionEntity.Code);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First()).WithData("shelfcode", saveDto.WarehouseShelfCode??"");
                 }
                 throw new CustomerValidationException(nameof(ErrorCode.MES19213));
             }
@@ -394,7 +399,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                     break;
                 //指定行生成
                 case WhWarehouseLocationTypeEnum.SpecifyRow:
-                    for (int j = (maxColumn+ saveDto.Column??0); j <= maxColumn + saveDto.Column; j++)
+                    for (int j = maxColumn+1; j <=saveDto.Column+ maxColumn; j++)
                     {
                         var scode = $"{whWarehouseShelfEntity.Code}-{saveDto.Row}-{j}";
                         result.Add(scode);
