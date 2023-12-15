@@ -181,22 +181,22 @@ namespace Hymson.MES.Services.Services.Plan
                     }
                     else
                     {
-                        if (whMaterialInventoryEntity.MaterialId != procMaterialEntity.Id)
-                        {
-                            var validationFailure = new ValidationFailure();
-                            if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", sfc}
-                                   };
-                            }
-                            else
-                            {
-                                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
-                            }
-                            validationFailure.ErrorCode = nameof(ErrorCode.MES16129);
-                            validationFailures.Add(validationFailure);
-                        }
+                        //if (whMaterialInventoryEntity.MaterialId != procMaterialEntity.Id)
+                        //{
+                        //    var validationFailure = new ValidationFailure();
+                        //    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                        //    {
+                        //        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                        //    { "CollectionIndex", sfc}
+                        //           };
+                        //    }
+                        //    else
+                        //    {
+                        //        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                        //    }
+                        //    validationFailure.ErrorCode = nameof(ErrorCode.MES16129);
+                        //    validationFailures.Add(validationFailure);
+                        //}
 
                         if (whMaterialInventoryEntity.QuantityResidue <= 0)
                         {
@@ -395,10 +395,10 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16120));
                 }
-                if (procMaterialEntity.Id != whMaterialInventoryEntity.MaterialId)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16129));
-                }
+                //if (procMaterialEntity.Id != whMaterialInventoryEntity.MaterialId)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES16129));
+                //}
                 qty = whMaterialInventoryEntity.QuantityResidue;
                 if (qty <= 0)
                 {
