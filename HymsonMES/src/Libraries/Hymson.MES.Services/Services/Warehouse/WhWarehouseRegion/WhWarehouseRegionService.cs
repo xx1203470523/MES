@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseRegion
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             //获取仓库
-            var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Code = saveDto.WarehouseCode });
+            var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Code = saveDto.WarehouseCode,SiteId= _currentSite.SiteId??0 });
             if (warehouseEntity==null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19224));
