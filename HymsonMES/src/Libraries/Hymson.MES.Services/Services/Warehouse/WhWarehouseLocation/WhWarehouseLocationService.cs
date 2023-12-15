@@ -249,7 +249,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                     result.WarehouseRegionName= warehouseRegionEntity.Name;
                 }
 
-                var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id= warehouseShelfEntity.WarehouseId } );
+                var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id= warehouseShelfEntity.WarehouseId, SiteId = _currentSite.SiteId ?? 0 } );
                 if (warehouseEntity != null)
                 {
                     result.WarehouseCode = warehouseEntity.Code;
