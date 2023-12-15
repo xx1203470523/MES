@@ -158,7 +158,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
                 if (afterNode == null)
                 {
-                    var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
+                    var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
                     if (sfcEntity == null) continue;
 
                     var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
