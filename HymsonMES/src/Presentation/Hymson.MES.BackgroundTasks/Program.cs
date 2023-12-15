@@ -39,6 +39,7 @@ Host.CreateDefaultBuilder(args)
        services.AddPrintBackgroundService(hostContext.Configuration);
        services.AddClearCacheService(hostContext.Configuration);
        var mySqlConnection = hostContext.Configuration.GetSection("ConnectionOptions").GetValue<string>("HymsonQUARTZDB");
+       var programName = hostContext.Configuration.GetSection("Quartz").GetValue<string>("ProgramName");
        // Add the required Quartz.NET services
        services.AddQuartz(q =>
        {
@@ -64,8 +65,8 @@ Host.CreateDefaultBuilder(args)
                persistentStoreOptions.SetProperty("quartz.serializer.type", "json");
                persistentStoreOptions.SetProperty("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
                string assemblyName = Assembly.GetExecutingAssembly().GetName().Name ?? "Hymson.MES.BackgroundTasks";
-               persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
-               persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName);
+               persistentStoreOptions.SetProperty("quartz.scheduler.instanceName", assemblyName + hostContext.HostingEnvironment.EnvironmentName + programName);
+               persistentStoreOptions.SetProperty("quartz.scheduler.instanceId", assemblyName + hostContext.HostingEnvironment.EnvironmentName + programName);
                persistentStoreOptions.UseMySql(mySqlConnection);
            });
        });

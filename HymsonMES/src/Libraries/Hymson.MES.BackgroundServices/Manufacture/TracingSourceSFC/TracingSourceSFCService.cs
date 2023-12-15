@@ -145,7 +145,15 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
                     if (sfcInfoEntity == null) continue;
 
-                    beforeNode = new ManuSFCNodeEntity { Id = sfcEntity.Id, SiteId = sfcEntity.SiteId, ProductId = sfcInfoEntity.ProductId, SFC = sfcEntity.SFC };
+                    beforeNode = new ManuSFCNodeEntity
+                    {
+                        Id = sfcEntity.Id,
+                        SiteId = sfcEntity.SiteId,
+                        ProductId = sfcInfoEntity.ProductId,
+                        SFC = sfcEntity.SFC,
+                        CreatedBy = user,
+                        UpdatedBy = user
+                    };
                 }
 
                 if (afterNode == null)
@@ -156,7 +164,15 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
                     if (sfcInfoEntity == null) continue;
 
-                    afterNode = new ManuSFCNodeEntity { Id = sfcEntity.Id, SiteId = sfcEntity.SiteId, ProductId = sfcInfoEntity.ProductId, SFC = sfcEntity.SFC };
+                    afterNode = new ManuSFCNodeEntity
+                    {
+                        Id = sfcEntity.Id,
+                        SiteId = sfcEntity.SiteId,
+                        ProductId = sfcInfoEntity.ProductId,
+                        SFC = sfcEntity.SFC,
+                        CreatedBy = user,
+                        UpdatedBy = user
+                    };
                 }
 
                 // 这个放外面是为了产品的名字有变动时，会随着节点更新同步
@@ -191,7 +207,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(afterNode);
             }
 
-            
             using var trans = TransactionHelper.GetTransactionScope();
 
             // 保存节点信息
@@ -206,7 +221,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             // 更新水位
             await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, manuSfcCirculationList.Max(x => x.Id));
             trans.Complete();
-           
 
         }
 

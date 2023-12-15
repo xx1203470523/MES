@@ -79,10 +79,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSFCNodeRepository
     {
-        const string InsertsSql = "REPLACE INTO manu_sfc_node(  `Id`, `ProductId`, `SFC`, `Name`, `Location`, `SourceNodes`, `DestinationNodes`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @ProductId, @SFC, @Name, @Location, @SourceNodes, @DestinationNodes, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
+        const string InsertsSql = "REPLACE INTO manu_sfc_node(  `Id`, `ProductId`, `SFC`, `Name`, `Location`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @ProductId, @SFC, @Name, @Location, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE manu_sfc_node SET   ProductId = @ProductId, SFC = @SFC, Name = @Name, Location = @Location, SourceNodes = @SourceNodes, DestinationNodes = @DestinationNodes, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE manu_sfc_node SET   ProductId = @ProductId, SFC = @SFC, Name = @Name, Location = @Location, SourceNodes = @SourceNodes, DestinationNodes = @DestinationNodes, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE manu_sfc_node SET   ProductId = @ProductId, SFC = @SFC, Name = @Name, Location = @Location, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE manu_sfc_node SET   ProductId = @ProductId, SFC = @SFC, Name = @Name, Location = @Location, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
 
         const string GetByIdSql = @"SELECT * FROM manu_sfc_node WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM manu_sfc_node WHERE Id IN @Ids ";
