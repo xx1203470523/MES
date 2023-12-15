@@ -173,7 +173,7 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <returns></returns>
         public async Task<WhWarehouseDto?> QueryByIdAsync(long id) 
         {
-           var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = id });
+           var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = id,SiteId= _currentSite.SiteId ?? 0 });
            if (whWarehouseEntity == null) return null;
            
            return whWarehouseEntity.ToModel<WhWarehouseDto>();
