@@ -8,7 +8,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
     /// <summary>
     /// 控制器（参数）
     [ApiController]
-    [Route("EquipmentService/api/v1/Collection")]
+    [Route("EquipmentService/api/v1/Tracing")]
     public class TracingSourceController : ControllerBase
     {
         /// <summary>
