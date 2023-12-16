@@ -30,14 +30,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 根据ID获取数据
+        /// 查询List
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSFCNodeSourceEntity> GetByIdAsync(long id)
+        public async Task<IEnumerable<ManuSFCNodeSourceEntity>> GetEntitiesAsync(IEnumerable<long> nodeIds)
         {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("NodeId IN @NodeIds");
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSFCNodeSourceEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryAsync<ManuSFCNodeSourceEntity>(template.RawSql, new { NodeIds = nodeIds });
         }
 
         /// <summary>
@@ -63,9 +67,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_source /**where**/  ";
 
-        const string InsertsSql = "INSERT IGNORE manu_sfc_node_source(  `Id`, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (  @Id, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
-
-        const string GetByIdSql = @"SELECT * FROM manu_sfc_node_source WHERE Id = @Id ";
+        const string InsertsSql = "REPLACE INTO manu_sfc_node_source(  `Id`, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (  @Id, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
 
     }
 }

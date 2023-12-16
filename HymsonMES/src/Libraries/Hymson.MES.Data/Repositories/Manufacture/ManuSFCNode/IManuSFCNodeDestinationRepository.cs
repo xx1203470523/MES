@@ -17,18 +17,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertRangeAsync(IEnumerable<ManuSFCNodeDestinationEntity> entities);
 
         /// <summary>
-        /// 根据ID获取数据
+        /// 查询List
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<ManuSFCNodeDestinationEntity> GetByIdAsync(long id);
-    
+        Task<IEnumerable<ManuSFCNodeDestinationEntity>> GetEntitiesAsync(IEnumerable<long> nodeIds);
+
         /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSFCNodeDestinationEntity>> GetEntitiesAsync(ManuSFCNodeDestinationQuery query);
-        
+
     }
 }
