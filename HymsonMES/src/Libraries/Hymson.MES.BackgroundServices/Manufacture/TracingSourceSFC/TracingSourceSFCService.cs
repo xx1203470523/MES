@@ -202,17 +202,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     case SfcCirculationTypeEnum.ModuleAdd:
                     case SfcCirculationTypeEnum.ModuleReplace:
                     default:
-                        // 将流转记录的条码ID追加到节点的去向集合中
-                        nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = item.SiteId,
-                            NodeId = beforeNode.Id,
-                            DestinationId = afterNode.Id,
-                            CreatedBy = user,
-                            UpdatedBy = user
-                        });
-
                         // 将流转记录的条码ID追加到节点的来源集合中
                         nodeSourceEntities.Add(new ManuSFCNodeSourceEntity
                         {
@@ -220,6 +209,17 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                             SiteId = item.SiteId,
                             NodeId = afterNode.Id,
                             SourceId = beforeNode.Id,
+                            CreatedBy = user,
+                            UpdatedBy = user
+                        });
+
+                        // 将流转记录的条码ID追加到节点的去向集合中
+                        nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = item.SiteId,
+                            NodeId = beforeNode.Id,
+                            DestinationId = afterNode.Id,
                             CreatedBy = user,
                             UpdatedBy = user
                         });

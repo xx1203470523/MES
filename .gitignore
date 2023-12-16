@@ -407,5 +407,4 @@ dist-ssr
 pnpm-debug
 /HymsonMES/src/Libraries/Hymson.MES.ServicesTests/Hymson.MES.ServicesTests.csproj
 /HymsonMES/src/Presentation/Hymson.MES.Equipment.Api/.config/dotnet-tools.json
-/HymsonMES/src/Presentation/Hymson.MES.Equipment.Api/Properties/launchSettings.json
 /HymsonMES/src/Presentation/Hymson.MES.Api/Properties/launchSettings.json

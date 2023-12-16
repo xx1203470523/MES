@@ -10,6 +10,7 @@
         /// </summary>
         public long Id { get; set; }
 
+        /*
         /// <summary>
         /// 站点ID
         /// </summary>
@@ -19,6 +20,7 @@
         /// 产品ID
         /// </summary>
         public long ProductId { get; set; }
+        */
 
         /// <summary>
         /// 条码
