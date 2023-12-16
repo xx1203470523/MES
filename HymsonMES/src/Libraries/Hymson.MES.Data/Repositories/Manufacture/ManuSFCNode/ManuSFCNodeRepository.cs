@@ -1,6 +1,7 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -61,6 +62,22 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ManuSFCNodeEntity> GetBySFCAsync(EntityBySFCQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Where("SFC = @SFC");
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuSFCNodeEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
@@ -79,6 +96,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSFCNodeRepository
     {
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node /**where**/  ";
+
         const string InsertsSql = "INSERT IGNORE manu_sfc_node(  `Id`, `ProductId`, `SFC`, `Name`, `Location`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @ProductId, @SFC, @Name, @Location, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string UpdateSql = "UPDATE manu_sfc_node SET   ProductId = @ProductId, SFC = @SFC, Name = @Name, Location = @Location, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";

@@ -1,4 +1,5 @@
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -20,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSFCNodeEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -34,7 +35,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuSFCNodeEntity> GetByIdAsync(long id);
-    
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSFCNodeEntity> GetBySFCAsync(EntityBySFCQuery query);
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>

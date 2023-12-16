@@ -1,5 +1,4 @@
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -15,6 +14,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="entities"></param>
         /// <returns></returns>
         Task<int> InsertRangeAsync(IEnumerable<ManuSFCNodeDestinationEntity> entities);
+
+        /// <summary>
+        /// 查询树数据的List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSFCNodeDestinationEntity>> GetTreeEntitiesAsync(long nodeId);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSFCNodeDestinationEntity>> GetEntitiesAsync(long nodeId);
 
         /// <summary>
         /// 查询List

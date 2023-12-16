@@ -82,6 +82,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             _manuSFCNodeDestinationRepository = manuSFCNodeDestinationRepository;
         }
 
+
         /// <summary>
         /// 执行统计
         /// </summary>
@@ -102,13 +103,13 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             var user = $"{BusinessKey.TracingSourceSFC}作业";
 
             // 通过站点ID分组
-            var manuSfcCirculationSiteIdDic = manuSfcCirculationList.ToLookup(x => x.SiteId).ToDictionary(d => d.Key, d => d);
+            var manuSfcCirculationSiteIdDict = manuSfcCirculationList.ToLookup(x => x.SiteId).ToDictionary(d => d.Key, d => d);
 
             List<ManuSFCNodeEntity> nodeEntities = new();
             List<ManuSFCNodeSourceEntity> nodeSourceEntities = new();
             List<ManuSFCNodeDestinationEntity> nodeDestinationEntities = new();
             List<ManuSfcEntity> sfcEntities = new();
-            foreach (var item in manuSfcCirculationSiteIdDic)
+            foreach (var item in manuSfcCirculationSiteIdDict)
             {
                 var barCodes = item.Value.Select(s => s.SFC).Union(item.Value.Select(s => s.CirculationBarCode)).Distinct();
 
@@ -134,6 +135,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             // 根据条码批量查询条码信息
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+            var sfcInfoDict = sfcInfoEntities.ToDictionary(node => node.Id);
 
             // 根据条码信息批量查询产品信息
             var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
@@ -149,8 +151,8 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.SFC);
                     if (sfcEntity == null) continue;
 
-                    var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
-                    if (sfcInfoEntity == null) continue;
+                    if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
+                    var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
 
                     var beforeProductEntity = productEntities.FirstOrDefault(x => x.Id == sfcInfoEntity.ProductId);
                     beforeNode = new ManuSFCNodeEntity
@@ -170,8 +172,8 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     var sfcEntity = sfcEntities.FirstOrDefault(x => x.SiteId == item.SiteId && x.SFC == item.CirculationBarCode);
                     if (sfcEntity == null) continue;
 
-                    var sfcInfoEntity = sfcInfoEntities.FirstOrDefault(x => x.SfcId == sfcEntity.Id);
-                    if (sfcInfoEntity == null) continue;
+                    if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
+                    var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
 
                     var afterProductEntity = productEntities.FirstOrDefault(x => x.Id == sfcInfoEntity.ProductId);
                     afterNode = new ManuSFCNodeEntity

@@ -16,6 +16,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertRangeAsync(IEnumerable<ManuSFCNodeSourceEntity> entities);
 
         /// <summary>
+        /// 查询树数据的List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSFCNodeSourceEntity>> GetTreeEntitiesAsync(long nodeId);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSFCNodeSourceEntity>> GetEntitiesAsync(long nodeId);
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>

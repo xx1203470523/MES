@@ -546,7 +546,7 @@
         #region 条码调整(合并、拆分、调整数量)
         public const string MES12800 = "条码调整(合并、拆分、调整数量)错误";
         public const string MES12801 = "条码为空";
-        public const string MES12802 = "条码【{sfc}】不存在";
+        public const string MES12802 = "产品序列码【{sfc}】不存在，具体请查看【产品序列码报告】";
         public const string MES12803 = "条码【{sfc}】在载具中已绑定，如需操作请先去解绑";
         public const string MES12804 = "条码【{sfc}】在容器中，不允许操作";
         public const string MES12805 = "产品序列码【{SFC}】当前状态【{Current}】，不允许操作。";
