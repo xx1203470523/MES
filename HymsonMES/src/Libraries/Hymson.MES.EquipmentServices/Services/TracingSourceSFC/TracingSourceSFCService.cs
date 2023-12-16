@@ -1,0 +1,210 @@
+﻿using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.Web.Framework.WorkContext;
+
+namespace Hymson.MES.EquipmentServices.Services
+{
+    /// <summary>
+    /// 条码追溯服务
+    /// </summary>
+    public class TracingSourceSFCService : ITracingSourceSFCService
+    {
+        /// <summary>
+        /// 当前设备对象
+        /// </summary>
+        private readonly ICurrentEquipment _currentEquipment;
+
+        /// <summary>
+        /// 仓储接口（条码追溯）
+        /// </summary>
+        private readonly IManuSFCNodeRepository _manuSFCNodeRepository;
+
+        /// <summary>
+        /// 仓储接口（条码追溯-反向）
+        /// </summary>
+        private readonly IManuSFCNodeSourceRepository _manuSFCNodeSourceRepository;
+
+        /// <summary>
+        /// 仓储接口（条码追溯-正向）
+        /// </summary>
+        private readonly IManuSFCNodeDestinationRepository _manuSFCNodeDestinationRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentEquipment"></param>
+        /// <param name="manuSFCNodeRepository"></param>
+        /// <param name="manuSFCNodeSourceRepository"></param>
+        /// <param name="manuSFCNodeDestinationRepository"></param>
+        public TracingSourceSFCService(ICurrentEquipment currentEquipment,
+            IManuSFCNodeRepository manuSFCNodeRepository,
+            IManuSFCNodeSourceRepository manuSFCNodeSourceRepository,
+            IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository)
+        {
+            _currentEquipment = currentEquipment;
+            _manuSFCNodeRepository = manuSFCNodeRepository;
+            _manuSFCNodeSourceRepository = manuSFCNodeSourceRepository;
+            _manuSFCNodeDestinationRepository = manuSFCNodeDestinationRepository;
+        }
+
+
+        /// <summary>
+        /// 条码追溯（反向）
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<NodeSourceBo> SourceAsync(string sfc)
+        {
+            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(new EntityBySFCQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                SFC = sfc
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", sfc);
+
+            // 取得该根节点下面的所有树节点
+            var sourceEntities = await _manuSFCNodeSourceRepository.GetTreeEntitiesAsync(rootNodeEntity.Id);
+            //var sourceDict = sourceEntities.ToLookup(x => x.NodeId).ToDictionary(d => d.Key, d => d);
+
+            // 取得整个树的基础信息方便下文填充数据
+            var nodeIds = sourceEntities.Select(s => s.NodeId).Union(sourceEntities.Select(s => s.SourceId)).Distinct();
+            var nodeEntities = await _manuSFCNodeRepository.GetByIdsAsync(nodeIds);
+            var nodeDict = nodeEntities.ToDictionary(node => node.Id);
+
+            // 初始化根节点Bo对象
+            var rootNode = new NodeSourceBo
+            {
+                Id = rootNodeEntity.Id,
+                //SiteId = rootNodeEntity.SiteId,
+                //ProductId = rootNodeEntity.ProductId,
+                SFC = rootNodeEntity.SFC,
+                Name = rootNodeEntity.Name,
+                Location = rootNodeEntity.Location
+            };
+
+            var filledNodes = FillChildrenNodes(rootNode, sourceEntities, nodeDict);
+            if (filledNodes == null) return rootNode;
+
+            return filledNodes;
+        }
+
+        /// <summary>
+        /// 条码追溯（正向）
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<NodeSourceBo> DestinationAsync(string sfc)
+        {
+            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(new EntityBySFCQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                SFC = sfc
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", sfc);
+
+            // 取得该根节点下面的所有树节点
+            var destinationEntities = await _manuSFCNodeDestinationRepository.GetTreeEntitiesAsync(rootNodeEntity.Id);
+            //var sourceDict = sourceEntities.ToLookup(x => x.NodeId).ToDictionary(d => d.Key, d => d);
+
+            // 取得整个树的基础信息方便下文填充数据
+            var nodeIds = destinationEntities.Select(s => s.NodeId).Union(destinationEntities.Select(s => s.DestinationId)).Distinct();
+            var nodeEntities = await _manuSFCNodeRepository.GetByIdsAsync(nodeIds);
+            var nodeDict = nodeEntities.ToDictionary(node => node.Id);
+
+            // 初始化根节点Bo对象
+            var rootNode = new NodeSourceBo
+            {
+                Id = rootNodeEntity.Id,
+                //SiteId = rootNodeEntity.SiteId,
+                //ProductId = rootNodeEntity.ProductId,
+                SFC = rootNodeEntity.SFC,
+                Name = rootNodeEntity.Name,
+                Location = rootNodeEntity.Location
+            };
+
+            var filledNodes = FillChildrenNodes(rootNode, destinationEntities, nodeDict);
+            if (filledNodes == null) return rootNode;
+
+            return filledNodes;
+        }
+
+        /// <summary>
+        /// 填充来源
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <param name="sourceEntities"></param>
+        /// <param name="nodeDict"></param>
+        /// <returns></returns>
+        public NodeSourceBo? FillChildrenNodes(NodeSourceBo? currentNode, IEnumerable<ManuSFCNodeSourceEntity> sourceEntities, Dictionary<long, ManuSFCNodeEntity> nodeDict)
+        {
+            if (currentNode == null) return currentNode;
+            if (sourceEntities == null || !sourceEntities.Any()) return currentNode;
+
+            var childrenSourceEntities = sourceEntities.Where(x => x.NodeId == currentNode.Id);
+            if (childrenSourceEntities == null || !childrenSourceEntities.Any()) return currentNode;
+
+            // 填充node的Children
+            foreach (var item in childrenSourceEntities)
+            {
+                if (!nodeDict.ContainsKey(item.SourceId)) continue;
+
+                var nodeEntity = nodeDict[item.SourceId];
+                var nodeBo = new NodeSourceBo
+                {
+                    Id = nodeEntity.Id,
+                    //SiteId = nodeEntity.SiteId,
+                    //ProductId = nodeEntity.ProductId,
+                    SFC = nodeEntity.SFC,
+                    Name = nodeEntity.Name,
+                    Location = nodeEntity.Location
+                };
+
+                nodeBo = FillChildrenNodes(nodeBo, sourceEntities, nodeDict) ?? nodeBo;
+                currentNode.Children.Add(nodeBo);
+            }
+            return currentNode;
+        }
+
+        /// <summary>
+        /// 填充去向
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <param name="sourceEntities"></param>
+        /// <param name="nodeDict"></param>
+        /// <returns></returns>
+        public NodeSourceBo? FillChildrenNodes(NodeSourceBo? currentNode, IEnumerable<ManuSFCNodeDestinationEntity> sourceEntities, Dictionary<long, ManuSFCNodeEntity> nodeDict)
+        {
+            if (currentNode == null) return currentNode;
+            if (sourceEntities == null || !sourceEntities.Any()) return currentNode;
+
+            var childrenSourceEntities = sourceEntities.Where(x => x.NodeId == currentNode.Id);
+            if (childrenSourceEntities == null || !childrenSourceEntities.Any()) return currentNode;
+
+            // 填充node的Children
+            foreach (var item in childrenSourceEntities)
+            {
+                if (!nodeDict.ContainsKey(item.DestinationId)) continue;
+
+                var nodeEntity = nodeDict[item.DestinationId];
+                var nodeBo = new NodeSourceBo
+                {
+                    Id = nodeEntity.Id,
+                    //SiteId = nodeEntity.SiteId,
+                    //ProductId = nodeEntity.ProductId,
+                    SFC = nodeEntity.SFC,
+                    Name = nodeEntity.Name,
+                    Location = nodeEntity.Location
+                };
+
+                nodeBo = FillChildrenNodes(nodeBo, sourceEntities, nodeDict) ?? nodeBo;
+                currentNode.Children.Add(nodeBo);
+            }
+            return currentNode;
+        }
+
+    }
+
+
+}

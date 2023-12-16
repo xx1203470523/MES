@@ -3,13 +3,14 @@
     /// <summary>
     /// 条码树
     /// </summary>
-    public class NodeSFCBo
+    public class NodeSourceBo
     {
         /// <summary>
         /// 条码ID
         /// </summary>
         public long Id { get; set; }
 
+        /*
         /// <summary>
         /// 站点ID
         /// </summary>
@@ -19,6 +20,7 @@
         /// 产品ID
         /// </summary>
         public long ProductId { get; set; }
+        */
 
         /// <summary>
         /// 条码
@@ -36,14 +38,9 @@
         public string Location { get; set; }
 
         /// <summary>
-        /// 条码ID集合（来源）
+        /// 条码ID集合（来源/去向）
         /// </summary>
-        public List<long> SourceIds { get; set; } = new();
-
-        /// <summary>
-        /// 条码ID集合（去向）
-        /// </summary>
-        public List<long> DestinationIds { get; set; } = new();
+        public List<NodeSourceBo> Children { get; set; } = new();
 
     }
 

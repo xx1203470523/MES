@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseRegion
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             //获取仓库
-            var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Code = saveDto.WarehouseCode });
+            var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Code = saveDto.WarehouseCode,SiteId= _currentSite.SiteId??0 });
             if (warehouseEntity==null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19224));
@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseRegion
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         public async Task<PagedInfo<WhWarehouseRegionDto>> GetPagedListAsync(WhWarehouseRegionPagedQueryDto pagedQueryDto)
-        {
+            {
             var returnData = new PagedInfo<WhWarehouseRegionDto>(Enumerable.Empty<WhWarehouseRegionDto>(), 0, 0, 0);
             var wareHouseQuery = new WhWarehouseQuery();
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WareHouseCode))

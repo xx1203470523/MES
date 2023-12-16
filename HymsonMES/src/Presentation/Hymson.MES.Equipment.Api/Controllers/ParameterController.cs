@@ -28,7 +28,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
 
         /// <summary>
-        ///产品过程参数采集
+        /// 产品过程参数采集
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -41,7 +41,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        ///设备过程参数采集
+        /// 设备过程参数采集
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
