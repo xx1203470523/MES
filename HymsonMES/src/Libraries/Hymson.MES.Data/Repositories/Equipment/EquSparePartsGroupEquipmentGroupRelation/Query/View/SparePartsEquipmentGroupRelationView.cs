@@ -29,6 +29,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePartsGroupEquipmentGrou
             public string CreatedBy { get; set; }
 
             /// <summary>
+            /// 设备组编码
+            /// </summary>
+            public string EquipmentGroupCode { get; set; }
+
+            /// <summary>
+            /// 设备组名称
+            /// </summary>
+            public string EquipmentGroupName { get; set; }
+
+            /// <summary>
             /// 创建时间
             /// </summary>
             public DateTime CreatedOn { get; set; }

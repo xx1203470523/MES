@@ -98,6 +98,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteBySparePartsId, command);
+        }
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -183,18 +194,23 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM `equ_spare_parts_group_equipment_group_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_spare_parts_group_equipment_group_relation`  WHERE Id IN @Ids ";
+        const string DeleteBySparePartsId = "DELETE FROM equ_spare_parts_group_equipment_group_relation WHERE SparePartsGroupId = @ParentId";
 
         const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
 	                                                                        ESPGEGR.Id,
 	                                                                        ESPGEGR.SparePartsGroupId,
 	                                                                        ESPGEGR.EquipmentGroupId,
+	                                                                        EEG.EquipmentGroupCode,
+	                                                                        EEG.EquipmentGroupName,
 	                                                                        ESPGEGR.CreatedBy,
 	                                                                        ESPGEGR.CreatedOn
                                                                         FROM
 	                                                                        equ_spare_parts_group ESPG
                                                                          JOIN equ_spare_parts_group_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartsGroupId = ESPG.Id 
+                                                                         JOIN equ_equipment_group EEG ON EEG.Id=ESPGEGR.EquipmentGroupId
+
                                                                         WHERE
-	                                                                        QUC.Id = @Id 
+	                                                                        ESPG.Id = @Id 
 	                                                                        AND ESPG.IsDeleted = 0";
 
     }

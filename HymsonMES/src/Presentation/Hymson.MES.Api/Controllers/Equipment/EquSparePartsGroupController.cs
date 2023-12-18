@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -82,6 +83,17 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<EquSparePartsGroupDto?> QueryEquSparePartsGroupByIdAsync(long id)
         {
             return await _equSparePartsGroupService.QueryEquSparePartsGroupByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询容器关联的设备组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/equipmentGroupList")]
+        public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetQualUnqualifiedCodeGroupRelationByIdAsync(long id)
+        {
+            return await _equSparePartsGroupService.GetSparePartsEquipmentGroupRelationByIdAsync(id);
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -100,15 +101,15 @@ namespace Hymson.MES.Services.Services.Equipment
             //关联的设备组
             List<EquSparePartsGroupEquipmentGroupRelationEntity> list = new();
 
-            if (saveDto.EquipmentGroups != null)
-                foreach (var item in saveDto.EquipmentGroups)
+            if (saveDto.EquipmentGroupIds != null)
+                foreach (var item in saveDto.EquipmentGroupIds)
                 {
                     var equipmentGroupEntity = new EquSparePartsGroupEquipmentGroupRelationEntity
                     {
-                        Id = entity.Id = IdGenProvider.Instance.CreateId(),
+                        Id =IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         SparePartsGroupId = entity.Id,
-                        EquipmentGroupId = item.EquipmentGroupId,
+                        EquipmentGroupId = item,
                         CreatedBy = updatedBy,
                         CreatedOn = updatedOn,
                         UpdatedBy = updatedBy,
@@ -140,6 +141,35 @@ namespace Hymson.MES.Services.Services.Equipment
         }
 
         /// <summary>
+        /// 获取设备组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id)
+        {
+            var unqualifiedCodeGroupRelations = await _equSparePartsGroupEquipmentGroupRelationRepository.GetSparePartsEquipmentGroupRelationAsync(id);
+            var nqualifiedCodeGroupRelationList = new List<EquSparePartsGroupEquipmentGroupRelationSaveDto>();
+            if (unqualifiedCodeGroupRelations != null && unqualifiedCodeGroupRelations.Any())
+            {
+
+                foreach (var item in unqualifiedCodeGroupRelations)
+                {
+                    nqualifiedCodeGroupRelationList.Add(new EquSparePartsGroupEquipmentGroupRelationSaveDto()
+                    {
+                        Id = item.Id,
+                        EquipmentGroupId= item.EquipmentGroupId,
+                        SparePartsGroupId= item.SparePartsGroupId,
+                        EquipmentGroupCode=item.EquipmentGroupCode,
+                        EquipmentGroupName=item.EquipmentGroupName,
+                        CreatedBy = item.CreatedBy,
+                        CreatedOn = item.CreatedOn
+                    });
+                }
+            }
+            return nqualifiedCodeGroupRelationList;
+        }
+
+        /// <summary>
         /// 修改
         /// </summary>
         /// <param name="saveDto"></param>
@@ -157,7 +187,55 @@ namespace Hymson.MES.Services.Services.Equipment
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _equSparePartsGroupRepository.UpdateAsync(entity);
+            //获取关联设备
+            List<EquSparePartsGroupEquipmentGroupRelationEntity> list = new();
+
+            if (saveDto.EquipmentGroupIds != null)
+                foreach (var item in saveDto.EquipmentGroupIds)
+                {
+                    var equipmentGroupEntity = new EquSparePartsGroupEquipmentGroupRelationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        SparePartsGroupId = entity.Id,
+                        EquipmentGroupId = item,
+                        CreatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now()
+                };
+                    list.Add(equipmentGroupEntity);
+                }
+
+            var command = new DeleteByParentIdCommand
+            {
+                ParentId = entity.Id,
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            //保存
+            var rows = 0;
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                rows = await _equSparePartsGroupEquipmentGroupRelationRepository.DeleteByParentIdAsync(command);
+
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                }
+                else
+                {
+                    var rowArray = await Task.WhenAll(new List<Task<int>>() {
+                    _equSparePartsGroupRepository.UpdateAsync(entity),
+                    _equSparePartsGroupEquipmentGroupRelationRepository.InsertRangeAsync(list),
+
+                    });
+                    rows += rowArray.Sum();
+                    trans.Complete();
+                }
+            }
+            return rows;
+
+
         }
 
         /// <summary>

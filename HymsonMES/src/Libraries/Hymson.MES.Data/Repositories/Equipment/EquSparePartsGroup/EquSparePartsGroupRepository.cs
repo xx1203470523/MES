@@ -146,6 +146,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
@@ -183,7 +184,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public partial class EquSparePartsGroupRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spare_parts_group` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_spare_parts_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_spare_parts_group` /**where**/ ";
         const string GetEquSparePartsGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/

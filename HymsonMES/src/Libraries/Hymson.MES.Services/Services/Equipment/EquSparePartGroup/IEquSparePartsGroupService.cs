@@ -37,6 +37,13 @@ namespace Hymson.MES.Services.Services.Equipment
         Task<int> DeletesEquSparePartsGroupAsync(long[] ids);
 
         /// <summary>
+        /// 获取设备组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<EquSparePartsGroupEquipmentGroupRelationSaveDto>> GetSparePartsEquipmentGroupRelationByIdAsync(long id);
+
+        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>

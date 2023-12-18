@@ -27,7 +27,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long? EquipmentGroupId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 设备组编码
+        /// </summary>
+        public string EquipmentGroupCode { get; set; }
+
+        /// <summary>
+        /// 设备组名称
+        /// </summary>
+        public string EquipmentGroupName { get; set; }
+
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }

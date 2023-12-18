@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquSparePartsGroupEquipmentGroupRelation.Query.View;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -53,6 +54,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -65,6 +73,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<EquSparePartsGroupEquipmentGroupRelationEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 获取设备组关联备件维护
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SparePartsEquipmentGroupRelationView>> GetSparePartsEquipmentGroupRelationAsync(long Id);
 
         /// <summary>
         /// 获取List

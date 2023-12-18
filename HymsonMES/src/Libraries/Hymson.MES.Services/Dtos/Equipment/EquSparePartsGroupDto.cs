@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 关联设备组
         /// </summary>
-        public IEnumerable<EquSparePartsGroupEquipmentGroupRelationDto>? EquipmentGroups { get; set; }
+        public IEnumerable<long>? EquipmentGroupIds { get; set; }
 
         /// <summary>
         /// 关联备件
