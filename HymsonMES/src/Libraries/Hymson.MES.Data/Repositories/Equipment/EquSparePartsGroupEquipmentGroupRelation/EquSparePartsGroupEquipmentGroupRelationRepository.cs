@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquSparePartsGroupEquipmentGroupRelation.Query.View;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -28,6 +29,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
+        }
+
+        /// <summary>
+        /// 获取设备组关联备件维护
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SparePartsEquipmentGroupRelationView>> GetSparePartsEquipmentGroupRelationAsync(long Id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<SparePartsEquipmentGroupRelationView>(GetSparePartsEquipmentGroupRelationSqlTemplate, new { Id = Id });
         }
 
         /// <summary>
@@ -171,6 +183,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string GetByIdSql = @"SELECT * FROM `equ_spare_parts_group_equipment_group_relation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_spare_parts_group_equipment_group_relation`  WHERE Id IN @Ids ";
+
+        const string GetSparePartsEquipmentGroupRelationSqlTemplate = @"SELECT
+	                                                                        ESPGEGR.Id,
+	                                                                        ESPGEGR.SparePartsGroupId,
+	                                                                        ESPGEGR.EquipmentGroupId,
+	                                                                        ESPGEGR.CreatedBy,
+	                                                                        ESPGEGR.CreatedOn
+                                                                        FROM
+	                                                                        equ_spare_parts_group ESPG
+                                                                         JOIN equ_spare_parts_group_equipment_group_relation ESPGEGR ON ESPGEGR.SparePartsGroupId = ESPG.Id 
+                                                                        WHERE
+	                                                                        QUC.Id = @Id 
+	                                                                        AND ESPG.IsDeleted = 0";
 
     }
 }
