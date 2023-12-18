@@ -126,6 +126,9 @@ namespace Hymson.MES.CoreServices.Services
         public NodeSourceBo? FillChildrenNodes(NodeSourceBo? currentNode, IEnumerable<ManuSFCNodeSourceEntity> sourceEntities, Dictionary<long, ManuSFCNodeEntity> nodeDict)
         {
             if (currentNode == null) return currentNode;
+            currentNode.Label = $"{currentNode.SFC} - {currentNode.Name}";
+            if (!string.IsNullOrWhiteSpace(currentNode.Location)) currentNode.Label = $" - {currentNode.Location}";
+
             if (sourceEntities == null || !sourceEntities.Any()) return currentNode;
 
             var childrenSourceEntities = sourceEntities.Where(x => x.NodeId == currentNode.Id);
@@ -163,6 +166,9 @@ namespace Hymson.MES.CoreServices.Services
         public NodeSourceBo? FillChildrenNodes(NodeSourceBo? currentNode, IEnumerable<ManuSFCNodeDestinationEntity> destinationEntities, Dictionary<long, ManuSFCNodeEntity> nodeDict)
         {
             if (currentNode == null) return currentNode;
+            currentNode.Label = $"{currentNode.SFC} - {currentNode.Name}";
+            if (!string.IsNullOrWhiteSpace(currentNode.Location)) currentNode.Label = $" - {currentNode.Location}";
+
             if (destinationEntities == null || !destinationEntities.Any()) return currentNode;
 
             var childrenDestinationEntities = destinationEntities.Where(x => x.NodeId == currentNode.Id);
