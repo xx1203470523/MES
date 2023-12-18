@@ -7,4 +7,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     {
     
     }
+
+    public class InteCustomFieldInternationalizationByCustomFieldIdsQuery
+    {
+        public long SiteId {  get; set; }
+
+        public long[] CustomFieldIds {  get; set; }
+    }
 }

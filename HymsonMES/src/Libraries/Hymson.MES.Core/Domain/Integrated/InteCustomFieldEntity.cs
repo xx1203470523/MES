@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -18,7 +19,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 业务类型
         /// </summary>
-        public bool BusinessType { get; set; }
+        public InteCustomFieldBusinessTypeEnum BusinessType { get; set; }
 
        /// <summary>
         /// 字段名

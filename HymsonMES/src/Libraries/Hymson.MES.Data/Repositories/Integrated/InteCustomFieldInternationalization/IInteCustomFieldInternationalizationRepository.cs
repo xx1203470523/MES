@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -80,5 +81,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         Task<PagedInfo<InteCustomFieldInternationalizationEntity>> GetPagedListAsync(InteCustomFieldInternationalizationPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 批量根据字段ID获取字段语言设置信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteCustomFieldInternationalizationEntity>> GetEntitiesByCustomFieldIdsAsync(InteCustomFieldInternationalizationByCustomFieldIdsQuery query);
+
+        /// <summary>
+        /// 根据自定义字段IDs 批量硬删除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeletedByCustomFieldIdsAsync(InternationalizationDeleteByCustomFieldIdsCommand command);
     }
 }

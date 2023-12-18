@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
@@ -148,6 +149,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return new PagedInfo<InteCustomFieldInternationalizationEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+
+        /// <summary>
+        /// 批量根据字段ID获取字段语言设置信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteCustomFieldInternationalizationEntity>> GetEntitiesByCustomFieldIdsAsync(InteCustomFieldInternationalizationByCustomFieldIdsQuery query) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteCustomFieldInternationalizationEntity>(GetEntitiesByCustomFieldIdsSql, query);
+        }
+
+        /// <summary>
+        /// 根据自定义字段IDs 批量硬删除
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeletedByCustomFieldIdsAsync(InternationalizationDeleteByCustomFieldIdsCommand command) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletedByCustomFieldIdsSql, command);
+        }
     }
 
 
@@ -174,5 +197,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT * FROM inte_custom_field_internationalization WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_custom_field_internationalization WHERE Id IN @Ids ";
 
+        const string GetEntitiesByCustomFieldIdsSql = @"SELECT * FROM inte_custom_field_internationalization WHERE SiteId=@SiteId and IsDeleted=0 and CustomFieldId in @CustomFieldIds ";
+
+        const string DeletedByCustomFieldIdsSql = @"DELETE FROM inte_custom_field_internationalization WHERE  SiteId=@SiteId and CustomFieldId in @CustomFieldIds ";
     }
 }

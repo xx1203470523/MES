@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
 using Microsoft.AspNetCore.Authorization;
@@ -40,13 +41,24 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <summary>
         /// 添加或更新（自定义字段）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="saveDtos"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("addOrUpdate")]
-        public async Task AddOrUpdateAsync([FromBody] InteCustomFieldSaveDto saveDto)
+        public async Task AddOrUpdateAsync([FromBody] IEnumerable<InteCustomFieldSaveDto> saveDtos)
         {
-             await _inteCustomFieldService.AddOrUpdateAsync(saveDto);
+             await _inteCustomFieldService.AddOrUpdateAsync(saveDtos);
+        }
+
+        /// <summary>
+        /// 获取业务类型下的字段信息
+        /// </summary>
+        /// <param name="businessType"></param>
+        /// <returns></returns>
+        [HttpGet("getDataByBusinessType")]
+        public async Task<IEnumerable<InteCustomFieldDto>> GetDataByBusinessTypeAsync([FromQuery] InteCustomFieldBusinessTypeEnum businessType) 
+        {
+            return await _inteCustomFieldService.GetDataByBusinessTypeAsync(businessType);
         }
     }
 }

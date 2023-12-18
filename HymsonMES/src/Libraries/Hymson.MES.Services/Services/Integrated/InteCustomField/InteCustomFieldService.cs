@@ -1,4 +1,5 @@
 using FluentValidation;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -6,12 +7,19 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
-using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Integrated.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Hymson.Web.Framework.Attributes;
+using Org.BouncyCastle.Utilities;
+using System.Linq;
+using System.Security.Policy;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -35,6 +43,11 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteCustomFieldSaveDto> _validationSaveRules;
 
         /// <summary>
+        /// 参数验证器
+        /// </summary>
+        private readonly AbstractValidator<InteCustomFieldInternationalizationDto> _internationalizationDtovalidationRules;
+
+        /// <summary>
         /// 仓储接口（自定义字段）
         /// </summary>
         private readonly IInteCustomFieldRepository _inteCustomFieldRepository;
@@ -50,43 +63,169 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteCustomFieldRepository"></param>
         /// <param name="inteCustomFieldInternationalizationRepository"></param>
         public InteCustomFieldService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteCustomFieldSaveDto> validationSaveRules, 
-            IInteCustomFieldRepository inteCustomFieldRepository, IInteCustomFieldInternationalizationRepository inteCustomFieldInternationalizationRepository)
+            IInteCustomFieldRepository inteCustomFieldRepository, IInteCustomFieldInternationalizationRepository inteCustomFieldInternationalizationRepository, AbstractValidator<InteCustomFieldInternationalizationDto> internationalizationDtovalidationRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _inteCustomFieldRepository = inteCustomFieldRepository;
             _inteCustomFieldInternationalizationRepository = inteCustomFieldInternationalizationRepository;
+            _internationalizationDtovalidationRules = internationalizationDtovalidationRules;
         }
 
         /// <summary>
         /// 创建或更新
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="saveDtos"></param>
         /// <returns></returns>
-        public async Task<int> AddOrUpdateAsync(InteCustomFieldSaveDto saveDto)
+        public async Task AddOrUpdateAsync(IEnumerable<InteCustomFieldSaveDto> saveDtos)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
-            // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            if (saveDtos == null || !saveDtos.Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15602));
+            }
+
+            foreach (var item in saveDtos)
+            {
+                // 验证DTO
+                await _validationSaveRules.ValidateAndThrowAsync(item);
+
+                if (item.Languages!=null)
+                    foreach (var language in item.Languages)
+                    {
+                        await _internationalizationDtovalidationRules.ValidateAndThrowAsync(language);
+                    }
+            }
+
+            //验证是否有其他的业务类型
+            var businessTypes= saveDtos.Select(x => x.BusinessType).Distinct();
+            if (businessTypes.Count() > 1) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15601));
+            }
+            var currentBusinessType= businessTypes.FirstOrDefault();
+
+            //验证重复
+            var duplicateNames = saveDtos.GroupBy(x => x.Name)
+                                     .Where(group => group.Count() > 1)
+                                     .Select(group => group.Key);
+            if (duplicateNames.Any()) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15603)).WithData("name", string.Join(",",duplicateNames));
+            }
+
+            //找到之前的字段信息
+            var oldInteCustomFields = await _inteCustomFieldRepository.GetEntitiesByBusinessTypeAsync(new InteCustomFieldByBusinessQuery { SiteId=_currentSite.SiteId??0,BusinessType= currentBusinessType });
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            // DTO转换实体
-            var entity = saveDto.ToEntity<InteCustomFieldEntity>();
-            entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = updatedBy;
-            entity.CreatedOn = updatedOn;
-            entity.UpdatedBy = updatedBy;
-            entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            List<InteCustomFieldEntity> inteCustomFieldEntities = new List<InteCustomFieldEntity>();
+            List<InteCustomFieldInternationalizationEntity> inteCustomFieldInternationalizationEntities = new List<InteCustomFieldInternationalizationEntity>();
+            foreach (var item in saveDtos) 
+            {
+                var inteCustomFieldEntityId = IdGenProvider.Instance.CreateId();
 
-            // 保存
-            return await _inteCustomFieldRepository.InsertAsync(entity);
+                inteCustomFieldEntities.Add(new InteCustomFieldEntity () 
+                {
+                    Id= inteCustomFieldEntityId,
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn,
+                    SiteId = _currentSite.SiteId ?? 0,
+
+                    BusinessType=item.BusinessType,
+                    Name= item.Name,
+                    Remark= item.Remark,
+
+                });
+
+                if (item.Languages != null)
+                {
+                    foreach (var internationalizationDto in item.Languages)
+                    {
+                        inteCustomFieldInternationalizationEntities.Add(new InteCustomFieldInternationalizationEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = updatedBy,
+                            CreatedOn = updatedOn,
+                            UpdatedBy = updatedBy,
+                            UpdatedOn = updatedOn,
+                            SiteId = _currentSite.SiteId ?? 0,
+
+                            CustomFieldId = inteCustomFieldEntityId,
+                            LanguageType = internationalizationDto.LanguageType,
+                            TranslationValue = internationalizationDto.TranslationValue,
+
+                        });
+                    }
+                }
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                if (oldInteCustomFields != null && oldInteCustomFields.Any())
+                {
+                    //删除
+                    await _inteCustomFieldRepository.DeletesTrueAsync(new Data.Repositories.Common.Command.DeleteCommand()
+                    {
+                        Ids = oldInteCustomFields.Select(x => x.Id).Distinct()
+                    });
+
+                    await _inteCustomFieldInternationalizationRepository.DeletedByCustomFieldIdsAsync(new InternationalizationDeleteByCustomFieldIdsCommand
+                    {
+                        SiteId = _currentSite.SiteId ?? 0,
+                        CustomFieldIds = oldInteCustomFields.Select(x => x.Id).Distinct()
+                    });
+                }
+
+                // 保存
+                await _inteCustomFieldRepository.InsertRangeAsync(inteCustomFieldEntities);
+
+                await _inteCustomFieldInternationalizationRepository.InsertRangeAsync(inteCustomFieldInternationalizationEntities);
+
+                ts.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 获取业务类型下的自定义字段信息（包含对应的语言设置）
+        /// </summary>
+        /// <param name="businessType"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteCustomFieldDto>> GetDataByBusinessTypeAsync(InteCustomFieldBusinessTypeEnum businessType) 
+        {
+            if(!System.Enum.IsDefined(typeof(InteCustomFieldBusinessTypeEnum), businessType)) throw new CustomerValidationException(nameof(ErrorCode.MES15604));
+
+            List<InteCustomFieldDto> result=new List<InteCustomFieldDto>();
+
+            var inteCustomFields = await _inteCustomFieldRepository.GetEntitiesByBusinessTypeAsync(new InteCustomFieldByBusinessQuery { SiteId = _currentSite.SiteId ?? 0, BusinessType = businessType });
+
+            if (inteCustomFields == null || !inteCustomFields.Any()) return result;
+
+            //找到对应的语言
+            var inteCustomFieldInternationalizations=  await _inteCustomFieldInternationalizationRepository.GetEntitiesByCustomFieldIdsAsync(new InteCustomFieldInternationalizationByCustomFieldIdsQuery {SiteId=_currentSite.SiteId??0, CustomFieldIds= inteCustomFields.Select(x=>x.Id).ToArray() });
+
+            foreach (var item in inteCustomFields) 
+            {
+                var languages= inteCustomFieldInternationalizations?.Where(x => x.CustomFieldId == item.Id);
+
+                result.Add(new InteCustomFieldDto
+                {
+                    BusinessType = businessType,
+                    Name = item.Name,
+                    Remark = item.Remark,
+
+                    Languages = languages?.Select(x => new InteCustomFieldInternationalizationDto { LanguageType=x.LanguageType, TranslationValue=x.TranslationValue })
+                }) ;
+            }
+
+            return result;
         }
     }
 }

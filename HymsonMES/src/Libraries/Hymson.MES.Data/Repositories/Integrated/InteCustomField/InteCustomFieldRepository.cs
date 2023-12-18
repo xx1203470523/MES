@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Microsoft.Extensions.Options;
 
@@ -148,6 +149,28 @@ namespace Hymson.MES.Data.Repositories.Integrated
             return new PagedInfo<InteCustomFieldEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+
+        /// <summary>
+        /// 查询某业务的字段List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteCustomFieldEntity>> GetEntitiesByBusinessTypeAsync(InteCustomFieldByBusinessQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<InteCustomFieldEntity>(GetEntitiesByBusinessTypeSql, query);
+        }
+
+        /// <summary>
+        /// 硬删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueAsync(DeleteCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesTrueSql, command);
+        }
     }
 
 
@@ -173,6 +196,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetByIdSql = @"SELECT * FROM inte_custom_field WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM inte_custom_field WHERE Id IN @Ids ";
+        const string GetEntitiesByBusinessTypeSql = @"SELECT * FROM inte_custom_field WHERE SiteId=@SiteId and IsDeleted=0 and BusinessType = @BusinessType ";
 
+        const string DeletesTrueSql = @" DELETE FROM inte_custom_field WHERE  Id IN @Ids ";
     }
 }

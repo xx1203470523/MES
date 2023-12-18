@@ -442,6 +442,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteMessageManageTriggerSaveDto>, InteMessageManageSaveValidator>();
 
             services.AddSingleton<AbstractValidator<InteCustomFieldSaveDto>, InteCustomFieldSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteCustomFieldInternationalizationDto>, InteCustomFieldInternationalizationValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();

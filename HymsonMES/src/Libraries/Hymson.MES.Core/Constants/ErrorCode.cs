@@ -796,6 +796,24 @@
         public const string MES15507 = "该条码{BarCode}已存在于当前上料点！";
         #endregion
 
+        #region 自定义字段 15600
+        public const string MES15600 = "自定义字段异常！";
+        public const string MES15601 = "含有其他业务类型的字段数据";
+        public const string MES15602 = "传入参数为空";
+        public const string MES15603 = "存在重复的字段【{name}】";
+        public const string MES15604 = "自定义字段业务类型不符合要求";
+        public const string MES15605 = "自定义字段名称不能为空";
+        public const string MES15606 = "自定义字段名称不能有空格";
+        public const string MES15607 = "自定义字段备注不能超过255个字符";
+        public const string MES15608 = "自定义字段名称不能超过100个字符";
+        public const string MES15609 = "自定义字段对应语言设置的翻译值不能为空";
+        public const string MES15610 = "自定义字段对应语言设置的翻译值不能超过255个字符";
+        public const string MES15611 = "自定义字段名称只能是英文或数字组合";
+        public const string MES15612 = "自定义字段对应语言设置的翻译值不能包含特殊字符";
+        public const string MES15613 = "自定义字段对应语言设置的翻译值不能有空格";
+
+        #endregion
+
         #region 工单 16000
         public const string MES16000 = "工单错误";
         public const string MES16001 = "此工单编码{orderCode}在系统已经存在！";

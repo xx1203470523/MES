@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Core.Domain.Integrated
 {
@@ -23,7 +24,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 语言类型
         /// </summary>
-        public bool LanguageType { get; set; }
+        public string LanguageType { get; set; }
 
        /// <summary>
         /// 翻译值

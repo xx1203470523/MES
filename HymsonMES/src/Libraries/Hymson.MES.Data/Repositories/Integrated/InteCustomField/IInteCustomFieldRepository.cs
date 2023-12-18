@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -80,5 +81,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         Task<PagedInfo<InteCustomFieldEntity>> GetPagedListAsync(InteCustomFieldPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 查询某业务的字段List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteCustomFieldEntity>> GetEntitiesByBusinessTypeAsync(InteCustomFieldByBusinessQuery query);
+
+
+        /// <summary>
+        /// 硬删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeletesTrueAsync(DeleteCommand command);
     }
 }
