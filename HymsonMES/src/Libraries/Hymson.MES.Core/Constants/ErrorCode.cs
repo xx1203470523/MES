@@ -812,6 +812,13 @@
         public const string MES15612 = "自定义字段对应语言设置的翻译值不能包含特殊字符";
         public const string MES15613 = "自定义字段对应语言设置的翻译值不能有空格";
 
+        public const string MES15614 = "自定义业务ID不能为空";
+        public const string MES15615 = "自定义业务ID不能为空";
+        public const string MES15616 = "自定义业务值不能有空格";
+        public const string MES15617 = "自定义业务值不能超过255个字符";
+        public const string MES15618 = "自定义业务ID不是同一个";
+        public const string MES15619 = "自定义业务类型不是同一个";
+
         #endregion
 
         #region 工单 16000

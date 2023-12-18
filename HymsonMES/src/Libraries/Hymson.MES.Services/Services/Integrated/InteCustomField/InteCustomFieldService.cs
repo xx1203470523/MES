@@ -48,11 +48,18 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly AbstractValidator<InteCustomFieldInternationalizationDto> _internationalizationDtovalidationRules;
 
         /// <summary>
+        /// 参数验证器
+        /// </summary>
+        private readonly AbstractValidator<InteCustomFieldBusinessEffectuateDto> _businessEffectuateDtovalidationRules;
+
+        /// <summary>
         /// 仓储接口（自定义字段）
         /// </summary>
         private readonly IInteCustomFieldRepository _inteCustomFieldRepository;
 
         private readonly IInteCustomFieldInternationalizationRepository _inteCustomFieldInternationalizationRepository;
+
+        private readonly IInteCustomFieldBusinessEffectuateRepository _inteCustomFieldBusinessEffectuateRepository;
 
         /// <summary>
         /// 构造函数
@@ -62,8 +69,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="validationSaveRules"></param>
         /// <param name="inteCustomFieldRepository"></param>
         /// <param name="inteCustomFieldInternationalizationRepository"></param>
+        /// <param name="internationalizationDtovalidationRules"></param>
+        /// <param name="businessEffectuateDtovalidationRules"></param>
+        /// <param name="inteCustomFieldBusinessEffectuateRepository"></param>
         public InteCustomFieldService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<InteCustomFieldSaveDto> validationSaveRules, 
-            IInteCustomFieldRepository inteCustomFieldRepository, IInteCustomFieldInternationalizationRepository inteCustomFieldInternationalizationRepository, AbstractValidator<InteCustomFieldInternationalizationDto> internationalizationDtovalidationRules)
+            IInteCustomFieldRepository inteCustomFieldRepository, IInteCustomFieldInternationalizationRepository inteCustomFieldInternationalizationRepository, AbstractValidator<InteCustomFieldInternationalizationDto> internationalizationDtovalidationRules, AbstractValidator<InteCustomFieldBusinessEffectuateDto> businessEffectuateDtovalidationRules, IInteCustomFieldBusinessEffectuateRepository inteCustomFieldBusinessEffectuateRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -71,6 +81,8 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteCustomFieldRepository = inteCustomFieldRepository;
             _inteCustomFieldInternationalizationRepository = inteCustomFieldInternationalizationRepository;
             _internationalizationDtovalidationRules = internationalizationDtovalidationRules;
+            _businessEffectuateDtovalidationRules = businessEffectuateDtovalidationRules;
+            _inteCustomFieldBusinessEffectuateRepository = inteCustomFieldBusinessEffectuateRepository;
         }
 
         /// <summary>
@@ -223,6 +235,83 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     Languages = languages?.Select(x => new InteCustomFieldInternationalizationDto { LanguageType=x.LanguageType, TranslationValue=x.TranslationValue })
                 }) ;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 保存各个业务ID的自定义字段数据
+        /// </summary>
+        /// <param name="saveBusinessDtos"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task SaveBusinessDataAsync(IEnumerable<InteCustomFieldBusinessEffectuateDto> saveBusinessDtos)
+        {
+            if (saveBusinessDtos == null || !saveBusinessDtos.Any()) return;
+
+            foreach (var item in saveBusinessDtos) 
+            {
+                await _businessEffectuateDtovalidationRules.ValidateAndThrowAsync(item);
+            }
+
+            //检测是否同一个businessID与BusinessTYpe
+            if(saveBusinessDtos.GroupBy(x => new { x.BusinessType }).Any(x => x.Count() > 1)) throw new CustomerValidationException(nameof(ErrorCode.MES15619));
+            if (saveBusinessDtos.GroupBy(x => new { x.BusinessId }).Any(x => x.Count() > 1)) throw new CustomerValidationException(nameof(ErrorCode.MES15618));
+
+            var currentBusinessId = saveBusinessDtos.First().BusinessId;
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
+
+            //组装数据
+            List<InteCustomFieldBusinessEffectuateEntity> list = new List<InteCustomFieldBusinessEffectuateEntity>();
+            foreach (var item in saveBusinessDtos)
+            {
+                list.Add(new InteCustomFieldBusinessEffectuateEntity() 
+                {
+                    Id= IdGenProvider.Instance.CreateId(),
+                    CreatedBy = updatedBy,
+                    CreatedOn = updatedOn,
+                    UpdatedBy = updatedBy,
+                    UpdatedOn = updatedOn,
+                    SiteId = _currentSite.SiteId ?? 0,
+
+                    BusinessId = item.BusinessId,
+                    BusinessType = item.BusinessType,
+                    CustomFieldName = item.CustomFieldName,
+                    SetValue = item.SetValue,
+                });
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                await _inteCustomFieldBusinessEffectuateRepository.DeleteTrueByBusinessIdAsync(currentBusinessId);
+
+                await _inteCustomFieldBusinessEffectuateRepository.InsertRangeAsync(list);
+
+                ts.Complete();
+            }
+        }
+
+        /// <summary>
+        /// 根据业务ID获取业务数据
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<IEnumerable<InteCustomFieldBusinessEffectuateDto>> GetBusinessEffectuatesAsync(long businessId) 
+        {
+            if(businessId==0) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            List<InteCustomFieldBusinessEffectuateDto> result = new List<InteCustomFieldBusinessEffectuateDto>();
+
+            var businessEffectuates = await _inteCustomFieldBusinessEffectuateRepository.GetBusinessEffectuatesByBusinessIdAsync(businessId);
+
+            foreach (var item in businessEffectuates)
+            {
+                result.Add(item.ToModel<InteCustomFieldBusinessEffectuateDto>());
             }
 
             return result;

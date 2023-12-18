@@ -62,4 +62,25 @@ namespace Hymson.MES.Services.Validators.Integrated
         }
     }
 
+    /// <summary>
+    /// 自定义字段业务数据 验证
+    /// </summary>
+    internal class InteCustomFieldBusinessEffectuatenValidator : AbstractValidator<InteCustomFieldBusinessEffectuateDto>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public InteCustomFieldBusinessEffectuatenValidator()
+        {
+            RuleFor(y => y.BusinessId).Must(x=>x>0).WithErrorCode(nameof(ErrorCode.MES15614));
+            RuleFor(x => x.BusinessType).Must(it => Enum.IsDefined(typeof(InteCustomFieldBusinessTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES15604));
+
+            RuleFor(y => y.CustomFieldName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15605));
+            RuleFor(x => x.CustomFieldName).Matches("^[a-zA-Z0-9]+$").WithErrorCode(nameof(ErrorCode.MES15611));
+            RuleFor(x => x.CustomFieldName).Must(x => !x.Any(x => char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES15606));
+
+            RuleFor(y => y.SetValue).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES15617));
+            RuleFor(x => x.SetValue).Must(x => !x.Any(x => char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES15616));
+        }
+    }
 }

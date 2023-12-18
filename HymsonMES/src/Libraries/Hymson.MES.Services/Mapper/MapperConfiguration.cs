@@ -343,6 +343,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
             CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
             #endregion
+
+            #region InteCustomField
+            CreateMap<InteCustomFieldBusinessEffectuateEntity, InteCustomFieldBusinessEffectuateDto>();
+            #endregion
         }
 
         /// <summary>

@@ -75,9 +75,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("create")]
         [LogDescription("载具类型", BusinessType.INSERT)]
         [PermissionDescription("inte:inteVehicleType:insert")]
-        public async Task AddInteVehicleTypeAsync([FromBody] InteVehicleTypeCreateDto parm)
+        public async Task<long> AddInteVehicleTypeAsync([FromBody] InteVehicleTypeCreateDto parm)
         {
-             await _inteVehicleTypeService.CreateInteVehicleTypeAsync(parm);
+            return await _inteVehicleTypeService.CreateInteVehicleTypeAsync(parm);
         }
 
         /// <summary>

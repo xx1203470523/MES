@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Services.Dtos.Integrated;
 
@@ -23,5 +24,21 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="businessType"></param>
         /// <returns></returns>
         Task<IEnumerable<InteCustomFieldDto>> GetDataByBusinessTypeAsync(InteCustomFieldBusinessTypeEnum businessType);
+
+        /// <summary>
+        /// 保存各个业务ID的自定义字段数据
+        /// </summary>
+        /// <param name="saveBusinessDtos"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task SaveBusinessDataAsync(IEnumerable<InteCustomFieldBusinessEffectuateDto> saveBusinessDtos);
+
+        /// <summary>
+        /// 根据业务ID获取业务数据
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<IEnumerable<InteCustomFieldBusinessEffectuateDto>> GetBusinessEffectuatesAsync(long businessId);
     }
 }

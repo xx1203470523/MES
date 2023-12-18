@@ -3,11 +3,6 @@ using Hymson.MES.Core.Enums.Integrated;
 
 namespace Hymson.MES.Services.Dtos.Integrated
 {
-    public record InteCustomFieldSaveOrUpdateDto : BaseEntityDto
-    {
-        public IEnumerable<InteCustomFieldSaveDto> InteCustomFieldSaveDtos { get; set; }
-    }
-
     /// <summary>
     /// 自定义字段新增/更新Dto
     /// </summary>
@@ -73,4 +68,26 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public IEnumerable<InteCustomFieldInternationalizationDto>? Languages { get; set; }
     }
 
+    public record InteCustomFieldBusinessEffectuateDto: BaseEntityDto 
+    {
+        /// <summary>
+        /// 业务表id
+        /// </summary>
+        public long BusinessId { get; set; }
+
+        /// <summary>
+        /// 业务类型
+        /// </summary>
+        public InteCustomFieldBusinessTypeEnum BusinessType { get; set; }
+
+        /// <summary>
+        /// 自定义字段名称
+        /// </summary>
+        public string CustomFieldName { get; set; }
+
+        /// <summary>
+        /// 设定值
+        /// </summary>
+        public string? SetValue { get; set; }
+    }
 }

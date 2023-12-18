@@ -60,5 +60,29 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             return await _inteCustomFieldService.GetDataByBusinessTypeAsync(businessType);
         }
+
+        /// <summary>
+        /// 保存各个业务ID的自定义字段数据
+        /// </summary>
+        /// <param name="saveBusinessDtos"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("saveBusinessData")]
+        public async Task SaveBusinessDataAsync(IEnumerable<InteCustomFieldBusinessEffectuateDto> saveBusinessDtos) 
+        {
+            await _inteCustomFieldService.SaveBusinessDataAsync(saveBusinessDtos);
+        }
+
+        /// <summary>
+        /// 根据业务ID获取业务数据
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getBusinessEffectuates")]
+        public async Task<IEnumerable<InteCustomFieldBusinessEffectuateDto>> GetBusinessEffectuatesAsync(long businessId) 
+        {
+            return await _inteCustomFieldService.GetBusinessEffectuatesAsync(businessId);
+        }
     }
 }
