@@ -135,7 +135,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             // 根据条码批量查询条码信息
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
-            var sfcInfoDict = sfcInfoEntities.ToDictionary(node => node.Id);
+            var sfcInfoDict = sfcInfoEntities.ToDictionary(node => node.SfcId);
 
             // 根据条码信息批量查询产品信息
             var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
