@@ -227,7 +227,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                 }
 
                 if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(beforeNode);
-                if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(afterNode);
+                if (!nodeEntities.Any(a => a.Id == afterNode.Id)) nodeEntities.Add(afterNode);
             }
 
             using var trans = TransactionHelper.GetTransactionScope();
