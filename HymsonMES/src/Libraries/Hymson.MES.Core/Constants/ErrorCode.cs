@@ -109,6 +109,7 @@
         public const string MES10386 = "作业不能为空！";
         public const string MES10387 = "作业参数不能为空！";
         public const string MES10388 = "资源不存在！";
+        public const string MES10389 = "通过工序未找到关联资源，请检查系统配置！";
         #endregion
 
         #region 标签模板 10340
@@ -424,6 +425,8 @@
         public const string MES12604 = "设备信息不存在！";
         public const string MES12605 = "状态不合法，请检查！";
         public const string MES12606 = "存放位置不能为空";
+
+        public const string MES12620 = "通过资源未找到关联设备，请检查系统配置";
         #endregion
 
         #region 设备组 12700

@@ -1,4 +1,5 @@
 ﻿using Hymson.Authentication;
+using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
@@ -12,7 +13,10 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
+using System.Globalization;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
 {
@@ -44,6 +48,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
@@ -57,6 +62,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             IEquEquipmentRepository equipmentRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
             IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository procResourceRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
@@ -70,6 +76,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             _equipmentRepository = equipmentRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
             _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
@@ -180,31 +187,125 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task CreateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto)
         {
             //获取条码信息
-            var bindSfcInfo = await _manuSfcRepository.GetBySFCAsync(new() { SFC = bindDto.BindSFC })
+            var bindManuSfc = await _manuSfcRepository.GetBySFCAsync(new() { SFC = bindDto.BindSFC, SiteId = 123456 })
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
 
-            var procedureEntities = await _procProcedureRepository.GetByIdAsync(bindDto.procedureId)
+            var bindManuSfcInfo = await _manuSfcInfoRepository.GetBySFCAsync(bindManuSfc.Id)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES16371)).WithData("BindSFC", bindDto.BindSFC);
+
+            var procedureEntity = await _procProcedureRepository.GetByIdAsync(bindDto.procedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17311));
 
-            //根据工序获取资源跟设备
-            var resourceEntities = await _procResourceRepository.GetByResTypeIdsAsync(new() { IdsArr = new long[] { procedureEntities.ResourceTypeId.GetValueOrDefault() } });
-            var resourceEntity = resourceEntities.FirstOrDefault();
-            var equEuipmentEntity = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(new() { ResourceId = resourceEntity.Id });
+            //获取资源
+            var resourceEntities = await _procResourceRepository.GetByResTypeIdsAsync(new() { IdsArr = new long[] { procedureEntity.ResourceTypeId.GetValueOrDefault() }, SiteId = 123456 });
+            var resourceEntity = resourceEntities.FirstOrDefault() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10389));
 
+            //根据工序获取资源跟设备
+            var equEuipmentEntities = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(new() { ResourceId = resourceEntity.Id })
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12620));
+            var equEuipmentEntity = equEuipmentEntities.FirstOrDefault();
+
+            //获取条码流转记录
+            var bindSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
+            {
+                CirculationBarCode = bindDto.SFC,
+                SiteId = 123456
+            });
+
+            //获取条码流转记录
+            var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
+            {
+                Sfcs = new string[] { bindDto.SFC } ,
+                SiteId = 123456
+            });
+
+            var locationId = 0;
+
+            //获取最后一个位置码+1
+            if (bindSfcCirculationEntities.Any())
+            {
+                var location = bindSfcCirculationEntities.Max(a => a.Location);
+
+                if (int.TryParse(location, out locationId))
+                    locationId += 1;
+            }
+
+            ManuSfcCirculationCreateDto sfcData = new ManuSfcCirculationCreateDto();
 
             //目前绑定只添加绑定关系，不增加条码信息和在制信息
-            ManuSfcCirculationCreateDto bindData = new ManuSfcCirculationCreateDto()
+            ManuSfcCirculationCreateDto bindSfcData = new ManuSfcCirculationCreateDto()
             {
-                
+                Id = IdGenProvider.Instance.CreateId(),
+                SiteId = 123456,
+                ProcedureId = procedureEntity.Id,
+                ResourceId = resourceEntity.Id,
+                EquipmentId = equEuipmentEntity.Id,
+                FeedingPointId = null,
+                SFC = bindDto.BindSFC,
+                WorkOrderId = bindManuSfcInfo.WorkOrderId,
+                ProductId = bindManuSfcInfo.ProductId,
+                Location = locationId.ToString(),
+                CirculationBarCode = bindDto.SFC,
+                CirculationWorkOrderId = bindManuSfcInfo.WorkOrderId, //暂不考虑流转后工单变更场景
+                CirculationProductId = bindManuSfcInfo.ProductId, //产品同上
+                CirculationQty = 1,
+                CirculationType = "2",
+                IsDisassemble = Core.Enums.TrueOrFalseEnum.No,
+                CreatedBy = _currentUser.UserName ?? "system",
+                CreatedOn = HymsonClock.Now(),
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now(),
+                IsDeleted = 0
             };
 
-            //添加绑定条码信息
-            ManuSfcCirculationBindDto sfcData = new ManuSfcCirculationBindDto()
+            if (!sfcCirculationEntities.Any())
             {
+                //添加绑定条码信息
+                sfcData = new ManuSfcCirculationCreateDto()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = 123456,
+                    ProcedureId = procedureEntity.Id,
+                    ResourceId = resourceEntity.Id,
+                    EquipmentId = equEuipmentEntity.Id,
+                    FeedingPointId = null,
+                    SFC = bindDto.SFC,
+                    WorkOrderId = bindManuSfcInfo.WorkOrderId,
+                    ProductId = bindManuSfcInfo.ProductId,
+                    Location = "0",
+                    CirculationBarCode = "",
+                    CirculationWorkOrderId = bindManuSfcInfo.WorkOrderId, //暂不考虑流转后工单变更场景
+                    CirculationProductId = bindManuSfcInfo.ProductId, //产品同上
+                    CirculationQty = 1,
+                    CirculationType = "2",
+                    IsDisassemble = Core.Enums.TrueOrFalseEnum.No,
+                    CreatedBy = _currentUser.UserName ?? "system",
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    IsDeleted = 0
+                };
+            }
 
-            };
+            if (bindDto.BindSFC.IndexOf("CCS") != -1)
+            {
+                bindSfcData.CirculationType = "6";
+            }
 
+            using var tran = TransactionHelper.GetTransactionScope();
 
+            //插入条码记录
+            if (sfcData.Id != 0)
+            {
+                var sfcEntity = sfcData.ToEntity<ManuSfcCirculationEntity>();
+                var insertSfc = await _manuSfcCirculationRepository.InsertAsync(sfcEntity);
+            }
+
+            //插入绑定条码绑定记录
+            var BindSfcEntity = bindSfcData.ToEntity<ManuSfcCirculationEntity>();
+            var insertBindSfc = await _manuSfcCirculationRepository.InsertAsync(BindSfcEntity);
+
+            tran.Complete();
         }
     }
 }

@@ -193,6 +193,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("CirculationBarCode != ''");
 
             if (query.Sfc != null)
             {

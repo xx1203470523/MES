@@ -819,7 +819,6 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                     ngInfo.ProcedureCode = procedures.Code;
                     ngInfo.ProcedureName = procedures.Name;
                     ngInfo.CreatedOn = sumFirst.CreatedOn;
-
                 }
 
                 circulationModuleCCSInfo.SFC = manuSfcCirculation.SFC;

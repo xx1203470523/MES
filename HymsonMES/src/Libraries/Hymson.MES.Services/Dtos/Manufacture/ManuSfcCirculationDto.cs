@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Manufacture;
 
@@ -184,6 +185,11 @@ public record ManuSfcCirculationCreateDto : BaseEntityDto
     public long ProductId { get; set; }
 
     /// <summary>
+    /// 位置码
+    /// </summary>
+    public string? Location { get; set; }
+
+    /// <summary>
     /// 流转后条码信息
     /// </summary>
     public string CirculationBarCode { get; set; }
@@ -211,7 +217,7 @@ public record ManuSfcCirculationCreateDto : BaseEntityDto
     /// <summary>
     /// 是否拆解
     /// </summary>
-    public bool? IsDisassemble { get; set; }
+    public TrueOrFalseEnum? IsDisassemble { get; set; } = TrueOrFalseEnum.No;
 
     /// <summary>
     /// 拆解人

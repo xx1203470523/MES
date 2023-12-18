@@ -562,6 +562,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuContainerPackRecordPagedQueryDto, ManuContainerPackRecordPagedQuery>();
             CreateMap<ManuContainerPackRecordEntity, ManuContainerPackRecordDto>();
             #endregion
+
+            #region manuSfcCirculation
+
+            CreateMap<ManuSfcCirculationCreateDto, ManuSfcCirculationEntity>();
+            CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationCreateDto>();
+
+            #endregion
         }
 
         /// <summary>
