@@ -10,6 +10,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Services;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
@@ -283,6 +284,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ComUsage
             services.AddSingleton<IComUsageReportService, ComUsageReportService>();
             #endregion
+
+            services.AddSingleton<ITracingSourceSFCService, TracingSourceSFCService>();
 
             #endregion
 

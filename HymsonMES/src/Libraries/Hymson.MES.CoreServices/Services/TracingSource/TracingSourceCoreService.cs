@@ -4,20 +4,14 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.Web.Framework.WorkContext;
 
-namespace Hymson.MES.EquipmentServices.Services
+namespace Hymson.MES.CoreServices.Services
 {
     /// <summary>
     /// 条码追溯服务
     /// </summary>
-    public class TracingSourceSFCService : ITracingSourceSFCService
+    public class TracingSourceCoreService : ITracingSourceCoreService
     {
-        /// <summary>
-        /// 当前设备对象
-        /// </summary>
-        private readonly ICurrentEquipment _currentEquipment;
-
         /// <summary>
         /// 仓储接口（条码追溯）
         /// </summary>
@@ -40,12 +34,10 @@ namespace Hymson.MES.EquipmentServices.Services
         /// <param name="manuSFCNodeRepository"></param>
         /// <param name="manuSFCNodeSourceRepository"></param>
         /// <param name="manuSFCNodeDestinationRepository"></param>
-        public TracingSourceSFCService(ICurrentEquipment currentEquipment,
-            IManuSFCNodeRepository manuSFCNodeRepository,
+        public TracingSourceCoreService(IManuSFCNodeRepository manuSFCNodeRepository,
             IManuSFCNodeSourceRepository manuSFCNodeSourceRepository,
             IManuSFCNodeDestinationRepository manuSFCNodeDestinationRepository)
         {
-            _currentEquipment = currentEquipment;
             _manuSFCNodeRepository = manuSFCNodeRepository;
             _manuSFCNodeSourceRepository = manuSFCNodeSourceRepository;
             _manuSFCNodeDestinationRepository = manuSFCNodeDestinationRepository;
@@ -55,15 +47,12 @@ namespace Hymson.MES.EquipmentServices.Services
         /// <summary>
         /// 条码追溯（反向）
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<NodeSourceBo> SourceAsync(string sfc)
+        public async Task<NodeSourceBo> SourceAsync(EntityBySFCQuery query)
         {
-            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(new EntityBySFCQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                SFC = sfc
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", sfc);
+            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(query)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", query.SFC);
 
             // 取得该根节点下面的所有树节点
             var sourceEntities = await _manuSFCNodeSourceRepository.GetTreeEntitiesAsync(rootNodeEntity.Id);
@@ -94,15 +83,12 @@ namespace Hymson.MES.EquipmentServices.Services
         /// <summary>
         /// 条码追溯（正向）
         /// </summary>
-        /// <param name="sfc"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<NodeSourceBo> DestinationAsync(string sfc)
+        public async Task<NodeSourceBo> DestinationAsync(EntityBySFCQuery query)
         {
-            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(new EntityBySFCQuery
-            {
-                SiteId = _currentEquipment.SiteId,
-                SFC = sfc
-            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", sfc);
+            var rootNodeEntity = await _manuSFCNodeRepository.GetBySFCAsync(query)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES12802)).WithData("sfc", query.SFC);
 
             // 取得该根节点下面的所有树节点
             var destinationEntities = await _manuSFCNodeDestinationRepository.GetTreeEntitiesAsync(rootNodeEntity.Id);

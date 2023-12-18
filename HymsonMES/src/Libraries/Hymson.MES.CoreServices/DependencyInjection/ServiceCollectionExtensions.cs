@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Services;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
 using Hymson.MES.CoreServices.Services.Integrated;
@@ -93,6 +94,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<IManuSfcSummaryService, ManuSfcSummaryService>();
             services.AddSingleton<IManuPassStationService, ManuPassStationService>();
             services.AddSingleton<IManuBindService, ManuBindService>();
+            services.AddSingleton<ITracingSourceCoreService, TracingSourceCoreService>();
 
             return services;
         }

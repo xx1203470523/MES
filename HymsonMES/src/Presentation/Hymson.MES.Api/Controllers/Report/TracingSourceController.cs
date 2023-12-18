@@ -1,14 +1,14 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.EquipmentServices.Services;
+using Hymson.MES.Services.Services;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Equipment.Api.Controllers
+namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（条码追溯）
     [ApiController]
-    [Route("EquipmentService/api/v1/Tracing")]
+    [Route("api/v1/[controller]")]
     public class TracingSourceController : ControllerBase
     {
         /// <summary>
