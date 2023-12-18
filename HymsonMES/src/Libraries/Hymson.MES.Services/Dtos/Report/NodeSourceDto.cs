@@ -1,24 +1,17 @@
-﻿namespace Hymson.MES.CoreServices.Bos.Common
+﻿using Hymson.MES.CoreServices.Bos.Common;
+using Hymson.MES.Services.Dtos.Common;
+
+namespace Hymson.MES.Services.Dtos.Report
 {
     /// <summary>
-    /// 条码树
+    /// 
     /// </summary>
-    public record NodeSourceBo : BaseBo
+    public partial record NodeSourceDto : BaseDto
     {
         /// <summary>
         /// 条码ID
         /// </summary>
         public long Id { get; set; }
-
-        /// <summary>
-        /// 站点ID
-        /// </summary>
-        public long SiteId { get; set; }
-
-        /// <summary>
-        /// 产品ID
-        /// </summary>
-        public long ProductId { get; set; }
 
         /// <summary>
         /// 条码
@@ -44,7 +37,6 @@
         /// 条码ID集合（来源/去向）
         /// </summary>
         public List<NodeSourceBo> Children { get; set; } = new();
-
     }
 
 }

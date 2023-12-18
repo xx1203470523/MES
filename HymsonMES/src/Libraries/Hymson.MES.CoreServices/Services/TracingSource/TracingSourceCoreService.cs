@@ -67,8 +67,8 @@ namespace Hymson.MES.CoreServices.Services
             var rootNode = new NodeSourceBo
             {
                 Id = rootNodeEntity.Id,
-                //SiteId = rootNodeEntity.SiteId,
-                //ProductId = rootNodeEntity.ProductId,
+                SiteId = rootNodeEntity.SiteId,
+                ProductId = rootNodeEntity.ProductId,
                 SFC = rootNodeEntity.SFC,
                 Name = rootNodeEntity.Name,
                 Location = rootNodeEntity.Location
@@ -103,8 +103,8 @@ namespace Hymson.MES.CoreServices.Services
             var rootNode = new NodeSourceBo
             {
                 Id = rootNodeEntity.Id,
-                //SiteId = rootNodeEntity.SiteId,
-                //ProductId = rootNodeEntity.ProductId,
+                SiteId = rootNodeEntity.SiteId,
+                ProductId = rootNodeEntity.ProductId,
                 SFC = rootNodeEntity.SFC,
                 Name = rootNodeEntity.Name,
                 Location = rootNodeEntity.Location
@@ -143,8 +143,8 @@ namespace Hymson.MES.CoreServices.Services
                 var nodeBo = new NodeSourceBo
                 {
                     Id = nodeEntity.Id,
-                    //SiteId = nodeEntity.SiteId,
-                    //ProductId = nodeEntity.ProductId,
+                    SiteId = nodeEntity.SiteId,
+                    ProductId = nodeEntity.ProductId,
                     SFC = nodeEntity.SFC,
                     Name = nodeEntity.Name,
                     Location = nodeEntity.Location
@@ -183,8 +183,8 @@ namespace Hymson.MES.CoreServices.Services
                 var nodeBo = new NodeSourceBo
                 {
                     Id = nodeEntity.Id,
-                    //SiteId = nodeEntity.SiteId,
-                    //ProductId = nodeEntity.ProductId,
+                    SiteId = nodeEntity.SiteId,
+                    ProductId = nodeEntity.ProductId,
                     SFC = nodeEntity.SFC,
                     Name = nodeEntity.Name,
                     Location = nodeEntity.Location

@@ -1,4 +1,4 @@
-﻿using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
@@ -32,8 +32,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <param name="sfc"></param>
         /// <returns></returns>
         [HttpGet("from/{sfc}")]
-        [ProducesDefaultResponseType(typeof(ResultDto))]
-        public async Task<NodeSourceBo> SourceAsync(string sfc)
+        public async Task<NodeSourceDto> SourceAsync(string sfc)
         {
             return await _tracingSFCService.SourceAsync(sfc);
         }
@@ -44,8 +43,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <param name="sfc"></param>
         /// <returns></returns>
         [HttpGet("to/{sfc}")]
-        [ProducesDefaultResponseType(typeof(ResultDto))]
-        public async Task<NodeSourceBo> DestinationAsync(string sfc)
+        public async Task<NodeSourceDto> DestinationAsync(string sfc)
         {
             return await _tracingSFCService.DestinationAsync(sfc);
         }

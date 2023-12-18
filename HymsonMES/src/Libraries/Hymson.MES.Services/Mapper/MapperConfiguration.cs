@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.WhWareHouse;
 using Hymson.MES.Core.Domain.WhWarehouseLocation;
 using Hymson.MES.Core.Domain.WhWarehouseRegion;
 using Hymson.MES.Core.Domain.WhWarehouseShelf;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -907,6 +908,7 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            CreateMap<NodeSourceBo, NodeSourceDto>();
         }
 
         /// <summary>
