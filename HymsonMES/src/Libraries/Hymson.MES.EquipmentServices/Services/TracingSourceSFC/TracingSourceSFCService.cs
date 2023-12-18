@@ -171,19 +171,19 @@ namespace Hymson.MES.EquipmentServices.Services
         /// 填充去向
         /// </summary>
         /// <param name="currentNode"></param>
-        /// <param name="sourceEntities"></param>
+        /// <param name="destinationEntities"></param>
         /// <param name="nodeDict"></param>
         /// <returns></returns>
-        public NodeSourceBo? FillChildrenNodes(NodeSourceBo? currentNode, IEnumerable<ManuSFCNodeDestinationEntity> sourceEntities, Dictionary<long, ManuSFCNodeEntity> nodeDict)
+        public NodeSourceBo? FillChildrenNodes(NodeSourceBo? currentNode, IEnumerable<ManuSFCNodeDestinationEntity> destinationEntities, Dictionary<long, ManuSFCNodeEntity> nodeDict)
         {
             if (currentNode == null) return currentNode;
-            if (sourceEntities == null || !sourceEntities.Any()) return currentNode;
+            if (destinationEntities == null || !destinationEntities.Any()) return currentNode;
 
-            var childrenSourceEntities = sourceEntities.Where(x => x.NodeId == currentNode.Id);
-            if (childrenSourceEntities == null || !childrenSourceEntities.Any()) return currentNode;
+            var childrenDestinationEntities = destinationEntities.Where(x => x.NodeId == currentNode.Id);
+            if (childrenDestinationEntities == null || !childrenDestinationEntities.Any()) return currentNode;
 
             // 填充node的Children
-            foreach (var item in childrenSourceEntities)
+            foreach (var item in childrenDestinationEntities)
             {
                 if (!nodeDict.ContainsKey(item.DestinationId)) continue;
 
@@ -198,7 +198,7 @@ namespace Hymson.MES.EquipmentServices.Services
                     Location = nodeEntity.Location
                 };
 
-                nodeBo = FillChildrenNodes(nodeBo, sourceEntities, nodeDict) ?? nodeBo;
+                nodeBo = FillChildrenNodes(nodeBo, destinationEntities, nodeDict) ?? nodeBo;
                 currentNode.Children.Add(nodeBo);
             }
             return currentNode;
