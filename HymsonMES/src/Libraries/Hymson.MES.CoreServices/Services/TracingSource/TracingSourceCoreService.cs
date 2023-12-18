@@ -197,6 +197,3 @@ namespace Hymson.MES.CoreServices.Services
         }
 
     }
-
-
-}
