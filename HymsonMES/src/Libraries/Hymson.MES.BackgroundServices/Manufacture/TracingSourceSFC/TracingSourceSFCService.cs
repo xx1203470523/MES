@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -194,42 +195,35 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     };
                 }
 
-                // 因为里面有的类型是拆解，需要移除之前的关系
-                switch (item.CirculationType)
+                // 是否解除绑定
+                if (item.IsDisassemble == TrueOrFalseEnum.Yes)
                 {
-                    case SfcCirculationTypeEnum.Disassembly:
-                        nodeDestinationEntities.RemoveAll(x => x.NodeId == beforeNode.Id && x.DestinationId == afterNode.Id);
-                        nodeSourceEntities.RemoveAll(x => x.NodeId == afterNode.Id && x.SourceId == beforeNode.Id);
-                        break;
-                    case SfcCirculationTypeEnum.Split:
-                    case SfcCirculationTypeEnum.Merge:
-                    case SfcCirculationTypeEnum.Change:
-                    case SfcCirculationTypeEnum.Consume:
-                    case SfcCirculationTypeEnum.ModuleAdd:
-                    case SfcCirculationTypeEnum.ModuleReplace:
-                    default:
-                        // 将流转记录的条码ID追加到节点的来源集合中
-                        nodeSourceEntities.Add(new ManuSFCNodeSourceEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = item.SiteId,
-                            NodeId = afterNode.Id,
-                            SourceId = beforeNode.Id,
-                            CreatedBy = user,
-                            UpdatedBy = user
-                        });
+                    nodeDestinationEntities.RemoveAll(x => x.NodeId == beforeNode.Id && x.DestinationId == afterNode.Id);
+                    nodeSourceEntities.RemoveAll(x => x.NodeId == afterNode.Id && x.SourceId == beforeNode.Id);
+                }
+                else
+                {
+                    // 将流转记录的条码ID追加到节点的来源集合中
+                    nodeSourceEntities.Add(new ManuSFCNodeSourceEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = item.SiteId,
+                        NodeId = afterNode.Id,
+                        SourceId = beforeNode.Id,
+                        CreatedBy = user,
+                        UpdatedBy = user
+                    });
 
-                        // 将流转记录的条码ID追加到节点的去向集合中
-                        nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = item.SiteId,
-                            NodeId = beforeNode.Id,
-                            DestinationId = afterNode.Id,
-                            CreatedBy = user,
-                            UpdatedBy = user
-                        });
-                        break;
+                    // 将流转记录的条码ID追加到节点的去向集合中
+                    nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = item.SiteId,
+                        NodeId = beforeNode.Id,
+                        DestinationId = afterNode.Id,
+                        CreatedBy = user,
+                        UpdatedBy = user
+                    });
                 }
 
                 if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(beforeNode);

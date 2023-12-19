@@ -1,5 +1,4 @@
-﻿using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.Services.Dtos.Common;
+﻿using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -36,7 +35,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 条码ID集合（来源/去向）
         /// </summary>
-        public List<NodeSourceBo> Children { get; set; } = new();
+        public List<NodeSourceDto> Children { get; set; } = new();
     }
 
 }
