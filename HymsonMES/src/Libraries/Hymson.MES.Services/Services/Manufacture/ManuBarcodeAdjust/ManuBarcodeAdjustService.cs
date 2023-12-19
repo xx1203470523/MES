@@ -1446,27 +1446,23 @@ namespace Hymson.MES.Services.Services.Manufacture
                 }
             }
 
-            //是否验证 是否相同bom或者相同工艺路线，  ps: 因为是通过工单查的，所有如果前面没有查询是否相同工单，下方在出现 条码信息中存在一种无工单，一种相同工单时，下方的验证会出现问题
-            if (sfcs.Length > 1 && (verifyConditions.IsVerifySameBom || verifyConditions.IsVerifySameProcessRoute))
+            //是否验证 物料清单必相同
+            if (sfcs.Length > 1 && verifyConditions.IsVerifySameBom) 
             {
-                //查询 工单 
-                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(manuSfcs.Select(x => x.WorkOrderId).ToList());
-
-                if (verifyConditions.IsVerifySameBom)
+                var sfcsGroupByBoms = manuSfcs.GroupBy(x => x.ProductBOMId);
+                if (sfcsGroupByBoms.Count() > 1)
                 {
-                    var sfcsGroupByBoms = workOrders.GroupBy(x => x.ProductBOMId);
-                    if (sfcsGroupByBoms.Count() > 1)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12810));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12810));
                 }
-                if (verifyConditions.IsVerifySameProcessRoute)
+            }
+
+            //是否验证 工艺路线必相同
+            if (sfcs.Length > 1 && verifyConditions.IsVerifySameProcessRoute) 
+            {
+                var sfcsGroupByProcessRoutes = manuSfcs.GroupBy(x => x.ProcessRouteId);
+                if (sfcsGroupByProcessRoutes.Count() > 1)
                 {
-                    var sfcsGroupByProcessRoutes = workOrders.GroupBy(x => x.ProcessRouteId);
-                    if (sfcsGroupByProcessRoutes.Count() > 1)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES12811));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12811));
                 }
             }
 
