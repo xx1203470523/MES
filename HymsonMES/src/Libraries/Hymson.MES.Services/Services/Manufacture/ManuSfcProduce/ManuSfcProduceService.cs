@@ -1336,7 +1336,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             if (manuUpdateSaveDto.WorkOrderId > 0)
             {
                 //新工单
-                newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId);
+                newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId.Value);
 
                 // PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed };
                 PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.SendDown, PlanWorkOrderStatusEnum.InProduction };
@@ -1362,9 +1362,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 }
             }
 
-            var productId = manuUpdateSaveDto.MaterialId > 0 ? manuUpdateSaveDto.MaterialId : newPlanWorkOrderEntity.ProductId;
-            var processRouterId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId : newPlanWorkOrderEntity.ProcessRouteId;
-            var bomId = manuUpdateSaveDto.BomId > 0 ? manuUpdateSaveDto.BomId : newPlanWorkOrderEntity.ProductBOMId;
+            var productId = manuUpdateSaveDto.MaterialId > 0 ? manuUpdateSaveDto.MaterialId.Value : newPlanWorkOrderEntity.ProductId;
+            var processRouterId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId.Value : newPlanWorkOrderEntity.ProcessRouteId;
+            var bomId = manuUpdateSaveDto.BomId > 0 ? manuUpdateSaveDto.BomId.Value : newPlanWorkOrderEntity.ProductBOMId;
             //组装步骤
             var sfcStepList = new List<ManuSfcStepEntity>();
             foreach (var item in manuSfcProduces)
@@ -1424,7 +1424,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     var newSfcInfo = new ManuSfcInfoEntity()
                     {
                         SfcId = item.SfcId,
-                        WorkOrderId = manuUpdateSaveDto.WorkOrderId > 0 ? manuUpdateSaveDto.WorkOrderId : item.WorkOrderId,
+                        WorkOrderId = manuUpdateSaveDto.WorkOrderId > 0 ? manuUpdateSaveDto.WorkOrderId.Value : item.WorkOrderId,
                         ProductId = productId > 0 ? productId : item.ProductId,
                         ProcessRouteId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId : item.ProcessRouteId,
                         ProductBOMId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.BomId : item.ProductBOMId,
