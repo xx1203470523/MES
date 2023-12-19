@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -295,6 +296,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                         SfcId = manuSfcEntity.Id,
                         WorkOrderId = planWorkOrderEntity.Id,
                         ProductId = productId,
+                        ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                        ProductBOMId = planWorkOrderEntity.ProductBOMId,
                         IsUsed = true,
                         CreatedBy = param.UserName!,
                         UpdatedBy = param.UserName
@@ -455,6 +458,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     SfcId = manuSfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     IsUsed = true,
                     CreatedBy = param.UserName!,
                     UpdatedBy = param.UserName
@@ -607,6 +612,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
                     SfcId = sfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductId = planWorkOrderEntity.ProductId,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     IsUsed = true,
                     CreatedBy = param.UserName!,
                     UpdatedBy = param.UserName

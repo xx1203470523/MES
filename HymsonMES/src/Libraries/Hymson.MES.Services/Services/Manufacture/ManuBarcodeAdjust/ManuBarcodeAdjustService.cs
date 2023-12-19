@@ -602,6 +602,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SfcId = sfcId,
                 WorkOrderId = oneManuSfc.WorkOrderId,
                 ProductId = oneManuSfc.ProductId,
+                ProcessRouteId = oneManuSfc.ProcessRouteId,
+                ProductBOMId = oneManuSfc.ProductBOMId,
                 IsUsed = true,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName
@@ -836,7 +838,6 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             #endregion
 
-
             var barCodeList = await GenerateBarcodeByproductId(manuSfcInfoEntity?.ProductId ?? 0);
             if (barCodeList == null || !barCodeList.Any())
             {
@@ -847,6 +848,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12831)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
             }
+            
             string? newSplitSFC = barCodeList.SelectMany(x => x.BarCodes.Select(x => x)).FirstOrDefault();
             if (newSplitSFC == null)
             {
@@ -942,6 +944,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SfcId = manuSfc.Id,
                 WorkOrderId = manuSfcInfoEntity?.WorkOrderId ?? 0,
                 ProductId = manuSfcInfoEntity?.ProductId ?? 0,
+                ProcessRouteId = planWorkOrderEntity?.ProcessRouteId,
+                ProductBOMId = planWorkOrderEntity?.ProductBOMId,
                 IsUsed = true,
                 CreatedBy = _currentUser.UserName,
                 UpdatedBy = _currentUser.UserName,

@@ -177,6 +177,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     SfcId = manuSfc.Id,
                     WorkOrderId = workOrderId,
                     ProductId = outputProductId,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     IsUsed = true,
                     CreatedBy = param.UserName,
                     UpdatedBy = param.UserName
