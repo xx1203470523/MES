@@ -1333,6 +1333,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
                 //新工单
                 newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId.Value);
+                if (newPlanWorkOrderEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18231));
+                }
 
                 // PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.Pending, PlanWorkOrderStatusEnum.Closed };
                 PlanWorkOrderStatusEnum[] statusArr = { PlanWorkOrderStatusEnum.NotStarted, PlanWorkOrderStatusEnum.SendDown, PlanWorkOrderStatusEnum.InProduction };
@@ -1344,7 +1348,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
                 //比对条码的产品和工单的产品是否一致，来决定是否扣减，条码和老工单产品一致增加老工单可下达数量，否则不增加
                 //条码和新工单产品一致减少新工单可下达数量，否则不减少
-                var oldProduct = planWorkOrderEntity.ProductId;
+                var oldProduct = planWorkOrderEntity?.ProductId ?? 0;
                 var newProduct = newPlanWorkOrderEntity.ProductId;
                 oldWorkOrderQty = manuSfcProduces.Where(x => x.ProductId == oldProduct).Sum(x => x.Qty);
                 newWorkOrderQty = manuSfcProduces.Where(x => x.ProductId == newProduct).Sum(x => x.Qty);
@@ -1447,15 +1451,18 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         UpdateDate = HymsonClock.Now()
                     });
 
-                    //老工单
-                    await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                    if (planWorkOrderEntity != null && planWorkOrderEntity.Id > 0)
                     {
-                        WorkOrderId = workOrderId,
-                        PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
-                        PassDownQuantity = -oldWorkOrderQty,
-                        UserName = _currentUser.UserName,
-                        UpdateDate = HymsonClock.Now()
-                    });
+                        //老工单
+                        await _planWorkOrderRepository.UpdatePassDownQuantityByWorkOrderId(new UpdatePassDownQuantityCommand
+                        {
+                            WorkOrderId = workOrderId,
+                            PlanQuantity = planWorkOrderEntity.Qty * (1 + planWorkOrderEntity.OverScale / 100),
+                            PassDownQuantity = -oldWorkOrderQty,
+                            UserName = _currentUser.UserName,
+                            UpdateDate = HymsonClock.Now()
+                        });
+                    }
                 }
 
                 //条码信息更改
