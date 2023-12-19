@@ -695,14 +695,14 @@
 
         #region 车间库存接收  15100
         public const string MES15100 = "物料库存错误";
-        public const string MES15101 = "物料不存在";
+        public const string MES15101 = "物料条码【{MaterialCode}】所属物料不存在！";
         public const string MES15102 = "物料条码未关联到供应商";
-        public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
-        public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
-        public const string MES15105 = " 增加库存失败";
-        public const string MES15106 = " 请扫描物料条码";
-        public const string MES15107 = " 重复扫描！";
-        public const string MES15108 = " 供应商不能为空";
+        public const string MES15103 = "物料条码【{MaterialCode}】数量需大于0";
+        public const string MES15104 = "物料条码【{MaterialCode}】在车间库存中已存在！";
+        public const string MES15105 = "增加库存失败";
+        public const string MES15106 = "请扫描物料条码";
+        public const string MES15107 = "物料条码【{MaterialCode}】重复扫描！";
+        public const string MES15108 = "物料条码【{MaterialCode}】供应商不能为空";
 
         public const string MES15120 = " 没有查询到对应原材料库存数据";
         public const string MES15121 = " 维护库存剩余数量要不大于接收数量且不小于0";
