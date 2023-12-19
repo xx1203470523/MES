@@ -1296,7 +1296,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             }
 
             //验证工序
-            if (manuUpdateSaveDto.WorkOrderId.HasValue || manuUpdateSaveDto.ProcessRouteId.HasValue)
+            if ((manuUpdateSaveDto.WorkOrderId.HasValue && manuUpdateSaveDto.WorkOrderId.Value > 0) || (manuUpdateSaveDto.ProcessRouteId.HasValue && manuUpdateSaveDto.ProcessRouteId.Value > 0))
             {
                 if (!manuUpdateSaveDto.ProcedureId.HasValue || manuUpdateSaveDto.ProcedureId <= 0)
                 {
