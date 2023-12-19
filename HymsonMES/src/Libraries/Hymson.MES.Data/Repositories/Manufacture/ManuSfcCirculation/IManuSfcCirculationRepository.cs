@@ -56,6 +56,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<IEnumerable<ManuSfcCirculationEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetListByStartWaterMarkTimeAsync(EntityByWaterMarkTimeQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="manuSfcCirculationQuery"></param>

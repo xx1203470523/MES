@@ -3,7 +3,7 @@
     /// <summary>
     /// 条码树
     /// </summary>
-    public class NodeSourceBo
+    public record NodeSourceBo : BaseBo
     {
         /// <summary>
         /// 条码ID
@@ -34,6 +34,11 @@
         /// 位置
         /// </summary>
         public string Location { get; set; }
+
+        /// <summary>
+        /// 最终树展示的文本
+        /// </summary>
+        public string Label { get; set; }
 
         /// <summary>
         /// 条码ID集合（来源/去向）

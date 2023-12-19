@@ -1,6 +1,6 @@
-﻿using Hymson.MES.CoreServices.Bos.Common;
+﻿using Hymson.MES.Services.Dtos.Report;
 
-namespace Hymson.MES.EquipmentServices.Services
+namespace Hymson.MES.Services.Services
 {
     /// <summary>
     /// 条码追溯服务接口
@@ -12,14 +12,14 @@ namespace Hymson.MES.EquipmentServices.Services
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<NodeSourceBo> SourceAsync(string sfc);
+        Task<NodeSourceDto> SourceAsync(string sfc);
 
         /// <summary>
         /// 条码追溯（正向）
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        Task<NodeSourceBo> DestinationAsync(string sfc);
+        Task<NodeSourceDto> DestinationAsync(string sfc);
 
     }
 }

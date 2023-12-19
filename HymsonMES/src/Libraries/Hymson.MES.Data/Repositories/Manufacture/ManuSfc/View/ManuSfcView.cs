@@ -38,6 +38,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// Bom id
+        /// </summary>
+        public long? ProductBOMId { get; set; }
+
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal Qty { get; set; }

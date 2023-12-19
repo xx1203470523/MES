@@ -92,10 +92,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         {
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
-            // 获取流转表数据
-            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
+            DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
+            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
-                StartWaterMarkId = waterMarkId,
+                StartWaterMarkTime = startWaterMarkTime,
                 Rows = limitCount
             });
             if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
@@ -135,7 +136,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             // 根据条码批量查询条码信息
             var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
-            var sfcInfoDict = sfcInfoEntities.ToDictionary(node => node.Id);
+            var sfcInfoDict = sfcInfoEntities.ToDictionary(node => node.SfcId);
 
             // 根据条码信息批量查询产品信息
             var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
@@ -202,17 +203,6 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     case SfcCirculationTypeEnum.ModuleAdd:
                     case SfcCirculationTypeEnum.ModuleReplace:
                     default:
-                        // 将流转记录的条码ID追加到节点的去向集合中
-                        nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = item.SiteId,
-                            NodeId = beforeNode.Id,
-                            DestinationId = afterNode.Id,
-                            CreatedBy = user,
-                            UpdatedBy = user
-                        });
-
                         // 将流转记录的条码ID追加到节点的来源集合中
                         nodeSourceEntities.Add(new ManuSFCNodeSourceEntity
                         {
@@ -223,11 +213,22 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                             CreatedBy = user,
                             UpdatedBy = user
                         });
+
+                        // 将流转记录的条码ID追加到节点的去向集合中
+                        nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = item.SiteId,
+                            NodeId = beforeNode.Id,
+                            DestinationId = afterNode.Id,
+                            CreatedBy = user,
+                            UpdatedBy = user
+                        });
                         break;
                 }
 
                 if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(beforeNode);
-                if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(afterNode);
+                if (!nodeEntities.Any(a => a.Id == afterNode.Id)) nodeEntities.Add(afterNode);
             }
 
             using var trans = TransactionHelper.GetTransactionScope();
@@ -242,7 +243,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
-            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, manuSfcCirculationList.Max(x => x.Id));
+            var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
+            if (maxUpdateWaterMarkUpdatedOn != null)
+            {
+                long timestamp = ((DateTimeOffset)maxUpdateWaterMarkUpdatedOn.Value).ToUnixTimeMilliseconds();
+                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+            }
             trans.Complete();
 
         }

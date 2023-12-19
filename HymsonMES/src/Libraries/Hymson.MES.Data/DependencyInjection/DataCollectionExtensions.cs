@@ -75,6 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
+            services.AddSingleton<IEquSparePartsGroupRepository, EquSparePartsGroupRepository>();
+            services.AddSingleton<IEquSparePartsGroupEquipmentGroupRelationRepository, EquSparePartsGroupEquipmentGroupRelationRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
 
@@ -128,6 +130,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteMessageManageRepository, InteMessageManageRepository>();
             services.AddSingleton<IInteMessageManageAnalysisReportAttachmentRepository, InteMessageManageAnalysisReportAttachmentRepository>();
             services.AddSingleton<IInteMessageManageHandleProgrammeAttachmentRepository, InteMessageManageHandleProgrammeAttachmentRepository>();
+
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
