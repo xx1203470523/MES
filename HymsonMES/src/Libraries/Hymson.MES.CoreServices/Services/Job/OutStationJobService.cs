@@ -1000,6 +1000,8 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 添加维修业务
                 disposalResult = ProductBadDisposalResultEnum.Repair;
+                sfcProduceEntity.IsRepair = TrueOrFalseEnum.Yes;
+
                 responseBo.SFCProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
