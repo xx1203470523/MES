@@ -635,17 +635,19 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 var material = materials.FirstOrDefault(x => x.Id == oneManuSfc.ProductId);
 
+                var whMaterialInventoryFather = whMaterialInventorys.FirstOrDefault();//找到父组件的一个库存信息
+
                 whMaterialInventoryEntities.Add(new WhMaterialInventoryEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SupplierId = whMaterialInventorys.FirstOrDefault()?.SupplierId ?? 0,
+                    SupplierId = whMaterialInventoryFather?.SupplierId ?? 0,
                     MaterialId = oneManuSfc.ProductId,
                     MaterialBarCode = oneNewSfc,
-                    Batch = whMaterialInventorys.FirstOrDefault()?.Batch ?? "",
-                    MaterialType = whMaterialInventorys.FirstOrDefault()?.MaterialType ?? 0,
+                    Batch = whMaterialInventoryFather?.Batch ?? "",
+                    MaterialType = whMaterialInventoryFather?.MaterialType ?? 0,
                     QuantityResidue = qty,
                     Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                    Source = MaterialInventorySourceEnum.InventoryModify,
+                    Source = whMaterialInventoryFather?.Source ?? MaterialInventorySourceEnum.ManuComplete,
                     SiteId = _currentSite.SiteId ?? 0,
                     CreatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
@@ -660,11 +662,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                     MaterialName = material?.MaterialName ?? "",
                     MaterialVersion = material?.Version ?? "",
                     MaterialBarCode = oneNewSfc,
-                    Batch = whMaterialInventorys.FirstOrDefault()?.Batch ?? "",
+                    Batch = whMaterialInventoryFather?.Batch ?? "",
                     Quantity = qty,//库存修改为0 
                     Unit = material?.Unit ?? "",
-                    Type = WhMaterialInventoryTypeEnum.InventoryModify,
-                    Source = MaterialInventorySourceEnum.InventoryModify,
+                    Type = WhMaterialInventoryTypeEnum.Merge,
+                    Source = whMaterialInventoryFather?.Source ?? MaterialInventorySourceEnum.ManuComplete,
                     CreatedBy = _currentUser.UserName,
                     CreatedOn = HymsonClock.Now(),
                     UpdatedBy = _currentUser.UserName,

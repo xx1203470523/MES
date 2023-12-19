@@ -5,6 +5,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.Query
     /// </summary>
     public class ManuSFCNodeSourceQuery
     {
-    
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<long> NodeIds { get; set; }
     }
 }

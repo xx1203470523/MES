@@ -16,12 +16,12 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseRegion
         /// <summary>
         /// 库区编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 库区名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         ///// <summary>
         ///// 仓库id
@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseRegion
        /// <summary>
         /// 状态;1、启用  2未启用
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
        // /// <summary>
        // /// 创建人

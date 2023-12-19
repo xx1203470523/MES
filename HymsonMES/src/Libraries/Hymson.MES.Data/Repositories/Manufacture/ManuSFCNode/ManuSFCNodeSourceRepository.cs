@@ -1,8 +1,8 @@
 using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.Query;
+using IdGen;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -30,14 +30,44 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
-        /// 根据ID获取数据
+        /// 查询树数据的List
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSFCNodeSourceEntity> GetByIdAsync(long id)
+        public async Task<IEnumerable<ManuSFCNodeSourceEntity>> GetTreeEntitiesAsync(long nodeId)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuSFCNodeSourceEntity>(GetByIdSql, new { Id = id });
+            return await conn.QueryAsync<ManuSFCNodeSourceEntity>(GetTreeEntitiesSql, new { NodeId = nodeId });
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSFCNodeSourceEntity>> GetEntitiesAsync(long nodeId)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("NodeId = @NodeId");
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSFCNodeSourceEntity>(template.RawSql, new { NodeId = nodeId });
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSFCNodeSourceEntity>> GetEntitiesAsync(IEnumerable<long> nodeIds)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("NodeId IN @NodeIds");
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSFCNodeSourceEntity>(template.RawSql, new { NodeIds = nodeIds });
         }
 
         /// <summary>
@@ -61,11 +91,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public partial class ManuSFCNodeSourceRepository
     {
+        const string GetTreeEntitiesSql = @"
+                            ;WITH RECURSIVE CTE AS (
+                              SELECT NodeId, SourceId
+                              FROM manu_sfc_node_source
+                              WHERE NodeId = @NodeId 
+                              UNION ALL
+                              SELECT T.NodeId, T.SourceId
+                              FROM manu_sfc_node_source T
+                              JOIN CTE ON CTE.SourceId = T.NodeId
+                            )
+                            SELECT * FROM CTE;";
+
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_source /**where**/  ";
 
-        const string InsertsSql = "INSERT IGNORE manu_sfc_node_source(  `Id`, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (  @Id, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
-
-        const string GetByIdSql = @"SELECT * FROM manu_sfc_node_source WHERE Id = @Id ";
+        const string InsertsSql = "REPLACE INTO manu_sfc_node_source(  `Id`, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (  @Id, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
 
     }
 }

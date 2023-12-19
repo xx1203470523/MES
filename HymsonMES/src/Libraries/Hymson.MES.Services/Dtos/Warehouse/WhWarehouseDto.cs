@@ -16,17 +16,17 @@ namespace Hymson.MES.Services.Dtos.WhWareHouse
         /// <summary>
         /// 仓库编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 仓库名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
        /// <summary>
         /// 状态
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
         /// 描述
@@ -163,12 +163,12 @@ namespace Hymson.MES.Services.Dtos.WhWareHouse
         /// <summary>
         /// 仓库名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 状态
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
         /// 描述

@@ -546,7 +546,7 @@
         #region 条码调整(合并、拆分、调整数量)
         public const string MES12800 = "条码调整(合并、拆分、调整数量)错误";
         public const string MES12801 = "条码为空";
-        public const string MES12802 = "条码【{sfc}】不存在";
+        public const string MES12802 = "产品序列码【{sfc}】不存在，具体请查看【产品序列码报告】";
         public const string MES12803 = "条码【{sfc}】在载具中已绑定，如需操作请先去解绑";
         public const string MES12804 = "条码【{sfc}】在容器中，不允许操作";
         public const string MES12805 = "产品序列码【{SFC}】当前状态【{Current}】，不允许操作。";
@@ -1009,6 +1009,7 @@
         public const string MES16413 = "没有找到该资源对应的工作中心";
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
         public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
+        public const string MES16416 = "工单【{Code}】状态为【未激活】，不允许生产，具体请查看【工单激活】！";
         #endregion
 
         #region 条码下达 MES16500
@@ -1556,7 +1557,7 @@
         #endregion
 
         #region 仓库 19200
-     public const string MES19201 = "仓库编码不能为空!";
+        public const string MES19201 = "仓库编码不能为空!";
         public const string MES19202 = "仓库名称不能为空!";
         public const string MES19203 = "仓库编码【{code}】已存在!";
         public const string MES19204 = "库区编码不能为空!";

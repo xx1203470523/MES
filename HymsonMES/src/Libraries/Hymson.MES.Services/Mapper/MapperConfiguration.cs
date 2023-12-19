@@ -11,6 +11,7 @@ using Hymson.MES.Core.Domain.WhWareHouse;
 using Hymson.MES.Core.Domain.WhWarehouseLocation;
 using Hymson.MES.Core.Domain.WhWarehouseRegion;
 using Hymson.MES.Core.Domain.WhWarehouseShelf;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Integrated;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -20,6 +21,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
+using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
@@ -167,7 +169,7 @@ namespace Hymson.MES.Services.Mapper
             #region EquSparePartType
             CreateMap<EquSparePartTypeSaveDto, EquSparePartTypeEntity>();
             CreateMap<EquSparePartTypePagedQueryDto, EquSparePartTypePagedQuery>();
-
+            CreateMap<EquSparePartsGroupSaveDto, EquSparePartsGroupEntity>();
             CreateMap<EquSparePartTypeEntity, EquSparePartTypeDto>();
             #endregion
 
@@ -185,6 +187,13 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquEquipmentVerifyEntity, EquEquipmentVerifyDto>();
 
             #endregion
+
+            #region EquSparePartsType
+            CreateMap<EquSparePartsGroupPagedQueryDto, EquSparePartsGroupPagedQuery>();
+            CreateMap<EquSparePartsGroupEntity, EquSparePartsGroupDto>();
+
+            #endregion
+
         }
 
         /// <summary>
@@ -899,6 +908,7 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            CreateMap<NodeSourceBo, NodeSourceDto>();
         }
 
         /// <summary>

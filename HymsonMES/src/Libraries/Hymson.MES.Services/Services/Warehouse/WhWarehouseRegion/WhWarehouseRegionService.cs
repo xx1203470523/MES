@@ -195,7 +195,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseRegion
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         public async Task<PagedInfo<WhWarehouseRegionDto>> GetPagedListAsync(WhWarehouseRegionPagedQueryDto pagedQueryDto)
-        {
+            {
             var returnData = new PagedInfo<WhWarehouseRegionDto>(Enumerable.Empty<WhWarehouseRegionDto>(), 0, 0, 0);
             var wareHouseQuery = new WhWarehouseQuery();
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WareHouseCode))

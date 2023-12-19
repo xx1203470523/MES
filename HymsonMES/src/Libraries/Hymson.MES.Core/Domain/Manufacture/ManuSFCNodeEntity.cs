@@ -15,36 +15,25 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long ProductId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码
         /// </summary>
         public string SFC { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 位置
         /// </summary>
-        public string Location { get; set; }
+        public string Location { get; set; } = "";
 
-       /// <summary>
-        /// 反向树
-        /// </summary>
-        public string SourceNodes { get; set; }
-
-       /// <summary>
-        /// 正向树
-        /// </summary>
-        public string DestinationNodes { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
     }
 }

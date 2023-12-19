@@ -3,7 +3,7 @@
     /// <summary>
     /// 条码树
     /// </summary>
-    public class NodeSFCBo
+    public record NodeSourceBo : BaseBo
     {
         /// <summary>
         /// 条码ID
@@ -36,14 +36,14 @@
         public string Location { get; set; }
 
         /// <summary>
-        /// 条码ID集合（来源）
+        /// 最终树展示的文本
         /// </summary>
-        public List<long> SourceIds { get; set; } = new();
+        public string Label { get; set; }
 
         /// <summary>
-        /// 条码ID集合（去向）
+        /// 条码ID集合（来源/去向）
         /// </summary>
-        public List<long> DestinationIds { get; set; } = new();
+        public List<NodeSourceBo> Children { get; set; } = new();
 
     }
 

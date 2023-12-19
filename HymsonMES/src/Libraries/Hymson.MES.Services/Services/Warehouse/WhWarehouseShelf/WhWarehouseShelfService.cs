@@ -226,9 +226,11 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
             {
                 return returnData;
             }
+            var wareHouseIds = wareHouseEntities.Select(x => x.Id);
 
             //查询库区
             var warehouseRegionQuery = new WhWarehouseRegionQuery();
+            warehouseRegionQuery.WarehouseIds = wareHouseIds;
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WareHouseRegionCode))
             {
                 warehouseRegionQuery.CodeLike = pagedQueryDto.WareHouseRegionCode;
@@ -238,8 +240,6 @@ namespace Hymson.MES.Services.Services.WhWarehouseShelf
             {
                 return returnData;
             }
-
-            var wareHouseIds = wareHouseEntities.Select(x => x.Id);
             var warehouseRegionIds = wareHouseRegionEntities.Select(x => x.Id);
 
             var pagedQuery = pagedQueryDto.ToQuery<WhWarehouseShelfPagedQuery>();
