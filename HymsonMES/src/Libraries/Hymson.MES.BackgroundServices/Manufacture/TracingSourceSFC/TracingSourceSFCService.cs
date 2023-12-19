@@ -140,6 +140,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             // 根据条码信息批量查询产品信息
             var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
+            var productDict = productEntities.ToDictionary(node => node.Id);
 
             // 遍历流转记录
             foreach (var item in manuSfcCirculationList)
@@ -155,14 +156,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
                     var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
 
-                    var beforeProductEntity = productEntities.FirstOrDefault(x => x.Id == sfcInfoEntity.ProductId);
+                    if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
+                    var beforeProductEntity = productDict[sfcInfoEntity.ProductId];
+
                     beforeNode = new ManuSFCNodeEntity
                     {
                         Id = sfcEntity.Id,
                         SiteId = sfcEntity.SiteId,
                         ProductId = sfcInfoEntity.ProductId,
                         SFC = sfcEntity.SFC,
-                        Name = beforeProductEntity!.MaterialName,
+                        Name = beforeProductEntity.MaterialName,
                         CreatedBy = user,
                         UpdatedBy = user
                     };
@@ -176,14 +179,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
                     var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
 
-                    var afterProductEntity = productEntities.FirstOrDefault(x => x.Id == sfcInfoEntity.ProductId);
+                    if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
+                    var afterProductEntity = productDict[sfcInfoEntity.ProductId];
+
                     afterNode = new ManuSFCNodeEntity
                     {
                         Id = sfcEntity.Id,
                         SiteId = sfcEntity.SiteId,
                         ProductId = sfcInfoEntity.ProductId,
                         SFC = sfcEntity.SFC,
-                        Name = afterProductEntity!.MaterialName,
+                        Name = afterProductEntity.MaterialName,
                         CreatedBy = user,
                         UpdatedBy = user
                     };
