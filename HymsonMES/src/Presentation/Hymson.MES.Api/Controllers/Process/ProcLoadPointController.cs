@@ -70,9 +70,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("上料点维护", BusinessType.INSERT)]
         [PermissionDescription("proc:loadPoint:insert")]
-        public async Task AddProcLoadPointAsync([FromBody] ProcLoadPointCreateDto parm)
+        public async Task<long> AddProcLoadPointAsync([FromBody] ProcLoadPointCreateDto parm)
         {
-             await _procLoadPointService.CreateProcLoadPointAsync(parm);
+           return  await _procLoadPointService.CreateProcLoadPointAsync(parm);
         }
 
         /// <summary>

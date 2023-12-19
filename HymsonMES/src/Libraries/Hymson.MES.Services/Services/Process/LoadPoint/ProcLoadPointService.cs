@@ -8,6 +8,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -93,7 +94,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procLoadPointCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateProcLoadPointAsync(ProcLoadPointCreateDto procLoadPointCreateDto)
+        public async Task<long> CreateProcLoadPointAsync(ProcLoadPointCreateDto procLoadPointCreateDto)
         {
             if (procLoadPointCreateDto == null)
             {
@@ -255,8 +256,9 @@ namespace Hymson.MES.Services.Services.Process
                     throw new CustomerValidationException(nameof(ErrorCode.MES10704));
                 }
             }
-
             trans.Complete();
+
+            return procLoadPointEntity.Id;
         }
 
         /// <summary>
