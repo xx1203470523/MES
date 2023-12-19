@@ -582,6 +582,9 @@
         public const string MES12835 = "产品序列码【{sfc}】对应工单状志为【{WorkOrder}】，不允许操作!";
         public const string MES12836 = "产品序列码对应物料的数量限制为仅为1.0，不允许操作";
         public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
+        public const string MES12838 = "产品序列码【{sfc}】带有复判标识，不允许操作!";
+        public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
+
         #endregion
 
         #region 故障现象 12900
@@ -1570,7 +1573,8 @@
         public const string MES19211 = "库区不能为空!";
         public const string MES19212 = "库区信息为空!";
         public const string MES19213 = "库位新增失败!";
-        public const string MES19214 = "自定义库位编码【{code}】在【{shelfcode}】货架中已存在!";
+        //在【{shelfcode}】货架中
+        public const string MES19214 = "自定义库位编码【{code}】已存在!";
         public const string MES19215 = "货架不能为空!";
         public const string MES19216 = "仓库下已绑定库区,请解绑!";
         public const string MES19217 = "库区下已绑定货架,请解绑!";
