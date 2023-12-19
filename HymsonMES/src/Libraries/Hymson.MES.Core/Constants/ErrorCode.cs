@@ -1310,6 +1310,7 @@
         public const string MES18228 = "产品序列码【{SFC}】应进站工序【{Procedure}】不属于所处的工艺路线！";
         public const string MES18229 = "产品序列码【{SFC}】当前进站工序【{Current}】不属于所处的工艺路线！";
         public const string MES18230 = "作业【{Job}】出现重复，请检查作业设置！";
+        public const string MES18231 = "新工单号不存在";
         #endregion
 
         #region 系统Token MES18300
