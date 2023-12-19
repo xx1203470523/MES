@@ -16,7 +16,14 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(WhWarehouseRegionEntity entity);
-        
+
+        /// <summary>
+        /// 新增忽略重复
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> InsertIgnoreAsync(WhWarehouseRegionEntity entity);
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -52,19 +59,27 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
         /// <returns></returns>
         Task<int> DeletesAsync(DeleteCommand command);
 
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<WhWarehouseRegionEntity> GetByIdAsync(long id);
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //Task<WhWarehouseRegionEntity> GetByIdAsync(long id);
     
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //Task<IEnumerable<WhWarehouseRegionEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+
         /// <summary>
-        /// 根据IDs获取数据（批量）
+        /// 获取单条
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="whWarehouseRegionQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhWarehouseRegionEntity>> GetByIdsAsync(IEnumerable<long> ids);
+        Task<WhWarehouseRegionEntity> GetOneAsync(WhWarehouseRegionQuery whWarehouseRegionQuery);
 
         /// <summary>
         /// 获取List

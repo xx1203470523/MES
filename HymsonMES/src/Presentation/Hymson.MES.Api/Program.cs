@@ -144,10 +144,10 @@ namespace Hymson.MES.Api
 
                 // using System.Reflection;
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), true);
 
                 var xmlFilename2 = $"Hymson.MES.Services.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2));
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2), true);
 
                 options.OperationFilter<AddResponseHeadersFilter>();
                 //options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();

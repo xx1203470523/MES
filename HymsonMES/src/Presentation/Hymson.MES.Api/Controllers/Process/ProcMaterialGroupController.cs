@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（物料组维护表）
-    /// @author Karl
-    /// @date 2023-02-10 03:54:07
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialGroupController : ControllerBase

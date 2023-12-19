@@ -16,6 +16,7 @@ using Hymson.MES.CoreServices.Bos.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
@@ -267,9 +268,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16712));
                     }
-                    var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new Data.Repositories.Manufacture.ManuSfc.Query.GetBySfcQuery
+                    var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
                     {
-                        SiteId = _currentSite.SiteId,
+                        SiteId = _currentSite.SiteId ?? 0,
                         SFC = createManuContainerBarcodeDto.BarCode
                     });
                     sfcProduceEntity = new ManuSfcProduceEntity
@@ -721,7 +722,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var rows = 0;
                 using (TransactionScope trans = TransactionHelper.GetTransactionScope())
                 {
-                    if (level == 1 && sfcStepEntity!=null)
+                    if (level == 1 && sfcStepEntity != null)
                     {
                         // 记录step信息
                         await _manuSfcStepRepository.InsertAsync(sfcStepEntity);
@@ -733,7 +734,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         trans.Dispose();
                         throw new CustomerValidationException(nameof(ErrorCode.MES16721))
-                            .WithData("sfc", sfcStepEntity!.SFC??"")
+                            .WithData("sfc", sfcStepEntity!.SFC ?? "")
                             .WithData("barcode", barcode);
                     }
 

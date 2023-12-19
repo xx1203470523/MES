@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Plan
 {
     /// <summary>
     /// 控制器（工单信息表）
-    /// @author Karl
-    /// @date 2023-03-20 10:07:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanWorkOrderController : ControllerBase

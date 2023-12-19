@@ -18,10 +18,13 @@
   <ItemGroup>
     <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <Compile Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <Compile Remove="Services\Process\Recipe\**" />
     <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <EmbeddedResource Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <EmbeddedResource Remove="Services\Process\Recipe\**" />
     <None Remove="Services\Manufacture\ManuMainstreamProcess\Consume\**" />
     <None Remove="Services\Manufacture\ManuMainstreamProcess\Package\**" />
+    <None Remove="Services\Process\Recipe\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Process\Recipe\" />
+    <Folder Include="Dtos\Process\LabelTemplate\Utility\" />
   </ItemGroup>
 
 </Project>

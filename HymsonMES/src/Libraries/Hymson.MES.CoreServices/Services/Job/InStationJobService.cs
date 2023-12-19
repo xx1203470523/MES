@@ -142,6 +142,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES16370));
             }
 
+            // 判断条码是否为空
+            if (commonBo.InStationRequestBos.Any(a => a.SFC == null))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16382));
+            }
+
             // 进站工序信息
             var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);

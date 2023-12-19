@@ -546,7 +546,7 @@
         #region 条码调整(合并、拆分、调整数量)
         public const string MES12800 = "条码调整(合并、拆分、调整数量)错误";
         public const string MES12801 = "条码为空";
-        public const string MES12802 = "条码【{sfc}】不存在";
+        public const string MES12802 = "产品序列码【{sfc}】不存在，具体请查看【产品序列码报告】";
         public const string MES12803 = "条码【{sfc}】在载具中已绑定，如需操作请先去解绑";
         public const string MES12804 = "条码【{sfc}】在容器中，不允许操作";
         public const string MES12805 = "产品序列码【{SFC}】当前状态【{Current}】，不允许操作。";
@@ -577,9 +577,14 @@
         public const string MES12830 = "产品【{ProductCode}】规则生成条码失败，请查看【编码规则】";
         public const string MES12831 = "产品【{ProductCode}】生成多个条码，当前功能无法实现，请联系管理员";
         public const string MES12832 = "数据不为最新，请刷新后再操作";
-        public const string MES12833 = "产品序列码【{sfc}】带有NG标识、复判标识，不允许提作!";
-        public const string MES12834 = "“产品序列码【{sfc}】在不合格工艺路线【{ProcedureCode}】工序，不允许损作!";
-        public const string MES12835 = "“产品序列码{sfc}】对应工单状志为【{WorkOrder}】，不允许据作作!";
+        public const string MES12833 = "产品序列码【{sfc}】带有NG标识、复判标识，不允许操作!";
+        public const string MES12834 = "产品序列码【{sfc}】在不合格工艺路线【{ProcedureCode}】工序，不允许操作!";
+        public const string MES12835 = "产品序列码【{sfc}】对应工单状志为【{WorkOrder}】，不允许操作!";
+        public const string MES12836 = "产品序列码对应物料的数量限制为仅为1.0，不允许操作";
+        public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
+        public const string MES12838 = "产品序列码【{sfc}】带有复判标识，不允许操作!";
+        public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
+
         #endregion
 
         #region 故障现象 12900
@@ -591,6 +596,8 @@
         public const string MES12905 = "设备故障现象不存在！";
         public const string MES12906 = "状态不合法！";
         public const string MES12907 = "状态不能为空！";
+        public const string MES12908 = "设备故障现象新增失败！";
+        public const string MES12909 = "设备故障现象修改失败！";
         #endregion
 
         #region 故障原因 13000
@@ -690,14 +697,14 @@
 
         #region 车间库存接收  15100
         public const string MES15100 = "物料库存错误";
-        public const string MES15101 = "物料不存在";
+        public const string MES15101 = "物料条码【{MaterialCode}】所属物料不存在！";
         public const string MES15102 = "物料条码未关联到供应商";
-        public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
-        public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
-        public const string MES15105 = " 增加库存失败";
-        public const string MES15106 = " 请扫描物料条码";
-        public const string MES15107 = " 重复扫描！";
-        public const string MES15108 = " 供应商不能为空";
+        public const string MES15103 = "物料条码【{MaterialCode}】数量需大于0";
+        public const string MES15104 = "物料条码【{MaterialCode}】在车间库存中已存在！";
+        public const string MES15105 = "增加库存失败";
+        public const string MES15106 = "请扫描物料条码";
+        public const string MES15107 = "物料条码【{MaterialCode}】重复扫描！";
+        public const string MES15108 = "物料条码【{MaterialCode}】供应商不能为空";
 
         public const string MES15120 = " 没有查询到对应原材料库存数据";
         public const string MES15121 = " 维护库存剩余数量要不大于接收数量且不小于0";
@@ -751,6 +758,7 @@
 
         public const string MES15320 = "条码【{sfcs}】已不存在";
         public const string MES15321 = "条码【{sfc}】缺失步骤信息，无法查询到开始时间";
+        public const string MES15322 = "载具内没有条码";
         #endregion
 
         #region 质量录入 15400
@@ -924,6 +932,9 @@
         public const string MES16206 = "流水号转换只实现了16,32进制";
         public const string MES16207 = "生成的序列号{BarCode}超过规则限制";
         public const string MES16208 = "统配失败-统配编码{code},类型{type}查询不到值";
+        public const string MES16209 = "线别必须维护自定义值，请查看【编码规则维护】";
+        public const string MES16210 = "线别配置值【{Value}】异常，格式为【线体编码:设定值】，例如【L001:1;L002:2】，请查看【编码规则维护】";
+        public const string MES16211 = "未上报线体信息";
         #endregion
 
         #region 生产通用 MES16300
@@ -999,8 +1010,6 @@
         public const string MES16371 = "已成功将【{0}】个产品序列码置于工序【{1}】，状态为【{2}】！";
         public const string MES16372 = "获取不到条码【{SFC}】工序【{code}】的产品参数信息";
 
-
-
         public const string MES16373 = "产品序列码【{SFC}】指定的工单不存在！";
         public const string MES16374 = "TODO";
         public const string MES16375 = "TODO";
@@ -1010,6 +1019,7 @@
         public const string MES16379 = "产品序列码已经被装箱，不允许操作。";
         public const string MES16380 = "条码不存在。";
         public const string MES16381 = "数据状态不是最新的,请刷新！";
+        public const string MES16382 = "产品序列码存在NULL值，请检查参数！";
         #endregion
 
         #region 工单激活 MES16400
@@ -1029,6 +1039,7 @@
         public const string MES16413 = "没有找到该资源对应的工作中心";
         public const string MES16414 = "当前资源所对应的工作中心不是线体";
         public const string MES16415 = "工单[{orderCode}]处于暂停中，无法操作！";
+        public const string MES16416 = "工单【{Code}】状态为【未激活】，不允许生产，具体请查看【工单激活】！";
         #endregion
 
         #region 条码下达 MES16500
@@ -1329,6 +1340,7 @@
         public const string MES18228 = "产品序列码【{SFC}】应进站工序【{Procedure}】不属于所处的工艺路线！";
         public const string MES18229 = "产品序列码【{SFC}】当前进站工序【{Current}】不属于所处的工艺路线！";
         public const string MES18230 = "作业【{Job}】出现重复，请检查作业设置！";
+        public const string MES18231 = "新工单号不存在";
         #endregion
 
         #region 系统Token MES18300
@@ -1589,11 +1601,20 @@
         public const string MES19211 = "库区不能为空!";
         public const string MES19212 = "库区信息为空!";
         public const string MES19213 = "库位新增失败!";
-        public const string MES19214 = "自定义库位编码【{code}】在【{shelfcode}】货架中已存在!";
+        //在【{shelfcode}】货架中
+        public const string MES19214 = "自定义库位编码【{code}】已存在!";
         public const string MES19215 = "货架不能为空!";
         public const string MES19216 = "仓库下已绑定库区,请解绑!";
         public const string MES19217 = "库区下已绑定货架,请解绑!";
         public const string MES19218 = "货架下已绑定库位,请解绑!";
+        public const string MES19219 = "状态不能为空!";
+        public const string MES19220 = "参数不能为空!";
+        public const string MES19221 = "货架行/列不能为空!";
+        public const string MES19222 = "库位生成类型不能为空!";
+        public const string MES19223 = "库位编码不能为空!";
+        public const string MES19224 = "仓库不存在,请确认仓库编码!";
+        public const string MES19225 = "库区不存在,请确认库区编码!";
+        public const string MES19226 = "货架不存在,请确认货架编码!";
         #endregion
 
         #endregion

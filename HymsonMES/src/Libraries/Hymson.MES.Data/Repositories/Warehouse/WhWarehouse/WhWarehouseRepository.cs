@@ -19,12 +19,25 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
         /// <param name="connectionOptions"></param>
         public WhWarehouseRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
+        #region 新增
+
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public async Task<int> InsertAsync(WhWarehouseEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, entity);
+        }
+
+        /// <summary>
+        /// 新增忽略重复
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertIgnoreAsync(WhWarehouseEntity entity)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertIgnoreSql, entity);
@@ -40,6 +53,10 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, entities);
         }
+
+        #endregion
+
+        #region 更新
 
         /// <summary>
         /// 更新
@@ -85,27 +102,57 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             return await conn.ExecuteAsync(DeletesSql, command);
         }
 
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<WhWarehouseEntity> GetByIdAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<WhWarehouseEntity>(GetByIdSql, new { Id = id });
-        }
+        #endregion
+
+        #region 查询
+
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //public async Task<WhWarehouseEntity> GetByIdAsync(long id)
+        //{
+        //    using var conn = GetMESDbConnection();
+        //    return await conn.QueryFirstOrDefaultAsync<WhWarehouseEntity>(GetByIdSql, new { Id = id });
+        //}
 
         /// <summary>
-        /// 根据IDs获取数据（批量）
+        /// 获取单条
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhWarehouseEntity>> GetByIdsAsync(IEnumerable<long> ids) 
+        public async Task<WhWarehouseEntity> GetOneAsync(WhWarehouseQuery query)
         {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetOneSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.Code)) {
+                sqlBuilder.Where("Code=@Code");
+            }
+
+            if (query.Id.HasValue) {
+                sqlBuilder.Where("Id=@Id");
+            }
+
+            sqlBuilder.AddParameters(query);
+
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WhWarehouseEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryFirstOrDefaultAsync<WhWarehouseEntity>(templateData.RawSql, templateData.Parameters);
         }
+
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<WhWarehouseEntity>> GetByIdsAsync(IEnumerable<long> ids) 
+        //{
+        //    using var conn = GetMESDbConnection();
+        //    return await conn.QueryAsync<WhWarehouseEntity>(GetByIdsSql, new { Ids = ids });
+        //}
 
         /// <summary>
         /// 查询List
@@ -127,6 +174,10 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             {
                 query.NameLike = $"%{query.NameLike}%";
                 sqlBuilder.Where("Name like @NameLike");
+            }
+
+            if (query.Ids != null && query.Ids.Any()) {
+                sqlBuilder.Where("Id IN @Ids");
             }
 
             using var conn = GetMESDbConnection();
@@ -177,6 +228,8 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
             return new PagedInfo<WhWarehouseEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        #endregion
+
     }
 
 
@@ -185,25 +238,38 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse
     /// </summary>
     public partial class WhWarehouseRepository
     {
+        #region 查询
+
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM wh_warehouse /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM wh_warehouse /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM wh_warehouse /**where**/  ";
+        //const string GetByIdSql = @"SELECT * FROM wh_warehouse WHERE Id = @Id ";
+        //const string GetByIdsSql = @"SELECT * FROM wh_warehouse WHERE Id IN @Ids ";
+
+        const string GetOneSqlTemplate = "SELECT * FROM `wh_warehouse` /**where**/ LIMIT 1;";
+
+        #endregion
+
+        #region 新增
 
         const string InsertSql = "INSERT INTO wh_warehouse(  `Id`, `Code`, `Name`, `Status`, `Address`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO wh_warehouse(  `Id`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string InsertIgnoreSql = "INSERT IGNORE INTO wh_warehouse(  `Id`, `Code`, `Name`, `Status`,  `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name,  @Status,  @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE wh_warehouse SET   Code = @Code, Name = @Name, Status = @Status,  Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE wh_warehouse SET   Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        #endregion
+
+        #region 修改
+
+        const string UpdateSql = "UPDATE wh_warehouse SET  Name = @Name, Status = @Status,  Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE wh_warehouse SET  Name = @Name, Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE wh_warehouse SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE wh_warehouse SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT * FROM wh_warehouse WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM wh_warehouse WHERE Id IN @Ids ";
+        #endregion
 
     }
 }

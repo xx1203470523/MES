@@ -1,12 +1,4 @@
-/*
- *creator: Karl
- *
- *describe: ESOP    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-11-02 02:39:53
- */
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
@@ -15,14 +7,11 @@ using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（ESOP）
-    /// @author zhaoqing
-    /// @date 2023-11-02 02:39:53
     /// </summary>
     [Authorize]
     [ApiController]

@@ -773,7 +773,7 @@ namespace Hymson.MES.Services.Services.Process
                         BomCode = item.BomCode,
                         BomName = item.BomName,
                         Version = item.Version,
-                        IsCurrentVersion = item.IsCurrentVersion== YesOrNoEnum.Yes?true:false,
+                        IsCurrentVersion = item.IsCurrentVersion== YesOrNoEnum.Yes,
                         Remark = item.Remark,
                         Status = SysDataStatusEnum.Build,
 

@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Process;
@@ -15,13 +17,13 @@ using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
@@ -329,7 +331,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         public async Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo)
         {
             // 条码信息
-            var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new ManuSfcQuery
+            var manuSfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery
             {
                 SiteId = bo.SiteId,
                 SFCs = bo.SFCs
@@ -395,23 +397,33 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                 throw new CustomerValidationException(nameof(ErrorCode.MES17112)).WithData("Ids", string.Join(',', notInSystem));
             }
 
+            var validationFailures = new List<ValidationFailure>();
             foreach (var planWorkOrderEntity in planWorkOrderEntities)
             {
-                // 判断是否被锁定
-                if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16302)).WithData("ordercode", planWorkOrderEntity.OrderCode);
-                }
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", planWorkOrderEntity.OrderCode);
 
                 if (bo.IsVerifyActivation)
                 {
                     // 判断是否是激活的工单
-                    _ = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id)
-                        ?? throw new CustomerValidationException(nameof(ErrorCode.MES16410));
+                    var workOrderActivationRecord = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderEntity.Id);
+                    if (workOrderActivationRecord == null)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("Code", planWorkOrderEntity.OrderCode);
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16416);
+                        validationFailures.Add(validationFailure);
+                        continue;
+                    }
                 }
 
                 switch (planWorkOrderEntity.Status)
                 {
+                    // 判断是否被锁定
+                    case PlanWorkOrderStatusEnum.Pending:
+                        validationFailure.FormattedMessagePlaceholderValues.Add("ordercode", planWorkOrderEntity.OrderCode);
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16302);
+                        validationFailures.Add(validationFailure);
+                        continue;
                     case PlanWorkOrderStatusEnum.SendDown:
                     case PlanWorkOrderStatusEnum.InProduction:
                     case PlanWorkOrderStatusEnum.Finish:
@@ -419,8 +431,16 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
                     case PlanWorkOrderStatusEnum.NotStarted:
                     case PlanWorkOrderStatusEnum.Closed:
                     default:
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16303)).WithData("ordercode", planWorkOrderEntity.OrderCode);
+                        validationFailure.FormattedMessagePlaceholderValues.Add("ordercode", planWorkOrderEntity.OrderCode);
+                        validationFailure.ErrorCode = nameof(ErrorCode.MES16303);
+                        validationFailures.Add(validationFailure);
+                        continue;
                 }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException("", validationFailures);
             }
 
             return planWorkOrderEntities;

@@ -1,4 +1,3 @@
-using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
@@ -8,10 +7,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（环境参数）
-    /// @author zhaoqing
-    /// @date 2023-06-25 08:57:38
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterEnvironmentController : ControllerBase

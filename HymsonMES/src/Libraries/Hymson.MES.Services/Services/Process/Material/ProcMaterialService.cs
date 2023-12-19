@@ -59,6 +59,8 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IExcelService _excelService;
         private readonly IMinioService _minioService;
 
+        private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
+
         /// <summary>
         /// 
         /// </summary>
@@ -77,6 +79,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="localizationService"></param>
         /// <param name="excelService"></param>
         /// <param name="minioService"></param>
+        /// <param name="procMaterialGroupRepository"></param>
         public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
@@ -89,7 +92,7 @@ namespace Hymson.MES.Services.Services.Process
             IProcBomRepository procBomRepository,
             IPlanWorkOrderRepository planWorkOrderRepository, ILocalizationService localizationService,
             IExcelService excelService,
-            IMinioService minioService)
+            IMinioService minioService, IProcMaterialGroupRepository procMaterialGroupRepository)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
@@ -109,6 +112,8 @@ namespace Hymson.MES.Services.Services.Process
 
             _excelService = excelService;
             _minioService = minioService;
+
+            _procMaterialGroupRepository = procMaterialGroupRepository;
         }
 
 
@@ -315,6 +320,18 @@ namespace Hymson.MES.Services.Services.Process
         {
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
             procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            //判断是否需要查询物料组编码 -- 全匹配查询
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQueryDto.MaterialGroupCode)) 
+            {
+                var materialGroup=(await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
+                if (materialGroup == null) 
+                {
+                    return new PagedInfo<ProcMaterialDto>(new List<ProcMaterialDto>(), procMaterialPagedQueryDto.PageIndex, procMaterialPagedQueryDto.PageSize,0);
+                }
+                procMaterialPagedQuery.GroupId = materialGroup?.Id;
+            }
+
             var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
 
             //实体到DTO转换 装载数据
@@ -488,6 +505,7 @@ namespace Hymson.MES.Services.Services.Process
                     UpdatedBy = procMaterialEntity.UpdatedBy,
                     UpdatedOn = procMaterialEntity.UpdatedOn,
                     ConsumeRatio = procMaterialEntity.ConsumeRatio,
+                    QuantityLimit = procMaterialEntity.QuantityLimit,
                 });
 
                 if (response == 0)

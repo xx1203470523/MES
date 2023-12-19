@@ -179,7 +179,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="EquFaultReasonQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultReasonEntity>> GetEquFaultReasonEntitiesAsync(EquFaultReasonQuery EquFaultReasonQuery)
+        public async Task<IEnumerable<EquFaultReasonEntity>> GetListAsync(EquFaultReasonQuery EquFaultReasonQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquFaultReasonEntitiesSqlTemplate);
@@ -191,9 +191,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
             {
                 sqlBuilder.Where(" SiteId=@SiteId ");
             }
+
             if (!string.IsNullOrWhiteSpace(EquFaultReasonQuery.FaultReasonCode))
             {
                 sqlBuilder.Where(" FaultReasonCode = @FaultReasonCode ");
+            }
+
+            if (EquFaultReasonQuery.Ids != null && EquFaultReasonQuery.Ids.Any()) {
+                sqlBuilder.Where(" Id = @Ids ");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);

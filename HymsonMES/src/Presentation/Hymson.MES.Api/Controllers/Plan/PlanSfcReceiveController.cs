@@ -1,25 +1,13 @@
-/*
- *creator: Karl
- *
- *describe: 条码接收    控制器 | 代码由框架生成  
- *builder:  pengxin
- *build datetime: 2023-03-21 04:33:58
- */
-using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
 {
     /// <summary>
     /// 控制器（条码接收）
-    /// @author pengxin
-    /// @date 2023-03-21 04:33:58
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanSfcReceiveController : ControllerBase

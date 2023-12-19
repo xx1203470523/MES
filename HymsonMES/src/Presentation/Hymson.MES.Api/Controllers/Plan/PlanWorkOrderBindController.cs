@@ -1,24 +1,12 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活（物理删除）    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-04-12 11:14:23
- */
-using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Plan
 {
     /// <summary>
     /// 控制器（工单激活（物理删除））
-    /// @author Karl
-    /// @date 2023-04-12 11:14:23
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanWorkOrderBindController : ControllerBase

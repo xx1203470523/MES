@@ -10,8 +10,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（事件维护）
-    /// @author Czhipu
-    /// @date 2023-08-03 02:42:52
     /// </summary>
     [Authorize]
     [ApiController]

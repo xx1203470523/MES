@@ -17,6 +17,13 @@ namespace Hymson.MES.Services.Services.Equipment
         Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto EquFaultReasonPagedQueryDto);
 
         /// <summary>
+        /// 根据查询条件获数据
+        /// </summary>
+        /// <param name="EquFaultReasonQueryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultReasonDto>> GetListAsync(EquFaultReasonQueryDto EquFaultReasonQueryDto);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="EquFaultReasonCreateDto"></param>

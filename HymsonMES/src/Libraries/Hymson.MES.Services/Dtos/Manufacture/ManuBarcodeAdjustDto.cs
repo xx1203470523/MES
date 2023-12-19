@@ -154,6 +154,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProductBomId { get; set; }
 
         /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
         /// 载具编码
         /// </summary>
         public string VehicleCode { get; set; }
@@ -206,6 +211,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否验证绑定载具
         /// </summary>
         public bool IsVerifyBindVehicle {  get; set; }=false;
+
+        /// <summary>
+        /// 是否验证物料的数量限制
+        /// </summary>
+        public bool IsVerifyMaterialQuantityLimit { get; set; } = false;
 
         /// <summary>
         /// 是否绑定容器

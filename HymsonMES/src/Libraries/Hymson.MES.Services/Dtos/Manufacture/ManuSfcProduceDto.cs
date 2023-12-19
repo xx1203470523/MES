@@ -974,7 +974,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 工单ID
         /// </summary>
-        public long WorkOrderId { get; set; }
+        public long? WorkOrderId { get; set; }
 
         /// <summary>
         /// 工序ID
@@ -984,22 +984,22 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 物料Id
         /// </summary>
-        public long MaterialId { get; set; }
+        public long? MaterialId { get; set; }
 
         /// <summary>
         /// Bom Id
         /// </summary>
-        public long BomId { get; set; }
+        public long? BomId { get; set; }
 
         /// <summary>
         /// 工艺路线Id
         /// </summary>
-        public long ProcessRouteId { get; set; }
+        public long? ProcessRouteId { get; set; }
     }
 
 

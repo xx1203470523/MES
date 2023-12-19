@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（产品检验参数组）
-    /// @author Czhipu
-    /// @date 2023-07-25 01:58:43
     /// </summary>
     [Authorize]
     [ApiController]

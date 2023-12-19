@@ -17,7 +17,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 设备故障原因表 查询故障原因
     /// </summary>
-    public class EquFaultReasonQuery
+    public class EquFaultReasonQuery: QueryAbstraction
     {
         //
         // 摘要:
@@ -29,5 +29,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// 空值 : false  
         /// </summary>
         public string FaultReasonCode { get; set; } 
+
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
     }
 }

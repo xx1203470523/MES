@@ -19,7 +19,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.FaultPhenomenonCode).MaximumLength(50).WithErrorCode(ErrorCode.MES10109);
             RuleFor(x => x.FaultPhenomenonName).NotEmpty().WithErrorCode(ErrorCode.MES12902);
             RuleFor(x => x.FaultPhenomenonName).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
-            RuleFor(x => x.EquipmentGroupId).Must(it => it != 0).WithErrorCode(ErrorCode.MES12904);
+            //RuleFor(x => x.EquipmentGroupId).Must(it => it != 0).WithErrorCode(ErrorCode.MES12904);
 
         }
     }

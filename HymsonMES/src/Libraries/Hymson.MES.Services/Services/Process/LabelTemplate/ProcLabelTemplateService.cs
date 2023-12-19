@@ -369,12 +369,12 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
 
             //await _printExecuteTaskRepository.InsertAsync(new PrintExecuteTaskEntity
             //{
-            //    Id= IdGenProvider.Instance.CreateId(),
+            //    Id = IdGenProvider.Instance.CreateId(),
             //    PrintName = "TestPrintName",
-            //    PrintCount= 1,
-            //    TemplateName= "15528011388198912",
+            //    PrintCount = 1,
+            //    TemplateName = "15528011388198912",
 
-            //    PrintBodies= JsonConvert.SerializeObject(new ProcPrintTestPrintDto()
+            //    PrintBodies = JsonConvert.SerializeObject(new ProcPrintTestPrintDto()
             //    {
             //        Id = 123,
             //        ProcureCode = "后台-1002",
@@ -384,10 +384,10 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //        OutTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             //    }),
 
-            //    CreatedBy ="admin",
-            //    CreatedOn=DateTime.Now,
-            //    UpdatedBy="admin",
-            //    UpdatedOn=DateTime.Now,
+            //    CreatedBy = "admin",
+            //    CreatedOn = DateTime.Now,
+            //    UpdatedBy = "admin",
+            //    UpdatedOn = DateTime.Now,
             //});
 
 

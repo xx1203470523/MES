@@ -211,7 +211,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         [Description("条码合并-新增")]
         SfcMergeAdd = 39,
         /// <summary>
-        /// 条码合并-新增
+        /// 条码数量调整
         /// </summary>
         [Description("条码数量调整")]
         SfcQtyAdjust = 40,

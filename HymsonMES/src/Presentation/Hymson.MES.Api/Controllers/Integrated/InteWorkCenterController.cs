@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     ///  工作中心控制器
-    /// @author admin
-    /// @date 2023-02-21
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]

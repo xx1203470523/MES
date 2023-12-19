@@ -305,6 +305,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuFeeding
 
             if (queryDto.Source == ManuSFCFeedingSourceEnum.BOM)
             {
+                // 这句是兼容代码。选择BOM类型时，之前切换上料点的值没有清空，所以这里需要清空
+                queryDto.FeedingPointId = null;
+
                 // 2023.10.17 中越和产品说，需要再过滤一次，只要资源关联工序对应的物料（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
                 var procedureEntity = await _procProcedureRepository.GetProcProcedureByResourceIdAsync(new ProcProdureByResourceIdQuery
                 {

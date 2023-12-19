@@ -10,8 +10,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（条码生产信息（物理删除））
-    /// @author zhaoqing
-    /// @date 2023-03-18 05:37:27
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]

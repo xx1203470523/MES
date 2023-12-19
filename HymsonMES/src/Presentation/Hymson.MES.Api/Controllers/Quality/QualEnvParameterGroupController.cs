@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 控制器（环境检验参数表）
-    /// @author Czhipu
-    /// @date 2023-07-22 10:54:48
     /// </summary>
     [Authorize]
     [ApiController]

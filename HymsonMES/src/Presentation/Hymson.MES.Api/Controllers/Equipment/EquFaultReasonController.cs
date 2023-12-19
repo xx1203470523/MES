@@ -4,17 +4,13 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（设备故障原因表）
-    /// @author pengxin
-    /// @date 2023-02-28 15:15:20
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquFaultReasonController : ControllerBase
@@ -87,6 +83,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync([FromQuery] EquFaultReasonPagedQueryDto parm)
         {
             return await _EquFaultReasonService.GetPageListAsync(parm);
+        }
+
+        /// <summary>
+        /// 查询列表（设备故障原因表）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getlist")]
+        public async Task<IEnumerable<EquFaultReasonDto>> QueryEquFaultReasonListAsync([FromQuery] EquFaultReasonQueryDto parm)
+        {
+            return await _EquFaultReasonService.GetListAsync(parm);
         }
 
         /// <summary>
