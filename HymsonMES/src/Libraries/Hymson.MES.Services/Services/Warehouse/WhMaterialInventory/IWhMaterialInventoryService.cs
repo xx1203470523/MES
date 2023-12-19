@@ -21,7 +21,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="materialBarCode"></param>
         /// <returns></returns>
-        Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode);
+        Task<bool> CheckMaterialBarCodeAnyAsync(string materialBarCode);
 
         /// <summary>
         /// 根据物料条码查询
@@ -41,10 +41,9 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         ///批量新增
         /// </summary>
-        /// <param name="whMaterialInventoryLists"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns>
-
-        Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryLists);
+        Task CreateWhMaterialInventoryListAsync(IEnumerable<WhMaterialInventoryListCreateDto> requestDtos);
 
         /// <summary>
         /// 修改
