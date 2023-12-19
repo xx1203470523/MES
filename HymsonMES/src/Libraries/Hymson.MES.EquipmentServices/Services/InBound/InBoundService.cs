@@ -274,7 +274,7 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
                     {
                         //_logger.LogError($"工艺路线卡控,进站条码：{inBoundMoreDto.SFCs},进站资源对应工序：在制品工序不一致");
-                        throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("SFC", inBoundMoreDto.SFCs);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("SFC", string.Join(",", inBoundMoreDto.SFCs));
                     }
 
                     //进站修改为激活
