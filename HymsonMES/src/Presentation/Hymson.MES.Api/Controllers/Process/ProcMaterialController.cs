@@ -90,9 +90,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("物料维护", BusinessType.INSERT)]
         [PermissionDescription("proc:material:insert")]
-        public async Task AddProcMaterialAsync([FromBody] ProcMaterialCreateDto parm)
+        public async Task<long> AddProcMaterialAsync([FromBody] ProcMaterialCreateDto parm)
         {
-             await _procMaterialService.CreateProcMaterialAsync(parm);
+            return await _procMaterialService.CreateProcMaterialAsync(parm);
         }
 
         /// <summary>

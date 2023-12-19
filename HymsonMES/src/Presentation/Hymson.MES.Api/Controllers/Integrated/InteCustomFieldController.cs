@@ -84,5 +84,17 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             return await _inteCustomFieldService.GetBusinessEffectuatesAsync(businessId);
         }
+
+        /// <summary>
+        /// 根据业务ID获取业务数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("delBusinessEffectuates")]
+        public async Task<int> DelBusinessEffectuatesAsync(long[] ids)
+        {
+            return await _inteCustomFieldService.DelBusinessEffectuatesAsync(ids);
+        }
     }
 }

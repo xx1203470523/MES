@@ -131,7 +131,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task AddProcResourceTypeAsync(ProcResourceTypeAddDto param)
+        public async Task<long> AddProcResourceTypeAsync(ProcResourceTypeAddDto param)
         {
             if (param == null)
             {
@@ -186,6 +186,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
 
                 ts.Complete();
             }
+            return entity.Id;
         }
 
         /// <summary>

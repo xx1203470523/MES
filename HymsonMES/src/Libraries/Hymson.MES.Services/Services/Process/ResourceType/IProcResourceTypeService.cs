@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task AddProcResourceTypeAsync(ProcResourceTypeAddDto param);
+        Task<long> AddProcResourceTypeAsync(ProcResourceTypeAddDto param);
 
         /// <summary>
         /// 修改资源类型数据

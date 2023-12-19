@@ -88,7 +88,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procSortingRuleCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto)
+        public async Task<long> CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto)
         {
             procSortingRuleCreateDto.Code = procSortingRuleCreateDto.Code.ToTrimSpace();
             procSortingRuleCreateDto.Name = procSortingRuleCreateDto.Name.Trim();
@@ -204,6 +204,7 @@ namespace Hymson.MES.Services.Services.Process
             await _ruleGradeDetailsRepository.InsertsAsync(procSortingRuleGradeDetailsEntities);
 
             trans.Complete();
+            return procSortingRuleEntity.Id;
         }
 
         /// <summary>

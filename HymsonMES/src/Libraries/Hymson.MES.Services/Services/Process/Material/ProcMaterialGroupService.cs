@@ -60,7 +60,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procMaterialGroupCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateProcMaterialGroupAsync(ProcMaterialGroupCreateDto procMaterialGroupCreateDto)
+        public async Task<long> CreateProcMaterialGroupAsync(ProcMaterialGroupCreateDto procMaterialGroupCreateDto)
         {
             if (procMaterialGroupCreateDto == null)
             {
@@ -127,6 +127,7 @@ namespace Hymson.MES.Services.Services.Process
                 ts.Complete();
             }
 
+            return procMaterialGroupEntity.Id;
             #endregion
 
         }

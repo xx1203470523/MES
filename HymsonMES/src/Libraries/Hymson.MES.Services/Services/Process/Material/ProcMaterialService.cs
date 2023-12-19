@@ -117,7 +117,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procMaterialCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto)
+        public async Task<long> CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto)
         {
             #region 参数校验
             procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToTrimSpace().ToUpperInvariant();
@@ -239,6 +239,8 @@ namespace Hymson.MES.Services.Services.Process
 
                 ts.Complete();
             }
+
+            return procMaterialEntity.Id;
 
             #endregion
 

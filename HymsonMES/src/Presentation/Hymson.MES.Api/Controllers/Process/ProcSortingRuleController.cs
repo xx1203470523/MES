@@ -98,9 +98,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPost]
         [Route("create")]
         [PermissionDescription("proc:procSortingRule:insert")]
-        public async Task AddProcSortingRuleAsync([FromBody] ProcSortingRuleCreateDto parm)
+        public async Task<long> AddProcSortingRuleAsync([FromBody] ProcSortingRuleCreateDto parm)
         {
-             await _procSortingRuleService.CreateProcSortingRuleAsync(parm);
+           return  await _procSortingRuleService.CreateProcSortingRuleAsync(parm);
         }
 
         /// <summary>
