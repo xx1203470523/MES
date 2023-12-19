@@ -1290,24 +1290,20 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             #region 验证
 
             //验证必须更改了一项
-            if (manuUpdateSaveDto.WorkOrderId == 0 && manuUpdateSaveDto.MaterialId == 0 && manuUpdateSaveDto.BomId == 0 && manuUpdateSaveDto.ProcessRouteId == 0)
+            if (!manuUpdateSaveDto.WorkOrderId.HasValue && !manuUpdateSaveDto.MaterialId.HasValue && !manuUpdateSaveDto.BomId.HasValue && !manuUpdateSaveDto.ProcessRouteId.HasValue)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18223));
             }
-            //if (manuUpdateSaveDto.WorkOrderId <= 0)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES18202));
-            //}
 
             //验证工序
-            if (manuUpdateSaveDto.WorkOrderId > 0 && manuUpdateSaveDto.ProcessRouteId > 0)
+            if ((manuUpdateSaveDto.WorkOrderId.HasValue && manuUpdateSaveDto.WorkOrderId.Value > 0) || (manuUpdateSaveDto.ProcessRouteId.HasValue && manuUpdateSaveDto.ProcessRouteId.Value > 0))
             {
-                if (manuUpdateSaveDto.ProcedureId <= 0)
+                if (!manuUpdateSaveDto.ProcedureId.HasValue || manuUpdateSaveDto.ProcedureId <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18203));
                 }
 
-                var procedureId = manuUpdateSaveDto.ProcedureId ?? 0;
+                var procedureId = manuUpdateSaveDto.ProcedureId.Value;
                 var procedure = await _procProcedureRepository.GetByIdAsync(procedureId);
                 if (procedure == null)
                 {
@@ -1320,21 +1316,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             #region 逻辑
             //在制数据
             var manuSfcProduces = await ManuUpdateVerifyAsync(manuUpdateSaveDto.Sfcs);
-
             //老工单
             var workOrderId = manuSfcProduces.First().WorkOrderId;
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
-
             var oldWorkOrderQty = 0m;// manuSfcProduces.Sum(it => it.Qty);
             var newWorkOrderQty = 0m;// manuSfcProduces.Sum(it => it.Qty);
-            if (workOrderId == manuUpdateSaveDto.WorkOrderId)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES18212)).WithData("Code", planWorkOrderEntity.OrderCode);
-            }
+            var planWorkOrderEntity = new PlanWorkOrderEntity();
 
             var newPlanWorkOrderEntity = new PlanWorkOrderEntity();
-            if (manuUpdateSaveDto.WorkOrderId > 0)
+            if (manuUpdateSaveDto.WorkOrderId.HasValue && manuUpdateSaveDto.WorkOrderId.Value > 0)
             {
+                planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(workOrderId);
+                if (workOrderId == manuUpdateSaveDto.WorkOrderId)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18212)).WithData("Code", planWorkOrderEntity.OrderCode);
+                }
+
                 //新工单
                 newPlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuUpdateSaveDto.WorkOrderId.Value);
 
@@ -1362,9 +1358,9 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 }
             }
 
-            var productId = manuUpdateSaveDto.MaterialId > 0 ? manuUpdateSaveDto.MaterialId.Value : newPlanWorkOrderEntity.ProductId;
-            var processRouterId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId.Value : newPlanWorkOrderEntity.ProcessRouteId;
-            var bomId = manuUpdateSaveDto.BomId > 0 ? manuUpdateSaveDto.BomId.Value : newPlanWorkOrderEntity.ProductBOMId;
+            var productId = manuUpdateSaveDto.MaterialId.HasValue && manuUpdateSaveDto.MaterialId > 0 ? manuUpdateSaveDto.MaterialId.Value : newPlanWorkOrderEntity.ProductId;
+            var processRouterId = manuUpdateSaveDto.ProcessRouteId.HasValue && manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId.Value : newPlanWorkOrderEntity.ProcessRouteId;
+            var bomId = manuUpdateSaveDto.BomId.HasValue && manuUpdateSaveDto.BomId > 0 ? manuUpdateSaveDto.BomId.Value : newPlanWorkOrderEntity.ProductBOMId;
             //组装步骤
             var sfcStepList = new List<ManuSfcStepEntity>();
             foreach (var item in manuSfcProduces)
@@ -1402,42 +1398,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 sfcStepList.Add(sfcStep);
             }
 
-            var isUpdateSfc = false;
+            //处理条码信息 
             var newSfcInfos = new List<ManuSfcInfoEntity>();
-            IEnumerable<ManuSfcInfoEntity> sfcInfos = new List<ManuSfcInfoEntity>();
-            if (newPlanWorkOrderEntity.Id > 0 || (manuUpdateSaveDto.MaterialId > 0) || (manuUpdateSaveDto.ProcessRouteId > 0) || (manuUpdateSaveDto.BomId > 0))
+            var manuSfcs = await _manuSfcRepository.GetBySFCsAsync(manuUpdateSaveDto.Sfcs);
+            var sfcIds = manuSfcs.Select(it => it.Id).ToArray();
+            var sfcInfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
+
+            //更改老条码状态 这里不直接改老条码  而是新增新条码  便于追溯
+            foreach (var item in sfcInfos)
             {
-                isUpdateSfc = true;
+                item.IsUsed = false;
+                item.UpdatedBy = _currentUser.UserName;
+                item.UpdatedOn = HymsonClock.Now();
 
-                //处理条码信息 manu_sfc_info select sum(Qty) from manu_sfc_produce where  WorkOrderId='10362438214823936'
-                var manuSfcs = await _manuSfcRepository.GetBySFCsAsync(manuUpdateSaveDto.Sfcs);
-                var sfcIds = manuSfcs.Select(it => it.Id).ToArray();
-                sfcInfos = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcIds);
-
-                //更改老条码状态 这里不直接改老条码  而是新增新条码  便于追溯
-                foreach (var item in sfcInfos)
+                var newSfcInfo = new ManuSfcInfoEntity()
                 {
-                    item.IsUsed = false;
-                    item.UpdatedBy = _currentUser.UserName;
-                    item.UpdatedOn = HymsonClock.Now();
-
-                    var newSfcInfo = new ManuSfcInfoEntity()
-                    {
-                        SfcId = item.SfcId,
-                        WorkOrderId = manuUpdateSaveDto.WorkOrderId > 0 ? manuUpdateSaveDto.WorkOrderId.Value : item.WorkOrderId,
-                        ProductId = productId > 0 ? productId : item.ProductId,
-                        ProcessRouteId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId : item.ProcessRouteId,
-                        ProductBOMId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.BomId : item.ProductBOMId,
-                        IsUsed = true,
-                        SiteId = _currentSite.SiteId ?? 0,
-                        Id = IdGenProvider.Instance.CreateId(),
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        CreatedOn = HymsonClock.Now(),
-                        UpdatedOn = HymsonClock.Now()
-                    };
-                    newSfcInfos.Add(newSfcInfo);
-                }
+                    SfcId = item.SfcId,
+                    WorkOrderId = manuUpdateSaveDto.WorkOrderId > 0 ? manuUpdateSaveDto.WorkOrderId.Value : item.WorkOrderId,
+                    ProductId = productId > 0 ? productId : item.ProductId,
+                    ProcessRouteId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId : item.ProcessRouteId,
+                    ProductBOMId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.BomId : item.ProductBOMId,
+                    IsUsed = true,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                };
+                newSfcInfos.Add(newSfcInfo);
             }
 
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -1470,12 +1459,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 }
 
                 //条码信息更改
-                if (isUpdateSfc)
-                {
-                    //条码
-                    await _manuSfcInfoRepository.UpdatesAsync(sfcInfos);
-                    await _manuSfcInfoRepository.InsertsAsync(newSfcInfos);
-                }
+                await _manuSfcInfoRepository.UpdatesAsync(sfcInfos);
+                await _manuSfcInfoRepository.InsertsAsync(newSfcInfos);
 
                 //步骤
                 await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
@@ -1668,7 +1653,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 
                     var sfcStepTemps = sfcSteps.Where(x => x.SFC == item.SFC);
 
-                    var lastNewInStepTime= DateTime.Now;
+                    var lastNewInStepTime = DateTime.Now;
                     if (!sfcStepTemps.Any())
                     {
                         //加入需求：合并新增或者拆分新增的条码是没有入站步骤的，现在需要查询该条码是否是合并新增或者拆分新增的，是则取生成时间

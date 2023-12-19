@@ -1573,7 +1573,8 @@
         public const string MES19211 = "库区不能为空!";
         public const string MES19212 = "库区信息为空!";
         public const string MES19213 = "库位新增失败!";
-        public const string MES19214 = "自定义库位编码【{code}】在【{shelfcode}】货架中已存在!";
+        //在【{shelfcode}】货架中
+        public const string MES19214 = "自定义库位编码【{code}】已存在!";
         public const string MES19215 = "货架不能为空!";
         public const string MES19216 = "仓库下已绑定库区,请解绑!";
         public const string MES19217 = "库区下已绑定货架,请解绑!";
