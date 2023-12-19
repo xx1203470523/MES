@@ -93,7 +93,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
             // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
-            DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeSeconds(waterMarkId).DateTime;
+            DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
             var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
                 StartWaterMarkTime = startWaterMarkTime,

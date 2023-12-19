@@ -306,6 +306,8 @@ namespace Hymson.MES.CoreServices.Services.Job
                     SfcId = manuSfcEntity.Id,
                     WorkOrderId = planWorkOrderEntity.Id,
                     ProductId = productId,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     IsUsed = true,
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,
