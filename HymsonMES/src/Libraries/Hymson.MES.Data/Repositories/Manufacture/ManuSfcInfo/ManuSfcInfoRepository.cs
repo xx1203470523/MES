@@ -431,6 +431,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                             s.`Status` as SFCStatus,
                             si.ProductId,
                             si.WorkOrderId,
+                            si.ProductBOMId,
+                            si.ProcessRouteId,
                             sp.ProcedureId,
                             sp.ResourceId,
                             s.Qty

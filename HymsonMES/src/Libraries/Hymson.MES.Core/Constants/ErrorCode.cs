@@ -582,6 +582,9 @@
         public const string MES12835 = "产品序列码【{sfc}】对应工单状志为【{WorkOrder}】，不允许操作!";
         public const string MES12836 = "产品序列码对应物料的数量限制为仅为1.0，不允许操作";
         public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
+        public const string MES12838 = "产品序列码【{sfc}】带有复判标识，不允许操作!";
+        public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
+
         #endregion
 
         #region 故障现象 12900
@@ -694,14 +697,14 @@
 
         #region 车间库存接收  15100
         public const string MES15100 = "物料库存错误";
-        public const string MES15101 = "物料不存在";
+        public const string MES15101 = "物料条码【{MaterialCode}】所属物料不存在！";
         public const string MES15102 = "物料条码未关联到供应商";
-        public const string MES15103 = "物料条码：{MaterialCode}数量需大于0";
-        public const string MES15104 = " 物料条码：{MaterialCode}在车间库存中已存在！";
-        public const string MES15105 = " 增加库存失败";
-        public const string MES15106 = " 请扫描物料条码";
-        public const string MES15107 = " 重复扫描！";
-        public const string MES15108 = " 供应商不能为空";
+        public const string MES15103 = "物料条码【{MaterialCode}】数量需大于0";
+        public const string MES15104 = "物料条码【{MaterialCode}】在车间库存中已存在！";
+        public const string MES15105 = "增加库存失败";
+        public const string MES15106 = "请扫描物料条码";
+        public const string MES15107 = "物料条码【{MaterialCode}】重复扫描！";
+        public const string MES15108 = "物料条码【{MaterialCode}】供应商不能为空";
 
         public const string MES15120 = " 没有查询到对应原材料库存数据";
         public const string MES15121 = " 维护库存剩余数量要不大于接收数量且不小于0";
@@ -1337,6 +1340,7 @@
         public const string MES18228 = "产品序列码【{SFC}】应进站工序【{Procedure}】不属于所处的工艺路线！";
         public const string MES18229 = "产品序列码【{SFC}】当前进站工序【{Current}】不属于所处的工艺路线！";
         public const string MES18230 = "作业【{Job}】出现重复，请检查作业设置！";
+        public const string MES18231 = "新工单号不存在";
         #endregion
 
         #region 系统Token MES18300
@@ -1597,7 +1601,8 @@
         public const string MES19211 = "库区不能为空!";
         public const string MES19212 = "库区信息为空!";
         public const string MES19213 = "库位新增失败!";
-        public const string MES19214 = "自定义库位编码【{code}】在【{shelfcode}】货架中已存在!";
+        //在【{shelfcode}】货架中
+        public const string MES19214 = "自定义库位编码【{code}】已存在!";
         public const string MES19215 = "货架不能为空!";
         public const string MES19216 = "仓库下已绑定库区,请解绑!";
         public const string MES19217 = "库区下已绑定货架,请解绑!";
