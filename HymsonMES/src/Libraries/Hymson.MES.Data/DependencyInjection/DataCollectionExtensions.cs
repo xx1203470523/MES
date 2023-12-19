@@ -75,8 +75,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
-            services.AddSingleton<IEquSparePartsGroupRepository, EquSparePartsGroupRepository>();
-            services.AddSingleton<IEquSparePartsGroupEquipmentGroupRelationRepository, EquSparePartsGroupEquipmentGroupRelationRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
 
@@ -131,6 +129,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteMessageManageAnalysisReportAttachmentRepository, InteMessageManageAnalysisReportAttachmentRepository>();
             services.AddSingleton<IInteMessageManageHandleProgrammeAttachmentRepository, InteMessageManageHandleProgrammeAttachmentRepository>();
 
+            services.AddSingleton<IInteCustomFieldRepository, InteCustomFieldRepository>();
+            services.AddSingleton<IInteCustomFieldInternationalizationRepository, InteCustomFieldInternationalizationRepository>();
+            services.AddSingleton<IInteCustomFieldBusinessEffectuateRepository, InteCustomFieldBusinessEffectuateRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
@@ -303,10 +304,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcGradeDetailRepository, ManuSfcGradeDetailRepository>();
 
             services.AddSingleton<IManuWorkOrderSFCRepository, ManuWorkOrderSFCRepository>();
-
-            services.AddSingleton<IManuSFCNodeRepository, ManuSFCNodeRepository>();
-            services.AddSingleton<IManuSFCNodeSourceRepository, ManuSFCNodeSourceRepository>();
-            services.AddSingleton<IManuSFCNodeDestinationRepository, ManuSFCNodeDestinationRepository>();
             #endregion
 
             #region Warehouse 
