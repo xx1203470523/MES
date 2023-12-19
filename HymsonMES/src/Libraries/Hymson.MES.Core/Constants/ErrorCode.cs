@@ -582,6 +582,9 @@
         public const string MES12835 = "产品序列码【{sfc}】对应工单状志为【{WorkOrder}】，不允许操作!";
         public const string MES12836 = "产品序列码对应物料的数量限制为仅为1.0，不允许操作";
         public const string MES12837 = "产品【{ProductCode}】没有生成新条码，请检查!";
+        public const string MES12838 = "产品序列码【{sfc}】带有复判标识，不允许操作!";
+        public const string MES12839 = "产品序列码【{sfc}】带有NG标识，不允许操作!";
+
         #endregion
 
         #region 故障现象 12900

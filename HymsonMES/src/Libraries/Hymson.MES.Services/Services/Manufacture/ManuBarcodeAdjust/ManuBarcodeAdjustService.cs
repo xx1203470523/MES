@@ -826,7 +826,12 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (manuProductBadRecordEntities != null && manuProductBadRecordEntities.Any())
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12833)).WithData("sfc", param.SFC);
+                if (manuProductBadRecordEntities.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.WaitingJudge)) 
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12838)).WithData("sfc", param.SFC);
+                }
+
+                throw new CustomerValidationException(nameof(ErrorCode.MES12839)).WithData("sfc", param.SFC);
             }
 
             var procMaterialEntitity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity?.ProductId ?? 0);
@@ -1341,7 +1346,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                 });
                 if (ngSfcs != null && ngSfcs.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES12833)).WithData("sfc", string.Join(",", ngSfcs.Select(x => x.SFC).Distinct()));
+                    var needJudgeNgs = ngSfcs.Where(x => x.DisposalResult == ProductBadDisposalResultEnum.WaitingJudge);
+
+                    if (needJudgeNgs.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12838)).WithData("sfc", string.Join(",", needJudgeNgs.Select(x => x.SFC).Distinct()));
+                    }
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12839)).WithData("sfc", string.Join(",", ngSfcs.Select(x => x.SFC).Distinct()));
                 }
 
                 
