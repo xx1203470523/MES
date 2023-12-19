@@ -175,7 +175,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
             var result= await _whWarehouseLocationRepository.InsertIgnoreRangeAsync(entitys);
             if (result != entitys.Count) {
                 if (saveDto.Type == WhWarehouseLocationTypeEnum.Customize) {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First()).WithData("shelfcode", warehouseShelfEntity.Code);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First());
                 }
                 throw new CustomerValidationException(nameof(ErrorCode.MES19213));
             }
