@@ -47,4 +47,8 @@
     <ProjectReference Include="..\Hymson.MES.HttpClients\Hymson.MES.HttpClients.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Process\LabelTemplate\Utility\" />
+  </ItemGroup>
+
 </Project>

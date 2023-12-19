@@ -92,10 +92,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         {
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
-            // 获取流转表数据
-            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
+            DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
+            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
-                StartWaterMarkId = waterMarkId,
+                StartWaterMarkTime = startWaterMarkTime,
                 Rows = limitCount
             });
             if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
@@ -242,7 +243,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
-            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, manuSfcCirculationList.Max(x => x.Id));
+            var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
+            if (maxUpdateWaterMarkUpdatedOn != null)
+            {
+                long timestamp = ((DateTimeOffset)maxUpdateWaterMarkUpdatedOn.Value).ToUnixTimeMilliseconds();
+                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+            }
             trans.Complete();
 
         }
