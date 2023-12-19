@@ -86,6 +86,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
+        /// 查询列表（设备故障原因表）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getlist")]
+        public async Task<IEnumerable<EquFaultReasonDto>> QueryEquFaultReasonListAsync([FromQuery] EquFaultReasonQueryDto parm)
+        {
+            return await _EquFaultReasonService.GetListAsync(parm);
+        }
+
+        /// <summary>
         /// 查询详情（设备故障原因表）
         /// </summary>
         /// <param name="id"></param>

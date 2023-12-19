@@ -8,6 +8,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -15,6 +16,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Security.Cryptography.Xml;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -159,6 +161,21 @@ namespace Hymson.MES.Services.Services.Equipment
             //实体到DTO转换 装载数据
             List<EquFaultReasonDto> EquFaultReasonDtos = PrepareEquFaultReasonDtos(pagedInfo).ToList();
             return new PagedInfo<EquFaultReasonDto>(EquFaultReasonDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据查询条件获数据
+        /// </summary>
+        /// <param name="EquFaultReasonQueryDto"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultReasonDto>> GetListAsync(EquFaultReasonQueryDto EquFaultReasonQueryDto)
+        {
+            var EquFaultReasonQuery = EquFaultReasonQueryDto.ToQuery<EquFaultReasonQuery>();
+            EquFaultReasonQuery.SiteId = _currentSite.SiteId;
+            var equFaultReasonEntities = await _equFaultReasonRepository.GetListAsync(EquFaultReasonQuery);
+
+            //实体到DTO转换 装载数据
+            return equFaultReasonEntities.Select(a =>  a.ToModel<EquFaultReasonDto>());
         }
 
         /// <summary>

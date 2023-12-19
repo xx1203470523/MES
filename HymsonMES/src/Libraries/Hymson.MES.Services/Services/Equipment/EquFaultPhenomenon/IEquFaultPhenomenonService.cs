@@ -45,6 +45,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         Task<EquFaultPhenomenonDto> GetDetailAsync(long id);
 
         /// <summary>
+        /// 查询已经分配设备故障原因
+        /// </summary>
+        /// <param name="equFaultPhenomenonQueryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultReasonDto>> GetEquFaultReasonListAsync(EquFaultPhenomenonQueryDto equFaultPhenomenonQueryDto);
+
+        /// <summary>
         /// 状态变更
         /// </summary>
         /// <param name="param"></param>

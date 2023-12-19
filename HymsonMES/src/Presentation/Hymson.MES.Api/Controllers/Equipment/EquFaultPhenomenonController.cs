@@ -96,6 +96,17 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _equFaultPhenomenonService.GetDetailAsync(id);
         }
 
+        /// <summary>
+        /// 获取已分配故障原因
+        /// </summary>
+        /// <param name="equFaultPhenomenonQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet("getChangedFaultReason")]
+        public async Task<IEnumerable<EquFaultReasonDto>> GetChangedFaultReasonAsync([FromQuery] EquFaultPhenomenonQueryDto equFaultPhenomenonQueryDto)
+        {
+            return await _equFaultPhenomenonService.GetEquFaultReasonListAsync(equFaultPhenomenonQueryDto);
+        }
+
         #region 状态变更
         /// <summary>
         /// 启用（设备故障现象）

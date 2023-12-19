@@ -153,8 +153,8 @@ namespace Hymson.MES.Services.Mapper
             #region EquFaultPhenomenon
             CreateMap<EquFaultPhenomenonSaveDto, EquFaultPhenomenonEntity>();
             CreateMap<EquFaultPhenomenonPagedQueryDto, EquFaultPhenomenonPagedQuery>();
-
             CreateMap<EquFaultPhenomenonView, EquFaultPhenomenonDto>();
+            CreateMap<EquFaultPhenomenonQueryDto, EquFaultPhenomenonQuery>();
             #endregion
 
             #region EquSparePart
@@ -176,6 +176,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
+            CreateMap<EquFaultReasonQueryDto, EquFaultReasonQuery>();
             #endregion
 
             #region EquEquipmentVerify

@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="EquFaultReasonQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonEntity>> GetEquFaultReasonEntitiesAsync(EquFaultReasonQuery EquFaultReasonQuery);
+        Task<IEnumerable<EquFaultReasonEntity>> GetListAsync(EquFaultReasonQuery EquFaultReasonQuery);
 
         /// <summary>
         /// 分页查询
