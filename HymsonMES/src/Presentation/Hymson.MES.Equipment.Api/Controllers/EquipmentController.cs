@@ -37,7 +37,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             _sfcBindingService= sfcBindingService;
         }
 
-
         /// <summary>
         /// 创建条码
         /// </summary>
@@ -50,7 +49,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
             return await _manufactureService.CreateBarcodeBySemiProductIdAsync(dto);
         }
 
-
         /// <summary>
         ///条码绑定
         /// </summary>
@@ -62,7 +60,6 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _sfcBindingService.SfcCirculationBindAsync(sfcBindingDto);
         }
-
 
         /// <summary>
         /// 进站 HY-MES-EQU-015
@@ -129,6 +126,5 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _manufactureService.OutBoundCarrierAsync(request);
         }
-
     }
 }

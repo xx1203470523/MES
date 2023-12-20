@@ -32,7 +32,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             _connectionOptions = connectionOptions.Value;
         }
 
-
         #region 方法
         /// <summary>
         /// 删除（软删除）
@@ -311,7 +310,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Select(@" ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
-                                pwo.OrderCode as WorkOrderCode, pwo.ProcessRouteId, pwo.ProductBomId
+                                pwo.OrderCode as WorkOrderCode, 
+                                msi.ProcessRouteId, msi.ProductBomId
             ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
@@ -337,7 +337,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             }
             if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0)
             {
-                sqlBuilder.Where("pwo.ProcessRouteId = @ProcessRouteId");
+                sqlBuilder.Where("msi.ProcessRouteId = @ProcessRouteId");
             }
             if (query.Sfcs != null && query.Sfcs.Any())
             {
@@ -673,7 +673,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetManuSfcInfoEntitiesSqlTemplate = @"SELECT 
-                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,info.Id AS SFCInfoId, info.WorkOrderId ,info.ProductId ,info.IsUsed  FROM manu_sfc sfc LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
+                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,
+                                            info.Id AS SFCInfoId, info.WorkOrderId ,info.ProductId,info.ProcessRouteId ,info.ProductBOMId  ,info.IsUsed  
+                                        FROM manu_sfc sfc 
+                                        LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
                                             /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -707,7 +710,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetManSfcAboutInfoBySfcSql = @"SELECT ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
-                                pwo.OrderCode as WorkOrderCode, pwo.ProcessRouteId, pwo.ProductBomId 
+                                pwo.OrderCode as WorkOrderCode, 
+                                msi.ProcessRouteId, msi.ProductBOMId   -- 231219 修改，取 manu_sfc_info 里的才是最新的
                                                     FROM manu_sfc MS 
                                      INNER JOIN manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0
                                      LEFT JOIN  plan_work_order pwo on msi.WorkOrderId = pwo.id AND pwo.IsDeleted=0

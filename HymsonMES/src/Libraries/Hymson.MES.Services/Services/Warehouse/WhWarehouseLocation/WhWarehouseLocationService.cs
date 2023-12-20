@@ -133,9 +133,12 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                 //int number = 0;
                 var code = $"{warehouseShelfEntity.Code}-{saveDto.Row}-";
                 var warehouseLocationList = warehouseLocationEntities.Where(a=>a.Code.Contains(code));
-                Regex regex = new Regex(@"^[0-9]+$");
-                warehouseLocationList = warehouseLocationList.Where(a => regex.IsMatch(a.Code.Split('-').Last().ToString()));
-                maxColumn = warehouseLocationList.Max(a => int.Parse(a.Code.Split('-').Last()));
+                if (warehouseLocationList.Any())
+                {
+                    Regex regex = new Regex(@"^[0-9]+$");
+                    warehouseLocationList = warehouseLocationList.Where(a => regex.IsMatch(a.Code.Split('-').Last().ToString()));
+                    maxColumn = warehouseLocationList.Max(a => int.Parse(a.Code.Split('-').Last()));
+                }
             }
 
             //获取库位编码
@@ -172,7 +175,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
             var result= await _whWarehouseLocationRepository.InsertIgnoreRangeAsync(entitys);
             if (result != entitys.Count) {
                 if (saveDto.Type == WhWarehouseLocationTypeEnum.Customize) {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First()).WithData("shelfcode", saveDto.WarehouseShelfCode??"");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First());
                 }
                 throw new CustomerValidationException(nameof(ErrorCode.MES19213));
             }

@@ -103,7 +103,7 @@ namespace Hymson.MES.Services.Services.Report
                 var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.WorkOrderId));
 
                 // 查询bom
-                var procBomsTask = _procBomRepository.GetByIdsAsync(workOrders.Select(x => x.ProductBOMId));
+                var procBomsTask = _procBomRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductBOMId));
 
                 // 查询物料
                 var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
@@ -120,7 +120,7 @@ namespace Hymson.MES.Services.Services.Report
                     var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
                     var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
                     var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
-                    var bom = procBoms.FirstOrDefault(x => x.Id == workOrder?.ProductBOMId);
+                    var bom = procBoms.FirstOrDefault(x => x.Id == item.ProductBOMId);
 
                     listDto.Add(new WorkshopJobControlReportViewDto
                     {

@@ -9,8 +9,14 @@
 
   <ItemGroup>
     <Compile Remove="Dtos\Bootup\**" />
+    <Compile Remove="Validators\EquipmentCollect\**" />
+    <Compile Remove="Validators\Recipe\**" />
     <EmbeddedResource Remove="Dtos\Bootup\**" />
+    <EmbeddedResource Remove="Validators\EquipmentCollect\**" />
+    <EmbeddedResource Remove="Validators\Recipe\**" />
     <None Remove="Dtos\Bootup\**" />
+    <None Remove="Validators\EquipmentCollect\**" />
+    <None Remove="Validators\Recipe\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,8 +33,6 @@
 	<ItemGroup>
 	  <Folder Include="Bos\Manufacture\" />
 	  <Folder Include="Services\Bootup\" />
-	  <Folder Include="Validators\EquipmentCollect\" />
-	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>
 
 </Project>

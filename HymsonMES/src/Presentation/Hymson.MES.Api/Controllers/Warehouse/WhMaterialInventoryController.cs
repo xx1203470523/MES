@@ -50,7 +50,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [HttpGet("getMaterialBarCodeAny/{materialBarCode}")]
         public async Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode)
         {
-            return await _whMaterialInventoryService.GetMaterialBarCodeAnyAsync(materialBarCode);
+            return await _whMaterialInventoryService.CheckMaterialBarCodeAnyAsync(materialBarCode);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         [Route("createList")]
         [LogDescription("物料库存", BusinessType.INSERT)]
         [PermissionDescription("wh:materialInventory:insert")]
-        public async Task AddWhMaterialInventoryListAsync([FromBody] List<WhMaterialInventoryListCreateDto> parm)
+        public async Task AddWhMaterialInventoryListAsync([FromBody] IEnumerable<WhMaterialInventoryListCreateDto> parm)
         {
             await _whMaterialInventoryService.CreateWhMaterialInventoryListAsync(parm);
         }

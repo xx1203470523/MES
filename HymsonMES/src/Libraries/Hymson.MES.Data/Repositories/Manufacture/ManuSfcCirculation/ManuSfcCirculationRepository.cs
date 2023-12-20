@@ -176,6 +176,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcCirculationEntity>> GetListByStartWaterMarkTimeAsync(EntityByWaterMarkTimeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcCirculationEntity>(GetListByStartWaterMarkTimeSql, query);
+        }
+
+        /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="manuSfcCirculationPagedQuery"></param>
@@ -375,6 +386,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM `manu_sfc_circulation`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc_circulation`  WHERE Id IN @ids ";
         const string GetListByStartWaterMarkIdSql = @"SELECT * FROM `manu_sfc_circulation` WHERE Id > @StartWaterMarkId ORDER BY Id ASC LIMIT @Rows";
+        const string GetListByStartWaterMarkTimeSql = @"SELECT * FROM `manu_sfc_circulation` WHERE UpdatedOn > @StartWaterMarkTime ORDER BY UpdatedOn ASC LIMIT @Rows";
 
         const string DisassemblyUpdateSql = "UPDATE manu_sfc_circulation SET " +
             "CirculationType = @CirculationType, IsDisassemble = @IsDisassemble," +

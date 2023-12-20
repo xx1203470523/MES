@@ -154,6 +154,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProductBomId { get; set; }
 
         /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
         /// 载具编码
         /// </summary>
         public string VehicleCode { get; set; }

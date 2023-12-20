@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
@@ -92,10 +92,11 @@ namespace Hymson.MES.BackgroundServices.Manufacture
         {
             var waterMarkId = await _waterMarkService.GetWaterMarkAsync(BusinessKey.TracingSourceSFC);
 
-            // 获取流转表数据
-            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkIdAsync(new EntityByWaterMarkQuery
+            // 获取流转表数据（因为这张表的数据会有更新操作，所以不能用常规水位）
+            DateTime startWaterMarkTime = DateTimeOffset.FromUnixTimeMilliseconds(waterMarkId).DateTime;
+            var manuSfcCirculationList = await _manuSfcCirculationRepository.GetListByStartWaterMarkTimeAsync(new EntityByWaterMarkTimeQuery
             {
-                StartWaterMarkId = waterMarkId,
+                StartWaterMarkTime = startWaterMarkTime,
                 Rows = limitCount
             });
             if (manuSfcCirculationList == null || !manuSfcCirculationList.Any()) return;
@@ -139,6 +140,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
 
             // 根据条码信息批量查询产品信息
             var productEntities = await _procMaterialRepository.GetByIdsAsync(sfcInfoEntities.Select(s => s.ProductId));
+            var productDict = productEntities.ToDictionary(node => node.Id);
 
             // 遍历流转记录
             foreach (var item in manuSfcCirculationList)
@@ -154,14 +156,16 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
                     var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
 
-                    var beforeProductEntity = productEntities.FirstOrDefault(x => x.Id == sfcInfoEntity.ProductId);
+                    if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
+                    var beforeProductEntity = productDict[sfcInfoEntity.ProductId];
+
                     beforeNode = new ManuSFCNodeEntity
                     {
                         Id = sfcEntity.Id,
                         SiteId = sfcEntity.SiteId,
                         ProductId = sfcInfoEntity.ProductId,
                         SFC = sfcEntity.SFC,
-                        Name = beforeProductEntity!.MaterialName,
+                        Name = beforeProductEntity.MaterialName,
                         CreatedBy = user,
                         UpdatedBy = user
                     };
@@ -175,55 +179,50 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     if (!sfcInfoDict.ContainsKey(sfcEntity.Id)) continue;
                     var sfcInfoEntity = sfcInfoDict[sfcEntity.Id];
 
-                    var afterProductEntity = productEntities.FirstOrDefault(x => x.Id == sfcInfoEntity.ProductId);
+                    if (!productDict.ContainsKey(sfcInfoEntity.ProductId)) continue;
+                    var afterProductEntity = productDict[sfcInfoEntity.ProductId];
+
                     afterNode = new ManuSFCNodeEntity
                     {
                         Id = sfcEntity.Id,
                         SiteId = sfcEntity.SiteId,
                         ProductId = sfcInfoEntity.ProductId,
                         SFC = sfcEntity.SFC,
-                        Name = afterProductEntity!.MaterialName,
+                        Name = afterProductEntity.MaterialName,
                         CreatedBy = user,
                         UpdatedBy = user
                     };
                 }
 
-                // 因为里面有的类型是拆解，需要移除之前的关系
-                switch (item.CirculationType)
+                // 是否解除绑定
+                if (item.IsDisassemble == TrueOrFalseEnum.Yes)
                 {
-                    case SfcCirculationTypeEnum.Disassembly:
-                        nodeDestinationEntities.RemoveAll(x => x.NodeId == beforeNode.Id && x.DestinationId == afterNode.Id);
-                        nodeSourceEntities.RemoveAll(x => x.NodeId == afterNode.Id && x.SourceId == beforeNode.Id);
-                        break;
-                    case SfcCirculationTypeEnum.Split:
-                    case SfcCirculationTypeEnum.Merge:
-                    case SfcCirculationTypeEnum.Change:
-                    case SfcCirculationTypeEnum.Consume:
-                    case SfcCirculationTypeEnum.ModuleAdd:
-                    case SfcCirculationTypeEnum.ModuleReplace:
-                    default:
-                        // 将流转记录的条码ID追加到节点的来源集合中
-                        nodeSourceEntities.Add(new ManuSFCNodeSourceEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = item.SiteId,
-                            NodeId = afterNode.Id,
-                            SourceId = beforeNode.Id,
-                            CreatedBy = user,
-                            UpdatedBy = user
-                        });
+                    nodeDestinationEntities.RemoveAll(x => x.NodeId == beforeNode.Id && x.DestinationId == afterNode.Id);
+                    nodeSourceEntities.RemoveAll(x => x.NodeId == afterNode.Id && x.SourceId == beforeNode.Id);
+                }
+                else
+                {
+                    // 将流转记录的条码ID追加到节点的来源集合中
+                    nodeSourceEntities.Add(new ManuSFCNodeSourceEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = item.SiteId,
+                        NodeId = afterNode.Id,
+                        SourceId = beforeNode.Id,
+                        CreatedBy = user,
+                        UpdatedBy = user
+                    });
 
-                        // 将流转记录的条码ID追加到节点的去向集合中
-                        nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
-                        {
-                            Id = IdGenProvider.Instance.CreateId(),
-                            SiteId = item.SiteId,
-                            NodeId = beforeNode.Id,
-                            DestinationId = afterNode.Id,
-                            CreatedBy = user,
-                            UpdatedBy = user
-                        });
-                        break;
+                    // 将流转记录的条码ID追加到节点的去向集合中
+                    nodeDestinationEntities.Add(new ManuSFCNodeDestinationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = item.SiteId,
+                        NodeId = beforeNode.Id,
+                        DestinationId = afterNode.Id,
+                        CreatedBy = user,
+                        UpdatedBy = user
+                    });
                 }
 
                 if (!nodeEntities.Any(a => a.Id == beforeNode.Id)) nodeEntities.Add(beforeNode);
@@ -242,7 +241,12 @@ namespace Hymson.MES.BackgroundServices.Manufacture
             await _manuSFCNodeDestinationRepository.InsertRangeAsync(nodeDestinationEntities);
 
             // 更新水位
-            await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, manuSfcCirculationList.Max(x => x.Id));
+            var maxUpdateWaterMarkUpdatedOn = manuSfcCirculationList.Max(x => x.UpdatedOn);
+            if (maxUpdateWaterMarkUpdatedOn != null)
+            {
+                long timestamp = ((DateTimeOffset)maxUpdateWaterMarkUpdatedOn.Value).ToUnixTimeMilliseconds();
+                await _waterMarkService.RecordWaterMarkAsync(BusinessKey.TracingSourceSFC, timestamp);
+            }
             trans.Complete();
 
         }
