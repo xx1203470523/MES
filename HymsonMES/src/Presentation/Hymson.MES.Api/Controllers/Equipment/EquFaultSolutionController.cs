@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,18 +21,19 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 日志
         /// </summary>
         private readonly ILogger<EquFaultSolutionController> _logger;
+
         /// <summary>
         /// 服务接口（设备故障解决措施）
         /// </summary>
         private readonly IEquFaultSolutionService _equFaultSolutionService;
-
 
         /// <summary>
         /// 构造函数（设备故障解决措施）
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="equFaultSolutionService"></param>
-        public EquFaultSolutionController(ILogger<EquFaultSolutionController> logger, IEquFaultSolutionService equFaultSolutionService)
+        public EquFaultSolutionController(ILogger<EquFaultSolutionController> logger,
+            IEquFaultSolutionService equFaultSolutionService)
         {
             _logger = logger;
             _equFaultSolutionService = equFaultSolutionService;
@@ -44,9 +46,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("equipment:equFaultSolution:insert")]
         public async Task AddAsync([FromBody] EquFaultSolutionSaveDto saveDto)
         {
-             await _equFaultSolutionService.CreateAsync(saveDto);
+            await _equFaultSolutionService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -56,9 +59,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("equipment:equFaultSolution:update")]
         public async Task UpdateAsync([FromBody] EquFaultSolutionSaveDto saveDto)
         {
-             await _equFaultSolutionService.ModifyAsync(saveDto);
+            await _equFaultSolutionService.ModifyAsync(saveDto);
         }
 
         /// <summary>
@@ -68,6 +72,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [PermissionDescription("equipment:equFaultSolution:delete")]
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _equFaultSolutionService.DeletesAsync(ids);
@@ -95,6 +100,53 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equFaultSolutionService.GetPagedListAsync(pagedQueryDto);
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 启用
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("enable")]
+        [PermissionDescription("equipment:equFaultSolution:enable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            // TODO
+            await Task.CompletedTask;
+            //await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("retain")]
+        [PermissionDescription("equipment:equFaultSolution:retain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            // TODO
+            await Task.CompletedTask;
+            //await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("abolish")]
+        [PermissionDescription("equipment:equFaultSolution:abolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            // TODO
+            await Task.CompletedTask;
+            //await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+        #endregion
 
     }
 }

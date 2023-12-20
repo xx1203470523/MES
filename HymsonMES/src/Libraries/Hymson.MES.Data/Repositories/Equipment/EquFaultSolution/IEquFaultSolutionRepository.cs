@@ -1,6 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -16,7 +18,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(EquFaultSolutionEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -30,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(EquFaultSolutionEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -44,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -53,12 +55,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<InteEventEntity> GetByCodeAsync(EntityByCodeQuery query);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<EquFaultSolutionEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<EquFaultSolutionEntity>> GetEntitiesAsync(EquFaultSolutionQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

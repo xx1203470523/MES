@@ -2,9 +2,12 @@ using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -72,11 +75,19 @@ namespace Hymson.MES.Services.Services.Equipment
             // DTO转换实体
             var entity = saveDto.ToEntity<EquFaultSolutionEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+
+            // 编码唯一性验证
+            var checkEntity = await _equFaultSolutionRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
 
             // 保存
             return await _equFaultSolutionRepository.InsertAsync(entity);
@@ -94,8 +105,20 @@ namespace Hymson.MES.Services.Services.Equipment
 
             // DTO转换实体
             var entity = saveDto.ToEntity<EquFaultSolutionEntity>();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+
+            // 编码唯一性验证
+            var checkEntity = await _equFaultSolutionRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+            }
 
             return await _equFaultSolutionRepository.UpdateAsync(entity);
         }
