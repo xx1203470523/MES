@@ -318,7 +318,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentGroupSaveDto>, EquEquipmentGroupValidator>();
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
             services.AddSingleton<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
-            services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonValidator>();
+            services.AddSingleton<AbstractValidator<EquFaultSolutionSaveDto>, EquFaultSolutionValidator>();
             services.AddSingleton<AbstractValidator<EquSparePartsGroupSaveDto>, EquSparePartsGroupSaveValidator>();
 
             services.AddSingleton<AbstractValidator<EquEquipmentVerifyCreateDto>, EquEquipmentVerifyCreateValidator>();
@@ -449,7 +450,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteCustomFieldSaveDto>, InteCustomFieldSaveValidator>();
             services.AddSingleton<AbstractValidator<InteCustomFieldInternationalizationDto>, InteCustomFieldInternationalizationValidator>();
             services.AddSingleton<AbstractValidator<InteCustomFieldBusinessEffectuateDto>, InteCustomFieldBusinessEffectuatenValidator>();
-            
+
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCodeRulesModifyDto>, InteCodeRulesModifyValidator>();
@@ -518,7 +519,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleCreateDto>, ManuDowngradingRuleCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleModifyDto>, ManuDowngradingRuleModifyValidator>();
-           
+
             services.AddSingleton<AbstractValidator<ManuBarcodeSplitAdjustDto>, ManusBarcodeSplitAdjustValidator>();
             #endregion
 
