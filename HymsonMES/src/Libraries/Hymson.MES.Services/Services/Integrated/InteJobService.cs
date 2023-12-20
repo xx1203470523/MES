@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        public async Task CreateInteJobAsync(InteJobCreateDto param)
+        public async Task<long> CreateInteJobAsync(InteJobCreateDto param)
         {
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
@@ -135,6 +135,7 @@ namespace Hymson.MES.Services.Services.Integrated
             inteJobEntity.SiteId = _currentSite.SiteId ?? 0;
 
             await _inteJobRepository.InsertAsync(inteJobEntity);
+            return inteJobEntity.Id;
         }
 
         /// <summary>

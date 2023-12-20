@@ -67,9 +67,9 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [Route("create")]
         [LogDescription("降级规则", BusinessType.INSERT)]
         [PermissionDescription("manu:manuDowngradingRule:insert")]
-        public async Task AddManuDowngradingRuleAsync([FromBody] ManuDowngradingRuleCreateDto parm)
+        public async Task<long> AddManuDowngradingRuleAsync([FromBody] ManuDowngradingRuleCreateDto parm)
         {
-             await _manuDowngradingRuleService.CreateManuDowngradingRuleAsync(parm);
+            return await _manuDowngradingRuleService.CreateManuDowngradingRuleAsync(parm);
         }
 
         /// <summary>

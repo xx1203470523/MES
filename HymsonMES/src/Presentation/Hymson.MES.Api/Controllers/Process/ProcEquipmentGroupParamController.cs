@@ -68,9 +68,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("设备参数组", BusinessType.INSERT)]
         [PermissionDescription("proc:equipmentGroupParam:insert")]
-        public async Task AddProcEquipmentGroupParamAsync([FromBody] ProcEquipmentGroupParamCreateDto parm)
+        public async Task<long> AddProcEquipmentGroupParamAsync([FromBody] ProcEquipmentGroupParamCreateDto parm)
         {
-             await _procEquipmentGroupParamService.CreateProcEquipmentGroupParamAsync(parm);
+            return await _procEquipmentGroupParamService.CreateProcEquipmentGroupParamAsync(parm);
         }
 
         /// <summary>

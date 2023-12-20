@@ -14,7 +14,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(QualInspectionParameterGroupSaveDto saveDto);
+        Task<long> CreateAsync(QualInspectionParameterGroupSaveDto saveDto);
 
         /// <summary>
         /// 修改

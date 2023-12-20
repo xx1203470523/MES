@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procEquipmentGroupParamCreateDto"></param>
         /// <returns></returns>
-        Task CreateProcEquipmentGroupParamAsync(ProcEquipmentGroupParamCreateDto procEquipmentGroupParamCreateDto);
+        Task<long> CreateProcEquipmentGroupParamAsync(ProcEquipmentGroupParamCreateDto procEquipmentGroupParamCreateDto);
 
         /// <summary>
         /// 修改

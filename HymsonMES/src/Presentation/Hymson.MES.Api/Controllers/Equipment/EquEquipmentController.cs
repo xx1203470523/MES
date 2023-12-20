@@ -38,9 +38,9 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [HttpPost]
         [LogDescription("设备注册", BusinessType.INSERT)]
         [PermissionDescription("equ:equipment:insert")]
-        public async Task CreateAsync(EquEquipmentSaveDto createDto)
+        public async Task<long> CreateAsync(EquEquipmentSaveDto createDto)
         {
-            await _equEquipmentService.CreateAsync(createDto);
+            return await _equEquipmentService.CreateAsync(createDto);
         }
 
         /// <summary>
