@@ -44,7 +44,8 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equFaultSolutionRepository"></param>
-        public EquFaultSolutionService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquFaultSolutionSaveDto> validationSaveRules, 
+        public EquFaultSolutionService(ICurrentUser currentUser, ICurrentSite currentSite,
+            AbstractValidator<EquFaultSolutionSaveDto> validationSaveRules,
             IEquFaultSolutionRepository equFaultSolutionRepository)
         {
             _currentUser = currentUser;
@@ -88,7 +89,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> ModifyAsync(EquFaultSolutionSaveDto saveDto)
         {
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -129,12 +130,12 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquFaultSolutionDto?> QueryByIdAsync(long id) 
+        public async Task<EquFaultSolutionDto?> QueryByIdAsync(long id)
         {
-           var equFaultSolutionEntity = await _equFaultSolutionRepository.GetByIdAsync(id);
-           if (equFaultSolutionEntity == null) return null;
-           
-           return equFaultSolutionEntity.ToModel<EquFaultSolutionDto>();
+            var equFaultSolutionEntity = await _equFaultSolutionRepository.GetByIdAsync(id);
+            if (equFaultSolutionEntity == null) return null;
+
+            return equFaultSolutionEntity.ToModel<EquFaultSolutionDto>();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -12,57 +13,26 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 故障解决措施代码
         /// </summary>
-        public string FaultSolutionCode { get; set; }
+        public string Code { get; set; }
 
-       /// <summary>
-        /// 故障解决措施代码
+        /// <summary>
+        /// 故障解决措施名称
         /// </summary>
-        public string FaultSolutionName { get; set; }
+        public string Name { get; set; }
 
-       /// <summary>
-        /// 启用状态;新建/启用/保留/废除
+        /// <summary>
+        /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public bool UseStatus { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备故障先
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
-        /// 更新人
-        /// </summary>
-        public string UpdatedBy { get; set; }
-
-       /// <summary>
-        /// 更新时间
-        /// </summary>
-        public DateTime UpdatedOn { get; set; }
-
-       /// <summary>
-        /// 是否删除
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
     }
 
     /// <summary>
@@ -75,62 +45,58 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 故障解决措施代码
         /// </summary>
-        public string FaultSolutionCode { get; set; }
+        public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 故障解决措施代码
         /// </summary>
-        public string FaultSolutionName { get; set; }
+        public string Name { get; set; }
 
-       /// <summary>
-        /// 启用状态;新建/启用/保留/废除
+        /// <summary>
+        /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public bool UseStatus { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 设备故障先
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-       /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
-        /// 是否删除
-        /// </summary>
-        public long IsDeleted { get; set; }
-
-       /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long SiteId { get; set; }
-
-       
     }
 
     /// <summary>
     /// 设备故障解决措施分页Dto
     /// </summary>
-    public class EquFaultSolutionPagedQueryDto : PagerInfo { }
+    public class EquFaultSolutionPagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 编码（设备故障原因）
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 名称（设备故障原因）
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 故障原因状态（字典定义）
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
+    }
 
 }
