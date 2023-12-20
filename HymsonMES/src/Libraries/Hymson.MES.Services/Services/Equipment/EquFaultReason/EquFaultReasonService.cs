@@ -66,8 +66,8 @@ namespace Hymson.MES.Services.Services.Equipment
         public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto)
         {
             // 验证DTO
-            EquFaultReasonCreateDto.FaultReasonCode = EquFaultReasonCreateDto.FaultReasonCode.ToTrimSpace();
-            EquFaultReasonCreateDto.FaultReasonCode = EquFaultReasonCreateDto.FaultReasonCode.ToUpperInvariant();
+            EquFaultReasonCreateDto.Code = EquFaultReasonCreateDto.Code.ToTrimSpace();
+            EquFaultReasonCreateDto.Code = EquFaultReasonCreateDto.Code.ToUpperInvariant();
             await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonCreateDto);
 
             // DTO转换实体
@@ -77,11 +77,11 @@ namespace Hymson.MES.Services.Services.Equipment
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
 
-            entity.UseStatus = SysDataStatusEnum.Build;
+            entity.Status = SysDataStatusEnum.Build;
 
             // 编码唯一性验证
-            var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultReasonCode });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.FaultReasonCode);
+            var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.Code);
 
             // 保存实体
             return await _equFaultReasonRepository.InsertAsync(entity);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES13013));
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
-            if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))
+            if (!canEditStatusEnum.Any(x => x == entityOld.Status))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
@@ -134,7 +134,7 @@ namespace Hymson.MES.Services.Services.Equipment
         public async Task<int> DeletesEquFaultReasonAsync(long[] idsArr)
         {
             var entities = await _equFaultReasonRepository.GetByIdsAsync(idsArr);
-            if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
+            if (entities != null && entities.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
@@ -246,9 +246,9 @@ namespace Hymson.MES.Services.Services.Equipment
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES13013));
             }
-            if (entity.UseStatus == changeStatusCommand.Status)
+            if (entity.Status == changeStatusCommand.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.UseStatus)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
 

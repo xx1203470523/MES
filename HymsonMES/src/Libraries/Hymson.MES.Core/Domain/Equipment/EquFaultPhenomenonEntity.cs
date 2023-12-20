@@ -14,28 +14,22 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :故障现象代码 
         /// 空值 : false  
         /// </summary>
-        public string FaultPhenomenonCode { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// 描述 :故障现象名称 
         /// 空值 : false  
         /// </summary>
-        public string FaultPhenomenonName { get; set; }
-
-        /// <summary>
-        /// 描述 :设备组ID 
-        /// 空值 : false  
-        /// </summary>
-        public long EquipmentGroupId { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 描述 :使用状态 0-禁用 1-启用 
         /// 空值 : false  
         /// </summary>
-        public SysDataStatusEnum UseStatus { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 描述 :设备故障先 
+        /// 描述 
         /// 空值 : true  
         /// </summary>
         public string Remark { get; set; } = "";
@@ -44,5 +38,6 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 站点ID 
         /// </summary>
         public long? SiteId { get; set; }
+
     }
 }

@@ -1,4 +1,4 @@
-namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
+namespace Hymson.MES.Data.Repositories.Equipment.Query
 {
     /// <summary>
     /// 查询参数（设备故障现象）

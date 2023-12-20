@@ -108,12 +108,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentGroupService, EquEquipmentGroupService>();
             services.AddSingleton<IEquEquipmentUnitService, EquEquipmentUnitService>();
             services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
+            services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
+            services.AddSingleton<IEquFaultSolutionService, EquFaultSolutionService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
             services.AddSingleton<IEquSparePartsGroupService, EquSparePartsGroupService>();
 
-            // FaultReason
-            services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
             #endregion
 
             #region Integrated

@@ -18,7 +18,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -155,8 +154,9 @@ namespace Hymson.MES.Services.Mapper
             #region EquFaultPhenomenon
             CreateMap<EquFaultPhenomenonSaveDto, EquFaultPhenomenonEntity>();
             CreateMap<EquFaultPhenomenonPagedQueryDto, EquFaultPhenomenonPagedQuery>();
-            CreateMap<EquFaultPhenomenonView, EquFaultPhenomenonDto>();
             CreateMap<EquFaultPhenomenonQueryDto, EquFaultPhenomenonQuery>();
+
+            CreateMap<EquFaultPhenomenonEntity, EquFaultPhenomenonDto>();
             #endregion
 
             #region EquSparePart
@@ -634,7 +634,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhWarehouseShelfPagedQueryDto, WhWarehouseShelfPagedQuery>();
             CreateMap<WhWarehouseShelfSaveDto, WhWarehouseShelfEntity>();
             CreateMap<WhWarehouseShelfEntity, WhWarehouseShelfDto>();
-            CreateMap<WhWarehouseShelfModifyDto, WhWarehouseShelfEntity>(); 
+            CreateMap<WhWarehouseShelfModifyDto, WhWarehouseShelfEntity>();
 
             #endregion
 

@@ -5,7 +5,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -73,17 +72,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
             services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
+            services.AddSingleton<IEquEquipmentVerifyRepository, EquEquipmentVerifyRepository>();
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
+            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
+            services.AddSingleton<IEquFaultSolutionRepository, EquFaultSolutionRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
 
-            services.AddSingleton<IEquEquipmentVerifyRepository, EquEquipmentVerifyRepository>();
-
-            #region FaultReason
-            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
-
-            #endregion
             #endregion
 
             #region Integrated
