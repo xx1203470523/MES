@@ -778,6 +778,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
             var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId));
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkOrderEntities.Select(x => x.ProductId));
+            IEnumerable<ManuSfcProduceBusinessEntity>? sfcProduceBusinessEntities = new List<ManuSfcProduceBusinessEntity>();
+            if (manuSfcProduceEntities != null && manuSfcProduceEntities.Any())
+            {
+                var ids = sfcProduceBusinessEntities.Select(x => x.Id).ToList();
+                if (ids.Any())
+                {
+                    sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(ids);
+                }
+            }
 
             var sfcStepList = new List<ManuSfcStepEntity>();
             var whMaterialStandingbookList = new List<WhMaterialStandingbookEntity>();
@@ -864,7 +873,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                var manuSfcProduceEntity = manuSfcProduceEntities.FirstOrDefault(x => x.SFC == item);
+                var manuSfcProduceEntity = manuSfcProduceEntities!.FirstOrDefault(x => x.SFC == item);
 
                 sfcStepList.Add(new ManuSfcStepEntity
                 {
@@ -889,7 +898,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 }
                     );
 
-
                 // 界面的选择步骤操作类型
                 switch (sfcProduceStepDto.Type)
                 {
@@ -901,16 +909,42 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         }
                         else
                         {
-                            
-                            manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                            if (manuSfcProduceEntity.IsRepair == TrueOrFalseEnum.Yes)
                             {
-                                Id = manuSfcEntity.Id,
-                                Status = SfcStatusEnum.Complete,
-                                CurrentStatus = manuSfcEntity.Status,
-                                UpdatedOn = HymsonClock.Now(),
-                                UpdatedBy = _currentUser.UserName
-                            });
-                            deleteIds.Add(manuSfcProduceEntity.Id);
+                                if (sfcProduceBusinessEntities.Any(x => x.SfcProduceId == manuSfcProduceEntity.Id))
+                                {
+
+                                }
+                                else
+                                {
+                                    var validationFailure = new ValidationFailure();
+                                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                                    {
+                                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                            { "CollectionIndex", manuSfcEntity.SFC}};
+                                    }
+                                    else
+                                    {
+                                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", manuSfcEntity.SFC);
+                                    }
+                                    validationFailure.FormattedMessagePlaceholderValues.Add("ordercode", planWorkOrderEntitity.OrderCode);
+                                    validationFailure.ErrorCode = nameof(ErrorCode.MES16383);
+                                    validationFailures.Add(validationFailure);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                                {
+                                    Id = manuSfcEntity.Id,
+                                    Status = SfcStatusEnum.Complete,
+                                    CurrentStatus = manuSfcEntity.Status,
+                                    UpdatedOn = HymsonClock.Now(),
+                                    UpdatedBy = _currentUser.UserName
+                                });
+                                deleteIds.Add(manuSfcProduceEntity.Id);
+                            }
                         }
 
                         if (whMaterialInventoryList != null && whMaterialInventoryList.Any(it => it.MaterialBarCode == item))

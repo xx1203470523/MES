@@ -1,0 +1,100 @@
+using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Services.Equipment;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Hymson.MES.Api.Controllers.Equipment
+{
+    /// <summary>
+    /// 控制器（备件注册表）
+    /// @author Kongaomeng
+    /// @date 2023-12-18 02:37:31
+    /// </summary>
+    [Authorize]
+    [ApiController]
+    [Route("api/v1/[controller]")]
+    public class EquSparePartsController : ControllerBase
+    {
+        /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<EquSparePartsController> _logger;
+        /// <summary>
+        /// 服务接口（备件注册表）
+        /// </summary>
+        private readonly IEquSparePartsService _equSparePartsService;
+
+
+        /// <summary>
+        /// 构造函数（备件注册表）
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="equSparePartsService"></param>
+        public EquSparePartsController(ILogger<EquSparePartsController> logger, IEquSparePartsService equSparePartsService)
+        {
+            _logger = logger;
+            _equSparePartsService = equSparePartsService;
+        }
+
+        /// <summary>
+        /// 添加（备件注册表）
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("create")]
+        public async Task AddEquSparePartsAsync([FromBody] EquSparePartsSaveDto saveDto)
+        {
+             await _equSparePartsService.CreateEquSparePartsAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 更新（备件注册表）
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("update")]
+        public async Task UpdateEquSparePartsAsync([FromBody] EquSparePartsSaveDto saveDto)
+        {
+             await _equSparePartsService.ModifyEquSparePartsAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 删除（备件注册表）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("delete")]
+        public async Task DeleteEquSparePartsAsync([FromBody] long[] ids)
+        {
+            await _equSparePartsService.DeletesEquSparePartsAsync(ids);
+        }
+
+        /// <summary>
+        /// 查询详情（备件注册表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<EquSparePartsDto?> QueryEquSparePartsByIdAsync(long id)
+        {
+            return await _equSparePartsService.QueryEquSparePartsByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 分页查询列表（备件注册表）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pagelist")]
+        public async Task<PagedInfo<EquSparePartsDto>> QueryPagedEquSparePartsAsync([FromQuery] EquSparePartsPagedQueryDto pagedQueryDto)
+        {
+            return await _equSparePartsService.GetPagedListAsync(pagedQueryDto);
+        }
+
+    }
+}
