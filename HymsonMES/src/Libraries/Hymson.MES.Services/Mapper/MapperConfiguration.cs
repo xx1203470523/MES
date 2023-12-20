@@ -207,6 +207,12 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region EquSpareParts
+            CreateMap<EquSparePartsSaveDto, EquSparePartsEntity>();
+            CreateMap<EquSparePartsPagedQueryDto, EquSparePartsPagedQuery>();
+            CreateMap<EquSparePartsEntity, EquSparePartsDto>();
+            #endregion
+
         }
 
         /// <summary>

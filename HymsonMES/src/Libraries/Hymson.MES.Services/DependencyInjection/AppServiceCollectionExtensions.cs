@@ -113,6 +113,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
             services.AddSingleton<IEquSparePartsGroupService, EquSparePartsGroupService>();
+            services.AddSingleton<IEquSparePartsService, EquSparePartsService>();
 
             #endregion
 
@@ -321,6 +322,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonValidator>();
             services.AddSingleton<AbstractValidator<EquFaultSolutionSaveDto>, EquFaultSolutionValidator>();
             services.AddSingleton<AbstractValidator<EquSparePartsGroupSaveDto>, EquSparePartsGroupSaveValidator>();
+            services.AddSingleton<AbstractValidator<EquSparePartsSaveDto>, EquSparePartsSaveValidator>();
 
             services.AddSingleton<AbstractValidator<EquEquipmentVerifyCreateDto>, EquEquipmentVerifyCreateValidator>();
             #endregion

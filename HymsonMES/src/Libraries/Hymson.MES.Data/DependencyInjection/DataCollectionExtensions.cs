@@ -79,6 +79,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
+            services.AddSingleton<IEquSparePartsRepository, EquSparePartsRepository>();
 
             #endregion
 
