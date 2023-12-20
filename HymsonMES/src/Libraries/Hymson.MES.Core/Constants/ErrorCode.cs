@@ -554,7 +554,7 @@
         public const string MES12807 = "产品序列码【{SFC}】对应工单【{WorkOrderCode}】【{WorkOrderStatus}】，不允许操作。";
         public const string MES12808 = "产品序列码对应工单不是相同的，不允许操作。";
         public const string MES12809 = "产品序列码对应物料不是相同的，不允许操作。";
-        public const string MES12810 = "产品序列码对应物料清单不是相同的，不允许操作。";
+        public const string MES12810 = "产品序列码对应BOM不是相同的，不允许操作。";
         public const string MES12811 = "产品序列码对应工艺路线不是相同的，不允许操作。";
         public const string MES12812 = "产品序列码没有对应工单，无法进行工单相关验证";
         public const string MES12813 = "产品序列码对应状态不是相同的，不允许操作";
