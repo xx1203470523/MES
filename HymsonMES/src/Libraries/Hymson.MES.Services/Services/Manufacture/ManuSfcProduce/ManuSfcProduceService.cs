@@ -1419,10 +1419,10 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 var newSfcInfo = new ManuSfcInfoEntity()
                 {
                     SfcId = item.SfcId,
-                    WorkOrderId = manuUpdateSaveDto.WorkOrderId > 0 ? manuUpdateSaveDto.WorkOrderId.Value : item.WorkOrderId,
+                    WorkOrderId = manuUpdateSaveDto.WorkOrderId.HasValue && manuUpdateSaveDto.WorkOrderId > 0 ? manuUpdateSaveDto.WorkOrderId.Value : item.WorkOrderId,
                     ProductId = productId > 0 ? productId : item.ProductId,
-                    ProcessRouteId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.ProcessRouteId : item.ProcessRouteId,
-                    ProductBOMId = manuUpdateSaveDto.ProcessRouteId > 0 ? manuUpdateSaveDto.BomId : item.ProductBOMId,
+                    ProcessRouteId = processRouterId > 0 ? processRouterId : item.ProcessRouteId,
+                    ProductBOMId = bomId > 0 ? bomId : item.ProductBOMId,
                     IsUsed = true,
                     SiteId = _currentSite.SiteId ?? 0,
                     Id = IdGenProvider.Instance.CreateId(),
