@@ -146,22 +146,22 @@ namespace Hymson.MES.Services.Services.Plan
                 var manuSfcEntity = manuSfcList.FirstOrDefault(x => x.SFC == sfc);
                 if (planSfcInfoCreateDto.ReceiveType == PlanSFCReceiveTypeEnum.MaterialSfc)
                 {
-                    if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == planSfcInfoCreateDto.RelevanceWorkOrderId))
-                    {
-                        var validationFailure = new ValidationFailure();
-                        if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", sfc}
-                        };
-                        }
-                        else
-                        {
-                            validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
-                        }
-                        validationFailure.ErrorCode = nameof(ErrorCode.MES16127);
-                        validationFailures.Add(validationFailure);
-                    }
+                    //if (!manuSfcInfoList.Any(x => x.SfcId == manuSfcEntity?.Id && x.WorkOrderId == planSfcInfoCreateDto.RelevanceWorkOrderId))
+                    //{
+                    //    var validationFailure = new ValidationFailure();
+                    //    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
+                    //    {
+                    //        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
+                    //        { "CollectionIndex", sfc}
+                    //    };
+                    //    }
+                    //    else
+                    //    {
+                    //        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
+                    //    }
+                    //    validationFailure.ErrorCode = nameof(ErrorCode.MES16127);
+                    //    validationFailures.Add(validationFailure);
+                    //}
                     var whMaterialInventoryEntity = whMaterialInventoryList.FirstOrDefault(x => x.MaterialBarCode == sfc);
                     if (whMaterialInventoryEntity == null || whMaterialInventoryEntity.QuantityResidue == 0)
                     {
@@ -378,10 +378,10 @@ namespace Hymson.MES.Services.Services.Plan
                 }
                 var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
 
-                if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.RelevanceWorkOrderId)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16127));
-                }
+                //if (manuSfcInfoEntity != null && manuSfcInfoEntity.WorkOrderId != param.RelevanceWorkOrderId)
+                //{
+                //    throw new CustomerValidationException(nameof(ErrorCode.MES16127));
+                //}
 
                 var manuContainerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(new ManuContainerPackQuery { LadeBarCode = param.SFC, SiteId = _currentSite.SiteId ?? 0 });
 
