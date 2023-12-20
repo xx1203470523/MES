@@ -4,12 +4,15 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -41,18 +44,26 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquFaultSolutionRepository _equFaultSolutionRepository;
 
         /// <summary>
+        /// 多语言服务
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equFaultSolutionRepository"></param>
+        /// <param name="localizationService"></param>
         public EquFaultSolutionService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquFaultSolutionSaveDto> validationSaveRules,
-            IEquFaultSolutionRepository equFaultSolutionRepository)
+            IEquFaultSolutionRepository equFaultSolutionRepository,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
+            _localizationService = localizationService;
             _validationSaveRules = validationSaveRules;
             _equFaultSolutionRepository = equFaultSolutionRepository;
         }
@@ -176,6 +187,40 @@ namespace Hymson.MES.Services.Services.Equipment
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquFaultSolutionDto>());
             return new PagedInfo<EquFaultSolutionDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
+
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="statusDto"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto statusDto)
+        {
+            if (statusDto.Id == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+
+            // 校验状态是否在枚举里面
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), statusDto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            // 不能重新设置为新建
+            if (statusDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+
+            // 读取当前实时信息
+            var entity = await _equFaultSolutionRepository.GetByIdAsync(statusDto.Id);
+            if (entity == null || entity.IsDeleted != 0) throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            if (entity.Status == statusDto.Status) throw new CustomerValidationException(nameof(ErrorCode.MES10127))
+                    .WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
+
+            await _equFaultSolutionRepository.UpdateStatusAsync(new ChangeStatusCommand()
+            {
+                Id = statusDto.Id,
+                Status = statusDto.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            });
+        }
+
+        #endregion
 
     }
 }

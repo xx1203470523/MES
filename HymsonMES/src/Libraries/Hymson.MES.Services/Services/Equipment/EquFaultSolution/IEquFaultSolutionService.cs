@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
 namespace Hymson.MES.Services.Services.Equipment
@@ -49,6 +50,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<EquFaultSolutionDto>> GetPagedListAsync(EquFaultSolutionPagedQueryDto pagedQueryDto);
+
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="statusDto"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto statusDto);
 
     }
 }

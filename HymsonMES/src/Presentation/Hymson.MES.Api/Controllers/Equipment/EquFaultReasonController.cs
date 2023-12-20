@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.Web.Framework.Attributes;
@@ -116,11 +118,13 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPut]
         [Route("enable")]
         [PermissionDescription("equipment:equFaultReason:enable")]
-        public async Task UpdateStatusEnable([FromBody] long id)
+        public async Task EnableAsync([FromBody] long id)
         {
-            // TODO
-            await Task.CompletedTask;
-            //await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+            await _equFaultReasonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Enable
+            });
         }
 
         /// <summary>
@@ -131,11 +135,13 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPut]
         [Route("retain")]
         [PermissionDescription("equipment:equFaultReason:retain")]
-        public async Task UpdateStatusRetain([FromBody] long id)
+        public async Task RetainAsyn([FromBody] long id)
         {
-            // TODO
-            await Task.CompletedTask;
-            //await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+            await _equFaultReasonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Retain
+            });
         }
 
         /// <summary>
@@ -146,11 +152,13 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPut]
         [Route("abolish")]
         [PermissionDescription("equipment:equFaultReason:abolish")]
-        public async Task UpdateStatusAbolish([FromBody] long id)
+        public async Task AbolishAsyn([FromBody] long id)
         {
-            // TODO
-            await Task.CompletedTask;
-            //await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+            await _equFaultReasonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Abolish
+            });
         }
         #endregion
 

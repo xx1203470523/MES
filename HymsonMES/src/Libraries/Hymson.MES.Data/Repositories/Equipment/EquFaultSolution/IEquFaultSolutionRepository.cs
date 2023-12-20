@@ -41,6 +41,13 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> UpdateRangeAsync(IEnumerable<EquFaultSolutionEntity> entities);
 
         /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
         /// 软删除  
         /// </summary>
         /// <param name="id"></param>
