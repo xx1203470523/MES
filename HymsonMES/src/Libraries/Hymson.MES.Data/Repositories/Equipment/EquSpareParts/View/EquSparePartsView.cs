@@ -1,17 +1,15 @@
-using Hymson.Infrastructure;
+﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Equipment.Query
+namespace Hymson.MES.Data.Repositories.Equipment.EquSpareParts.View
 {
-    /// <summary>
-    /// 备件类型 分页参数
-    /// </summary>
-    public class EquSparePartsGroupPagedQuery : PagerInfo
+    public class EquSparePartsView:BaseEntity
     {
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long? SiteId { get; set; }
 
         /// <summary>
         /// 备件编码
@@ -33,6 +31,10 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// </summary>
         public string? SparePartsGroup { get; set; }
 
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
 
     }
 }

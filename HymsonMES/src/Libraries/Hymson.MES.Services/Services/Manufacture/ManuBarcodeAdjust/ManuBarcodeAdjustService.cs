@@ -1393,14 +1393,15 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (verifyConditions.IsVerifyBindContainer)
             {
                 //查询是否装箱
-                var containerBarcodes = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+                //var containerBarcodes = await _manuContainerBarcodeRepository.GetByCodesAsync(new ManuContainerBarcodeQuery
+                //{
+                //    SiteId = _currentSite.SiteId ?? 0,
+                //    BarCodes = distinctSfcs.ToArray(),
+                //});
+                var containerPacks=  await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { SiteId=_currentSite.SiteId??0,LadeBarCodes= distinctSfcs });
+                if (containerPacks != null && containerPacks.Any())
                 {
-                    SiteId = _currentSite.SiteId ?? 0,
-                    BarCodes = distinctSfcs.ToArray(),
-                });
-                if (containerBarcodes != null && containerBarcodes.Any())
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES12804)).WithData("sfc", string.Join(",", containerBarcodes.Select(x => x.BarCode)));
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12804)).WithData("sfc", string.Join(",", containerPacks.Select(x => x.LadeBarCode)));
                 }
             }
 

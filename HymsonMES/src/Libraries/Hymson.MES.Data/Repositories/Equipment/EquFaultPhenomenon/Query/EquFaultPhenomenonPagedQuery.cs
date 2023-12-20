@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
+namespace Hymson.MES.Data.Repositories.Equipment.Query
 {
     /// <summary>
     /// 分页参数（设备故障现象）
@@ -16,12 +16,12 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
         /// <summary>
         /// 编号（设备故障现象）
         /// </summary>
-        public string FaultPhenomenonCode { get; set; } = "";
+        public string Code { get; set; } = "";
 
         /// <summary>
         /// 名称（设备故障现象）
         /// </summary>
-        public string FaultPhenomenonName { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 设备组名称
@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query
         /// <summary>
         /// 使用状态 0-禁用 1-启用（设备故障现象）
         /// </summary>
-        public SysDataStatusEnum? UseStatus { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 备注

@@ -5,14 +5,14 @@ using Hymson.MES.Services.Dtos.Equipment;
 namespace Hymson.MES.Services.Validators.Equipment
 {
     /// <summary>
-    /// 验证器（设备故障现象）
+    /// 验证器（设备故障解决措施）
     /// </summary>
-    internal class EquFaultPhenomenonValidator : AbstractValidator<EquFaultPhenomenonSaveDto>
+    internal class EquFaultSolutionValidator : AbstractValidator<EquFaultSolutionSaveDto>
     {
         /// <summary>
         /// 
         /// </summary>
-        public EquFaultPhenomenonValidator()
+        public EquFaultSolutionValidator()
         {
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCode.MES10113);
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(ErrorCode.MES10109);

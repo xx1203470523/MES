@@ -83,9 +83,9 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="EquFaultReasonPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultReasonEntity>> GetPagedInfoAsync(EquFaultReasonPagedQuery EquFaultReasonPagedQuery);
+        Task<PagedInfo<EquFaultReasonEntity>> GetPagedInfoAsync(EquFaultReasonPagedQuery pagedQuery);
 
         /// <summary>
         /// 更新状态

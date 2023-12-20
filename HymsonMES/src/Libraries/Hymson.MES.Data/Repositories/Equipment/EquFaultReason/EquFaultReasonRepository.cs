@@ -5,26 +5,19 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
     /// 设备故障原因表仓储
     /// </summary>
-    public partial class EquFaultReasonRepository : IEquFaultReasonRepository
+    public partial class EquFaultReasonRepository : BaseRepository, IEquFaultReasonRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquFaultReasonRepository(IOptions<ConnectionOptions> connectionOptions)
-        {
-            _connectionOptions = connectionOptions.Value;
-        }
-
+        public EquFaultReasonRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         /// <summary>
         /// 新增
@@ -33,7 +26,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> InsertAsync(EquFaultReasonEntity equFaultReasonEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, equFaultReasonEntity);
         }
 
@@ -44,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, equFaultReasonEntitys);
         }
 
@@ -55,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> UpdateAsync(EquFaultReasonEntity equFaultReasonEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, equFaultReasonEntity);
         }
 
@@ -66,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, equFaultReasonEntitys);
         }
 
@@ -77,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -88,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -99,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<EquFaultReasonEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquFaultReasonEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -110,7 +103,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<IEnumerable<EquFaultReasonEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquFaultReasonEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -121,57 +114,53 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<EquFaultReasonEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquFaultReasonEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="EquFaultReasonPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquFaultReasonEntity>> GetPagedInfoAsync(EquFaultReasonPagedQuery EquFaultReasonPagedQuery)
+        public async Task<PagedInfo<EquFaultReasonEntity>> GetPagedInfoAsync(EquFaultReasonPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            sqlBuilder.Select("*");
 
-            if (EquFaultReasonPagedQuery.UseStatus.HasValue)
+            if (pagedQuery.Status.HasValue)
             {
-                sqlBuilder.Where("UseStatus = @UseStatus");
+                sqlBuilder.Where("Status = @Status");
             }
 
-            if (!string.IsNullOrWhiteSpace(EquFaultReasonPagedQuery.FaultReasonCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
-                EquFaultReasonPagedQuery.FaultReasonCode = $"%{EquFaultReasonPagedQuery.FaultReasonCode}%";
-                sqlBuilder.Where(" FaultReasonCode like @FaultReasonCode ");
-            }
-            if (!string.IsNullOrWhiteSpace(EquFaultReasonPagedQuery.FaultReasonName))
-            {
-                EquFaultReasonPagedQuery.FaultReasonName = $"%{EquFaultReasonPagedQuery.FaultReasonName}%";
-                sqlBuilder.Where(" FaultReasonName like @FaultReasonName ");
-            }
-            if (!string.IsNullOrWhiteSpace(EquFaultReasonPagedQuery.Remark))
-            {
-                EquFaultReasonPagedQuery.Remark = $"%{EquFaultReasonPagedQuery.Remark}%";
-                sqlBuilder.Where(" Remark like @Remark ");
+                pagedQuery.Code = $"%{pagedQuery.Code}%";
+                sqlBuilder.Where("Code LIKE @Code");
             }
 
-            var offSet = (EquFaultReasonPagedQuery.PageIndex - 1) * EquFaultReasonPagedQuery.PageSize;
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
+            {
+                pagedQuery.Name = $"%{pagedQuery.Name}%";
+                sqlBuilder.Where("Name LIKE @Name");
+            }
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = EquFaultReasonPagedQuery.PageSize });
-            sqlBuilder.AddParameters(EquFaultReasonPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var EquFaultReasonEntitiesTask = conn.QueryAsync<EquFaultReasonEntity>(templateData.RawSql, templateData.Parameters);
+            using var conn = GetMESDbConnection();
+            var entitiesTask = conn.QueryAsync<EquFaultReasonEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var EquFaultReasonEntities = await EquFaultReasonEntitiesTask;
+            var entities = await entitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<EquFaultReasonEntity>(EquFaultReasonEntities, EquFaultReasonPagedQuery.PageIndex, EquFaultReasonPagedQuery.PageSize, totalCount);
+            return new PagedInfo<EquFaultReasonEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -192,16 +181,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
                 sqlBuilder.Where(" SiteId=@SiteId ");
             }
 
-            if (!string.IsNullOrWhiteSpace(EquFaultReasonQuery.FaultReasonCode))
+            if (!string.IsNullOrWhiteSpace(EquFaultReasonQuery.Code))
             {
-                sqlBuilder.Where(" FaultReasonCode = @FaultReasonCode ");
+                sqlBuilder.Where(" Code = @Code ");
             }
 
-            if (EquFaultReasonQuery.Ids != null && EquFaultReasonQuery.Ids.Any()) {
+            if (EquFaultReasonQuery.Ids != null && EquFaultReasonQuery.Ids.Any())
+            {
                 sqlBuilder.Where(" Id = @Ids ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var EquFaultReasonEntities = await conn.QueryAsync<EquFaultReasonEntity>(template.RawSql, EquFaultReasonQuery);
             return EquFaultReasonEntities;
         }
@@ -213,7 +203,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
     }
@@ -225,25 +215,19 @@ namespace Hymson.MES.Data.Repositories.Equipment
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
-        const string GetEquFaultReasonEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
+        const string GetEquFaultReasonEntitiesSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FaultReasonCode, @FaultReasonName, @UseStatus, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string UpdateSql = "UPDATE `equ_fault_reason` SET FaultReasonName = @FaultReasonName, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `equ_fault_reason` SET SiteId = @SiteId, FaultReasonCode = @FaultReasonCode, FaultReasonName = @FaultReasonName, UseStatus = @UseStatus, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `equ_fault_reason` SET Name = @Name, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `equ_fault_reason` SET SiteId = @SiteId, Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `equ_fault_reason` SET IsDeleted = Id WHERE Id = @Id  ";
         const string DeletesSql = "UPDATE `equ_fault_reason` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `equ_fault_reason`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `FaultReasonCode`, `FaultReasonName`, `UseStatus`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `equ_fault_reason`  WHERE Id IN @ids ";
-        const string GetByCodeSql = "SELECT * FROM equ_fault_reason WHERE `IsDeleted` = 0 AND SiteId = @Site AND FaultReasonCode = @Code LIMIT 1";
+        const string GetByIdSql = @"SELECT * FROM `equ_fault_reason`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `equ_fault_reason`  WHERE Id IN @ids ";
+        const string GetByCodeSql = "SELECT * FROM equ_fault_reason WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
 
-        const string UpdateStatusSql = "UPDATE `equ_fault_reason` SET UseStatus= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE `equ_fault_reason` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
     }
 }

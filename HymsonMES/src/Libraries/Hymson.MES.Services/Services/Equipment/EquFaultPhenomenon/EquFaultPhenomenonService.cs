@@ -8,18 +8,15 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
+using Hymson.MES.Data.Repositories.Equipment.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Runtime.InteropServices;
 
 namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
 {
@@ -61,8 +58,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <param name="localizationService"></param>
         /// <param name="equFaultReasonRepository"></param>
         public EquFaultPhenomenonService(ICurrentUser currentUser, ICurrentSite currentSite,
+            ILocalizationService localizationService,
             AbstractValidator<EquFaultPhenomenonSaveDto> validationSaveRules,
-            IEquFaultPhenomenonRepository equFaultPhenomenonRepository, ILocalizationService localizationService, IEquFaultReasonRepository equFaultReasonRepository)
+            IEquFaultPhenomenonRepository equFaultPhenomenonRepository,
+            IEquFaultReasonRepository equFaultReasonRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -83,8 +82,8 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             await _validationSaveRules.ValidateAndThrowAsync(parm);
 
             // 验证DTO
-            parm.FaultPhenomenonCode = parm.FaultPhenomenonCode.ToTrimSpace();
-            parm.FaultPhenomenonCode = parm.FaultPhenomenonCode.ToUpperInvariant();
+            parm.Code = parm.Code.ToTrimSpace();
+            parm.Code = parm.Code.ToUpperInvariant();
 
             //if (parm.EquipmentGroupId == 0)
             //{
@@ -97,15 +96,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             entity.CreatedBy = _currentUser.UserName;
             entity.UpdatedBy = _currentUser.UserName;
             entity.SiteId = _currentSite.SiteId;
-            entity.UseStatus = SysDataStatusEnum.Build;
+            entity.Status = SysDataStatusEnum.Build;
 
             //增加设备故障原因
-            var equFaultReasonPhenomenonEntities = new List<EquFaultReasonPhenomenonEntity>();
-            if (parm.EquFaultReasonList != null && parm.EquFaultReasonList.Any()) {
+            var equFaultReasonPhenomenonEntities = new List<EquFaultPhenomenonReasonRelationEntity>();
+            if (parm.EquFaultReasonList != null && parm.EquFaultReasonList.Any())
+            {
                 foreach (var item in parm.EquFaultReasonList)
                 {
-                    var model = new EquFaultReasonPhenomenonEntity();
-                    model.Id= IdGenProvider.Instance.CreateId();
+                    var model = new EquFaultPhenomenonReasonRelationEntity();
+                    model.Id = IdGenProvider.Instance.CreateId();
                     model.CreatedBy = _currentUser.UserName;
                     model.UpdatedBy = _currentUser.UserName;
                     //model.SiteId = _currentSite.SiteId;
@@ -118,10 +118,10 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
 
 
             // 编码唯一性验证
-            var checkEntity = await _equFaultPhenomenonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultPhenomenonCode });
+            var checkEntity = await _equFaultPhenomenonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.Code });
             if (checkEntity != null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12900)).WithData("Code", entity.FaultPhenomenonCode);
+                throw new CustomerValidationException(nameof(ErrorCode.MES12900)).WithData("Code", entity.Code);
             }
 
             using var scope = TransactionHelper.GetTransactionScope();
@@ -135,8 +135,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
                 }
             }
 
-            var insertFaultPhenomenon= await _equFaultPhenomenonRepository.InsertAsync(entity);
-            if (insertFaultPhenomenon == 0) {
+            var insertFaultPhenomenon = await _equFaultPhenomenonRepository.InsertAsync(entity);
+            if (insertFaultPhenomenon == 0)
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12908));
             }
 
@@ -160,29 +161,30 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
 
             //验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
-            if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))
+            if (!canEditStatusEnum.Any(x => x == entityOld.Status))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             //处理设备故障原因
-            var equFaultReasonPhenomenonEntities = new List<EquFaultReasonPhenomenonEntity>();
-            if (parm.EquFaultReasonList != null && parm.EquFaultReasonList.Any()) {
+            var equFaultReasonPhenomenonEntities = new List<EquFaultPhenomenonReasonRelationEntity>();
+            if (parm.EquFaultReasonList != null && parm.EquFaultReasonList.Any())
+            {
                 //增加设备故障原因
-                
-                    foreach (var item in parm.EquFaultReasonList)
-                    {
-                        var model = new EquFaultReasonPhenomenonEntity();
-                        model.Id = IdGenProvider.Instance.CreateId();
-                        model.CreatedBy = _currentUser.UserName;
-                        model.UpdatedBy = _currentUser.UserName;
-                        //model.SiteId = _currentSite.SiteId;
-                        model.FaultReasonId = item;
-                        model.FaultPhenomenonId = parm.Id.GetValueOrDefault();
 
-                        equFaultReasonPhenomenonEntities.Add(model);
-                   }
-                
+                foreach (var item in parm.EquFaultReasonList)
+                {
+                    var model = new EquFaultPhenomenonReasonRelationEntity();
+                    model.Id = IdGenProvider.Instance.CreateId();
+                    model.CreatedBy = _currentUser.UserName;
+                    model.UpdatedBy = _currentUser.UserName;
+                    //model.SiteId = _currentSite.SiteId;
+                    model.FaultReasonId = item;
+                    model.FaultPhenomenonId = parm.Id.GetValueOrDefault();
+
+                    equFaultReasonPhenomenonEntities.Add(model);
+                }
+
             }
 
             using var scope = TransactionHelper.GetTransactionScope();
@@ -208,8 +210,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             var entity = parm.ToEntity<EquFaultPhenomenonEntity>();
             entity.UpdatedBy = _currentUser.UserName;
 
-            var updateResult= await _equFaultPhenomenonRepository.UpdateAsync(entity);
-            if (updateResult == 0) {
+            var updateResult = await _equFaultPhenomenonRepository.UpdateAsync(entity);
+            if (updateResult == 0)
+            {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12909));
             }
 
@@ -229,7 +232,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         public async Task<int> DeletesAsync(long[] idsArr)
         {
             var entities = await _equFaultPhenomenonRepository.GetByIdsAsync(idsArr);
-            if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
+            if (entities != null && entities.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
@@ -265,12 +268,12 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         public async Task<EquFaultPhenomenonDto> GetDetailAsync(long id)
         {
-            var date = await _equFaultPhenomenonRepository.GetViewByIdAsync(id);
-            var result= date.ToModel<EquFaultPhenomenonDto>();
+            var date = await _equFaultPhenomenonRepository.GetByIdAsync(id);
+            var result = date.ToModel<EquFaultPhenomenonDto>();
 
             //获取已分配故障原因
             var changedFaultReasonList = await _equFaultPhenomenonRepository.GetEquFaultReasonListAsync(new EquFaultPhenomenonQuery { Id = id });
-            result.equFaultReasonList = changedFaultReasonList?.Select(a => a.FaultReasonId);
+            result.EquFaultReasonList = changedFaultReasonList?.Select(a => a.FaultReasonId);
 
             return result;
         }
@@ -286,12 +289,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             //query.SiteId = _currentSite.SiteId;
             //获取已经分配的故障原因（中间关系表）
             var changedEquFaultReasonList = await _equFaultPhenomenonRepository.GetEquFaultReasonListAsync(query);
-            if (changedEquFaultReasonList == null || !changedEquFaultReasonList.Any()) { 
+            if (changedEquFaultReasonList == null || !changedEquFaultReasonList.Any())
+            {
                 return Enumerable.Empty<EquFaultReasonDto>();
             }
 
             var equFaultReasonIds = changedEquFaultReasonList.Select(a => a.FaultReasonId);
-            var equFaultReasonEntities = await _equFaultReasonRepository.GetListAsync(new EquFaultReasonQuery {Ids= equFaultReasonIds,SiteId= _currentSite.SiteId??0 });
+            var equFaultReasonEntities = await _equFaultReasonRepository.GetListAsync(new EquFaultReasonQuery { Ids = equFaultReasonIds, SiteId = _currentSite.SiteId ?? 0 });
             if (equFaultReasonEntities == null || !equFaultReasonEntities.Any())
             {
                 return Enumerable.Empty<EquFaultReasonDto>();
@@ -340,9 +344,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12905));
             }
-            if (entity.UseStatus == changeStatusCommand.Status)
+            if (entity.Status == changeStatusCommand.Status)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.UseStatus)}"));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
 

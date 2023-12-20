@@ -2,9 +2,9 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
+using Hymson.MES.Data.Repositories.Equipment.Query;
 
-namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
+namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
     /// 仓储接口（设备故障现象）
@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="equFaultReasonPhenomenonEntities"></param>
         /// <returns></returns>
-        Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultReasonPhenomenonEntity> equFaultReasonPhenomenonEntities);
+        Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> equFaultReasonPhenomenonEntities);
 
         /// <summary>
         /// 更新（设备故障现象）
@@ -54,13 +54,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         Task<EquFaultPhenomenonEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 根据ID获取数据（设备故障现象）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<EquFaultPhenomenonView> GetViewByIdAsync(long id);
-
-        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>
@@ -72,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultPhenomenonView>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery pagedQuery);
+        Task<PagedInfo<EquFaultPhenomenonEntity>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery pagedQuery);
 
         /// <summary>
         /// 根据ID获取数据
@@ -93,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="equFaultPhenomenonQuery"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonPhenomenonEntity>> GetEquFaultReasonListAsync(EquFaultPhenomenonQuery equFaultPhenomenonQuery);
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetEquFaultReasonListAsync(EquFaultPhenomenonQuery equFaultPhenomenonQuery);
 
         /// <summary>
         /// 删除设备故障原因关系（物理删除）

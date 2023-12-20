@@ -1,91 +1,86 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
     /// <summary>
-    /// 设备故障原因表新增Dto
+    /// 设备故障解决措施新增/更新Dto
     /// </summary>
-    public record EquFaultReasonSaveDto : BaseEntityDto
+    public record EquFaultSolutionSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键id
         /// </summary>
         public long Id { get; set; }
 
         /// <summary>
-        /// 故障原因代码
+        /// 故障解决措施代码
         /// </summary>
         public string Code { get; set; }
 
         /// <summary>
-        /// 故障原因名称
+        /// 故障解决措施名称
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 使用状态 0-禁用 1-启用
+        /// </summary>
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 说明
+        /// 设备故障先
         /// </summary>
-        public string? Remark { get; set; }
+        public string Remark { get; set; }
 
     }
 
     /// <summary>
-    /// 设备故障原因表Dto
+    /// 设备故障解决措施Dto
     /// </summary>
-    public record EquFaultReasonDto : BaseEntityDto
+    public record EquFaultSolutionDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 主键id
         /// </summary>
         public long Id { get; set; }
 
         /// <summary>
-        /// 故障原因代码
+        /// 故障解决措施代码
         /// </summary>
         public string Code { get; set; }
 
         /// <summary>
-        /// 故障原因名称
+        /// 故障解决措施代码
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// 故障原因状态（字典定义）
+        /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
-        /// 说明
+        /// 设备故障先
         /// </summary>
         public string Remark { get; set; }
 
         /// <summary>
-        /// 最后修改人
+        /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
         /// <summary>
-        /// 修改时间
+        /// 更新时间
         /// </summary>
-        public DateTime? UpdatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
 
     }
 
     /// <summary>
-    /// 
+    /// 设备故障解决措施分页Dto
     /// </summary>
-    public record CustomEquFaultReasonDto : EquFaultReasonDto
-    {
-
-    }
-
-    /// <summary>
-    /// 设备故障原因表分页Dto
-    /// </summary>
-    public class EquFaultReasonPagedQueryDto : PagerInfo
+    public class EquFaultSolutionPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 编码（设备故障原因）
@@ -102,20 +97,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
 
-        /// <summary>
-        /// 描述（设备故障原因）
-        /// </summary>
-        public string? Remark { get; set; }
     }
 
-    /// <summary>
-    /// 设备故障原因表查询Dto
-    /// </summary>
-    public class EquFaultReasonQueryDto : QueryDtoAbstraction
-    { 
-        /// <summary>
-        /// Ids
-        /// </summary>
-        public IEnumerable<long>? Ids { get; set; }
-    }
 }

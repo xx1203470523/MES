@@ -17,18 +17,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障现象代码
         /// </summary>
-        public string FaultPhenomenonCode { get; set; } = "";
+        public string Code { get; set; } = "";
 
         /// <summary>
         /// 故障现象名称
         /// </summary>
-        public string FaultPhenomenonName { get; set; } = "";
-
-        /// <summary>
-        /// 设备组ID
-        /// </summary>
-        public long EquipmentGroupId { get; set; }
-
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 设备故障先
@@ -55,22 +49,17 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障现象代码
         /// </summary>
-        public string FaultPhenomenonCode { get; set; } = "";
+        public string Code { get; set; } = "";
 
         /// <summary>
         /// 故障现象名称
         /// </summary>
-        public string FaultPhenomenonName { get; set; } = "";
-
-        /// <summary>
-        /// 设备组ID
-        /// </summary>
-        public long EquipmentGroupId { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public SysDataStatusEnum UseStatus { get; set; }
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 设备故障先
@@ -88,14 +77,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public DateTime? UpdatedOn { get; set; }
 
         /// <summary>
-        /// 设备组名称
-        /// </summary>
-        public string EquipmentGroupName { get; set; } = "";
-
-        /// <summary>
         /// 已分配故障原因
         /// </summary>
-        public IEnumerable<long>? equFaultReasonList { get; set; }
+        public IEnumerable<long>? EquFaultReasonList { get; set; }
     }
 
     /// <summary>
@@ -106,22 +90,18 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障现象代码
         /// </summary>
-        public string? FaultPhenomenonCode { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 故障现象名称
         /// </summary>
-        public string? FaultPhenomenonName { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 使用状态 0-禁用 1-启用
         /// </summary>
-        public SysDataStatusEnum? UseStatus { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
-        /// <summary>
-        /// 设备组名称
-        /// </summary>
-        public string? EquipmentGroupName { get; set; }
     }
 
     /// <summary>
