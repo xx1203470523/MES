@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Warehouse;
@@ -139,6 +140,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                 validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
+                validationFailure.FormattedMessagePlaceholderValues.Add("MaterialCode", item.MaterialBarCode);
 
                 // 校验是否有重复条码
                 item.MaterialBarCode = item.MaterialBarCode.Trim();
@@ -230,7 +232,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             // 是否存在错误
             if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
             }
 
             // 保存实体

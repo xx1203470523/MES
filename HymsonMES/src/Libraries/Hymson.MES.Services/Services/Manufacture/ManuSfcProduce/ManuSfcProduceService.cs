@@ -901,6 +901,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         }
                         else
                         {
+                            
                             manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
                             {
                                 Id = manuSfcEntity.Id,
