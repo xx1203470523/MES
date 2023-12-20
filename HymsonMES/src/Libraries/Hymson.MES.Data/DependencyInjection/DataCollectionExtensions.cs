@@ -305,6 +305,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcGradeDetailRepository, ManuSfcGradeDetailRepository>();
 
             services.AddSingleton<IManuWorkOrderSFCRepository, ManuWorkOrderSFCRepository>();
+
+            services.AddSingleton<IManuSFCNodeRepository, ManuSFCNodeRepository>();
+            services.AddSingleton<IManuSFCNodeSourceRepository, ManuSFCNodeSourceRepository>();
+            services.AddSingleton<IManuSFCNodeDestinationRepository, ManuSFCNodeDestinationRepository>();
             #endregion
 
             #region Warehouse 
