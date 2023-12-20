@@ -1,9 +1,11 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.WhWarehouseRegion;
+using Hymson.MES.Core.Domain.WhWarehouseShelf;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
+using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
@@ -96,26 +98,55 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
             return await conn.ExecuteAsync(DeletesSql, command);
         }
 
-        /// <summary>
-        /// 根据ID获取数据
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<WhWarehouseRegionEntity> GetByIdAsync(long id)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<WhWarehouseRegionEntity>(GetByIdSql, new { Id = id });
-        }
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //public async Task<WhWarehouseRegionEntity> GetByIdAsync(long id)
+        //{
+        //    using var conn = GetMESDbConnection();
+        //    return await conn.QueryFirstOrDefaultAsync<WhWarehouseRegionEntity>(GetByIdSql, new { Id = id });
+        //}
+
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //public async Task<IEnumerable<WhWarehouseRegionEntity>> GetByIdsAsync(IEnumerable<long> ids) 
+        //{
+        //    using var conn = GetMESDbConnection();
+        //    return await conn.QueryAsync<WhWarehouseRegionEntity>(GetByIdsSql, new { Ids = ids });
+        //}
+
 
         /// <summary>
-        /// 根据IDs获取数据（批量）
+        /// 获取单条
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="whWarehouseRegionQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhWarehouseRegionEntity>> GetByIdsAsync(IEnumerable<long> ids) 
+        public async Task<WhWarehouseRegionEntity> GetOneAsync(WhWarehouseRegionQuery whWarehouseRegionQuery)
         {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetOneSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId=@SiteId");
+
+            if (!string.IsNullOrWhiteSpace(whWarehouseRegionQuery.Code))
+            {
+                sqlBuilder.Where("Code=@Code");
+            }
+
+            if (whWarehouseRegionQuery.Id.HasValue)
+            {
+                sqlBuilder.Where("Id=@Id");
+            }
+
+            sqlBuilder.AddParameters(whWarehouseRegionQuery);
+
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<WhWarehouseRegionEntity>(GetByIdsSql, new { Ids = ids });
+            return await conn.QueryFirstOrDefaultAsync<WhWarehouseRegionEntity>(templateData.RawSql, templateData.Parameters);
         }
 
         /// <summary>
@@ -128,6 +159,7 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted=0");
 
             if (!string.IsNullOrWhiteSpace(query.CodeLike)) {
                 query.CodeLike = $"%{query.CodeLike}%";
@@ -173,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
                 sqlBuilder.Where("Status = @Status");
             }
 
-            if (pagedQuery.WareHouseIds != null && !pagedQuery.WareHouseIds.Any()) {
+            if (pagedQuery.WareHouseIds != null && pagedQuery.WareHouseIds.Any()) {
                 sqlBuilder.Where("WarehouseId IN @WareHouseIds");
             }
 
@@ -204,19 +236,21 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseRegion
                                             /**select**/
                                            FROM wh_warehouse_region /**where**/  ";
 
+        //const string GetByIdSql = @"SELECT * FROM wh_warehouse_region WHERE Id = @Id ";
+        //const string GetByIdsSql = @"SELECT * FROM wh_warehouse_region WHERE Id IN @Ids ";
+
+        const string GetOneSqlTemplate = "SELECT * FROM `wh_warehouse_region` /**where**/ LIMIT 1;";
+
         const string InsertSql = "INSERT INTO wh_warehouse_region(  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
         const string InsertsSql = "INSERT INTO wh_warehouse_region(  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
         const string InsertIgnoreSql = "INSERT IGNORE INTO wh_warehouse_region(  `Id`, `Code`, `Name`, `WarehouseId`, `Remark`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (  @Id, @Code, @Name, @WarehouseId, @Remark, @Status, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId) ";
 
-        const string UpdateSql = "UPDATE wh_warehouse_region SET   Code = @Code, Name = @Name, WarehouseId = @WarehouseId, Remark = @Remark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE wh_warehouse_region SET   Code = @Code, Name = @Name, WarehouseId = @WarehouseId, Remark = @Remark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE wh_warehouse_region SET Name = @Name, Remark = @Remark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE wh_warehouse_region SET Name = @Name,  Remark = @Remark, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE wh_warehouse_region SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE wh_warehouse_region SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
-
-        const string GetByIdSql = @"SELECT * FROM wh_warehouse_region WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT * FROM wh_warehouse_region WHERE Id IN @Ids ";
 
     }
 }

@@ -44,6 +44,11 @@ namespace Hymson.MES.Core.Enums
         /// 条码拆分
         /// </summary>
         [Description("条码拆分")]
-        Split = 7
+        Split = 7,
+        /// <summary>
+        /// 条码合并
+        /// </summary>
+        [Description("条码合并")]
+        Merge = 8
     }
 }

@@ -10,10 +10,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（仓库标签模板）
-    /// @author wxk
-    /// @date 2023-03-09 02:51:26
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcLabelTemplateController : ControllerBase

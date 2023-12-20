@@ -3,15 +3,17 @@ using FluentValidation.Results;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Common.MasterData;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 
 namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuCommonService
     {
         /// <summary>
@@ -23,7 +25,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <exception cref="ValidationException">状态(在 无效 删除 报废 锁定) 产品序列码状态为【xxxx】，不允许操作  包装验证  产品序列码已经被包装，不允许操作 </exception>
         public async Task<IEnumerable<ManuSfcBo>> GetManuSfcInfos(MultiSFCBo param, ILocalizationService localizationService)
         {
-            var manuSfcEntitiesTask = _manuSfcRepository.GetManuSfcEntitiesAsync(new ManuSfcQuery { SiteId = param.SiteId, SFCs = param.SFCs });
+            var manuSfcEntitiesTask = _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SiteId = param.SiteId, SFCs = param.SFCs });
             var manuSfcProduceEntitiesTask = _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery { SiteId = param.SiteId, Sfcs = param.SFCs });
             var sfcPackListTask = _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { LadeBarCodes = param.SFCs, SiteId = param.SiteId });
 
@@ -129,9 +131,9 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 }
                 else
                 {
-                    manuSfcBo.ProcedureId = manuSfcProduceEntity.ProcedureId ;
-                    manuSfcBo.ResourceId = manuSfcProduceEntity.ResourceId ;
-                    manuSfcBo.ProcessRouteId = manuSfcProduceEntity.ProcessRouteId ;
+                    manuSfcBo.ProcedureId = manuSfcProduceEntity.ProcedureId;
+                    manuSfcBo.ResourceId = manuSfcProduceEntity.ResourceId;
+                    manuSfcBo.ProcessRouteId = manuSfcProduceEntity.ProcessRouteId;
                 }
                 list.Add(manuSfcBo);
             }

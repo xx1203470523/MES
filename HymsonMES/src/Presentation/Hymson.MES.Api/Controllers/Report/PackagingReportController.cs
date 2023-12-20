@@ -1,8 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（包装报告）
-    /// @author zhaoqing
-    /// @date 2023-04-21 17:34:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PackagingReportController : ControllerBase

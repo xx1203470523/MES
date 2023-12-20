@@ -1,13 +1,7 @@
-/*
- *describe: 产品不良录入    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:49:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（产品不良录入）
-    /// @author zhaoqing
-    /// @date 2023-03-27 03:49:17
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]

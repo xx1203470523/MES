@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 降级录入    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-08-10 10:15:26
- */
-using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
@@ -16,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（降级录入）
-    /// @author Karl
-    /// @date 2023-08-10 10:15:26
     /// </summary>
     [Authorize]
     [ApiController]

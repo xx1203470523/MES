@@ -5,21 +5,36 @@ using Hymson.MES.Data.Repositories;
 namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
 {
     /// <summary>
-    /// 库位新增/更新Dto
+    /// 库位新增
     /// </summary>
     public record WhWarehouseLocationSaveDto : BaseEntityDto
     {
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public long Id { get; set; }
+
+       ///// <summary>
+       // /// 货架id
+       // /// </summary>
+       // public long? WarehouseShelfId { get; set; }
+
         /// <summary>
-        /// 
+        /// 货架编码
         /// </summary>
-        public long Id { get; set; }
+        public string? WarehouseShelfCode { get; set; }
 
-       /// <summary>
-        /// 货架id
+        /// <summary>
+        /// 仓库编码
         /// </summary>
-        public long? WarehouseShelfId { get; set; }
+        public string? WarehouseCode { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 库区编码
+        /// </summary>
+        public string? WarehouseRegionCode { get; set; }
+
+        /// <summary>
         /// 库位编码
         /// </summary>
         public string? Code { get; set; }
@@ -32,12 +47,12 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
        /// <summary>
         /// 状态;1、启用  2、未启用
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 行
@@ -200,6 +215,11 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
         /// 库位编码
         /// </summary>
         public string? Code { get; set; }
+
+        /// <summary>
+        /// 状态;1、启用  2、未启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
     }
 
     /// <summary>
@@ -213,4 +233,23 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
         public long? WarehouseShelfId { get; set; }
     }
 
+    /// <summary>
+    /// 更新Dto
+    /// </summary>
+    public record WhWarehouseLocationModifyDto : BaseEntityDto {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 状态;1、启用  2、未启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
+    }
 }

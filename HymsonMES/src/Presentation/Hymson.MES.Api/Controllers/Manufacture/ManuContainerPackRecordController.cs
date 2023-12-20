@@ -1,24 +1,13 @@
-/*
- *creator: Karl
- *
- *describe: 容器装载记录    控制器 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-04-12 02:32:21
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（容器装载记录）
-    /// @author wxk
-    /// @date 2023-04-12 02:32:21
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerPackRecordController : ControllerBase

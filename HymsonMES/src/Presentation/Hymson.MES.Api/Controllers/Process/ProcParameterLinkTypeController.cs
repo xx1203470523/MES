@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（标准参数关联类型表）
-    /// @author Karl
-    /// @date 2023-02-15 03:53:38
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterLinkTypeController : ControllerBase

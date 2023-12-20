@@ -18,9 +18,9 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(WhWarehouseSaveDto saveDto);
+        Task<int> ModifyAsync(WhWarehouseModifyDto modifyDto);
 
         /// <summary>
         /// 删除

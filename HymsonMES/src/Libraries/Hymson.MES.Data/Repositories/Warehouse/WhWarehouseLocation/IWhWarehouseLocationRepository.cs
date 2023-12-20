@@ -67,19 +67,26 @@ namespace Hymson.MES.Data.Repositories.WhWarehouseLocation
         /// <returns></returns>
         Task<int> DeletesPhysicsAsync(DeleteCommand command);
 
+        ///// <summary>
+        ///// 根据ID获取数据
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //Task<WhWarehouseLocationEntity> GetByIdAsync(long id);
+
+        ///// <summary>
+        ///// 根据IDs获取数据（批量）
+        ///// </summary>
+        ///// <param name="ids"></param>
+        ///// <returns></returns>
+        //Task<IEnumerable<WhWarehouseLocationEntity>> GetByIdsAsync(long[] ids);
+
         /// <summary>
-        /// 根据ID获取数据
+        /// 获取单条
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="whWarehouseLocationQuery"></param>
         /// <returns></returns>
-        Task<WhWarehouseLocationEntity> GetByIdAsync(long id);
-    
-        /// <summary>
-        /// 根据IDs获取数据（批量）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<WhWarehouseLocationEntity>> GetByIdsAsync(long[] ids);
+        Task<WhWarehouseLocationEntity> GetOneAsync(WhWarehouseLocationQuery whWarehouseLocationQuery);
 
         /// <summary>
         /// 获取List

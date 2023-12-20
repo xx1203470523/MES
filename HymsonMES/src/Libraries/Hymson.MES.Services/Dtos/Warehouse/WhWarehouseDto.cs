@@ -4,29 +4,29 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.WhWareHouse
 {
     /// <summary>
-    /// 仓库新增/更新Dto
+    /// 仓库新增Dto
     /// </summary>
     public record WhWarehouseSaveDto : BaseEntityDto
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long? Id { get; set; }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public long? Id { get; set; }
 
         /// <summary>
         /// 仓库编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 仓库名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
        /// <summary>
         /// 状态
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
         /// <summary>
         /// 描述
@@ -53,17 +53,15 @@ namespace Hymson.MES.Services.Dtos.WhWareHouse
         // /// </summary>
         // public DateTime UpdatedOn { get; set; }
 
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public long? IsDeleted { get; set; }
+        ///// <summary>
+        ///// 是否逻辑删除
+        ///// </summary>
+        //public long? IsDeleted { get; set; }
 
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long? SiteId { get; set; }
-
-
+        ///// <summary>
+        ///// 站点Id
+        ///// </summary>
+        //public long? SiteId { get; set; }
     }
 
     /// <summary>
@@ -151,6 +149,31 @@ namespace Hymson.MES.Services.Dtos.WhWareHouse
         /// 状态
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
+    }
+
+    /// <summary>
+    /// 更新Dto
+    /// </summary>
+    public record WhWarehouseModifyDto : BaseEntityDto {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 仓库名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
     }
 
 }

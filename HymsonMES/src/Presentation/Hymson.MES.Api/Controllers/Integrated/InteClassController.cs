@@ -2,17 +2,13 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（班制维护）
-    /// @author 陈志谱
-    /// @date 2023-02-10 08:55:55
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class InteClassController : ControllerBase

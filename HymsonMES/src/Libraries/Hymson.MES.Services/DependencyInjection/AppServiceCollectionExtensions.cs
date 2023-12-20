@@ -11,6 +11,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Services;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
@@ -110,6 +111,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquFaultPhenomenonService, EquFaultPhenomenonService>();
             services.AddSingleton<IEquSparePartService, EquSparePartService>();
             services.AddSingleton<IEquSparePartTypeService, EquSparePartTypeService>();
+            services.AddSingleton<IEquSparePartsGroupService, EquSparePartsGroupService>();
+            services.AddSingleton<IEquSparePartsService, EquSparePartsService>();
 
             // FaultReason
             services.AddSingleton<IEquFaultReasonService, EquFaultReasonService>();
@@ -290,6 +293,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IComUsageReportService, ComUsageReportService>();
             #endregion
 
+            services.AddSingleton<ITracingSourceSFCService, TracingSourceSFCService>();
+
             #endregion
 
             return services;
@@ -320,6 +325,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentUnitSaveDto>, EquipmentUnitCreateValidator>();
             services.AddSingleton<AbstractValidator<EquFaultPhenomenonSaveDto>, EquFaultPhenomenonValidator>();
             services.AddSingleton<AbstractValidator<EquFaultReasonSaveDto>, EquFaultReasonCreateValidator>();
+            services.AddSingleton<AbstractValidator<EquSparePartsGroupSaveDto>, EquSparePartsGroupSaveValidator>();
+            services.AddSingleton<AbstractValidator<EquSparePartsSaveDto>, EquSparePartsSaveValidator>();
 
             services.AddSingleton<AbstractValidator<EquEquipmentVerifyCreateDto>, EquEquipmentVerifyCreateValidator>();
             #endregion
@@ -540,12 +547,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<WhMaterialStandingbookModifyDto>, WhMaterialStandingbookModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseSaveDto>, WhWarehouseSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseModifyDto>, WhWarehouseModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseRegionSaveDto>, WhWarehouseRegionSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseRegionModifyDto>, WhWarehouseRegionModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseShelfSaveDto>, WhWarehouseShelfSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseShelfModifyDto>, WhWarehouseShelfModifyValidator>();
 
             services.AddSingleton<AbstractValidator<WhWarehouseLocationSaveDto>, WhWarehouseLocationSaveValidator>();
+            services.AddSingleton<AbstractValidator<WhWarehouseLocationModifyDto>, WhWarehouseLocationModifyValidator>();
+
             #endregion
 
             #region Plan

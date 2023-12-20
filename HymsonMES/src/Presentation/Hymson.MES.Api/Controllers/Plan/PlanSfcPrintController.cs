@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Plan
 {
     /// <summary>
     /// 控制器（条码打印）
-    /// @author pengxin
-    /// @date 2023-03-21 04:33:58
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanSfcPrintController : ControllerBase

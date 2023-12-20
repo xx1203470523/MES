@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 控制器（IPQC检验项目）
-    /// @author xiaofei
-    /// @date 2023-08-08 10:19:34
     /// </summary>
     [Authorize]
     [ApiController]

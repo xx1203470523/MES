@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 分选规则    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-07-25 03:24:54
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
@@ -18,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（分选规则）
-    /// @author zhaoqing
-    /// @date 2023-07-25 03:24:54
     /// </summary>
     [Authorize]
     [ApiController]
