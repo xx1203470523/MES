@@ -4,15 +4,10 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Data.Repositories.Equipment.Query
 {
     /// <summary>
-    /// 备件类型 分页参数
+    /// 备件注册表 分页参数
     /// </summary>
-    public class EquSparePartsGroupPagedQuery : PagerInfo
+    public class EquSparePartsPagedQuery : PagerInfo
     {
-        /// <summary>
-        /// 站点Id
-        /// </summary>
-        public long? SiteId { get; set; }
-
         /// <summary>
         /// 备件编码
         /// </summary>
@@ -33,6 +28,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// </summary>
         public string? SparePartsGroup { get; set; }
 
-
+        /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long SiteId { get;set; }
     }
 }
