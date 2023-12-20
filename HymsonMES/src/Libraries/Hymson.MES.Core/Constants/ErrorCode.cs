@@ -36,6 +36,7 @@
         public const string MES10127 = "状态已经是[{status}],无法重复设置";
         public const string MES10128 = "变更状态的状态不能为新建";
         public const string MES10129 = "只有新建或者保留才能编辑";
+        public const string MES10130 = "操作数据已经不存在了";
 
 
         #region 物料 10200
@@ -826,6 +827,12 @@
         public const string MES15617 = "自定义业务值不能超过255个字符";
         public const string MES15618 = "自定义业务ID不是同一个";
         public const string MES15619 = "自定义业务类型不是同一个";
+
+        #endregion
+
+        #region 配方维护 15700
+        public const string MES15700 = "配方维护异常！";
+        public const string MES15701 = "操作的配方数据已不存在";
 
         #endregion
 

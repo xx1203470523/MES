@@ -184,6 +184,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
 
+            //配方
+            services.AddSingleton<IProcFormulaService, ProcFormulaService>();
+
             //ESOP
             services.AddSingleton<IProcEsopService, ProcEsopService>();
             #endregion
@@ -401,6 +404,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcSortingRuleModifyDto>, ProcSortingRuleModifyValidator>();
             #endregion
 
+
+            services.AddSingleton<AbstractValidator<ProcFormulaSaveDto>, ProcFormulaSaveValidator>();
 
             services.AddSingleton<AbstractValidator<ProcEquipmentGroupParamCreateDto>, ProcEquipmentGroupParamCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcEquipmentGroupParamModifyDto>, ProcEquipmentGroupParamModifyValidator>();

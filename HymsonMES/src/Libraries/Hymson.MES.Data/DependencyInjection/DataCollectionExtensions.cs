@@ -239,6 +239,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcEquipmentGroupParamDetailRepository, ProcEquipmentGroupParamDetailRepository>();
             #endregion
 
+            #region  ProcFormula
+            services.AddSingleton<IProcFormulaRepository, ProcFormulaRepository>();
+            #endregion
+
             #endregion
 
             #region Quality
