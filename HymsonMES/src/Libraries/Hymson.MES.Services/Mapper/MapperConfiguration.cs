@@ -566,6 +566,22 @@ namespace Hymson.MES.Services.Mapper
             #region Esop 
 
             #endregion
+
+            #region ProcFormulaOperation
+            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationDto > ();
+            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationSaveDto>();
+            CreateMap<ProcFormulaOperationSaveDto, ProcFormulaOperationEntity>();
+            CreateMap<ProcFormulaOperationPagedQueryDto, ProcFormulaOperationPagedQuery>();
+            CreateMap<ProcFormulaOperationSetEntity, ProcFormulaOperationSetDto>();
+            #endregion
+
+            #region ProcFormulaOperationGroup
+            CreateMap<ProcFormulaOperationGroupEntity, ProcFormulaOperationGroupDto>();
+            CreateMap<ProcFormulaOperationGroupDto, ProcFormulaOperationGroupEntity>();
+            CreateMap<ProcFormulaOperationGroupSaveDto, ProcFormulaOperationGroupEntity>();
+            CreateMap<ProcFormulaOperationGroupEntity, ProcFormulaOperationGroupSaveDto>();
+            CreateMap<ProcFormulaOperationGroupPagedQueryDto, ProcFormulaOperationGroupPagedQuery>();
+            #endregion
         }
 
         /// <summary>
