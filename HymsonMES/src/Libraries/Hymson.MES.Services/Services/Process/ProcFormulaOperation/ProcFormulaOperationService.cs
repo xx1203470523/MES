@@ -193,7 +193,7 @@ namespace Hymson.MES.Services.Services.Process
                 Version = addDto.FormulaOperation.Version,
                 Site = _currentSite.SiteId ?? 0
             });
-            if (entity != null)
+            if (entity != null && entity.Id != addDto.FormulaOperation.Id)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11307));
             }
