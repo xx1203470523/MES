@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
@@ -108,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <returns></returns>
         [HttpGet("list")]
-        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync()
+        public async Task<IEnumerable<SelectOptionDto>> QuerySolutionsAsync()
         {
             return await _equFaultSolutionService.QuerySolutionsAsync();
         }
@@ -119,7 +120,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="reasonId"></param>
         /// <returns></returns>
         [HttpGet("reason/{reasonId}")]
-        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId)
+        public async Task<IEnumerable<SelectOptionDto>> QuerySolutionsByMainIdAsync(long reasonId)
         {
             return await _equFaultSolutionService.QuerySolutionsByMainIdAsync(reasonId);
         }

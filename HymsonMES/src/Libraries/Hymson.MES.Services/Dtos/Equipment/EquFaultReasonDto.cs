@@ -75,28 +75,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 自定义实体列表（故障原因）
-    /// </summary>
-    public record EquFaultReasonBaseDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 唯一标识
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 编码（设备注册）
-        /// </summary>
-        public string Code { get; set; } = "";
-
-        /// <summary>
-        /// 名称（设备注册）
-        /// </summary>
-        public string Name { get; set; } = "";
-
-    }
-
-    /// <summary>
     /// 
     /// </summary>
     public record CustomEquFaultReasonDto : EquFaultReasonDto

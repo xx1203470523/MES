@@ -8,6 +8,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -182,10 +183,15 @@ namespace Hymson.MES.Services.Services.Equipment
         /// 获取解决措施（可被引用）
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync()
+        public async Task<IEnumerable<SelectOptionDto>> QuerySolutionsAsync()
         {
             var solutionEntities = await _equFaultSolutionRepository.GetEntitiesAsync(new EntityByStatusQuery { SiteId = _currentSite.SiteId ?? 0 });
-            return solutionEntities.Select(s => s.ToModel<EquFaultSolutionBaseDto>());
+            return solutionEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"${s.Code} - ${s.Name}",
+                Value = $"{s.Id}"
+            });
         }
 
         /// <summary>
@@ -193,15 +199,22 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="reasonId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId)
+        public async Task<IEnumerable<SelectOptionDto>> QuerySolutionsByMainIdAsync(long reasonId)
         {
+            if (reasonId == 0) return Array.Empty<SelectOptionDto>();
+
             var relationEntities = await _equFaultSolutionRepository.GetRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = reasonId });
-            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<EquFaultSolutionBaseDto>();
+            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<SelectOptionDto>();
 
             var solutionEntities = await _equFaultSolutionRepository.GetByIdsAsync(relationEntities.Select(s => s.FaultSolutionId));
-            if (solutionEntities == null || !solutionEntities.Any()) return Array.Empty<EquFaultSolutionBaseDto>();
+            if (solutionEntities == null || !solutionEntities.Any()) return Array.Empty<SelectOptionDto>();
 
-            return solutionEntities.Select(s => s.ToModel<EquFaultSolutionBaseDto>());
+            return solutionEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"${s.Code} - ${s.Name}",
+                Value = $"{s.Id}"
+            });
         }
 
 

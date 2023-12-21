@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
@@ -49,14 +50,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// 获取解决措施（可被引用）
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync();
+        Task<IEnumerable<SelectOptionDto>> QuerySolutionsAsync();
 
         /// <summary>
         /// 根据ID获取关联解决措施
         /// </summary>
         /// <param name="reasonId"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId);
+        Task<IEnumerable<SelectOptionDto>> QuerySolutionsByMainIdAsync(long reasonId);
 
 
         /// <summary>

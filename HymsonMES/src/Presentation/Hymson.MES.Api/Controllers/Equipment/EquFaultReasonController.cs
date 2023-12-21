@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
@@ -102,7 +103,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <returns></returns>
         [HttpGet("list")]
-        public async Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsAsync()
+        public async Task<IEnumerable<SelectOptionDto>> QueryReasonsAsync()
         {
             return await _equFaultReasonService.QueryReasonsAsync();
         }
@@ -113,7 +114,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="phenomenonId"></param>
         /// <returns></returns>
         [HttpGet("phenomenon/{phenomenonId}")]
-        public async Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsByMainIdAsync(long phenomenonId)
+        public async Task<IEnumerable<SelectOptionDto>> QueryReasonsByMainIdAsync(long phenomenonId)
         {
             return await _equFaultReasonService.QueryReasonsByMainIdAsync(phenomenonId);
         }

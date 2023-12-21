@@ -78,28 +78,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     }
 
     /// <summary>
-    /// 自定义实体列表（故障解决措施）
-    /// </summary>
-    public record EquFaultSolutionBaseDto : BaseEntityDto
-    {
-        /// <summary>
-        /// 唯一标识
-        /// </summary>
-        public long Id { get; set; }
-
-        /// <summary>
-        /// 编码（设备注册）
-        /// </summary>
-        public string Code { get; set; } = "";
-
-        /// <summary>
-        /// 名称（设备注册）
-        /// </summary>
-        public string Name { get; set; } = "";
-
-    }
-
-    /// <summary>
     /// 设备故障解决措施分页Dto
     /// </summary>
     public class EquFaultSolutionPagedQueryDto : PagerInfo
