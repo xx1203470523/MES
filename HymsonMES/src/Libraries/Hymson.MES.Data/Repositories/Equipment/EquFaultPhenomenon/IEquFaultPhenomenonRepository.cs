@@ -19,13 +19,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<int> InsertAsync(EquFaultPhenomenonEntity entity);
 
         /// <summary>
-        /// 新增（设备故障现象和原因关系）
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities);
-
-        /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
         /// <param name="entity"></param>
@@ -80,20 +73,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids);
-
-        /// <summary>
-        /// 获取已经分配设备故障原因
-        /// </summary>
-        /// <param name="equFaultPhenomenonQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetEquFaultReasonListAsync(EquFaultPhenomenonQuery equFaultPhenomenonQuery);
-
-        /// <summary>
-        /// 删除设备故障原因关系（物理删除）
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        Task<int> DeleteEquFaultReasonPhenomenonRelationsAsync(DeleteCommand command);
 
 
 
