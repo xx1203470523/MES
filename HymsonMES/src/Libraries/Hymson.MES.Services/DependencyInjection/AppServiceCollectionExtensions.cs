@@ -139,7 +139,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventTypeService, InteEventTypeService>();
             services.AddSingleton<IInteEventService, InteEventService>();
             services.AddSingleton<IInteMessageManageService, InteMessageManageService>();
-
             services.AddSingleton<IInteCustomFieldService, InteCustomFieldService>();
             #endregion
 
@@ -185,6 +184,8 @@ namespace Microsoft.Extensions.DependencyInjection
             // 工艺设备组
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();
             services.AddSingleton<IProcProcessEquipmentGroupRelationService, ProcProcessEquipmentGroupRelationService>();
+
+            services.AddSingleton<IProcFormulaService, ProcFormulaService>();
 
             //ESOP
             services.AddSingleton<IProcEsopService, ProcEsopService>();
@@ -419,6 +420,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupSaveDto>, ProcProcessEquipmentGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<ProcProcessEquipmentGroupRelationSaveDto>, ProcProcessEquipmentGroupRelationSaveValidator>();
 
+            services.AddSingleton<AbstractValidator<ProcFormulaSaveDto>, ProcFormulaSaveValidator>();
+
             #region Esop
             services.AddSingleton<AbstractValidator<ProcEsopCreateDto>, ProcEsopCreateValidator>();
             services.AddSingleton<AbstractValidator<ProcEsopModifyDto>, ProcEsopModifyValidator>();
@@ -463,11 +466,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventTypeSaveDto>, InteEventTypeSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventSaveDto>, InteEventSaveValidator>();
-            services.AddSingleton<AbstractValidator<InteMessageManageTriggerSaveDto>, InteMessageManageSaveValidator>();
-
             services.AddSingleton<AbstractValidator<InteCustomFieldSaveDto>, InteCustomFieldSaveValidator>();
             services.AddSingleton<AbstractValidator<InteCustomFieldInternationalizationDto>, InteCustomFieldInternationalizationValidator>();
             services.AddSingleton<AbstractValidator<InteCustomFieldBusinessEffectuateDto>, InteCustomFieldBusinessEffectuatenValidator>();
+            services.AddSingleton<AbstractValidator<InteMessageManageTriggerSaveDto>, InteMessageManageSaveValidator>();
 
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
@@ -537,7 +539,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleCreateDto>, ManuDowngradingRuleCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleModifyDto>, ManuDowngradingRuleModifyValidator>();
-
+           
             services.AddSingleton<AbstractValidator<ManuBarcodeSplitAdjustDto>, ManusBarcodeSplitAdjustValidator>();
             #endregion
 

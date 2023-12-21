@@ -51,12 +51,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <returns></returns>
         Task<IEnumerable<EquFaultReasonDto>> GetEquFaultReasonListAsync(EquFaultPhenomenonQueryDto equFaultPhenomenonQueryDto);
 
+
         /// <summary>
         /// 状态变更
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="statusDto"></param>
         /// <returns></returns>
-        Task UpdateStatusAsync(ChangeStatusDto param);
+        Task UpdateStatusAsync(ChangeStatusDto statusDto);
 
     }
 }

@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateProcProcessEquipmentGroupAsync(ProcProcessEquipmentGroupSaveDto saveDto);
+        Task<long> CreateProcProcessEquipmentGroupAsync(ProcProcessEquipmentGroupSaveDto saveDto);
 
         /// <summary>
         /// 修改

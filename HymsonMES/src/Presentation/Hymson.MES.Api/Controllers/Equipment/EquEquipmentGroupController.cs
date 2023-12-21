@@ -38,9 +38,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPost]
         [LogDescription("设备组", BusinessType.INSERT)]
         [PermissionDescription("equ:equipmentGroup:insert")]
-        public async Task CreateAsync(EquEquipmentGroupSaveDto createDto)
+        public async Task<long> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
-            await _equEquipmentGroupService.CreateAsync(createDto);
+            return await _equEquipmentGroupService.CreateAsync(createDto);
         }
 
         /// <summary>

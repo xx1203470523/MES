@@ -72,14 +72,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLinkApiRepository, EquEquipmentLinkApiRepository>();
             services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
-            services.AddSingleton<IEquEquipmentVerifyRepository, EquEquipmentVerifyRepository>();
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
             services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
             services.AddSingleton<IEquFaultSolutionRepository, EquFaultSolutionRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
+            services.AddSingleton<IEquSparePartsGroupRepository, EquSparePartsGroupRepository>();
+            services.AddSingleton<IEquSparePartsGroupEquipmentGroupRelationRepository, EquSparePartsGroupEquipmentGroupRelationRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
             services.AddSingleton<IEquSparePartsRepository, EquSparePartsRepository>();
+
+            services.AddSingleton<IEquEquipmentVerifyRepository, EquEquipmentVerifyRepository>();
 
             #endregion
 
@@ -311,6 +314,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcGradeDetailRepository, ManuSfcGradeDetailRepository>();
 
             services.AddSingleton<IManuWorkOrderSFCRepository, ManuWorkOrderSFCRepository>();
+
+            services.AddSingleton<IManuSFCNodeRepository, ManuSFCNodeRepository>();
+            services.AddSingleton<IManuSFCNodeSourceRepository, ManuSFCNodeSourceRepository>();
+            services.AddSingleton<IManuSFCNodeDestinationRepository, ManuSFCNodeDestinationRepository>();
             #endregion
 
             #region Warehouse 

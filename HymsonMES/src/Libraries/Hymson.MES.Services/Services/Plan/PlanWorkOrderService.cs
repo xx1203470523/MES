@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planWorkOrderCreateDto"></param>
         /// <returns></returns>
-        public async Task CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
+        public async Task<long> CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
         {
 
             // 验证DTO
@@ -154,6 +154,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
             ts.Complete();
+            return planWorkOrderEntity.Id;
         }
 
         /// <summary>

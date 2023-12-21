@@ -92,9 +92,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [LogDescription("不合格代码组", BusinessType.INSERT)]
         [PermissionDescription("qual:unqualifiedGroup:insert")]
-        public async Task AddQualUnqualifiedGroupAsync([FromBody] QualUnqualifiedGroupCreateDto parm)
+        public async Task<long> AddQualUnqualifiedGroupAsync([FromBody] QualUnqualifiedGroupCreateDto parm)
         {
-            await _qualUnqualifiedGroupService.CreateQualUnqualifiedGroupAsync(parm);
+            return await _qualUnqualifiedGroupService.CreateQualUnqualifiedGroupAsync(parm);
         }
    
         /// <summary>

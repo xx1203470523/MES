@@ -158,7 +158,6 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<EquFaultPhenomenonEntity, EquFaultPhenomenonDto>();
 
-
             #endregion
 
             #region EquFaultReason
@@ -167,6 +166,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region EquFaultSolution
+            CreateMap<EquFaultSolutionSaveDto, EquFaultSolutionEntity>();
             CreateMap<EquFaultSolutionPagedQueryDto, EquFaultSolutionPagedQuery>();
             CreateMap<EquFaultSolutionEntity, EquFaultSolutionDto>();
             #endregion
@@ -592,6 +592,19 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcSortingRulePagedQueryDto, ProcSortingRulePagedQuery>();
 
             #endregion
+
+            #region ProcFormula
+            CreateMap<ProcFormulaEntity, ProcFormulaDto>();
+            CreateMap<ProcFormulaSaveDto, ProcFormulaEntity>();
+
+            CreateMap<ProcFormulaView, ProcFormulaViewDto>();
+
+            CreateMap<ProcFormulaEntity, ProcFormulaDetailViewDto>();
+
+            CreateMap<ProcFormulaPagedQueryDto, ProcFormulaPagedQuery>();
+
+            #endregion
+
 
             CreateMap<ProcEsopView, ProcEsopDto>();
             CreateMap<ProcEsopPagedQueryDto, ProcEsopPagedQuery>();

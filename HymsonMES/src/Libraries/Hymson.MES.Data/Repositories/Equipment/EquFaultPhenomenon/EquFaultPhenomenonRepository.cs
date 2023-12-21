@@ -54,6 +54,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
+        /// <summary>
         /// 删除（设备故障现象）
         /// </summary>
         /// <param name="id"></param>
@@ -74,17 +85,6 @@ namespace Hymson.MES.Data.Repositories.Equipment
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
 
-        }
-
-        /// <summary>
-        /// 更新状态
-        /// </summary>
-        /// <param name="procMaterialEntitys"></param>
-        /// <returns></returns>
-        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
 
         /// <summary>
@@ -224,9 +224,9 @@ namespace Hymson.MES.Data.Repositories.Equipment
         #region 修改
 
         const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET Name = @Name, EquipmentGroupId = @EquipmentGroupId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
-        const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
-        const string UpdateStatusSql = "UPDATE `equ_fault_phenomenon` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE equ_fault_phenomenon SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = UpdatedOn WHERE Id = @Id; ";
 
+        const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteEquFaultReasonPhenomenonRelationsSql = "DELETE FROM equ_fault_reason_phenomenon_relation WHERE FaultPhenomenonId in @Ids;";
 
         #endregion

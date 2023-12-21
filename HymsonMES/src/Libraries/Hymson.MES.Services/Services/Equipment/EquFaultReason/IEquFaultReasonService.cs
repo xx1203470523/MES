@@ -58,12 +58,13 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id);
 
+
         /// <summary>
         /// 状态变更
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="statusDto"></param>
         /// <returns></returns>
-        Task UpdateStatusAsync(ChangeStatusDto param);
+        Task UpdateStatusAsync(ChangeStatusDto statusDto);
 
     }
 }

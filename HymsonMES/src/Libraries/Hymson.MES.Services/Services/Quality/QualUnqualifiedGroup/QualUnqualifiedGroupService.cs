@@ -93,7 +93,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto param)
+        public async Task<long> CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto param)
         {
             param.UnqualifiedGroup = param.UnqualifiedGroup.ToTrimSpace().ToUpperInvariant();
             param.UnqualifiedGroupName = param.UnqualifiedGroupName.Trim();
@@ -160,6 +160,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
                 await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedGroupProcedureRelationRangAsync(qualUnqualifiedGroupProcedureRelationList);
             }
             ts.Complete();
+            return qualUnqualifiedGroupEntity.Id;
         }
 
         /// <summary>

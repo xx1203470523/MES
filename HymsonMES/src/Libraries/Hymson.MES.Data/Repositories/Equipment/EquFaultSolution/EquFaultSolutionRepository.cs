@@ -1,8 +1,10 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -64,6 +66,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
+        /// <summary>
         /// 软删除
         /// </summary>
         /// <param name="id"></param>
@@ -83,6 +96,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<InteEventEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<InteEventEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -182,10 +206,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string UpdateSql = "UPDATE equ_fault_solution SET   Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE equ_fault_solution SET   Code = @Code, Name = @Name, Status = @Status, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateStatusSql = "UPDATE equ_fault_solution SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = UpdatedOn WHERE Id = @Id; ";
 
         const string DeleteSql = "UPDATE equ_fault_solution SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE equ_fault_solution SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
+        const string GetByCodeSql = "SELECT * FROM equ_fault_solution WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM equ_fault_solution WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_fault_solution WHERE Id IN @Ids ";
 

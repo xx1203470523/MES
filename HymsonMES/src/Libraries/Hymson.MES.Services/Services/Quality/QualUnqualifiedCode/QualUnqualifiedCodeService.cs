@@ -196,7 +196,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        public async Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param)
+        public async Task<long> CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param)
         {
             param.UnqualifiedCode = param.UnqualifiedCode.ToTrimSpace().ToUpperInvariant();
             param.UnqualifiedCodeName = param.UnqualifiedCodeName.Trim();
@@ -244,6 +244,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
                 await _qualUnqualifiedGroupRepository.InsertQualUnqualifiedCodeGroupRelationRangAsync(list);
             }
             ts.Complete();
+            return qualUnqualifiedCodeEntity.Id;
         }
 
         /// <summary>
