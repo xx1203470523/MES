@@ -96,5 +96,28 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _equSparePartsService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 分页查询列表（过滤已经有类型的备件）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("page")]
+        public async Task<PagedInfo<EquSparePartsDto>> QueryGetPagedAsync([FromQuery] EquSparePartsPagedQueryDto pagedQueryDto)
+        {
+            return await _equSparePartsService.GetPagedAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 查询备件类型关联的备件
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}/sparePartsGroupList")]
+        public async Task<List<EquSparePartsDto>> GetSparePartsGroupRelationByIdAsync(long id)
+        {
+            return await _equSparePartsService.GetSparePartsGroupRelationByIdAsync(id);
+        }
+
     }
 }

@@ -9,6 +9,11 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     public class EquSparePartsPagedQuery : PagerInfo
     {
         /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
         /// 备件编码
         /// </summary>
         public string? Code { get; set; }
@@ -32,5 +37,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
         /// 站点Id
         /// </summary>
         public long SiteId { get;set; }
+
     }
 }

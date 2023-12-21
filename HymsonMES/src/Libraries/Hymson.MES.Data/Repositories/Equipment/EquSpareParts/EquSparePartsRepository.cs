@@ -4,7 +4,6 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquSpareParts.View;
 using Hymson.MES.Data.Repositories.Equipment.Query;
 using Microsoft.Extensions.Options;
 
@@ -55,6 +54,28 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
         /// <summary>
+        /// 更新（备件关联备件类型）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateTypeAsync(UpdateSparePartsTypeEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateTypeSql, entity);
+        }
+
+        /// <summary>
+        /// 更新（清空备件关联备件类型）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public async Task<int> CleanTypeAsync(UpdateSparePartsTypeEntity entity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(CleanTypeSql, entity);
+        }
+
+        /// <summary>
         /// 更新（批量）
         /// </summary>
         /// <param name="entities"></param>
@@ -81,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -114,10 +135,21 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquSparePartsEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<EquSparePartsEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquSparePartsEntity>(GetByIdsSql, new { Ids = ids });
+        }
+
+        /// <summary>
+        /// 获取关联的备件
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquSparePartsEntity>> GetSparePartsGroupRelationAsync(long Id)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquSparePartsEntity>(GetSparePartsGroupRelationSqlTemplate, new { Id = Id });
         }
 
         /// <summary>
@@ -146,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
             sqlBuilder.Select("esp.Id,ESP.`Code`,ESP.`Name`,ESP.`Status`,ESPG.`Code` AS sparePartsGroup,esp.Remark,esp.CreatedBy,esp.CreatedOn,esp.UpdatedOn,esp.UpdatedBy");
             sqlBuilder.Where("esp.SiteId = @SiteId");
             sqlBuilder.Where("esp.IsDeleted = 0");
-            sqlBuilder.Join("equ_spare_parts_group espg ON espg.Id = esp.SparePartsGroupId");
+            sqlBuilder.LeftJoin("equ_spare_parts_group espg ON espg.Id = esp.SparePartsGroupId");
             sqlBuilder.OrderBy("esp.UpdatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
@@ -182,6 +214,35 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return new PagedInfo<EquSparePartsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 分页查询(过滤掉已有类型的备件)
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<EquSparePartsEntity>> GetPagedInfoNotWithTypeoAsync(EquSparePartsPagedQuery pagedQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
+            sqlBuilder.Select("esp.Id,ESP.`Code`,ESP.`Name`,ESP.`Status`,esp.Remark,esp.CreatedBy,esp.CreatedOn,esp.UpdatedOn,esp.UpdatedBy,esp.IsDeleted");
+            sqlBuilder.Where("esp.SiteId = @SiteId");
+            sqlBuilder.Where("esp.IsDeleted = 0");
+            sqlBuilder.Where("(esp.SparePartsGroupId is null Or esp.SparePartsGroupId=0 Or esp.SparePartsGroupId=@Id)");
+            sqlBuilder.OrderBy("esp.UpdatedOn DESC");
+
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
+
+            using var conn = GetMESDbConnection();
+            var entitiesTask = conn.QueryAsync<EquSparePartsEntity>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var entities = await entitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<EquSparePartsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+        }
+
     }
 
 
@@ -201,6 +262,8 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string UpdateSql = "UPDATE `equ_spare_parts` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, Supplier = @Supplier, Status = @Status, SparePartsGroupId = @SparePartsGroupId, DrawCode = @DrawCode, Model = @Model, Position = @Position, IsAssociatedDevice = @IsAssociatedDevice, IsStandardPart = @IsStandardPart, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `equ_spare_parts` SET   SiteId = @SiteId, Code = @Code, Name = @Name, Manufacturer = @Manufacturer, Supplier = @Supplier, Status = @Status, SparePartsGroupId = @SparePartsGroupId, DrawCode = @DrawCode, Model = @Model, Position = @Position, IsAssociatedDevice = @IsAssociatedDevice, IsStandardPart = @IsStandardPart, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateTypeSql = "UPDATE `equ_spare_parts` SET  SparePartsGroupId = @Id, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @SparePartIds ";
+        const string CleanTypeSql = "UPDATE equ_spare_parts SET SparePartsGroupId=0 where SparePartsGroupId=@Id";
 
         const string DeleteSql = "UPDATE `equ_spare_parts` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `equ_spare_parts` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -209,6 +272,21 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetByIdsSql = @"SELECT * FROM `equ_spare_parts`  WHERE Id IN @Ids ";
 
         const string GetByCodeSql = "SELECT * FROM `equ_spare_parts` WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+
+        const string GetSparePartsGroupRelationSqlTemplate = @"SELECT
+	                                                                       Id,
+	                                                                       Code,
+	                                                                       Name,
+	                                                                       SparePartsGroupId,
+                                                                           IsDeleted,
+	                                                                       CreatedBy,
+	                                                                       CreatedOn
+                                                                        FROM
+	                                                                        equ_spare_parts 
+
+                                                                        WHERE
+	                                                                        SparePartsGroupId = @Id 
+	                                                                        AND IsDeleted = 0";
 
     }
 }
