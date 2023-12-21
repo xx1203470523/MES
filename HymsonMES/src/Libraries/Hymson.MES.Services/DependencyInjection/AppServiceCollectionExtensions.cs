@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -187,6 +188,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             //ESOP
             services.AddSingleton<IProcEsopService, ProcEsopService>();
+
+            //配方操作
+            services.AddSingleton<IProcFormulaOperationService, ProcFormulaOperationService>();
+            //配方操作组
+            services.AddSingleton<IProcFormulaOperationGroupService, ProcFormulaOperationGroupService>();
+
             #endregion
 
             #region Quality
@@ -417,6 +424,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcEsopModifyDto>, ProcEsopModifyValidator>();
             services.AddSingleton<AbstractValidator<ProcEsopGetJobQueryDto>, ProcEsopGetJobValidator>();
             #endregion
+
+            #region ProcFormulaOperation
+            services.AddSingleton<AbstractValidator<ProcFormulaOperationSaveDto>, ProcFormulaOperationSaveValidator>();
+            #endregion
+
+            #region ProcFormulaOperationGroup
+            services.AddSingleton<AbstractValidator<ProcFormulaOperationGroupSaveDto>, ProcFormulaOperationGroupSaveValidator>();
+            #endregion
+
             #endregion
 
             #region Integrated
