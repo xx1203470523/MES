@@ -729,6 +729,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量删除（物理删除）
         /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteSfcProduceBusinessByIdAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(DeleteSfcProduceBusinessByIdSql, new { Ids= ids });
+        }
+
+        /// <summary>
+        /// 批量删除（物理删除）
+        /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
         public async Task<int> DeleteSfcProduceBusinessBySfcInfoIdsAsync(DeleteSFCProduceBusinesssByIdsCommand command)
@@ -926,7 +937,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string InsertSql = "INSERT INTO `manu_sfc_produce`(  `Id`, `SFC`,`SFCId`, `ProductId`, `WorkOrderId`, `BarCodeInfoId`, `ProcessRouteId`, `WorkCenterId`, `ProductBOMId`, `Qty`, `EquipmentId`, `ResourceId`, `ProcedureId`, `Status`, `Lock`, `LockProductionId`, `IsSuspicious`, `RepeatedCount`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsScrap`) VALUES (   @Id, @SFC,@SFCId, @ProductId, @WorkOrderId, @BarCodeInfoId, @ProcessRouteId, @WorkCenterId, @ProductBOMId, @Qty, @EquipmentId, @ResourceId, @ProcedureId, @Status, @Lock, @LockProductionId, @IsSuspicious, @RepeatedCount, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsScrap )  ";
         const string InsertSfcProduceBusinessSql = "INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `manu_sfc_produce` SET Sfc = @Sfc, ProductId = @ProductId, WorkOrderId = @WorkOrderId, BarCodeInfoId = @BarCodeInfoId, ProcessRouteId = @ProcessRouteId, WorkCenterId = @WorkCenterId, ProductBOMId = @ProductBOMId, EquipmentId = @EquipmentId, ResourceId = @ResourceId, ProcedureId = @ProcedureId, Status = @Status, `Lock` = @Lock, LockProductionId = @LockProductionId, IsSuspicious = @IsSuspicious, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdateWithStatusCheckSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcessRouteId = @ProcessRouteId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
+        const string UpdateWithStatusCheckSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcessRouteId = @ProcessRouteId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount,IsScrap=@IsScrap, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
         const string UpdateWithStatusCheckUseInSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id IN @Ids; ";
         const string UpdateProduceInStationSFCSql = "UPDATE manu_sfc_produce SET Status = @Status, ResourceId = @ResourceId, ProcedureId = @ProcedureId, RepeatedCount = @RepeatedCount, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id AND (Status = @CurrentStatus OR CreatedOn = UpdatedOn); ";
         const string UpdateSfcProduceBusinessSql = "UPDATE `manu_sfc_produce_business` SET BusinessType = @BusinessType, BusinessContent = @BusinessContent, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
@@ -952,6 +963,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string DeletePhysicalRangeByIdsSql = "DELETE FROM manu_sfc_produce WHERE SiteId = @SiteId AND Id IN @Ids ";
         const string DeletePhysicalRangeByIdSql = "DELETE FROM manu_sfc_produce WHERE Id = @Id ";
         const string DeleteSfcProduceBusinessBySfcInfoIdSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId = @SfcInfoId";
+        const string DeleteSfcProduceBusinessByIdSql = "DELETE FROM manu_sfc_produce_business WHERE Id in @Ids";
         const string DeleteSfcProduceBusinessBySfcInfoIdsSql = "DELETE FROM manu_sfc_produce_business WHERE SiteId = @SiteId AND SfcProduceId IN @SfcInfoIds";
         const string RealDeletesSfcProduceBusinessSql = "DELETE FROM manu_sfc_produce_business WHERE SfcProduceId IN @SfcInfoIds AND BusinessType=@BusinessType";
         const string InsertOrUpdateSfcProduceBusinessSql = @"INSERT INTO `manu_sfc_produce_business`(  `Id`, `SiteId`, `SfcProduceId`, `BusinessType`, `BusinessContent`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcProduceId, @BusinessType, @BusinessContent, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted ) ON DUPLICATE KEY UPDATE

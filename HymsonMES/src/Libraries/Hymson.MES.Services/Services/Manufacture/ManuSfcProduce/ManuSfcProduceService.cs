@@ -15,6 +15,7 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
+using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -37,6 +38,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {
@@ -771,6 +773,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 BarCodes = manuSfcs
             });
 
+
+
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
@@ -781,7 +785,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             IEnumerable<ManuSfcProduceBusinessEntity>? sfcProduceBusinessEntities = new List<ManuSfcProduceBusinessEntity>();
             if (manuSfcProduceEntities != null && manuSfcProduceEntities.Any())
             {
-                var ids = sfcProduceBusinessEntities.Select(x => x.Id).ToList();
+                var ids = manuSfcProduceEntities.Select(x => x.Id).ToList();
                 if (ids.Any())
                 {
                     sfcProduceBusinessEntities = await _manuSfcProduceRepository.GetSfcProduceBusinessBySFCIdsAsync(ids);
@@ -796,7 +800,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var updateProduceInStationSFCCommands = new List<UpdateProduceInStationSFCCommand>();
             var manuSfcProduceList = new List<ManuSfcProduceEntity>();
             var manuSfcUpdateStatusByIdCommands = new List<ManuSfcUpdateStatusByIdCommand>();
-
+            var manuSfcUpdateRouteByIdCommands = new List<ManuSfcUpdateRouteByIdCommand>();
+            var deleteSfcProduceBusinessIds = new List<long>();
             var deleteIds = new List<long>();
             var validationFailures = new List<ValidationFailure>();
             foreach (var item in manuSfcs)
@@ -911,11 +916,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                         {
                             if (manuSfcProduceEntity.IsRepair == TrueOrFalseEnum.Yes)
                             {
-                                if (sfcProduceBusinessEntities.Any(x => x.SfcProduceId == manuSfcProduceEntity.Id))
-                                {
-
-                                }
-                                else
+                                var sfcProduceBusinessEntity = sfcProduceBusinessEntities.FirstOrDefault(x => x.SfcProduceId == manuSfcProduceEntity.Id && x.BusinessType == ManuSfcProduceBusinessType.Repair);
+                                if (sfcProduceBusinessEntity == null)
                                 {
                                     var validationFailure = new ValidationFailure();
                                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -927,11 +929,24 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                     {
                                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", manuSfcEntity.SFC);
                                     }
-                                    validationFailure.FormattedMessagePlaceholderValues.Add("ordercode", planWorkOrderEntitity.OrderCode);
+                                    validationFailure.FormattedMessagePlaceholderValues.Add("ordercode", planWorkOrderEntitity!.OrderCode);
                                     validationFailure.ErrorCode = nameof(ErrorCode.MES16383);
                                     validationFailures.Add(validationFailure);
                                     continue;
                                 }
+                                var sfcProduceRepairBo = JsonSerializer.Deserialize<SfcProduceRepairBo>(sfcProduceBusinessEntity.BusinessContent);
+                                manuSfcUpdateRouteByIdCommands.Add(new ManuSfcUpdateRouteByIdCommand
+                                {
+                                    Id = manuSfcProduceEntity.Id,
+                                    ProcessRouteId = sfcProduceRepairBo?.ProcessRouteId ?? 0,
+                                    ProcedureId = sfcProduceRepairBo?.ProcedureId ?? 0,
+                                    Status = SfcStatusEnum.InProductionComplete,
+                                    IsRepair = TrueOrFalseEnum.Yes,
+                                    UpdatedBy = _currentUser.UserName,
+                                    UpdatedOn = HymsonClock.Now()
+                                });
+
+                                deleteSfcProduceBusinessIds.Add(sfcProduceBusinessEntity?.Id ?? 0);
                             }
                             else
                             {
@@ -1074,7 +1089,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                             });
                         }
                         break;
-                    default:
+                    default: 
                         break;
                 }
             }
@@ -1139,8 +1154,17 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 };
                 await _manuSfcProduceRepository.DeletePhysicalRangeByIdsSqlAsync(physicalDeleteSFCProduceByIdsCommand);
             }
-            trans.Complete();
 
+            if (manuSfcUpdateRouteByIdCommands != null && manuSfcUpdateRouteByIdCommands.Any())
+            {
+                await _manuSfcProduceRepository.UpdateRouteByIdRangeAsync(manuSfcUpdateRouteByIdCommands);
+            }
+
+            if (deleteSfcProduceBusinessIds != null && deleteSfcProduceBusinessIds.Any())
+            {
+                await _manuSfcProduceRepository.DeleteSfcProduceBusinessByIdAsync(deleteSfcProduceBusinessIds);
+            }
+            trans.Complete();
         }
         #endregion
 
