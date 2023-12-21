@@ -598,6 +598,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcFormulaSaveDto, ProcFormulaEntity>();
 
             CreateMap<ProcFormulaView, ProcFormulaViewDto>();
+            CreateMap<ProcFormulaDetailsEntity, ProcFormulaDetailsDto>();
+            CreateMap<ProcFormulaDetailsEntity, ProcFormulaDetailsViewDto>();
 
             CreateMap<ProcFormulaEntity, ProcFormulaDetailViewDto>();
 

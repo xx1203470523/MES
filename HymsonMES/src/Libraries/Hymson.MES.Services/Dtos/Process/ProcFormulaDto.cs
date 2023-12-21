@@ -53,6 +53,8 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? Remark { get; set; }
 
+
+        public IEnumerable<ProcFormulaDetailsDto>? ProcFormulaDetailsDtos { get; set; }
     }
 
     /// <summary>
@@ -244,4 +246,66 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ProcedureName { get; set; }
     }
 
+    /// <summary>
+    /// 配方维护详情Dto
+    /// </summary>
+    public record ProcFormulaDetailsDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int Serial { get; set; }
+
+        /// <summary>
+        /// proc_formula_operation id 配方操作id
+        /// </summary>
+        public long FormulaOperationId { get; set; }
+
+        /// <summary>
+        /// proc_material 的id
+        /// </summary>
+        public long? MateriaId { get; set; }
+
+        /// <summary>
+        /// proc_material_group 的id
+        /// </summary>
+        public long? MateriaGroupId { get; set; }
+
+        /// <summary>
+        /// proc_process_equipment_group的id
+        /// </summary>
+        public long? EquipmentGroupId { get; set; }
+
+        /// <summary>
+        /// 功能代码
+        /// </summary>
+        public string? FunctionCode { get; set; }
+
+        /// <summary>
+        /// 设定值
+        /// </summary>
+        public string Setvalue { get; set; }
+
+        /// <summary>
+        /// 上限
+        /// </summary>
+        public decimal? UpperLimit { get; set; }
+
+        /// <summary>
+        /// 下限
+        /// </summary>
+        public decimal? LowLimit { get; set; }
+
+        /// <summary>
+        /// 单位
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
+    }
+
+    public record ProcFormulaDetailsViewDto : ProcFormulaDetailsDto { }
 }

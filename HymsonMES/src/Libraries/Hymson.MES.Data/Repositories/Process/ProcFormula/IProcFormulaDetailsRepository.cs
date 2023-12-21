@@ -80,5 +80,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<PagedInfo<ProcFormulaDetailsEntity>> GetPagedListAsync(ProcFormulaDetailsPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 获取对应FormulaId的详情
+        /// </summary>
+        /// <param name="formulaId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcFormulaDetailsEntity>> GetFormulaDetailsByFormulaIdAsync(long formulaId);
     }
 }

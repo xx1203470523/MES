@@ -99,6 +99,17 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procFormulaService.GetPagedListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 获取详情
+        /// </summary>
+        /// <param name="formulaId"></param>
+        /// <returns></returns>
+        [HttpGet("details/{formulaId}")]
+        public async Task<IEnumerable<ProcFormulaDetailsViewDto>> GetFormulaDetailsByFormulaIdAsync(long formulaId) 
+        {
+            return await _procFormulaService.GetFormulaDetailsByFormulaIdAsync(formulaId);
+        }
+
         #region 状态变更
         /// <summary>
         /// 启用

@@ -52,6 +52,13 @@ namespace Hymson.MES.Services.Services.Process
         Task<PagedInfo<ProcFormulaViewDto>> GetPagedListAsync(ProcFormulaPagedQueryDto pagedQueryDto);
 
         /// <summary>
+        /// 获取详情
+        /// </summary>
+        /// <param name="formulaId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcFormulaDetailsViewDto>> GetFormulaDetailsByFormulaIdAsync(long formulaId);
+
+        /// <summary>
         /// 状态变更
         /// </summary>
         /// <param name="param"></param>

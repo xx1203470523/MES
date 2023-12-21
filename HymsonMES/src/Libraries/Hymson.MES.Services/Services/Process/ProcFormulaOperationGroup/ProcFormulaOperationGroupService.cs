@@ -320,5 +320,19 @@ namespace Hymson.MES.Services.Services.Process
             }
             return new PagedInfo<ProcFormulaOperationDto>(dtos, pagedQueryDto.PageIndex, pagedQueryDto.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 根据操作组Id获取所有配方操作
+        /// </summary>
+        /// <param name="formulaOperationGroupId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcFormulaOperationDto>> GetFormulaOperationByFormulaOperationGroupIdAsync(long formulaOperationGroupId) 
+        {
+            var formulaOperationGroupRelatiions = await _procFormulaOperationGroupRelatiionRepository.GetOperationIdsByGroupIdAsync(formulaOperationGroupId);
+
+            var formulaOperations= await _procFormulaOperationRepository.GetByIdsAsync(formulaOperationGroupRelatiions.Select(x => x.FormulaOperationId).ToArray());
+
+            return formulaOperations.Select(x => x.ToModel<ProcFormulaOperationDto>());
+        }
     }
 }

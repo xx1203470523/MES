@@ -52,6 +52,8 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcFormulaOperationGroupRepository _procFormulaOperationGroupRepository;
 
+        private readonly IProcFormulaDetailsRepository _procFormulaDetailsRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -65,7 +67,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procFormulaOperationGroupRepository"></param>
         public ProcFormulaService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaSaveDto> validationSaveRules, 
-            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository)
+            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository, IProcFormulaDetailsRepository procFormulaDetailsRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -76,6 +78,7 @@ namespace Hymson.MES.Services.Services.Process
             _procProcedureRepository = procProcedureRepository;
             _procProcessEquipmentGroupRepository = procProcessEquipmentGroupRepository;
             _procFormulaOperationGroupRepository = procFormulaOperationGroupRepository;
+            _procFormulaDetailsRepository = procFormulaDetailsRepository;
         }
 
 
@@ -229,6 +232,18 @@ namespace Hymson.MES.Services.Services.Process
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<ProcFormulaViewDto>());
             return new PagedInfo<ProcFormulaViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 获取详情
+        /// </summary>
+        /// <param name="formulaId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcFormulaDetailsViewDto>> GetFormulaDetailsByFormulaIdAsync(long formulaId) 
+        {
+            var formulaDetails=  await _procFormulaDetailsRepository.GetFormulaDetailsByFormulaIdAsync(formulaId);
+
+            return formulaDetails.Select(s => s.ToModel<ProcFormulaDetailsViewDto>());
         }
 
 

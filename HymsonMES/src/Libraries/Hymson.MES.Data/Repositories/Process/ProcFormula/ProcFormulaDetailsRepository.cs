@@ -148,6 +148,16 @@ namespace Hymson.MES.Data.Repositories.Process
             return new PagedInfo<ProcFormulaDetailsEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 获取对应FormulaId的详情
+        /// </summary>
+        /// <param name="formulaId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcFormulaDetailsEntity>> GetFormulaDetailsByFormulaIdAsync(long formulaId) 
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcFormulaDetailsEntity>(GetFormulaDetailsByFormulaIdSql, new { FormulaId= formulaId });
+        }
     }
 
 
@@ -174,5 +184,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM proc_formula_details WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM proc_formula_details WHERE Id IN @Ids ";
 
+        const string GetFormulaDetailsByFormulaIdSql = @"SELECT * FROM proc_formula_details WHERE FormulaId = @FormulaId ";
     }
 }

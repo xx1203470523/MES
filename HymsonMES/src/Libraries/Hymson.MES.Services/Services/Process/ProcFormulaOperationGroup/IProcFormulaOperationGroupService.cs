@@ -57,5 +57,11 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task<PagedInfo<ProcFormulaOperationDto>> GetFormulaOperationListAsync(OperationGroupGetOperationPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 根据操作组Id获取所有配方操作
+        /// </summary>
+        /// <param name="formulaOperationGroupId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcFormulaOperationDto>> GetFormulaOperationByFormulaOperationGroupIdAsync(long formulaOperationGroupId);
     }
 }

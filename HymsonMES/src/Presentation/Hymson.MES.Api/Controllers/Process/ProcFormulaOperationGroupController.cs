@@ -108,5 +108,15 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procFormulaOperationGroupService.GetFormulaOperationListAsync(pagedQueryDto);
         }
 
+        /// <summary>
+        /// 根据操作组Id获取所有配方操作
+        /// </summary>
+        /// <param name="formulaOperationGroupId"></param>
+        /// <returns></returns>
+        [HttpGet("getOperationsByGroupId/{formulaOperationGroupId}")]
+        public async Task<IEnumerable<ProcFormulaOperationDto>> GetFormulaOperationByFormulaOperationGroupIdAsync(long formulaOperationGroupId) 
+        {
+            return await _procFormulaOperationGroupService.GetFormulaOperationByFormulaOperationGroupIdAsync(formulaOperationGroupId);
+        }
     }
 }
