@@ -85,7 +85,13 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述
         /// </summary>
         public string? Remark { get; set; }
+    }
 
-       
+    public class UpdateSparePartsTypeEntity : BaseEntity
+    {
+     /// <summary>
+     /// 关联备件
+      /// </summary>
+        public IEnumerable<long>? SparePartIds { get; set; }
     }
 }
