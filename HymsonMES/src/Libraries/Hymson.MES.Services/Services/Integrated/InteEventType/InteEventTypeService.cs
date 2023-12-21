@@ -125,7 +125,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteEventTypeSaveDto saveDto)
+        public async Task<long> CreateAsync(InteEventTypeSaveDto saveDto)
         {
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -282,7 +282,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     trans.Complete();
                 }
             }
-            return rows;
+            return entity.Id;
         }
 
         /// <summary>
