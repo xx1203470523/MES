@@ -249,6 +249,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcFormulaOperationGroupRelatiionRepository, ProcFormulaOperationGroupRelatiionRepository>();
             #endregion
 
+            #region  ProcFormula
+            services.AddSingleton<IProcFormulaRepository, ProcFormulaRepository>();
+            #endregion
+
             #endregion
 
             #region Quality
