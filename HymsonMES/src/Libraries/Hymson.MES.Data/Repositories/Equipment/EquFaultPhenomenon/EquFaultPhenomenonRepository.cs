@@ -23,34 +23,34 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity)
+        public async Task<int> InsertAsync(EquFaultPhenomenonEntity entity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, equFaultPhenomenonEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 新增（设备故障现象和原因关系）
         /// </summary>
-        /// <param name="equFaultReasonPhenomenonEntities"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> equFaultReasonPhenomenonEntities)
+        public async Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertFaultReasonPhenomenonRelationSql, equFaultReasonPhenomenonEntities);
+            return await conn.ExecuteAsync(InsertFaultReasonPhenomenonRelationSql, entities);
         }
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity)
+        public async Task<int> UpdateAsync(EquFaultPhenomenonEntity entity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, equFaultPhenomenonEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
@@ -205,6 +205,46 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return await conn.QueryAsync<EquFaultPhenomenonReasonRelationEntity>(templateData.RawSql, templateData.Parameters);
         }
 
+
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByParentIdSql, command);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRelationsAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertRelationsSql, entities);
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetRelationEntitiesSqlTemplate);
+            sqlBuilder.Where("FaultPhenomenonId = @ParentId");
+            sqlBuilder.Select("*");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquFaultPhenomenonReasonRelationEntity>(template.RawSql, query);
+        }
+
     }
 
     /// <summary>
@@ -233,17 +273,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         #region 查询
         const string GetByIdSql = @"SELECT * FROM `equ_fault_phenomenon`  WHERE Id = @Id ";
-        const string GetViewById = @"SELECT 
-                EFP.Id, EFP.Code, EFP.Name, EFP.EquipmentGroupId, EFP.Status, EFP.CreatedBy, EFP.CreatedOn, EFP.UpdatedBy, EFP.UpdatedOn, EEG.EquipmentGroupName,EFP.Remark 
-                FROM equ_fault_phenomenon EFP LEFT JOIN equ_equipment_group EEG ON EFP.EquipmentGroupId = EEG.Id 
-                WHERE EFP.Id = @Id ";
         const string GetByCodeSql = "SELECT * FROM equ_fault_phenomenon WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ ";
-
         const string GetByIdsSql = @"SELECT * FROM equ_fault_phenomenon WHERE IsDeleted = 0 AND Id IN @ids ";
-
         const string GetEquFaultReasonsSql = @"SELECT * FROM equ_fault_reason_phenomenon_relation /**where**/ ";
         #endregion
+
+
+        const string DeleteByParentIdSql = "DELETE FROM equ_fault_phenomenon_reason_relation WHERE FaultPhenomenonId = @ParentId";
+        const string InsertRelationsSql = "INSERT INTO equ_fault_phenomenon_reason_relation (Id, FaultPhenomenonId, FaultReasonId) VALUES (@Id, @FaultPhenomenonId, @FaultReasonId) ";
+        const string GetRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon_reason_relation /**where**/  ";
+
     }
 }

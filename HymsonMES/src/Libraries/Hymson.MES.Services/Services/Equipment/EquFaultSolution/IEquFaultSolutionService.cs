@@ -47,17 +47,11 @@ namespace Hymson.MES.Services.Services.Equipment
         Task<EquFaultSolutionDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 获取解决措施（可被引用）
+        /// 获取解决措施列表
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<SelectOptionDto>> QuerySolutionsAsync();
 
-        /// <summary>
-        /// 根据ID获取关联解决措施
-        /// </summary>
-        /// <param name="reasonId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<SelectOptionDto>> QuerySolutionsByMainIdAsync(long reasonId);
 
 
         /// <summary>

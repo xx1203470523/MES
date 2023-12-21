@@ -114,16 +114,6 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _equFaultSolutionService.QuerySolutionsAsync();
         }
 
-        /// <summary>
-        /// 查询列表（关联故障原因）
-        /// </summary>
-        /// <param name="reasonId"></param>
-        /// <returns></returns>
-        [HttpGet("reason/{reasonId}")]
-        public async Task<IEnumerable<SelectOptionDto>> QuerySolutionsByMainIdAsync(long reasonId)
-        {
-            return await _equFaultSolutionService.QuerySolutionsByMainIdAsync(reasonId);
-        }
 
 
         #region 状态变更

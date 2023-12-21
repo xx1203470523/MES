@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("create")]
         [PermissionDescription("equipment:equFaultPhenomenon:insert")]
         public async Task AddAsync(EquFaultPhenomenonSaveDto createDto)
         {
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
+        [Route("update")]
         [PermissionDescription("equipment:equFaultPhenomenon:update")]
         public async Task UpdateAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [Route("delete")]
         [PermissionDescription("equipment:equFaultPhenomenon:delete")]
         public async Task DeleteAsync(long[] ids)
         {
@@ -92,9 +96,20 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquFaultPhenomenonDto> QueryByIdAsync(long id)
+        public async Task<EquFaultPhenomenonDto?> QueryByIdAsync(long id)
         {
             return await _equFaultPhenomenonService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询列表（关联故障现象）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("reasons/{id}")]
+        public async Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long id)
+        {
+            return await _equFaultPhenomenonService.QueryReasonsByMainIdAsync(id);
         }
 
 

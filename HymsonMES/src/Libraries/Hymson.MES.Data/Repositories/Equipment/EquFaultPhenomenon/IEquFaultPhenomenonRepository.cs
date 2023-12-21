@@ -14,23 +14,23 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
+        Task<int> InsertAsync(EquFaultPhenomenonEntity entity);
 
         /// <summary>
         /// 新增（设备故障现象和原因关系）
         /// </summary>
-        /// <param name="equFaultReasonPhenomenonEntities"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> equFaultReasonPhenomenonEntities);
+        Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities);
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
+        Task<int> UpdateAsync(EquFaultPhenomenonEntity entity);
 
         /// <summary>
         /// 更新状态
@@ -94,6 +94,29 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteEquFaultReasonPhenomenonRelationsAsync(DeleteCommand command);
+
+
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertRelationsAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

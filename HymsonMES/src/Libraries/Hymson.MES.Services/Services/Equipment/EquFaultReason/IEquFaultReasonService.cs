@@ -44,10 +44,10 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquFaultReasonDto> QueryByIdAsync(long id);
+        Task<EquFaultReasonDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 获取解决措施（可被引用）
+        /// 获取故障原因列表
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<SelectOptionDto>> QueryReasonsAsync();
@@ -55,9 +55,10 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 根据ID获取关联解决措施
         /// </summary>
-        /// <param name="phenomenonId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task<IEnumerable<SelectOptionDto>> QueryReasonsByMainIdAsync(long phenomenonId);
+        Task<IEnumerable<long>> QuerySolutionsByMainIdAsync(long id);
+
 
 
         /// <summary>

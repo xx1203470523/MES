@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -29,6 +28,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 关联解决措施
+        /// </summary>
+        public IEnumerable<long>? SolutionIds { get; set; }
 
     }
 
@@ -111,7 +115,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 设备故障原因表查询Dto
     /// </summary>
-    public class EquFaultReasonQueryDto : QueryDtoAbstraction
+    public class EquFaultReasonQueryDto
     {
         /// <summary>
         /// Ids
