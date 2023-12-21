@@ -251,6 +251,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region  ProcFormula
             services.AddSingleton<IProcFormulaRepository, ProcFormulaRepository>();
+            services.AddSingleton<IProcFormulaDetailsRepository, ProcFormulaDetailsRepository>();
             #endregion
 
             #endregion
