@@ -141,12 +141,12 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("f.IsDeleted = 0");
             sqlBuilder.Where("f.SiteId = @SiteId");
 
-            if (string.IsNullOrWhiteSpace( pagedQuery.Code))
+            if (!string.IsNullOrWhiteSpace( pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("f.Code LIKE  @Code");
             }
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("f.Name LIKE  @Name");
@@ -165,12 +165,12 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("f.ProcedureId =  @ProcedureId");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.MaterialName))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialName))
             {
                 pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";
                 sqlBuilder.Where("m.MaterialName LIKE  @MaterialName");
             }
-            if (string.IsNullOrWhiteSpace(pagedQuery.ProcedureName))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ProcedureName))
             {
                 pagedQuery.ProcedureName = $"%{pagedQuery.ProcedureName}%";
                 sqlBuilder.Where("p.Name LIKE  @ProcedureName");
