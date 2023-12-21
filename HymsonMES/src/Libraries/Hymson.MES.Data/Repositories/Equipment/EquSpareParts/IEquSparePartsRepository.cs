@@ -89,5 +89,33 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<EquSparePartsEntity> GetByCodeAsync(EntityByCodeQuery query);
 
+        /// <summary>
+        /// 更新（备件关联备件类型）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateTypeAsync(UpdateSparePartsTypeEntity entity);
+
+        /// <summary>
+        /// 分页查询(过滤掉已有类型的备件)
+        /// </summary>
+        /// <param name="pagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquSparePartsEntity>> GetPagedInfoNotWithTypeoAsync(EquSparePartsPagedQuery pagedQuery);
+
+        /// <summary>
+        /// 获取关联的备件
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquSparePartsEntity>> GetSparePartsGroupRelationAsync(long Id);
+
+        /// <summary>
+        /// 更新（清空备件关联备件类型）
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> CleanTypeAsync(UpdateSparePartsTypeEntity entity);
+
     }
 }
