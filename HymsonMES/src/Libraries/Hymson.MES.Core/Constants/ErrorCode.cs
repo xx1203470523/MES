@@ -1144,6 +1144,13 @@
         public const string MES19308 = "系统中无{Code}数据，请检查是否导入";
         #endregion
 
+        #region 报表 19401
+
+        //Pack追溯电芯码报表
+        public const string MES19401 = "查询条件条码或者日期不能为空！";
+
+        #endregion
+
         #region 系统执行出错 业务逻辑出错
         //public const string MES20001 = "MES20001";
 
