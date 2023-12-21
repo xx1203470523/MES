@@ -138,6 +138,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventTypeService, InteEventTypeService>();
             services.AddSingleton<IInteEventService, InteEventService>();
             services.AddSingleton<IInteMessageManageService, InteMessageManageService>();
+            services.AddSingleton<IInteCustomFieldService, InteCustomFieldService>();
             #endregion
 
             #region Process
@@ -445,6 +446,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteMessageGroupSaveDto>, InteMessageGroupSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventTypeSaveDto>, InteEventTypeSaveValidator>();
             services.AddSingleton<AbstractValidator<InteEventSaveDto>, InteEventSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteCustomFieldSaveDto>, InteCustomFieldSaveValidator>();
+            services.AddSingleton<AbstractValidator<InteCustomFieldInternationalizationDto>, InteCustomFieldInternationalizationValidator>();
+            services.AddSingleton<AbstractValidator<InteCustomFieldBusinessEffectuateDto>, InteCustomFieldBusinessEffectuatenValidator>();
             services.AddSingleton<AbstractValidator<InteMessageManageTriggerSaveDto>, InteMessageManageSaveValidator>();
 
             #region CodeRule
