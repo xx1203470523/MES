@@ -773,8 +773,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 BarCodes = manuSfcs
             });
 
-
-
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
@@ -941,7 +939,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                     ProcessRouteId = sfcProduceRepairBo?.ProcessRouteId ?? 0,
                                     ProcedureId = sfcProduceRepairBo?.ProcedureId ?? 0,
                                     Status = SfcStatusEnum.InProductionComplete,
-                                    IsRepair = TrueOrFalseEnum.Yes,
+                                    IsRepair = TrueOrFalseEnum.No,
                                     UpdatedBy = _currentUser.UserName,
                                     UpdatedOn = HymsonClock.Now()
                                 });
@@ -959,63 +957,64 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                     UpdatedBy = _currentUser.UserName
                                 });
                                 deleteIds.Add(manuSfcProduceEntity.Id);
+
+                                if (whMaterialInventoryList != null && whMaterialInventoryList.Any(it => it.MaterialBarCode == item))
+                                {
+                                    updateAddInventoryQuantityList.Add(new UpdateQuantityRangeCommand
+                                    {
+                                        Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                                        BarCode = item,
+                                        QuantityResidue = manuSfcEntity.Qty,
+                                        UpdatedBy = _currentUser.UserName,
+                                        UpdatedOn = HymsonClock.Now()
+                                    });
+                                }
+                                else
+                                {
+                                    // 物料库存
+                                    addWhMaterialInventoryList.Add(new WhMaterialInventoryEntity
+                                    {
+                                        SupplierId = 0,//自制品 没有
+                                        MaterialId = manuSfcInfoEntity?.ProductId ?? 0,
+                                        MaterialBarCode = item,
+                                        Batch = "",//自制品 没有
+                                        MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
+                                        QuantityResidue = manuSfcEntity.Qty,
+                                        Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                                        Source = MaterialInventorySourceEnum.ManuComplete,
+                                        SiteId = _currentSite.SiteId ?? 0,
+                                        Id = IdGenProvider.Instance.CreateId(),
+                                        CreatedBy = _currentUser.UserName,
+                                        UpdatedBy = _currentUser.UserName,
+                                        CreatedOn = HymsonClock.Now(),
+                                        UpdatedOn = HymsonClock.Now()
+                                    });
+
+                                    var procMaterialEntitity = procMaterialEntities.FirstOrDefault(x => x.Id == manuSfcInfoEntity?.ProductId);
+
+                                    // 台账数据
+                                    whMaterialStandingbookList.Add(new WhMaterialStandingbookEntity
+                                    {
+                                        MaterialCode = procMaterialEntitity?.MaterialCode ?? "",
+                                        MaterialName = procMaterialEntitity?.MaterialName ?? "",
+                                        MaterialVersion = procMaterialEntitity?.Version ?? "",
+                                        MaterialBarCode = item,
+                                        Batch = "",//自制品 没有
+                                        Quantity = manuSfcEntity.Qty,
+                                        Unit = procMaterialEntitity?.Unit ?? "",
+                                        Type = WhMaterialInventoryTypeEnum.StepControl,
+                                        Source = MaterialInventorySourceEnum.ManuComplete,
+                                        SiteId = _currentSite.SiteId ?? 0,
+                                        Id = IdGenProvider.Instance.CreateId(),
+                                        CreatedBy = _currentUser.UserName,
+                                        UpdatedBy = _currentUser.UserName,
+                                        CreatedOn = HymsonClock.Now(),
+                                        UpdatedOn = HymsonClock.Now()
+                                    });
+                                }
                             }
                         }
 
-                        if (whMaterialInventoryList != null && whMaterialInventoryList.Any(it => it.MaterialBarCode == item))
-                        {
-                            updateAddInventoryQuantityList.Add(new UpdateQuantityRangeCommand
-                            {
-                                Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                                BarCode = item,
-                                QuantityResidue = manuSfcEntity.Qty,
-                                UpdatedBy = _currentUser.UserName,
-                                UpdatedOn = HymsonClock.Now()
-                            });
-                        }
-                        else
-                        {
-                            // 物料库存
-                            addWhMaterialInventoryList.Add(new WhMaterialInventoryEntity
-                            {
-                                SupplierId = 0,//自制品 没有
-                                MaterialId = manuSfcInfoEntity?.ProductId ?? 0,
-                                MaterialBarCode = item,
-                                Batch = "",//自制品 没有
-                                MaterialType = MaterialInventoryMaterialTypeEnum.SelfMadeParts,
-                                QuantityResidue = manuSfcEntity.Qty,
-                                Status = WhMaterialInventoryStatusEnum.ToBeUsed,
-                                Source = MaterialInventorySourceEnum.ManuComplete,
-                                SiteId = _currentSite.SiteId ?? 0,
-                                Id = IdGenProvider.Instance.CreateId(),
-                                CreatedBy = _currentUser.UserName,
-                                UpdatedBy = _currentUser.UserName,
-                                CreatedOn = HymsonClock.Now(),
-                                UpdatedOn = HymsonClock.Now()
-                            });
-
-                            var procMaterialEntitity = procMaterialEntities.FirstOrDefault(x => x.Id == manuSfcInfoEntity?.ProductId);
-
-                            // 台账数据
-                            whMaterialStandingbookList.Add(new WhMaterialStandingbookEntity
-                            {
-                                MaterialCode = procMaterialEntitity?.MaterialCode ?? "",
-                                MaterialName = procMaterialEntitity?.MaterialName ?? "",
-                                MaterialVersion = procMaterialEntitity?.Version ?? "",
-                                MaterialBarCode = item,
-                                Batch = "",//自制品 没有
-                                Quantity = manuSfcEntity.Qty,
-                                Unit = procMaterialEntitity?.Unit ?? "",
-                                Type = WhMaterialInventoryTypeEnum.StepControl,
-                                Source = MaterialInventorySourceEnum.ManuComplete,
-                                SiteId = _currentSite.SiteId ?? 0,
-                                Id = IdGenProvider.Instance.CreateId(),
-                                CreatedBy = _currentUser.UserName,
-                                UpdatedBy = _currentUser.UserName,
-                                CreatedOn = HymsonClock.Now(),
-                                UpdatedOn = HymsonClock.Now()
-                            });
-                        }
                         break;
                     case SfcStepControlEnum.InProductionComplete:
                     case SfcStepControlEnum.lineUp:
