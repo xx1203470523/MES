@@ -80,10 +80,17 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultSolutionEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquFaultSolutionEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultSolutionEntity>> GetEntitiesAsync(EntityByStatusQuery query);
+
+        /// <summary>
+        /// 查询List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -95,6 +102,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<EquFaultSolutionEntity>> GetPagedListAsync(EquFaultSolutionPagedQuery pagedQuery);
+
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

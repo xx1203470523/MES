@@ -45,7 +45,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [PermissionDescription("equipment:equFaultPhenomenon:insert")]
-        public async Task CreateAsync(EquFaultPhenomenonSaveDto createDto)
+        public async Task AddAsync(EquFaultPhenomenonSaveDto createDto)
         {
             await _equFaultPhenomenonService.CreateAsync(createDto);
         }
@@ -57,7 +57,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [PermissionDescription("equipment:equFaultPhenomenon:update")]
-        public async Task ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
+        public async Task UpdateAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             await _equFaultPhenomenonService.ModifyAsync(modifyDto);
         }
@@ -69,7 +69,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [PermissionDescription("equipment:equFaultPhenomenon:delete")]
-        public async Task DeletesAsync(long[] ids)
+        public async Task DeleteAsync(long[] ids)
         {
             await _equFaultPhenomenonService.DeletesAsync(ids);
         }
@@ -92,21 +92,11 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquFaultPhenomenonDto> GetDetailAsync(long id)
+        public async Task<EquFaultPhenomenonDto> QueryByIdAsync(long id)
         {
-            return await _equFaultPhenomenonService.GetDetailAsync(id);
+            return await _equFaultPhenomenonService.QueryByIdAsync(id);
         }
 
-        /// <summary>
-        /// 获取已分配故障原因
-        /// </summary>
-        /// <param name="equFaultPhenomenonQueryDto"></param>
-        /// <returns></returns>
-        [HttpGet("getChangedFaultReason")]
-        public async Task<IEnumerable<EquFaultReasonDto>> GetChangedFaultReasonAsync([FromQuery] EquFaultPhenomenonQueryDto equFaultPhenomenonQueryDto)
-        {
-            return await _equFaultPhenomenonService.GetEquFaultReasonListAsync(equFaultPhenomenonQueryDto);
-        }
 
         #region 状态变更
         /// <summary>
