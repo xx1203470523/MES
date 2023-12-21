@@ -48,6 +48,10 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcProcedureRepository _procProcedureRepository;
 
+        private readonly IProcProcessEquipmentGroupRepository _procProcessEquipmentGroupRepository;
+
+        private readonly IProcFormulaOperationGroupRepository _procFormulaOperationGroupRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -58,8 +62,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="localizationService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
+        /// <param name="procProcessEquipmentGroupRepository"></param>
+        /// <param name="procFormulaOperationGroupRepository"></param>
         public ProcFormulaService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaSaveDto> validationSaveRules, 
-            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository)
+            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -68,6 +74,8 @@ namespace Hymson.MES.Services.Services.Process
             _localizationService = localizationService;
             _procMaterialRepository = procMaterialRepository;
             _procProcedureRepository = procProcedureRepository;
+            _procProcessEquipmentGroupRepository = procProcessEquipmentGroupRepository;
+            _procFormulaOperationGroupRepository = procFormulaOperationGroupRepository;
         }
 
 
@@ -182,6 +190,25 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     detailViewDto.ProcedureName = procedure.Name;
                     detailViewDto.ProcedureCode = procedure.Code;
+                }
+            }
+            if (procFormulaEntity.EquipmentGroupId > 0) 
+            {
+                var processEquipmentGroupEntity = await _procProcessEquipmentGroupRepository.GetByIdAsync(procFormulaEntity.EquipmentGroupId);
+                if (processEquipmentGroupEntity != null)
+                {
+                    detailViewDto.EquipmentGroupCode = processEquipmentGroupEntity.Code;
+                    detailViewDto.EquipmentGroupName = processEquipmentGroupEntity.Name;
+                }
+            }
+
+            if (procFormulaEntity.FormulaOperationGroupId > 0)
+            {
+                var formulaOperationGroupEntity  = await _procFormulaOperationGroupRepository.GetByIdAsync(procFormulaEntity.FormulaOperationGroupId);
+                if (formulaOperationGroupEntity != null)
+                {
+                    detailViewDto.FormulaOperationGroupCode = formulaOperationGroupEntity.Code;
+                    detailViewDto.FormulaOperationGroupName = formulaOperationGroupEntity.Name;
                 }
             }
 

@@ -182,6 +182,26 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 工序名称
         /// </summary>
         public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 工艺设备组编码
+        /// </summary>
+        public string EquipmentGroupCode { get; set; }
+
+        /// <summary>
+        /// 工艺设备组名称
+        /// </summary>
+        public string EquipmentGroupName { get; set; }
+
+        /// <summary>
+        /// 操作组编码
+        /// </summary>
+        public string FormulaOperationGroupCode {  get; set; }
+
+        /// <summary>
+        /// 操作组名称
+        /// </summary>
+        public string FormulaOperationGroupName { get;set; }
     }
     /// <summary>
     /// 配方维护分页Dto
