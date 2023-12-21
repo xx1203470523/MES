@@ -773,6 +773,8 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 BarCodes = manuSfcs
             });
 
+
+
             var manuSfcEntities = await manuSfcEntitiesTask;
             var manuSfcProduceEntities = await manuSfcProduceEntitiesTask;
             var sfcPackList = await sfcPackListTask;
