@@ -81,6 +81,18 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
+        /// 分页查询列表（设备故障解决措施）
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pagelist")]
+        public async Task<PagedInfo<EquFaultSolutionDto>> QueryPagedListAsync([FromQuery] EquFaultSolutionPagedQueryDto pagedQueryDto)
+        {
+            return await _equFaultSolutionService.GetPagedListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
         /// 查询详情（设备故障解决措施）
         /// </summary>
         /// <param name="id"></param>
@@ -92,16 +104,26 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 分页查询列表（设备故障解决措施）
+        /// 查询列表
         /// </summary>
-        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
-        public async Task<PagedInfo<EquFaultSolutionDto>> QueryPagedListAsync([FromQuery] EquFaultSolutionPagedQueryDto pagedQueryDto)
+        [HttpGet("list")]
+        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync()
         {
-            return await _equFaultSolutionService.GetPagedListAsync(pagedQueryDto);
+            return await _equFaultSolutionService.QuerySolutionsAsync();
         }
+
+        /// <summary>
+        /// 查询列表（关联故障原因）
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        [HttpGet("reason/{reasonId}")]
+        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId)
+        {
+            return await _equFaultSolutionService.QuerySolutionsByMainIdAsync(reasonId);
+        }
+
 
         #region 状态变更
         /// <summary>

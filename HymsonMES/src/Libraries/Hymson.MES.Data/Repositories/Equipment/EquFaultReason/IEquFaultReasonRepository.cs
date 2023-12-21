@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquFaultReasonEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据Code查询对象
@@ -81,18 +81,26 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<EquFaultReasonEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
-        /// 获取List
+        /// 查询List
         /// </summary>
-        /// <param name="EquFaultReasonQuery"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonEntity>> GetListAsync(EquFaultReasonQuery EquFaultReasonQuery);
+        Task<IEnumerable<EquFaultReasonEntity>> GetEntitiesAsync(EntityByStatusQuery query);
 
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultReasonEntity>> GetPagedInfoAsync(EquFaultReasonPagedQuery pagedQuery);
+        Task<PagedInfo<EquFaultReasonEntity>> GetPagedListAsync(EquFaultReasonPagedQuery pagedQuery);
+
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

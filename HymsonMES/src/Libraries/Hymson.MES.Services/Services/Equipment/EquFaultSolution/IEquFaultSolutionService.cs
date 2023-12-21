@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
@@ -24,18 +25,18 @@ namespace Hymson.MES.Services.Services.Equipment
         Task<int> ModifyAsync(EquFaultSolutionSaveDto saveDto);
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeletesAsync(long[] ids);
+
+        /// <summary>
+        /// 获取分页List
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquFaultSolutionDto>> GetPagedListAsync(EquFaultSolutionPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询
@@ -45,11 +46,17 @@ namespace Hymson.MES.Services.Services.Equipment
         Task<EquFaultSolutionDto?> QueryByIdAsync(long id);
 
         /// <summary>
-        /// 获取分页List
+        /// 获取解决措施（可被引用）
         /// </summary>
-        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultSolutionDto>> GetPagedListAsync(EquFaultSolutionPagedQueryDto pagedQueryDto);
+        Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync();
+
+        /// <summary>
+        /// 根据ID获取关联解决措施
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId);
 
 
         /// <summary>

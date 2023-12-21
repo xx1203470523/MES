@@ -63,9 +63,9 @@ namespace Hymson.MES.Services.Services.Equipment
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            _localizationService = localizationService;
             _validationSaveRules = validationSaveRules;
             _equFaultSolutionRepository = equFaultSolutionRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -135,16 +135,6 @@ namespace Hymson.MES.Services.Services.Equipment
         }
 
         /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
-        {
-            return await _equFaultSolutionRepository.DeleteAsync(id);
-        }
-
-        /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="ids"></param>
@@ -157,19 +147,6 @@ namespace Hymson.MES.Services.Services.Equipment
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             });
-        }
-
-        /// <summary>
-        /// 根据ID查询
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<EquFaultSolutionDto?> QueryByIdAsync(long id)
-        {
-            var equFaultSolutionEntity = await _equFaultSolutionRepository.GetByIdAsync(id);
-            if (equFaultSolutionEntity == null) return null;
-
-            return equFaultSolutionEntity.ToModel<EquFaultSolutionDto>();
         }
 
         /// <summary>
@@ -186,6 +163,45 @@ namespace Hymson.MES.Services.Services.Equipment
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<EquFaultSolutionDto>());
             return new PagedInfo<EquFaultSolutionDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
+        /// <summary>
+        /// 根据ID查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<EquFaultSolutionDto?> QueryByIdAsync(long id)
+        {
+            var equFaultSolutionEntity = await _equFaultSolutionRepository.GetByIdAsync(id);
+            if (equFaultSolutionEntity == null) return null;
+
+            return equFaultSolutionEntity.ToModel<EquFaultSolutionDto>();
+        }
+
+        /// <summary>
+        /// 获取解决措施（可被引用）
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync()
+        {
+            var solutionEntities = await _equFaultSolutionRepository.GetEntitiesAsync(new EntityByStatusQuery { SiteId = _currentSite.SiteId ?? 0 });
+            return solutionEntities.Select(s => s.ToModel<EquFaultSolutionBaseDto>());
+        }
+
+        /// <summary>
+        /// 根据ID获取关联解决措施
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId)
+        {
+            var relationEntities = await _equFaultSolutionRepository.GetRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = reasonId });
+            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<EquFaultSolutionBaseDto>();
+
+            var solutionEntities = await _equFaultSolutionRepository.GetByIdsAsync(relationEntities.Select(s => s.FaultSolutionId));
+            if (solutionEntities == null || !solutionEntities.Any()) return Array.Empty<EquFaultSolutionBaseDto>();
+
+            return solutionEntities.Select(s => s.ToModel<EquFaultSolutionBaseDto>());
         }
 
 

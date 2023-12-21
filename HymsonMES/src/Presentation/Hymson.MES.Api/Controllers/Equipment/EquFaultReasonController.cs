@@ -45,9 +45,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPost]
         [PermissionDescription("equipment:equFaultReason:insert")]
-        public async Task AddEquFaultReasonAsync(EquFaultReasonSaveDto parm)
+        public async Task AddAsync(EquFaultReasonSaveDto parm)
         {
-            await _equFaultReasonService.CreateEquFaultReasonAsync(parm);
+            await _equFaultReasonService.CreateAsync(parm);
         }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpPut]
         [PermissionDescription("equipment:equFaultReason:update")]
-        public async Task UpdateEquFaultReasonAsync(EquFaultReasonSaveDto parm)
+        public async Task UpdateAsync(EquFaultReasonSaveDto parm)
         {
-            await _equFaultReasonService.ModifyEquFaultReasonAsync(parm);
+            await _equFaultReasonService.ModifyAsync(parm);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpDelete]
         [PermissionDescription("equipment:equFaultReason:delete")]
-        public async Task DeleteEquFaultReasonAsync(long[] ids)
+        public async Task DeleteAsync(long[] ids)
         {
-            await _equFaultReasonService.DeletesEquFaultReasonAsync(ids);
+            await _equFaultReasonService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -87,27 +87,37 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 查询列表（设备故障原因表）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("getlist")]
-        public async Task<IEnumerable<EquFaultReasonDto>> QueryEquFaultReasonListAsync([FromQuery] EquFaultReasonQueryDto parm)
-        {
-            return await _equFaultReasonService.GetListAsync(parm);
-        }
-
-        /// <summary>
         /// 查询详情（设备故障原因表）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id)
+        public async Task<EquFaultReasonDto> QueryByIdAsync(long id)
         {
-            return await _equFaultReasonService.QueryEquFaultReasonByIdAsync(id);
+            return await _equFaultReasonService.QueryByIdAsync(id);
         }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("list")]
+        public async Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsAsync()
+        {
+            return await _equFaultReasonService.QueryReasonsAsync();
+        }
+
+        /// <summary>
+        /// 查询列表（关联故障现象）
+        /// </summary>
+        /// <param name="phenomenonId"></param>
+        /// <returns></returns>
+        [HttpGet("phenomenon/{phenomenonId}")]
+        public async Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsByMainIdAsync(long phenomenonId)
+        {
+            return await _equFaultReasonService.QueryReasonsByMainIdAsync(phenomenonId);
+        }
+
 
         #region 状态变更
         /// <summary>

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
@@ -10,53 +11,52 @@ namespace Hymson.MES.Services.Services.Equipment
     public interface IEquFaultReasonService
     {
         /// <summary>
-        /// 获取分页List
-        /// </summary>
-        /// <param name="EquFaultReasonPagedQueryDto"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto EquFaultReasonPagedQueryDto);
-
-        /// <summary>
-        /// 根据查询条件获数据
-        /// </summary>
-        /// <param name="EquFaultReasonQueryDto"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonDto>> GetListAsync(EquFaultReasonQueryDto EquFaultReasonQueryDto);
-
-        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="EquFaultReasonCreateDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto);
+        Task<int> CreateAsync(EquFaultReasonSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="EquFaultReasonModifyDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonModifyDto);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteEquFaultReasonAsync(long id);
+        Task<int> ModifyAsync(EquFaultReasonSaveDto saveDto);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesEquFaultReasonAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
+
+        /// <summary>
+        /// 获取分页List
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id);
+        Task<EquFaultReasonDto> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 获取解决措施（可被引用）
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsAsync();
+
+        /// <summary>
+        /// 根据ID获取关联解决措施
+        /// </summary>
+        /// <param name="phenomenonId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsByMainIdAsync(long phenomenonId);
 
 
         /// <summary>

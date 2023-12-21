@@ -12,16 +12,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 添加（设备故障现象）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquFaultPhenomenonSaveDto parm);
+        Task<int> CreateAsync(EquFaultPhenomenonSaveDto saveDto);
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> ModifyAsync(EquFaultPhenomenonSaveDto parm);
+        Task<int> ModifyAsync(EquFaultPhenomenonSaveDto saveDto);
 
         /// <summary>
         /// 删除（设备故障现象）
@@ -33,23 +33,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 查询列表（设备故障现象）
         /// </summary>
-        /// <param name="parm"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync(EquFaultPhenomenonPagedQueryDto parm);
+        Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync(EquFaultPhenomenonPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 查询详情（设备故障现象）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquFaultPhenomenonDto> GetDetailAsync(long id);
-
-        /// <summary>
-        /// 查询已经分配设备故障原因
-        /// </summary>
-        /// <param name="equFaultPhenomenonQueryDto"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonDto>> GetEquFaultReasonListAsync(EquFaultPhenomenonQueryDto equFaultPhenomenonQueryDto);
+        Task<EquFaultPhenomenonDto> QueryByIdAsync(long id);
 
 
         /// <summary>
