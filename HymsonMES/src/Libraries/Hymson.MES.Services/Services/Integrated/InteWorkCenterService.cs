@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        public async Task CreateInteWorkCenterAsync(InteWorkCenterCreateDto param)
+        public async Task<long> CreateInteWorkCenterAsync(InteWorkCenterCreateDto param)
         {
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
@@ -290,6 +290,7 @@ namespace Hymson.MES.Services.Services.Integrated
             await _inteWorkCenterRepository.InsertInteWorkCenterRelationRangAsync(inteWorkCenterRelations);
             await _inteWorkCenterRepository.InsertInteWorkCenterResourceRelationRangAsync(inteWorkCenterResourceRelations);
             ts.Complete();
+            return entity.Id;
         }
 
         /// <summary>

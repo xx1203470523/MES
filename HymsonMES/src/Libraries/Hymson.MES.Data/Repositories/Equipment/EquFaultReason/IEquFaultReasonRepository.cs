@@ -13,30 +13,30 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equFaultReasonEntity"></param>
+        /// <param name="entity"></param>entities
         /// <returns></returns>
-        Task<int> InsertAsync(EquFaultReasonEntity equFaultReasonEntity);
+        Task<int> InsertAsync(EquFaultReasonEntity entity);
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="equFaultReasonEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys);
+        Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> entities);
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="equFaultReasonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquFaultReasonEntity equFaultReasonEntity);
+        Task<int> UpdateAsync(EquFaultReasonEntity entity);
 
         /// <summary>
         /// 批量更新 
         /// </summary>
-        /// <param name="equFaultReasonEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys);
+        Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> entities);
 
         /// <summary>
         /// 更新状态
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(DeleteCommand param);
+        Task<int> DeletesAsync(DeleteCommand command);
 
         /// <summary>
         /// 根据ID获取数据
@@ -95,12 +95,27 @@ namespace Hymson.MES.Data.Repositories.Equipment
         Task<PagedInfo<EquFaultReasonEntity>> GetPagedListAsync(EquFaultReasonPagedQuery pagedQuery);
 
 
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertRelationsAsync(IEnumerable<EquFaultReasonSolutionRelationEntity> entities);
+
         /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
+        Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

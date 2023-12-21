@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
@@ -42,7 +43,15 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquFaultPhenomenonDto> QueryByIdAsync(long id);
+        Task<EquFaultPhenomenonDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID获取关联故障原因
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long id);
+
 
 
         /// <summary>

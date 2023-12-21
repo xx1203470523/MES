@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories;
 
 namespace Hymson.MES.Services.Dtos.Equipment
 {
@@ -30,9 +29,9 @@ namespace Hymson.MES.Services.Dtos.Equipment
         public string? Remark { get; set; } = "";
 
         /// <summary>
-        /// 设备故障原因Id
+        /// 关联原因
         /// </summary>
-        public IEnumerable<long>? EquFaultReasonList{ get; set; }
+        public IEnumerable<long>? ReasonIds { get; set; }
 
     }
 
@@ -76,10 +75,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-        /// <summary>
-        /// 已分配故障原因
-        /// </summary>
-        public IEnumerable<long>? EquFaultReasonList { get; set; }
     }
 
     /// <summary>
@@ -107,7 +102,8 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// <summary>
     /// 设备故障现象查询Dto
     /// </summary>
-    public class EquFaultPhenomenonQueryDto : QueryDtoAbstraction { 
+    public class EquFaultPhenomenonQueryDto
+    {
         /// <summary>
         /// 设备故障现象Id
         /// </summary>

@@ -8,6 +8,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -91,6 +92,7 @@ namespace Hymson.MES.Services.Services.Equipment
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
+            entity.Status = SysDataStatusEnum.Build;
 
             // 编码唯一性验证
             var checkEntity = await _equFaultSolutionRepository.GetByCodeAsync(new EntityByCodeQuery
@@ -172,37 +174,27 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<EquFaultSolutionDto?> QueryByIdAsync(long id)
         {
-            var equFaultSolutionEntity = await _equFaultSolutionRepository.GetByIdAsync(id);
-            if (equFaultSolutionEntity == null) return null;
+            var entity = await _equFaultSolutionRepository.GetByIdAsync(id);
+            if (entity == null) return null;
 
-            return equFaultSolutionEntity.ToModel<EquFaultSolutionDto>();
+            return entity.ToModel<EquFaultSolutionDto>();
         }
 
         /// <summary>
-        /// 获取解决措施（可被引用）
+        /// 获取解决措施列表
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsAsync()
+        public async Task<IEnumerable<SelectOptionDto>> QuerySolutionsAsync()
         {
             var solutionEntities = await _equFaultSolutionRepository.GetEntitiesAsync(new EntityByStatusQuery { SiteId = _currentSite.SiteId ?? 0 });
-            return solutionEntities.Select(s => s.ToModel<EquFaultSolutionBaseDto>());
+            return solutionEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"{s.Code} - {s.Name}",
+                Value = $"{s.Id}"
+            });
         }
 
-        /// <summary>
-        /// 根据ID获取关联解决措施
-        /// </summary>
-        /// <param name="reasonId"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<EquFaultSolutionBaseDto>> QuerySolutionsByMainIdAsync(long reasonId)
-        {
-            var relationEntities = await _equFaultSolutionRepository.GetRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = reasonId });
-            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<EquFaultSolutionBaseDto>();
-
-            var solutionEntities = await _equFaultSolutionRepository.GetByIdsAsync(relationEntities.Select(s => s.FaultSolutionId));
-            if (solutionEntities == null || !solutionEntities.Any()) return Array.Empty<EquFaultSolutionBaseDto>();
-
-            return solutionEntities.Select(s => s.ToModel<EquFaultSolutionBaseDto>());
-        }
 
 
         #region 状态变更

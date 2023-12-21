@@ -14,23 +14,16 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
-
-        /// <summary>
-        /// 新增（设备故障现象和原因关系）
-        /// </summary>
-        /// <param name="equFaultReasonPhenomenonEntities"></param>
-        /// <returns></returns>
-        Task<int> InsertFaultReasonAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> equFaultReasonPhenomenonEntities);
+        Task<int> InsertAsync(EquFaultPhenomenonEntity entity);
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
+        Task<int> UpdateAsync(EquFaultPhenomenonEntity entity);
 
         /// <summary>
         /// 更新状态
@@ -81,19 +74,28 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids);
 
-        /// <summary>
-        /// 获取已经分配设备故障原因
-        /// </summary>
-        /// <param name="equFaultPhenomenonQuery"></param>
-        /// <returns></returns>
-        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetEquFaultReasonListAsync(EquFaultPhenomenonQuery equFaultPhenomenonQuery);
+
 
         /// <summary>
-        /// 删除设备故障原因关系（物理删除）
+        /// 删除（批量）
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeleteEquFaultReasonPhenomenonRelationsAsync(DeleteCommand command);
+        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertRelationsAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

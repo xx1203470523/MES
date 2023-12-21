@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
@@ -44,6 +45,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("create")]
         [PermissionDescription("equipment:equFaultReason:insert")]
         public async Task AddAsync(EquFaultReasonSaveDto parm)
         {
@@ -56,6 +58,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
+        [Route("update")]
         [PermissionDescription("equipment:equFaultReason:update")]
         public async Task UpdateAsync(EquFaultReasonSaveDto parm)
         {
@@ -68,6 +71,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
+        [Route("delete")]
         [PermissionDescription("equipment:equFaultReason:delete")]
         public async Task DeleteAsync(long[] ids)
         {
@@ -92,9 +96,20 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquFaultReasonDto> QueryByIdAsync(long id)
+        public async Task<EquFaultReasonDto?> QueryByIdAsync(long id)
         {
             return await _equFaultReasonService.QueryByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询列表（关联故障原因）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("solutions/{id}")]
+        public async Task<IEnumerable<long>> QuerySolutionsByMainIdAsync(long id)
+        {
+            return await _equFaultReasonService.QuerySolutionsByMainIdAsync(id);
         }
 
         /// <summary>
@@ -102,21 +117,11 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// </summary>
         /// <returns></returns>
         [HttpGet("list")]
-        public async Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsAsync()
+        public async Task<IEnumerable<SelectOptionDto>> QueryReasonsAsync()
         {
             return await _equFaultReasonService.QueryReasonsAsync();
         }
 
-        /// <summary>
-        /// 查询列表（关联故障现象）
-        /// </summary>
-        /// <param name="phenomenonId"></param>
-        /// <returns></returns>
-        [HttpGet("phenomenon/{phenomenonId}")]
-        public async Task<IEnumerable<EquFaultReasonBaseDto>> QueryReasonsByMainIdAsync(long phenomenonId)
-        {
-            return await _equFaultReasonService.QueryReasonsByMainIdAsync(phenomenonId);
-        }
 
 
         #region 状态变更

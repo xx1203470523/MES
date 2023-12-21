@@ -67,9 +67,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("create")]
         [LogDescription("客户维护", BusinessType.INSERT)]
         [PermissionDescription("inte:inteCustom:insert")]
-        public async Task AddInteCustomAsync([FromBody] InteCustomCreateDto parm)
+        public async Task<long> AddInteCustomAsync([FromBody] InteCustomCreateDto parm)
         {
-             await _inteCustomService.CreateInteCustomAsync(parm);
+            return await _inteCustomService.CreateInteCustomAsync(parm);
         }
 
         /// <summary>

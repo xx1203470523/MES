@@ -3,7 +3,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.Query
     /// <summary>
     /// 查询参数（设备故障现象）
     /// </summary>
-    public class EquFaultPhenomenonQuery: QueryAbstraction
+    public class EquFaultPhenomenonQuery
     {
         /// <summary>
         /// 设备故障现象Id

@@ -22,45 +22,45 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="equFaultReasonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(EquFaultReasonEntity equFaultReasonEntity)
+        public async Task<int> InsertAsync(EquFaultReasonEntity entity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertSql, equFaultReasonEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="equFaultReasonEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<EquFaultReasonEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(InsertsSql, equFaultReasonEntitys);
+            return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="equFaultReasonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(EquFaultReasonEntity equFaultReasonEntity)
+        public async Task<int> UpdateAsync(EquFaultReasonEntity entity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, equFaultReasonEntity);
+            return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="equFaultReasonEntitys"></param>
+        /// <param name="entities"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> equFaultReasonEntitys)
+        public async Task<int> UpdatesAsync(IEnumerable<EquFaultReasonEntity> entities)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, equFaultReasonEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, entities);
         }
 
         /// <summary>
@@ -90,10 +90,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param)
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesSql, param);
+            return await conn.ExecuteAsync(DeletesSql, command);
         }
 
         /// <summary>
@@ -193,20 +193,43 @@ namespace Hymson.MES.Data.Repositories.Equipment
         }
 
 
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteByParentIdSql, command);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertRelationsAsync(IEnumerable<EquFaultReasonSolutionRelationEntity> entities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertRelationsSql, entities);
+        }
+
         /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query)
+        public async Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetRelationEntitiesSqlTemplate);
-            sqlBuilder.Where("FaultPhenomenonId = @ParentId");
+            sqlBuilder.Where("FaultReasonId = @ParentId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<EquFaultPhenomenonReasonRelationEntity>(template.RawSql, query);
+            return await conn.QueryAsync<EquFaultReasonSolutionRelationEntity>(template.RawSql, query);
         }
 
     }
@@ -218,8 +241,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `equ_fault_reason` /**innerjoin**/ /**leftjoin**/ /**where**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_solution /**where**/  ";
-        const string GetRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon_reason_relation /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_reason /**where**/  ";
 
         const string InsertSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `equ_fault_reason`(  `Id`, `SiteId`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -233,6 +255,12 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetByIdSql = @"SELECT * FROM `equ_fault_reason`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_fault_reason`  WHERE Id IN @ids ";
         const string GetByCodeSql = "SELECT * FROM equ_fault_reason WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
+
+
+
+        const string DeleteByParentIdSql = "DELETE FROM equ_fault_reason_solution_relation WHERE FaultReasonId = @ParentId";
+        const string InsertRelationsSql = "INSERT INTO equ_fault_reason_solution_relation (Id, FaultReasonId, FaultSolutionId) VALUES (@Id, @FaultReasonId, @FaultSolutionId) ";
+        const string GetRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_reason_solution_relation /**where**/  ";
 
     }
 }
