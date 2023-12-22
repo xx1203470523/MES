@@ -229,19 +229,16 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 根据ID获取关联故障原因
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="phenomenonId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long id)
+        public async Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long phenomenonId)
         {
-            if (id == 0) return Array.Empty<long>();
+            if (phenomenonId == 0) return Array.Empty<long>();
 
-            var relationEntities = await _equFaultPhenomenonRepository.GetRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = id });
+            var relationEntities = await _equFaultPhenomenonRepository.GetReasonRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = phenomenonId });
             if (relationEntities == null || !relationEntities.Any()) return Array.Empty<long>();
 
-            var solutionEntities = await _equFaultReasonRepository.GetByIdsAsync(relationEntities.Select(s => s.FaultReasonId));
-            if (solutionEntities == null || !solutionEntities.Any()) return Array.Empty<long>();
-
-            return solutionEntities.Select(s => s.Id);
+            return relationEntities.Select(s => s.FaultReasonId);
         }
 
 

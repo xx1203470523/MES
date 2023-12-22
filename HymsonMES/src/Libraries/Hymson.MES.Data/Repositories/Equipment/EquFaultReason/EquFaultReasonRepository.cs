@@ -221,15 +221,31 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query)
+        public async Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetSolutionRelationEntitiesAsync(EntityByParentIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetRelationEntitiesSqlTemplate);
+            var template = sqlBuilder.AddTemplate(GetSolutionRelationEntitiesSqlTemplate);
             sqlBuilder.Where("FaultReasonId = @ParentId");
             sqlBuilder.Select("*");
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquFaultReasonSolutionRelationEntity>(template.RawSql, query);
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetPhenomenonRelationEntitiesAsync(EntityByParentIdQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetPhenomenonRelationEntitiesSqlTemplate);
+            sqlBuilder.Where("FaultReasonId = @ParentId");
+            sqlBuilder.Select("*");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquFaultPhenomenonReasonRelationEntity>(template.RawSql, query);
         }
 
     }
@@ -260,7 +276,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
 
         const string DeleteByParentIdSql = "DELETE FROM equ_fault_reason_solution_relation WHERE FaultReasonId = @ParentId";
         const string InsertRelationsSql = "INSERT INTO equ_fault_reason_solution_relation (Id, FaultReasonId, FaultSolutionId) VALUES (@Id, @FaultReasonId, @FaultSolutionId) ";
-        const string GetRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_reason_solution_relation /**where**/  ";
-
+        const string GetSolutionRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_reason_solution_relation /**where**/  ";
+        const string GetPhenomenonRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_phenomenon_reason_relation /**where**/  ";
     }
 }

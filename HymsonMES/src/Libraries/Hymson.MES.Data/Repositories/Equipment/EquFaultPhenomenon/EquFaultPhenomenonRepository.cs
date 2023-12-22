@@ -153,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquFaultPhenomenonEntity>(GetByIdsSql, new { ids });
@@ -188,7 +188,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query)
+        public async Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetReasonRelationEntitiesAsync(EntityByParentIdQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetRelationEntitiesSqlTemplate);
@@ -221,6 +221,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_fault_phenomenon EFP /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetByIdsSql = @"SELECT * FROM equ_fault_phenomenon WHERE IsDeleted = 0 AND Id IN @ids ";
         #endregion
+
 
 
         const string DeleteByParentIdSql = "DELETE FROM equ_fault_phenomenon_reason_relation WHERE FaultPhenomenonId = @ParentId";

@@ -207,6 +207,24 @@ namespace Hymson.MES.Data.Repositories.Equipment
             return new PagedInfo<EquFaultSolutionEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetReasonRelationEntitiesAsync(EntityByParentIdQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetRelationEntitiesSqlTemplate);
+            sqlBuilder.Where("FaultSolutionId = @ParentId");
+            sqlBuilder.Select("*");
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<EquFaultReasonSolutionRelationEntity>(template.RawSql, query);
+        }
+
     }
 
 
@@ -232,6 +250,10 @@ namespace Hymson.MES.Data.Repositories.Equipment
         const string GetByCodeSql = "SELECT * FROM equ_fault_solution WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetByIdSql = @"SELECT * FROM equ_fault_solution WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM equ_fault_solution WHERE Id IN @Ids ";
+
+
+
+        const string GetRelationEntitiesSqlTemplate = @"SELECT /**select**/ FROM equ_fault_reason_solution_relation /**where**/  ";
 
     }
 }

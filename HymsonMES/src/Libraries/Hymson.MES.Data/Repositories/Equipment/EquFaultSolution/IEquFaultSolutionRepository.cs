@@ -103,5 +103,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <returns></returns>
         Task<PagedInfo<EquFaultSolutionEntity>> GetPagedListAsync(EquFaultSolutionPagedQuery pagedQuery);
 
+
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetReasonRelationEntitiesAsync(EntityByParentIdQuery query);
+
     }
 }

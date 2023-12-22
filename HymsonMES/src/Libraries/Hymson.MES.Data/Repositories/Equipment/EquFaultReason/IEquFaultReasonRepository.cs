@@ -115,7 +115,14 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
+        Task<IEnumerable<EquFaultReasonSolutionRelationEntity>> GetSolutionRelationEntitiesAsync(EntityByParentIdQuery query);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetPhenomenonRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

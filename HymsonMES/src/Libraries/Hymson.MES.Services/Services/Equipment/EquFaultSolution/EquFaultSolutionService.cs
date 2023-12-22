@@ -45,6 +45,11 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly IEquFaultSolutionRepository _equFaultSolutionRepository;
 
         /// <summary>
+        /// 仓储接口（设备故障原因） 
+        /// </summary>
+        private readonly IEquFaultReasonRepository _equFaultReasonRepository;
+
+        /// <summary>
         /// 多语言服务
         /// </summary>
         private readonly ILocalizationService _localizationService;
@@ -56,16 +61,19 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equFaultSolutionRepository"></param>
+        /// <param name="equFaultReasonRepository"></param>
         /// <param name="localizationService"></param>
         public EquFaultSolutionService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquFaultSolutionSaveDto> validationSaveRules,
             IEquFaultSolutionRepository equFaultSolutionRepository,
+            IEquFaultReasonRepository equFaultReasonRepository,
             ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _equFaultSolutionRepository = equFaultSolutionRepository;
+            _equFaultReasonRepository = equFaultReasonRepository;
             _localizationService = localizationService;
         }
 
@@ -178,6 +186,29 @@ namespace Hymson.MES.Services.Services.Equipment
             if (entity == null) return null;
 
             return entity.ToModel<EquFaultSolutionDto>();
+        }
+
+        /// <summary>
+        /// 根据ID获取关联故障原因
+        /// </summary>
+        /// <param name="solutionId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<BaseInfoDto>> QueryReasonsByMainIdAsync(long solutionId)
+        {
+            if (solutionId == 0) return Array.Empty<BaseInfoDto>();
+
+            var relationEntities = await _equFaultSolutionRepository.GetReasonRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = solutionId });
+            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<BaseInfoDto>();
+
+            var reasonEntities = await _equFaultReasonRepository.GetByIdsAsync(relationEntities.Select(s => s.FaultReasonId));
+            if (reasonEntities == null || !reasonEntities.Any()) return Array.Empty<BaseInfoDto>();
+
+            return reasonEntities.Select(s => new BaseInfoDto
+            {
+                Id = s.Id,
+                Code = s.Code,
+                Name = s.Name
+            });
         }
 
         /// <summary>

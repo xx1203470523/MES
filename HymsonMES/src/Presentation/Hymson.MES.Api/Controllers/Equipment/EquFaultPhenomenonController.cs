@@ -102,14 +102,14 @@ namespace Hymson.MES.Api.Controllers.Equipment
         }
 
         /// <summary>
-        /// 查询列表（关联故障现象）
+        /// 查询ID集合（关联故障现象）
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="phenomenonId"></param>
         /// <returns></returns>
-        [HttpGet("reasons/{id}")]
-        public async Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long id)
+        [HttpGet("reasons/{phenomenonId}")]
+        public async Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long phenomenonId)
         {
-            return await _equFaultPhenomenonService.QueryReasonsByMainIdAsync(id);
+            return await _equFaultPhenomenonService.QueryReasonsByMainIdAsync(phenomenonId);
         }
 
 

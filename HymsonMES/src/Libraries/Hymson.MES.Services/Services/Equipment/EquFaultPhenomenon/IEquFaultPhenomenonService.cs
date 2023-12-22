@@ -48,9 +48,9 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 根据ID获取关联故障原因
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="phenomenonId"></param>
         /// <returns></returns>
-        Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long id);
+        Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long phenomenonId);
 
 
 

@@ -72,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
 
 
@@ -95,7 +95,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetRelationEntitiesAsync(EntityByParentIdQuery query);
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetReasonRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }
