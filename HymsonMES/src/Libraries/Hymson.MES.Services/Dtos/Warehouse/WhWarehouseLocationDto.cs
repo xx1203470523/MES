@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories;
 
 namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
 {
@@ -14,10 +13,10 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
         ///// </summary>
         //public long Id { get; set; }
 
-       ///// <summary>
-       // /// 货架id
-       // /// </summary>
-       // public long? WarehouseShelfId { get; set; }
+        ///// <summary>
+        // /// 货架id
+        // /// </summary>
+        // public long? WarehouseShelfId { get; set; }
 
         /// <summary>
         /// 货架编码
@@ -39,17 +38,17 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
         /// </summary>
         public string? Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 方式;1、自动生成  2、自定义 3、指定
         /// </summary>
         public WhWarehouseLocationTypeEnum? Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1、启用  2、未启用
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; }
@@ -106,57 +105,57 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 货架id
         /// </summary>
         public long? WarehouseShelfId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 库位编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 方式;1、自动生成  2、自定义 3、指定
         /// </summary>
         public WhWarehouseLocationTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1、启用  2、未启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string Remark { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 是否逻辑删除
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -195,7 +194,8 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
     /// <summary>
     /// 库位分页Dto
     /// </summary>
-    public class WhWarehouseLocationPagedQueryDto : PagerInfo {
+    public class WhWarehouseLocationPagedQueryDto : PagerInfo
+    {
         /// <summary>
         /// 仓库编码
         /// </summary>
@@ -225,8 +225,8 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
     /// <summary>
     /// 库区查询Dto
     /// </summary>
-    public class WhWarehouseLocationQueryDto: QueryDtoAbstraction
-    { 
+    public record WhWarehouseLocationQueryDto : BaseEntityDto
+    {
         /// <summary>
         /// 货架Id
         /// </summary>
@@ -236,7 +236,8 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseLocation
     /// <summary>
     /// 更新Dto
     /// </summary>
-    public record WhWarehouseLocationModifyDto : BaseEntityDto {
+    public record WhWarehouseLocationModifyDto : BaseEntityDto
+    {
         /// <summary>
         /// 
         /// </summary>

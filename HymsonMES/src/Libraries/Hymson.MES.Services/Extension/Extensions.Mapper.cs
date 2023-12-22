@@ -17,7 +17,6 @@ namespace Hymson.MES.Services
         /// <typeparam name="TDto"></typeparam>
         /// <param name="bo"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
         public static TDto ToDto<TDto>(this BaseBo bo) where TDto : BaseDto
         {
             if (bo == null) throw new ArgumentNullException(nameof(bo));
@@ -30,14 +29,9 @@ namespace Hymson.MES.Services
         /// <typeparam name="TQuery"></typeparam>
         /// <param name="dto"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static TQuery ToQuery<TQuery>(this QueryDtoAbstraction dto) where TQuery : QueryAbstraction
+        public static TQuery ToQuery<TQuery>(this BaseEntityDto dto)
         {
-            if (dto == null)
-            {
-                throw new ArgumentNullException(nameof(dto));
-            }
-
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
             return AutoMapperConfiguration.Mapper.Map<TQuery>(dto);
         }
 

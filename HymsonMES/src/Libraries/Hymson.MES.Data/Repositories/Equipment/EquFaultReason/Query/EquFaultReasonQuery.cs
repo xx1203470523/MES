@@ -3,7 +3,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// <summary>
     /// 设备故障原因表 查询故障原因
     /// </summary>
-    public class EquFaultReasonQuery: QueryAbstraction
+    public class EquFaultReasonQuery
     {
         /// <summary>
         /// 站点id
