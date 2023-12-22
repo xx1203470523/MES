@@ -96,11 +96,23 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
+            if (!string.IsNullOrWhiteSpace(sysReleaseRecordPagedQuery.Version))
+            {
+                sqlBuilder.Where("Version=@Version");
+            }
+            if (sysReleaseRecordPagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("Status=@Status");
+            }
+            if (sysReleaseRecordPagedQuery.EnvironmentType.HasValue)
+            {
+                sqlBuilder.Where("EnvironmentType=@EnvironmentType");
+            }
+            if (sysReleaseRecordPagedQuery.RealTime != null && sysReleaseRecordPagedQuery.RealTime.Length > 0 && sysReleaseRecordPagedQuery.RealTime.Length >= 2)
+            {
+                sqlBuilder.AddParameters(new { RealTimeOnStart = sysReleaseRecordPagedQuery.RealTime[0], RealTimeOnEnd = sysReleaseRecordPagedQuery.RealTime[1].AddDays(1) });
+                sqlBuilder.Where(" RealTime >= @RealTimeOnStart AND RealTime < @RealTimeOnEnd ");
+            }
             var offSet = (sysReleaseRecordPagedQuery.PageIndex - 1) * sysReleaseRecordPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = sysReleaseRecordPagedQuery.PageSize });

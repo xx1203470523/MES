@@ -62,7 +62,13 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
-            await IsVersionAsync(sysReleaseRecordCreateDto.Version);
+            sysReleaseRecordCreateDto.Version = sysReleaseRecordCreateDto.Version.Trim();
+            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(sysReleaseRecordCreateDto.Version);
+            if (entity != null && entity.EnvironmentType == sysReleaseRecordCreateDto.EnvironmentType)
+            {
+                // 判断版本存在
+                throw new CustomerValidationException(nameof(ErrorCode.MES19301));
+            }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(sysReleaseRecordCreateDto);
 
@@ -88,6 +94,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task DeleteSysReleaseRecordAsync(long id)
         {
+            var entity = await _sysReleaseRecordRepository.GetByIdAsync(id);
+            if (entity != null && entity.Status == SysReleaseRecordStatusEnum.release)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+            }
             await _sysReleaseRecordRepository.DeleteAsync(id);
         }
 
@@ -98,6 +109,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesSysReleaseRecordAsync(long[] ids)
         {
+            var list = await _sysReleaseRecordRepository.GetByIdsAsync(ids);
+            foreach (var item in list)
+            {
+                if (item.Status == SysReleaseRecordStatusEnum.release)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+                }
+            }
+
             return await _sysReleaseRecordRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 
@@ -145,8 +165,9 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
+            sysReleaseRecordModifyDto.Version = (sysReleaseRecordModifyDto.Version ?? "").Trim();
             var entity = await _sysReleaseRecordRepository.GetByVersionAsync(sysReleaseRecordModifyDto.Version ?? "");
-            if (entity != null && entity.Version == sysReleaseRecordModifyDto.Version && entity.Id != sysReleaseRecordModifyDto.Id)
+            if (entity != null && entity.EnvironmentType == sysReleaseRecordModifyDto.EnvironmentType && entity.Id != sysReleaseRecordModifyDto.Id)
             {
                 // 判断版本存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES19301));
@@ -156,9 +177,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //DTO转换实体
             var sysReleaseRecordEntity = sysReleaseRecordModifyDto.ToEntity<SysReleaseRecordEntity>();
-            sysReleaseRecordEntity.Version = sysReleaseRecordModifyDto.Version;
+            sysReleaseRecordEntity.Version = sysReleaseRecordModifyDto.Version ?? "";
             sysReleaseRecordEntity.EnvironmentType = sysReleaseRecordModifyDto.EnvironmentType;
-            sysReleaseRecordEntity.PlanTime = sysReleaseRecordModifyDto.PlanTime.ParseToDateTime();
+            sysReleaseRecordEntity.PlanTime = (sysReleaseRecordModifyDto.PlanTime ?? HymsonClock.Now().ToString()).ParseToDateTime();
             sysReleaseRecordEntity.Content = sysReleaseRecordModifyDto.Content ?? "";
             sysReleaseRecordEntity.UpdatedBy = _currentUser.UserName;
             sysReleaseRecordEntity.UpdatedOn = HymsonClock.Now();
@@ -224,19 +245,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
         #region 内部方法
 
-        /// <summary>
-        /// 验证版本是否存在
-        /// </summary>
-        /// <param name="version"></param>
-        private async Task IsVersionAsync(string version)
-        {
-            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(version);
-            if (entity != null && entity.Version == version)
-            {
-                // 判断版本存在
-                throw new CustomerValidationException(nameof(ErrorCode.MES19301));
-            }
-        }
+
         #endregion
     }
 }
