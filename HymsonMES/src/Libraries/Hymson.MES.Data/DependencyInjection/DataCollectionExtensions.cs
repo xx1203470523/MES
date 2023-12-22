@@ -132,6 +132,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteCustomFieldRepository, InteCustomFieldRepository>();
             services.AddSingleton<IInteCustomFieldInternationalizationRepository, InteCustomFieldInternationalizationRepository>();
             services.AddSingleton<IInteCustomFieldBusinessEffectuateRepository, InteCustomFieldBusinessEffectuateRepository>();
+            services.AddSingleton<ISysReleaseRecordRepository, SysReleaseRecordRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();

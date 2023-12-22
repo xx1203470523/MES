@@ -347,6 +347,15 @@ namespace Hymson.MES.Services.Mapper
             #region InteCustomField
             CreateMap<InteCustomFieldBusinessEffectuateEntity, InteCustomFieldBusinessEffectuateDto>();
             #endregion
+
+            #region SysReleaseRecord
+            CreateMap<SysReleaseRecordEntity, SysReleaseRecordDto>();
+            CreateMap<SysReleaseRecordDto, SysReleaseRecordEntity>();
+            CreateMap<SysReleaseRecordCreateDto, SysReleaseRecordEntity>();
+            CreateMap<SysReleaseRecordModifyDto, SysReleaseRecordEntity>();
+            CreateMap<SysReleaseRecordPagedQueryDto, SysReleaseRecordPagedQuery>();
+            CreateMap<SysReleaseRecordPagedQueryDto, SysReleaseRecordPagedQuery>();
+            #endregion
         }
 
         /// <summary>
@@ -613,7 +622,7 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<WhWarehouseRegionPagedQueryDto, WhWarehouseRegionPagedQuery>();
             CreateMap<WhWarehouseRegionSaveDto, WhWarehouseRegionEntity>();
-            CreateMap<WhWarehouseRegionEntity, WhWarehouseRegionDto>(); 
+            CreateMap<WhWarehouseRegionEntity, WhWarehouseRegionDto>();
 
             #endregion
 

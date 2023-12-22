@@ -137,6 +137,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteMessageManageService, InteMessageManageService>();
 
             services.AddSingleton<IInteCustomFieldService, InteCustomFieldService>();
+            services.AddSingleton<ISysReleaseRecordService, SysReleaseRecordService>();
             #endregion
 
             #region Process
@@ -444,7 +445,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<InteCustomFieldSaveDto>, InteCustomFieldSaveValidator>();
             services.AddSingleton<AbstractValidator<InteCustomFieldInternationalizationDto>, InteCustomFieldInternationalizationValidator>();
             services.AddSingleton<AbstractValidator<InteCustomFieldBusinessEffectuateDto>, InteCustomFieldBusinessEffectuatenValidator>();
-            
+            services.AddSingleton<AbstractValidator<SysReleaseRecordCreateDto>, SysReleaseRecordCreateValidator>();
+            services.AddSingleton<AbstractValidator<SysReleaseRecordModifyDto>, SysReleaseRecordModifyValidator>();
+
             #region CodeRule
             services.AddSingleton<AbstractValidator<InteCodeRulesCreateDto>, InteCodeRulesCreateValidator>();
             services.AddSingleton<AbstractValidator<InteCodeRulesModifyDto>, InteCodeRulesModifyValidator>();
@@ -513,7 +516,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleCreateDto>, ManuDowngradingRuleCreateValidator>();
             services.AddSingleton<AbstractValidator<ManuDowngradingRuleModifyDto>, ManuDowngradingRuleModifyValidator>();
-           
+
             services.AddSingleton<AbstractValidator<ManuBarcodeSplitAdjustDto>, ManusBarcodeSplitAdjustValidator>();
             #endregion
 

@@ -89,7 +89,7 @@ namespace Hymson.MES.Api
                     if (epplusTableColumnAttribute == null) { continue; }
                     var resourceName = $"{type.Namespace}.{type.Name}.{propertyInfo.Name}";
                     var resourceValue = epplusTableColumnAttribute.Header;
-                    foreach (var languageEntity in languageEntities.Select(x=>x.Id))
+                    foreach (var languageEntity in languageEntities.Select(x => x.Id))
                     {
                         var localeStringResourceEntity = new LocaleStringResourceEntity
                         {
@@ -113,7 +113,7 @@ namespace Hymson.MES.Api
                             await _resourceRepository.InsertIgnoreAsync(localeStringResourceEntity);
                         }
                     }
-                        
+
                 }
             }
         }

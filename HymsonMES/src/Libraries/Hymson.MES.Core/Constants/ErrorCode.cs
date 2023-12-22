@@ -1596,6 +1596,10 @@
         public const string MES19218 = "货架下已绑定库位,请解绑!";
         #endregion
 
+        #region 发布记录 19300 
+        public const string MES19301 = "版本已存在!";
+        public const string MES19302 = "发布已超过24小时，不允许预留!";
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错
