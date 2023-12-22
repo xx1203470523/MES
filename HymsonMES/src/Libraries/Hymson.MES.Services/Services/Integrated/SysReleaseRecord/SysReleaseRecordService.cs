@@ -94,6 +94,11 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task DeleteSysReleaseRecordAsync(long id)
         {
+            var entity = await _sysReleaseRecordRepository.GetByIdAsync(id);
+            if (entity != null && entity.Status == SysReleaseRecordStatusEnum.release)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+            }
             await _sysReleaseRecordRepository.DeleteAsync(id);
         }
 
@@ -104,6 +109,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesSysReleaseRecordAsync(long[] ids)
         {
+            var list = await _sysReleaseRecordRepository.GetByIdsAsync(ids);
+            foreach (var item in list)
+            {
+                if (item.Status == SysReleaseRecordStatusEnum.release)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19303));
+                }
+            }
+
             return await _sysReleaseRecordRepository.DeletesAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = _currentUser.UserName });
         }
 

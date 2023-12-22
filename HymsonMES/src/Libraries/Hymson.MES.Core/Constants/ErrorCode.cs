@@ -1628,6 +1628,7 @@
         #region 发布记录 19300 
         public const string MES19301 = "版本已存在!";
         public const string MES19302 = "发布已超过24小时，不允许预留!";
+        public const string MES19303 = "已发布，不允许删除!"; 
         #endregion
         #endregion
 
