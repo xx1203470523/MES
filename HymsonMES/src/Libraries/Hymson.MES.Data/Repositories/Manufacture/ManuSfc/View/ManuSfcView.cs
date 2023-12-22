@@ -38,6 +38,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// Bom id
+        /// </summary>
+        public long? ProductBOMId { get; set; }
+
+        /// <summary>
         /// 数量
         /// </summary>
         public decimal Qty { get; set; }
@@ -45,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View
         /// <summary>
         /// 状态;1：在制；2：完成；3：已入库；4：报废；
         /// </summary>
-        public SfcStatusEnum? Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 是否在用

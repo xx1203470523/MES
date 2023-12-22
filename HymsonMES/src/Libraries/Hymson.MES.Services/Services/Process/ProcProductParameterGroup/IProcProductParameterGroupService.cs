@@ -15,7 +15,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(ProcProductParameterGroupSaveDto saveDto);
+        Task<long> CreateAsync(ProcProductParameterGroupSaveDto saveDto);
 
         /// <summary>
         /// 修改

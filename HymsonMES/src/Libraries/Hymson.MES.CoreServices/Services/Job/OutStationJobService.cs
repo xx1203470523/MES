@@ -221,6 +221,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 throw new CustomerValidationException(nameof(ErrorCode.MES16370));
             }
 
+            // 判断条码是否为空
+            if (commonBo.OutStationRequestBos.Any(a => a.SFC == null))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16382));
+            }
+
             // 临时中转变量
             var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.OutStationRequestBos.Select(s => s.SFC) };
 
@@ -321,7 +327,8 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 条码信息
-            var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
+            //var manuSFCEntities = await _manuSfcRepository.GetByIdsAsync(sfcProduceEntities.Select(s => s.SFCId));
+            var manuSFCEntities = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetByIdsAsync, sfcProduceEntities.Select(s => s.SFCId));
             if (manuSFCEntities == null || !manuSFCEntities.Any()) return default;
 
             // 全部物料加载数据
@@ -749,7 +756,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                         MaterialVersion = procMaterialEntity.Version ?? "",
                         MaterialBarCode = sfcProduceEntity.SFC,
                         Batch = "",//自制品 没有
-                        Quantity = procMaterialEntity.Batch,
+                        Quantity = sfcProduceEntity.Qty,
                         Unit = procMaterialEntity.Unit ?? "",
                         Type = WhMaterialInventoryTypeEnum.ManuComplete,
                         Source = MaterialInventorySourceEnum.ManuComplete,
@@ -993,6 +1000,8 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 添加维修业务
                 disposalResult = ProductBadDisposalResultEnum.Repair;
+                sfcProduceEntity.IsRepair = TrueOrFalseEnum.Yes;
+
                 responseBo.SFCProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -1269,7 +1278,7 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 取得半成品的总数量
             var smiFinishedUsages = 1m;
-            if (summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
+            if (summaryBo.SmiFinisheds != null && summaryBo.SmiFinisheds.Any()) smiFinishedUsages = summaryBo.SmiFinisheds.Sum(s => s.Usages);
 
             // 过滤扣料集合
             List<UpdateFeedingQtyByIdCommand> updates = new();
@@ -1280,9 +1289,9 @@ namespace Hymson.MES.CoreServices.Services.Job
 
                 // 半成品时扣减数量 = 产出数量 * (1 / 半成品用量总和 * 物料用料 * (1 + 物料损耗) * 物料消耗系数 ÷ 100)
                 // 需扣减数量 = 物料用量 * (1 + 物料损耗) * 物料消耗系数 ÷ 100
-                decimal residue = materialBo.Usages / smiFinishedUsages;
+                decimal residue = sfcProduceEntity.Qty * materialBo.Usages / smiFinishedUsages;// materialBo.Usages / smiFinishedUsages;
 
-                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value);
+                if (materialBo.Loss.HasValue && materialBo.Loss > 0) residue *= (1 + materialBo.Loss.Value / 100);
                 if (materialBo.ConsumeRatio > 0) residue *= (materialBo.ConsumeRatio / 100);
 
                 /*

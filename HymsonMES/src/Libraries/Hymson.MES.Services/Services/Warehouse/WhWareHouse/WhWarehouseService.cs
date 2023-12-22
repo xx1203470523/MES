@@ -36,6 +36,7 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<WhWarehouseSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<WhWarehouseModifyDto> _validationModifyRules;
 
         /// <summary>
         /// 仓储接口（仓库）
@@ -51,14 +52,16 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <param name="validationSaveRules"></param>
         /// <param name="whWarehouseRepository"></param>
         /// <param name="whWarehouseRegionRepository"></param>
+        /// <param name="validationModifyRules"></param>
         public WhWarehouseService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<WhWarehouseSaveDto> validationSaveRules,
-            IWhWarehouseRepository whWarehouseRepository, IWhWarehouseRegionRepository whWarehouseRegionRepository)
+            IWhWarehouseRepository whWarehouseRepository, IWhWarehouseRegionRepository whWarehouseRegionRepository, AbstractValidator<WhWarehouseModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _whWarehouseRepository = whWarehouseRepository;
             _whWarehouseRegionRepository = whWarehouseRegionRepository;
+            _validationModifyRules = validationModifyRules;
         }
 
 
@@ -92,7 +95,7 @@ namespace Hymson.MES.Services.Services.WhWareHouse
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 保存
-            var result= await _whWarehouseRepository.InsertAsync(entity);
+            var result= await _whWarehouseRepository.InsertIgnoreAsync(entity);
             if (result == 0) {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19203)).WithData("code", saveDto.Code);
             }
@@ -102,9 +105,9 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(WhWarehouseSaveDto saveDto)
+        public async Task<int> ModifyAsync(WhWarehouseModifyDto modifyDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
@@ -113,7 +116,7 @@ namespace Hymson.MES.Services.Services.WhWareHouse
             }
 
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
 
             //var query = new WhWarehouseQuery();
             //query.WareHouseCode = saveDto.WareHouseCode;
@@ -125,7 +128,7 @@ namespace Hymson.MES.Services.Services.WhWareHouse
             //}
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<WhWarehouseEntity>();
+            var entity = modifyDto.ToEntity<WhWarehouseEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
             entity.SiteId = _currentSite.SiteId ?? 0;
@@ -170,7 +173,7 @@ namespace Hymson.MES.Services.Services.WhWareHouse
         /// <returns></returns>
         public async Task<WhWarehouseDto?> QueryByIdAsync(long id) 
         {
-           var whWarehouseEntity = await _whWarehouseRepository.GetByIdAsync(id);
+           var whWarehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = id,SiteId= _currentSite.SiteId ?? 0 });
            if (whWarehouseEntity == null) return null;
            
            return whWarehouseEntity.ToModel<WhWarehouseDto>();
@@ -197,6 +200,6 @@ namespace Hymson.MES.Services.Services.WhWareHouse
             });
             return new PagedInfo<WhWarehouseDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
-
+        
     }
 }

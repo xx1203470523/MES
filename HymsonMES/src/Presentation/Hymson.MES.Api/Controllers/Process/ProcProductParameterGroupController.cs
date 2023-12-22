@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（产品检验参数组）
-    /// @author Czhipu
-    /// @date 2023-07-25 01:58:43
     /// </summary>
     [Authorize]
     [ApiController]
@@ -48,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPost]
         [Route("create")]
         [PermissionDescription("process:procProductParameterGroup:insert")]
-        public async Task AddAsync([FromBody] ProcProductParameterGroupSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] ProcProductParameterGroupSaveDto saveDto)
         {
-            await _procProductParameterGroupService.CreateAsync(saveDto);
+            return await _procProductParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>

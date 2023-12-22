@@ -97,6 +97,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public long WorkOrderId { get; set; }
 
         /// <summary>
+        /// bomID
+        /// </summary>
+        public long ProductBOMId { get; set; }
+
+        /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
         /// 工序Id
         /// </summary>
         public long ProcedureId { get; set; }

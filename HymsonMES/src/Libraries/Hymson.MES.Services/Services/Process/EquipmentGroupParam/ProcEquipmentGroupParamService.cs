@@ -66,7 +66,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procEquipmentGroupParamCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateProcEquipmentGroupParamAsync(ProcEquipmentGroupParamCreateDto procEquipmentGroupParamCreateDto)
+        public async Task<long> CreateProcEquipmentGroupParamAsync(ProcEquipmentGroupParamCreateDto procEquipmentGroupParamCreateDto)
         {
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procEquipmentGroupParamCreateDto);
@@ -152,6 +152,7 @@ namespace Hymson.MES.Services.Services.Process
                     trans.Complete();
                 }
             }
+            return procEquipmentGroupParamEntity.Id;
         }
 
         /// <summary>

@@ -2,20 +2,14 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.ResourceType;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
-    /// 资源类型维护表Controller
-    /// @tableName proc_resource_type
-    /// @author zhaoqing
-    /// @date 2023-02-06
+    /// 资源类型维护表
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceTypeController : ControllerBase
@@ -80,9 +74,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [LogDescription("资源类型维护", BusinessType.INSERT)]
         [PermissionDescription("proc:resourceType:insert")]
-        public async Task AddProcResourceTypeAsync([FromBody] ProcResourceTypeAddDto parm)
+        public async Task<long> AddProcResourceTypeAsync([FromBody] ProcResourceTypeAddDto parm)
         {
-            await _procResourceTypeService.AddProcResourceTypeAsync(parm);
+            return await _procResourceTypeService.AddProcResourceTypeAsync(parm);
         }
 
         /// <summary>

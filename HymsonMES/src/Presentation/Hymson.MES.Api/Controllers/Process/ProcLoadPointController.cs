@@ -1,21 +1,16 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（上料点表）
-    /// @author Karl
-    /// @date 2023-02-17 08:57:53
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcLoadPointController : ControllerBase
@@ -70,9 +65,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("上料点维护", BusinessType.INSERT)]
         [PermissionDescription("proc:loadPoint:insert")]
-        public async Task AddProcLoadPointAsync([FromBody] ProcLoadPointCreateDto parm)
+        public async Task<long> AddProcLoadPointAsync([FromBody] ProcLoadPointCreateDto parm)
         {
-             await _procLoadPointService.CreateProcLoadPointAsync(parm);
+           return  await _procLoadPointService.CreateProcLoadPointAsync(parm);
         }
 
         /// <summary>

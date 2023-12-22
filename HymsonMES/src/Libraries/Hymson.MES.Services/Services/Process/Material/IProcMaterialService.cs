@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procMaterialCreateDto"></param>
         /// <returns></returns>
-        Task CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto);
+        Task<long> CreateProcMaterialAsync(ProcMaterialCreateDto procMaterialCreateDto);
 
         /// <summary>
         /// 修改

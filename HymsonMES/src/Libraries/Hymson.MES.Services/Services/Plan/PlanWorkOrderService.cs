@@ -94,7 +94,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planWorkOrderCreateDto"></param>
         /// <returns></returns>
-        public async Task CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
+        public async Task<long> CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto)
         {
 
             // 验证DTO
@@ -154,6 +154,7 @@ namespace Hymson.MES.Services.Services.Plan
             }
             await _planWorkOrderRepository.InsertPlanWorkOrderRecordAsync(planWorkOrderRecordEntity);
             ts.Complete();
+            return planWorkOrderEntity.Id;
         }
 
         /// <summary>
@@ -557,7 +558,7 @@ namespace Hymson.MES.Services.Services.Plan
                 var planWorkOrderDetailView = planWorkOrderEntity.ToModel<PlanWorkOrderDetailViewDto>();
 
                 //关联物料
-                var material = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId, planWorkOrderEntity.SiteId);
+                var material = await _procMaterialRepository.GetByIdAsync(planWorkOrderEntity.ProductId);
                 if (material != null)
                 {
                     planWorkOrderDetailView.MaterialCode = material.MaterialCode;
@@ -574,7 +575,7 @@ namespace Hymson.MES.Services.Services.Plan
                     planWorkOrderDetailView.BomVersion = bom.Version;
                 }
 
-                //关联BOM
+                //关联工艺路线
                 var processRoute = await _procProcessRouteRepository.GetByIdAsync(planWorkOrderEntity.ProcessRouteId);
                 if (processRoute != null)
                 {

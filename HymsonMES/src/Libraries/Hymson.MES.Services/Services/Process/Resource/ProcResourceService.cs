@@ -474,7 +474,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task AddProcResourceAsync(ProcResourceCreateDto param)
+        public async Task<long> AddProcResourceAsync(ProcResourceCreateDto param)
         {
             #region 验证
             if (param == null)
@@ -824,6 +824,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
                 ts.Complete();
             }
+            return entity.Id;
         }
 
         /// <summary>

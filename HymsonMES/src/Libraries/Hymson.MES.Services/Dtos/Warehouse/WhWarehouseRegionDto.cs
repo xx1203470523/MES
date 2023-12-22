@@ -4,31 +4,36 @@ using Hymson.MES.Core.Enums;
 namespace Hymson.MES.Services.Dtos.WhWarehouseRegion
 {
     /// <summary>
-    /// 库区新增/更新Dto
+    /// 库区新增Dto
     /// </summary>
     public record WhWarehouseRegionSaveDto : BaseEntityDto
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long? Id { get; set; }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public long? Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 库区编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 库区名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-       /// <summary>
-        /// 仓库id
+        ///// <summary>
+        ///// 仓库id
+        ///// </summary>
+        //public long? WarehouseId { get; set; }
+
+        /// <summary>
+        /// 仓库编码
         /// </summary>
-        public long WarehouseId { get; set; }
+        public string? WarehouseCode { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 描述
         /// </summary>
         public string? Remark { get; set; }
@@ -36,7 +41,7 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseRegion
        /// <summary>
         /// 状态;1、启用  2未启用
         /// </summary>
-        public DisableOrEnableEnum Status { get; set; }
+        public DisableOrEnableEnum? Status { get; set; }
 
        // /// <summary>
        // /// 创建人
@@ -185,4 +190,29 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseRegion
         public DisableOrEnableEnum? Status { get; set; }
     }
 
+    /// <summary>
+    /// 修改Dto
+    /// </summary>
+    public record WhWarehouseRegionModifyDto : BaseEntityDto {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 库区名称
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string? Remark { get; set; }
+
+        /// <summary>
+        /// 状态;1、启用  2未启用
+        /// </summary>
+        public DisableOrEnableEnum? Status { get; set; }
+    }
 }

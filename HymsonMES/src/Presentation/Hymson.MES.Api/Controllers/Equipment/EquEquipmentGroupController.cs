@@ -2,17 +2,13 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（设备组）
-    /// @author 陈志谱
-    /// @date 2023-02-08 02:43:18
     /// </summary>
-    //
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentGroupController : ControllerBase
@@ -42,9 +38,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         [HttpPost]
         [LogDescription("设备组", BusinessType.INSERT)]
         [PermissionDescription("equ:equipmentGroup:insert")]
-        public async Task CreateAsync(EquEquipmentGroupSaveDto createDto)
+        public async Task<long> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
-            await _equEquipmentGroupService.CreateAsync(createDto);
+            return await _equEquipmentGroupService.CreateAsync(createDto);
         }
 
         /// <summary>

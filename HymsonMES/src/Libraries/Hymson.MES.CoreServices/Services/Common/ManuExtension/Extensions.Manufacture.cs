@@ -288,13 +288,16 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
         }
 
         /// <summary>
-        /// 验证条码
+        /// 转换为状态描述
         /// </summary>
-        /// <param name="barCode"></param>
-        /// <param name="maskCodeRules"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="statusEnum"></param>
         /// <returns></returns>
         public static string GetSFCStatusEnumDescription(this ILocalizationService localizationService, SfcStatusEnum statusEnum)
         {
+            return localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{statusEnum.ToString()}");
+
+            /*
             return statusEnum switch
             {
                 SfcStatusEnum.lineUp => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.lineUp)}"),
@@ -305,6 +308,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
                 SfcStatusEnum.Scrapping => localizationService.GetResource($"{typeof(SfcStatusEnum).FullName}.{nameof(SfcStatusEnum.Scrapping)}"),
                 _ => ""
             };
+            */
         }
 
     }

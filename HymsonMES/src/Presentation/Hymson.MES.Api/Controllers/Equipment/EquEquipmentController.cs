@@ -8,11 +8,7 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（设备注册）
-    /// @tableName equ_equipment
-    /// @author Czhipu
-    /// @date 2022-11-08
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquEquipmentController : ControllerBase
@@ -42,9 +38,9 @@ namespace IMTC.EIS.Admin.WebApi.Controllers.Equipment
         [HttpPost]
         [LogDescription("设备注册", BusinessType.INSERT)]
         [PermissionDescription("equ:equipment:insert")]
-        public async Task CreateAsync(EquEquipmentSaveDto createDto)
+        public async Task<long> CreateAsync(EquEquipmentSaveDto createDto)
         {
-            await _equEquipmentService.CreateAsync(createDto);
+            return await _equEquipmentService.CreateAsync(createDto);
         }
 
         /// <summary>

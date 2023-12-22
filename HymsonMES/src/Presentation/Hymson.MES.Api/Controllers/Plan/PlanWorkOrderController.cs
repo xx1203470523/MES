@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Plan
 {
     /// <summary>
     /// 控制器（工单信息表）
-    /// @author Karl
-    /// @date 2023-03-20 10:07:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanWorkOrderController : ControllerBase
@@ -77,9 +74,9 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("create")]
         [LogDescription("生产工单", BusinessType.INSERT)]
         [PermissionDescription("plan:workOrder:insert")]
-        public async Task AddPlanWorkOrderAsync([FromBody] PlanWorkOrderCreateDto parm)
+        public async Task<long> AddPlanWorkOrderAsync([FromBody] PlanWorkOrderCreateDto parm)
         {
-            await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
+            return await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
         }
 
         /// <summary>

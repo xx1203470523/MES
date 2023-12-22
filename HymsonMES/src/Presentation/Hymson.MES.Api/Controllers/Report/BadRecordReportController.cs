@@ -7,10 +7,7 @@ namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（不良报告）
-    /// @author Karl
-    /// @date 2023-04-21 17:34:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class BadRecordReportController : ControllerBase

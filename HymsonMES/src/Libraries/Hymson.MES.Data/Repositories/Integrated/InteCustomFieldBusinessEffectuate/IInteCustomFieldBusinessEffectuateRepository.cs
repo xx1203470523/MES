@@ -93,5 +93,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="businessId"></param>
         /// <returns></returns>
         Task<IEnumerable<InteCustomFieldBusinessEffectuateEntity>> GetBusinessEffectuatesByBusinessIdAsync(long businessId);
+
+        /// <summary>
+        /// 根据业务ID硬删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<int> DeleteTrueByBusinessIdsAsync(long[] ids);
     }
 }

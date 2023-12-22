@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 控制器（全检参数表）
-    /// @author Czhipu
-    /// @date 2023-07-25 02:07:36
     /// </summary>
     [Authorize]
     [ApiController]
@@ -48,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [Route("create")]
         [PermissionDescription("quality:qualInspectionParameterGroup:insert")]
-        public async Task AddAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
         {
-            await _qualInspectionParameterGroupService.CreateAsync(saveDto);
+            return await _qualInspectionParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>

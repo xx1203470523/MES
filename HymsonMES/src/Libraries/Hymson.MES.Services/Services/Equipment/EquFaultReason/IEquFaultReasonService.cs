@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 
@@ -10,53 +12,68 @@ namespace Hymson.MES.Services.Services.Equipment
     public interface IEquFaultReasonService
     {
         /// <summary>
-        /// 获取分页List
-        /// </summary>
-        /// <param name="EquFaultReasonPagedQueryDto"></param>
-        /// <returns></returns>
-        Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto EquFaultReasonPagedQueryDto);
-
-        /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="EquFaultReasonCreateDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto);
+        Task<int> CreateAsync(EquFaultReasonSaveDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="EquFaultReasonModifyDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonModifyDto);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteEquFaultReasonAsync(long id);
+        Task<int> ModifyAsync(EquFaultReasonSaveDto saveDto);
 
         /// <summary>
         /// 批量删除
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesEquFaultReasonAsync(long[] idsArr);
+        Task<int> DeletesAsync(long[] idsArr);
+
+        /// <summary>
+        /// 获取分页List
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id);
+        Task<EquFaultReasonDto?> QueryByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID获取关联解决措施
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<long>> QuerySolutionsByMainIdAsync(long reasonId);
+
+        /// <summary>
+        /// 根据ID获取关联故障现象
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<BaseInfoDto>> QueryPhenomenonsByMainIdAsync(long reasonId);
+
+        /// <summary>
+        /// 获取故障原因列表
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<SelectOptionDto>> QueryReasonsAsync();
+
+
 
         /// <summary>
         /// 状态变更
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="statusDto"></param>
         /// <returns></returns>
-        Task UpdateStatusAsync(ChangeStatusDto param);
+        Task UpdateStatusAsync(ChangeStatusDto statusDto);
 
     }
 }

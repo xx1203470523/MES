@@ -52,13 +52,13 @@ namespace Hymson.MES.Api.Controllers.WhWareHouse
         /// <summary>
         /// 更新（仓库）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
-        public async Task UpdateAsync([FromBody] WhWarehouseSaveDto saveDto)
+        public async Task UpdateAsync([FromBody] WhWarehouseModifyDto modifyDto)
         {
-             await _whWarehouseService.ModifyAsync(saveDto);
+             await _whWarehouseService.ModifyAsync(modifyDto);
         }
 
         /// <summary>

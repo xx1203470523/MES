@@ -1,39 +1,41 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（设备故障原因表）
-    /// @author pengxin
-    /// @date 2023-02-28 15:15:20
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquFaultReasonController : ControllerBase
     {
         /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<EquFaultReasonController> _logger;
+
+        /// <summary>
         /// 接口（设备故障原因表）
         /// </summary>
-        private readonly IEquFaultReasonService _EquFaultReasonService;
-        private readonly ILogger<EquFaultReasonController> _logger;
+        private readonly IEquFaultReasonService _equFaultReasonService;
 
         /// <summary>
         /// 构造函数（设备故障原因表）
         /// </summary>
-        /// <param name="EquFaultReasonService"></param>
         /// <param name="logger"></param>
-        public EquFaultReasonController(IEquFaultReasonService EquFaultReasonService, ILogger<EquFaultReasonController> logger)
+        /// <param name="equFaultReasonService"></param>
+        public EquFaultReasonController(ILogger<EquFaultReasonController> logger,
+            IEquFaultReasonService equFaultReasonService)
         {
-            _EquFaultReasonService = EquFaultReasonService;
             _logger = logger;
+            _equFaultReasonService = equFaultReasonService;
         }
 
 
@@ -43,11 +45,11 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("设备故障原因", BusinessType.INSERT)]
-        [PermissionDescription("equ:faultReason:insert")]
-        public async Task AddEquFaultReasonAsync(EquFaultReasonSaveDto parm)
+        [Route("create")]
+        [PermissionDescription("equipment:equFaultReason:insert")]
+        public async Task AddAsync(EquFaultReasonSaveDto parm)
         {
-            await _EquFaultReasonService.CreateEquFaultReasonAsync(parm);
+            await _equFaultReasonService.CreateAsync(parm);
         }
 
         /// <summary>
@@ -56,11 +58,11 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPut]
-        [LogDescription("设备故障原因", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultReason:update")]
-        public async Task UpdateEquFaultReasonAsync(EquFaultReasonSaveDto parm)
+        [Route("update")]
+        [PermissionDescription("equipment:equFaultReason:update")]
+        public async Task UpdateAsync(EquFaultReasonSaveDto parm)
         {
-            await _EquFaultReasonService.ModifyEquFaultReasonAsync(parm);
+            await _equFaultReasonService.ModifyAsync(parm);
         }
 
         /// <summary>
@@ -69,11 +71,11 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [LogDescription("设备故障原因", BusinessType.DELETE)]
-        [PermissionDescription("equ:faultReason:delete")]
-        public async Task DeleteEquFaultReasonAsync(long[] ids)
+        [Route("delete")]
+        [PermissionDescription("equipment:equFaultReason:delete")]
+        public async Task DeleteAsync(long[] ids)
         {
-            await _EquFaultReasonService.DeletesEquFaultReasonAsync(ids);
+            await _equFaultReasonService.DeletesAsync(ids);
         }
 
         /// <summary>
@@ -82,11 +84,10 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("page")]
-        //[PermissionDescription("equ:faultReason:list")]
+        [Route("pagelist")]
         public async Task<PagedInfo<EquFaultReasonDto>> QueryPagedEquFaultReasonAsync([FromQuery] EquFaultReasonPagedQueryDto parm)
         {
-            return await _EquFaultReasonService.GetPageListAsync(parm);
+            return await _equFaultReasonService.GetPageListAsync(parm);
         }
 
         /// <summary>
@@ -95,54 +96,97 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id)
+        public async Task<EquFaultReasonDto?> QueryByIdAsync(long id)
         {
-            return await _EquFaultReasonService.QueryEquFaultReasonByIdAsync(id);
+            return await _equFaultReasonService.QueryByIdAsync(id);
         }
+
+        /// <summary>
+        /// 查询ID集合（关联故障原因）
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        [HttpGet("solutions/{reasonId}")]
+        public async Task<IEnumerable<long>> QuerySolutionsByMainIdAsync(long reasonId)
+        {
+            return await _equFaultReasonService.QuerySolutionsByMainIdAsync(reasonId);
+        }
+
+        /// <summary>
+        /// 查询列表（关联故障现象）
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        [HttpGet("phenomenons/{reasonId}")]
+        public async Task<IEnumerable<BaseInfoDto>> QueryPhenomenonsByMainIdAsync(long reasonId)
+        {
+            return await _equFaultReasonService.QueryPhenomenonsByMainIdAsync(reasonId);
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("list")]
+        public async Task<IEnumerable<SelectOptionDto>> QueryReasonsAsync()
+        {
+            return await _equFaultReasonService.QueryReasonsAsync();
+        }
+
+
 
         #region 状态变更
         /// <summary>
-        /// 启用（设备故障原因表）
+        /// 启用
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("updateStatusEnable")]
-        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultReason:updateStatusEnable")]
-        public async Task UpdateStatusEnable([FromBody] long id)
+        [Route("enable")]
+        [PermissionDescription("equipment:equFaultReason:enable")]
+        public async Task EnableAsync([FromBody] long id)
         {
-            await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+            await _equFaultReasonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Enable
+            });
         }
 
         /// <summary>
-        /// 保留（设备故障原因表）
+        /// 保留
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("updateStatusRetain")]
-        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultReason:updateStatusRetain")]
-        public async Task UpdateStatusRetain([FromBody] long id)
+        [Route("retain")]
+        [PermissionDescription("equipment:equFaultReason:retain")]
+        public async Task RetainAsyn([FromBody] long id)
         {
-            await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+            await _equFaultReasonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Retain
+            });
         }
 
         /// <summary>
-        /// 废除（设备故障原因表）
+        /// 废除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("updateStatusAbolish")]
-        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultReason:updateStatusAbolish")]
-        public async Task UpdateStatusAbolish([FromBody] long id)
+        [Route("abolish")]
+        [PermissionDescription("equipment:equFaultReason:abolish")]
+        public async Task AbolishAsyn([FromBody] long id)
         {
-            await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+            await _equFaultReasonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Abolish
+            });
         }
-
         #endregion
+
     }
 }

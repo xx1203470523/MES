@@ -1,23 +1,15 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.PrintConfig;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
-    /// 打印机配置表Controller
-    /// @tableName PrintConfig
-    /// @author zhaoqing
-    /// @date 2023-02-08
+    /// 打印机配置
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcPrintConfigController : ControllerBase

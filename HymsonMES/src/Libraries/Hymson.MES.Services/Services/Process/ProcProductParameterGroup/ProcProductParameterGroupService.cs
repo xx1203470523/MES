@@ -129,7 +129,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(ProcProductParameterGroupSaveDto saveDto)
+        public async Task<long> CreateAsync(ProcProductParameterGroupSaveDto saveDto)
         {
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Services.Process
                     trans.Complete();
                 }
             }
-            return rows;
+            return entity.Id;
         }
 
         /// <summary>
@@ -435,7 +435,7 @@ namespace Hymson.MES.Services.Services.Process
                 Sfcs = sfcs,
             });
 
-            if (sfcProduces == null || sfcProduces.Count() == 0)
+            if (sfcProduces == null || !sfcProduces.Any())
             {
                 throw new CustomerValidationException(ErrorCode.MES16600);
             }

@@ -32,7 +32,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="planWorkOrderCreateDto"></param>
         /// <returns></returns>
-        Task CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto);
+        Task<long> CreatePlanWorkOrderAsync(PlanWorkOrderCreateDto planWorkOrderCreateDto);
 
         /// <summary>
         /// 修改

@@ -2,17 +2,13 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePartType;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（工装类型）
-    /// @author 陈志谱
-    /// @date 2023-02-18
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquConsumableTypeController : ControllerBase

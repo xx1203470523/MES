@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto);
+        Task<long> CreateAsync(EquEquipmentGroupSaveDto createDto);
 
         /// <summary>
         /// 修改

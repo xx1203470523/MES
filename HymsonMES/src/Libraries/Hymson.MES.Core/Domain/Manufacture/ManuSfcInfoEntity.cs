@@ -31,6 +31,16 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long ProductId { get; set; }
 
         /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// Bom id
+        /// </summary>
+        public long? ProductBOMId { get; set; }
+
+        /// <summary>
         /// 是否在用
         /// </summary>
         public bool IsUsed { get; set; }

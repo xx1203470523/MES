@@ -6,10 +6,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（操作面板-生产过站面板）
-    /// @author Karl
-    /// @date 2023-04-014 14:54:24
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateProductionController : ControllerBase

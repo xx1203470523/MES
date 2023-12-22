@@ -2,7 +2,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +10,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（物料维护）
-    /// @author Karl
-    /// @date 2023-02-08 04:47:44
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialController : ControllerBase
@@ -90,9 +86,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("物料维护", BusinessType.INSERT)]
         [PermissionDescription("proc:material:insert")]
-        public async Task AddProcMaterialAsync([FromBody] ProcMaterialCreateDto parm)
+        public async Task<long> AddProcMaterialAsync([FromBody] ProcMaterialCreateDto parm)
         {
-             await _procMaterialService.CreateProcMaterialAsync(parm);
+            return await _procMaterialService.CreateProcMaterialAsync(parm);
         }
 
         /// <summary>

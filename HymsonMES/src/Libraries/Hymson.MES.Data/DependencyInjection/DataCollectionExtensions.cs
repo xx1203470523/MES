@@ -5,7 +5,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -74,16 +73,17 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
+            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
+            services.AddSingleton<IEquFaultSolutionRepository, EquFaultSolutionRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
+            services.AddSingleton<IEquSparePartsGroupRepository, EquSparePartsGroupRepository>();
+            services.AddSingleton<IEquSparePartsGroupEquipmentGroupRelationRepository, EquSparePartsGroupEquipmentGroupRelationRepository>();
             services.AddSingleton<IEquSparePartTypeRepository, EquSparePartTypeRepository>();
             services.AddSingleton<IEquEquipmentTokenRepository, EquEquipmentTokenRepository>();
+            services.AddSingleton<IEquSparePartsRepository, EquSparePartsRepository>();
 
             services.AddSingleton<IEquEquipmentVerifyRepository, EquEquipmentVerifyRepository>();
 
-            #region FaultReason
-            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
-
-            #endregion
             #endregion
 
             #region Integrated
@@ -240,6 +240,21 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcEquipmentGroupParamDetailRepository, ProcEquipmentGroupParamDetailRepository>();
             #endregion
 
+            #region ProcFormulaOperation
+            services.AddSingleton<IProcFormulaOperationRepository, ProcFormulaOperationRepository>();
+            services.AddSingleton<IProcFormulaOperationSetRepository, ProcFormulaOperationSetRepository>();
+            #endregion
+
+            #region ProcFormulaOperationGroup
+            services.AddSingleton<IProcFormulaOperationGroupRepository, ProcFormulaOperationGroupRepository>();
+            services.AddSingleton<IProcFormulaOperationGroupRelatiionRepository, ProcFormulaOperationGroupRelatiionRepository>();
+            #endregion
+
+            #region  ProcFormula
+            services.AddSingleton<IProcFormulaRepository, ProcFormulaRepository>();
+            services.AddSingleton<IProcFormulaDetailsRepository, ProcFormulaDetailsRepository>();
+            #endregion
+
             #endregion
 
             #region Quality
@@ -305,6 +320,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcGradeDetailRepository, ManuSfcGradeDetailRepository>();
 
             services.AddSingleton<IManuWorkOrderSFCRepository, ManuWorkOrderSFCRepository>();
+
+            services.AddSingleton<IManuSFCNodeRepository, ManuSFCNodeRepository>();
+            services.AddSingleton<IManuSFCNodeSourceRepository, ManuSFCNodeSourceRepository>();
+            services.AddSingleton<IManuSFCNodeDestinationRepository, ManuSFCNodeDestinationRepository>();
             #endregion
 
             #region Warehouse 

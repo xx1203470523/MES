@@ -13,7 +13,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<int> CreateAsync(InteEventSaveDto saveDto);
+        Task<long> CreateAsync(InteEventSaveDto saveDto);
 
         /// <summary>
         /// 修改

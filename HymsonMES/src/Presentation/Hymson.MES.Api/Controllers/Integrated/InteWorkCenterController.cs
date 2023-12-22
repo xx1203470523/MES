@@ -11,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     ///  工作中心控制器
-    /// @author admin
-    /// @date 2023-02-21
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -108,9 +106,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPost]
         [LogDescription("工作中心", BusinessType.INSERT)]
         [PermissionDescription("inte:workCenter:insert")]
-        public async Task AddInteWorkCenterAsync([FromBody] InteWorkCenterCreateDto param)
+        public async Task<long> AddInteWorkCenterAsync([FromBody] InteWorkCenterCreateDto param)
         {
-            await _inteWorkCenterService.CreateInteWorkCenterAsync(param);
+            return await _inteWorkCenterService.CreateInteWorkCenterAsync(param);
         }
 
         /// <summary>

@@ -22,6 +22,9 @@ using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Linq;
+using System.Security.Policy;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.WhWarehouseLocation
 {
@@ -43,6 +46,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<WhWarehouseLocationSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<WhWarehouseLocationModifyDto> _validationModifyRules;
 
         /// <summary>
         /// 仓储接口（库位）
@@ -62,8 +66,9 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
         /// <param name="whWarehouseShelfRepository"></param>
         /// <param name="whWarehouseRegionRepository"></param>
         /// <param name="whWarehouseRepository"></param>
+        /// <param name="validationModifyRules"></param>
         public WhWarehouseLocationService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<WhWarehouseLocationSaveDto> validationSaveRules,
-            IWhWarehouseLocationRepository whWarehouseLocationRepository, IWhWarehouseShelfRepository whWarehouseShelfRepository, IWhWarehouseRegionRepository whWarehouseRegionRepository, IWhWarehouseRepository whWarehouseRepository)
+            IWhWarehouseLocationRepository whWarehouseLocationRepository, IWhWarehouseShelfRepository whWarehouseShelfRepository, IWhWarehouseRegionRepository whWarehouseRegionRepository, IWhWarehouseRepository whWarehouseRepository, AbstractValidator<WhWarehouseLocationModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -72,6 +77,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
             _whWarehouseShelfRepository = whWarehouseShelfRepository;
             _whWarehouseRegionRepository = whWarehouseRegionRepository;
             _whWarehouseRepository = whWarehouseRepository;
+            _validationModifyRules = validationModifyRules;
         }
 
 
@@ -88,30 +94,55 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
+            if (saveDto.Type == WhWarehouseLocationTypeEnum.Customize && string.IsNullOrWhiteSpace(saveDto.Code)) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19223));
+            }
+
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
-            var warehouseRegionEntity = await _whWarehouseShelfRepository.GetByIdAsync(saveDto.WarehouseShelfId.GetValueOrDefault());
+            //获取货架
+            var warehouseShelfEntity = await _whWarehouseShelfRepository.GetOneAsync(new WhWarehouseShelfQuery {Code= saveDto.WarehouseShelfCode, SiteId = _currentSite.SiteId ?? 0 });
+            if (warehouseShelfEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19226));
+            }
+
+            //获取库区
+            var warehouseRegionEntity = await _whWarehouseRegionRepository.GetOneAsync(new WhWarehouseRegionQuery { Id = warehouseShelfEntity.WarehouseRegionId, Code = saveDto.WarehouseRegionCode ,SiteId= _currentSite.SiteId ??0});
             if (warehouseRegionEntity == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES19212));
+                throw new CustomerValidationException(nameof(ErrorCode.MES19225));
+            }
+
+            //获取仓库
+            var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id = warehouseRegionEntity.WarehouseId,Code= saveDto.WarehouseCode,SiteId= _currentSite.SiteId ?? 0 });
+            if (warehouseEntity == null) {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19224));
             }
 
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            var warehouseLocationEntities = await _whWarehouseLocationRepository.GetEntitiesAsync(new WhWarehouseLocationQuery { WarehouseShelfId = saveDto.WarehouseShelfId, SiteId = _currentSite.SiteId ?? 0 });
+            var warehouseLocationEntities = await _whWarehouseLocationRepository.GetEntitiesAsync(new WhWarehouseLocationQuery { WarehouseShelfId = warehouseShelfEntity.Id, SiteId = _currentSite.SiteId ?? 0 });
 
             //获取货架下的最大库位
-            var maxColumn = 1;
-            if (warehouseLocationEntities != null && warehouseLocationEntities.Any())
+            var maxColumn = 0;
+            if (warehouseLocationEntities != null && warehouseLocationEntities.Any()&& saveDto.Type== WhWarehouseLocationTypeEnum.SpecifyRow)
             {
-                var warehouseLocationMaxInfo = warehouseLocationEntities.Where(a => a.Code.Split('-')[1] == saveDto.Row.ToString()).OrderByDescending(a => a.Code.Last()).First();
-                maxColumn = int.Parse(warehouseLocationMaxInfo.Code.Last().ToString());
+                //int number = 0;
+                var code = $"{warehouseShelfEntity.Code}-{saveDto.Row}-";
+                var warehouseLocationList = warehouseLocationEntities.Where(a=>a.Code.Contains(code));
+                if (warehouseLocationList.Any())
+                {
+                    Regex regex = new Regex(@"^[0-9]+$");
+                    warehouseLocationList = warehouseLocationList.Where(a => regex.IsMatch(a.Code.Split('-').Last().ToString()));
+                    maxColumn = warehouseLocationList.Max(a => int.Parse(a.Code.Split('-').Last()));
+                }
             }
 
             //获取库位编码
-            var locationCodes = GetLocationCode(saveDto, warehouseRegionEntity, maxColumn);
+            var locationCodes = GetLocationCode(saveDto, warehouseShelfEntity, maxColumn);
             var entitys = new List<WhWarehouseLocationEntity>();
 
             foreach (var item in locationCodes)
@@ -125,6 +156,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                 entity.SiteId = _currentSite.SiteId ?? 0;
                 entity.Status = DisableOrEnableEnum.Enable;
                 entity.Code = item;
+                entity.WarehouseShelfId = warehouseShelfEntity.Id;
                 entitys.Add(entity);
             }
 
@@ -132,15 +164,18 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
 
             //自动生成时，需要先清空之前生成的库位
             if (saveDto.Type == WhWarehouseLocationTypeEnum.Automatically) {
-                var warehouseLocationIds = warehouseLocationEntities.Select(x => x.Id);
-                await _whWarehouseLocationRepository.DeletesPhysicsAsync(new DeleteCommand {Ids= warehouseLocationIds });
+                var warehouseLocationIds = warehouseLocationEntities?.Select(x => x.Id);
+                if (warehouseLocationIds != null && warehouseLocationIds.Any())
+                {
+                    await _whWarehouseLocationRepository.DeletesPhysicsAsync(new DeleteCommand { Ids = warehouseLocationIds });
+                }
             }
 
             // 保存
             var result= await _whWarehouseLocationRepository.InsertIgnoreRangeAsync(entitys);
             if (result != entitys.Count) {
                 if (saveDto.Type == WhWarehouseLocationTypeEnum.Customize) {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First()).WithData("shelfcode", warehouseRegionEntity.Code);
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19214)).WithData("code", locationCodes.First());
                 }
                 throw new CustomerValidationException(nameof(ErrorCode.MES19213));
             }
@@ -151,18 +186,18 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(WhWarehouseLocationSaveDto saveDto)
+        public async Task<int> ModifyAsync(WhWarehouseLocationModifyDto modifyDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            await _validationModifyRules.ValidateAndThrowAsync(modifyDto);
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<WhWarehouseLocationEntity>();
+            var entity = modifyDto.ToEntity<WhWarehouseLocationEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
             entity.SiteId = _currentSite.SiteId ?? 0;
@@ -202,27 +237,27 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
         /// <returns></returns>
         public async Task<WhWarehouseLocationDto?> QueryByIdAsync(long id)
         {
-            var whWarehouseLocationEntity = await _whWarehouseLocationRepository.GetByIdAsync(id);
+            var whWarehouseLocationEntity = await _whWarehouseLocationRepository.GetOneAsync(new WhWarehouseLocationQuery {Id= id, SiteId = _currentSite.SiteId ?? 0 });
             if (whWarehouseLocationEntity == null)
             { 
                 return null; 
             }
 
             var result= whWarehouseLocationEntity.ToModel<WhWarehouseLocationDto>();
-            var warehouseShelfEntity = await _whWarehouseShelfRepository.GetByIdAsync(whWarehouseLocationEntity.WarehouseShelfId);
+            var warehouseShelfEntity = await _whWarehouseShelfRepository.GetOneAsync(new WhWarehouseShelfQuery {Id= whWarehouseLocationEntity.WarehouseShelfId, SiteId = _currentSite.SiteId??0 } );
             if (warehouseShelfEntity != null)
             {
                 result.WarehouseShelfCode = warehouseShelfEntity.Code;
                 result.WarehouseShelfName = warehouseShelfEntity.Name;
 
-                var warehouseRegionEntity = await _whWarehouseRegionRepository.GetByIdAsync(warehouseShelfEntity.WarehouseRegionId);
+                var warehouseRegionEntity = await _whWarehouseRegionRepository.GetOneAsync(new WhWarehouseRegionQuery {Id= warehouseShelfEntity.WarehouseRegionId, SiteId = _currentSite.SiteId ?? 0 } );
                 if (warehouseRegionEntity != null)
                 {
                     result.WarehouseRegionCode= warehouseRegionEntity.Code;
                     result.WarehouseRegionName= warehouseRegionEntity.Name;
                 }
 
-                var warehouseEntity = await _whWarehouseRepository.GetByIdAsync(warehouseShelfEntity.WarehouseId);
+                var warehouseEntity = await _whWarehouseRepository.GetOneAsync(new WhWarehouseQuery { Id= warehouseShelfEntity.WarehouseId, SiteId = _currentSite.SiteId ?? 0 } );
                 if (warehouseEntity != null)
                 {
                     result.WarehouseCode = warehouseEntity.Code;
@@ -240,25 +275,48 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
         /// <returns></returns>
         public async Task<PagedInfo<WhWarehouseLocationDto>> GetPagedListAsync(WhWarehouseLocationPagedQueryDto pagedQueryDto)
         {
-            var returnData=new PagedInfo<WhWarehouseLocationDto>(Enumerable.Empty<WhWarehouseLocationDto>(), 0, 0, 0);
+            var returnData = new PagedInfo<WhWarehouseLocationDto>(new List<WhWarehouseLocationDto>(), pagedQueryDto.PageIndex, pagedQueryDto.PageSize);
             var pagedQuery = pagedQueryDto.ToQuery<WhWarehouseLocationPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             pagedQuery.CodeLike = pagedQueryDto.Code;
 
             var whWarehouseQuery = new WhWarehouseQuery();
+            var whWarehouseRegionQuery = new WhWarehouseRegionQuery();
+            var whWarehouseShelfQuery = new WhWarehouseShelfQuery();
+
+            //获取仓库信息
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WarehouseCode)) {
                 whWarehouseQuery.CodeLike = pagedQueryDto.WarehouseCode;
+                
+            }
+            var warehouseEntities = await _whWarehouseRepository.GetEntitiesAsync(whWarehouseQuery);
+            if (warehouseEntities == null || !warehouseEntities.Any())
+            {
+                return returnData;
             }
 
-            var whWarehouseRegionQuery = new WhWarehouseRegionQuery();
+            //获取库区信息
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WarehouseRegionCode)) {
                 whWarehouseRegionQuery.CodeLike= pagedQueryDto.WarehouseRegionCode;
             }
+            whWarehouseRegionQuery.WarehouseIds = warehouseEntities.Select(x => x.Id);
+            var warehouseRegionEntities = await _whWarehouseRegionRepository.GetEntitiesAsync(whWarehouseRegionQuery);
+            if (warehouseRegionEntities == null || !warehouseRegionEntities.Any())
+            {
+                return returnData;
+            }
 
-            var whWarehouseShelfQuery = new WhWarehouseShelfQuery();
+            //获取货架信息
             if (!string.IsNullOrWhiteSpace(pagedQueryDto.WarehouseShelfCode))
             {
                 whWarehouseShelfQuery.CodeLike = pagedQueryDto.WarehouseShelfCode;
+            }
+            whWarehouseShelfQuery.WarehouseIds = warehouseEntities.Select(x => x.Id);
+            whWarehouseShelfQuery.WarehouseRegionIds = warehouseRegionEntities.Select(x => x.Id);
+            var warehouseShelfEntities = await _whWarehouseShelfRepository.GetEntitiesAsync(whWarehouseShelfQuery);
+            if (warehouseShelfEntities == null || !warehouseShelfEntities.Any())
+            {
+                return returnData;
             }
 
             var pagedInfo = await _whWarehouseLocationRepository.GetPagedListAsync(pagedQuery);
@@ -266,28 +324,16 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                 return returnData;
             }
 
-            //获取货架信息
-            var warehouseShelfEntities = await _whWarehouseShelfRepository.GetEntitiesAsync(whWarehouseShelfQuery);
-            if (warehouseShelfEntities == null || !warehouseShelfEntities.Any()) {
-                return returnData;
-            }
-
-            //获取库区信息
-            var warehouseRegionEntities = await _whWarehouseRegionRepository.GetEntitiesAsync(whWarehouseRegionQuery);
-            if (warehouseRegionEntities == null || !warehouseRegionEntities.Any())
-            {
-                return returnData;
-            }
-
-            //获取仓库信息
-            var warehouseEntities = await _whWarehouseRepository.GetEntitiesAsync(whWarehouseQuery);
-            if (warehouseEntities == null || !warehouseEntities.Any())
-            {
-                return returnData;
-            }
+            var query = new WhWarehouseLocationQuery();
+            query.CodeLike = pagedQueryDto.Code;
+            query.WarehouseShelfIds = warehouseShelfEntities.Select(a => a.Id);
+            query.SiteId= _currentSite.SiteId ?? 0;
+            query.Status= pagedQueryDto.Status;
+            var warehouseLocationEntities = await _whWarehouseLocationRepository.GetEntitiesAsync(query);
 
             var result=new List<WhWarehouseLocationDto>();
-            foreach (var item in pagedInfo.Data) {
+            var warehouseLocationOrderList = warehouseLocationEntities.OrderByDescending(a => a.Code).OrderByDescending(a => a.UpdatedOn);
+            foreach (var item in warehouseLocationOrderList) {
                 var model = item.ToModel<WhWarehouseLocationDto>();
 
                 var warehouseShelfEntity = warehouseShelfEntities.FirstOrDefault(a => a.Id == item.WarehouseShelfId);
@@ -303,8 +349,11 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                     }
                 }
             }
-            
-            return new PagedInfo<WhWarehouseLocationDto>(result, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var pageIndex = (pagedQueryDto.PageIndex - 1) * pagedQueryDto.PageSize;
+            returnData.Data= result.Skip(pageIndex).Take(pagedQueryDto.PageSize).OrderByDescending(a => a.Code).OrderByDescending(a=>a.UpdatedOn);
+            returnData.TotalCount = result.Count;
+
+            return returnData;
         }
 
 
@@ -353,7 +402,7 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                     break;
                 //指定行生成
                 case WhWarehouseLocationTypeEnum.SpecifyRow:
-                    for (int j = (maxColumn+ saveDto.Column??0); j <= maxColumn + saveDto.Column; j++)
+                    for (int j = maxColumn+1; j <=saveDto.Column+ maxColumn; j++)
                     {
                         var scode = $"{whWarehouseShelfEntity.Code}-{saveDto.Row}-{j}";
                         result.Add(scode);
@@ -369,8 +418,11 @@ namespace Hymson.MES.Services.Services.WhWarehouseLocation
                     //        result.Add(ccode);
                     //    }
                     //}
-                    var ccode = $"{whWarehouseShelfEntity.Code}-{saveDto.Row}-{saveDto.Column}";
-                    result.Add(ccode);
+                    //var ccode = $"{whWarehouseShelfEntity.Code}-{saveDto.Row}-{saveDto.Column}";
+                    if (!string.IsNullOrWhiteSpace(saveDto.Code))
+                    {
+                        result.Add(saveDto.Code);
+                    }
                     break;
                 default:
                     break;

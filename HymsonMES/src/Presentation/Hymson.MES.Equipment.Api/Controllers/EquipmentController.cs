@@ -1,6 +1,8 @@
 ﻿using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
+using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Equipment.Api.Controllers
@@ -19,14 +21,21 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IManufactureService _manufactureService;
 
         /// <summary>
+        /// 条码绑定
+        /// </summary>
+        private readonly ISfcBindingService _sfcBindingService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="manufactureService"></param>
-        public EquipmentController(IManufactureService manufactureService)
+        /// <param name="sfcBindingService"></param>
+        public EquipmentController(IManufactureService manufactureService,
+            ISfcBindingService sfcBindingService)
         {
             _manufactureService = manufactureService;
+            _sfcBindingService= sfcBindingService;
         }
-
 
         /// <summary>
         /// 创建条码
@@ -38,6 +47,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<IEnumerable<string>> CreateBarCodeBySemiProductAsync(BaseDto dto)
         {
             return await _manufactureService.CreateBarcodeBySemiProductIdAsync(dto);
+        }
+
+        /// <summary>
+        ///条码绑定
+        /// </summary>
+        /// <param name="sfcBindingDto"></param> 
+        /// <returns></returns>
+        [HttpPost]
+        [Route("SfcBinding")]
+        public async Task SfcBindingAsync(SfcBindingDto sfcBindingDto)
+        {
+            await _sfcBindingService.SfcCirculationBindAsync(sfcBindingDto);
         }
 
         /// <summary>
@@ -105,6 +126,5 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             await _manufactureService.OutBoundCarrierAsync(request);
         }
-
     }
 }

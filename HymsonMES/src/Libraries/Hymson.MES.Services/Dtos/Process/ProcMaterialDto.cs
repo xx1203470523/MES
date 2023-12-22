@@ -156,6 +156,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 掩码规则ID
         /// </summary>
         public long? MaskCodeId { get; set; }
+
+        /// <summary>
+        /// 数量限制
+        /// </summary>
+        public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
     }
 
 
@@ -260,6 +265,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 掩码规则ID
         /// </summary>
         public long? MaskCodeId { get; set; }
+
+        /// <summary>
+        /// 数量限制
+        /// </summary>
+        public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
 
         /// <summary>
         /// 替代品集合
@@ -406,6 +416,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MaskCodeId { get; set; }
 
         /// <summary>
+        /// 数量限制
+        /// </summary>
+        public MaterialQuantityLimitEnum? QuantityLimit { get; set; }
+
+        /// <summary>
         /// 替代品集合
         /// </summary>
         public List<ProcMaterialReplaceDto>? DynamicList { get; set; } = new List<ProcMaterialReplaceDto>();
@@ -455,6 +470,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 采购类型 数组
         /// </summary>
         public MaterialBuyTypeEnum[]? BuyTypes { get; set; }
+
+        /// <summary>
+        /// 物料组编码
+        /// </summary>
+        public string? MaterialGroupCode {  get; set; }
     }
 
     /// <summary>

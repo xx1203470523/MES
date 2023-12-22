@@ -2,19 +2,14 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.QualUnqualifiedCode;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 不合格代码控制器
-    /// @author wangkeming
-    /// @date 2023-02-11 04:45:25
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -88,9 +83,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [LogDescription("不合格代码", BusinessType.INSERT)]
         [PermissionDescription("qual:unqualifiedCode:insert")]
-        public async Task AddQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeCreateDto parm)
+        public async Task<long> AddQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeCreateDto parm)
         {
-            await _qualUnqualifiedCodeService.CreateQualUnqualifiedCodeAsync(parm);
+            return await _qualUnqualifiedCodeService.CreateQualUnqualifiedCodeAsync(parm);
         }
 
         /// <summary>

@@ -40,5 +40,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
         Task<IEnumerable<InteCustomFieldBusinessEffectuateDto>> GetBusinessEffectuatesAsync(long businessId);
+
+        /// <summary>
+        /// 根据业务ID删除业务数据
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        Task<int> DelBusinessEffectuatesAsync(long[] businessId);
     }
 }

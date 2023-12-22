@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 烘烤工序    控制器 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-07-28 05:41:13
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
@@ -15,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（烘烤工序）
-    /// @author wxk
-    /// @date 2023-07-28 05:41:13
     /// </summary>
     [Authorize]
     [ApiController]

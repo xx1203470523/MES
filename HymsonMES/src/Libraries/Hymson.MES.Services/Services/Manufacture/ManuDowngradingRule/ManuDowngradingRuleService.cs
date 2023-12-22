@@ -53,7 +53,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="manuDowngradingRuleCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateManuDowngradingRuleAsync(ManuDowngradingRuleCreateDto manuDowngradingRuleCreateDto)
+        public async Task<long> CreateManuDowngradingRuleAsync(ManuDowngradingRuleCreateDto manuDowngradingRuleCreateDto)
         {
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(manuDowngradingRuleCreateDto);
@@ -84,6 +84,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //入库
             await _manuDowngradingRuleRepository.InsertAsync(manuDowngradingRuleEntity);
+
+            return manuDowngradingRuleEntity.Id;
         }
 
         /// <summary>

@@ -87,7 +87,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
                                     if (valueItem != null)  
                                     {
                                         var newValueItem = valueItem as BaseEntity;
-                                        var index = ((IEnumerable<BaseEntity>)newCacheValue).ToList().FindLastIndex(x => x.Id == newValueItem?.Id);
+                                        var index = (newCacheValue).ToList().FindLastIndex(x => x.Id == newValueItem?.Id);
                                         if (index > -1)
                                         {
                                             var type = cacheValue.GetType();

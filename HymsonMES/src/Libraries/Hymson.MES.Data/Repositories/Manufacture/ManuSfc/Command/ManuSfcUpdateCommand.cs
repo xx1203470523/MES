@@ -266,6 +266,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
         public decimal Qty { get; set; }
 
         /// <summary>
+        /// 条码当前状态
+        /// </summary>
+        public SfcStatusEnum CurrentStatus { get; set; }
+
+        /// <summary>
         /// 当前数量
         /// </summary>
         public decimal CurrentQty { get; set; }

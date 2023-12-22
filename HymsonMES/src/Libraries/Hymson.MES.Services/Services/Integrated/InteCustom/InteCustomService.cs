@@ -79,7 +79,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteCustomCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateInteCustomAsync(InteCustomCreateDto inteCustomCreateDto)
+        public async Task<long> CreateInteCustomAsync(InteCustomCreateDto inteCustomCreateDto)
         {
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteCustomCreateDto);
@@ -102,6 +102,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //入库
             await _inteCustomRepository.InsertAsync(inteCustomEntity);
+            return inteCustomEntity.Id;
         }
 
         /// <summary>

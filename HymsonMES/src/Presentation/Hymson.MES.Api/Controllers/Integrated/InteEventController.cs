@@ -9,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（事件维护）
-    /// @author Czhipu
-    /// @date 2023-08-09 09:47:24
     /// </summary>
     [Authorize]
     [ApiController]
@@ -46,9 +44,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPost]
         [Route("create")]
         [PermissionDescription("integrated:inteEvent:insert")]
-        public async Task AddAsync([FromBody] InteEventSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] InteEventSaveDto saveDto)
         {
-             await _inteEventService.CreateAsync(saveDto);
+            return await _inteEventService.CreateAsync(saveDto);
         }
 
         /// <summary>

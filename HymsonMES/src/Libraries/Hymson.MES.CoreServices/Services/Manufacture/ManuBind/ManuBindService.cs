@@ -14,9 +14,9 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
@@ -177,6 +177,8 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                     SfcId = manuSfc.Id,
                     WorkOrderId = workOrderId,
                     ProductId = outputProductId,
+                    ProcessRouteId = planWorkOrderEntity.ProcessRouteId,
+                    ProductBOMId = planWorkOrderEntity.ProductBOMId,
                     IsUsed = true,
                     CreatedBy = param.UserName,
                     UpdatedBy = param.UserName
@@ -249,7 +251,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             }
             else
             {
-                if (manuSfcProduceEntity.Status!= SfcStatusEnum.Activity)
+                if (manuSfcProduceEntity.Status != SfcStatusEnum.Activity)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES17426)).WithData("SFC", param.SFC);
                 }
@@ -265,40 +267,40 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
                 });
             }
 
-            var boms = await _masterDataService.GetInitialMaterialsAsync(new MaterialDeductRequestBo
-            {
-                SiteId = param.SiteId,
-                ProcedureId = param.ProcedureId,
-                ProductBOMId = planWorkOrderEntity.ProductBOMId
-            });
+            //var boms = await _masterDataService.GetInitialMaterialsAsync(new MaterialDeductRequestBo
+            //{
+            //    SiteId = param.SiteId,
+            //    ProcedureId = param.ProcedureId,
+            //    ProductBOMId = planWorkOrderEntity.ProductBOMId
+            //});
 
-            if (boms != null && boms.Any())
-            {
-                var bom = boms.FirstOrDefault(x => x.MaterialId == productId);
-                if (bom == null)
-                {
-                    var pprocMaterialEntity = await _procMaterialRepository.GetByIdAsync(productId);
-                    var procBomEntity = await _procBomRepository.GetByIdAsync(planWorkOrderEntity.ProductBOMId);
-                    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
+            //if (boms != null && boms.Any())
+            //{
+            //    var bom = boms.FirstOrDefault(x => x.MaterialId == productId);
+            //    if (bom == null)
+            //    {
+            //        var pprocMaterialEntity = await _procMaterialRepository.GetByIdAsync(productId);
+            //        var procBomEntity = await _procBomRepository.GetByIdAsync(planWorkOrderEntity.ProductBOMId);
+            //        var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES17407)).WithData("MaterialName", pprocMaterialEntity?.MaterialName ?? "")
-                        .WithData("WorkOrder", planWorkOrderEntity?.OrderCode ?? "").WithData("BomName", procBomEntity?.BomName ?? "").WithData("ProcedureName", procProcedureEntity?.Name ?? "");
-                }
+            //        throw new CustomerValidationException(nameof(ErrorCode.MES17407)).WithData("MaterialName", pprocMaterialEntity?.MaterialName ?? "")
+            //            .WithData("WorkOrder", planWorkOrderEntity?.OrderCode ?? "").WithData("BomName", procBomEntity?.BomName ?? "").WithData("ProcedureName", procProcedureEntity?.Name ?? "");
+            //    }
                 //if ((manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0) + manuSfcProduceList!.Sum(x => x.Qty) > bom.Usages)
                 //{
                 //    throw new CustomerValidationException(nameof(ErrorCode.MES17411)).WithData("BindQty", manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0)
                 //        .WithData("TreatQty", manuSfcProduceList!.Sum(x => x.Qty))
                 //         .WithData("TreatQty", bom.Usages);
                 //}
-            }
-            else
-            {
-                var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
+            //}
+            //else
+            //{
+            //    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(param.ProcedureId);
 
-                throw new CustomerValidationException(nameof(ErrorCode.MES17414))
-                    .WithData("WorkOrder", planWorkOrderEntity?.OrderCode ?? "")
-                    .WithData("ProcedureName", procProcedureEntity?.Name ?? "");
-            }
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES17414))
+            //        .WithData("WorkOrder", planWorkOrderEntity?.OrderCode ?? "")
+            //        .WithData("ProcedureName", procProcedureEntity?.Name ?? "");
+            //}
 
             var deleteIds = new List<long>();
             foreach (var item in param.BindSFCs)
@@ -926,11 +928,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             var validationFailures = new List<ValidationFailure>();
             List<ManuSfcStepEntity> manuSfcStepList = new();
             List<WhMaterialInventoryEntity> whMaterialInventoryEntities = new();
-            var sfc = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SiteId = param.SiteId });
-            if (sfc == null)
+            var sfc = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
-            }
+                SiteId = param.SiteId,
+                SFC = param.SFC
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES17423)).WithData("SFC", param.SFC);
+
             var manuSfc = await _manuSfcInfoRepository.GetBySFCAsync(sfc.Id);
             if (manuSfc == null)
             {

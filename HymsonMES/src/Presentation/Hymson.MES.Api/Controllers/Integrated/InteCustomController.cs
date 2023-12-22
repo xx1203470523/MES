@@ -1,14 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 客户维护    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-07-11 09:33:26
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services.Integrated;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -18,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（客户维护）
-    /// @author Karl
-    /// @date 2023-07-11 09:33:26
     /// </summary>
     [Authorize]
     [ApiController]
@@ -78,9 +67,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("create")]
         [LogDescription("客户维护", BusinessType.INSERT)]
         [PermissionDescription("inte:inteCustom:insert")]
-        public async Task AddInteCustomAsync([FromBody] InteCustomCreateDto parm)
+        public async Task<long> AddInteCustomAsync([FromBody] InteCustomCreateDto parm)
         {
-             await _inteCustomService.CreateInteCustomAsync(parm);
+            return await _inteCustomService.CreateInteCustomAsync(parm);
         }
 
         /// <summary>

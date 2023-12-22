@@ -316,5 +316,19 @@ namespace Hymson.MES.Services.Services.Integrated
 
             return result;
         }
+
+        /// <summary>
+        /// 根据业务ID删除业务数据
+        /// </summary>
+        /// <param name="businessId"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task<int> DelBusinessEffectuatesAsync(long[] businessId)
+        {
+            if (businessId.Length == 0) 
+                throw new CustomerValidationException(nameof(ErrorCode.MES10100));
+
+            return await _inteCustomFieldBusinessEffectuateRepository.DeleteTrueByBusinessIdsAsync(businessId);
+        }
     }
 }

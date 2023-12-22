@@ -1,8 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture;
-using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（条码调整）
-    /// @author Karl
-    /// @date 2023-11-29 09:15:26
     /// </summary>
     [Authorize]
     [ApiController]
@@ -25,6 +21,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（条码调整）
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="manuBarcodeAdjustService"></param>
         public ManuBarcodeAdjustController(ILogger<ManuDowngradingController> logger, IManuBarcodeAdjustService manuBarcodeAdjustService)
         {
             _logger = logger;

@@ -8,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（工艺设备组）
-    /// @author Hjy
-    /// @date 2023-07-25 10:22:45
     /// </summary>
     [Authorize]
     [ApiController]
@@ -44,9 +42,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddProcProcessEquipmentGroupAsync([FromBody] ProcProcessEquipmentGroupSaveDto saveDto)
+        public async Task<long> AddProcProcessEquipmentGroupAsync([FromBody] ProcProcessEquipmentGroupSaveDto saveDto)
         {
-             await _procProcessEquipmentGroupService.CreateProcProcessEquipmentGroupAsync(saveDto);
+            return await _procProcessEquipmentGroupService.CreateProcProcessEquipmentGroupAsync(saveDto);
         }
 
         /// <summary>

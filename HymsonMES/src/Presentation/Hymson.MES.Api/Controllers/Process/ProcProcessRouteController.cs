@@ -5,16 +5,12 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using Minio.DataModel;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（工艺路线表）
-    /// @author zhaoqing
-    /// @date 2023-02-14 10:07:11
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcessRouteController : ControllerBase
@@ -104,9 +100,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPost]
         [LogDescription("工艺路线", BusinessType.INSERT)]
         [PermissionDescription("proc:processRoute:insert")]
-        public async Task AddProcProcessRouteAsync([FromBody] ProcProcessRouteCreateDto parm)
+        public async Task<long> AddProcProcessRouteAsync([FromBody] ProcProcessRouteCreateDto parm)
         {
-             await _procProcessRouteService.AddProcProcessRouteAsync(parm);
+           return  await _procProcessRouteService.AddProcProcessRouteAsync(parm);
         }
 
         /// <summary>

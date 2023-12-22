@@ -8,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（单位维护）
-    /// @author Kaomeng
-    /// @date 2023-07-25 08:34:41
     /// </summary>
     [Authorize]
     [ApiController]
@@ -46,9 +44,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         
         [HttpPost]
         [Route("create")]
-        public async Task AddInteUnitAsync([FromBody] InteUnitSaveDto saveDto)
+        public async Task<long> AddInteUnitAsync([FromBody] InteUnitSaveDto saveDto)
         {
-             await _inteUnitService.CreateInteUnitAsync(saveDto);
+           return  await _inteUnitService.CreateInteUnitAsync(saveDto);
         }
 
         /// <summary>

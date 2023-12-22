@@ -1,7 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcStep.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -27,9 +26,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 根据水位批量获取数据
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(ManuSfcStepStatisticQuery query);
+        Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
         /// 获取List
@@ -118,5 +117,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCsAsync(string tableName, EntityBySFCsQuery query);
 
+
+        /// <summary>
+        /// 获取一个条码的合并新增或拆分新增步骤记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query);
     }
 }

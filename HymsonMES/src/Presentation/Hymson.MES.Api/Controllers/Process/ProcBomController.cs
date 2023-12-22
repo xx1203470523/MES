@@ -1,31 +1,17 @@
-/*
- *creator: Karl
- *
- *describe: BOM表    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-14 10:04:25
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（BOM表）
-    /// @author Karl
-    /// @date 2023-02-14 10:04:25
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcBomController : ControllerBase
@@ -90,9 +76,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("BOM维护", BusinessType.INSERT)]
         [PermissionDescription("proc:bom:insert")]
-        public async Task AddProcBomAsync([FromBody] ProcBomCreateDto parm)
+        public async Task<long> AddProcBomAsync([FromBody] ProcBomCreateDto parm)
         {
-             await _procBomService.CreateProcBomAsync(parm);
+            return await _procBomService.CreateProcBomAsync(parm);
         }
 
         /// <summary>

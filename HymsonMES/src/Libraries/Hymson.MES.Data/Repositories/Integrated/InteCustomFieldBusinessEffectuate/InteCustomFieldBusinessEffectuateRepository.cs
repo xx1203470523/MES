@@ -158,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteTrueByBusinessIdSql, new { BusinessId = businessId });
         }
-
+      
         /// <summary>
         /// 通过业务ID获取业务数据
         /// </summary>
@@ -169,6 +169,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteCustomFieldBusinessEffectuateEntity>(GetBusinessEffectuatesByBusinessIdSql, new { BusinessId = businessId });
         }
+
+        /// <summary>
+        /// 批量删除（真删除）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteTrueByBusinessIdsAsync(long[] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteTrueByBusinessIdsSql, new { BusinessIds = ids });
+        }
+
     }
 
 
@@ -196,6 +208,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdsSql = @"SELECT * FROM inte_custom_field_business_effectuate WHERE Id IN @Ids ";
 
         const string DeleteTrueByBusinessIdSql = @"DELETE FROM inte_custom_field_business_effectuate WHERE BusinessId=@BusinessId ";
+
+        const string DeleteTrueByBusinessIdsSql = @"DELETE FROM inte_custom_field_business_effectuate WHERE BusinessId in @BusinessIds ";
+
         const string GetBusinessEffectuatesByBusinessIdSql = @"SELECT * FROM inte_custom_field_business_effectuate WHERE BusinessId=@BusinessId ";
     }
 }

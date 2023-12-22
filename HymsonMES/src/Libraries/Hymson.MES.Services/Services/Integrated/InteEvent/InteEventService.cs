@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(InteEventSaveDto saveDto)
+        public async Task<long> CreateAsync(InteEventSaveDto saveDto)
         {
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -99,7 +99,8 @@ namespace Hymson.MES.Services.Services.Integrated
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
 
             // 保存
-            return await _inteEventRepository.InsertAsync(entity);
+            await _inteEventRepository.InsertAsync(entity);
+            return entity.Id;
         }
 
         /// <summary>

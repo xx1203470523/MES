@@ -3,8 +3,18 @@ namespace Hymson.MES.Data.Repositories.WhWareHouse.Query
     /// <summary>
     /// 仓库 查询参数
     /// </summary>
-    public class WhWarehouseQuery
+    public class WhWarehouseQuery: QueryAbstraction
     {
+        /// <summary>
+        /// 仓库Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
+        /// 仓库Ids
+        /// </summary>
+        public IEnumerable<long> Ids { get; set; }
+
         /// <summary>
         /// 仓库编码
         /// </summary>

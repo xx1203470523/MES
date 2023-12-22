@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（物料组维护表）
-    /// @author Karl
-    /// @date 2023-02-10 03:54:07
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialGroupController : ControllerBase
@@ -78,9 +75,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("物料组维护", BusinessType.INSERT)]
         [PermissionDescription("proc:materialGroup:insert")]
-        public async Task AddProcMaterialGroupAsync([FromBody] ProcMaterialGroupCreateDto parm)
+        public async Task<long> AddProcMaterialGroupAsync([FromBody] ProcMaterialGroupCreateDto parm)
         {
-             await _procMaterialGroupService.CreateProcMaterialGroupAsync(parm);
+            return await _procMaterialGroupService.CreateProcMaterialGroupAsync(parm);
         }
 
         /// <summary>

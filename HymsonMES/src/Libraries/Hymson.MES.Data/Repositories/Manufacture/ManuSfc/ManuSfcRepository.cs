@@ -3,10 +3,10 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
-using IdGen;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -31,7 +31,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             _connectionOptions = connectionOptions.Value;
         }
-
 
         #region 方法
         /// <summary>
@@ -223,12 +222,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("manu_sfc_produce msp  on msp.SFC =ms.SFC");
 
 
-            if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode)) 
+            if (!string.IsNullOrEmpty(query.MaterialVersion) || !string.IsNullOrWhiteSpace(query.MaterialCode))
             {
                 sqlBuilder.LeftJoin(" proc_material ma  on msi.ProductId =ma.id");
             }
 
-            if (!string.IsNullOrEmpty(query.MaterialCode)) 
+            if (!string.IsNullOrEmpty(query.MaterialCode))
             {
                 query.MaterialCode = $"%{query.MaterialCode}%";
                 sqlBuilder.Where("ma.MaterialCode like  @MaterialCode");
@@ -301,7 +300,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         public async Task<PagedInfo<ManuSfcAboutInfoView>> GetManuSfcAboutInfoPagedAsync(ManuSfcAboutInfoPagedQuery query)
-        {                              
+        {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
@@ -311,7 +310,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Select(@" ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
-                                pwo.OrderCode as WorkOrderCode, pwo.ProcessRouteId, pwo.ProductBomId
+                                pwo.OrderCode as WorkOrderCode, 
+                                msi.ProcessRouteId, msi.ProductBomId
             ");
 
             sqlBuilder.InnerJoin("manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0");
@@ -323,23 +323,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                 query.Sfc = $"%{query.Sfc}%";
                 sqlBuilder.Where("ms.Sfc like  @Sfc");
             }
-            if (query.WorkOrderId.HasValue&& query.WorkOrderId>0)
+            if (query.WorkOrderId.HasValue && query.WorkOrderId > 0)
             {
                 sqlBuilder.Where("msi.WorkOrderId = @WorkOrderId");
             }
-            if (query.Status.HasValue) 
+            if (query.Status.HasValue)
             {
                 sqlBuilder.Where("ms.Status = @Status");
             }
-            if (query.MaterialId.HasValue&&query.MaterialId>0)
+            if (query.MaterialId.HasValue && query.MaterialId > 0)
             {
                 sqlBuilder.Where("msi.ProductId = @MaterialId");
             }
-            if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0) 
+            if (query.ProcessRouteId.HasValue && query.ProcessRouteId > 0)
             {
-                sqlBuilder.Where("pwo.ProcessRouteId = @ProcessRouteId");
+                sqlBuilder.Where("msi.ProcessRouteId = @ProcessRouteId");
             }
-            if (query.Sfcs != null && query.Sfcs.Any()) 
+            if (query.Sfcs != null && query.Sfcs.Any())
             {
                 sqlBuilder.Where("ms.Sfc in  @Sfcs");
             }
@@ -362,7 +362,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcAboutInfoView> GetManSfcAboutInfoBySfcAsync(ManuSfcAboutInfoBySfcQuery query) 
+        public async Task<ManuSfcAboutInfoView> GetManSfcAboutInfoBySfcAsync(ManuSfcAboutInfoBySfcQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcAboutInfoView>(GetManSfcAboutInfoBySfcSql, query);
@@ -373,7 +373,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcQuery"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuSfcEntity>> GetManuSfcEntitiesAsync(ManuSfcQuery manuSfcQuery)
+        public async Task<IEnumerable<ManuSfcEntity>> GetManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuSfcEntity>(GetSFCsSql, manuSfcQuery);
@@ -601,10 +601,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ManuSfcEntity> GetBySFCAsync(GetBySfcQuery query)
+        public async Task<ManuSfcEntity> GetBySFCAsync(EntityBySFCQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcEntity>(GetBySFCSql, query);
+        }
+
+        /// <summary>
+        /// 获取SFC（批量）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(EntityBySFCsQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcEntity>(GetBySFCsNewSql, query);
         }
 
         /// <summary>
@@ -662,7 +673,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM manu_sfc MS /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetManuSfcInfoEntitiesSqlTemplate = @"SELECT 
-                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,info.Id AS SFCInfoId, info.WorkOrderId ,info.ProductId ,info.IsUsed  FROM manu_sfc sfc LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
+                                            sfc.Id ,sfc.SiteId ,sfc.SFC ,sfc.Qty ,sfc.Status ,
+                                            info.Id AS SFCInfoId, info.WorkOrderId ,info.ProductId,info.ProcessRouteId ,info.ProductBOMId  ,info.IsUsed  
+                                        FROM manu_sfc sfc 
+                                        LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
                                             /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -689,13 +703,15 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM `manu_sfc`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
-        const string GetBySFCSql = @"SELECT * FROM `manu_sfc`  WHERE SFC = @SFC AND SiteId=@SiteId";
+        const string GetBySFCSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC = @SFC";
+        const string GetBySFCsNewSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs";
         const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
         const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs; ";
 
         const string GetManSfcAboutInfoBySfcSql = @"SELECT ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
-                                pwo.OrderCode as WorkOrderCode, pwo.ProcessRouteId, pwo.ProductBomId 
+                                pwo.OrderCode as WorkOrderCode, 
+                                msi.ProcessRouteId, msi.ProductBOMId   -- 231219 修改，取 manu_sfc_info 里的才是最新的
                                                     FROM manu_sfc MS 
                                      INNER JOIN manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0
                                      LEFT JOIN  plan_work_order pwo on msi.WorkOrderId = pwo.id AND pwo.IsDeleted=0
@@ -703,6 +719,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                   ";
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc` SET Status=@Status, Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  SFC IN @SFCs AND SiteId = @SiteId ";
         const string UpdateStatusAndQtyByIdSql = @"UPDATE `manu_sfc` SET Status=@Status, Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
-        const string UpdateManuSfcQtyAndCurrentQtyVerifyByIdSql = @"UPDATE `manu_sfc` SET  Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@Qty AND Qty=@CurrentQty ";
+        const string UpdateManuSfcQtyAndCurrentQtyVerifyByIdSql = @"UPDATE `manu_sfc` SET  Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
     }
 }

@@ -39,7 +39,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
             IInteCodeRulesRepository inteCodeRulesRepository,
             IInteCodeRulesMakeRepository inteCodeRulesMakeRepository,
             ISequenceService sequenceService,
-            IInteTimeWildcardRepository inteTimeWildcardRepository,ILocalizationService localizationService)
+            IInteTimeWildcardRepository inteTimeWildcardRepository, ILocalizationService localizationService)
         {
             _inteCodeRulesRepository = inteCodeRulesRepository;
             _inteCodeRulesMakeRepository = inteCodeRulesMakeRepository;
@@ -122,7 +122,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                 ResetType = param.ResetType,
                 StartNumber = param.StartNumber,
                 CodeMode = param.CodeMode,
-                SiteId=param.SiteId,
+                SiteId = param.SiteId,
             });
             var list = new List<string>();
             foreach (var barcode in barcodes)
@@ -218,6 +218,147 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode
                             break;
                         case GenerateBarcodeWildcard.YMDWildcard:
                             rules.Add(new List<string> { ymdWildcard });
+                            break;
+                        default:
+                            throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
+                    }
+                }
+
+                var combinations = GenerateCombination1s(rules);
+                var barCodes = new List<string>();
+                foreach (var combination in combinations)
+                {
+                    barCodes.Add(string.Join("", combination));
+                }
+                list.Add(new BarCodeInfo
+                {
+                    SerialNumber = serialStr,
+                    BarCodes = barCodes
+                });
+            }
+
+            #endregion
+
+            return list;
+        }
+
+        /// <summary>
+        /// 生成流水号
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<BarCodeInfo>> GenerateBarCodeSerialNumberReturnBarCodeInfosAsync(BarCodeSerialNumberBo bo, BarCodeExtendBo? barCodeExtendBo = null)
+        {
+            bo.CodeRulesMakeBos = bo.CodeRulesMakeBos.OrderBy(x => x.Seq);
+
+            List<BarCodeInfo> list = new();
+
+            var serialStrings = await GetSerialNumbersAsync(bo);
+
+            if (serialStrings == null || !serialStrings.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16203));
+            }
+
+            var ymdWildcard = "";
+            #region 查询年月日的通配
+            if (bo.CodeRulesMakeBos.Any(x => x.ValueTakingType == CodeValueTakingTypeEnum.VariableValue && x.SegmentedValue == GenerateBarcodeWildcard.YMDWildcard))
+            {
+
+                var currentTime = HymsonClock.Now();
+                var timeWildcards = await _inteTimeWildcardRepository.GetAllAsync(bo.SiteId);
+
+                var yearWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Year + "" && x.Type == TimeWildcardTypeEnum.Year);
+                if (yearWildcard == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Year + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Year)}"));
+                }
+                else
+                    ymdWildcard += yearWildcard.Value;
+
+                var monthWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Month + "" && x.Type == TimeWildcardTypeEnum.Month);
+                if (monthWildcard == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Month + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Month)}"));
+                }
+                else
+                    ymdWildcard += monthWildcard.Value;
+
+                var dayWildcard = timeWildcards.FirstOrDefault(x => x.Code == currentTime.Day + "" && x.Type == TimeWildcardTypeEnum.Day);
+                if (dayWildcard == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES16208)).WithData("code", currentTime.Day + "").WithData("type", _localizationService.GetResource($"{typeof(TimeWildcardTypeEnum).FullName}.{nameof(TimeWildcardTypeEnum.Day)}"));
+                }
+                else
+                    ymdWildcard += dayWildcard.Value;
+            }
+            #endregion
+
+
+            #region 组合数据生成条码
+            foreach (var serialStr in serialStrings)
+            {
+                var rules = new List<List<string>>();
+                foreach (var item in bo.CodeRulesMakeBos)
+                {
+                    if (item.ValueTakingType == CodeValueTakingTypeEnum.FixedValue)
+                    {
+                        rules.Add(new List<string> { item.SegmentedValue! });
+                        continue;
+                    }
+
+                    switch (item.SegmentedValue)
+                    {
+                        case GenerateBarcodeWildcard.Activity:
+                            rules.Add(new List<string> { serialStr });
+                            break;
+                        case GenerateBarcodeWildcard.Yymmdd:
+                            rules.Add(new List<string> { HymsonClock.Now().ToString("yyMMdd") });
+                            break;
+                        case GenerateBarcodeWildcard.MultipleVariable:
+                            //模式是多个时，生成多个条码
+                            if (bo.CodeMode == CodeRuleCodeModeEnum.More)
+                            {
+                                if (string.IsNullOrEmpty(item.CustomValue))
+                                {
+                                    throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+                                }
+                                var customValueArray = item.CustomValue.Split(';');
+                                rules.Add(customValueArray.ToList());
+                            }
+                            break;
+                        case GenerateBarcodeWildcard.YMDWildcard:
+                            rules.Add(new List<string> { ymdWildcard });
+                            break;
+                        case GenerateBarcodeWildcard.LINETYPE:
+                            if (barCodeExtendBo == null)
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES16211));
+                            }
+                            if (string.IsNullOrEmpty(item.CustomValue))
+                            {
+                                throw new CustomerValidationException(nameof(ErrorCode.MES16205));
+                            }
+                            else
+                            {
+                                var customValues = item.CustomValue.Split(";").ToList<string>();
+                                var barCodeExtendValue = customValues.FirstOrDefault(x => x.Contains(barCodeExtendBo?.LineCode ?? ""));
+                                if (string.IsNullOrEmpty(barCodeExtendValue))
+                                {
+                                    throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue);
+                                }
+                                else
+                                {
+                                    var barCodeExtendValueArray = barCodeExtendValue.Split(":");
+                                    if (barCodeExtendValueArray.Length != 2)
+                                    {
+                                        throw new CustomerValidationException(nameof(ErrorCode.MES16210)).WithData("Value", barCodeExtendValue);
+                                    }
+                                    else
+                                    {
+                                        rules.Add(new List<string> { barCodeExtendValueArray[1] });
+                                    }
+                                }
+                            }
                             break;
                         default:
                             throw new CustomerValidationException(nameof(ErrorCode.MES16205)).WithData("value", item.SegmentedValue!);
