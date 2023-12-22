@@ -62,7 +62,13 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
-            await IsVersionAsync(sysReleaseRecordCreateDto.Version);
+            sysReleaseRecordCreateDto.Version = sysReleaseRecordCreateDto.Version.Trim();
+            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(sysReleaseRecordCreateDto.Version);
+            if (entity != null && entity.EnvironmentType == sysReleaseRecordCreateDto.EnvironmentType)
+            {
+                // 判断版本存在
+                throw new CustomerValidationException(nameof(ErrorCode.MES19301));
+            }
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(sysReleaseRecordCreateDto);
 
@@ -145,8 +151,9 @@ namespace Hymson.MES.Services.Services.Integrated
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
+            sysReleaseRecordModifyDto.Version = (sysReleaseRecordModifyDto.Version ?? "").Trim();
             var entity = await _sysReleaseRecordRepository.GetByVersionAsync(sysReleaseRecordModifyDto.Version ?? "");
-            if (entity != null && entity.Version == sysReleaseRecordModifyDto.Version && entity.Id != sysReleaseRecordModifyDto.Id)
+            if (entity != null && entity.EnvironmentType == sysReleaseRecordModifyDto.EnvironmentType && entity.Id != sysReleaseRecordModifyDto.Id)
             {
                 // 判断版本存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES19301));
@@ -224,19 +231,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
         #region 内部方法
 
-        /// <summary>
-        /// 验证版本是否存在
-        /// </summary>
-        /// <param name="version"></param>
-        private async Task IsVersionAsync(string version)
-        {
-            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(version);
-            if (entity != null && entity.Version == version)
-            {
-                // 判断版本存在
-                throw new CustomerValidationException(nameof(ErrorCode.MES19301));
-            }
-        }
+
         #endregion
     }
 }
