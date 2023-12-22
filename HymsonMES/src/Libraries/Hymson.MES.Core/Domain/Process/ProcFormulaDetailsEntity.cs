@@ -35,10 +35,10 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long? MateriaGroupId { get; set; }
 
-       /// <summary>
-        /// proc_process_equipment_group的id
+        /// <summary>
+        /// proc_parameter的id
         /// </summary>
-        public long? EquipmentGroupId { get; set; }
+        public long? ParameterId { get; set; }
 
        /// <summary>
         /// 功能代码

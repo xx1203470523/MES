@@ -609,8 +609,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcFormulaView, ProcFormulaViewDto>();
             CreateMap<ProcFormulaDetailsEntity, ProcFormulaDetailsDto>();
             CreateMap<ProcFormulaDetailsEntity, ProcFormulaDetailsViewDto>();
+            CreateMap<ProcFormulaDetailsDto, ProcFormulaDetailsEntity>();
 
-            CreateMap<ProcFormulaEntity, ProcFormulaDetailViewDto>();
+            CreateMap<ProcFormulaEntity, ProcFormulaViewDto>();
 
             CreateMap<ProcFormulaPagedQueryDto, ProcFormulaPagedQuery>();
 

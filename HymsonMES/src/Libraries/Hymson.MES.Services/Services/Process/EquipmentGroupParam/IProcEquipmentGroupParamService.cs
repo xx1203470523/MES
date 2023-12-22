@@ -66,6 +66,13 @@ namespace Hymson.MES.Services.Services.Process
         Task<IEnumerable<ProcEquipmentGroupParamDetailDto>> QueryProcEquipmentGroupParamDetailByRecipeIdAsync(long recipeId);
 
         /// <summary>
+        /// 分页查询详情的参数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcParameterDto>> GetDetailParamByProductIdAndProcedureIdPagedAsync(ProcEquipmentGroupParamDetailParamPagedQueryDto queryDto);
+
+        /// <summary>
         /// 状态变更
         /// </summary>
         /// <param name="param"></param>

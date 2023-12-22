@@ -116,6 +116,19 @@ namespace Hymson.MES.Api.Controllers.Process
             return await _procEquipmentGroupParamService.QueryProcEquipmentGroupParamDetailByRecipeIdAsync(recipeId);
         }
 
+
+        /// <summary>
+        /// 分页查询详情的参数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getDetailParamByProductIdAndProcedureIdPagelist")]
+        public async Task<PagedInfo<ProcParameterDto>> GetDetailParamByProductIdAndProcedureIdPagedAsync([FromQuery] ProcEquipmentGroupParamDetailParamPagedQueryDto queryDto) 
+        {
+            return await _procEquipmentGroupParamService.GetDetailParamByProductIdAndProcedureIdPagedAsync(queryDto);
+        }
+
         #region 状态变更
         /// <summary>
         /// 启用（设备组参数详情维护）

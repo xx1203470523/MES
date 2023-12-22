@@ -42,7 +42,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcFormulaDetailViewDto?> QueryByIdAsync(long id);
+        Task<ProcFormulaViewDto?> QueryByIdAsync(long id);
 
         /// <summary>
         /// 获取分页List

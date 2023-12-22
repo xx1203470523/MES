@@ -82,7 +82,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ProcFormulaDetailViewDto?> QueryByIdAsync(long id)
+        public async Task<ProcFormulaViewDto?> QueryByIdAsync(long id)
         {
             return await _procFormulaService.QueryByIdAsync(id);
         }

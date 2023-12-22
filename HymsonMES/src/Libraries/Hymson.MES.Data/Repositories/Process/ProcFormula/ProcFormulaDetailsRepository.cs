@@ -158,6 +158,17 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcFormulaDetailsEntity>(GetFormulaDetailsByFormulaIdSql, new { FormulaId= formulaId });
         }
+
+        /// <summary>
+        /// 根据FormulaId硬删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesTrueByFormulaIdAsync(long formulaId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesTrueByFormulaIdSql, new { FormulaId= formulaId });
+        }
     }
 
 
@@ -172,11 +183,11 @@ namespace Hymson.MES.Data.Repositories.Process
                                             /**select**/
                                            FROM proc_formula_details /**where**/  ";
 
-        const string InsertSql = "INSERT INTO proc_formula_details(  `Id`, `Serial`, `FormulaId`, `FormulaOperationId`, `MateriaId`, `MateriaGroupId`, `EquipmentGroupId`, `FunctionCode`, `Setvalue`, `UpperLimit`, `LowLimit`, `Unit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (  @Id, @Serial, @FormulaId, @FormulaOperationId, @MateriaId, @MateriaGroupId, @EquipmentGroupId, @FunctionCode, @Setvalue, @UpperLimit, @LowLimit, @Unit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId) ";
-        const string InsertsSql = "INSERT INTO proc_formula_details(  `Id`, `Serial`, `FormulaId`, `FormulaOperationId`, `MateriaId`, `MateriaGroupId`, `EquipmentGroupId`, `FunctionCode`, `Setvalue`, `UpperLimit`, `LowLimit`, `Unit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (  @Id, @Serial, @FormulaId, @FormulaOperationId, @MateriaId, @MateriaGroupId, @EquipmentGroupId, @FunctionCode, @Setvalue, @UpperLimit, @LowLimit, @Unit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId) ";
+        const string InsertSql = "INSERT INTO proc_formula_details(  `Id`, `Serial`, `FormulaId`, `FormulaOperationId`, `MateriaId`, `MateriaGroupId`, `ParameterId`, `FunctionCode`, `Setvalue`, `UpperLimit`, `LowLimit`, `Unit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (  @Id, @Serial, @FormulaId, @FormulaOperationId, @MateriaId, @MateriaGroupId, @ParameterId, @FunctionCode, @Setvalue, @UpperLimit, @LowLimit, @Unit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId) ";
+        const string InsertsSql = "INSERT INTO proc_formula_details(  `Id`, `Serial`, `FormulaId`, `FormulaOperationId`, `MateriaId`, `MateriaGroupId`, `ParameterId`, `FunctionCode`, `Setvalue`, `UpperLimit`, `LowLimit`, `Unit`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`) VALUES (  @Id, @Serial, @FormulaId, @FormulaOperationId, @MateriaId, @MateriaGroupId, @ParameterId, @FunctionCode, @Setvalue, @UpperLimit, @LowLimit, @Unit, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId) ";
 
-        const string UpdateSql = "UPDATE proc_formula_details SET   Serial = @Serial, FormulaId = @FormulaId, FormulaOperationId = @FormulaOperationId, MateriaId = @MateriaId, MateriaGroupId = @MateriaGroupId, EquipmentGroupId = @EquipmentGroupId, FunctionCode = @FunctionCode, Setvalue = @Setvalue, UpperLimit = @UpperLimit, LowLimit = @LowLimit, Unit = @Unit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE proc_formula_details SET   Serial = @Serial, FormulaId = @FormulaId, FormulaOperationId = @FormulaOperationId, MateriaId = @MateriaId, MateriaGroupId = @MateriaGroupId, EquipmentGroupId = @EquipmentGroupId, FunctionCode = @FunctionCode, Setvalue = @Setvalue, UpperLimit = @UpperLimit, LowLimit = @LowLimit, Unit = @Unit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE proc_formula_details SET   Serial = @Serial, FormulaId = @FormulaId, FormulaOperationId = @FormulaOperationId, MateriaId = @MateriaId, MateriaGroupId = @MateriaGroupId, ParameterId = @ParameterId, FunctionCode = @FunctionCode, Setvalue = @Setvalue, UpperLimit = @UpperLimit, LowLimit = @LowLimit, Unit = @Unit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE proc_formula_details SET   Serial = @Serial, FormulaId = @FormulaId, FormulaOperationId = @FormulaOperationId, MateriaId = @MateriaId, MateriaGroupId = @MateriaGroupId, ParameterId = @ParameterId, FunctionCode = @FunctionCode, Setvalue = @Setvalue, UpperLimit = @UpperLimit, LowLimit = @LowLimit, Unit = @Unit, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE proc_formula_details SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE proc_formula_details SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -185,5 +196,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdsSql = @"SELECT * FROM proc_formula_details WHERE Id IN @Ids ";
 
         const string GetFormulaDetailsByFormulaIdSql = @"SELECT * FROM proc_formula_details WHERE FormulaId = @FormulaId ";
+
+        const string DeletesTrueByFormulaIdSql = @"DELETE FROM proc_formula_details WHERE FormulaId = @FormulaId ";
     }
 }

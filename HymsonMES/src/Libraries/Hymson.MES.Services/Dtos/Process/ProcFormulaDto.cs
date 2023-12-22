@@ -148,29 +148,6 @@ namespace Hymson.MES.Services.Dtos.Process
         public string MaterialName { get; set; }
 
         /// <summary>
-        /// 工序编码
-        /// </summary>
-        public string ProcedureCode { get; set; }
-
-        /// <summary>
-        /// 工序名称
-        /// </summary>
-        public string ProcedureName { get; set; }
-    }
-
-    public record ProcFormulaDetailViewDto : ProcFormulaDto 
-    {
-        /// <summary>
-        /// 物料编码
-        /// </summary>
-        public string MaterialCode { get; set; }
-
-        /// <summary>
-        /// 物料名称
-        /// </summary>
-        public string MaterialName { get; set; }
-
-        /// <summary>
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }
@@ -198,13 +175,14 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 操作组编码
         /// </summary>
-        public string FormulaOperationGroupCode {  get; set; }
+        public string FormulaOperationGroupCode { get; set; }
 
         /// <summary>
         /// 操作组名称
         /// </summary>
-        public string FormulaOperationGroupName { get;set; }
+        public string FormulaOperationGroupName { get; set; }
     }
+
     /// <summary>
     /// 配方维护分页Dto
     /// </summary>
@@ -272,9 +250,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public long? MateriaGroupId { get; set; }
 
         /// <summary>
-        /// proc_process_equipment_group的id
+        /// proc_parameter的id
         /// </summary>
-        public long? EquipmentGroupId { get; set; }
+        public long? ParameterId { get; set; }
 
         /// <summary>
         /// 功能代码
@@ -307,5 +285,8 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? Remark { get; set; }
     }
 
-    public record ProcFormulaDetailsViewDto : ProcFormulaDetailsDto { }
+    public record ProcFormulaDetailsViewDto : ProcFormulaDetailsDto 
+    {
+    
+    }
 }

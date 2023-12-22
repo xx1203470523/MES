@@ -86,5 +86,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="formulaId"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcFormulaDetailsEntity>> GetFormulaDetailsByFormulaIdAsync(long formulaId);
+
+        /// <summary>
+        /// 根据FormulaId硬删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeletesTrueByFormulaIdAsync(long formulaId);
     }
 }

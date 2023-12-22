@@ -15,6 +15,8 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -108,8 +110,35 @@ namespace Hymson.MES.Services.Services.Process
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
-            // 保存
-            return await _procFormulaRepository.InsertAsync(entity);
+            #region 组装详情数据
+            var procFormulaDetailsEntitys=new List<ProcFormulaDetailsEntity>();
+            if(saveDto.ProcFormulaDetailsDtos!=null)
+                foreach (var detail in saveDto.ProcFormulaDetailsDtos)
+                {
+                    var detailEntity= detail.ToEntity<ProcFormulaDetailsEntity>();
+                    detailEntity.Id = IdGenProvider.Instance.CreateId();
+                    detailEntity.CreatedBy = updatedBy;
+                    detailEntity.CreatedOn = updatedOn;
+                    detailEntity.UpdatedBy = updatedBy;
+                    detailEntity.UpdatedOn = updatedOn;
+                    detailEntity.SiteId = _currentSite.SiteId ?? 0;
+
+                    detailEntity.FormulaId = entity.Id;
+                    procFormulaDetailsEntitys.Add(detailEntity);
+                }
+            
+            #endregion
+
+            var row = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope()) 
+            {
+                row= await _procFormulaRepository.InsertAsync(entity);
+
+                if(procFormulaDetailsEntitys.Any()) await _procFormulaDetailsRepository.InsertRangeAsync(procFormulaDetailsEntitys);
+
+                ts.Complete();
+            }
+            return row;
         }
 
         /// <summary>
@@ -131,12 +160,44 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES15701));
             }
 
+            var updatedOn = HymsonClock.Now();
+
             // DTO转换实体
             var entity = saveDto.ToEntity<ProcFormulaEntity>();
             entity.UpdatedBy = _currentUser.UserName;
-            entity.UpdatedOn = HymsonClock.Now();
+            entity.UpdatedOn = updatedOn;
 
-            return await _procFormulaRepository.UpdateAsync(entity);
+            #region 组装详情数据
+            var procFormulaDetailsEntitys = new List<ProcFormulaDetailsEntity>();
+            if (saveDto.ProcFormulaDetailsDtos != null)
+                foreach (var detail in saveDto.ProcFormulaDetailsDtos)
+                {
+                    var detailEntity = detail.ToEntity<ProcFormulaDetailsEntity>();
+                    detailEntity.Id = IdGenProvider.Instance.CreateId();
+                    detailEntity.CreatedBy = _currentUser.UserName;
+                    detailEntity.CreatedOn = updatedOn;
+                    detailEntity.UpdatedBy = _currentUser.UserName;
+                    detailEntity.UpdatedOn = updatedOn;
+                    detailEntity.SiteId = _currentSite.SiteId ?? 0;
+
+                    detailEntity.FormulaId = entity.Id;
+                    procFormulaDetailsEntitys.Add(detailEntity);
+                }
+
+            #endregion
+
+            var row = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+                row = await _procFormulaRepository.UpdateAsync(entity);
+
+                await _procFormulaDetailsRepository.DeletesTrueByFormulaIdAsync(entity.Id);
+
+                if (procFormulaDetailsEntitys.Any()) await _procFormulaDetailsRepository.InsertRangeAsync(procFormulaDetailsEntitys);
+
+                ts.Complete();
+            }
+            return row;
         }
 
         /// <summary>
@@ -169,21 +230,21 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcFormulaDetailViewDto?> QueryByIdAsync(long id) 
+        public async Task<ProcFormulaViewDto?> QueryByIdAsync(long id) 
         {
            var procFormulaEntity = await _procFormulaRepository.GetByIdAsync(id);
            if (procFormulaEntity == null) return null;
 
-            var detailViewDto = procFormulaEntity.ToModel<ProcFormulaDetailViewDto>();
+            var procFormulaViewDto = procFormulaEntity.ToModel<ProcFormulaViewDto>();
 
             if (procFormulaEntity.MaterialId > 0) 
             {
                 var material= await _procMaterialRepository.GetByIdAsync(procFormulaEntity.MaterialId);
                 if (material != null) 
                 {
-                    detailViewDto.MaterialCode = material.MaterialCode;
-                    detailViewDto.MaterialName = material.MaterialName;
-                    detailViewDto.MaterialVersion = material.Version??""; 
+                    procFormulaViewDto.MaterialCode = material.MaterialCode;
+                    procFormulaViewDto.MaterialName = material.MaterialName;
+                    procFormulaViewDto.MaterialVersion = material.Version??""; 
                 }
             }
             if (procFormulaEntity.ProcedureId > 0)
@@ -191,8 +252,8 @@ namespace Hymson.MES.Services.Services.Process
                 var procedure = await _procProcedureRepository.GetByIdAsync(procFormulaEntity.ProcedureId);
                 if (procedure != null)
                 {
-                    detailViewDto.ProcedureName = procedure.Name;
-                    detailViewDto.ProcedureCode = procedure.Code;
+                    procFormulaViewDto.ProcedureName = procedure.Name;
+                    procFormulaViewDto.ProcedureCode = procedure.Code;
                 }
             }
             if (procFormulaEntity.EquipmentGroupId > 0) 
@@ -200,8 +261,8 @@ namespace Hymson.MES.Services.Services.Process
                 var processEquipmentGroupEntity = await _procProcessEquipmentGroupRepository.GetByIdAsync(procFormulaEntity.EquipmentGroupId);
                 if (processEquipmentGroupEntity != null)
                 {
-                    detailViewDto.EquipmentGroupCode = processEquipmentGroupEntity.Code;
-                    detailViewDto.EquipmentGroupName = processEquipmentGroupEntity.Name;
+                    procFormulaViewDto.EquipmentGroupCode = processEquipmentGroupEntity.Code;
+                    procFormulaViewDto.EquipmentGroupName = processEquipmentGroupEntity.Name;
                 }
             }
 
@@ -210,12 +271,12 @@ namespace Hymson.MES.Services.Services.Process
                 var formulaOperationGroupEntity  = await _procFormulaOperationGroupRepository.GetByIdAsync(procFormulaEntity.FormulaOperationGroupId);
                 if (formulaOperationGroupEntity != null)
                 {
-                    detailViewDto.FormulaOperationGroupCode = formulaOperationGroupEntity.Code;
-                    detailViewDto.FormulaOperationGroupName = formulaOperationGroupEntity.Name;
+                    procFormulaViewDto.FormulaOperationGroupCode = formulaOperationGroupEntity.Code;
+                    procFormulaViewDto.FormulaOperationGroupName = formulaOperationGroupEntity.Name;
                 }
             }
 
-            return detailViewDto;
+            return procFormulaViewDto;
         }
 
         /// <summary>

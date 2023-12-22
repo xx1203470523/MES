@@ -377,6 +377,37 @@ namespace Hymson.MES.Services.Services.Process
             return procEquipmentGroupParamDetailDtos;
         }
 
+        /// <summary>
+        /// 分页查询详情的参数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcParameterDto>> GetDetailParamByProductIdAndProcedureIdPagedAsync(ProcEquipmentGroupParamDetailParamPagedQueryDto queryDto) 
+        {
+            var resultZero= new PagedInfo<ProcParameterDto>(new List<ProcParameterDto>(), 1, queryDto.PageSize, 0);
+
+            var procEquipmentGroupParams=  await _procEquipmentGroupParamRepository.GetProcEquipmentGroupParamEntitiesAsync(new ProcEquipmentGroupParamQuery { SiteId = _currentSite.SiteId ?? 0, ProductId = queryDto.ProductId, ProcedureId = queryDto.ProcedureId });
+
+            if (procEquipmentGroupParams == null || !procEquipmentGroupParams.Any()) return resultZero;
+
+            //找到对应的detail信息
+            var procEquipmentGroupParamDetails= await _procEquipmentGroupParamDetailRepository.GetEntitiesByRecipeIdsAsync(procEquipmentGroupParams.Select(x => x.Id).ToArray());
+
+            if (procEquipmentGroupParamDetails == null || !procEquipmentGroupParamDetails.Any()) return resultZero;
+
+            //查询参数分页
+            var pagedInfo = await _procParameterRepository.GetPagedListAsync(new Data.Repositories.Process.Query.ProcParameterPagedQuery() 
+            {
+                SiteId=_currentSite.SiteId??0,
+                Ids= procEquipmentGroupParamDetails.Select(x=>x.ParamId).ToArray(),
+
+                PageIndex= queryDto.PageIndex,
+                PageSize= queryDto.PageSize,
+            });
+
+            return new PagedInfo<ProcParameterDto>(pagedInfo.Data.Select(x => x.ToModel<ProcParameterDto>()), pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        }
+
         #region 状态变更
         /// <summary>
         /// 状态变更
