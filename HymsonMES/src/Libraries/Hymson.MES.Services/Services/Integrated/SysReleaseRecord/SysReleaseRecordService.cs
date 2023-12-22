@@ -156,9 +156,9 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //DTO转换实体
             var sysReleaseRecordEntity = sysReleaseRecordModifyDto.ToEntity<SysReleaseRecordEntity>();
-            sysReleaseRecordEntity.Version = sysReleaseRecordModifyDto.Version;
+            sysReleaseRecordEntity.Version = sysReleaseRecordModifyDto.Version ?? "";
             sysReleaseRecordEntity.EnvironmentType = sysReleaseRecordModifyDto.EnvironmentType;
-            sysReleaseRecordEntity.PlanTime = sysReleaseRecordModifyDto.PlanTime.ParseToDateTime();
+            sysReleaseRecordEntity.PlanTime = (sysReleaseRecordModifyDto.PlanTime ?? HymsonClock.Now().ToString()).ParseToDateTime();
             sysReleaseRecordEntity.Content = sysReleaseRecordModifyDto.Content ?? "";
             sysReleaseRecordEntity.UpdatedBy = _currentUser.UserName;
             sysReleaseRecordEntity.UpdatedOn = HymsonClock.Now();
