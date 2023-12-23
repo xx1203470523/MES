@@ -351,7 +351,8 @@ namespace Hymson.MES.Services.Services.Process
                 formulaDetailViewDtos.Add(formulaDetailViewDto);
             }
 
-            return formulaDetailViewDtos;
+
+            return formulaDetailViewDtos.OrderBy(x=>x.Serial).ToList();
         }
 
 
