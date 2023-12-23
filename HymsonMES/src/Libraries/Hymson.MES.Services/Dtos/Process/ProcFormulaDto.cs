@@ -242,12 +242,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// proc_material 的id
         /// </summary>
-        public long? MateriaId { get; set; }
+        public long? MaterialId { get; set; }
 
         /// <summary>
         /// proc_material_group 的id
         /// </summary>
-        public long? MateriaGroupId { get; set; }
+        public long? MaterialGroupId { get; set; }
 
         /// <summary>
         /// proc_parameter的id
@@ -287,6 +287,14 @@ namespace Hymson.MES.Services.Dtos.Process
 
     public record ProcFormulaDetailsViewDto : ProcFormulaDetailsDto 
     {
-    
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        public string MaterialGroupCode {  get; set; }
+
+        public string ParameterCode { get; set; }
+
     }
 }

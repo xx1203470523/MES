@@ -28,12 +28,12 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// proc_material 的id
         /// </summary>
-        public long? MateriaId { get; set; }
+        public long? MaterialId { get; set; }
 
        /// <summary>
         /// proc_material_group 的id
         /// </summary>
-        public long? MateriaGroupId { get; set; }
+        public long? MaterialGroupId { get; set; }
 
         /// <summary>
         /// proc_parameter的id

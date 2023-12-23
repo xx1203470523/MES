@@ -56,6 +56,10 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcFormulaDetailsRepository _procFormulaDetailsRepository;
 
+        private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
+
+        private readonly IProcParameterRepository _procParameterRepository;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -69,7 +73,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procFormulaOperationGroupRepository"></param>
         public ProcFormulaService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaSaveDto> validationSaveRules, 
-            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository, IProcFormulaDetailsRepository procFormulaDetailsRepository)
+            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository, IProcFormulaDetailsRepository procFormulaDetailsRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IProcParameterRepository procParameterRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -81,6 +85,8 @@ namespace Hymson.MES.Services.Services.Process
             _procProcessEquipmentGroupRepository = procProcessEquipmentGroupRepository;
             _procFormulaOperationGroupRepository = procFormulaOperationGroupRepository;
             _procFormulaDetailsRepository = procFormulaDetailsRepository;
+            _procMaterialGroupRepository = procMaterialGroupRepository;
+            _procParameterRepository = procParameterRepository;
         }
 
 
@@ -304,7 +310,48 @@ namespace Hymson.MES.Services.Services.Process
         {
             var formulaDetails=  await _procFormulaDetailsRepository.GetFormulaDetailsByFormulaIdAsync(formulaId);
 
-            return formulaDetails.Select(s => s.ToModel<ProcFormulaDetailsViewDto>());
+            if (formulaDetails == null||!formulaDetails.Any()) return Enumerable.Empty<ProcFormulaDetailsViewDto>();
+
+            //查找物料
+            var materialIds = formulaDetails.Where(x => x.MaterialId.HasValue).Select(x => x.MaterialId!.Value).Distinct().ToArray();
+            var materials = (materialIds != null && materialIds.Any()) ? await _procMaterialRepository.GetByIdsAsync(materialIds) : null;
+
+            //查找物料组
+            var materialGroupIds= formulaDetails.Where(x => x.MaterialGroupId.HasValue).Select(x => x.MaterialGroupId!.Value).Distinct().ToArray();
+            var materialGroups = materialGroupIds.Any() ? await _procMaterialGroupRepository.GetByIdsAsync(materialGroupIds) : null;
+
+            //查找参数
+            var parameterIds = formulaDetails.Where(x => x.ParameterId.HasValue).Select(x => x.ParameterId!.Value).Distinct().ToArray();
+            var parameters = parameterIds.Any() ? await _procParameterRepository.GetByIdsAsync(parameterIds) : null;
+
+            var formulaDetailViewDtos = new List<ProcFormulaDetailsViewDto>();
+
+            foreach (var item in formulaDetails) 
+            {
+                var formulaDetailViewDto=item.ToModel<ProcFormulaDetailsViewDto>();
+
+                var material = materials?.FirstOrDefault(x => x.Id == item.MaterialId);
+                if (material != null) 
+                {
+                    formulaDetailViewDto.MaterialCode= material.MaterialCode;
+                }
+
+                var materialGroup =  materialGroups?.FirstOrDefault(x => x.Id == item.MaterialGroupId);
+                if (materialGroup != null)
+                {
+                    formulaDetailViewDto.MaterialGroupCode = materialGroup.GroupCode;
+                }
+
+                var parameter = parameters?.FirstOrDefault(x => x.Id == item.ParameterId);
+                if (parameter != null) 
+                {
+                    formulaDetailViewDto.ParameterCode = parameter.ParameterCode;
+                }
+
+                formulaDetailViewDtos.Add(formulaDetailViewDto);
+            }
+
+            return formulaDetailViewDtos;
         }
 
 
