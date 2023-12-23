@@ -164,10 +164,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesTrueByFormulaIdAsync(long formulaId)
+        public async Task<int> DeletesTrueByFormulaIdsAsync(long[] formulaIds)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(DeletesTrueByFormulaIdSql, new { FormulaId= formulaId });
+            return await conn.ExecuteAsync(DeletesTrueByFormulaIdsSql, new { FormulaIds= formulaIds });
         }
     }
 
@@ -197,6 +197,6 @@ namespace Hymson.MES.Data.Repositories.Process
 
         const string GetFormulaDetailsByFormulaIdSql = @"SELECT * FROM proc_formula_details WHERE FormulaId = @FormulaId ";
 
-        const string DeletesTrueByFormulaIdSql = @"DELETE FROM proc_formula_details WHERE FormulaId = @FormulaId ";
+        const string DeletesTrueByFormulaIdsSql = @"DELETE FROM proc_formula_details WHERE FormulaId in @FormulaIds ";
     }
 }

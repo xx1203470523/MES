@@ -103,6 +103,11 @@ namespace Hymson.MES.Services.Services.Process
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            #region 验证 配方编码 + 版本是否唯一
+            var formulaByCodeAndVersion = await _procFormulaRepository.GetByCodeAndVersionAsync(new ProcFormulaByCodeAndVersion {SiteId=_currentSite.SiteId??0,Code= saveDto.Code,Version=saveDto.Version });
+            if (formulaByCodeAndVersion != null) throw new CustomerValidationException(nameof(ErrorCode.MES15703)).WithData("code", saveDto.Code).WithData("version",saveDto.Version);
+            #endregion
+
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
@@ -197,7 +202,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 row = await _procFormulaRepository.UpdateAsync(entity);
 
-                await _procFormulaDetailsRepository.DeletesTrueByFormulaIdAsync(entity.Id);
+                await _procFormulaDetailsRepository.DeletesTrueByFormulaIdsAsync(new long[] { entity.Id });
 
                 if (procFormulaDetailsEntitys.Any()) await _procFormulaDetailsRepository.InsertRangeAsync(procFormulaDetailsEntitys);
 
@@ -223,12 +228,20 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _procFormulaRepository.DeletesAsync(new DeleteCommand
+            var row = 0;
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                row = await _procFormulaRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = ids,
+                    DeleteOn = HymsonClock.Now(),
+                    UserId = _currentUser.UserName
+                });
+
+                await _procFormulaDetailsRepository.DeletesTrueByFormulaIdsAsync(ids);
+            }
+
+            return row;
         }
 
         /// <summary>
@@ -400,6 +413,20 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
             #endregion
+
+            //当是需要更改为启用状态时 判断是否 物料 + 工序 是否已经有启用状态的的配方
+            if (changeStatusCommand.Status== SysDataStatusEnum.Enable) 
+            {
+                var sameEnableFormulas = await _procFormulaRepository.GetEntitiesAsync(new ProcFormulaQuery { SiteId = _currentSite.SiteId??0,MaterialId= entity.MaterialId,ProcedureId=entity.ProcedureId,Status= SysDataStatusEnum.Enable }) ;
+
+                if (sameEnableFormulas != null && sameEnableFormulas.Any()) 
+                {
+                    var material = await _procMaterialRepository.GetByIdAsync(entity.MaterialId);
+                    var procedure = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode??"").WithData("procedureCode",procedure?.Code??"");
+                }
+            }
 
             #region 操作数据库
             await _procFormulaRepository.UpdateStatusAsync(changeStatusCommand);

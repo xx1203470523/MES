@@ -92,6 +92,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> DeletesTrueByFormulaIdAsync(long formulaId);
+        Task<int> DeletesTrueByFormulaIdsAsync(long[] formulaIds);
     }
 }

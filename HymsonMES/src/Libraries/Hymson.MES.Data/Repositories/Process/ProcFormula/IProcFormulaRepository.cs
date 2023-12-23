@@ -87,5 +87,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据编码与版本获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcFormulaEntity> GetByCodeAndVersionAsync(ProcFormulaByCodeAndVersion query);
     }
 }

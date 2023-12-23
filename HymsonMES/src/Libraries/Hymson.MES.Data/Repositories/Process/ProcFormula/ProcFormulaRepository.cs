@@ -120,6 +120,23 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (query.MaterialId.HasValue && query.MaterialId.Value>0)
+            {
+                sqlBuilder.Where(" MaterialId = @MaterialId ");
+            }
+            if (query.ProcedureId.HasValue && query.ProcedureId.Value > 0)
+            {
+                sqlBuilder.Where(" ProcedureId = @ProcedureId ");
+            }
+            if (query.Status.HasValue )
+            {
+                sqlBuilder.Where(" Status = @Status ");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcFormulaEntity>(template.RawSql, query);
         }
@@ -199,6 +216,12 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
+
+        public async Task<ProcFormulaEntity> GetByCodeAndVersionAsync(ProcFormulaByCodeAndVersion query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcFormulaEntity>(GetByCodeAndVersionSql, query);
+        }
     }
 
 
@@ -225,7 +248,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM proc_formula WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM proc_formula WHERE Id IN @Ids ";
 
-        const string UpdateStatusSql = "UPDATE `proc_formula` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
-
+        const string UpdateStatusSql = @"UPDATE `proc_formula` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        const string GetByCodeAndVersionSql = @"SELECT * FROM proc_formula WHERE SiteId=@SiteId AND Code=@Code AND Version=@Version AND IsDeleted=0 ";
     }
 }

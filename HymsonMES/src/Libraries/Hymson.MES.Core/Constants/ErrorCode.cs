@@ -833,6 +833,8 @@
         #region 配方维护 15700
         public const string MES15700 = "配方维护异常！";
         public const string MES15701 = "操作的配方数据已不存在";
+        public const string MES15702 = "物料[{materialCode}] + 工序[{procedureCode}]已存在启用状态的配方，不允许重复添加！";
+        public const string MES15703 = "配方编码[{code}]版本[{version}]已存在，请重新输入！";
 
         #endregion
 
