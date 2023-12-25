@@ -994,6 +994,7 @@
         public const string MES16381 = "数据状态不是最新的,请刷新！";
         public const string MES16382 = "产品序列码存在NULL值，请检查参数！";
         public const string MES16383 = "返修数据不存在，请联系管理员！！！";
+        public const string MES16384 = "物料编码【{BarCodes}】已过期！";
         #endregion
 
         #region 工单激活 MES16400
