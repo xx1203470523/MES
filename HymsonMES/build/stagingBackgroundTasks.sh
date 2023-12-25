@@ -8,7 +8,8 @@ docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 docker push $registryUrl/$imageName:$timestamp
 docker service rm $serviceName
-echo 'docker service create \
+echo $registryUrl/$imageName:$timestamp
+docker service create \
   --with-registry-auth \
   --name $serviceName \
   --replicas 2 \
@@ -17,4 +18,4 @@ echo 'docker service create \
   --env SERVICE_NAME={{.Service.Name}} \
   --hostname="{{.Node.ID}}-{{.Service.Name}}"\
    --mount type=volume,src=hymsonvolume,dst=/logs \
-  $registryUrl/$imageName:$timestamp'
+  $registryUrl/$imageName:$timestamp
