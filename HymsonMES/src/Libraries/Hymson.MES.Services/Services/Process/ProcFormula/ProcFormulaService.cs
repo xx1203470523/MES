@@ -76,6 +76,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcedureRepository"></param>
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procFormulaOperationGroupRepository"></param>
+        /// <param name="procFormulaDetailsRepository"></param>
+        /// <param name="procMaterialGroupRepository"></param>
+        /// <param name="procParameterRepository"></param>
+        /// <param name="procFormulaOperationRepository"></param>
         public ProcFormulaService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaSaveDto> validationSaveRules, AbstractValidator<ProcFormulaDetailsDto> validationDetailsDtoRules,
             IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository, IProcFormulaDetailsRepository procFormulaDetailsRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IProcParameterRepository procParameterRepository, IProcFormulaOperationRepository procFormulaOperationRepository)
         {
