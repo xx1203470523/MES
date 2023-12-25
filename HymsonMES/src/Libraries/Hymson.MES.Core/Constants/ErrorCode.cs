@@ -994,6 +994,7 @@
         public const string MES16381 = "数据状态不是最新的,请刷新！";
         public const string MES16382 = "产品序列码存在NULL值，请检查参数！";
         public const string MES16383 = "返修数据不存在，请联系管理员！！！";
+        public const string MES16384 = "物料编码【{BarCodes}】已过期！";
         #endregion
 
         #region 工单激活 MES16400
@@ -1556,6 +1557,7 @@
         public const string MES19934 = "设备{EquipmentCode}不存在";
         public const string MES19935 = "资源【{ResCode}】未绑定启用/保留状态的工序，请检查配置";
         public const string MES19936 = "条码{SFC}所属产品编码{P1}与托盘绑定的产品编码不一致";
+        public const string MES19937 = "工单{WorkOrderCode}未激活，无法进行条码接收操作！";
         #endregion
 
 

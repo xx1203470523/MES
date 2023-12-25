@@ -54,6 +54,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IPlanWorkOrderBindRepository _planWorkOrderBindRepository;
         private readonly IManuCommonService _manuCommonService;
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
         /// 构造函数
@@ -81,7 +82,8 @@ namespace Hymson.MES.CoreServices.Services.Job
            IManuSfcProduceRepository manuSfcProduceRepository,
            IPlanWorkOrderBindRepository planWorkOrderBindRepository,
            IManuCommonService manuCommonService,
-           IManuSfcStepRepository manuSfcStepRepository)
+           IManuSfcStepRepository manuSfcStepRepository,
+           IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _logger = logger;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -95,6 +97,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             _planWorkOrderBindRepository = planWorkOrderBindRepository;
             _manuCommonService = manuCommonService;
             _manuSfcStepRepository = manuSfcStepRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
         }
 
         /// <summary>
@@ -156,6 +159,12 @@ namespace Hymson.MES.CoreServices.Services.Job
                 WorkOrderId = planWorkOrderBindEntity.WorkOrderId,
                 IsVerifyActivation = false
             });
+
+            var planWorkOrderActivationEntity = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(planWorkOrderBindEntity.WorkOrderId);
+            if (planWorkOrderActivationEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19937)).WithData("WorkOrderCode", planWorkOrderEntity.OrderCode);
+            }
 
             // 获取产出设置的产品ID
             var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new Bos.Common.MasterData.ProductSetBo
