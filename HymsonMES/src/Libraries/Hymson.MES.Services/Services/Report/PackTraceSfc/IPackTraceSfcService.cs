@@ -1,5 +1,6 @@
 ﻿
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Report.PackTraceSfcDto;
 
@@ -10,13 +11,20 @@ namespace Hymson.MES.Services.Services.Report.PackTraceSfc;
 /// </summary>
 public interface IPackTraceSfcService
 {
+
     /// <summary>
     /// 分页查询
     /// </summary>
     /// <param name="queryDto"></param>
     /// <returns></returns>
-    Task<PagedInfo<PackTraceSfcViewDto>> GetPageInfoAsync(PackTraceSfcQueryDto queryDto);
+    Task<IEnumerable<PackTraceSfcViewDto>> GetListAsync(PackTraceSfcQueryDto queryDto);
 
+    /// <summary>
+    /// 分页查询
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    Task<PagedInfo<PackTraceSfcViewDto>> GetPageInfoAsync(PackTraceSfcPageQueryDto queryDto);
 
     #region Excel导出
 
@@ -25,7 +33,7 @@ public interface IPackTraceSfcService
     /// </summary>
     /// <param name="queryDto"></param>
     /// <returns></returns>
-    Task<IEnumerable<PackTraceSfcViewDto>> ExportPortAsyc(PackTraceSfcQueryDto queryDto);
+    Task<ExportResultDto> ExportExcelAsyc(PackTraceSfcQueryDto queryDto);
 
     #endregion
 }

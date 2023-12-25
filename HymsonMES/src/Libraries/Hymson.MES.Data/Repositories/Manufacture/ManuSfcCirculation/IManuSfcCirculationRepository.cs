@@ -49,9 +49,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="manuSfcCirculationPagedQuery"></param>
+        /// <param name="pageQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery manuSfcCirculationPagedQuery);
+        Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery pageQuery);
 
         /// <summary>
         /// 根据流转前和流转后条码获取绑定记录

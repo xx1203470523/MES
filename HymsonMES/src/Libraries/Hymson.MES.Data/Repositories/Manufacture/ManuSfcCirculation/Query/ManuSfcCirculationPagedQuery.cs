@@ -23,6 +23,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 站点id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string> CirculationBarCodes { get; set; }
     }
 
     /// <summary>
