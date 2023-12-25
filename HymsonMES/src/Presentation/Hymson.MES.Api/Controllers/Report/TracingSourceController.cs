@@ -1,12 +1,12 @@
 ﻿using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Services;
-using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（条码追溯）
+    /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
     public class TracingSourceController : ControllerBase
