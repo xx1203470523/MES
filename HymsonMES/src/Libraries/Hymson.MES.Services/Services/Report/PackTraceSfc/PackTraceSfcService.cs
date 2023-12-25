@@ -62,12 +62,12 @@ public class PackTraceSfcService : IPackTraceSfcService
                 SiteId = 123456
             });
 
-            queryDto.SFCs =  sfc.Select(a => a.CirculationBarCode);
+            queryDto.SFCs =  sfc.Select(a => a.CirculationBarCode).Distinct();
             if (queryDto.SFCs.Any() == false) return result;
         }
         else
         {
-            queryDto.SFCs = queryDto.SFC.Split(",");
+            queryDto.SFCs = queryDto.SFC.Split(",").Distinct();
             if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
         }
 
@@ -78,7 +78,7 @@ public class PackTraceSfcService : IPackTraceSfcService
             CirculationBarCodes = queryDto.SFCs.ToArray(),
             SiteId = 123456
         });
-        var manuSfcs = moduleSfcCirculationEntities.Select(a => a.SFC);
+        var manuSfcs = moduleSfcCirculationEntities.Select(a => a.SFC).Distinct();
 
         //获取Module码绑定的SFC
         var sfcCirculationEntities = await _manuSfcCirculationRepository.GetPagedInfoAsync(new()
@@ -88,7 +88,7 @@ public class PackTraceSfcService : IPackTraceSfcService
             PageSize = queryDto.PageSize,
             SiteId = 123456
         });
-        var manuBindSfcs = sfcCirculationEntities.Data.Select(a => a.SFC);
+        var manuBindSfcs = sfcCirculationEntities.Data.Select(a => a.SFC).Distinct();
 
         //组装数据并返回
         List<PackTraceSfcViewDto> list = new List<PackTraceSfcViewDto>();
@@ -152,12 +152,12 @@ public class PackTraceSfcService : IPackTraceSfcService
                 SiteId = 123456
             });
 
-            queryDto.SFCs = sfc.Select(a => a.CirculationBarCode);
+            queryDto.SFCs = sfc.Select(a => a.CirculationBarCode).Distinct();
             if (queryDto.SFCs.Any() == false) return list;
         }
         else
         {
-            queryDto.SFCs = queryDto.SFC.Split(",");
+            queryDto.SFCs = queryDto.SFC.Split(",").Distinct();
             if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
         }
 
@@ -166,14 +166,14 @@ public class PackTraceSfcService : IPackTraceSfcService
         {
             CirculationBarCodes = queryDto.SFCs.ToArray()
         });
-        var manuSfcs = moduleSfcCirculationEntities.Select(a => a.SFC);
+        var manuSfcs = moduleSfcCirculationEntities.Select(a => a.SFC).Distinct();
 
         //获取Module码绑定的SFC
         var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
         {
             CirculationBarCodes = manuSfcs.ToArray()
         });
-        var manuBindSfcs = sfcCirculationEntities.Select(a => a.SFC);
+        var manuBindSfcs = sfcCirculationEntities.Select(a => a.SFC).Distinct();
 
         foreach (var pack in queryDto.SFCs)
         {
@@ -232,12 +232,12 @@ public class PackTraceSfcService : IPackTraceSfcService
                 SiteId = 123456
             });
 
-            queryDto.SFCs = sfc.Select(a => a.CirculationBarCode);
+            queryDto.SFCs = sfc.Select(a => a.CirculationBarCode).Distinct();
             if (queryDto.SFCs.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19402));
         }
         else
         {
-            queryDto.SFCs = queryDto.SFC.Split(",");
+            queryDto.SFCs = queryDto.SFC.Split(",").Distinct();
             if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
         }
 
@@ -247,7 +247,7 @@ public class PackTraceSfcService : IPackTraceSfcService
             CirculationBarCodes = queryDto.SFCs.ToArray(),
             SiteId = 123456
         });
-        var manuSfcs = moduleSfcCirculationEntities.Select(a => a.SFC);
+        var manuSfcs = moduleSfcCirculationEntities.Select(a => a.SFC).Distinct();
 
         //获取Module码绑定的SFC
         var sfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
@@ -255,7 +255,7 @@ public class PackTraceSfcService : IPackTraceSfcService
             CirculationBarCodes = manuSfcs.ToArray(),
             SiteId = 123456
         });
-        var manuBindSfcs = sfcCirculationEntities.Select(a => a.SFC);
+        var manuBindSfcs = sfcCirculationEntities.Select(a => a.SFC).Distinct();
 
         //组装数据并返回
         List<PackTraceSfcViewDto> list = new List<PackTraceSfcViewDto>();
