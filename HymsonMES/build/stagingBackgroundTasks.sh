@@ -1,7 +1,7 @@
 #! /bin/bash
 PublishEnvironment=Release
 timestamp=$(date +%Y%m%d%H%M%S)
-serviceName=hymson-mes-backgroundtasks-bat-test
+serviceName=hymson-mes-backgroundtasks-batttery-test
 registryUrl=10.10.79.13:8081/test
 imageName=hymson.mes.backgroundtasks
 docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.BackgroundTasks/Dockerfile .
