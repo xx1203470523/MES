@@ -182,6 +182,15 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("f.ProcedureId =  @ProcedureId");
             }
 
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode)) 
+            {
+                sqlBuilder.Where("m.MaterialCode =  @MaterialCode");
+            }
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ProcedureCode))
+            {
+                sqlBuilder.Where("p.Code =  @ProcedureCode");
+            }
+
             if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialName))
             {
                 pagedQuery.MaterialName = $"%{pagedQuery.MaterialName}%";

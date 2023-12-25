@@ -835,7 +835,32 @@
         public const string MES15701 = "操作的配方数据已不存在";
         public const string MES15702 = "物料[{materialCode}] + 工序[{procedureCode}]已存在启用状态的配方，不允许重复添加！";
         public const string MES15703 = "配方编码[{code}]版本[{version}]已存在，请重新输入！";
+        public const string MES15704 = "配方编码不能为空";
+        public const string MES15705 = "配方名称不能为空";
+        public const string MES15706 = "配方版本不能为空";
+        public const string MES15707 = "配方的物料不能为空";
+        public const string MES15708 = "配方的工序不能为空";
+        public const string MES15709 = "配方的工艺设备组不能为空";
+        public const string MES15710 = "配方的操作组不能为空";
+        public const string MES15711 = "配方的ID不能为空";
+        public const string MES15712 = "配方编码长度不能超过50个字符";
+        public const string MES15713 = "配方名称长度不能超过50个字符";
+        public const string MES15714 = "配方版本长度不能超过50个字符";
+        public const string MES15715 = "配方备注长度不能超过255个字符";
 
+        public const string MES15716 = "配方详细设定值长度不能超过255个字符";
+        public const string MES15717 = "配方详细单位长度不能超过100个字符";
+        public const string MES15718 = "配方详细备注长度不能超过255个字符";
+        public const string MES15719 = "配方详细序号应该为大于0的整数";
+        public const string MES15720 = "配方详细操作不能为空";
+        public const string MES15721 = "配方详细设定值不能为空";
+        public const string MES15722 = "配方详细单位不能为空";
+        public const string MES15723 = "配方操作Id【{id}】没有找到对应数据";
+
+        public const string MES15724 = "配方详细中选择的操作需要有物料ID";
+        public const string MES15725 = "配方详细中选择的操作需要有物料组ID";
+        public const string MES15726 = "配方详细中选择的操作需要有功能代码";
+        public const string MES15727 = "配方详细中选择的操作需要有参数ID";
         #endregion
 
         #region 工单 16000

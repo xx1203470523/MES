@@ -38,6 +38,7 @@ namespace Hymson.MES.Services.Services.Process
         /// 参数验证器
         /// </summary>
         private readonly AbstractValidator<ProcFormulaSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<ProcFormulaDetailsDto> _validationDetailsDtoRules;
 
         /// <summary>
         /// 仓储接口（配方维护）
@@ -54,6 +55,8 @@ namespace Hymson.MES.Services.Services.Process
 
         private readonly IProcFormulaOperationGroupRepository _procFormulaOperationGroupRepository;
 
+        private readonly IProcFormulaOperationRepository _procFormulaOperationRepository;
+
         private readonly IProcFormulaDetailsRepository _procFormulaDetailsRepository;
 
         private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
@@ -66,18 +69,20 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
+        /// <param name="validationDetailsDtoRules"></param>
         /// <param name="procFormulaRepository"></param>
         /// <param name="localizationService"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procFormulaOperationGroupRepository"></param>
-        public ProcFormulaService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaSaveDto> validationSaveRules, 
-            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository, IProcFormulaDetailsRepository procFormulaDetailsRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IProcParameterRepository procParameterRepository)
+        public ProcFormulaService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaSaveDto> validationSaveRules, AbstractValidator<ProcFormulaDetailsDto> validationDetailsDtoRules,
+            IProcFormulaRepository procFormulaRepository, ILocalizationService localizationService, IProcMaterialRepository procMaterialRepository, IProcProcedureRepository procProcedureRepository, IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository, IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository, IProcFormulaDetailsRepository procFormulaDetailsRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IProcParameterRepository procParameterRepository, IProcFormulaOperationRepository procFormulaOperationRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
+            _validationDetailsDtoRules = validationDetailsDtoRules;
             _procFormulaRepository = procFormulaRepository;
             _localizationService = localizationService;
             _procMaterialRepository = procMaterialRepository;
@@ -87,6 +92,7 @@ namespace Hymson.MES.Services.Services.Process
             _procFormulaDetailsRepository = procFormulaDetailsRepository;
             _procMaterialGroupRepository = procMaterialGroupRepository;
             _procParameterRepository = procParameterRepository;
+            _procFormulaOperationRepository = procFormulaOperationRepository;
         }
 
 
@@ -102,6 +108,47 @@ namespace Hymson.MES.Services.Services.Process
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            if (saveDto.ProcFormulaDetailsDtos != null&& saveDto.ProcFormulaDetailsDtos.Any()) 
+            {
+                foreach (var item in saveDto.ProcFormulaDetailsDtos)
+                {
+                    await _validationDetailsDtoRules.ValidateAndThrowAsync(item);
+                }
+
+
+                //查询操作
+                var formulaOperations = await _procFormulaOperationRepository.GetByIdsAsync(saveDto.ProcFormulaDetailsDtos.Select(x => x.FormulaOperationId).Distinct().ToArray());
+
+                foreach (var item in saveDto.ProcFormulaDetailsDtos)
+                {
+                    var formulaOperation = formulaOperations.FirstOrDefault(x => x.Id == item.FormulaOperationId);
+
+                    if (formulaOperation == null) throw new CustomerValidationException(nameof(ErrorCode.MES15723)).WithData("id", item.FormulaOperationId);
+
+                    switch (formulaOperation.Type)
+                    {
+                        case Core.Enums.Process.FormulaOperationTypeEnum.Material:
+                            if (!item.MaterialId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15724));
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.MaterialGroup:
+                            if (!item.MaterialGroupId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15725));
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.FixedValue:
+                            //这个不需要设置值
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.SetValue:
+                            if (string.IsNullOrWhiteSpace(item.FunctionCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15726));
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.ParameterValue:
+                            if (!item.ParameterId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15727));
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+            }
 
             #region 验证 配方编码 + 版本是否唯一
             var formulaByCodeAndVersion = await _procFormulaRepository.GetByCodeAndVersionAsync(new ProcFormulaByCodeAndVersion {SiteId=_currentSite.SiteId??0,Code= saveDto.Code,Version=saveDto.Version });
@@ -165,13 +212,60 @@ namespace Hymson.MES.Services.Services.Process
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
+            if (saveDto.Id <= 0) 
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15711));
+            }
+
+            if (saveDto.ProcFormulaDetailsDtos != null && saveDto.ProcFormulaDetailsDtos.Any())
+                foreach (var item in saveDto.ProcFormulaDetailsDtos)
+                {
+                    await _validationDetailsDtoRules.ValidateAndThrowAsync(item);
+                }
+
             var procFormula = await _procFormulaRepository.GetByIdAsync(saveDto.Id);
             if (procFormula == null) 
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15701));
             }
 
-            var updatedOn = HymsonClock.Now();
+            //校验 详情中 某些参数不能为空
+            if (saveDto.ProcFormulaDetailsDtos != null && saveDto.ProcFormulaDetailsDtos.Any()) 
+            {
+                //查询操作
+                var formulaOperations = await _procFormulaOperationRepository.GetByIdsAsync(saveDto.ProcFormulaDetailsDtos.Select(x => x.FormulaOperationId).Distinct().ToArray());
+
+                foreach (var item in saveDto.ProcFormulaDetailsDtos)
+                {
+                    var formulaOperation = formulaOperations.FirstOrDefault(x=>x.Id==item.FormulaOperationId);
+
+                    if (formulaOperation == null) throw new CustomerValidationException(nameof(ErrorCode.MES15723)).WithData("id", item.FormulaOperationId);
+
+                    switch (formulaOperation.Type)  
+                    {
+                        case Core.Enums.Process.FormulaOperationTypeEnum.Material:
+                            if(!item.MaterialId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15724));
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.MaterialGroup:
+                            if (!item.MaterialGroupId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15725));
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.FixedValue:
+                            //这个不需要设置值
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.SetValue:
+                            if (string.IsNullOrWhiteSpace(item.FunctionCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15726));
+                            break;
+                        case Core.Enums.Process.FormulaOperationTypeEnum.ParameterValue:
+                            if (!item.ParameterId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15727));
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+            }
+
+                var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
             var entity = saveDto.ToEntity<ProcFormulaEntity>();
