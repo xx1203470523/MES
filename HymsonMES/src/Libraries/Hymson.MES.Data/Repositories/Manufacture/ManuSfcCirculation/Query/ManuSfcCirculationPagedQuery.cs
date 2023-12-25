@@ -33,6 +33,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 条码
         /// </summary>
         public IEnumerable<string> CirculationBarCodes { get; set; }
+
+        /// <summary>
+        /// 条码模糊查询
+        /// </summary>
+        public string? CirculationBarCodeLike { get; set; }
+
+        /// <summary>
+        /// 起始时间
+        /// </summary>
+        public DateTime? BeginTime { get; set; }
+
+        /// <summary>
+        /// 起始时间
+        /// </summary>
+        public DateTime? EndTime { get; set; }
     }
 
     /// <summary>

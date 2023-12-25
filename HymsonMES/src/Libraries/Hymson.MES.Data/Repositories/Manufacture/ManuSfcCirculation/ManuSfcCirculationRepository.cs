@@ -208,41 +208,53 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
     /// <summary>
     /// 根据流转前和流转后条码获取绑定记录
     /// </summary>
-    /// <param name="manuSfcCirculationBarCodeQuery"></param>
+    /// <param name="query"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationBarCodeEntitiesAsync(ManuSfcCirculationBarCodeQuery manuSfcCirculationBarCodeQuery)
+    public async Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationBarCodeEntitiesAsync(ManuSfcCirculationBarCodeQuery query)
     {
         var sqlBuilder = new SqlBuilder();
         var template = sqlBuilder.AddTemplate(GetManuSfcCirculationEntitiesSqlTemplate);
         sqlBuilder.Where("IsDeleted=0");
         sqlBuilder.Select("*");
         sqlBuilder.Where("SiteId=@SiteId");
-        if (manuSfcCirculationBarCodeQuery.CirculationType.HasValue)
+        if (query.CirculationType.HasValue)
         {
             sqlBuilder.Where("CirculationType=@CirculationType");
         }
-        if (manuSfcCirculationBarCodeQuery.ResourceId.HasValue)
+        if (query.ResourceId.HasValue)
         {
             sqlBuilder.Where("ResourceId=@ResourceId");
         }
-        if (manuSfcCirculationBarCodeQuery.IsDisassemble.HasValue)
+        if (query.IsDisassemble.HasValue)
         {
             sqlBuilder.Where("IsDisassemble=@IsDisassemble");
         }
-        if (manuSfcCirculationBarCodeQuery.Sfcs != null && manuSfcCirculationBarCodeQuery.Sfcs.Length > 0)
+        if (query.Sfcs != null && query.Sfcs.Length > 0)
         {
             sqlBuilder.Where("SFC IN @Sfcs");
         }
-        if (manuSfcCirculationBarCodeQuery.CirculationBarCodes != null && manuSfcCirculationBarCodeQuery.CirculationBarCodes.Length > 0)
+        if (query.CirculationBarCodes != null && query.CirculationBarCodes.Length > 0)
         {
             sqlBuilder.Where("CirculationBarCode IN @CirculationBarCodes");
         }
-        if (!string.IsNullOrEmpty(manuSfcCirculationBarCodeQuery.CirculationBarCode))
+        if (!string.IsNullOrEmpty(query.CirculationBarCode))
         {
             sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
         }
+        if (query.CirculationBarCodeLike != null)
+        {
+            sqlBuilder.Where($"CirculationBarCode LIKE '{query.CirculationBarCodeLike}%'");
+        }
+        if (query.BeginTime != null)
+        {
+            sqlBuilder.Where(" CreatedOn >= @BeginTime");
+        }
+        if (query.EndTime != null)
+        {
+            sqlBuilder.Where(" CreatedOn < @EndTime");
+        }
         using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(template.RawSql, manuSfcCirculationBarCodeQuery);
+        var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(template.RawSql, query);
         return manuSfcCirculationEntities;
     }
 
@@ -506,6 +518,18 @@ public partial class ManuSfcCirculationRepository
         if (query.CirculationBarCodes?.Any() == true)
         {
             sqlbuilder.Where($"CirculationBarCode IN ('{string.Join("','", query.CirculationBarCodes)}')");
+        }
+        if (query.CirculationBarCodeLike != null)
+        {
+            sqlbuilder.Where($"CirculationBarCode LIKE '{query.CirculationBarCodeLike}%'");
+        }
+        if (query.BeginTime != null)
+        {
+            sqlbuilder.Where(" CreatedOn >= @BeginTime");
+        }
+        if (query.EndTime != null)
+        {
+            sqlbuilder.Where(" CreatedOn < @EndTime");
         }
     }
 }

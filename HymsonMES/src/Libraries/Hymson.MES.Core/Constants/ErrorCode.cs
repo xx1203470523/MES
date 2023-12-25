@@ -1148,6 +1148,7 @@
 
         //Pack追溯电芯码报表
         public const string MES19401 = "查询条件条码或者日期不能为空！";
+        public const string MES19402 = "查询时间段内没有任何数据！";
 
         #endregion
 

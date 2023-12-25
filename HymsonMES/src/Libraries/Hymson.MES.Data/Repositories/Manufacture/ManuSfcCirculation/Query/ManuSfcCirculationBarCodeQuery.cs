@@ -48,5 +48,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
         /// 当前状态;1：排队；2：激活；3：完工；
         /// </summary>
         public SfcProduceStatusEnum? CurrentStatus { get; set; }
+
+        /// <summary>
+        /// 起始时间
+        /// </summary>
+
+        public DateTime? BeginTime { get; set; }
+
+        /// <summary>
+        /// 截止时间
+        /// </summary>
+        public DateTime? EndTime { get; set; }
+
+        /// <summary>
+        /// CirculationBarCodeLike模糊查询
+        /// </summary>
+        public string? CirculationBarCodeLike { get; set; }
     }
 }

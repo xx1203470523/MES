@@ -25,6 +25,11 @@ public class PackTraceSfcQueryDto
     /// <summary>
     /// 起止时间
     /// </summary>
+    public DateTime[]? DateList { get; set; }
+
+    /// <summary>
+    /// 起止时间
+    /// </summary>
     public DateTime? BeginTime { get; set; }
 
     /// <summary>
@@ -47,6 +52,11 @@ public class PackTraceSfcPageQueryDto : PagerInfo
     /// 查询条码
     /// </summary>
     public IEnumerable<string>? SFCs { get; set; }
+
+    /// <summary>
+    /// 起止时间
+    /// </summary>
+    public DateTime[]? DateList { get; set; }
 
     /// <summary>
     /// 起止时间

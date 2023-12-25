@@ -10,6 +10,7 @@ using Hymson.MES.Services.Dtos.Report.Excel;
 using Hymson.MES.Services.Dtos.Report.PackTraceSfcDto;
 using Hymson.Minio;
 using Hymson.Utils;
+using MySqlX.XDevAPI.Common;
 using Org.BouncyCastle.Crypto.Engines;
 using System.Drawing.Drawing2D;
 
@@ -41,17 +42,35 @@ public class PackTraceSfcService : IPackTraceSfcService
     {
         PagedInfo<PackTraceSfcViewDto> result = new PagedInfo<PackTraceSfcViewDto>(new List<PackTraceSfcViewDto>(), queryDto.PageIndex, queryDto.PageSize);
 
+        if (queryDto.DateList?.Any() == true)
+        {
+            queryDto.BeginTime = queryDto.DateList[0];
+            queryDto.EndTime = queryDto.DateList[1];
+        }
+
         if (queryDto.SFC == null)
         {
             if (queryDto.EndTime == null || queryDto.BeginTime == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19401));
+
+            //获取Pack码绑定的Module码
+            var sfc = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
+            {
+                BeginTime = queryDto.BeginTime,
+                EndTime = queryDto.EndTime,
+                CirculationBarCodeLike = "ES",
+                SiteId = 123456
+            });
+
+            queryDto.SFCs =  sfc.Select(a => a.CirculationBarCode);
+            if (queryDto.SFCs.Any() == false) return result;
         }
         else
         {
             queryDto.SFCs = queryDto.SFC.Split(",");
+            if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
         }
 
-        if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
 
         //获取Pack码绑定的Module码
         var moduleSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
@@ -110,17 +129,37 @@ public class PackTraceSfcService : IPackTraceSfcService
     /// <exception cref="CustomerValidationException"></exception>
     public async Task<IEnumerable<PackTraceSfcViewDto>> GetListAsync(PackTraceSfcQueryDto queryDto)
     {
+        //组装数据并返回
+        List<PackTraceSfcViewDto> list = new List<PackTraceSfcViewDto>();
+
+        if (queryDto.DateList?.Any() == true)
+        {
+            queryDto.BeginTime = queryDto.DateList[0];
+            queryDto.EndTime = queryDto.DateList[1];
+        }
+
         if (queryDto.SFC == null)
         {
             if (queryDto.EndTime == null || queryDto.BeginTime == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19401));
+
+            //获取Pack码绑定的Module码
+            var sfc = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
+            {
+                BeginTime = queryDto.BeginTime,
+                EndTime = queryDto.EndTime,
+                CirculationBarCodeLike = "ES",
+                SiteId = 123456
+            });
+
+            queryDto.SFCs = sfc.Select(a => a.CirculationBarCode);
+            if (queryDto.SFCs.Any() == false) return list;
         }
         else
         {
             queryDto.SFCs = queryDto.SFC.Split(",");
+            if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
         }
-
-        if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
 
         //获取Pack码绑定的Module码
         var moduleSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
@@ -136,8 +175,6 @@ public class PackTraceSfcService : IPackTraceSfcService
         });
         var manuBindSfcs = sfcCirculationEntities.Select(a => a.SFC);
 
-        //组装数据并返回
-        List<PackTraceSfcViewDto> list = new List<PackTraceSfcViewDto>();
         foreach (var pack in queryDto.SFCs)
         {
             //获取模组码集合
@@ -174,17 +211,35 @@ public class PackTraceSfcService : IPackTraceSfcService
     {
         string fileName = string.Format("({0}Pack码追溯电芯码报表)", DateTime.Now.ToString("yyyyMMddHHmmss"));
 
+        if (queryDto.DateList?.Any() == true)
+        {
+            queryDto.BeginTime = queryDto.DateList[0];
+            queryDto.EndTime = queryDto.DateList[1];
+        }
+
+
         if (queryDto.SFC == null)
         {
             if (queryDto.EndTime == null || queryDto.BeginTime == null)
                 throw new CustomerValidationException(nameof(ErrorCode.MES19401));
+
+            //获取Pack码绑定的Module码
+            var sfc = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
+            {
+                BeginTime = queryDto.BeginTime,
+                EndTime = queryDto.EndTime,
+                CirculationBarCodeLike = "ES",
+                SiteId = 123456
+            });
+
+            queryDto.SFCs = sfc.Select(a => a.CirculationBarCode);
+            if (queryDto.SFCs.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES19402));
         }
         else
         {
             queryDto.SFCs = queryDto.SFC.Split(",");
+            if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
         }
-
-        if (queryDto.SFCs?.Any() != true) throw new CustomerValidationException(nameof(ErrorCode.MES19401));
 
         //获取Pack码绑定的Module码
         var moduleSfcCirculationEntities = await _manuSfcCirculationRepository.GetManuSfcCirculationBarCodeEntitiesAsync(new()
