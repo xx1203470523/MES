@@ -7,14 +7,8 @@ imageName=hymson.mes.backgroundtasks
 docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.BackgroundTasks/Dockerfile .
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 docker push $registryUrl/$imageName:$timestamp
-echo '1'
-echo $serviceName
-echo '2'
 docker service rm $serviceName
-echo '3'
-echo $imageName
-echo $timestamp
-echo '4'
+echo $registryUrl/$imageName:$timestamp
 docker service create \
   --with-registry-auth \
   --name $serviceName \
