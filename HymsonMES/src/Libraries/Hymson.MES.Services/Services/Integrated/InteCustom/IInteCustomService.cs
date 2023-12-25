@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteCustomCreateDto"></param>
         /// <returns></returns>
-        Task CreateInteCustomAsync(InteCustomCreateDto inteCustomCreateDto);
+        Task<long> CreateInteCustomAsync(InteCustomCreateDto inteCustomCreateDto);
 
         /// <summary>
         /// 修改

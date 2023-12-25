@@ -76,7 +76,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         /// </summary>
         /// <param name="createDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentGroupSaveDto createDto)
+        public async Task<long> CreateAsync(EquEquipmentGroupSaveDto createDto)
         {
             if (createDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
 
@@ -111,7 +111,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
 
                 trans.Complete();
             }
-            return rows;
+            return entity.Id;
         }
 
         /// <summary>

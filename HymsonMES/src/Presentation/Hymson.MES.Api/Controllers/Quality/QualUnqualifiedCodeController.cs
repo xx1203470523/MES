@@ -83,9 +83,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [LogDescription("不合格代码", BusinessType.INSERT)]
         [PermissionDescription("qual:unqualifiedCode:insert")]
-        public async Task AddQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeCreateDto parm)
+        public async Task<long> AddQualUnqualifiedCodeAsync([FromBody] QualUnqualifiedCodeCreateDto parm)
         {
-            await _qualUnqualifiedCodeService.CreateQualUnqualifiedCodeAsync(parm);
+            return await _qualUnqualifiedCodeService.CreateQualUnqualifiedCodeAsync(parm);
         }
 
         /// <summary>

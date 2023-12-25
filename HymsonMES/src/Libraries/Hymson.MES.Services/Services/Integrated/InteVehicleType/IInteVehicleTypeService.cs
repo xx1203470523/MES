@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteVehicleTypeCreateDto"></param>
         /// <returns></returns>
-        Task CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto inteVehicleTypeCreateDto);
+        Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto inteVehicleTypeCreateDto);
 
         /// <summary>
         /// 修改

@@ -42,9 +42,9 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
-        public async Task AddProcProcessEquipmentGroupAsync([FromBody] ProcProcessEquipmentGroupSaveDto saveDto)
+        public async Task<long> AddProcProcessEquipmentGroupAsync([FromBody] ProcProcessEquipmentGroupSaveDto saveDto)
         {
-             await _procProcessEquipmentGroupService.CreateProcProcessEquipmentGroupAsync(saveDto);
+            return await _procProcessEquipmentGroupService.CreateProcProcessEquipmentGroupAsync(saveDto);
         }
 
         /// <summary>

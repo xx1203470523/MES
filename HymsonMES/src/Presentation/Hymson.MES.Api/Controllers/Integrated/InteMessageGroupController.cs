@@ -44,9 +44,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPost]
         [Route("create")]
         [PermissionDescription("integrated:inteMessageGroup:insert")]
-        public async Task AddAsync([FromBody] InteMessageGroupSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] InteMessageGroupSaveDto saveDto)
         {
-             await _inteMessageGroupService.CreateAsync(saveDto);
+            return await _inteMessageGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>

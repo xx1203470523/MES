@@ -16,18 +16,23 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障原因代码
         /// </summary>
-        public string FaultReasonCode { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// 故障原因名称
         /// </summary>
-        public string FaultReasonName { get; set; }
+        public string Name { get; set; }
 
 
         /// <summary>
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 关联解决措施
+        /// </summary>
+        public IEnumerable<long>? SolutionIds { get; set; }
 
     }
 
@@ -44,32 +49,22 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 故障原因代码
         /// </summary>
-        public string FaultReasonCode { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
         /// 故障原因名称
         /// </summary>
-        public string FaultReasonName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// 故障原因状态（字典定义）
         /// </summary>
-        public SysDataStatusEnum? UseStatus { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
-
-        /// <summary>
-        /// 创建人
-        /// </summary>
-        public string CreatedBy { get; set; }
-
-        /// <summary>
-        /// 创建时间
-        /// </summary>
-        public DateTime CreatedOn { get; set; }
 
         /// <summary>
         /// 最后修改人
@@ -80,12 +75,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
-
-        /// <summary>
-        /// 是否逻辑删除
-        /// </summary>
-        public bool? IsDeleted { get; set; }
-
 
     }
 
@@ -105,21 +94,32 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 编码（设备故障原因）
         /// </summary>
-        public string? FaultReasonCode { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// 名称（设备故障原因）
         /// </summary>
-        public string? FaultReasonName { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// 故障原因状态（字典定义）
         /// </summary>
-        public SysDataStatusEnum? UseStatus { get; set; }
+        public SysDataStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 描述（设备故障原因）
         /// </summary>
         public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 设备故障原因表查询Dto
+    /// </summary>
+    public class EquFaultReasonQueryDto
+    {
+        /// <summary>
+        /// Ids
+        /// </summary>
+        public IEnumerable<long>? Ids { get; set; }
     }
 }

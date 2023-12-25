@@ -62,7 +62,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("标准参数", BusinessType.INSERT)]
         [PermissionDescription("proc:parameter:insert")]
-        public async Task<int> AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
+        public async Task<long> AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
         {
             return await _procParameterService.CreateProcParameterAsync(parm);
         }

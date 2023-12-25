@@ -13,6 +13,12 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcEquipmentGroupParamQuery
     {
+        public long SiteId {  get; set; }
+
+        public long? ProductId { get; set; }
+
+        public long? ProcedureId { get; set;}
+
     }
 
     public class ProcEquipmentGroupParamCodeQuery 

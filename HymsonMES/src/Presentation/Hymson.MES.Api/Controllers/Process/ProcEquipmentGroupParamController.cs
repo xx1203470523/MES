@@ -68,9 +68,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("设备参数组", BusinessType.INSERT)]
         [PermissionDescription("proc:equipmentGroupParam:insert")]
-        public async Task AddProcEquipmentGroupParamAsync([FromBody] ProcEquipmentGroupParamCreateDto parm)
+        public async Task<long> AddProcEquipmentGroupParamAsync([FromBody] ProcEquipmentGroupParamCreateDto parm)
         {
-             await _procEquipmentGroupParamService.CreateProcEquipmentGroupParamAsync(parm);
+            return await _procEquipmentGroupParamService.CreateProcEquipmentGroupParamAsync(parm);
         }
 
         /// <summary>
@@ -114,6 +114,19 @@ namespace Hymson.MES.Api.Controllers.Process
         public async Task<IEnumerable<ProcEquipmentGroupParamDetailDto>> QueryProcEquipmentGroupParamDetailByRecipeIdAsync(long recipeId)
         {
             return await _procEquipmentGroupParamService.QueryProcEquipmentGroupParamDetailByRecipeIdAsync(recipeId);
+        }
+
+
+        /// <summary>
+        /// 分页查询详情的参数
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getDetailParamByProductIdAndProcedureIdPagelist")]
+        public async Task<PagedInfo<ProcParameterDto>> GetDetailParamByProductIdAndProcedureIdPagedAsync([FromQuery] ProcEquipmentGroupParamDetailParamPagedQueryDto queryDto) 
+        {
+            return await _procEquipmentGroupParamService.GetDetailParamByProductIdAndProcedureIdPagedAsync(queryDto);
         }
 
         #region 状态变更

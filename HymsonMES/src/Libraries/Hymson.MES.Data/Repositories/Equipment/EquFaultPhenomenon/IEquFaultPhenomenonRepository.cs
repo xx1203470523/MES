@@ -2,9 +2,9 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
+using Hymson.MES.Data.Repositories.Equipment.Query;
 
-namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
+namespace Hymson.MES.Data.Repositories.Equipment
 {
     /// <summary>
     /// 仓储接口（设备故障现象）
@@ -14,16 +14,23 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <summary>
         /// 新增（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> InsertAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
+        Task<int> InsertAsync(EquFaultPhenomenonEntity entity);
 
         /// <summary>
         /// 更新（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateAsync(EquFaultPhenomenonEntity equFaultPhenomenonEntity);
+        Task<int> UpdateAsync(EquFaultPhenomenonEntity entity);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 
         /// <summary>
         /// 删除（设备故障现象）
@@ -47,13 +54,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         Task<EquFaultPhenomenonEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 根据ID获取数据（设备故障现象）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<EquFaultPhenomenonView> GetViewByIdAsync(long id);
-
-        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>
@@ -65,21 +65,37 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultPhenomenonView>> GetPagedInfoAsync(EquFaultPhenomenonPagedQuery pagedQuery);
+        Task<PagedInfo<EquFaultPhenomenonEntity>> GetPagedListAsync(EquFaultPhenomenonPagedQuery pagedQuery);
 
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+
 
         /// <summary>
-        /// 更新状态
+        /// 删除（批量）
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+        Task<int> DeleteByParentIdAsync(DeleteByParentIdCommand command);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertRelationsAsync(IEnumerable<EquFaultPhenomenonReasonRelationEntity> entities);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquFaultPhenomenonReasonRelationEntity>> GetReasonRelationEntitiesAsync(EntityByParentIdQuery query);
 
     }
 }

@@ -5,7 +5,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentLinkApi;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -74,6 +73,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLinkHardwareRepository, EquEquipmentLinkHardwareRepository>();
             services.AddSingleton<IEquEquipmentUnitRepository, EquEquipmentUnitRepository>();
             services.AddSingleton<IEquFaultPhenomenonRepository, EquFaultPhenomenonRepository>();
+            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
+            services.AddSingleton<IEquFaultSolutionRepository, EquFaultSolutionRepository>();
             services.AddSingleton<IEquSparePartRepository, EquSparePartRepository>();
             services.AddSingleton<IEquSparePartsGroupRepository, EquSparePartsGroupRepository>();
             services.AddSingleton<IEquSparePartsGroupEquipmentGroupRelationRepository, EquSparePartsGroupEquipmentGroupRelationRepository>();
@@ -83,10 +84,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IEquEquipmentVerifyRepository, EquEquipmentVerifyRepository>();
 
-            #region FaultReason
-            services.AddSingleton<IEquFaultReasonRepository, EquFaultReasonRepository>();
-
-            #endregion
             #endregion
 
             #region Integrated
@@ -132,6 +129,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteMessageManageAnalysisReportAttachmentRepository, InteMessageManageAnalysisReportAttachmentRepository>();
             services.AddSingleton<IInteMessageManageHandleProgrammeAttachmentRepository, InteMessageManageHandleProgrammeAttachmentRepository>();
 
+            services.AddSingleton<IInteCustomFieldRepository, InteCustomFieldRepository>();
+            services.AddSingleton<IInteCustomFieldInternationalizationRepository, InteCustomFieldInternationalizationRepository>();
+            services.AddSingleton<IInteCustomFieldBusinessEffectuateRepository, InteCustomFieldBusinessEffectuateRepository>();
+            services.AddSingleton<ISysReleaseRecordRepository, SysReleaseRecordRepository>();
 
             #region CodeRule
             services.AddSingleton<IInteCodeRulesRepository, InteCodeRulesRepository>();
@@ -237,6 +238,21 @@ namespace Microsoft.Extensions.DependencyInjection
             #region EquipmentGroupParam
             services.AddSingleton<IProcEquipmentGroupParamRepository, ProcEquipmentGroupParamRepository>();
             services.AddSingleton<IProcEquipmentGroupParamDetailRepository, ProcEquipmentGroupParamDetailRepository>();
+            #endregion
+
+            #region ProcFormulaOperation
+            services.AddSingleton<IProcFormulaOperationRepository, ProcFormulaOperationRepository>();
+            services.AddSingleton<IProcFormulaOperationSetRepository, ProcFormulaOperationSetRepository>();
+            #endregion
+
+            #region ProcFormulaOperationGroup
+            services.AddSingleton<IProcFormulaOperationGroupRepository, ProcFormulaOperationGroupRepository>();
+            services.AddSingleton<IProcFormulaOperationGroupRelatiionRepository, ProcFormulaOperationGroupRelatiionRepository>();
+            #endregion
+
+            #region  ProcFormula
+            services.AddSingleton<IProcFormulaRepository, ProcFormulaRepository>();
+            services.AddSingleton<IProcFormulaDetailsRepository, ProcFormulaDetailsRepository>();
             #endregion
 
             #endregion

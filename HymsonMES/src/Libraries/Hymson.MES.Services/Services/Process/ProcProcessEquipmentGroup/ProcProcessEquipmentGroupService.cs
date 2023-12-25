@@ -80,7 +80,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateProcProcessEquipmentGroupAsync(ProcProcessEquipmentGroupSaveDto saveDto)
+        public async Task<long> CreateProcProcessEquipmentGroupAsync(ProcProcessEquipmentGroupSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -161,7 +161,7 @@ namespace Hymson.MES.Services.Services.Process
                 rows += await _procProcessEquipmentGroupRelationRepository.InsertRangeAsync(procProcessEquipmentGroupRelationEntities);
                 trans.Complete();
             }
-            return rows;
+            return entity.Id;
         }
 
         /// <summary>

@@ -76,9 +76,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("BOM维护", BusinessType.INSERT)]
         [PermissionDescription("proc:bom:insert")]
-        public async Task AddProcBomAsync([FromBody] ProcBomCreateDto parm)
+        public async Task<long> AddProcBomAsync([FromBody] ProcBomCreateDto parm)
         {
-             await _procBomService.CreateProcBomAsync(parm);
+            return await _procBomService.CreateProcBomAsync(parm);
         }
 
         /// <summary>

@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        Task CreateInteJobAsync(InteJobCreateDto param);
+        Task<long> CreateInteJobAsync(InteJobCreateDto param);
 
         /// <summary>
         /// 删除

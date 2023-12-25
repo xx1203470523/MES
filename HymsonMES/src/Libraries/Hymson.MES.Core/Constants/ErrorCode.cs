@@ -36,6 +36,7 @@
         public const string MES10127 = "状态已经是[{status}],无法重复设置";
         public const string MES10128 = "变更状态的状态不能为新建";
         public const string MES10129 = "只有新建或者保留才能编辑";
+        public const string MES10130 = "操作数据已经不存在了";
 
 
         #region 物料 10200
@@ -596,6 +597,8 @@
         public const string MES12905 = "设备故障现象不存在！";
         public const string MES12906 = "状态不合法！";
         public const string MES12907 = "状态不能为空！";
+        public const string MES12908 = "设备故障现象新增失败！";
+        public const string MES12909 = "设备故障现象修改失败！";
         #endregion
 
         #region 故障原因 13000
@@ -800,6 +803,64 @@
         public const string MES15505 = "未找到该条码相匹配的物料！";
         public const string MES15506 = "该条码与选定的物料不匹配！";
         public const string MES15507 = "该条码{BarCode}已存在于当前上料点！";
+        #endregion
+
+        #region 自定义字段 15600
+        public const string MES15600 = "自定义字段异常！";
+        public const string MES15601 = "含有其他业务类型的字段数据";
+        public const string MES15602 = "传入参数为空";
+        public const string MES15603 = "存在重复的字段【{name}】";
+        public const string MES15604 = "自定义字段业务类型不符合要求";
+        public const string MES15605 = "自定义字段名称不能为空";
+        public const string MES15606 = "自定义字段名称不能有空格";
+        public const string MES15607 = "自定义字段备注不能超过255个字符";
+        public const string MES15608 = "自定义字段名称不能超过100个字符";
+        public const string MES15609 = "自定义字段对应语言设置的翻译值不能为空";
+        public const string MES15610 = "自定义字段对应语言设置的翻译值不能超过255个字符";
+        public const string MES15611 = "自定义字段名称只能是英文或数字组合";
+        public const string MES15612 = "自定义字段对应语言设置的翻译值不能包含特殊字符";
+        public const string MES15613 = "自定义字段对应语言设置的翻译值不能有空格";
+
+        public const string MES15614 = "自定义业务ID不能为空";
+        public const string MES15615 = "自定义业务ID不能为空";
+        public const string MES15616 = "自定义业务值不能有空格";
+        public const string MES15617 = "自定义业务值不能超过255个字符";
+        public const string MES15618 = "自定义业务ID不是同一个";
+        public const string MES15619 = "自定义业务类型不是同一个";
+
+        #endregion
+
+        #region 配方维护 15700
+        public const string MES15700 = "配方维护异常！";
+        public const string MES15701 = "操作的配方数据已不存在";
+        public const string MES15702 = "物料[{materialCode}] + 工序[{procedureCode}]已存在启用状态的配方，不允许重复添加！";
+        public const string MES15703 = "配方编码[{code}]版本[{version}]已存在，请重新输入！";
+        public const string MES15704 = "配方编码不能为空";
+        public const string MES15705 = "配方名称不能为空";
+        public const string MES15706 = "配方版本不能为空";
+        public const string MES15707 = "配方的物料不能为空";
+        public const string MES15708 = "配方的工序不能为空";
+        public const string MES15709 = "配方的工艺设备组不能为空";
+        public const string MES15710 = "配方的操作组不能为空";
+        public const string MES15711 = "配方的ID不能为空";
+        public const string MES15712 = "配方编码长度不能超过50个字符";
+        public const string MES15713 = "配方名称长度不能超过50个字符";
+        public const string MES15714 = "配方版本长度不能超过50个字符";
+        public const string MES15715 = "配方备注长度不能超过255个字符";
+
+        public const string MES15716 = "配方详细设定值长度不能超过255个字符";
+        public const string MES15717 = "配方详细单位长度不能超过100个字符";
+        public const string MES15718 = "配方详细备注长度不能超过255个字符";
+        public const string MES15719 = "配方详细序号应该为大于0的整数";
+        public const string MES15720 = "配方详细操作不能为空";
+        public const string MES15721 = "配方详细设定值不能为空";
+        public const string MES15722 = "配方详细单位不能为空";
+        public const string MES15723 = "配方操作Id【{id}】没有找到对应数据";
+
+        public const string MES15724 = "配方详细中选择的操作需要有物料ID";
+        public const string MES15725 = "配方详细中选择的操作需要有物料组ID";
+        public const string MES15726 = "配方详细中选择的操作需要有功能代码";
+        public const string MES15727 = "配方详细中选择的操作需要有参数ID";
         #endregion
 
         #region 工单 16000
@@ -1593,6 +1654,11 @@
         public const string MES19226 = "货架不存在,请确认货架编码!";
         #endregion
 
+        #region 发布记录 19300 
+        public const string MES19301 = "版本已存在!";
+        public const string MES19302 = "发布已超过24小时，不允许预留!";
+        public const string MES19303 = "已发布，不允许删除!"; 
+        #endregion
         #endregion
 
         #region 系统执行出错 业务逻辑出错

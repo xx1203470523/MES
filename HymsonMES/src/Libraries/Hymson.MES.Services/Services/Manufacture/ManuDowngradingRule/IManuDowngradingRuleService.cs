@@ -29,7 +29,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="manuDowngradingRuleCreateDto"></param>
         /// <returns></returns>
-        Task CreateManuDowngradingRuleAsync(ManuDowngradingRuleCreateDto manuDowngradingRuleCreateDto);
+        Task<long> CreateManuDowngradingRuleAsync(ManuDowngradingRuleCreateDto manuDowngradingRuleCreateDto);
 
         /// <summary>
         /// 修改

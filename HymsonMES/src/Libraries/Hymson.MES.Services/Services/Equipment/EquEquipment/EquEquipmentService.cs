@@ -116,7 +116,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentSaveDto parm)
+        public async Task<long> CreateAsync(EquEquipmentSaveDto parm)
         {
             #region 参数处理
             // 验证DTO
@@ -210,7 +210,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                 rows += await _equEquipmentVerifyRepository.InsertsAsync(verifyList);
                 trans.Complete();
             }
-            return rows;
+            return entity.Id;
         }
 
         /// <summary>

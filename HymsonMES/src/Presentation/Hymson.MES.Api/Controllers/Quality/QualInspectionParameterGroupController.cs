@@ -46,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpPost]
         [Route("create")]
         [PermissionDescription("quality:qualInspectionParameterGroup:insert")]
-        public async Task AddAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] QualInspectionParameterGroupSaveDto saveDto)
         {
-            await _qualInspectionParameterGroupService.CreateAsync(saveDto);
+            return await _qualInspectionParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>

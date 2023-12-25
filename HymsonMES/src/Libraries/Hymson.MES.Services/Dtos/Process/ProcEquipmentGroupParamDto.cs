@@ -228,4 +228,16 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string? ProcedureCode { get; set; }
     }
+
+    /// <summary>
+    /// 设备参数组分页Dto
+    /// </summary>
+    public class ProcEquipmentGroupParamDetailParamPagedQueryDto : PagerInfo
+    {
+        public long? ProductId { get; set; }
+
+        public long? ProcedureId { get; set; }
+
+
+    }
 }

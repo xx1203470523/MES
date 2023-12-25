@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procSortingRuleCreateDto"></param>
         /// <returns></returns>
-        Task CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto);
+        Task<long> CreateProcSortingRuleAsync(ProcSortingRuleCreateDto procSortingRuleCreateDto);
 
         /// <summary>
         /// 修改

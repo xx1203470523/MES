@@ -75,9 +75,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("create")]
         [LogDescription("物料组维护", BusinessType.INSERT)]
         [PermissionDescription("proc:materialGroup:insert")]
-        public async Task AddProcMaterialGroupAsync([FromBody] ProcMaterialGroupCreateDto parm)
+        public async Task<long> AddProcMaterialGroupAsync([FromBody] ProcMaterialGroupCreateDto parm)
         {
-             await _procMaterialGroupService.CreateProcMaterialGroupAsync(parm);
+            return await _procMaterialGroupService.CreateProcMaterialGroupAsync(parm);
         }
 
         /// <summary>

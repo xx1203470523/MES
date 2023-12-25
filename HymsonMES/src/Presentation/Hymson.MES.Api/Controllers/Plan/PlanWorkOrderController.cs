@@ -74,9 +74,9 @@ namespace Hymson.MES.Api.Controllers.Plan
         [Route("create")]
         [LogDescription("生产工单", BusinessType.INSERT)]
         [PermissionDescription("plan:workOrder:insert")]
-        public async Task AddPlanWorkOrderAsync([FromBody] PlanWorkOrderCreateDto parm)
+        public async Task<long> AddPlanWorkOrderAsync([FromBody] PlanWorkOrderCreateDto parm)
         {
-            await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
+            return await _planWorkOrderService.CreatePlanWorkOrderAsync(parm);
         }
 
         /// <summary>
