@@ -128,7 +128,7 @@ namespace Hymson.MES.Api
                 {
                     Version = "v1",
                     Title = "MES Web API",
-                    Description = "MES Web API",
+                    Description = "Battery MES Web API",
                     TermsOfService = new Uri("https://www.hymson.com/"),
                     Contact = new OpenApiContact
                     {
