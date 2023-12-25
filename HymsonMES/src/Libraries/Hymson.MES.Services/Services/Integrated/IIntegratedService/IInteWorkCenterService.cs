@@ -59,7 +59,7 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// </summary>
         /// <param name="param">新增参数</param>
         /// <returns></returns>
-        Task CreateInteWorkCenterAsync(InteWorkCenterCreateDto param);
+        Task<long> CreateInteWorkCenterAsync(InteWorkCenterCreateDto param);
 
         /// <summary>
         /// 删除

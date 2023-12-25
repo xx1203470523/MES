@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task AddProcResourceAsync(ProcResourceCreateDto param);
+        Task<long> AddProcResourceAsync(ProcResourceCreateDto param);
 
         /// <summary>
         /// 修改资源数据

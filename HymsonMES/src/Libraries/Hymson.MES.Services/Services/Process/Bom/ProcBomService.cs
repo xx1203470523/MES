@@ -107,7 +107,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procBomCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateProcBomAsync(ProcBomCreateDto procBomCreateDto)
+        public async Task<long> CreateProcBomAsync(ProcBomCreateDto procBomCreateDto)
         {
             procBomCreateDto.BomCode = procBomCreateDto.BomCode.ToTrimSpace().ToUpperInvariant();
             procBomCreateDto.BomName = procBomCreateDto.BomName.Trim();
@@ -285,6 +285,7 @@ namespace Hymson.MES.Services.Services.Process
                 ts.Complete();
             }
 
+            return procBomEntity.Id;
             #endregion
         }
 

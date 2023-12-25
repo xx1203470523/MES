@@ -201,7 +201,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// </summary>
         /// <param name="procProcessRouteDto"></param>
         /// <returns></returns>
-        public async Task AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteDto)
+        public async Task<long> AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteDto)
         {
             #region 验证
             if (procProcessRouteDto == null) throw new CustomerValidationException(nameof(ErrorCode.MES10100));
@@ -312,6 +312,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
             if (links != null && links.Any()) await _procProcessRouteLinkRepository.InsertRangeAsync(links);
 
             trans.Complete();
+            return procProcessRouteEntity.Id;
         }
 
         /// <summary>

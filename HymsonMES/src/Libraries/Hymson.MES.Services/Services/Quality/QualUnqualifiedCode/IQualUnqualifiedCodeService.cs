@@ -51,7 +51,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param);
+        Task<long> CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param);
 
         /// <summary>
         /// 修改

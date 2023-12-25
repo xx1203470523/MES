@@ -74,9 +74,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [LogDescription("资源类型维护", BusinessType.INSERT)]
         [PermissionDescription("proc:resourceType:insert")]
-        public async Task AddProcResourceTypeAsync([FromBody] ProcResourceTypeAddDto parm)
+        public async Task<long> AddProcResourceTypeAsync([FromBody] ProcResourceTypeAddDto parm)
         {
-            await _procResourceTypeService.AddProcResourceTypeAsync(parm);
+            return await _procResourceTypeService.AddProcResourceTypeAsync(parm);
         }
 
         /// <summary>

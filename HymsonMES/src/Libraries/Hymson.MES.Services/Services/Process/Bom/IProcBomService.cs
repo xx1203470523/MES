@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procBomCreateDto"></param>
         /// <returns></returns>
-        Task CreateProcBomAsync(ProcBomCreateDto procBomCreateDto);
+        Task<long> CreateProcBomAsync(ProcBomCreateDto procBomCreateDto);
 
         /// <summary>
         /// 修改

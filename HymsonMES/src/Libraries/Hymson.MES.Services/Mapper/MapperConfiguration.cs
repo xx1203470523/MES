@@ -18,7 +18,6 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
@@ -155,8 +154,21 @@ namespace Hymson.MES.Services.Mapper
             #region EquFaultPhenomenon
             CreateMap<EquFaultPhenomenonSaveDto, EquFaultPhenomenonEntity>();
             CreateMap<EquFaultPhenomenonPagedQueryDto, EquFaultPhenomenonPagedQuery>();
+            CreateMap<EquFaultPhenomenonQueryDto, EquFaultPhenomenonQuery>();
 
-            CreateMap<EquFaultPhenomenonView, EquFaultPhenomenonDto>();
+            CreateMap<EquFaultPhenomenonEntity, EquFaultPhenomenonDto>();
+
+            #endregion
+
+            #region EquFaultReason
+            CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
+            CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
+            #endregion
+
+            #region EquFaultSolution
+            CreateMap<EquFaultSolutionSaveDto, EquFaultSolutionEntity>();
+            CreateMap<EquFaultSolutionPagedQueryDto, EquFaultSolutionPagedQuery>();
+            CreateMap<EquFaultSolutionEntity, EquFaultSolutionDto>();
             #endregion
 
             #region EquSparePart
@@ -178,6 +190,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<EquFaultReasonPagedQueryDto, EquFaultReasonPagedQuery>();
             CreateMap<EquFaultReasonEntity, EquFaultReasonDto>();
             CreateMap<EquFaultReasonEntity, CustomEquFaultReasonDto>();
+            CreateMap<EquFaultReasonQueryDto, EquFaultReasonQuery>();
             #endregion
 
             #region EquEquipmentVerify
@@ -357,6 +370,19 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageManageView, InteMessageManageDto>();
             CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
             CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
+            #endregion
+
+            #region InteCustomField
+            CreateMap<InteCustomFieldBusinessEffectuateEntity, InteCustomFieldBusinessEffectuateDto>();
+            #endregion
+
+            #region SysReleaseRecord
+            CreateMap<SysReleaseRecordEntity, SysReleaseRecordDto>();
+            CreateMap<SysReleaseRecordDto, SysReleaseRecordEntity>();
+            CreateMap<SysReleaseRecordCreateDto, SysReleaseRecordEntity>();
+            CreateMap<SysReleaseRecordModifyDto, SysReleaseRecordEntity>();
+            CreateMap<SysReleaseRecordPagedQueryDto, SysReleaseRecordPagedQuery>();
+            CreateMap<SysReleaseRecordPagedQueryDto, SysReleaseRecordPagedQuery>();
             #endregion
         }
 
@@ -576,10 +602,42 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
+            #region ProcFormula
+            CreateMap<ProcFormulaEntity, ProcFormulaDto>();
+            CreateMap<ProcFormulaSaveDto, ProcFormulaEntity>();
+
+            CreateMap<ProcFormulaView, ProcFormulaViewDto>();
+            CreateMap<ProcFormulaDetailsEntity, ProcFormulaDetailsDto>();
+            CreateMap<ProcFormulaDetailsEntity, ProcFormulaDetailsViewDto>();
+            CreateMap<ProcFormulaDetailsDto, ProcFormulaDetailsEntity>();
+
+            CreateMap<ProcFormulaEntity, ProcFormulaViewDto>();
+
+            CreateMap<ProcFormulaPagedQueryDto, ProcFormulaPagedQuery>();
+
+            #endregion
+
+
             CreateMap<ProcEsopView, ProcEsopDto>();
             CreateMap<ProcEsopPagedQueryDto, ProcEsopPagedQuery>();
             #region Esop 
 
+            #endregion
+
+            #region ProcFormulaOperation
+            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationDto > ();
+            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationSaveDto>();
+            CreateMap<ProcFormulaOperationSaveDto, ProcFormulaOperationEntity>();
+            CreateMap<ProcFormulaOperationPagedQueryDto, ProcFormulaOperationPagedQuery>();
+            CreateMap<ProcFormulaOperationSetEntity, ProcFormulaOperationSetDto>();
+            #endregion
+
+            #region ProcFormulaOperationGroup
+            CreateMap<ProcFormulaOperationGroupEntity, ProcFormulaOperationGroupDto>();
+            CreateMap<ProcFormulaOperationGroupDto, ProcFormulaOperationGroupEntity>();
+            CreateMap<ProcFormulaOperationGroupSaveDto, ProcFormulaOperationGroupEntity>();
+            CreateMap<ProcFormulaOperationGroupEntity, ProcFormulaOperationGroupSaveDto>();
+            CreateMap<ProcFormulaOperationGroupPagedQueryDto, ProcFormulaOperationGroupPagedQuery>();
             #endregion
         }
 
@@ -635,7 +693,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<WhWarehouseShelfPagedQueryDto, WhWarehouseShelfPagedQuery>();
             CreateMap<WhWarehouseShelfSaveDto, WhWarehouseShelfEntity>();
             CreateMap<WhWarehouseShelfEntity, WhWarehouseShelfDto>();
-            CreateMap<WhWarehouseShelfModifyDto, WhWarehouseShelfEntity>(); 
+            CreateMap<WhWarehouseShelfModifyDto, WhWarehouseShelfEntity>();
 
             #endregion
 

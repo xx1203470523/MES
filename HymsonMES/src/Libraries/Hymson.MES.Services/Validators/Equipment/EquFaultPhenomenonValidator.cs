@@ -1,12 +1,11 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Equipment;
 
-namespace Hymson.MES.Services.Validators.Process
+namespace Hymson.MES.Services.Validators.Equipment
 {
     /// <summary>
-    /// 验证（设备组）
+    /// 验证器（设备故障现象）
     /// </summary>
     internal class EquFaultPhenomenonValidator : AbstractValidator<EquFaultPhenomenonSaveDto>
     {
@@ -15,11 +14,11 @@ namespace Hymson.MES.Services.Validators.Process
         /// </summary>
         public EquFaultPhenomenonValidator()
         {
-            RuleFor(x => x.FaultPhenomenonCode).NotEmpty().WithErrorCode(ErrorCode.MES12901);
-            RuleFor(x => x.FaultPhenomenonCode).MaximumLength(50).WithErrorCode(ErrorCode.MES10109);
-            RuleFor(x => x.FaultPhenomenonName).NotEmpty().WithErrorCode(ErrorCode.MES12902);
-            RuleFor(x => x.FaultPhenomenonName).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
-            RuleFor(x => x.EquipmentGroupId).Must(it => it != 0).WithErrorCode(ErrorCode.MES12904);
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCode.MES10113);
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(ErrorCode.MES10109);
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES10116);
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
+            //RuleFor(x => x.EquipmentGroupId).Must(it => it != 0).WithErrorCode(ErrorCode.MES12904);
 
         }
     }

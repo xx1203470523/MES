@@ -127,6 +127,10 @@ namespace Hymson.MES.Data.Repositories.Process
                 procParameterPagedQuery.Remark = $"%{procParameterPagedQuery.Remark}%";
                 sqlBuilder.Where(" Remark LIKE @Remark ");
             }
+            if (procParameterPagedQuery.Ids != null) 
+            {
+                sqlBuilder.Where(" Id in @Ids ");
+            }
 
             var offSet = (procParameterPagedQuery.PageIndex - 1) * procParameterPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

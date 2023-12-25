@@ -54,7 +54,7 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// </summary>
         /// <param name="procProcessRouteDto"></param>
         /// <returns></returns>
-        Task AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteDto);
+        Task<long> AddProcProcessRouteAsync(ProcProcessRouteCreateDto procProcessRouteDto);
 
         /// <summary>
         /// 修改

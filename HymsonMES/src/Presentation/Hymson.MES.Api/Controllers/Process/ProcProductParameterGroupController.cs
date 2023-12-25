@@ -46,9 +46,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPost]
         [Route("create")]
         [PermissionDescription("process:procProductParameterGroup:insert")]
-        public async Task AddAsync([FromBody] ProcProductParameterGroupSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] ProcProductParameterGroupSaveDto saveDto)
         {
-            await _procProductParameterGroupService.CreateAsync(saveDto);
+            return await _procProductParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon;
@@ -16,20 +17,25 @@ namespace Hymson.MES.Api.Controllers.Equipment
     public class EquFaultPhenomenonController : ControllerBase
     {
         /// <summary>
+        /// 日志
+        /// </summary>
+        private readonly ILogger<EquFaultPhenomenonController> _logger;
+
+        /// <summary>
         /// 接口（设备故障现象）
         /// </summary>
         private readonly IEquFaultPhenomenonService _equFaultPhenomenonService;
-        private readonly ILogger<EquFaultPhenomenonController> _logger;
 
         /// <summary>
         /// 构造函数（设备故障现象）
         /// </summary>
-        /// <param name="equFaultPhenomenonService"></param>
         /// <param name="logger"></param>
-        public EquFaultPhenomenonController(IEquFaultPhenomenonService equFaultPhenomenonService, ILogger<EquFaultPhenomenonController> logger)
+        /// <param name="equFaultPhenomenonService"></param>
+        public EquFaultPhenomenonController(ILogger<EquFaultPhenomenonController> logger,
+            IEquFaultPhenomenonService equFaultPhenomenonService)
         {
-            _equFaultPhenomenonService = equFaultPhenomenonService;
             _logger = logger;
+            _equFaultPhenomenonService = equFaultPhenomenonService;
         }
 
 
@@ -39,9 +45,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("设备故障现象", BusinessType.INSERT)]
-        [PermissionDescription("equ:faultPhenomenon:insert")]
-        public async Task CreateAsync(EquFaultPhenomenonSaveDto createDto)
+        [Route("create")]
+        [PermissionDescription("equipment:equFaultPhenomenon:insert")]
+        public async Task AddAsync(EquFaultPhenomenonSaveDto createDto)
         {
             await _equFaultPhenomenonService.CreateAsync(createDto);
         }
@@ -52,9 +58,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [LogDescription("设备故障现象", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultPhenomenon:update")]
-        public async Task ModifyAsync(EquFaultPhenomenonSaveDto modifyDto)
+        [Route("update")]
+        [PermissionDescription("equipment:equFaultPhenomenon:update")]
+        public async Task UpdateAsync(EquFaultPhenomenonSaveDto modifyDto)
         {
             await _equFaultPhenomenonService.ModifyAsync(modifyDto);
         }
@@ -65,9 +71,9 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [LogDescription("设备故障现象", BusinessType.DELETE)]
-        [PermissionDescription("equ:faultPhenomenon:delete")]
-        public async Task DeletesAsync(long[] ids)
+        [Route("delete")]
+        [PermissionDescription("equipment:equFaultPhenomenon:delete")]
+        public async Task DeleteAsync(long[] ids)
         {
             await _equFaultPhenomenonService.DeletesAsync(ids);
         }
@@ -78,8 +84,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("page")]
-        //[PermissionDescription("equ:faultPhenomenon:list")]
+        [Route("pagelist")]
         public async Task<PagedInfo<EquFaultPhenomenonDto>> GetPagedListAsync([FromQuery] EquFaultPhenomenonPagedQueryDto pagedQueryDto)
         {
             return await _equFaultPhenomenonService.GetPagedListAsync(pagedQueryDto);
@@ -91,54 +96,75 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<EquFaultPhenomenonDto> GetDetailAsync(long id)
+        public async Task<EquFaultPhenomenonDto?> QueryByIdAsync(long id)
         {
-            return await _equFaultPhenomenonService.GetDetailAsync(id);
+            return await _equFaultPhenomenonService.QueryByIdAsync(id);
         }
+
+        /// <summary>
+        /// 查询ID集合（关联故障现象）
+        /// </summary>
+        /// <param name="phenomenonId"></param>
+        /// <returns></returns>
+        [HttpGet("reasons/{phenomenonId}")]
+        public async Task<IEnumerable<long>> QueryReasonsByMainIdAsync(long phenomenonId)
+        {
+            return await _equFaultPhenomenonService.QueryReasonsByMainIdAsync(phenomenonId);
+        }
+
 
         #region 状态变更
         /// <summary>
-        /// 启用（设备故障现象）
+        /// 启用
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("updateStatusEnable")]
-        [LogDescription("设备故障现象", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultPhenomenon:updateStatusEnable")]
-        public async Task UpdateStatusEnable([FromBody] long id)
+        [Route("enable")]
+        [PermissionDescription("equipment:equFaultPhenomenon:enable")]
+        public async Task EnableAsync([FromBody] long id)
         {
-            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Enable
+            });
         }
 
         /// <summary>
-        /// 保留（设备故障现象）
+        /// 保留
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("updateStatusRetain")]
-        [LogDescription("设备故障现象", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultPhenomenon:updateStatusRetain")]
-        public async Task UpdateStatusRetain([FromBody] long id)
+        [Route("retain")]
+        [PermissionDescription("equipment:equFaultPhenomenon:retain")]
+        public async Task RetainAsyn([FromBody] long id)
         {
-            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Retain
+            });
         }
 
         /// <summary>
-        /// 废除（设备故障现象）
+        /// 废除
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("updateStatusAbolish")]
-        [LogDescription("设备故障现象", BusinessType.UPDATE)]
-        [PermissionDescription("equ:faultPhenomenon:updateStatusAbolish")]
-        public async Task UpdateStatusAbolish([FromBody] long id)
+        [Route("abolish")]
+        [PermissionDescription("equipment:equFaultPhenomenon:abolish")]
+        public async Task AbolishAsyn([FromBody] long id)
         {
-            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+            await _equFaultPhenomenonService.UpdateStatusAsync(new ChangeStatusDto
+            {
+                Id = id,
+                Status = SysDataStatusEnum.Abolish
+            });
         }
-
         #endregion
+
     }
 }

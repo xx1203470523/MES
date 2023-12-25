@@ -23,7 +23,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procLoadPointCreateDto"></param>
         /// <returns></returns>
-        Task CreateProcLoadPointAsync(ProcLoadPointCreateDto procLoadPointCreateDto);
+        Task<long> CreateProcLoadPointAsync(ProcLoadPointCreateDto procLoadPointCreateDto);
 
         /// <summary>
         /// 修改

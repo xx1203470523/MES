@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto param);
+        Task<long> CreateQualUnqualifiedGroupAsync(QualUnqualifiedGroupCreateDto param);
 
         /// <summary>
         /// 修改

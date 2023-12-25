@@ -8,6 +8,7 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -15,6 +16,7 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Equipment
 {
@@ -30,11 +32,28 @@ namespace Hymson.MES.Services.Services.Equipment
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 设备故障原因表 仓储
+        /// 验证器
         /// </summary>
-        private readonly IEquFaultReasonRepository _equFaultReasonRepository;
         private readonly AbstractValidator<EquFaultReasonSaveDto> _validationSaveRules;
 
+        /// <summary>
+        /// 仓储接口（设备故障原因） 
+        /// </summary>
+        private readonly IEquFaultReasonRepository _equFaultReasonRepository;
+
+        /// <summary>
+        /// 仓储接口（设备故障解决措施）
+        /// </summary>
+        private readonly IEquFaultSolutionRepository _equFaultSolutionRepository;
+
+        /// <summary>
+        /// 仓储（设备故障现象）
+        /// </summary>
+        private readonly IEquFaultPhenomenonRepository _equFaultPhenomenonRepository;
+
+        /// <summary>
+        /// 多语言服务
+        /// </summary>
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
@@ -44,84 +63,120 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="equFaultReasonRepository"></param>
+        /// <param name="equFaultSolutionRepository"></param>
+        /// <param name="equFaultPhenomenonRepository"></param>
         /// <param name="localizationService"></param>
         public EquFaultReasonService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<EquFaultReasonSaveDto> validationSaveRules,
-            IEquFaultReasonRepository equFaultReasonRepository, ILocalizationService localizationService)
+            IEquFaultReasonRepository equFaultReasonRepository,
+            IEquFaultSolutionRepository equFaultSolutionRepository,
+            IEquFaultPhenomenonRepository equFaultPhenomenonRepository,
+            ILocalizationService localizationService)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
             _validationSaveRules = validationSaveRules;
             _equFaultReasonRepository = equFaultReasonRepository;
+            _equFaultSolutionRepository = equFaultSolutionRepository;
+            _equFaultPhenomenonRepository = equFaultPhenomenonRepository;
             _localizationService = localizationService;
         }
+
 
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="EquFaultReasonCreateDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonCreateDto)
+        public async Task<int> CreateAsync(EquFaultReasonSaveDto saveDto)
         {
             // 验证DTO
-            EquFaultReasonCreateDto.FaultReasonCode = EquFaultReasonCreateDto.FaultReasonCode.ToTrimSpace();
-            EquFaultReasonCreateDto.FaultReasonCode = EquFaultReasonCreateDto.FaultReasonCode.ToUpperInvariant();
-            await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonCreateDto);
+            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+
+            // 更新时间
+            var updatedBy = _currentUser.UserName;
+            var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
-            var entity = EquFaultReasonCreateDto.ToEntity<EquFaultReasonEntity>();
+            var entity = saveDto.ToEntity<EquFaultReasonEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
-            entity.CreatedBy = _currentUser.UserName;
-            entity.UpdatedBy = _currentUser.UserName;
-            entity.SiteId = _currentSite.SiteId;
-
-            entity.UseStatus = SysDataStatusEnum.Build;
+            entity.SiteId = _currentSite.SiteId ?? 0;
+            entity.CreatedBy = updatedBy;
+            entity.CreatedOn = updatedOn;
+            entity.UpdatedBy = updatedBy;
+            entity.UpdatedOn = updatedOn;
+            entity.Status = SysDataStatusEnum.Build;
 
             // 编码唯一性验证
-            var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery { Site = entity.SiteId, Code = entity.FaultReasonCode });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.FaultReasonCode);
+            var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.Code);
+
+            // 关联解决措施
+            saveDto.SolutionIds ??= new List<long>();
+            var relationEntities = saveDto.SolutionIds.Select(s => new EquFaultReasonSolutionRelationEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                FaultReasonId = entity.Id,
+                FaultSolutionId = s,
+            });
 
             // 保存实体
-            return await _equFaultReasonRepository.InsertAsync(entity);
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _equFaultReasonRepository.InsertAsync(entity);
+            rows += await _equFaultReasonRepository.InsertRelationsAsync(relationEntities);
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="EquFaultReasonModifyDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task ModifyEquFaultReasonAsync(EquFaultReasonSaveDto EquFaultReasonModifyDto)
+        public async Task<int> ModifyAsync(EquFaultReasonSaveDto saveDto)
         {
             // 验证DTO
-            await _validationSaveRules.ValidateAndThrowAsync(EquFaultReasonModifyDto);
-
-            var entityOld = await _equFaultReasonRepository.GetByIdAsync(EquFaultReasonModifyDto.Id)
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES13013));
-            //验证某些状态是不能编辑的
-            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
-            if (!canEditStatusEnum.Any(x => x == entityOld.UseStatus))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
-            }
+            await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
-            var entity = EquFaultReasonModifyDto.ToEntity<EquFaultReasonEntity>();
+            var entity = saveDto.ToEntity<EquFaultReasonEntity>();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
-            entity.SiteId = _currentSite.SiteId;
 
-            // 更新实体
-            await _equFaultReasonRepository.UpdateAsync(entity);
-        }
+            // 编码唯一性验证
+            var checkEntity = await _equFaultReasonRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = entity.SiteId,
+                Code = entity.Code
+            });
+            if (checkEntity != null && checkEntity.Id != entity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+            }
 
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task DeleteEquFaultReasonAsync(long id)
-        {
-            await _equFaultReasonRepository.DeleteAsync(id);
+            // 关联解决措施
+            saveDto.SolutionIds ??= new List<long>();
+            var relationEntities = saveDto.SolutionIds.Select(s => new EquFaultReasonSolutionRelationEntity
+            {
+                Id = IdGenProvider.Instance.CreateId(),
+                FaultReasonId = entity.Id,
+                FaultSolutionId = s,
+            });
+
+            // 保存实体
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _equFaultReasonRepository.DeleteByParentIdAsync(new DeleteByParentIdCommand { ParentId = entity.Id });
+            rows += await _equFaultReasonRepository.UpdateAsync(entity);
+            rows += await _equFaultReasonRepository.InsertRelationsAsync(relationEntities);
+            trans.Complete();
+            return rows;
         }
 
         /// <summary>
@@ -129,10 +184,10 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesEquFaultReasonAsync(long[] idsArr)
+        public async Task<int> DeletesAsync(long[] idsArr)
         {
             var entities = await _equFaultReasonRepository.GetByIdsAsync(idsArr);
-            if (entities != null && entities.Any(a => a.UseStatus != SysDataStatusEnum.Build))
+            if (entities != null && entities.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
@@ -148,34 +203,17 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <summary>
         /// 根据查询条件获取分页数据
         /// </summary>
-        /// <param name="EquFaultReasonPagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto EquFaultReasonPagedQueryDto)
+        public async Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto pagedQueryDto)
         {
-            var EquFaultReasonPagedQuery = EquFaultReasonPagedQueryDto.ToQuery<EquFaultReasonPagedQuery>();
-            EquFaultReasonPagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _equFaultReasonRepository.GetPagedInfoAsync(EquFaultReasonPagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<EquFaultReasonPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _equFaultReasonRepository.GetPagedListAsync(pagedQuery);
 
-            //实体到DTO转换 装载数据
-            List<EquFaultReasonDto> EquFaultReasonDtos = PrepareEquFaultReasonDtos(pagedInfo).ToList();
-            return new PagedInfo<EquFaultReasonDto>(EquFaultReasonDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pagedInfo"></param>
-        /// <returns></returns>
-        private static IEnumerable<EquFaultReasonDto> PrepareEquFaultReasonDtos(PagedInfo<EquFaultReasonEntity> pagedInfo)
-        {
-            var EquFaultReasonDtos = new List<EquFaultReasonDto>();
-            foreach (var EquFaultReasonEntity in pagedInfo.Data)
-            {
-                var EquFaultReasonDto = EquFaultReasonEntity.ToModel<EquFaultReasonDto>();
-                EquFaultReasonDtos.Add(EquFaultReasonDto);
-            }
-
-            return EquFaultReasonDtos;
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquFaultReasonDto>());
+            return new PagedInfo<EquFaultReasonDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -183,63 +221,101 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquFaultReasonDto> QueryEquFaultReasonByIdAsync(long id)
+        public async Task<EquFaultReasonDto?> QueryByIdAsync(long id)
         {
-            var EquFaultReasonEntity = await _equFaultReasonRepository.GetByIdAsync(id);
-            var dto = EquFaultReasonEntity.ToModel<CustomEquFaultReasonDto>();
-            return dto;
+            var entity = await _equFaultReasonRepository.GetByIdAsync(id);
+            if (entity == null) return null;
+
+            return entity.ToModel<CustomEquFaultReasonDto>();
         }
+
+        /// <summary>
+        /// 根据ID获取关联解决措施
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<long>> QuerySolutionsByMainIdAsync(long reasonId)
+        {
+            if (reasonId == 0) return Array.Empty<long>();
+
+            var relationEntities = await _equFaultReasonRepository.GetSolutionRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = reasonId });
+            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<long>();
+
+            return relationEntities.Select(s => s.FaultSolutionId);
+        }
+
+        /// <summary>
+        /// 根据ID获取关联故障现象
+        /// </summary>
+        /// <param name="reasonId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<BaseInfoDto>> QueryPhenomenonsByMainIdAsync(long reasonId)
+        {
+            if (reasonId == 0) return Array.Empty<BaseInfoDto>();
+
+            var relationEntities = await _equFaultReasonRepository.GetPhenomenonRelationEntitiesAsync(new EntityByParentIdQuery { ParentId = reasonId });
+            if (relationEntities == null || !relationEntities.Any()) return Array.Empty<BaseInfoDto>();
+
+            var phenomenonEntities = await _equFaultPhenomenonRepository.GetByIdsAsync(relationEntities.Select(s => s.FaultPhenomenonId));
+            if (phenomenonEntities == null || !phenomenonEntities.Any()) return Array.Empty<BaseInfoDto>();
+
+            return phenomenonEntities.Select(s => new BaseInfoDto
+            {
+                Id = s.Id,
+                Code = s.Code,
+                Name = s.Name
+            });
+        }
+
+        /// <summary>
+        /// 获取故障原因列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QueryReasonsAsync()
+        {
+            var solutionEntities = await _equFaultReasonRepository.GetEntitiesAsync(new EntityByStatusQuery { SiteId = _currentSite.SiteId ?? 0 });
+            return solutionEntities.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.Id}",
+                Label = $"{s.Code} - {s.Name}",
+                Value = $"{s.Id}"
+            });
+        }
+
+
 
         #region 状态变更
         /// <summary>
         /// 状态变更
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="statusDto"></param>
         /// <returns></returns>
-        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        public async Task UpdateStatusAsync(ChangeStatusDto statusDto)
         {
-            #region 参数校验
-            if (param.Id == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
-            }
-            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
-            }
-            if (param.Status == SysDataStatusEnum.Build)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
-            }
+            if (statusDto.Id == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10125));
 
-            #endregion
+            // 校验状态是否在枚举里面
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), statusDto.Status)) throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            // 不能重新设置为新建
+            if (statusDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES10128));
 
-            var changeStatusCommand = new ChangeStatusCommand()
+            // 读取当前实时信息
+            var entity = await _equFaultReasonRepository.GetByIdAsync(statusDto.Id);
+            if (entity == null || entity.IsDeleted != 0) throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            if (entity.Status == statusDto.Status) throw new CustomerValidationException(nameof(ErrorCode.MES10127))
+                    .WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
+
+            await _equFaultReasonRepository.UpdateStatusAsync(new ChangeStatusCommand()
             {
-                Id = param.Id,
-                Status = param.Status,
+                Id = statusDto.Id,
+                Status = statusDto.Status,
 
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
-            };
-
-            #region 校验数据
-            var entity = await _equFaultReasonRepository.GetByIdAsync(changeStatusCommand.Id);
-            if (entity == null || entity.IsDeleted != 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES13013));
-            }
-            if (entity.UseStatus == changeStatusCommand.Status)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.UseStatus)}"));
-            }
-            #endregion
-
-            #region 操作数据库
-            await _equFaultReasonRepository.UpdateStatusAsync(changeStatusCommand);
-            #endregion
+            });
         }
 
         #endregion
+
     }
 }

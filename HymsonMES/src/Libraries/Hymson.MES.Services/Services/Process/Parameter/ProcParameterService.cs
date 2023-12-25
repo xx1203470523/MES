@@ -89,7 +89,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="procParameterCreateDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto)
+        public async Task<long> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto)
         {
             if (procParameterCreateDto == null)
             {
@@ -122,7 +122,8 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             //入库
-            return await _procParameterRepository.InsertAsync(procParameterEntity);
+            await _procParameterRepository.InsertAsync(procParameterEntity);
+            return procParameterEntity.Id;
         }
 
         /// <summary>

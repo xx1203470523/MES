@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(QualInspectionParameterGroupSaveDto saveDto)
+        public async Task<long> CreateAsync(QualInspectionParameterGroupSaveDto saveDto)
         {
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -163,7 +163,7 @@ namespace Hymson.MES.Services.Services.Quality
                     trans.Complete();
                 }
             }
-            return rows;
+            return entity.Id;
         }
 
         /// <summary>

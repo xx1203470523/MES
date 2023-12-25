@@ -173,9 +173,9 @@ namespace Hymson.MES.Api.Controllers
         [HttpPost]
         [LogDescription("×ÊÔ´Î¬»¤", BusinessType.INSERT)]
         [PermissionDescription("proc:resource:insert")]
-        public async Task AddProcResourceAsync([FromBody] ProcResourceCreateDto parm)
+        public async Task<long> AddProcResourceAsync([FromBody] ProcResourceCreateDto parm)
         {
-            await _procResourceService.AddProcResourceAsync(parm);
+            return await _procResourceService.AddProcResourceAsync(parm);
         }
 
         /// <summary>

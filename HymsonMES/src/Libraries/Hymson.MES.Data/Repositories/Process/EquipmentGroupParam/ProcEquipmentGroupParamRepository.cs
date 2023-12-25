@@ -132,6 +132,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcEquipmentGroupParamEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("SiteId=@SiteId");
+            if (procEquipmentGroupParamQuery.ProductId.HasValue&& procEquipmentGroupParamQuery.ProductId>0) 
+            {
+                sqlBuilder.Where("ProductId=@ProductId");
+            }
+            if (procEquipmentGroupParamQuery.ProcedureId.HasValue && procEquipmentGroupParamQuery.ProcedureId > 0)
+            {
+                sqlBuilder.Where("ProcedureId=@ProcedureId");
+            }
+
             using var conn = GetMESDbConnection();
             var procEquipmentGroupParamEntities = await conn.QueryAsync<ProcEquipmentGroupParamEntity>(template.RawSql, procEquipmentGroupParamQuery);
             return procEquipmentGroupParamEntities;

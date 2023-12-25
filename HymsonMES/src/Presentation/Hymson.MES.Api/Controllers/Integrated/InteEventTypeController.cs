@@ -45,9 +45,9 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPost]
         [Route("create")]
         [PermissionDescription("integrated:inteEventType:insert")]
-        public async Task AddAsync([FromBody] InteEventTypeSaveDto saveDto)
+        public async Task<long> AddAsync([FromBody] InteEventTypeSaveDto saveDto)
         {
-            await _inteEventTypeService.CreateAsync(saveDto);
+            return await _inteEventTypeService.CreateAsync(saveDto);
         }
 
         /// <summary>

@@ -100,9 +100,9 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPost]
         [LogDescription("工艺路线", BusinessType.INSERT)]
         [PermissionDescription("proc:processRoute:insert")]
-        public async Task AddProcProcessRouteAsync([FromBody] ProcProcessRouteCreateDto parm)
+        public async Task<long> AddProcProcessRouteAsync([FromBody] ProcProcessRouteCreateDto parm)
         {
-             await _procProcessRouteService.AddProcProcessRouteAsync(parm);
+           return  await _procProcessRouteService.AddProcProcessRouteAsync(parm);
         }
 
         /// <summary>

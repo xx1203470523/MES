@@ -37,5 +37,10 @@ namespace Hymson.MES.Data.Repositories.Process.Query
         /// 描述（标准参数）
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 参数ID
+        /// </summary>
+        public long[]? Ids { get; set; }
     }
 }
