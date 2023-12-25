@@ -8,7 +8,7 @@ docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
 docker push $registryUrl/$imageName:$timestamp
 docker service rm $serviceName
-echo'docker service create \
+echo 'docker service create \
   --with-registry-auth \
   --name $serviceName \
   --replicas 2 \
