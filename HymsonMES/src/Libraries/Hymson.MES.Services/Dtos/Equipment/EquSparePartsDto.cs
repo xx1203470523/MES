@@ -125,7 +125,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public string? SparePartsGroup { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 备件类型Id
+        /// </summary>
+        public long? SparePartsGroupId { get; set; }
+
+        /// <summary>
         /// 图纸编号
         /// </summary>
         public string DrawCode { get; set; }
@@ -187,7 +192,12 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// 备件注册表分页Dto
     /// </summary>
     public class EquSparePartsPagedQueryDto : PagerInfo {
-      
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public long? Id { get; set; }
+
         /// <summary>
         /// 备件编码
         /// </summary>

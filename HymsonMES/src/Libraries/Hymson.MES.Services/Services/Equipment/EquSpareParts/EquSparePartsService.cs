@@ -124,11 +124,12 @@ namespace Hymson.MES.Services.Services.Equipment
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            if (entity.SparePartsGroupId == null || entity.SparePartsGroupId == 0)
+            if (entity.SparePartsGroupId == 0)
             {
                 var equSparePartsEntity = await _equSparePartsRepository.GetByIdAsync(entity.Id);
                 entity.SparePartsGroupId = equSparePartsEntity.SparePartsGroupId;
             }
+
 
             return await _equSparePartsRepository.UpdateAsync(entity);
         }
@@ -194,5 +195,54 @@ namespace Hymson.MES.Services.Services.Equipment
             return new PagedInfo<EquSparePartsDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
 
         }
+
+
+        /// <summary>
+        /// 获取分页数据(过滤已有类型的备件)
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<EquSparePartsDto>> GetPagedAsync(EquSparePartsPagedQueryDto pagedQueryDto)
+        {
+            var pagedQuery = pagedQueryDto.ToQuery<EquSparePartsPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _equSparePartsRepository.GetPagedInfoNotWithTypeoAsync(pagedQuery);
+
+            // 实体到DTO转换 装载数据
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquSparePartsDto>());
+            return new PagedInfo<EquSparePartsDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+        }
+
+        /// <summary>
+        /// 获取备件组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<List<EquSparePartsDto>> GetSparePartsGroupRelationByIdAsync(long id)
+        {
+            var unqualifiedCodeGroupRelations = await _equSparePartsRepository.GetSparePartsGroupRelationAsync(id);
+            var sparePartsGroupRelationList = new List<EquSparePartsDto>();
+            if (unqualifiedCodeGroupRelations != null && unqualifiedCodeGroupRelations.Any())
+            {
+
+                foreach (var item in unqualifiedCodeGroupRelations)
+                {
+                    sparePartsGroupRelationList.Add(new EquSparePartsDto()
+                    {
+                        Id = item.Id,
+                        Code = item.Code,
+                        Name = item.Name,
+                        SparePartsGroupId = item.SparePartsGroupId,
+                        CreatedBy = item.CreatedBy,
+                        IsDeleted = item.IsDeleted,
+                        CreatedOn = item.CreatedOn
+                    });
+                }
+            }
+            return sparePartsGroupRelationList;
+        }
+
+
     }
 }
