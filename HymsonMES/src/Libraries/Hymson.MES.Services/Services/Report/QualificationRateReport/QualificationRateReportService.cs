@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
         /// <param name="procProcedureRepository"></param>
         /// <param name="minioService"></param>
         /// <param name="excelService"></param>
-        public QualificationRateReportService(ICurrentUser currentUser, ICurrentSite currentSite, 
+        public QualificationRateReportService(ICurrentUser currentUser, ICurrentSite currentSite,
             IQualificationRateReportRepository qualificationRateReportRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
             IProcMaterialRepository procMaterialRepository,
@@ -100,11 +100,11 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             List<QualificationRateReportDto> listDto = new List<QualificationRateReportDto>();
             //工单
-            IEnumerable<PlanWorkOrderEntity>? workOrderInfos=new List<PlanWorkOrderEntity>();
+            IEnumerable<PlanWorkOrderEntity>? workOrderInfos = new List<PlanWorkOrderEntity>();
 
-            workOrderInfos = await _planWorkOrderRepository.GetsByCodeAsync(new PlanWorkOrderQuery() { OrderCode = pagedQueryDto.OrderCode??"", SiteId = pagedQuery.SiteId });
+            workOrderInfos = await _planWorkOrderRepository.GetsByCodeAsync(new PlanWorkOrderQuery() { OrderCode = pagedQueryDto.OrderCode ?? "", SiteId = pagedQuery.SiteId });
             //工单为空 直接返回
-            if (workOrderInfos == null || !workOrderInfos.Any())  return new PagedInfo<QualificationRateReportDto>(listDto, 1, 0, 0);
+            if (workOrderInfos == null || !workOrderInfos.Any()) return new PagedInfo<QualificationRateReportDto>(listDto, pagedQueryDto.PageIndex, pagedQueryDto.PageSize);
             pagedQuery.WorkOrderIds = workOrderInfos.Select(x => x.Id).ToArray();
 
             var pagedInfo = await _qualificationRateReportRepository.GetPagedInfoAsync(pagedQuery);
@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                 var productInfo = productInfos.FirstOrDefault(x => x.Id == item.ProductId);
 
                 string startOn = "";
-                string endOn="";
+                string endOn = "";
                 if (pagedQueryDto.Type == 1)//月
                 {
                     var date = Convert.ToDateTime(item.StartOn.ToString());
@@ -135,9 +135,9 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                 if (pagedQueryDto.Type == 2)//年
                 {
                     startOn = item.StartYear + "-" + item.StartMonth;
-                    if(item.StartMonth.HasValue && item.StartMonth==12) 
+                    if (item.StartMonth.HasValue && item.StartMonth == 12)
                     {
-                        endOn=(item.StartYear+1) + "-1";
+                        endOn = (item.StartYear + 1) + "-1";
                     }
                     else
                     {
@@ -153,14 +153,16 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                 }
                 listDto.Add(new QualificationRateReportDto
                 {
-                    OrderCode= workOrderInfo!=null ? workOrderInfo.OrderCode : "",
-                    MaterialName= productInfo!=null ? productInfo.MaterialName : "",
-                    ProcedureName=procedureInfo != null ? procedureInfo.Name : "",
-                    StartOn=startOn,
-                    EndOn= endOn,
-                    QualifiedQuantity =item.QualifiedQuantity,
-                    UnQualifiedQuantity=item.UnQualifiedQuantity,
-                    QualifiedRate=item.QualifiedQuantity/(item.QualifiedQuantity+item.UnQualifiedQuantity)*100,
+                    OrderCode = workOrderInfo != null ? workOrderInfo.OrderCode : "",
+                    MaterialName = productInfo != null ? productInfo.MaterialName : "",
+                    ProcedureName = procedureInfo != null ? procedureInfo.Name : "",
+                    StartOn = startOn,
+                    EndOn = endOn,
+                    QualifiedQuantity = item.QualifiedQuantity,
+                    OneQualifiedQuantity = item.OneQualifiedQuantity,
+                    UnQualifiedQuantity = item.UnQualifiedQuantity,
+                    QualifiedRate = Math.Round(item.QualifiedQuantity / (item.QualifiedQuantity + item.UnQualifiedQuantity) * 100, 2),
+                    OneQualifiedRate = Math.Round(item.OneQualifiedQuantity / (item.QualifiedQuantity + item.UnQualifiedQuantity) * 100, 2)
                 });
             }
             return new PagedInfo<QualificationRateReportDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
@@ -208,7 +210,8 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                     EndOn = item.EndOn,
                     QualifiedQuantity = Math.Round(item.QualifiedQuantity),
                     UnQualifiedQuantity = Math.Round(item.UnQualifiedQuantity),
-                    QualifiedRate = Math.Round(item.QualifiedRate, 2)
+                    QualifiedRate = Math.Round(item.QualifiedRate, 2),
+                    OneQualifiedRate = Math.Round(item.OneQualifiedRate.GetValueOrDefault(), 2),
                 };
 
                 exportExcels.Add(exportExcel);

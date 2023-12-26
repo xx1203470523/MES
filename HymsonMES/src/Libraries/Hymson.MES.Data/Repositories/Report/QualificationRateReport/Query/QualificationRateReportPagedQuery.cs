@@ -76,6 +76,11 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport.Query
         public decimal QualifiedQuantity { get; set; }
 
         /// <summary>
+        /// 一次合格数
+        /// </summary>
+        public decimal OneQualifiedQuantity { get; set; }
+
+        /// <summary>
         /// 不合格数
         /// </summary>
         public decimal UnQualifiedQuantity { get; set; }

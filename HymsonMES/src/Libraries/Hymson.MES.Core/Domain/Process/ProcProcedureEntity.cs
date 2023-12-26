@@ -56,7 +56,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :是否维修返回 
         /// 空值 : true  
         /// </summary>
-        public byte IsRepairReturn { get; set; }
+        public bool IsRepairReturn { get; set; }
         
         /// <summary>
         /// 描述 :版本 

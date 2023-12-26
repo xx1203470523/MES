@@ -92,7 +92,6 @@ namespace Hymson.MES.Services.Services.Report
             var workOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(workOrderIds.ToArray());
 
 
-
             List<ProductDetailReportOutputDto> list = new List<ProductDetailReportOutputDto>();
             foreach (var item in pageData.Data)
             {

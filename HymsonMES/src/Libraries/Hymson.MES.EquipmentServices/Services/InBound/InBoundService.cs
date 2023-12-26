@@ -267,7 +267,8 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 //当前条码
                 var sfcEntity = sfclist.FirstOrDefault(x => x.SFC == sfc);
                 //当前条码生产信息，兼容多段工序，根据工单和条码确认
-                var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
+                //var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc && x.WorkOrderId == planWorkOrder.Id);
+                var sfcProduceEntity = sfcProduceList.FirstOrDefault(x => x.SFC == sfc);
                 if (sfcProduceEntity != null)
                 {
                     // 校验设备资源对应的工序和在制工序是否一直
@@ -386,6 +387,12 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                     }
                     continue;
                 }
+                else
+                {
+                    //不能随意进站创建在制：当不存在在制信息时，需要校验工序是否允许进站创建在制信息
+                    if (!procedureEntity.IsRepairReturn) throw new CustomerValidationException(nameof(ErrorCode.MES16354)).WithData("procedureName", procedureEntity.Name);
+                }
+
                 //条码表
                 var manuSfcEntity = new ManuSfcEntity
                 {

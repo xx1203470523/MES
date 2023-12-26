@@ -688,6 +688,8 @@
 
         public const string MES16352 = "采集数据导入模板不正确!";
         public const string MES16353 = "按工艺路线生产，条码{SFC}进站资源对应的工序与在制品工序不一致，无法进站！";
+        public const string MES16354 = "进站失败：未找到在制信息，且该工序{procedureName}禁止进站创建在制信息，请检查工序配置项！";
+        public const string MES16355 = "绑定失败：条码{SFC}绑定资源对应的工序与在制品工序不一致！";
         #endregion
 
         #region 生产

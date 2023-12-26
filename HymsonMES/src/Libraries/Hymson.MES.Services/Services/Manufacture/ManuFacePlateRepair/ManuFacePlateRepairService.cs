@@ -413,7 +413,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Id == itemNode.ProcedureId);
                 if (procProcedureEntity == null) continue;
-                if (procProcedureEntity.IsRepairReturn != 1) continue;
+                if (!procProcedureEntity.IsRepairReturn) continue;
 
                 manuFacePlateRepairReturnProcedureList.Add(new ManuFacePlateRepairReturnProcedureDto
                 {

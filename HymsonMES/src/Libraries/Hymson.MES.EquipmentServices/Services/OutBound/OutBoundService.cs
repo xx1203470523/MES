@@ -17,6 +17,7 @@ using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.OutBound;
 using Hymson.Sequences;
 using Hymson.Snowflake;
@@ -260,6 +261,11 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
 
+            //根据设备资源获取工序
+            //根据资源获取工序
+            var procedureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new() { ResourceId = procResource.Id, SiteId = _currentEquipment.SiteId })
+             ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", procResource.ResCode);
+
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
             List<string> delManuSfcProduces = new List<string>();
@@ -271,10 +277,12 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
             //SFC信息处理
             foreach (var outBoundSFCDto in outBoundMoreDto.SFCs)
             {
+
                 var sfcEntity = sfclist.Where(c => c.SFC == outBoundSFCDto.SFC).First();
-                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).First();
+                //var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC && c.WorkOrderId == planWorkOrderEntity.Id).First();
+                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == outBoundSFCDto.SFC).First();
                 //汇总信息
-                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC ).FirstOrDefault();
+                var manuSfcSummaryEntity = manuSfcSummaryEntities.Where(c => c.SFC == outBoundSFCDto.SFC).FirstOrDefault();
                 // 更新时间
                 sfcProduceEntity.UpdatedBy = _currentEquipment.Name;
                 sfcProduceEntity.UpdatedOn = HymsonClock.Now();
@@ -304,6 +312,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 //如果是过站
                 if (outBoundSFCDto.IsPassingStation)
                 {
+                    #region 过站卡控逻辑
+
+                    //过站没有进站动作，也需要校验部分进站逻辑
+                    // 校验设备资源对应的工序和在制工序是否一致
+                    if (procedureEntity.Id != sfcProduceEntity.ProcedureId)
+                    {
+                        var msgSfc = outBoundMoreDto.SFCs.Select(a => a.SFC);
+                        throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("SFC", string.Join(",", msgSfc));
+                    }
+
+                    #endregion
+
                     //复制对象
                     var manuSfcStepPassingEntity = JsonSerializer.Deserialize<ManuSfcStepEntity>(JsonSerializer.Serialize(manuSfcStepEntity));
                     if (manuSfcStepPassingEntity != null)

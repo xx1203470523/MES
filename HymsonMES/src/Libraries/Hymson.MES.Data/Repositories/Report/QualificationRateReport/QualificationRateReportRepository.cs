@@ -34,11 +34,12 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport
 
             if (pagedQuery.Type == 2)//按年
             {
-                sqlBuilder.Select("WorkOrderId,ProductId,ProcedureId," +
-                    "YEAR(EndTime) AS StartYear," +
-                    "MONTH(EndTime) AS StartMonth," +
-                    "SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity," +
-                    "SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
+                sqlBuilder.Select(@"WorkOrderId,ProductId,ProcedureId,
+                    YEAR(EndTime) AS StartYear,
+                    MONTH(EndTime) AS StartMonth,
+                    SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity,
+                    SUM(CASE WHEN QualityStatus = 1 AND FirstQualityStatus = 1 THEN Qty ELSE 0 END) AS OneQualifiedQuantity,
+                    SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
 
                 sqlBuilder.GroupBy("WorkOrderId,ProductId,ProcedureId,YEAR(EndTime),MONTH(EndTime)");
                 sqlBuilder.OrderBy("YEAR(EndTime) DESC,MONTH(EndTime) DESC");
@@ -46,19 +47,21 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport
             else
             if (pagedQuery.Type==1)//按月
             {
-                sqlBuilder.Select("WorkOrderId,ProductId,ProcedureId,DATE(EndTime) AS StartOn, " +
-                    "SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity," +
-                    "SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
+                sqlBuilder.Select(@"WorkOrderId,ProductId,ProcedureId,DATE(EndTime) AS StartOn, 
+                    SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity,
+                    SUM(CASE WHEN QualityStatus = 1 AND FirstQualityStatus = 1 THEN Qty ELSE 0 END) AS OneQualifiedQuantity,
+                    SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
 
                 sqlBuilder.GroupBy("WorkOrderId,ProductId,ProcedureId,DATE(EndTime)");
                 sqlBuilder.OrderBy("DATE(EndTime) DESC");
             }
             else//按日
             {
-                sqlBuilder.Select("WorkOrderId,ProductId,ProcedureId,DATE(EndTime) AS StartOn, " +
-                    "HOUR(EndTime) AS StartHour," +
-                    "SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity," +
-                    "SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
+                sqlBuilder.Select(@"WorkOrderId,ProductId,ProcedureId,DATE(EndTime) AS StartOn, 
+                    HOUR(EndTime) AS StartHour,
+                    SUM(CASE WHEN QualityStatus = 1 THEN Qty ELSE 0 END) AS QualifiedQuantity,
+                    SUM(CASE WHEN QualityStatus = 1 AND FirstQualityStatus = 1 THEN Qty ELSE 0 END) AS OneQualifiedQuantity,
+                    SUM(CASE WHEN QualityStatus = 0 THEN Qty ELSE 0 END) AS UnQualifiedQuantity");
 
                 sqlBuilder.GroupBy("WorkOrderId,ProductId,ProcedureId,DATE(EndTime),HOUR(EndTime)");
                 sqlBuilder.OrderBy("DATE(EndTime) DESC,HOUR(EndTime) DESC");
@@ -88,10 +91,8 @@ namespace Hymson.MES.Data.Repositories.QualificationRateReport
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<QualificationRateReportEnity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var entities = await entitiesTask;
-            var totalCount = await totalCountTask;
+            var entities = await conn.QueryAsync<QualificationRateReportEnity>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<QualificationRateReportEnity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 

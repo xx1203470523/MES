@@ -85,6 +85,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuComm
         /// 描述 :是否维修返回 
         /// 空值 : true  
         /// </summary>
-        public byte IsRepairReturn { get; set; }
+        public bool IsRepairReturn { get; set; }
     }
 }

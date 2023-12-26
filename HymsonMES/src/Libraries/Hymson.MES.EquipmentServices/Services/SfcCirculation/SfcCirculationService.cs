@@ -35,6 +35,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
         private readonly ICurrentEquipment _currentEquipment;
         private readonly AbstractValidator<SfcCirculationBindDto> _validationSfcCirculationBindDtoRules;
         private readonly AbstractValidator<SfcCirculationUnBindDto> _validationSfcCirculationUnBindDtoRules;
+        private readonly IProcProcedureRepository _procProcedureRepository;
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -56,6 +57,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             ICurrentEquipment currentEquipment,
             AbstractValidator<SfcCirculationBindDto> validationSfcCirculationBindDtoRules,
             AbstractValidator<SfcCirculationUnBindDto> validationSfcCirculationUnBindDtoRules,
+            IProcProcedureRepository procProcedureRepository,
             IProcResourceRepository procResourceRepository,
             IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
@@ -72,6 +74,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             _currentEquipment = currentEquipment;
             _validationSfcCirculationBindDtoRules = validationSfcCirculationBindDtoRules;
             _validationSfcCirculationUnBindDtoRules = validationSfcCirculationUnBindDtoRules;
+            _procProcedureRepository = procProcedureRepository;
             _procResourceRepository = procResourceRepository;
             _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
             _planWorkOrderRepository = planWorkOrderRepository;
@@ -194,6 +197,9 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             if (noProduceSfcs.Any())
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
 
+            //根据资源获取工序
+            var procdureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new() { SiteId = _currentEquipment.Id.GetValueOrDefault(), ResourceId = procResource.Id });
+
             //排队中的条码也允许绑定
             //if (sfcProduceList.Any())
             //{
@@ -252,6 +258,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 });
             }
             var sfcProduceEntity = sfcProduceList.First();
+            //20231226 绑定校验在制工序和绑定工序是否一致
+            if (sfcProduceEntity.ProcedureId != procdureEntity.Id)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES16355));
+            }
+
             //记录流转信息
             manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
             {
@@ -367,7 +379,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 //    UpdatedBy = _currentEquipment.Name,
                 //    UpdatedOn = HymsonClock.Now()
                 //});
-                
+
             }
 
             //数据提交

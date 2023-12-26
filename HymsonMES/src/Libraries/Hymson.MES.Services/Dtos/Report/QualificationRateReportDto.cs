@@ -42,6 +42,11 @@ namespace Hymson.MES.Services.Dtos.QualificationRateReport
         public decimal QualifiedQuantity { get; set; }
 
         /// <summary>
+        /// 一次合格数
+        /// </summary>
+        public decimal? OneQualifiedQuantity { get; set; }
+
+        /// <summary>
         /// 不合格数
         /// </summary>
         public decimal UnQualifiedQuantity { get; set; }
@@ -50,6 +55,11 @@ namespace Hymson.MES.Services.Dtos.QualificationRateReport
         /// 合格率
         /// </summary>
         public decimal QualifiedRate { get; set; }
+
+        /// <summary>
+        /// 合格率
+        /// </summary>
+        public decimal? OneQualifiedRate { get; set; }
     }
 
     /// <summary>
@@ -131,6 +141,12 @@ namespace Hymson.MES.Services.Dtos.QualificationRateReport
         /// </summary>
         [EpplusTableColumn(Header = "合格率", Order = 8)]
         public decimal? QualifiedRate { get; set; }
+
+        /// <summary>
+        /// 一次合格率
+        /// </summary>
+        [EpplusTableColumn(Header = "合格率", Order = 8)]
+        public decimal? OneQualifiedRate { get; set; }
 
     }
 }
