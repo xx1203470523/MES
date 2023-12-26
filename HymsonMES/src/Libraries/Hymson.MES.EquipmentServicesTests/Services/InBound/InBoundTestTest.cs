@@ -1,8 +1,10 @@
-﻿using Hymson.MES.EquipmentServices.Dtos.InBound;
+﻿using Hymson.Authentication.JwtBearer;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServicesTests;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
@@ -12,10 +14,12 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
     {
         private readonly IInBoundService _inBoundService;
         private readonly IEquEquipmentService _equEquipmentService;
+        private readonly JwtOptions _jwtOptions;
         public InBoundTestTest()
         {
             _inBoundService = ServiceProvider.GetRequiredService<IInBoundService>();
             _equEquipmentService = ServiceProvider.GetRequiredService<IEquEquipmentService>();
+            _jwtOptions = ServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value;
         }
 
         [TestCleanup]
@@ -73,6 +77,26 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
                 SFC = prefix
             });
             Assert.IsTrue(true);
+        }
+
+        /// <summary>
+        /// 获取设备令牌
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod()]
+        public async Task GetToken()
+        {
+            var equipmentModel = new EquipmentModel
+            {
+                FactoryId = 123456,
+                Id = 12870073632952320,
+                Name = "盖板转接片激光焊接机1#",
+                SiteId = 123456,
+                Code = "Test"
+            };
+            var token = JwtHelper.GenerateJwtToken(equipmentModel, _jwtOptions);
+
+            await Task.CompletedTask;
         }
 
         ///// <summary>
