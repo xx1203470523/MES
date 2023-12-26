@@ -41,7 +41,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="inteUnitRepository"></param>
-        public InteUnitService(ICurrentUser currentUser, ICurrentSite currentSite, 
+        public InteUnitService(ICurrentUser currentUser, ICurrentSite currentSite,
             //AbstractValidator<InteUnitSaveDto> validationSaveRules, 
             IInteUnitRepository inteUnitRepository)
         {
@@ -49,7 +49,6 @@ namespace Hymson.MES.Services.Services.Integrated
             _currentSite = currentSite;
             _inteUnitRepository = inteUnitRepository;
         }
-
 
         /// <summary>
         /// 创建
@@ -63,7 +62,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 验证DTO
             if (saveDto.Code.Contains(' '))
                 throw new CustomerValidationException(nameof(ErrorCode.MES18800));
-            
+
             saveDto.Name = saveDto.Name.ToTrimSpace();
             if (saveDto.Name == "")
                 throw new CustomerValidationException(nameof(ErrorCode.MES18801));
@@ -84,6 +83,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 编码唯一性验证
             var checkEntity = await _inteUnitRepository.GetByCodeAsync(new EntityByCodeQuery
             {
+                Site = _currentSite.SiteId ?? 0,
                 Code = entity.Code
             });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
@@ -105,9 +105,9 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
 
-             // 验证DTO
-             saveDto.Name = saveDto.Name.ToTrimSpace();
-             if (saveDto.Name == "")   throw new CustomerValidationException(nameof(ErrorCode.MES18801));
+            // 验证DTO
+            saveDto.Name = saveDto.Name.ToTrimSpace();
+            if (saveDto.Name == "") throw new CustomerValidationException(nameof(ErrorCode.MES18801));
 
             // DTO转换实体
             var entity = saveDto.ToEntity<InteUnitEntity>();
@@ -147,12 +147,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteUnitDto?> QueryInteUnitByIdAsync(long id) 
+        public async Task<InteUnitDto?> QueryInteUnitByIdAsync(long id)
         {
-           var inteUnitEntity = await _inteUnitRepository.GetByIdAsync(id);
-           if (inteUnitEntity == null) return null;
-           
-           return inteUnitEntity.ToModel<InteUnitDto>();
+            var inteUnitEntity = await _inteUnitRepository.GetByIdAsync(id);
+            if (inteUnitEntity == null) return null;
+
+            return inteUnitEntity.ToModel<InteUnitDto>();
         }
 
         /// <summary>
