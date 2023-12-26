@@ -208,7 +208,7 @@ namespace Hymson.MES.Data.Repositories.Equipment
     {
         const string InsertSql = "INSERT INTO `equ_fault_phenomenon`( `Id`, `Code`, `Name`, `Status`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (@Id, @Code, @Name, @Status, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
 
-        const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET Name = @Name, EquipmentGroupId = @EquipmentGroupId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `equ_fault_phenomenon` SET Name = @Name,  UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, Remark = @Remark WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE equ_fault_phenomenon SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = UpdatedOn WHERE Id = @Id; ";
 
         const string DeleteSql = "UPDATE `equ_fault_phenomenon` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";

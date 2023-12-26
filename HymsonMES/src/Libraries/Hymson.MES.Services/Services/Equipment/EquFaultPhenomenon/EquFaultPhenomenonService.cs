@@ -170,7 +170,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _equFaultPhenomenonRepository.DeleteByParentIdAsync(new DeleteByParentIdCommand { ParentId = entity.Id });
-            rows += await _equFaultPhenomenonRepository.InsertAsync(entity);
+            rows += await _equFaultPhenomenonRepository.UpdateAsync(entity);
             rows += await _equFaultPhenomenonRepository.InsertRelationsAsync(relationEntities);
             trans.Complete();
             return rows;
