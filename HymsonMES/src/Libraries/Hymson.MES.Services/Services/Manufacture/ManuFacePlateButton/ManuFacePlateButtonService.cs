@@ -537,6 +537,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 result.Add(item.Key, new JobResponseDto
                 {
+                    IsSuccess = item.Value.IsSuccess,
                     Rows = item.Value.Rows,
                     Content = item.Value.Content,
                     Message = item.Value.Message,
