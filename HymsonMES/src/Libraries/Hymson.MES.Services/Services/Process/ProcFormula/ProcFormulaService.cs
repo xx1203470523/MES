@@ -120,7 +120,6 @@ namespace Hymson.MES.Services.Services.Process
                     await _validationDetailsDtoRules.ValidateAndThrowAsync(item);
                 }
 
-
                 //查询操作
                 var formulaOperations = await _procFormulaOperationRepository.GetByIdsAsync(saveDto.ProcFormulaDetailsDtos.Select(x => x.FormulaOperationId).Distinct().ToArray());
 
@@ -337,6 +336,7 @@ namespace Hymson.MES.Services.Services.Process
                 });
 
                 await _procFormulaDetailsRepository.DeletesTrueByFormulaIdsAsync(ids);
+                ts.Complete();
             }
 
             return row;
