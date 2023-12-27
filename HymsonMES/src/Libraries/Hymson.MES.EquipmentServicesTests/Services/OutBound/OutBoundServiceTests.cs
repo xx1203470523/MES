@@ -58,9 +58,9 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
         [TestMethod()]
         public async Task OutBoundTestAsync()
         {
-            string resourceCode = "QAEMZY017";
-            string equipmentCode = "QAEMSBBH017";
-            string prefix = "YTP280024A23970001EVE";
+            string resourceCode = "YTLPACK01ER016";
+            string equipmentCode = "YTLPACK01AE016";
+            string prefix = "test202312270001";
             List<OutBoundParam> outBoundParams = new List<OutBoundParam>();
             for (int i = 1; i <= 1; i++)
             {
@@ -73,17 +73,18 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
             try
             {
 
-           
-            await SetEquInfoAsync(equipmentCode);
-            await _outBoundService.OutBoundAsync(new OutBoundDto
-            {
-                ResourceCode = resourceCode,
-                Passed = 1,
-                LocalTime = HymsonClock.Now(),
-                //SFC = prefix + "1",
-                SFC = "QAMLCF00108YW01CACA00006",
-                ParamList = outBoundParams.ToArray()
-            });
+
+                await SetEquInfoAsync(equipmentCode);
+                await _outBoundService.OutBoundAsync(new OutBoundDto
+                {
+                    ResourceCode = resourceCode,
+                    Passed = 1,
+                    LocalTime = HymsonClock.Now(),
+                    //SFC = prefix + "1",
+                    SFC = "test202312270001",
+                    ParamList = outBoundParams.ToArray(),
+                    IsPassingStation=true
+                });
 
             }
             catch (Exception ex)

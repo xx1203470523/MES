@@ -5,19 +5,16 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Report;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Core.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Excel.Abstractions;
 using Hymson.Minio;
 using Hymson.MES.Services.Dtos.Report.Excel;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Report;
 
 namespace Hymson.MES.Services.Services.Report
 {

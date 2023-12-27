@@ -131,6 +131,12 @@ namespace Hymson.MES.Services.Dtos.QualificationRateReport
         public decimal? QualifiedQuantity { get; set; }
 
         /// <summary>
+        /// 一次合格数
+        /// </summary>
+        [EpplusTableColumn(Header = "一次合格数", Order = 6)]
+        public decimal? OneQualifiedQuantity { get; set; }
+
+        /// <summary>
         /// 不合格数
         /// </summary>
         [EpplusTableColumn(Header = "不合格数", Order = 7)]

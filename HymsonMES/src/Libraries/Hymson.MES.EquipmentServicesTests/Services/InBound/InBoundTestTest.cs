@@ -64,9 +64,9 @@ namespace Hymson.MES.EquipmentServices.Services.InBound.Tests
         [TestMethod()]
         public async Task LYPInBoundTestAsync()
         {
-            string resourceCode = "YTLPACK01ER004";
-            string equipmentCode = "YTLPACK01AE004";
-            string prefix = "0IJCBA05011111D7E0001813";
+            string resourceCode = "YTLPACK01ER014";
+            string equipmentCode = "YTLPACK01AE014";
+            string prefix = "0IJCBA05011111D7E0011905";
 
             await SetEquInfoAsync(equipmentCode);
             await _inBoundService.InBoundAsync(new InBoundDto

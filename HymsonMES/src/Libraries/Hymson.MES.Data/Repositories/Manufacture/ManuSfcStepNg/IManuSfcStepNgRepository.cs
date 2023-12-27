@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public interface IManuSfcStepNgRepository
     {
-        #region 
+        #region 方法
         /// <summary>
         /// 新增
         /// </summary>
@@ -94,6 +94,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcStepNgPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepNgEntity>> GetPagedInfoAsync(ManuSfcStepNgPagedQuery manuSfcStepNgPagedQuery);
+        #endregion
+
+        #region 扩展方法
+
+        /// <summary>
+        /// 联表分页查询
+        /// </summary>
+        /// <param name="manuSfcStepNgPagedQuery"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcStepNgEntity>> GetJoinPagedInfoAsync(ManuSfcStepNgPagedQuery manuSfcStepNgPagedQuery);
+
         #endregion
     }
 }

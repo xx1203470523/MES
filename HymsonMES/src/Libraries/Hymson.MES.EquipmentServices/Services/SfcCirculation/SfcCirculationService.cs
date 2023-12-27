@@ -198,7 +198,7 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
                 throw new CustomerValidationException(nameof(ErrorCode.MES19126)).WithData("SFCS", string.Join(',', noProduceSfcs));
 
             //根据资源获取工序
-            var procdureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new() { SiteId = _currentEquipment.Id.GetValueOrDefault(), ResourceId = procResource.Id });
+            var procdureEntity = await _procProcedureRepository.GetProcProdureByResourceIdAsync(new() { SiteId = _currentEquipment.SiteId, ResourceId = procResource.Id });
 
             //排队中的条码也允许绑定
             //if (sfcProduceList.Any())

@@ -1,11 +1,5 @@
-﻿
-using Hymson.Infrastructure;
+﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Report;
 

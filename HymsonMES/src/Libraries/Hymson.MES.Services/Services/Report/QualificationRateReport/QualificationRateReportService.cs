@@ -209,6 +209,7 @@ namespace Hymson.MES.Services.Services.QualificationRateReport
                     StartOn = item.StartOn,
                     EndOn = item.EndOn,
                     QualifiedQuantity = Math.Round(item.QualifiedQuantity),
+                    OneQualifiedQuantity = Math.Round(item.OneQualifiedQuantity.GetValueOrDefault(),2),
                     UnQualifiedQuantity = Math.Round(item.UnQualifiedQuantity),
                     QualifiedRate = Math.Round(item.QualifiedRate, 2),
                     OneQualifiedRate = Math.Round(item.OneQualifiedRate.GetValueOrDefault(), 2),
