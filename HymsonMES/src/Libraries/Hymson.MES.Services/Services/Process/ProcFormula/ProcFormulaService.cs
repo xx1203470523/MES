@@ -315,7 +315,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            return await _procFormulaRepository.DeleteAsync(id);
+            return await DeletesAsync(new long[] { id });
         }
 
         /// <summary>
@@ -325,6 +325,17 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (ids.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10102));
+
+            #region 参数校验
+            var entitys = await _procFormulaRepository.GetByIdsAsync(ids);
+
+            if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
+            }
+            #endregion
+
             var row = 0;
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
