@@ -1,6 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
 using Hymson.Web.Framework.Attributes;
@@ -12,24 +13,21 @@ namespace Hymson.MES.Api.Controllers.Integrated
     /// 控制器（容器维护）
     /// </summary>
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/v2/[controller]")]
     public class InteContainerController : ControllerBase
     {
         /// <summary>
         /// 
         /// </summary>
         private readonly IInteContainerService _inteContainerService;
-        private readonly ILogger<InteContainerController> _logger;
 
         /// <summary>
         /// 构造函数（容器维护）
         /// </summary>
-        /// <param name="logger"></param>
         /// <param name="inteContainerService"></param>
-        public InteContainerController(ILogger<InteContainerController> logger, IInteContainerService inteContainerService)
+        public InteContainerController(IInteContainerService inteContainerService)
         {
             _inteContainerService = inteContainerService;
-            _logger = logger;
         }
 
         /// <summary>
@@ -40,7 +38,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPost]
         [LogDescription("容器维护", BusinessType.INSERT)]
         [PermissionDescription("inte:container:insert")]
-        public async Task CreateAsync(InteContainerSaveDto createDto)
+        public async Task CreateAsync(InteContainerInfoDto createDto)
         {
             await _inteContainerService.CreateAsync(createDto);
         }
@@ -53,9 +51,42 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [HttpPut]
         [LogDescription("容器维护", BusinessType.UPDATE)]
         [PermissionDescription("inte:container:update")]
-        public async Task ModifyAsync(InteContainerSaveDto modifyDto)
+        public async Task ModifyAsync(InteContainerInfoUpdateDto modifyDto)
         {
             await _inteContainerService.ModifyAsync(modifyDto);
+        }
+
+        /// <summary>
+        /// 查询容器信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("contaiinerInfo/{id}")]
+        public async Task<InteContainerInfoOutputDto> GetInfoByIdAsync(long id)
+        {
+            return await _inteContainerService.GetInfoByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询容器规格信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("contaiinerSpecificationInfo/{id}")]
+        public async Task<InteContainerSpecificationOutputDto> GetSpecificationByIdAsync(long id)
+        {
+            return await _inteContainerService.GetSpecificationByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询容器货物列表
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("containerFreightInfo/{id}")]
+        public async Task<IEnumerable<InteContainerFreightOutputDto>> GetEntitiesAsync(long id)
+        {
+            return await _inteContainerService.GetEntitiesAsync(id);
         }
 
         /// <summary>
@@ -79,7 +110,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         [Route("page")]
         [HttpGet]
         //[PermissionDescription("inte:container:list")]
-        public async Task<PagedInfo<InteContainerDto>> GetPagedListAsync([FromQuery] InteContainerPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<InteContainerInfoOutputDto>> GetPagedListAsync([FromQuery] InteContainerInfoPagedQueryDto pagedQueryDto)
         {
             return await _inteContainerService.GetPagedListAsync(pagedQueryDto);
         }
@@ -90,7 +121,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<InteContainerDto> GetDetailAsync(long id)
+        public async Task<InteContainerReDto> GetDetailAsync(long id)
         {
             return await _inteContainerService.GetDetailAsync(id);
         }

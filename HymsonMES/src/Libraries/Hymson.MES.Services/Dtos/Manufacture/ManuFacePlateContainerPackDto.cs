@@ -26,10 +26,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源id
         /// </summary>
         public long ResourceId { get; set; }
+
         /// <summary>
         /// 资源编码
         /// </summary>
         public string ResourceCode { get; set; }
+
         /// <summary>
         /// 资源名称
         /// </summary>
@@ -49,10 +51,21 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 工序编码
         /// </summary>
         public string ProcedureCode { get; set; }
+
         /// <summary>
         /// 工序名称
         /// </summary>
         public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 容器ID
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string ContainerCode { get; set; }
 
         /// <summary>
         /// 包装等级
@@ -68,6 +81,10 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// JobId
         /// </summary>
         public string ScanJobId { get; set; }
+
+        /// <summary>
+        /// 扫码作业id
+        /// </summary>
         public string ScanJobCode { get; set; }
 
         /// <summary>
@@ -109,10 +126,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否允许混工单
         /// </summary>
         public bool IsMixedWorkOrder { get; set; }
+
         /// <summary>
         /// 是否允许排队产品
         /// </summary>
         public bool IsAllowQueueProduct { get; set; }
+
         /// <summary>
         /// 是否允许完成产品
         /// </summary>
@@ -132,6 +151,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否显示最大值
         /// </summary>
         public bool IsShowMaxQty { get; set; }
+
         /// <summary>
         /// 是否显示当前值
         /// </summary>
@@ -151,6 +171,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 显示不合格颜色
         /// </summary>
         public bool IsShowErrorsColour { get; set; }
+
         /// <summary>
         /// 报警颜色
         /// </summary>
@@ -160,6 +181,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 是否显示日志
         /// </summary>
         public bool IsShowLog { get; set; }
+
+        
     }
 
 
@@ -187,6 +210,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 资源id
         /// </summary>
         public long? ResourceId { get; set; }
+
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string? ContainerCode { get; set; }
+
         /// <summary>
         /// 资源编码
         /// </summary>
@@ -336,6 +370,16 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 面板Id
         /// </summary>
         public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string? ContainerCode { get; set; }
 
         /// <summary>
         /// 资源id
