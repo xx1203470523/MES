@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
                 Site = entity.SiteId,
                 Code = entity.Code
             });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.Code);
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12900)).WithData("Code", entity.Code);
 
             // 关联解决措施
             saveDto.ReasonIds ??= new List<long>();

@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 说明
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 关联解决措施
