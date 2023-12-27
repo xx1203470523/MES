@@ -520,6 +520,9 @@ namespace Hymson.MES.CoreServices.Services.Job
                 // 未更新到全部需更新的数据，事务回滚
                 if (data.UpdateFeedingQtyByIdCommands.Count() > responseBo.Rows)
                 {
+                    _logger.LogError($"MES18218 -> Rows: {responseBo.Rows}");
+                    _logger.LogError($"MES18218 -> Command: {data.UpdateFeedingQtyByIdCommands.ToSerialize()}");
+
                     responseBo.IsSuccess = false;
                     responseBo.Message = _localizationService.GetResource(nameof(ErrorCode.MES18218), string.Join(',', data.SFCProduceEntities!.Select(s => s.SFC)));
                     return responseBo;

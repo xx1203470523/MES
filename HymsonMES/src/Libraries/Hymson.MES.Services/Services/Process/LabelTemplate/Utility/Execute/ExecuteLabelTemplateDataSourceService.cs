@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Hymson.MES.Services.Services.Process.LabelTemplate.Utility.Execute
 {
     /// <summary>
-    /// 获取打印数据库原
+    /// 获取打印数据源
     /// </summary>
     public class ExecuteLabelTemplateDataSourceService : IExecuteLabelTemplateDataSourceService
     {
@@ -28,7 +28,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate.Utility.Execute
         /// <returns></returns>
         public async Task Execute()
         {
-
+           
         }
     }
 }
