@@ -206,7 +206,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetByIdSql = @"SELECT * FROM `inte_unit`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `inte_unit`  WHERE Id IN @Ids ";
 
-        const string GetByCodeSql = "SELECT * FROM inte_unit WHERE `IsDeleted` = 0 AND Code = @Code LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM inte_unit WHERE `IsDeleted` = 0 AND Code = @Code AND SiteId=@Site LIMIT 1";
 
     }
 }
