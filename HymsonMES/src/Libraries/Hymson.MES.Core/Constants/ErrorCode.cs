@@ -827,6 +827,7 @@
         public const string MES15617 = "自定义业务值不能超过255个字符";
         public const string MES15618 = "自定义业务ID不是同一个";
         public const string MES15619 = "自定义业务类型不是同一个";
+        public const string MES15620 = "自定义字段对应语言设置的语言类型重复";
 
         #endregion
 

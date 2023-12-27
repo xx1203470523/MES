@@ -105,11 +105,19 @@ namespace Hymson.MES.Services.Services.Integrated
                 // 验证DTO
                 await _validationSaveRules.ValidateAndThrowAsync(item);
 
-                if (item.Languages!=null)
+                if (item.Languages != null) 
+                {
                     foreach (var language in item.Languages)
                     {
                         await _internationalizationDtovalidationRules.ValidateAndThrowAsync(language);
                     }
+
+                    //验证语言类型只能有一行数据
+                    if (item.Languages.GroupBy(x => x.LanguageType).ToDictionary(g => g.Key, g => g.ToArray()).Any(x => x.Value.Count() > 1)) 
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15620));
+                    }
+                }
             }
 
             //验证是否有其他的业务类型
