@@ -41,6 +41,25 @@ namespace Hymson.MES.Core.Enums.Manufacture
         Unload = 2
 
     }
+
+    /// <summary>
+    /// 装载类型
+    /// </summary>
+    public enum ManuContainerBarcodePackTypeEnum : sbyte
+    {
+        /// <summary>
+        /// 生产条码
+        /// </summary>
+        [Description("生产条码")]
+        ManuSfc = 0,
+
+        /// <summary>
+        /// 容器
+        /// </summary>
+        [Description("容器")]
+        Container = 1
+    }
+
     /// <summary>
     /// 包装等级
     /// </summary>

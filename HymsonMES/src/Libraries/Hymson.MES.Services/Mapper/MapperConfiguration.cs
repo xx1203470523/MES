@@ -22,6 +22,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
@@ -59,6 +60,7 @@ using Hymson.MES.Data.Repositories.WhWarehouseLocation.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseRegion.Query;
 using Hymson.MES.Data.Repositories.WhWarehouseShelf.Query;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
@@ -225,12 +227,74 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteClassEntity, InteClassDto>();
             #endregion
 
-            #region InteContainer
+            //#region InteContainer
             CreateMap<InteContainerSaveDto, InteContainerEntity>();
             CreateMap<InteContainerPagedQueryDto, InteContainerPagedQuery>();
 
             CreateMap<InteContainerView, InteContainerDto>();
             CreateMap<InteContainerEntity, InteContainerDto>();
+            //#endregion
+
+            #region InteContainer
+            //CreateMap<InteContainerSaveDto, InteContainerEntity>();
+            //CreateMap<InteContainerPagedQueryDto, InteContainerPagedQuery>();
+            //CreateMap<InteContainerSpecificationGroupsDto, InteContainerSpecificationEntity>();
+            //CreateMap<InteContainerSaveDto, InteContainerInfoEntity>();
+            //CreateMap<InteContainerInfoQueryDto, InteContainerPagedQuery>();
+            //CreateMap<InteContainerFreightDto, InteContainerFreightEntity>();
+            //CreateMap<InteContainerSaveDto, InteContainerSpecificationEntity>();
+
+            #region 数据传输对象（操作对象）转换为实体对象
+
+            CreateMap<InteContainerInfoDto, InteContainerInfoCreateCommand>();
+
+            CreateMap<InteContainerInfoUpdateDto, InteContainerInfoUpdateCommand>();
+
+            CreateMap<InteContainerSpecificationDto, InteContainerSpecificationCreateCommand>();
+
+            CreateMap<InteContainerSpecificationUpdateDto, InteContainerSpecificationUpdateCommand>();
+
+            CreateMap<InteContainerFreightDto, InteContainerFreightCreateCommand>();
+
+            CreateMap<InteContainerFreightUpdateDto, InteContainerFreightUpdateCommand>();
+
+            #endregion
+
+            #region 数据传输对象（查询对象）转换为数据查询对象
+
+            CreateMap<InteContainerInfoPagedQueryDto, InteContainerInfoPagedQuery>();
+
+            CreateMap<InteContainerInfoQueryDto, InteContainerInfoQuery>();
+
+            CreateMap<InteContainerSpecificationPagedQueryDto, InteContainerSpecificationPagedQuery>();
+
+            CreateMap<InteContainerSpecificationQueryDto, InteContainerSpecificationQuery>();
+
+            CreateMap<InteContainerFreightPagedQueryDto, InteContainerFreightPagedQuery>();
+
+            CreateMap<InteContainerFreightQueryDto, InteContainerFreightQuery>();
+
+            #endregion
+
+            #region 实体对象转换为数据传输对象（页面输出）
+
+            CreateMap<InteContainerInfoEntity, Dtos.Inte.InteContainerInfoOutputDto>();
+
+            CreateMap<InteContainerSpecificationEntity, InteContainerSpecificationOutputDto>();
+
+            CreateMap<InteContainerFreightEntity, InteContainerFreightOutputDto>();
+
+            #endregion
+
+            CreateMap<InteContainerInfoDto, InteContainerInfoEntity>();
+            CreateMap<InteContainerInfoUpdateDto, InteContainerInfoEntity>();
+            CreateMap<InteContainerSpecificationDto, InteContainerSpecificationEntity>();
+            CreateMap<InteContainerFreightDto, InteContainerFreightEntity>();
+            CreateMap<InteContainerInfoPagedQueryDto, InteContainerPagedQuery>();
+            CreateMap<InteContainerView, InteContainerReDto>();
+            CreateMap<InteContainerView, InteContainerInfoDto>();
+            CreateMap<InteContainerEntity, InteContainerReDto>();
+
             #endregion
 
             #region InteJob

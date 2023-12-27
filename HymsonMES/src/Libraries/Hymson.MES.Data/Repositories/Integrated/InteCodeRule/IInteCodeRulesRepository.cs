@@ -106,5 +106,9 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteCodeRulesPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<InteCodeRulesPageView>> GetPagedInfoAsync(InteCodeRulesPagedQuery inteCodeRulesPagedQuery);
+        Task<InteCodeRulesEntity> GetOneAsync(InteCodeRulesReQuery query);
+        Task<IEnumerable<InteCodeRulesEntity>> GetListAsync(InteCodeRulesReQuery query);
+        Task<int> InsertReAsync(InteCodeRulesEntity entity);
+        Task<int> UpdateReAsync(InteCodeRulesEntity entity);
     }
 }

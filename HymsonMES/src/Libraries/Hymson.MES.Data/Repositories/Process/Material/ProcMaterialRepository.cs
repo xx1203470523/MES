@@ -439,6 +439,7 @@ namespace Hymson.MES.Data.Repositories.Process
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
                             LEFT JOIN proc_bom q on g.BomId = q.Id 
                             WHERE g.Id = @Id and g.SiteId=@SiteId ";
+
         const string GetMaterialByIdSql = @"SELECT * FROM `proc_material`
                             WHERE Id = @Id";
         const string GetByIdsSql = @"SELECT * FROM `proc_material`
