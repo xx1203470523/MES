@@ -169,10 +169,10 @@ namespace Hymson.MES.Services.Services.Equipment
             var equSparePartsEntity = await _equSparePartsRepository.GetByIdAsync(id);
             if (equSparePartsEntity == null) return null;
 
-            if (equSparePartsEntity.SparePartsGroupId.HasValue){
-
-             var equSparePartTypeEntity = await _equSparePartsGroupRepository.GetByIdAsync((long)equSparePartsEntity.SparePartsGroupId);
-                equSparePartsEntity.SparePartsGroup = equSparePartTypeEntity.Code;
+            if (equSparePartsEntity.SparePartsGroupId.HasValue)
+            {
+             var equSparePartTypeEntity = await _equSparePartsGroupRepository.GetByIdAsync(equSparePartsEntity.SparePartsGroupId??0);
+                equSparePartsEntity.SparePartsGroup = equSparePartTypeEntity?.Code;
             }
           
             var a= equSparePartsEntity.ToModel<EquSparePartsDto>();
