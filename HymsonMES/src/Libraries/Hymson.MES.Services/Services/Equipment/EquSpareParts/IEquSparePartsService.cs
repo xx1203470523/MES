@@ -50,5 +50,19 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         Task<PagedInfo<EquSparePartsDto>> GetPagedListAsync(EquSparePartsPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 获取分页数据(过滤已有类型的备件)
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquSparePartsDto>> GetPagedAsync(EquSparePartsPagedQueryDto pagedQueryDto);
+
+        /// <summary>
+        /// 获取备件组
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<List<EquSparePartsDto>> GetSparePartsGroupRelationByIdAsync(long id);
+
     }
 }
