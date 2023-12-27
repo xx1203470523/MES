@@ -16,9 +16,9 @@ namespace Hymson.MES.Services.Validators.Equipment
         {
             RuleFor(x => x.Code).NotEmpty().WithErrorCode(ErrorCode.MES10113);
             RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(ErrorCode.MES10109);
+            RuleFor(x => x.Name).Matches("^[a-zA-Z0-9]+$").WithErrorCode(nameof(ErrorCode.MES10131));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(ErrorCode.MES10116);
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(ErrorCode.MES10110);
-            //RuleFor(x => x.EquipmentGroupId).Must(it => it != 0).WithErrorCode(ErrorCode.MES12904);
 
         }
     }

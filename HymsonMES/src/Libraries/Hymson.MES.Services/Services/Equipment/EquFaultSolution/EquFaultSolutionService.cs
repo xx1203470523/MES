@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 Site = entity.SiteId,
                 Code = entity.Code
             });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12900)).WithData("Code", entity.Code);
 
             // 保存
             return await _equFaultSolutionRepository.InsertAsync(entity);
@@ -151,6 +151,12 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var entities = await _equFaultSolutionRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
+            }
+
             return await _equFaultSolutionRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,

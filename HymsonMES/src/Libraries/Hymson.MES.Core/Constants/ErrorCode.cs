@@ -37,7 +37,7 @@
         public const string MES10128 = "变更状态的状态不能为新建";
         public const string MES10129 = "只有新建或者保留才能编辑";
         public const string MES10130 = "操作数据已经不存在了";
-
+        public const string MES10131 = "编码只能是英文或数字组合";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";

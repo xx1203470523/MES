@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
                 Site = entity.SiteId,
                 Code = entity.Code
             });
-            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES13011)).WithData("Code", entity.Code);
+            if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES12900)).WithData("Code", entity.Code);
 
             // 关联解决措施
             saveDto.ReasonIds ??= new List<long>();
@@ -170,7 +170,7 @@ namespace Hymson.MES.Services.Services.Equipment.EquFaultPhenomenon
             var rows = 0;
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _equFaultPhenomenonRepository.DeleteByParentIdAsync(new DeleteByParentIdCommand { ParentId = entity.Id });
-            rows += await _equFaultPhenomenonRepository.InsertAsync(entity);
+            rows += await _equFaultPhenomenonRepository.UpdateAsync(entity);
             rows += await _equFaultPhenomenonRepository.InsertRelationsAsync(relationEntities);
             trans.Complete();
             return rows;

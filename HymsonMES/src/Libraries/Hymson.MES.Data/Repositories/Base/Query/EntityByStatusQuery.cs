@@ -10,7 +10,7 @@ namespace Hymson.MES.Data.Repositories.Common.Query
         /// <summary>
         /// 状态枚举
         /// </summary>
-        public IEnumerable<SysDataStatusEnum> StatusEnums { get; set; } = new List<SysDataStatusEnum> { SysDataStatusEnum.Enable, SysDataStatusEnum.Retain };
+        public IEnumerable<SysDataStatusEnum> StatusEnums { get; set; } = new List<SysDataStatusEnum> { SysDataStatusEnum.Enable };
 
     }
 }
