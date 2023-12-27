@@ -20,7 +20,6 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using System.Data;
 using System.Text.RegularExpressions;
-using static Mysqlx.Notice.Warning.Types;
 
 namespace Hymson.MES.Services.Services.Integrated.InteContainer
 {
