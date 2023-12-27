@@ -54,7 +54,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <param name="equSparePartsGroupRepository"></param>
         /// <param name="equSparePartsGroupEquipmentGroupRelationRepository"></param>
         /// <param name="equSparePartsRepository"></param>
-        public EquSparePartsGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSparePartsGroupSaveDto> validationSaveRules, 
+        public EquSparePartsGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquSparePartsGroupSaveDto> validationSaveRules,
             IEquSparePartsGroupRepository equSparePartsGroupRepository,
             IEquSparePartsGroupEquipmentGroupRelationRepository equSparePartsGroupEquipmentGroupRelationRepository, IEquSparePartsRepository equSparePartsRepository)
         {
@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Services.Equipment
                 {
                     var equipmentGroupEntity = new EquSparePartsGroupEquipmentGroupRelationEntity
                     {
-                        Id =IdGenProvider.Instance.CreateId(),
+                        Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
                         SparePartsGroupId = entity.Id,
                         EquipmentGroupId = item,
@@ -119,14 +119,14 @@ namespace Hymson.MES.Services.Services.Equipment
                     };
                     list.Add(equipmentGroupEntity);
                 }
-                //关联备件
-                var updatedTypeEntity = new UpdateSparePartsTypeEntity
-                {
-                    Id = entity.Id,
-                    SparePartIds = saveDto.SparePartIds,
-                    UpdatedBy= updatedBy,
-                    UpdatedOn= updatedOn
-                };
+            //关联备件
+            var updatedTypeEntity = new UpdateSparePartsTypeEntity
+            {
+                Id = entity.Id,
+                SparePartIds = saveDto.SparePartIds,
+                UpdatedBy = updatedBy,
+                UpdatedOn = updatedOn
+            };
             //保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
@@ -168,10 +168,10 @@ namespace Hymson.MES.Services.Services.Equipment
                     nqualifiedCodeGroupRelationList.Add(new EquSparePartsGroupEquipmentGroupRelationSaveDto()
                     {
                         Id = item.Id,
-                        EquipmentGroupId= item.EquipmentGroupId,
-                        SparePartsGroupId= item.SparePartsGroupId,
-                        EquipmentGroupCode=item.EquipmentGroupCode,
-                        EquipmentGroupName=item.EquipmentGroupName,
+                        EquipmentGroupId = item.EquipmentGroupId,
+                        SparePartsGroupId = item.SparePartsGroupId,
+                        EquipmentGroupCode = item.EquipmentGroupCode,
+                        EquipmentGroupName = item.EquipmentGroupName,
                         CreatedBy = item.CreatedBy,
                         CreatedOn = item.CreatedOn
                     });
@@ -190,7 +190,7 @@ namespace Hymson.MES.Services.Services.Equipment
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
-             // 验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
@@ -212,7 +212,7 @@ namespace Hymson.MES.Services.Services.Equipment
                         EquipmentGroupId = item,
                         CreatedBy = _currentUser.UserName,
                         CreatedOn = HymsonClock.Now()
-                };
+                    };
                     list.Add(equipmentGroupEntity);
                 }
 
@@ -230,31 +230,23 @@ namespace Hymson.MES.Services.Services.Equipment
                 SparePartIds = saveDto.SparePartIds,
                 UpdatedBy = _currentUser.UserName,
                 UpdatedOn = HymsonClock.Now()
-        };
+            };
 
             //保存
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows = await _equSparePartsGroupEquipmentGroupRelationRepository.DeleteByParentIdAsync(command);
-                var a = await _equSparePartsRepository.CleanTypeAsync(updatedTypeEntity);
+                rows += await _equSparePartsRepository.CleanTypeAsync(updatedTypeEntity);
 
-
-                if (rows <= 0)
-                {
-                    trans.Dispose();
-                }
-                else
-                {
-                    var rowArray = await Task.WhenAll(new List<Task<int>>() {
+                var rowArray = await Task.WhenAll(new List<Task<int>>() {
                     _equSparePartsGroupRepository.UpdateAsync(entity),
                     _equSparePartsGroupEquipmentGroupRelationRepository.InsertRangeAsync(list),
                     _equSparePartsRepository.UpdateTypeAsync(updatedTypeEntity),
 
                     });
-                    rows += rowArray.Sum();
-                    trans.Complete();
-                }
+                rows += rowArray.Sum();
+                trans.Complete();
             }
             return rows;
 
@@ -291,12 +283,12 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquSparePartsGroupDto?> QueryEquSparePartsGroupByIdAsync(long id) 
+        public async Task<EquSparePartsGroupDto?> QueryEquSparePartsGroupByIdAsync(long id)
         {
-           var equSparePartsGroupEntity = await _equSparePartsGroupRepository.GetByIdAsync(id);
-           if (equSparePartsGroupEntity == null) return null;
-           
-           return equSparePartsGroupEntity.ToModel<EquSparePartsGroupDto>();
+            var equSparePartsGroupEntity = await _equSparePartsGroupRepository.GetByIdAsync(id);
+            if (equSparePartsGroupEntity == null) return null;
+
+            return equSparePartsGroupEntity.ToModel<EquSparePartsGroupDto>();
         }
 
         /// <summary>
