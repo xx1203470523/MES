@@ -256,8 +256,8 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             //检测是否同一个businessID与BusinessTYpe
-            if(saveBusinessDtos.GroupBy(x => new { x.BusinessType }).Any(x => x.Count() > 1)) throw new CustomerValidationException(nameof(ErrorCode.MES15619));
-            if (saveBusinessDtos.GroupBy(x => new { x.BusinessId }).Any(x => x.Count() > 1)) throw new CustomerValidationException(nameof(ErrorCode.MES15618));
+            if (saveBusinessDtos.GroupBy(x => x.BusinessType ).ToList().Count()>1) throw new CustomerValidationException(nameof(ErrorCode.MES15619));
+            if (saveBusinessDtos.GroupBy(x => x.BusinessId ).ToList().Count() > 1) throw new CustomerValidationException(nameof(ErrorCode.MES15618));
 
             var currentBusinessId = saveBusinessDtos.First().BusinessId;
 
