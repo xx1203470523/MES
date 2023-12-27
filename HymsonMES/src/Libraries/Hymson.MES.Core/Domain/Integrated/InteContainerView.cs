@@ -13,9 +13,14 @@ namespace Hymson.MES.Core.Domain.Integrated
     public class InteContainerView : BaseEntity
     {
         /// <summary>
-        /// 物料/物料组名称
+        /// 容器名称
         /// </summary>
         public string Name { get; set; } = "";
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string Code { get; set; } = "";
 
         /// <summary>
         /// 版本

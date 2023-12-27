@@ -124,17 +124,27 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 产品id
         /// </summary>
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
+
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string? ContainerCode { get; set; }
 
         /// <summary>
         /// 编码类型;1：过程控制序列码；2：包装序列码；
         /// </summary>
-        public CodeRuleCodeTypeEnum CodeType { get; set; }
+        public CodeRuleCodeTypeEnum? CodeType { get; set; }
 
         /// <summary>
         /// 编码模式 1： 单个    2： 多个
         /// </summary>
-        public CodeRuleCodeModeEnum CodeMode { get; set; }
+        public CodeRuleCodeModeEnum? CodeMode { get; set; }
 
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
@@ -144,7 +154,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 基数;10 16 32
         /// </summary>
-        public int Base { get; set; }
+        public int? Base { get; set; }
 
         /// <summary>
         /// 忽略字符
@@ -154,12 +164,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 增量
         /// </summary>
-        public int Increment { get; set; }
+        public int? Increment { get; set; }
 
         /// <summary>
         /// 序列长度;0:表示无限长度
         /// </summary>
-        public int OrderLength { get; set; }
+        public int? OrderLength { get; set; }
 
         /// <summary>
         /// 重置序号;1：从不；2：每天；3：每周；4：每月；5：每年；
@@ -169,18 +179,17 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 初始值
         /// </summary>
-        public int StartNumber { get; set; }
+        public int? StartNumber { get; set; }
 
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
         public string? Remark { get; set; }
 
-
         /// <summary>
         /// 编码规则
         /// </summary>
-        public List<InteCodeRulesMakeCreateDto> CodeRulesMakes { get;set;}
+        public List<InteCodeRulesMakeCreateDto>? CodeRulesMakes { get;set;}
 
     }
 
@@ -193,6 +202,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 主键
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string? ContainerCode { get; set; }
 
         /// <summary>
         /// 产品id
@@ -393,6 +412,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
+
+        /// <summary>
+        /// 容器id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string? ContainerCode { get; set; }
 
         /// <summary>
         /// 编码类型;1：过程控制序列码；2：包装序列码；

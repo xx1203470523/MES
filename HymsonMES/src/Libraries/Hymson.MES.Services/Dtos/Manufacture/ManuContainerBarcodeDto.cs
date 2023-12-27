@@ -9,6 +9,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
 {
@@ -331,6 +332,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public int Status { get; set; }
+        public ManuContainerBarcodeStatusEnum Status { get; set; }
     }
 }

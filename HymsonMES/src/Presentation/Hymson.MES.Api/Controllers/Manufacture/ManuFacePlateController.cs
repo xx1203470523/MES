@@ -13,7 +13,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ManuFacePlateController : ControllerBase
+    public partial class ManuFacePlateController : ControllerBase
     {
         /// <summary>
         /// 接口（操作面板）
@@ -51,7 +51,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("querymanufaceplatebyId/{id}")]
+        [HttpGet("queryManuFacePlateById/{id}")]
         public async Task<ManuFacePlateQueryDto> QueryManuFacePlateByIdAsync(long id)
         {
             return await _manuFacePlateService.QueryManuFacePlateByIdAsync(id);
@@ -102,6 +102,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         #endregion
 
         #region 扩展方法
+
         /// <summary>
         /// 查询详情（操作面板）
         /// </summary>
@@ -114,6 +115,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         #region 状态变更
+
         /// <summary>
         /// 启用（操作面板）
         /// </summary>
@@ -125,7 +127,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [PermissionDescription("manu:facePlate:updateStatusEnable")]
         public async Task UpdateStatusEnable([FromBody] long id)
         {
-            await _manuFacePlateService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+            await _manuFacePlateService.UpdateManuFacePlateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
         }
 
         /// <summary>
@@ -139,7 +141,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [PermissionDescription("manu:facePlate:updateStatusRetain")]
         public async Task UpdateStatusRetain([FromBody] long id)
         {
-            await _manuFacePlateService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+            await _manuFacePlateService.UpdateManuFacePlateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
         }
 
         /// <summary>
@@ -153,10 +155,11 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         [PermissionDescription("manu:facePlate:updateStatusAbolish")]
         public async Task UpdateStatusAbolish([FromBody] long id)
         {
-            await _manuFacePlateService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+            await _manuFacePlateService.UpdateManuFacePlateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
         }
 
         #endregion
+
         #endregion
     }
 }

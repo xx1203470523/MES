@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit;
 using Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePart;
 using Hymson.MES.Data.Repositories.Equipment.EquSparePartType;
+using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar;
@@ -62,6 +63,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
+            //TODO 待测试通过后删除
+            #region 旧版本兼容（待验证后删除）
+
+            services.AddSingleton<Hymson.MES.Data.Repositories.Integrated.InteContainer.V1.IInteContainerRepository, Hymson.MES.Data.Repositories.Integrated.InteContainer.V1.InteContainerRepository>();
+
+            #endregion
+
             #region Commonm
             services.AddSingleton<IMessageTemplateRepository, MessageTemplateRepository>();
             services.AddSingleton<IMessagePushRepository, MessagePushRepository>();
@@ -90,17 +98,22 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+
             services.AddSingleton<IInteAttachmentRepository, InteAttachmentRepository>();
             services.AddSingleton<IInteCalendarDateDetailRepository, InteCalendarDateDetailRepository>();
             services.AddSingleton<IInteCalendarDateRepository, InteCalendarDateRepository>();
             services.AddSingleton<IInteCalendarRepository, InteCalendarRepository>();
             services.AddSingleton<IInteClassDetailRepository, InteClassDetailRepository>();
             services.AddSingleton<IInteClassRepository, InteClassRepository>();
+
             services.AddSingleton<IInteContainerRepository, InteContainerRepository>();
+            services.AddSingleton<IInteContainerInfoRepository, InteContainerInfoRepository>();
+            services.AddSingleton<IInteContainerSpecificationRepository, InteContainerSpecificationRepository>();
+            services.AddSingleton<IInteContainerFreightRepository, InteContainerFreightRepository>();
+
             services.AddSingleton<IInteJobClassRepository, InteJobClassRepository>();
             services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
 
-            //InteJob
             services.AddSingleton<IInteJobBusinessRelationRepository, InteJobBusinessRelationRepository>();
             services.AddSingleton<IInteJobRepository, InteJobRepository>();
             services.AddSingleton<IInteWorkCenterRepository, InteWorkCenterRepository>();
@@ -142,8 +155,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteSystemTokenRepository, InteSystemTokenRepository>();
             #endregion
 
-            //InteUnit
             services.AddSingleton<IInteUnitRepository, InteUnitRepository>();
+
             #endregion
 
             #region Process

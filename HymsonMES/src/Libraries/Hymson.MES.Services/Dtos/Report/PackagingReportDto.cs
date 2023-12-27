@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -39,7 +40,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public int Status { get; set; }
+        public ManuContainerBarcodeStatusEnum Status { get; set; }
 
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；
@@ -110,7 +111,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public int Status { get; set; } = 1;
+        public ManuContainerBarcodeStatusEnum Status { get; set; } = ManuContainerBarcodeStatusEnum.Open;
 
         /// <summary>
         /// 包装等级;1：一级；2：二级；3：三级；

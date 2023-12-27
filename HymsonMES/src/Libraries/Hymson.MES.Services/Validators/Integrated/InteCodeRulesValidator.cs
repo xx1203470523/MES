@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteCodeRulesCreateValidator()
         {
-            RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
+            //RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
             RuleFor(x => x.CodeMode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12442));
             RuleFor(x => x.CodeType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12411));
             RuleFor(x => x.Base).NotEmpty().GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12412));
@@ -45,7 +45,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.StartNumber).Must(it => it>=1 && it % 1== 0 ).WithErrorCode(nameof(ErrorCode.MES12440));
             RuleFor(x => x.Base).Must(it => it == 10 || it == 16 || it == 32 ).WithErrorCode(nameof(ErrorCode.MES12441));
 
-            RuleFor(x => x).Must(y=>y.CodeType!= CodeRuleCodeTypeEnum.PackagingSeqCode|| (y.PackType.HasValue && Enum.IsDefined(typeof(CodeRulePackTypeEnum), y.PackType)) ).WithErrorCode(nameof(ErrorCode.MES12435));
+            //RuleFor(x => x).Must(y=>y.CodeType!= CodeRuleCodeTypeEnum.PackagingSeqCode|| (y.PackType.HasValue && Enum.IsDefined(typeof(CodeRulePackTypeEnum), y.PackType)) ).WithErrorCode(nameof(ErrorCode.MES12435));
             RuleFor(x => x.IgnoreChar).Must(y => string.IsNullOrEmpty(y) || new Regex(@"^[A-Z](;[A-Z])*$").IsMatch(y) ).WithErrorCode(nameof(ErrorCode.MES12436));
         }
     }
@@ -59,7 +59,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         {
             RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12419));
 
-            RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
+            //RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
             RuleFor(x => x.CodeMode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12442));
             RuleFor(x => x.CodeType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12411));
             RuleFor(x => x.Base).NotEmpty().GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12412));
@@ -78,7 +78,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.StartNumber).Must(it => it >= 1 && it % 1 == 0).WithErrorCode(nameof(ErrorCode.MES12440));
             RuleFor(x => x.Base).Must(it => it == 10 || it == 16 || it == 32).WithErrorCode(nameof(ErrorCode.MES12441));
 
-            RuleFor(x => x).Must(y => y.CodeType != CodeRuleCodeTypeEnum.PackagingSeqCode || (y.PackType.HasValue && Enum.IsDefined(typeof(CodeRulePackTypeEnum), y.PackType))).WithErrorCode(nameof(ErrorCode.MES12435));
+            //RuleFor(x => x).Must(y => y.CodeType != CodeRuleCodeTypeEnum.PackagingSeqCode || (y.PackType.HasValue && Enum.IsDefined(typeof(CodeRulePackTypeEnum), y.PackType))).WithErrorCode(nameof(ErrorCode.MES12435));
             RuleFor(x => x.IgnoreChar).Must(y => string.IsNullOrEmpty(y) || new Regex(@"^[A-Z](;[A-Z])*$").IsMatch(y)).WithErrorCode(nameof(ErrorCode.MES12436));
         }
     }

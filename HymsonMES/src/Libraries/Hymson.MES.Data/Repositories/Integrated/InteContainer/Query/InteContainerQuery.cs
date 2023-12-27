@@ -33,4 +33,21 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer.Query
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
     }
+
+    /// <summary>
+    /// 查询实体
+    /// </summary>
+    public class EntityByContainerIdQuery
+    {
+        /// <summary>
+        /// 工厂
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 容器Id
+        /// </summary>
+        public long? ContainerId { get; set; }
+
+    }
 }
