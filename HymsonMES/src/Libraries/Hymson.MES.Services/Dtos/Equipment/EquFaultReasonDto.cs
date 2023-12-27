@@ -34,11 +34,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public IEnumerable<long>? SolutionIds { get; set; }
 
-        /// <summary>
-        /// 关联解决措施
-        /// </summary>
-        public IEnumerable<long>? SolutionIds { get; set; }
-
     }
 
     /// <summary>

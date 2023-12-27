@@ -39,7 +39,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 时间时间
         /// </summary>
-        public DateTime RealTime { get; set; }
+        public DateTime? RealTime { get; set; }
 
         /// <summary>
         /// 状态;1、预留 2、发布
