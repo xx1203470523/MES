@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="inteVehicleCreateDto"></param>
         /// <returns></returns>
-        public async Task CreateInteVehicleAsync(InteVehicleCreateDto inteVehicleCreateDto)
+        public async Task<long> CreateInteVehicleAsync(InteVehicleCreateDto inteVehicleCreateDto)
         {
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteVehicleCreateDto);
@@ -175,6 +175,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                 ts.Complete();
             }
+            return inteVehicleEntity.Id;
         }
 
         /// <summary>
