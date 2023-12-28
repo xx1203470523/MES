@@ -20,7 +20,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SourceId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 流转记录ID（对应manu_sfc_circulation表Id）
+        /// </summary>
+        public long CirculationId { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
