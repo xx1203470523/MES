@@ -14,6 +14,11 @@ public class NgRecordReportView
     public string? SFC { get; set; }
 
     /// <summary>
+    /// 设备Id
+    /// </summary>
+    public long? EquipmentId { get; set; }
+
+    /// <summary>
     /// 设备编码
     /// </summary>
     public string? EquipmentCode { get; set; }
@@ -24,6 +29,11 @@ public class NgRecordReportView
     public string? EquipmentName { get; set; }
 
     /// <summary>
+    /// 设备Id
+    /// </summary>
+    public long? ProcedureId { get; set; }
+
+    /// <summary>
     /// 工序编码
     /// </summary>
     public string? ProcedureCode { get; set; }
@@ -32,6 +42,11 @@ public class NgRecordReportView
     /// 工序名称
     /// </summary>
     public string? ProcedureName { get; set; }
+
+    /// <summary>
+    /// 资源ID22
+    /// </summary>
+    public long? ResourceId { get; set; }
 
     /// <summary>
     /// 资源编码

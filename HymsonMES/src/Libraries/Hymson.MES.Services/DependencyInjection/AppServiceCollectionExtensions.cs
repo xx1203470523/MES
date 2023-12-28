@@ -64,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class AppServiceCollectionExtensions
     {
-        
+
         /// <summary>
         /// 业务逻辑层依赖服务添加
         /// </summary>
@@ -290,6 +290,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region QualificationRateReport
             services.AddSingleton<IQualificationRateReportService, QualificationRateReportService>();
+            #endregion
+
+            #region NgRecordReport
+
+            services.AddSingleton<INgRecordService, NgRecordService>();
+
             #endregion
 
             #endregion
@@ -522,6 +528,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-       
+
     }
 }

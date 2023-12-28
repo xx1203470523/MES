@@ -95,16 +95,5 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepNgEntity>> GetPagedInfoAsync(ManuSfcStepNgPagedQuery manuSfcStepNgPagedQuery);
         #endregion
-
-        #region 扩展方法
-
-        /// <summary>
-        /// 联表分页查询
-        /// </summary>
-        /// <param name="manuSfcStepNgPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ManuSfcStepNgEntity>> GetJoinPagedInfoAsync(ManuSfcStepNgPagedQuery manuSfcStepNgPagedQuery);
-
-        #endregion
     }
 }

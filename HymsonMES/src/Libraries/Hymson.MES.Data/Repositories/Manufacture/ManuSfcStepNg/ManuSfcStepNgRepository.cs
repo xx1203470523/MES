@@ -169,78 +169,6 @@ public partial class ManuSfcStepNgRepository :BaseRepository, IManuSfcStepNgRepo
         return await conn.ExecuteAsync(UpdatesSql, manuSfcStepNgEntitys);
     }
     #endregion
-
-    #region 扩展方法
-
-    /// <summary>
-    /// 联表分页查询
-    /// </summary>
-    /// <param name="pageQuery"></param>
-    /// <returns></returns>
-    public async Task<PagedInfo<ManuSfcStepNgEntity>> GetJoinPagedInfoAsync(ManuSfcStepNgPagedQuery pageQuery)
-    {
-        var sqlBuilder = new SqlBuilder();
-        var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-        var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-        sqlBuilder.Where("mssn.IsDeleted=0");
-        sqlBuilder.Select("mss.*");
-
-        sqlBuilder.InnerJoin("manu_sfc_step mss ON mss.Id  = BarCodeStepId");
-
-        #region WhereFill
-
-        if (pageQuery.SFC != null)
-        {
-            sqlBuilder.Where("mss.SFC = @SFC");
-        }
-        if (pageQuery.EquipmentId != null)
-        {
-            sqlBuilder.Where("mss.EquipmentId = @EquipmentId");
-        }
-        if (pageQuery.EquipmentIds?.Any() == true)
-        {
-            sqlBuilder.Where("mss.EquipmentId IN @EquipmentIds");
-        }
-        if (pageQuery.ProcedureId != null)
-        {
-            sqlBuilder.Where("mss.ProcedureId = @ProcedureId");
-        }
-        if (pageQuery.ProcedureIds?.Any() == true)
-        {
-            sqlBuilder.Where("mss.ProcedureId IN @ProcedureIds");
-        }
-        if (pageQuery.ResourceId != null)
-        {
-            sqlBuilder.Where("mss.ResourceId = @ResourceId");
-        }
-        if (pageQuery.ResourceIds?.Any() == true)
-        {
-            sqlBuilder.Where("mss.ResourceId IN @ResourceIds");
-        }
-        if (pageQuery.BeginTime != null)
-        {
-            sqlBuilder.Where("mssn.CreatedOn >= @BeginTime");
-        }
-        if (pageQuery.EndTime != null)
-        {
-            sqlBuilder.Where("mssn.CreatedOn < @EndTime");
-        }
-
-        #endregion
-
-
-        var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
-        sqlBuilder.AddParameters(new { OffSet = offSet });
-        sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
-        sqlBuilder.AddParameters(pageQuery);
-
-        using var conn = GetMESDbConnection();
-        var manuSfcStepNgEntities = await conn.QueryAsync<ManuSfcStepNgEntity>(templateData.RawSql, templateData.Parameters);
-        var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-        return new PagedInfo<ManuSfcStepNgEntity>(manuSfcStepNgEntities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
-    }
-
-    #endregion
 }
 
 
@@ -274,10 +202,4 @@ public partial class ManuSfcStepNgRepository
                             FROM `manu_sfc_step_ng`  WHERE BarCodeStepId IN @BarCodeStepIds AND SiteId = @SiteId";
     #endregion
 
-    #region 扩展
-
-    const string GetJoinPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step_ng` mssn /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-    const string GetJoinPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_step_ng` mssn /**where**/ ";
-
-    #endregion
 }

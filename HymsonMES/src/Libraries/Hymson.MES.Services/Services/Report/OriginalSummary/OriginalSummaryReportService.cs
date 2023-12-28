@@ -90,7 +90,7 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             var bomDetailViews = new List<OriginalSummaryReportDto>();
-            //var manuSfc = await _manuSfcProduceRepository.GetBySFCAsync(queryDto.Sfc);
+            //var manuSfc = await _manuSfcProduceRepository.GetBySFCAsync(queryDto.SFC);
             //if (manuSfc == null)
             //{
             //    return bomDetailViews;

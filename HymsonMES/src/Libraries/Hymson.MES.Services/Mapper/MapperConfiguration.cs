@@ -652,6 +652,14 @@ namespace Hymson.MES.Services.Mapper
             #region QualificationRateReport
             CreateMap<QualificationRateReportPagedQueryDto, QualificationRateReportPagedQuery>();
             #endregion
+
+            #region NgRecordReport
+
+            CreateMap<NgRecordReportPageQueryDto, NgRecordReportPageQuery>();
+            CreateMap<NgRecordReportQueryDto, NgRecordReportQuery>();
+            CreateMap<NgRecordReportView, NgRecordReportDto>();
+
+            #endregion
         }
 
         /// <summary>

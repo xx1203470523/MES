@@ -517,7 +517,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySFCQuery
                 //{
                 //    Status = ProductBadRecordStatusEnum.Open,
-                //    SFC = badReJudgmentDto.Sfc,
+                //    SFC = badReJudgmentDto.SFC,
                 //    SiteId = _currentSite.SiteId ?? 0
                 //});
                 //foreach (var item in productBadRecordList)

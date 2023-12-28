@@ -10,7 +10,7 @@ namespace Hymson.MES.Services.Dtos.Report;
 /// <summary>
 /// Ng记录报表查询参数
 /// </summary>
-public class NgRecordReportQueryDto
+public class NgRecordReportQueryDto : PagerInfo
 {
     /// <summary>
     /// 设备编码
@@ -30,7 +30,7 @@ public class NgRecordReportQueryDto
     /// <summary>
     /// 日期
     /// </summary>
-    public IEnumerable<DateTime>? DateList { get; set; }
+    public DateTime[]? DateList { get; set; }
 
     /// <summary>
     /// 起始时间
@@ -48,5 +48,33 @@ public class NgRecordReportQueryDto
 /// </summary>
 public class NgRecordReportPageQueryDto : PagerInfo
 {
+    /// <summary>
+    /// 设备编码
+    /// </summary>
+    public string? EquipmentCode { get; set; }
 
+    /// <summary>
+    /// 工序
+    /// </summary>
+    public string? ProdureId { get; set; }
+
+    /// <summary>
+    /// 产品条码
+    /// </summary>
+    public string? SFC { get; set; }
+
+    /// <summary>
+    /// 日期
+    /// </summary>
+    public DateTime[]? DateList { get; set; }
+
+    /// <summary>
+    /// 起始时间
+    /// </summary>
+    public DateTime? BeginTime { get; set; }
+
+    /// <summary>
+    /// 截止日期
+    /// </summary>
+    public DateTime? EndTime { get; set; }
 }

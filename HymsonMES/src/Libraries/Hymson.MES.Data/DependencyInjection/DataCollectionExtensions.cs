@@ -219,7 +219,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcCcsNgRecordRepository, ManuSfcCcsNgRecordRepository>();
 
             services.AddSingleton<IManuNgJudgeRepository, ManuNgJudgeRepository>();
-            
+
             #endregion
 
             #region Warehouse 
@@ -256,6 +256,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Report
             services.AddSingleton<IProductDetailReportRepository, ProductDetailReportRepository>();
             services.AddSingleton<IQualificationRateReportRepository, QualificationRateReportRepository>();
+            services.AddSingleton<INgRecordReportRepository, NgRecordReportRepository>();
             #endregion
 
             return services;

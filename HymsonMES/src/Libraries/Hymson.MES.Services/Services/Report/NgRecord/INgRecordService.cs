@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,6 @@ public interface INgRecordService
     /// </summary>
     /// <param name="queryDto"></param>
     /// <returns></returns>
-    Task<IEnumerable<NgRecordReportExportDto>> ExportExcelAsync(NgRecordReportQueryDto queryDto);
+    Task<ExportResultDto> ExportExcelAsync(NgRecordReportQueryDto queryDto);
 
 }
