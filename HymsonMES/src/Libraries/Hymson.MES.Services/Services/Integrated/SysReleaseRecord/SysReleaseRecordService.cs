@@ -63,8 +63,8 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
             sysReleaseRecordCreateDto.Version = sysReleaseRecordCreateDto.Version.Trim();
-            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(sysReleaseRecordCreateDto.Version);
-            if (entity != null && entity.EnvironmentType == sysReleaseRecordCreateDto.EnvironmentType)
+            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(new SysReleaseRecordPagedQuery { Version = sysReleaseRecordCreateDto.Version, EnvironmentType = sysReleaseRecordCreateDto.EnvironmentType });
+            if (entity != null)
             {
                 // 判断版本存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES19301));
@@ -166,8 +166,8 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             }
             sysReleaseRecordModifyDto.Version = (sysReleaseRecordModifyDto.Version ?? "").Trim();
-            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(sysReleaseRecordModifyDto.Version ?? "");
-            if (entity != null && entity.EnvironmentType == sysReleaseRecordModifyDto.EnvironmentType && entity.Id != sysReleaseRecordModifyDto.Id)
+            var entity = await _sysReleaseRecordRepository.GetByVersionAsync(new SysReleaseRecordPagedQuery { Version = sysReleaseRecordModifyDto.Version, EnvironmentType = sysReleaseRecordModifyDto.EnvironmentType });
+            if (entity != null)
             {
                 // 判断版本存在
                 throw new CustomerValidationException(nameof(ErrorCode.MES19301));

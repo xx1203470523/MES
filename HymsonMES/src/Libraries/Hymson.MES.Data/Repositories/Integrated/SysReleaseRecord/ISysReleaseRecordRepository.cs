@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<SysReleaseRecordEntity> GetByVersionAsync(string Version);
+        Task<SysReleaseRecordEntity> GetByVersionAsync(SysReleaseRecordPagedQuery param);
 
         /// <summary>
         /// 根据IDs批量获取数据
