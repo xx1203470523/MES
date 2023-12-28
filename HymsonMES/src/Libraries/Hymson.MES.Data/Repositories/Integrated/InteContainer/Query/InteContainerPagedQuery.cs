@@ -20,6 +20,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteContainer.Query
         public string Name { get; set; } = "";
 
         /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string Code { get; set; } = "";
+
+
+        /// <summary>
         /// 版本
         /// </summary>
         public string Version { get; set; } = "";

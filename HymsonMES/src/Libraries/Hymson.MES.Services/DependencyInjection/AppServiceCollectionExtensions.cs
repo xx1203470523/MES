@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Inte;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
@@ -51,6 +52,7 @@ using Hymson.MES.Services.Services.WhWareHouse;
 using Hymson.MES.Services.Services.WhWarehouseLocation;
 using Hymson.MES.Services.Services.WhWarehouseRegion;
 using Hymson.MES.Services.Services.WhWarehouseShelf;
+using Hymson.MES.Services.Validators;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
 using Hymson.MES.Services.Validators.Manufacture;
@@ -102,6 +104,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+            //TODO 待测试通过后删除
+            #region 旧版本兼容（待验证后删除）
+
+            services.AddSingleton<Hymson.MES.Services.Services.Integrated.InteContainer.V1.IInteContainerService, Hymson.MES.Services.Services.Integrated.InteContainer.V1.InteContainerService>();
+
+            #endregion
+
             #region Equipment
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
@@ -421,7 +430,23 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+
             services.AddSingleton<AbstractValidator<InteContainerSaveDto>, InteContainerValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerInfoDto>, InteContainerInfoCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerInfoUpdateDto>, InteContainerInfoUpdateValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerInfoDeleteDto>, InteContainerInfoDeleteValidator>();
+
+            services.AddSingleton<AbstractValidator<InteContainerFreightDto>, InteContainerFreightCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerFreightUpdateDto>, InteContainerFreightUpdateValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerFreightDeleteDto>, InteContainerFreightDeleteValidator>();
+
+            services.AddSingleton<AbstractValidator<InteContainerSpecificationDto>, InteContainerSpecificationCreateValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerSpecificationUpdateDto>, InteContainerSpecificationUpdateValidator>();
+            services.AddSingleton<AbstractValidator<InteContainerSpecificationDeleteDto>, InteContainerSpecificationDeleteValidator>();
+
+            services.AddSingleton<AbstractValidator<ManuFacePlateCommonDto>, ManuFacePlateConfirmValidator>();
+            services.AddSingleton<AbstractValidator<ManuFacePlatePackDto>, ManuFacePlateConfirmByContainerCodeDtoValidator>();
+
             services.AddSingleton<AbstractValidator<InteClassSaveDto>, InteClassSaveValidator>();
             services.AddSingleton<AbstractValidator<InteJobCreateDto>, InteJobCreateValidator>();
             services.AddSingleton<AbstractValidator<InteJobModifyDto>, InteJobModifyValidator>();

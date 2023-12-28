@@ -182,12 +182,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteCodeRulesEntity"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public async Task<int> InsertAsync(InteCodeRulesEntity inteCodeRulesEntity)
+        public async Task<int> InsertAsync(InteCodeRulesEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(InsertSql, inteCodeRulesEntity);
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>

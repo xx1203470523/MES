@@ -123,6 +123,8 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             services.AddSingleton<AbstractValidator<PackageCloseRequestBo>, PackageCloseJobValidator>();
             services.AddSingleton<AbstractValidator<EsopOutRequestBo>, EsopOutJobValidator>();
 
+            services.AddSingleton<AbstractValidator<ManuFacePlatePackBo>, PackContainerJobValidator>();
+
             return services;
         }
 

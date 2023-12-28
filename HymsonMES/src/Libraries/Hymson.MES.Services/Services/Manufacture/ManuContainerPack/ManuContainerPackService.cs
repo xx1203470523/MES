@@ -154,7 +154,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16732));
             }
-            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault()!.ContainerBarCodeId);
+            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault()!.ContainerBarCodeId.GetValueOrDefault());
 
             IEnumerable<ManuSfcEntity> manuSfclist = new List<ManuSfcEntity>();
             IEnumerable<ManuSfcInfoEntity> manuSfcInfolist = new List<ManuSfcInfoEntity>();
@@ -185,7 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = param.ProcedureId ?? 0,
                     ContainerBarCodeId = item.ContainerBarCodeId,
                     LadeBarCode = item.LadeBarCode,
-                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+                    OperateType = ManuContainerPackRecordOperateTypeEnum.Remove
                 });
 
                 if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
@@ -269,7 +269,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = param.ProcedureId ?? 0,
                     ContainerBarCodeId = item.ContainerBarCodeId,
                     LadeBarCode = item.LadeBarCode,
-                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+                    OperateType = ManuContainerPackRecordOperateTypeEnum.Remove
                 });
 
                 if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)

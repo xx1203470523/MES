@@ -5,4 +5,5 @@
 /// </summary>
 public abstract class QueryAbstraction
 {
+
 }

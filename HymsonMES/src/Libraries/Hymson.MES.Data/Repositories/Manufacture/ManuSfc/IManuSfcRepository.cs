@@ -268,6 +268,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateManuSfcQtyAndCurrentQtyVerifyByIdAsync(UpdateManuSfcQtyAndCurrentQtyVerifyByIdCommand command);
+        Task<ManuSfcEntity> GetOneAsync(ManuSfcQuery query);
+        Task<IEnumerable<ManuSfcEntity>> GetListAsync(ManuSfcQuery query);
         #endregion
     }
 }
