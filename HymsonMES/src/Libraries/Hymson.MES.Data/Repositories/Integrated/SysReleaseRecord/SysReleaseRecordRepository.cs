@@ -65,10 +65,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<SysReleaseRecordEntity> GetByVersionAsync(string Version)
+        public async Task<SysReleaseRecordEntity> GetByVersionAsync(SysReleaseRecordPagedQuery param)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<SysReleaseRecordEntity>(GetBVersionSql, new { Version });
+            return await conn.QueryFirstOrDefaultAsync<SysReleaseRecordEntity>(GetBVersionSql, param);
         }
 
 
@@ -226,7 +226,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
         const string GetBVersionSql = @"SELECT  
                                `Id`, `SiteId`, `Version`, `PlanTime`, `RealTime`, `Status`, `Remark`, `Content`, `EnvironmentType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `sys_release_record`  WHERE Version = @Version AND IsDeleted=0";
+                            FROM `sys_release_record`  WHERE Version = @Version AND EnvironmentType=@EnvironmentType AND IsDeleted=0";
         #endregion
     }
 }
