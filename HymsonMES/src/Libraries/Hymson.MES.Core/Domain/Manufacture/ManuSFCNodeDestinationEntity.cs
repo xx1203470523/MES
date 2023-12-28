@@ -15,16 +15,21 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long NodeId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 条码ID（去向）;对应manu_sfc_node表Id
         /// </summary>
         public long DestinationId { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 流转记录ID（对应manu_sfc_circulation表Id）
+        /// </summary>
+        public long CirculationId { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
 
-       
+
     }
 }
