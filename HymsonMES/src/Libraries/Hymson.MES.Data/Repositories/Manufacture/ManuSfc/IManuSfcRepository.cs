@@ -92,6 +92,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuSfcEntity>> GetManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery);
 
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="manuSfcQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcEntity>> GetAllManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery);
+
         /// <summary>
         /// 分页查询
         /// </summary>

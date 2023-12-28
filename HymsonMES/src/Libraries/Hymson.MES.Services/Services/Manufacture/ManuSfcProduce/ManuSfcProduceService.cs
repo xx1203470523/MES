@@ -780,7 +780,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             var sfcPackList = await sfcPackListTask;
             var whMaterialInventoryList = await whMaterialInventoryListTask;
             var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId));
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId??0));
             var procMaterialEntities = await _procMaterialRepository.GetByIdsAsync(planWorkOrderEntities.Select(x => x.ProductId));
             IEnumerable<ManuSfcProduceBusinessEntity>? sfcProduceBusinessEntities = new List<ManuSfcProduceBusinessEntity>();
             if (manuSfcProduceEntities != null && manuSfcProduceEntities.Any())

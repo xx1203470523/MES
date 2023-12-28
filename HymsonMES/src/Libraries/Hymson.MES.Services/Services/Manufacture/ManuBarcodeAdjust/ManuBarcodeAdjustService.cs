@@ -790,7 +790,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
 
-            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId);
+            var planWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
             if (planWorkOrderEntity != null && planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Pending)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12835)).WithData("sfc", param.SFC).WithData("WorkOrder", planWorkOrderEntity.OrderCode);
@@ -995,7 +995,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 SFC = newSplitSFC,
                 ProductId = manuSfcInfo.ProductId,
-                WorkOrderId = manuSfcInfo.WorkOrderId,
+                WorkOrderId = manuSfcInfo.WorkOrderId??0,
                 WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
                 ProcedureId = manuSfcProduceEntity?.ProcedureId,

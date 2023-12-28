@@ -135,7 +135,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfc,
                     ProductId = sfcInfoEntity.ProductId,
-                    WorkOrderId = sfcInfoEntity.WorkOrderId,
+                    WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
                     WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
                     ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
                     Qty = sfcEntity.Qty,
@@ -239,7 +239,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             //在制品信息
             var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
 
-            var orderIds = sfcInfoEntities.Select(x => x.WorkOrderId).Distinct().ToArray();
+            var orderIds = sfcInfoEntities.Select(x => x.WorkOrderId ?? 0).Distinct().ToArray();
             var activeOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIds);
 
             var validationFailures = new List<ValidationFailure>();
@@ -338,7 +338,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfc,
                     ProductId = sfcInfoEntity.ProductId,
-                    WorkOrderId = sfcInfoEntity.WorkOrderId,
+                    WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
                     WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
                     ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
                     Qty = sfcEntity.Qty,

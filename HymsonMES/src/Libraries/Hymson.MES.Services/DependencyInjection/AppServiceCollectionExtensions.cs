@@ -35,6 +35,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Process;
 using Hymson.MES.Services.Services.Process.LabelTemplate;
+using Hymson.MES.Services.Services.Process.LabelTemplate.DataSource;
 using Hymson.MES.Services.Services.Process.MaskCode;
 using Hymson.MES.Services.Services.Process.PrintConfig;
 using Hymson.MES.Services.Services.Process.Procedure;
@@ -172,12 +173,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcProcessRouteService, ProcProcessRouteService>();
 
             services.AddSingleton<IProcPrintConfigService, ProcPrintConfigService>();
+
             // 标签模板
             services.AddSingleton<IProcLabelTemplateService, ProcLabelTemplateService>();
 
             services.AddSingleton<IProcSortingRuleService, ProcSortingRuleService>();
 
             services.AddSingleton<IProcEquipmentGroupParamService, ProcEquipmentGroupParamService>();
+
+            services.AddSingleton<IBarcodeDataSourceService, ProductionBarcodeService>();
 
             // 工艺设备组
             services.AddSingleton<IProcProcessEquipmentGroupService, ProcProcessEquipmentGroupService>();

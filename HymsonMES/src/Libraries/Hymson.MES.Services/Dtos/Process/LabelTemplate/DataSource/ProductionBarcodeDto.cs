@@ -41,56 +41,56 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
         /// <summary>
         /// 产品名称
         /// </summary>
-        [Description("产品名称")]
+        [Description("条码数量")]
         public decimal Qty { get; set; }
 
         /// <summary>
         /// 所在线体编码
         /// </summary>
         [Description("线体编码")]
-        public string WorkCenterLineCode { get; set; }
+        public string? WorkCenterLineCode { get; set; }
 
         /// <summary>
         /// 所在线体名称
         /// </summary>
         [Description("线体名称")]
-        public string WorkCenterLineName { get; set; }
+        public string? WorkCenterLineName { get; set; }
 
         /// <summary>
         /// 所在工序编码
         /// </summary>
         [Description("工序编码")]
-        public string ProcedureCode { get; set; }
+        public string? ProcedureCode { get; set; }
 
         /// <summary>
         /// 所在工序名称
         /// </summary>
         [Description("工序名称")]
-        public string ProcedureName { get; set; }
+        public string? ProcedureName { get; set; }
 
         /// <summary>
         /// 所在资源编码
         /// </summary>
         [Description("资源编码")]
-        public string ResourceCode { get; set; }
+        public string? ResourceCode { get; set; }
 
         /// <summary>
         /// 所在资源名称
         /// </summary>
         [Description("资源名称")]
-        public string ResourceName { get; set; }
+        public string? ResourceName { get; set; }
 
         /// <summary>
         /// 所在设备编码
         /// </summary>
         [Description("设备编码")]
-        public string EquipmentCode { get; set; }
+        public string? EquipmentCode { get; set; }
 
         /// <summary>
         /// 所在设备名称
         /// </summary>
         [Description("设备名称")]
-        public string EquipmentName { get; set; }
+        public string? EquipmentName { get; set; }
 
         /// <summary>
         /// 状态
@@ -102,12 +102,12 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
         /// 最后产出时间
         /// </summary>
         [Description("最后产出时间")]
-        public string LasttOutputTime { get; set; }
+        public string? LasttOutputTime { get; set; }
 
         /// <summary>
         /// 打印时间
         /// </summary>
         [Description("打印时间")]
-        public string PrintTime { get; set; }
+        public string? PrintTime { get; set; }
     }
 }

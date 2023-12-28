@@ -90,6 +90,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.LeftJoin("manu_sfc_info MSI ON MSI.SfcId = MS.Id AND MSI.IsUsed = 1");
             sqlBuilder.LeftJoin("plan_work_order PWO ON PWO.Id = MSI.WorkOrderId");
             sqlBuilder.LeftJoin("proc_material PM ON PM.Id = MSI.ProductId");
+            sqlBuilder.Where("MS.Type = 1");
             sqlBuilder.Where("MS.IsDeleted = 0");
             sqlBuilder.Where("MS.SiteId = @SiteId");
             sqlBuilder.OrderBy("MS.CreatedOn DESC");
@@ -136,6 +137,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.SiteId = @SiteId");
             sqlBuilder.Where("ms.Status <> 4");
             sqlBuilder.Where("ms.IsDeleted=0");
+            sqlBuilder.Where("MS.Type = 1");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
 
             sqlBuilder.Select(@"msp.ProductBOMId,msp.Id,msp.`Lock`,msp.ProcedureId,ms.Sfc,msp.LockProductionId,CASE ms.Status WHEN  1 THEN msp.Status ELSE 3 END AS  Status,pwo.OrderCode,pp.Code,pp.Name,pm.MaterialCode,pm.MaterialName,pm.Version,pr.ResCode ");
@@ -214,7 +216,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("ms.SiteId = @SiteId");
             sqlBuilder.Where("ms.IsDeleted=0");
             sqlBuilder.OrderBy("msp.UpdatedOn DESC");
-
+            sqlBuilder.Where("MS.Type = 1");
             sqlBuilder.Select(@"msp.ProductBOMId,msp.IsScrap,msp.Id,msp.`Lock`,msp.ProcedureId,msp.ProcessRouteId,ms.Sfc,msp.LockProductionId,ms.Status 
                                 , msi.WorkOrderId, msp.ResourceId, msi.ProductId ");
 
@@ -307,7 +309,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Where("ms.SiteId = @SiteId");
             sqlBuilder.Where("ms.IsDeleted=0");
-
+            sqlBuilder.Where("MS.Type = 1");
             sqlBuilder.Select(@" ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
                                 pwo.OrderCode as WorkOrderCode, 
@@ -377,6 +379,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuSfcEntity>(GetSFCsSql, manuSfcQuery);
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="manuSfcQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetAllManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuSfcEntity>(GetAllSFCsSql, manuSfcQuery);
         }
 
         /// <summary>
@@ -451,6 +464,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             var template = sqlBuilder.AddTemplate(GetManuSfcInfoEntitiesSqlTemplate);
             //sqlBuilder.Select("*");
             sqlBuilder.Where("sfc.SiteId=@SiteId ");
+            sqlBuilder.Where("sfc.Type=1 ");
             if (param.Sfcs != null && param.Sfcs.Any())
             {
                 sqlBuilder.Where("sfc.SFC in @Sfcs");
@@ -679,11 +693,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                         LEFT JOIN  manu_sfc_info info on sfc.Id =info.SfcId  and info.IsUsed =1
                                             /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`,`Type`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status,@Type, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_sfc`(  `Id`, `SiteId`, `SFC`, `Qty`, `Status`,`Type`, IsUsed, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @Qty, @Status, @Type, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status,Type = @Type, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_sfc` SET IsUsed = @IsUsed, SFC = @SFC, Qty = @Qty, Status = @Status,Type = @Type, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdateStatusSql = "UPDATE `manu_sfc` SET Status = @Status, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn  WHERE SiteId = @SiteId AND Status <> @Status AND SFC IN @Sfcs ";
         const string UpdateWithStatusCheckSql = "UPDATE manu_sfc SET Status = @Status, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Status <> @Status AND Id = @Id; ";
         const string UpdateManuSfcQtyByIdSql = "UPDATE `manu_sfc` SET  Qty = @Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
@@ -703,11 +717,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdSql = @"SELECT * FROM `manu_sfc`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
-        const string GetBySFCSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC = @SFC";
-        const string GetBySFCsNewSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs";
-        const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
-        const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs; ";
-
+        const string GetBySFCSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC = @SFC   AND Type=1";
+        const string GetBySFCsNewSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs   AND Type=1";
+        const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0    AND Type=1";
+        const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs  AND Type=1; ";
+        const string GetAllSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs ; ";
         const string GetManSfcAboutInfoBySfcSql = @"SELECT ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
                                 pwo.OrderCode as WorkOrderCode, 
@@ -715,7 +729,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                     FROM manu_sfc MS 
                                      INNER JOIN manu_sfc_info  msi on ms.Id=msi.SfcId AND msi.IsUsed=1 AND msi.IsDeleted=0
                                      LEFT JOIN  plan_work_order pwo on msi.WorkOrderId = pwo.id AND pwo.IsDeleted=0
-                                     WHERE  ms.IsDeleted=0 and ms.SiteId =@SiteId and ms.Sfc=@Sfc
+                                     WHERE  ms.IsDeleted=0 and ms.SiteId =@SiteId and ms.Sfc=@Sfc AND MS.Type=1
                                                   ";
         const string UpdateStatusAndQtyBySfcsSql = @"UPDATE `manu_sfc` SET Status=@Status, Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  SFC IN @SFCs AND SiteId = @SiteId ";
         const string UpdateStatusAndQtyByIdSql = @"UPDATE `manu_sfc` SET Status=@Status, Qty=@Qty, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE  Id=@Id  AND Status=@CurrentStatus AND Qty=@CurrentQty ";
