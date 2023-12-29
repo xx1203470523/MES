@@ -947,6 +947,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                                 });
 
                                 deleteSfcProduceBusinessIds.Add(sfcProduceBusinessEntity?.Id ?? 0);
+
+                                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                                {
+                                    Id = manuSfcEntity.Id,
+                                    Status = SfcStatusEnum.InProductionComplete,
+                                    CurrentStatus = manuSfcEntity.Status,
+                                    UpdatedOn = HymsonClock.Now(),
+                                    UpdatedBy = _currentUser.UserName
+                                });
                             }
                             else
                             {

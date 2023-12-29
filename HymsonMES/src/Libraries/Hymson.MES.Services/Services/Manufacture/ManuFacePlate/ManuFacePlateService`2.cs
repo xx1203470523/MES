@@ -511,7 +511,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
                 #region 工单信息
 
-                var planWorkOrderIds = manuSfcInfoEntities.Select(m => m.WorkOrderId).Distinct();
+                var planWorkOrderIds = manuSfcInfoEntities.Select(m => m.WorkOrderId ?? 0).Distinct();
                 var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(planWorkOrderIds);
 
                 #endregion
@@ -744,7 +744,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16915));
 
             process.ProcMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
-            process.PlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId);
+            process.PlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId??0);
 
             #endregion
 
