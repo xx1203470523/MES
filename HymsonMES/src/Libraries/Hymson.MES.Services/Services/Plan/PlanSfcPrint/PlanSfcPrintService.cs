@@ -312,7 +312,7 @@ namespace Hymson.MES.Services.Services.Plan
                     SFC = s.SFC,
                     Qty = s.Qty,
                     ProductId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.ProductId,
-                    WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId,
+                    WorkOrderId = sfcInfoEntities.FirstOrDefault(f => f.SfcId == s.Id)!.WorkOrderId??0 ,
                     Operatetype = ManuSfcStepTypeEnum.Delete,
                     CurrentStatus = SfcStatusEnum.Complete,
                     CreatedBy = _currentUser.UserName,

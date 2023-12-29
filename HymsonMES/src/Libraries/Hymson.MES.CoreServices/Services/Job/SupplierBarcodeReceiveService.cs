@@ -142,7 +142,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 Sfcs = multiSFCBo.SFCs
             });
 
-            var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetManuSfcEntitiesAsync, new EntityBySFCsQuery { SiteId = multiSFCBo.SiteId, SFCs = multiSFCBo.SFCs });
+            var sfcEntitys = await commonBo.Proxy!.GetDataBaseValueAsync(_manuSfcRepository.GetAllManuSfcEntitiesAsync, new EntityBySFCsQuery { SiteId = multiSFCBo.SiteId, SFCs = multiSFCBo.SFCs });
 
             var resourceEntity = await _procResourceRepository.GetByIdAsync(commonBo.ResourceId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16337));

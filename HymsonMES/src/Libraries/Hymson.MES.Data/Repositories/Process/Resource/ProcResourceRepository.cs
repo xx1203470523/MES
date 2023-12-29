@@ -100,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync( IEnumerable<long>   ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = ids });

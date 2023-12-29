@@ -34,7 +34,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             var sfcPackList = await sfcPackListTask;
 
             var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId));
+            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId ?? 0));
 
             List<ManuSfcBo> list = new List<ManuSfcBo>();
             var validationFailures = new List<ValidationFailure>();

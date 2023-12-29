@@ -135,6 +135,11 @@ public class InteContainerInfoPagedQueryDto : PagerInfo
     public string? Name { get; set; }
 
     /// <summary>
+    /// 编码
+    /// </summary>
+    public string? Code { get; set; }
+
+    /// <summary>
     /// 版本
     /// </summary>
     public string? Version { get; set; }

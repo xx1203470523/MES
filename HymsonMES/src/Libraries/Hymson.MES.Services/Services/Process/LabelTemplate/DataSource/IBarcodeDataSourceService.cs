@@ -11,13 +11,13 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate.DataSource
     /// <summary>
     /// 条码数据源
     /// </summary>
-    public interface IBarcodeDataSourceService<T, TResult> where T : BaseLabelTemplateDataDto where TResult : BasePrintData
+    public interface IBarcodeDataSourceService
     {
         /// <summary>
         ///获取模版数据
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<TResult> GetLabelTemplateData(T param);
+        Task<string> GetLabelTemplateData(BaseLabelTemplateDataDto param);
     }
 }

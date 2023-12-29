@@ -144,7 +144,7 @@
         public const string MES10375 = "没有获取到对应打印任务数据或打印模板";
         public const string MES10376 = "没有获取对应打印任务的打印模板信息";
         public const string MES10377 = "打印任务的模板名称无法转为ID";
-
+        public const string MES10378 = "打印数据源{DataSourceName}不存在,无法打印,请查看标签模板";
 
         #endregion
 
