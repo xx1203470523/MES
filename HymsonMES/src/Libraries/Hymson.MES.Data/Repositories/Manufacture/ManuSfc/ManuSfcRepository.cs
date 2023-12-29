@@ -729,7 +729,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
         const string GetBySFCSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC = @SFC   AND Type=1";
-        const string GetAllBySFCsql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs ";
+        const string GetAllBySFCsql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs ";
         const string GetProduceBySFCsql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs   AND Type=1";
         const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0    AND Type=1";
         const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs  AND Type=1; ";
