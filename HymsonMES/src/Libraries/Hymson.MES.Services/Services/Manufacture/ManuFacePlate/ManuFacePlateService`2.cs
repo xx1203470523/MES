@@ -294,7 +294,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
         });
         var manuContainerPackSFCs = manuContainerPackEntities.Select(m => m.LadeBarCode);
 
-        var manuSfcEntities = await _manuSfcRepository.GetBySFCsAsync(
+        var manuSfcEntities = await _manuSfcRepository.GetProduceBySFCsAsync(
             new EntityBySFCsQuery
             {
                 SFCs = manuContainerPackSFCs,
