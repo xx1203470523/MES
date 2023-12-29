@@ -511,7 +511,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
                 #region 工单信息
 
-                var planWorkOrderIds = manuSfcInfoEntities.Select(m => m.WorkOrderId).Distinct();
+                var planWorkOrderIds = manuSfcInfoEntities.Where(w => w.WorkOrderId != null).Select(m => m.WorkOrderId.Value).Distinct();
                 var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(planWorkOrderIds);
 
                 #endregion
@@ -744,7 +744,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES16915));
 
             process.ProcMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
-            process.PlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId);
+            process.PlanWorkOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId!.Value);
 
             #endregion
 
@@ -1114,7 +1114,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 {
                     process.ExecuteMode = ExecuteModeEnum.IncrementContainerBarcodeQty;
                 }
-                
+
                 #region 配置验证
 
                 await ValidatedTheRules(
@@ -1350,7 +1350,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         return result;
     }
-    
+
     /// <summary>
     /// 打开容器
     /// </summary>
@@ -1469,7 +1469,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16770)).WithData("code", packedManuContainerBarcodeEntity.BarCode);
                 }
-            }            
+            }
         }
 
         #endregion
