@@ -93,11 +93,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     {
         const string GetTreeEntitiesSql = @"
                             ;WITH RECURSIVE CTE AS (
-                              SELECT NodeId, SourceId
+                              SELECT CirculationId, NodeId, SourceId
                               FROM manu_sfc_node_source
                               WHERE NodeId = @NodeId 
                               UNION ALL
-                              SELECT T.NodeId, T.SourceId
+                              SELECT T.CirculationId, T.NodeId, T.SourceId
                               FROM manu_sfc_node_source T
                               JOIN CTE ON CTE.SourceId = T.NodeId
                             )
@@ -105,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM manu_sfc_node_source /**where**/  ";
 
-        const string InsertsSql = "REPLACE INTO manu_sfc_node_source(  `Id`, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (  @Id, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
+        const string InsertsSql = "REPLACE INTO manu_sfc_node_source(`Id`, CirculationId, `NodeId`, `SourceId`, `CreatedBy`, `CreatedOn`, `SiteId`) VALUES (@Id, @CirculationId, @NodeId, @SourceId, @CreatedBy, @CreatedOn, @SiteId) ";
 
     }
 }

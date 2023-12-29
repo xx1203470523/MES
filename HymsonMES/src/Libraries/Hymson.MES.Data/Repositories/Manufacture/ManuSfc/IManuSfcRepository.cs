@@ -147,7 +147,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(EntityBySFCsQuery query);
+        Task<IEnumerable<ManuSfcEntity>> GetAllBySFCsAsync(EntityBySFCsQuery query);
+
+        /// <summary>
+        /// 获取在制SFC（批量）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcEntity>> GetProduceBySFCsAsync(EntityBySFCsQuery query);
 
         /// <summary>
         /// 更具sfc 获取条码信息
