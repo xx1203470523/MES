@@ -9,7 +9,7 @@ namespace Hymson.MES.Services.Validators.Integrated
     /// <summary>
     /// 自定义字段 验证
     /// </summary>
-    internal class InteCustomFieldSaveValidator: AbstractValidator<InteCustomFieldSaveDto>
+    internal class InteCustomFieldSaveValidator : AbstractValidator<InteCustomFieldSaveDto>
     {
         /// <summary>
         /// 
@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         /// </summary>
         public InteCustomFieldBusinessEffectuatenValidator()
         {
-            RuleFor(y => y.BusinessId).Must(x=>x>0).WithErrorCode(nameof(ErrorCode.MES15614));
+            RuleFor(y => y.BusinessId).Must(x => x > 0).WithErrorCode(nameof(ErrorCode.MES15614));
             RuleFor(x => x.BusinessType).Must(it => Enum.IsDefined(typeof(InteCustomFieldBusinessTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES15604));
 
             RuleFor(y => y.CustomFieldName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15605));
@@ -80,7 +80,7 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.CustomFieldName).Must(x => !x.Any(x => char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES15606));
 
             RuleFor(y => y.SetValue).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES15617));
-            RuleFor(x => x.SetValue).Must(x => !x.Any(x => char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES15616));
+            RuleFor(x => x.SetValue).Must(x => x==null || !x.Any(x => char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES15616));
         }
     }
 }

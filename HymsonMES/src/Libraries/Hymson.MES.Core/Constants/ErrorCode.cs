@@ -38,6 +38,7 @@
         public const string MES10129 = "只有新建或者保留才能编辑";
         public const string MES10130 = "操作数据已经不存在了";
         public const string MES10131 = "编码只能是英文或数字组合";
+        public const string MES10132 = "编码不能包含特殊字符";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -827,6 +828,7 @@
         public const string MES15617 = "自定义业务值不能超过255个字符";
         public const string MES15618 = "自定义业务ID不是同一个";
         public const string MES15619 = "自定义业务类型不是同一个";
+        public const string MES15620 = "自定义字段对应语言设置的语言类型重复";
 
         #endregion
 
