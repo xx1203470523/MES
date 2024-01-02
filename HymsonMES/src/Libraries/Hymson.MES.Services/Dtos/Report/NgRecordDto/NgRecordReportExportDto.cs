@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Hymson.Excel.Abstractions.Attributes;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Mysqlx.Crud;
 using OfficeOpenXml.Attributes;
 using System;
@@ -60,7 +61,7 @@ public record NgRecordReportExportDto : BaseExcelDto
     /// 是否合格状态
     /// </summary>
     [EpplusTableColumn(Header = "是否合格状态", Order = 8)]
-    public string? Passed { get; set; }
+    public TrueOrFalseEnum? Passed { get; set; }
 
     /// <summary>
     /// 过站时间

@@ -114,6 +114,16 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public List<EquEquipmentLinkApiCreateDto> ApiLinks { get; set; }
         #endregion
+
+
+        #region 扩展字段
+
+        /// <summary>
+        /// 理论产能（）
+        /// </summary>
+        public decimal? TheoryQty { get; set; }
+
+        #endregion
     }
 
     /// <summary>

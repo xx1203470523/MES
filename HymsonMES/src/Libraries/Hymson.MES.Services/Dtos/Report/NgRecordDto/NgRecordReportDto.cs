@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,7 +47,7 @@ public class NgRecordReportDto
     /// <summary>
     /// 是否合格状态
     /// </summary>
-    public string? Passed { get; set; }
+    public TrueOrFalseEnum? Passed { get; set; }
 
     /// <summary>
     /// 过站时间

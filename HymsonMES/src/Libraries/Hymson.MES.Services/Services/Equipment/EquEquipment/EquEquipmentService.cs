@@ -1,4 +1,5 @@
 using FluentValidation;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer;
 using Hymson.Authentication.JwtBearer.Security;
@@ -149,6 +150,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
                     linkHardwareList.Add(linkHardware);
                 }
             }
+
+            //新增理论产出数
+            if (true)
+            {
+
+            }
+
             #endregion
 
             #region 参数校验

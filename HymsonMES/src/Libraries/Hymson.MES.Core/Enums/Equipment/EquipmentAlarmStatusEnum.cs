@@ -16,6 +16,6 @@ namespace Hymson.MES.Core.Enums
         /// 自动恢复运行
         /// </summary>
         [Description("恢复")]
-        Recover = 2
+        Recover = 0
     }
 }

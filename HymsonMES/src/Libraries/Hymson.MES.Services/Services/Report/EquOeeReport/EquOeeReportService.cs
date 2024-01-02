@@ -188,7 +188,7 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                     equipmentUtilizationRateDto.QualifiedRatio = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
                 }
 
-                equipmentUtilizationRateDto.Oee = decimal.Parse((equipmentUtilizationRateDto.AvailableRatio * equipmentUtilizationRateDto.WorkpieceRatio * equipmentUtilizationRateDto.QualifiedRatio).ToString("0.00") ?? "0");
+                equipmentUtilizationRateDto.Oee = Math.Round((equipmentUtilizationRateDto.AvailableRatio * equipmentUtilizationRateDto.WorkpieceRatio * equipmentUtilizationRateDto.QualifiedRatio),4);
 
 
                 dtos.Add(equipmentUtilizationRateDto);
