@@ -95,6 +95,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
+            sqlBuilder.OrderBy(" CreatedOn DESC");
 
             if (!string.IsNullOrWhiteSpace(sysReleaseRecordPagedQuery.Version))
             {
@@ -201,7 +202,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class SysReleaseRecordRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `sys_release_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `sys_release_record` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `sys_release_record` /**where**/ ";
         const string GetSysReleaseRecordEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
