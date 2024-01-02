@@ -1008,7 +1008,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
                             ProcessRouteId = manuSfcProduceEntity.ProcessRouteId, //badReJudgmentDto.BadProcessRouteId ?? 0,
-                            ProcedureId = manuSfcProduceEntity.ProductId,//processRouteProcedure.ProcedureId
+                            ProcedureId = manuSfcProduceEntity.ProcedureId,//processRouteProcedure.ProcedureId
                         }),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
@@ -1061,7 +1061,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
                             ProcessRouteId = manuSfcProduceEntity.ProcessRouteId, //badReJudgmentDto.BadProcessRouteId ?? 0,
-                            ProcedureId = manuSfcProduceEntity.ProductId,//processRouteProcedure.ProcedureId
+                            ProcedureId = manuSfcProduceEntity.ProcedureId,//processRouteProcedure.ProcedureId
                         }),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
