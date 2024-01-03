@@ -318,6 +318,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 车间名称
         /// </summary>
         public string WorkCenterShopName { get; set; } = "";
+
+        /// <summary>
+        /// 理论产能
+        /// </summary>
+        public decimal TheoryQty { get; set; } = 0;
     }
 
     /// <summary>
@@ -466,6 +471,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 设备组名称
         /// </summary>
         public string EquipmentGroupName { get; set; } = "";
+
+        /// <summary>
+        /// 理论产能数量
+        /// </summary>
+        public decimal? TheoryQty { get; set; }
     }
 
     /// <summary>

@@ -24,17 +24,24 @@ public class EquEquipmentTheoryCommand : BaseCommand
     /// <summary>
     /// 理论产出数
     /// </summary>
-    public string? TheoryOutputQty { get; set; }
+    public decimal? TheoryOutputQty { get; set; }
 
     /// <summary>
     /// 理论产出产出数（EA）
     /// </summary>
-    public string? OutputQty { get; set; }
+    public decimal? OutputQty { get; set; }
 }
 
 /// <summary>
 /// 创建Command
 /// </summary>
 public class EquEquipmentTheoryCreateCommand : EquEquipmentTheoryCommand
+{
+}
+
+/// <summary>
+/// 创建Command
+/// </summary>
+public class EquEquipmentTheoryUpdateCommand : EquEquipmentTheoryCommand
 {
 }
