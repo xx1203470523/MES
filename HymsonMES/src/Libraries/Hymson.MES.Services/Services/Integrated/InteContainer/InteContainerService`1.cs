@@ -130,20 +130,20 @@ public partial class InteContainerService : IInteContainerService
 
         //验证参数规格
 
-        //是否有参数数据
-        bool isSpecificationEntityParametersAnyNull = new[]
-        {
-            saveContainerSpecificationEntity.Height,
-            saveContainerSpecificationEntity.Length,
-            saveContainerSpecificationEntity.Weight,
-            saveContainerSpecificationEntity.MaxFillWeight,
-            saveContainerSpecificationEntity.Width
-        }.Any(x => x == null);
+        ////是否有参数数据
+        //bool isSpecificationEntityParametersAnyNull = new[]
+        //{
+        //    saveContainerSpecificationEntity.Height,
+        //    saveContainerSpecificationEntity.Length,
+        //    saveContainerSpecificationEntity.Weight,
+        //    saveContainerSpecificationEntity.MaxFillWeight,
+        //    saveContainerSpecificationEntity.Width
+        //}.Any(x => x == null);
 
-        if (isSpecificationEntityParametersAnyNull)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES12514));
-        }
+        //if (isSpecificationEntityParametersAnyNull)
+        //{
+        //    throw new CustomerValidationException(nameof(ErrorCode.MES12514));
+        //}
 
         saveContainerSpecificationEntity.Id = IdGenProvider.Instance.CreateId();
         saveContainerSpecificationEntity.ContainerId = entity.Id;
@@ -213,38 +213,38 @@ public partial class InteContainerService : IInteContainerService
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES12502));
         }
-        //规格参数都大于0
-        bool allSpecificationGreaterZero = new[]
-            {   saveContainerSpecificationEntity.Height,
-                saveContainerSpecificationEntity.Length,
-                saveContainerSpecificationEntity.Weight,
-                saveContainerSpecificationEntity.MaxFillWeight,
-                saveContainerSpecificationEntity.Width}.All(x => x > 0);
+        ////规格参数都大于0
+        //bool allSpecificationGreaterZero = new[]
+        //    {   saveContainerSpecificationEntity.Height,
+        //        saveContainerSpecificationEntity.Length,
+        //        saveContainerSpecificationEntity.Weight,
+        //        saveContainerSpecificationEntity.MaxFillWeight,
+        //        saveContainerSpecificationEntity.Width}.All(x => x > 0);
 
-        if (!allSpecificationGreaterZero)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES12514));
-        }
+        //if (!allSpecificationGreaterZero)
+        //{
+        //    throw new CustomerValidationException(nameof(ErrorCode.MES12514));
+        //}
 
         var rows = 0;
-        using (var trans = TransactionHelper.GetTransactionScope())
+
+        using var trans = TransactionHelper.GetTransactionScope();
+
+        rows = await _inteContainerRepository.InsertInfoAsync(entity);
+        if (rows <= 0)
         {
-            rows = await _inteContainerRepository.InsertInfoAsync(entity);
-            if (rows <= 0)
-            {
-                trans.Dispose();
-            }
-            else
-            {
-                var rowArray = await Task.WhenAll(new List<Task<int>>() {
+            trans.Dispose();
+        }
+        else
+        {
+            var rowArray = await Task.WhenAll(new List<Task<int>>() {
                     _inteContainerRepository.InsertFreightAsync(freightGroupEntities),
                     _inteContainerRepository.InsertSpecificationAsync(saveContainerSpecificationEntity)
             });
-                rows += rowArray.Sum();
-                trans.Complete();
-            }
-            return rows;
+            rows += rowArray.Sum();
+            trans.Complete();
         }
+        return rows;
     }
 
     /// <summary>
@@ -311,18 +311,18 @@ public partial class InteContainerService : IInteContainerService
         specificationEntity.UpdatedBy = updatedBy;
         specificationEntity.UpdatedOn = updatedOn;
 
-        //规格参数都大于0
-        bool allSpecificationGreaterZero = new[]
-            {   specificationEntity.Height,
-                specificationEntity.Length,
-                specificationEntity.Weight,
-                specificationEntity.MaxFillWeight,
-                specificationEntity.Width}.All(x => x > 0);
+        ////规格参数都大于0
+        //bool allSpecificationGreaterZero = new[]
+        //    {   specificationEntity.Height,
+        //        specificationEntity.Length,
+        //        specificationEntity.Weight,
+        //        specificationEntity.MaxFillWeight,
+        //        specificationEntity.Width}.All(x => x > 0);
 
-        if (!allSpecificationGreaterZero)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES12514));
-        }
+        //if (!allSpecificationGreaterZero)
+        //{
+        //    throw new CustomerValidationException(nameof(ErrorCode.MES12514));
+        //}
 
         //是否有相同的物料
         bool isHaveSameMaterial = freightGroupEntities.GroupBy(dto => new { dto.Version, dto.LevelValue }).Any(g => g.Count() > 1);
