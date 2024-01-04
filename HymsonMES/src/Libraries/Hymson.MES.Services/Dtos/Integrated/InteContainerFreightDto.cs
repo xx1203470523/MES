@@ -119,6 +119,11 @@ public record InteContainerFreightDto : BaseEntityDto
     /// </summary>
     public string? LevelValue { get; set; }
 
+    /// <summary>
+    /// 版本
+    /// </summary>
+    public string? Version { get; set; }
+
 }
 
 /// <summary>
