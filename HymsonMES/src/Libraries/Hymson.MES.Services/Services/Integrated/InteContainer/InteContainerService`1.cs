@@ -170,6 +170,7 @@ public partial class InteContainerService : IInteContainerService
             freightEntity.Minimum = s.Minimum;
             freightEntity.Maximum = s.Maximum;
             freightEntity.SiteId = siteId;
+            freightEntity.Version = s.Version ?? "";
             freightEntity.LevelValue = s.LevelValue;
             freightEntity.CreatedBy = userName;
             freightEntity.CreatedOn = now;
@@ -180,10 +181,13 @@ public partial class InteContainerService : IInteContainerService
         //验证关联货物信息
 
         //是否有相同的物料
-        bool isHaveSameMaterial = freightGroupEntities.GroupBy(dto => new { dto.Version, dto.LevelValue }).Any(g => g.Count() > 1);
-        if (isHaveSameMaterial)
+        var freightGroupEntitiesGroups = freightGroupEntities.Where(m => m.Type == Core.Enums.Integrated.ContainerFreightTypeEnum.Material).GroupBy(m => new { m.Version, m.LevelValue });
+        foreach(var group in freightGroupEntitiesGroups)
         {
-            throw new CustomerValidationException(nameof(ErrorCode.MES12503));
+            if(group.Count() > 1)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12503));
+            }
         }
 
         //是否有相同的容器
@@ -502,9 +506,15 @@ public partial class InteContainerService : IInteContainerService
     {
         var siteId = _currentSite.SiteId.GetValueOrDefault();
 
-        var pagedQuery = pageQueryDto.ToQuery<InteContainerInfoPagedQuery>();
-        pagedQuery.SiteId = siteId;
-        pagedQuery.Sorting = "CreatedOn Desc";
+        var pagedQuery = new InteContainerInfoPagedQuery
+        {
+            PageIndex = pageQueryDto.PageIndex,
+            PageSize = pageQueryDto.PageSize,
+            NameLike = pageQueryDto.Name,
+            CodeLike = pageQueryDto.Code,
+            SiteId = siteId,
+            Sorting = "CreatedOn Desc"
+        };
 
         var result = new List<InteContainerInfoOutputDto>();
 
