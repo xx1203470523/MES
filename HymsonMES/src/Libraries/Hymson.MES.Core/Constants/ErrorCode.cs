@@ -411,6 +411,7 @@
         public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
         public const string MES11410 = "降级移除失败:有数据已经被移除了,请清除后重新处理";
         public const string MES11411 = "产品序列码【{sfc}】状态为无效";
+        public const string MES11412 = "产品序列码【{sfc}】状态为删除";
 
         #endregion
 
@@ -1108,7 +1109,7 @@
         public const string MES16741 = "【容器包装】【{code}】没有维护容器特性!";
         public const string MES16742 = "【容器包装】此序列码不允许使用该容器进行包装!";
         public const string MES16743 = "【容器包装】此容器对该条码的存储已达到最大存储容量!";
-        public const string MES16744 = "【容器包装】此条码不允许进行容器包装!";
+        public const string MES16744 = "【容器包装】条码不存在!";
         public const string MES16745 = "【容器包装】此条码不存在工单信息!";
         public const string MES16746 = "【容器包装】数据异常，包装容器不存在!";
         public const string MES16747 = "【容器包装】容器编码不存在!";
@@ -1216,6 +1217,8 @@
         public const string MES17254 = "按钮中存在，作业为空，请检查！";
         public const string MES17255 = "未读取到有效作业，请检查！";
         public const string MES17256 = "作业参数【{Param}】获取失败，请检查！";
+
+        public const string MES17257 = "容器不存在！";
         #endregion
 
         #region 在制维修 MES17300

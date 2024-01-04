@@ -36,7 +36,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="createDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.INSERT)]
+        [LogDescription("Ìí¼ÓÈÝÆ÷", BusinessType.INSERT)]
         [PermissionDescription("inte:container:insert")]
         public async Task CreateAsync(InteContainerInfoDto createDto)
         {
@@ -49,7 +49,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="modifyDto"></param>
         /// <returns></returns>
         [HttpPut]
-        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.UPDATE)]
+        [LogDescription("¸üÐÂÈÝÆ÷", BusinessType.UPDATE)]
         [PermissionDescription("inte:container:update")]
         public async Task ModifyAsync(InteContainerInfoUpdateDto modifyDto)
         {
@@ -95,7 +95,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpDelete]
-        [LogDescription("ÈÝÆ÷Î¬»¤", BusinessType.DELETE)]
+        [LogDescription("É¾³ýÈÝÆ÷", BusinessType.DELETE)]
         [PermissionDescription("inte:container:delete")]
         public async Task DeletesAsync(long[] ids)
         {
