@@ -627,7 +627,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
     }
 
     /// <summary>
-    /// 容器装载
+    /// 装载
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
@@ -735,6 +735,11 @@ public partial class ManuFacePlateService : IManuFacePlateService
             if (manuSfcEntity.Status == Core.Enums.SfcStatusEnum.Locked)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", manuSfcEntity.SFC);
+            }
+
+            if (manuSfcEntity.Status == Core.Enums.SfcStatusEnum.Delete)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES11412)).WithData("sfc", manuSfcEntity.SFC);
             }
 
             #endregion

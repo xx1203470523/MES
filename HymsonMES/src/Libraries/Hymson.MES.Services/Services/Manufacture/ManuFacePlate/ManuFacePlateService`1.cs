@@ -95,9 +95,18 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 //验证容器包装
                 await _validationContainerPackCreateRules.ValidateAndThrowAsync(addManuFacePlateDto.FacePlateContainerPack);
+
+                var containerEntity = await _inteContainerInfoRepository.GetOneAsync(new InteContainerInfoQuery { Code = addManuFacePlateDto.FacePlate.ContainerCode });
+                if (containerEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17257));
+                }
+
                 // manuFacePlateContainerPackEntity表
+
                 manuFacePlateContainerPackEntity = addManuFacePlateDto.FacePlateContainerPack.ToEntity<ManuFacePlateContainerPackEntity>();
                 manuFacePlateContainerPackEntity.FacePlateId = manuFacePlateEntity.Id;
+                manuFacePlateContainerPackEntity.ContainerId = containerEntity.Id;
                 manuFacePlateContainerPackEntity.Id = IdGenProvider.Instance.CreateId();
                 manuFacePlateContainerPackEntity.CreatedBy = _currentUser.UserName;
                 manuFacePlateContainerPackEntity.UpdatedBy = _currentUser.UserName;
@@ -275,6 +284,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuFacePlateEntity = updateManuFacePlateDto.FacePlate.ToEntity<ManuFacePlateEntity>();
             manuFacePlateEntity.UpdatedBy = _currentUser.UserName;
             manuFacePlateEntity.UpdatedOn = HymsonClock.Now();
+
             #region 生产过站
             ManuFacePlateProductionEntity manuFacePlateProductionEntity = new ManuFacePlateProductionEntity();
             if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ProducePassingStation)
@@ -304,7 +314,15 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
             {
                 await _validationContainerPackModifyRules.ValidateAndThrowAsync(updateManuFacePlateDto.FacePlateContainerPack);
+
+                var containerEntity = await _inteContainerInfoRepository.GetOneAsync(new InteContainerInfoQuery { Code = updateManuFacePlateDto.FacePlate.ContainerCode });
+                if (containerEntity == null)
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES17257));
+                }
+
                 manuFacePlateContainerPackEntity = updateManuFacePlateDto.FacePlateContainerPack.ToEntity<ManuFacePlateContainerPackEntity>();
+                manuFacePlateContainerPackEntity.ContainerId = containerEntity.Id;
                 manuFacePlateContainerPackEntity.UpdatedBy = _currentUser.UserName;
                 manuFacePlateContainerPackEntity.UpdatedOn = HymsonClock.Now();
                 manuFacePlateContainerPackEntity.FacePlateId = manuFacePlateEntity.Id;
@@ -549,7 +567,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //容器包装
                 if (manuFacePlateEntity.Type == Core.Enums.Manufacture.ManuFacePlateTypeEnum.ContainerPack)
                 {
-                    var manuFacePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);
+                    var manuFacePlateContainerPackEntity = await _manuFacePlateContainerPackRepository.GetByFacePlateIdAsync(manuFacePlateEntity.Id);                    
                     if (manuFacePlateContainerPackEntity != null)
                     {
                         resourceId = manuFacePlateContainerPackEntity.ResourceId;
@@ -561,6 +579,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                         facePlateQueryDto.FacePlateContainerPack.IsShowErrorsColour = !string.IsNullOrEmpty(facePlateQueryDto.FacePlateContainerPack.ErrorsColour);
                         //填充Job数据
                         facePlateQueryDto.FacePlateContainerPack.ScanJobCode = await QueryInteJobCodesAsync(manuFacePlateContainerPackEntity.ScanJobId);
+
+                        var containerEntity = await _inteContainerInfoRepository.GetOneAsync(new InteContainerInfoQuery { Id = manuFacePlateContainerPackEntity.ContainerId });
+                        if(containerEntity != null)
+                        {
+                            facePlateQueryDto.FacePlateContainerPack.ContainerCode = containerEntity.Code;
+                        }
                     }
                 }
                 #endregion
