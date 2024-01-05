@@ -71,11 +71,28 @@ public partial class EquEquipmentTheoryRepository : BaseRepository, IEquEquipmen
         using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertOrUpdateSql, command);
     }
+
+    public async Task<EquEquipmentTheoryEntity> GetOneAsync(EquEquipmentTheoryQuery query)
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+        var sqlTemplete = sqlBuilder.AddTemplate(GetOneSql);
+
+        if (query.EquipmentCode != null)
+        {
+            sqlBuilder.Where("EquipmentCode = @EquipmentCode");
+        }
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = GetMESDbConnection();
+        return await conn.QueryFirstOrDefaultAsync<EquEquipmentTheoryEntity>(sqlTemplete.RawSql, sqlTemplete.Parameters);
+    }
 }
 
 
 public partial class EquEquipmentTheoryRepository
 {
+    const string GetOneSql = @"SELECT * FROM equ_equipment_theory eet /**where**/ LIMIT 1";
     const string GetListSql = @"SELECT * FROM equ_equipment_theory eet /**where**/";
 
     const string InsertSql = @"INSERT INTO equ_equipment_theory(Id, SiteId, EquipmentCode, TheoryOutputQty, OutputQty, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted)

@@ -38,4 +38,11 @@ public interface IEquEquipmentTheoryRepository
     /// <param name="query"></param>
     /// <returns></returns>
     public Task<IEnumerable<EquEquipmentTheoryEntity>> GetListAsync(EquEquipmentTheoryQuery query);
+
+    /// <summary>
+    /// 查询列表
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public Task<EquEquipmentTheoryEntity> GetOneAsync(EquEquipmentTheoryQuery query);
 }

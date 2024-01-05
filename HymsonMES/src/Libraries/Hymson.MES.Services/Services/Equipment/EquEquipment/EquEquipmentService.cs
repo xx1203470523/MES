@@ -369,7 +369,13 @@ namespace Hymson.MES.Services.Services.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentDto> GetDetailAsync(long id)
         {
-            return (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
+            var equEquipmentDto = (await _equEquipmentRepository.GetByIdAsync(id)).ToModel<EquEquipmentDto>();
+
+            var theoryEndtity = await _equEquipmentTheoryRepository.GetOneAsync(new() { EquipmentCode = equEquipmentDto.EquipmentCode });
+
+            equEquipmentDto.TheoryQty = theoryEndtity?.TheoryOutputQty;
+
+            return equEquipmentDto;
         }
 
         /// <summary>

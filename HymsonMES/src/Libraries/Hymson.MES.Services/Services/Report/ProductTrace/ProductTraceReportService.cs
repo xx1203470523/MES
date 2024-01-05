@@ -24,6 +24,7 @@ using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 
 namespace Hymson.MES.Services.Services.Report
@@ -851,7 +852,11 @@ namespace Hymson.MES.Services.Services.Report
                     case ManuSfcStepTypeEnum.Assemble:
                         returnView.OperatetypeStr = "组装";
                         break;
+                    case ManuSfcStepTypeEnum.StepControl:
+                        returnView.OperatetypeStr = "步骤控制";
+                        break;
                     default:
+                        returnView.OperatetypeStr = "步骤控制";
                         break;
                 }
                 returnView.CreatedOn = manuSfcStep.CreatedOn;

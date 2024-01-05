@@ -34,6 +34,11 @@ namespace Hymson.MES.Data.Repositories.Equipment
         /// <summary>
         /// 设备ID
         /// </summary>
+        public string? EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
         public string[]? EquipmentCodes { get; set; }
     }
 }
