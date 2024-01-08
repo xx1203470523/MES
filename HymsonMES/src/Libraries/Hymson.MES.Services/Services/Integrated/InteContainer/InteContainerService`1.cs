@@ -12,7 +12,6 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Inte;
 using Hymson.MES.Data.Repositories.Integrated.InteContainer;
-using Hymson.MES.Data.Repositories.Integrated.InteContainer.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Inte;
@@ -444,11 +443,17 @@ public partial class InteContainerService : IInteContainerService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<InteContainerFreightOutputDto>> GetEntitiesAsync(long id)
+    public async Task<IEnumerable<InteContainerFreightOutputDto>> GetContainerFreightInfoByIdAsync(long id)
     {
-        var inteFreightEntities = await _inteContainerRepository.GetFreightAsync(new EntityByParentIdQuery
+        //var inteFreightEntities = await _inteContainerRepository.GetFreightAsync(new EntityByParentIdQuery
+        //{
+        //    ParentId = id,
+        //    SiteId = _currentSite.SiteId.GetValueOrDefault()
+        //});
+
+        var inteFreightEntities = await _inteContainerFreightRepository.GetListAsync(new InteContainerFreightQuery
         {
-            ParentId = id,
+            ContainerId = id,
             SiteId = _currentSite.SiteId.GetValueOrDefault()
         });
 
@@ -469,28 +474,20 @@ public partial class InteContainerService : IInteContainerService
             list.Add(dto);
         }
 
-        var materialIds = list.Select(x => x.MaterialId).Where(id => id != null).Select(id => id.Value).ToArray();
-        if (materialIds.Length <= 0 && !materialIds.Any())
+        var materialFreights = list.Where(m => m.Type == Core.Enums.Integrated.ContainerFreightTypeEnum.Material);
+        if(materialFreights.Any())
         {
-            return list;
-        }
+            var materialIds = materialFreights.Select(x => x.MaterialId.GetValueOrDefault());
 
-        var materialInfos = await _procMaterialRepository.GetByIdsAsync(materialIds);
-        var materialVersions = materialInfos.Select(info => new { info.Id, info.Version });
-
-        Dictionary<long, string> versionDict = new Dictionary<long, string>();
-        foreach (var item in materialVersions)
-        {
-            versionDict[item.Id] = item.Version ?? "";
-        }
-
-        foreach (var item in list)
-        {
-            if (item.MaterialId == null)
-            { continue; }
-            if (versionDict.ContainsKey((long)item.MaterialId))
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(materialIds);
+            
+            foreach(var materialFreightItem in materialFreights)
             {
-                item.Version = versionDict[(long)item.MaterialId];
+                var materialEntity = materialEntities.FirstOrDefault(m => m.Id == materialFreightItem.MaterialId);
+                if( materialEntity != null)
+                {
+                    materialFreightItem.Version = materialEntity.Version ?? "";
+                }
             }
         }
 
