@@ -50,7 +50,7 @@ public interface IInteContainerService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<IEnumerable<InteContainerFreightOutputDto>> GetEntitiesAsync(long id);
+    Task<IEnumerable<InteContainerFreightOutputDto>> GetContainerFreightInfoByIdAsync(long id);
 
     /// <summary>
     /// 获取分页数据（容器维护）
