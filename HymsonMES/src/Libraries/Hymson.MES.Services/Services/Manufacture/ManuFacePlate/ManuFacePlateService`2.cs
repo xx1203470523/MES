@@ -997,7 +997,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
             #region 被包装容器是否打开
 
-            if (packedContainerBarcodeEntity.Status != ManuContainerBarcodeStatusEnum.Open)
+            if (packedContainerBarcodeEntity.Status != ManuContainerBarcodeStatusEnum.Close)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16740));
             }
