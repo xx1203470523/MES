@@ -6,6 +6,7 @@
  *build datetime: 2023-03-27 03:50:00
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,30 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
     public class ManuSfcCirculationPagedQuery : PagerInfo
     {
         /// <summary>
-        /// 站点id
+        /// 条码
         /// </summary>
-        public long SiteId { get; set; }
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string>? SFCs { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string>? CirculationBarCodes { get; set; }
+
+        /// <summary>
+        /// 条码流转类型
+        /// </summary>
+        public SfcCirculationTypeEnum? CirculationType { get; set; }
+
     }
 
     /// <summary>
