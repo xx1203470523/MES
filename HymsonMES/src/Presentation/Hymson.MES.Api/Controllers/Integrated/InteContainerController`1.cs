@@ -79,14 +79,14 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 查询容器货物列表
+        /// 查询容器装载列表
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("containerFreightInfo/{id}")]
-        public async Task<IEnumerable<InteContainerFreightOutputDto>> GetEntitiesAsync(long id)
+        public async Task<IEnumerable<InteContainerFreightOutputDto>> GetContainerFreightInfoByIdAsync(long id)
         {
-            return await _inteContainerService.GetEntitiesAsync(id);
+            return await _inteContainerService.GetContainerFreightInfoByIdAsync(id);
         }
 
         /// <summary>
