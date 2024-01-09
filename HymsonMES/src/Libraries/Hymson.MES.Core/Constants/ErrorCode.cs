@@ -173,6 +173,8 @@
         public const string MES10474 = $"工序节点手动排序号不能为空";
         public const string MES10475 = $"工序节点手动排序号最大长度为18";
 
+        public const string MES10480 = $"根据工序获取资源设备信息失败，请检查下系统配置！";
+
         #endregion
 
         #region 参数 10500
@@ -751,6 +753,12 @@
         public const string MES17330 = "维修方法不能为空！";
         public const string MES17331 = "未找到不良录入信息！";
 
+
+        #endregion
+
+        #region 绑定条码
+
+        public const string MES17401 = "未获取到条码信息，请确认下{SFC}是否存在系统中！"; 
 
         #endregion
 

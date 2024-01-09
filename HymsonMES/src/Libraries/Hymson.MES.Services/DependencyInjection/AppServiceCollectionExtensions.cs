@@ -195,6 +195,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuSfcBindRecordService, ManuSfcBindRecordService>();
             services.AddSingleton<IManuSfcStepMaterialService, ManuSfcStepMaterialService>();
 
+            services.AddSingleton<IManuSfcCirculationService, ManuSfcCirculationService>();
+
             #endregion
 
             #region Warehouse 

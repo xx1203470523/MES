@@ -21,4 +21,19 @@ public interface IManuSfcCirculationService
     /// <param name="pageQuery"></param>
     /// <returns></returns>
     Task<PagedInfo<ManuSfcCirculationViewDto>> GetPageInfoAsync(ManuSfcCirculationPagedQueryDto pageQuery);
+
+    /// <summary>
+    /// 删除条码绑定关系
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<int> DeteleteManuSfcCirculationAsync(long id);
+
+    /// <summary>
+    /// 创建条码绑定关系
+    /// </summary>
+    /// <param name="bindDto"></param>
+    /// <returns></returns>
+    Task CreateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto);
+
 }

@@ -7,6 +7,7 @@
  */
 
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Manufacture;
@@ -185,10 +186,15 @@ public record ManuSfcCirculationCreateDto : BaseEntityDto
     /// </summary>
     public long ProductId { get; set; }
 
+    /// <summary>
+    /// 位置码
+    /// </summary>
+    public string Location { get; set; }
+
    /// <summary>
     /// 流转后条码信息
     /// </summary>
-    public long CirculationBarCode { get; set; }
+    public string CirculationBarCode { get; set; }
 
    /// <summary>
     /// 流转后工单id
@@ -208,12 +214,12 @@ public record ManuSfcCirculationCreateDto : BaseEntityDto
    /// <summary>
     /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
     /// </summary>
-    public string CirculationType { get; set; }
+    public SfcCirculationTypeEnum CirculationType { get; set; }
 
    /// <summary>
     /// 是否拆解
     /// </summary>
-    public bool? IsDisassemble { get; set; }
+    public TrueOrFalseEnum? IsDisassemble { get; set; }
 
    /// <summary>
     /// 拆解人
@@ -311,7 +317,7 @@ public record ManuSfcCirculationModifyDto : BaseEntityDto
    /// <summary>
     /// 流转后条码信息
     /// </summary>
-    public long CirculationBarCode { get; set; }
+    public string? CirculationBarCode { get; set; }
 
    /// <summary>
     /// 流转后工单id
@@ -331,7 +337,7 @@ public record ManuSfcCirculationModifyDto : BaseEntityDto
    /// <summary>
     /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
     /// </summary>
-    public string CirculationType { get; set; }
+    public SfcCirculationTypeEnum CirculationType { get; set; }
 
    /// <summary>
     /// 是否拆解
@@ -444,3 +450,25 @@ public class ManuSfcCirculationQueryDto : PagerInfo
     public SfcCirculationTypeEnum? CirculationType { get; set; }
 }
 
+public class ManuSfcCirculationBindDto
+{
+    /// <summary>
+    /// 工序Id
+    /// </summary>
+    public long? ProcedureId { get; set; }
+
+    /// <summary>
+    /// 绑定类型
+    /// </summary>
+    public SfcCirculationTypeEnum? CirculationType { get; set; }
+
+    /// <summary>
+    /// 主条码
+    /// </summary>
+    public string? SFC { get; set; }
+
+    /// <summary>
+    /// 绑定条码
+    /// </summary>
+    public string? CirculationBarCode { get; set; }
+}

@@ -32,6 +32,11 @@ namespace Hymson.MES.Services.Dtos.Report
     public record ManuSfcCirculationViewDto : BaseEntityDto
     {
         /// <summary>
+        /// Id
+        /// </summary>
+        public long? Id { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
