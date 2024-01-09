@@ -1137,7 +1137,9 @@
         public const string MES16769 = "【容器包装】容器装箱失败，该条码已装入此容器，请勿重复装箱";
         public const string MES16770 = "【容器包装】容器打开失败，已达到【{code}】可装载的最大数量，请先移除条码再打开容器";
         public const string MES16771 = "【容器包装】容器打开失败，容器可能已被打开";
-        public const string MES16772 = "【容器包装】条码装载失败，未输入任何需要装载条码";
+        public const string MES16772 = "【容器包装】条码装载失败，未输入任何需要装载条码";        
+        public const string MES16773 = "容器装载失败，不允许混装不同类型的物件";
+        public const string MES16774 = "容器装载失败，包装编码【{code}】存在锁定状态产品序列码，不允许包装！";
         #endregion
 
         #region 绑定工单激活  MES16800
