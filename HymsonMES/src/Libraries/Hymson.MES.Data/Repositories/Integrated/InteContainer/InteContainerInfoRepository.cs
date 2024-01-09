@@ -259,7 +259,7 @@ public partial class InteContainerInfoRepository
 
         if (!string.IsNullOrWhiteSpace(query.CodeLike))
         {
-            query.CodeLike = $"{query.CodeLike}%";
+            query.CodeLike = $"%{query.CodeLike}%";
             sqlBuilder.Where("Code Like @CodeLike");
         }
 
@@ -271,7 +271,7 @@ public partial class InteContainerInfoRepository
 
         if (!string.IsNullOrWhiteSpace(query.NameLike))
         {
-            query.NameLike = $"{query.NameLike}%";
+            query.NameLike = $"%{query.NameLike}%";
             sqlBuilder.Where("Name Like @NameLike");
         }
 
