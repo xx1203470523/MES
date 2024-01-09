@@ -510,14 +510,14 @@
 
         #region 容器维护 12500
         public const string MES12500 = "容器维护错误";
-        public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
-        public const string MES12502 = "最大数量不能小于最小数量";
+        public const string MES12501 = "最大值不能小于最小值{Minimum}";
+        public const string MES12502 = "最大值不能小于最小值";
         public const string MES12503 = "同一物料/物料组只允许设置一次";
-        public const string MES12504 = "最小数量须为正整数";
-        public const string MES12505 = "最大数量须为正整数";
-        public const string MES12506 = "最小数量须大于0";
-        public const string MES12507 = "最大数量须大于0";
-        public const string MES12508 = "最大数量须大于最小数量";
+        public const string MES12504 = "最小值须为正整数";
+        public const string MES12505 = "最大值须为正整数";
+        public const string MES12506 = "最小值须大于0";
+        public const string MES12507 = "最大值须大于0";
+        public const string MES12508 = "最大值须大于最小值";
         public const string MES12509 = "只能删除新建状态的数据";
         public const string MES12510 = "非新建状态的数据不能修改为新建状态";
         public const string MES12511 = "状态不合法，请检查";
