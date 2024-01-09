@@ -165,6 +165,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 新增（忽略错误）
+        /// </summary>
+        /// <param name="manuContainerPackEntity"></param>
+        /// <returns></returns>
+        public async Task<int> InsertIgnoreAsync(ManuContainerPackEntity manuContainerPackEntity)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertIgnoreSql, manuContainerPackEntity);
+        }
+
+        /// <summary>
         /// 批量新增
         /// </summary>
         /// <param name="manuContainerPackEntitys"></param>
@@ -253,6 +264,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                            FROM `manu_container_pack` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `manu_container_pack`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `PackType`, `LadeBarCode`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @PackType, @LadeBarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+
+        const string InsertIgnoreSql = "INSERT IGNORE INTO `manu_container_pack`(  `Id`, `SiteId`,`ResourceId`,`ProcedureId`, `ContainerBarCodeId`, `PackType`, `LadeBarCode`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId,@ResourceId,@ProcedureId, @ContainerBarCodeId, @PackType, @LadeBarCode, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_container_pack` SET   SiteId = @SiteId,ResourceId=@ResourceId,ProcedureId=@ProcedureId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE `manu_container_pack` SET   SiteId = @SiteId,ResourceId=@ResourceId,ProcedureId=@ProcedureId, ContainerBarCodeId = @ContainerBarCodeId, LadeBarCode = @LadeBarCode, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
