@@ -319,7 +319,7 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
             procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
-            //判断是否需要查询物料组编码 -- 全匹配查询
+            // 判断是否需要查询物料组编码 -- 全匹配查询
             if (!string.IsNullOrWhiteSpace(procMaterialPagedQueryDto.MaterialGroupCode)) 
             {
                 var materialGroup=(await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
@@ -332,8 +332,25 @@ namespace Hymson.MES.Services.Services.Process
 
             var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
 
-            //实体到DTO转换 装载数据
+            // 实体到DTO转换 装载数据
             List<ProcMaterialDto> procMaterialDtos = PrepareProcMaterialDtos(pagedInfo);
+
+            if (pagedInfo.Data.Any())
+            {
+                var procMaterialGroupIds = pagedInfo.Data.Select(m => m.GroupId);
+                var procMaterialGroupEntities = await _procMaterialGroupRepository.GetByIdsAsync(procMaterialGroupIds);
+
+                foreach(var item in procMaterialDtos)
+                {
+                    var procMaterialGroupEntity = procMaterialGroupEntities.FirstOrDefault(m => m.Id == item.GroupId);
+
+                    if (procMaterialGroupEntity != null)
+                    {
+                        item.MaterialGroupCode = procMaterialGroupEntity.GroupCode;
+                    }
+                }
+            }
+
             return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

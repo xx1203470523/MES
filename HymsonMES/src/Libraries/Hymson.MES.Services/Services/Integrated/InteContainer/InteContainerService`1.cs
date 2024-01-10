@@ -260,13 +260,11 @@ public partial class InteContainerService : IInteContainerService
         // 验证DTO
         await _validationContainerInfoUpdateRules.ValidateAndThrowAsync(modifyDto);
 
-        //  await ValidationSaveDto(modifyDto);
-
         var updatedOn = HymsonClock.Now();
         var updatedBy = _currentUser.UserName;
         var siteId = _currentSite.SiteId ?? 0;
 
-        var inteContainerEntity = await _inteContainerRepository.GetContainerInfoByIdAsync(modifyDto.Id ?? 0);
+        var inteContainerEntity = await _inteContainerRepository.GetContainerInfoByIdAsync(modifyDto.Id ?? 0);        
 
         //验证某些状态是不能编辑的
         var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
@@ -278,6 +276,7 @@ public partial class InteContainerService : IInteContainerService
 
         // DTO转换实体
         var entity = modifyDto.ToEntity<InteContainerInfoEntity>();
+        entity.Status = inteContainerEntity.Status;
         entity.UpdatedBy = updatedBy;
         entity.UpdatedOn = updatedOn;
         //组装容器Freight
@@ -509,6 +508,7 @@ public partial class InteContainerService : IInteContainerService
             PageSize = pageQueryDto.PageSize,
             NameLike = pageQueryDto.Name,
             CodeLike = pageQueryDto.Code,
+            Status = pageQueryDto.Status,
             SiteId = siteId,
             Sorting = "CreatedOn Desc"
         };
