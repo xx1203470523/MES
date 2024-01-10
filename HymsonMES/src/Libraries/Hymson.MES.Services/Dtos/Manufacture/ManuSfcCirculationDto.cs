@@ -453,6 +453,11 @@ public class ManuSfcCirculationQueryDto : PagerInfo
 public class ManuSfcCirculationBindDto
 {
     /// <summary>
+    /// Id
+    /// </summary>
+    public long? Id { get; set; }
+
+    /// <summary>
     /// 工序Id
     /// </summary>
     public long? ProcedureId { get; set; }

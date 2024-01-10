@@ -533,6 +533,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcCirculationPagedQueryDto, ManuSfcCirculationPagedQuery>();
             CreateMap<ManuSfcCirculationViewDto, ManuSfcCirculationEntity>();
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
+            CreateMap<ManuSfcCirculationCreateDto, ManuSfcCirculationEntity>();
+            CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationCreateDto>();
 
             #endregion
         }
@@ -594,7 +596,7 @@ namespace Hymson.MES.Services.Mapper
             #region WorkshopJobControl
             CreateMap<WorkshopJobControlReportPagedQueryDto, WorkshopJobControlReportPagedQuery>();
             CreateMap<WorkshopJobControlReportView, WorkshopJobControlReportViewDto>();
-            
+
             CreateMap<ManuSfcStepBySFCPagedQueryDto, ManuSfcStepBySfcPagedQuery>();
             #endregion
 
@@ -629,7 +631,7 @@ namespace Hymson.MES.Services.Mapper
             #region ProductTraceReport
             CreateMap<ProductTracePagedQueryDto, ProductTraceReportPagedQuery>();
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
-            CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>(); 
+            CreateMap<ManuProductPrameterPagedQueryDto, ManuProductParameterPagedQuery>();
             CreateMap<ManuProductParameterView, ManuProductParameterViewDto>();
             CreateMap<ManuSfcStepPagedQueryDto, ManuSfcStepPagedQuery>();
             CreateMap<ManuSfcStepEntity, ManuSfcStepViewDto>();

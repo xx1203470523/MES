@@ -4,6 +4,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
+using IdGen;
 
 namespace Hymson.MES.Api.Controllers.Manufacture;
 
@@ -52,5 +53,17 @@ public class ManuSfcCirculationController : ControllerBase
     public async Task DelAsync(long id) 
     {
          await _manuSfcCirculationService.DeteleteManuSfcCirculationAsync(id);
+    }
+
+    /// <summary>
+    /// 条码流转表替换
+    /// </summary>
+    /// <param name="updateDto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("replace")]
+    public async Task UpdateSfcAsync([FromBody]ManuSfcCirculationBindDto updateDto)
+    {
+        await _manuSfcCirculationService.UpdateManuSfcCirculationAsync(updateDto);
     }
 }

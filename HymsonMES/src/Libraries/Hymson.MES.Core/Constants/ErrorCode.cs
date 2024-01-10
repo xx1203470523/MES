@@ -758,7 +758,8 @@
 
         #region 绑定条码
 
-        public const string MES17401 = "未获取到条码信息，请确认下{SFC}是否存在系统中！"; 
+        public const string MES17401 = "未获取到条码信息，请确认下{SFC}是否存在系统中！";
+        public const string MES17402 = "绑定条码已存在绑定关系，请检查！";
 
         #endregion
 

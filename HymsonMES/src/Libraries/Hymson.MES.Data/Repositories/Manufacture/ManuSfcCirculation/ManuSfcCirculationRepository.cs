@@ -415,6 +415,12 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
         var totalCount = await totalCountTask;
         return new PagedInfo<ManuSfcCirculationEntity>(manuSfcCirculationEntities, queryParam.PageIndex, queryParam.PageSize, totalCount);
     }
+
+    public async Task<int> UpdateSfcAsync(ManuSfcCirculationBind bind)
+    {
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        return await conn.ExecuteAsync(UpdateSFCSql, bind);
+    }
 }
 
 /// <summary>
@@ -422,6 +428,8 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
 /// </summary>
 public partial class ManuSfcCirculationRepository
 {
+    const string UpdateSFCSql = "UPDATE manu_sfc_circulation SET SFC = @SFC WHERE Id = @Id";
+
     const string GetPageInfoSql = "SELECT /**select**/ FROM `manu_sfc_circulation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
 
     const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_circulation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";

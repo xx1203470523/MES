@@ -36,4 +36,11 @@ public interface IManuSfcCirculationService
     /// <returns></returns>
     Task CreateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto);
 
+    /// <summary>
+    /// 条码流转表替换条码
+    /// </summary>
+    /// <param name="bindDto"></param>
+    /// <returns></returns>
+    Task UpdateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto);
+
 }

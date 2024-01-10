@@ -73,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("IsMain=@IsMain");
             }
-            if (query.Ids.Length > 0)
+            if (query.Ids?.Any() == true)
             {
                 sqlBuilder.Where("EquipmentId in @Ids");
             }

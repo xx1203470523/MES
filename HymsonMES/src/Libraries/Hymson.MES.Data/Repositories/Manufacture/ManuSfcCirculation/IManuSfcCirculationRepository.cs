@@ -115,5 +115,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="queryParam"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcCirculationEntity>> GetProductTraceReportPagedInfoAsync(ProductTraceReportPagedQuery queryParam);
+
+        /// <summary>
+        /// 替换条码
+        /// </summary>
+        /// <param name="bind"></param>
+        /// <returns></returns>
+        Task<int> UpdateSfcAsync(ManuSfcCirculationBind bind);
     }
 }
