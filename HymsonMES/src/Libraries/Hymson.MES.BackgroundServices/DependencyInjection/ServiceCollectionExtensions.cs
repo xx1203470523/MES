@@ -1,11 +1,11 @@
 ﻿using Hymson.EventBus.Abstractions;
+using Hymson.Infrastructure;
 using Hymson.MES.BackgroundServices.EventHandling;
-using Hymson.MES.BackgroundServices.Manufacture;
-using Hymson.MES.BackgroundServices.Manufacture.Productionstatistic;
 using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Hymson.MES.CoreServices.DependencyInjection
 {
@@ -63,9 +63,12 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <param name="services"></param>
         static void AddServices(IServiceCollection services)
         {
-            services.AddSingleton<IProductionstatisticService, ProductionstatisticService>();
-            services.AddSingleton<ITracingSourceSFCService, TracingSourceSFCService>();
-            services.AddSingleton<IWorkOrderStatisticService, WorkOrderStatisticService>();
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                services.TryAddSingleton(keyValuePair.Value,keyValuePair.Key);
+            }
         }
 
     }

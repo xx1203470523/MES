@@ -42,12 +42,11 @@ namespace Hymson.MES.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-           // builder.Services.AddHostedService<WorkService>();
+            builder.Services.AddHostedService<WorkService>();
 
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
-            builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddAppService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddHttpClientService(builder.Configuration);
