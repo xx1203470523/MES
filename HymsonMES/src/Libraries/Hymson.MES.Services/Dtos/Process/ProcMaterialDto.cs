@@ -38,6 +38,11 @@ namespace Hymson.MES.Services.Dtos.Process
         public long GroupId { get; set; }
 
         /// <summary>
+        /// 物料组编码
+        /// </summary>
+        public string MaterialGroupCode { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }
