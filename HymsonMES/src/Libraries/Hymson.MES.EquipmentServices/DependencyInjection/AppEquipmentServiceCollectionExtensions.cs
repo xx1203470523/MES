@@ -1,12 +1,8 @@
 ﻿using FluentValidation;
-using Hymson.MES.EquipmentServices.Dtos;
-using Hymson.MES.EquipmentServices.Dtos.InBound;
-using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.MES.EquipmentServices.Services.Manufacture;
-using Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection;
-using Hymson.MES.EquipmentServices.Services.SfcBinding;
-using Hymson.MES.EquipmentServices.Validators.Manufacture;
+using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -24,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddEquipmentService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddWebFrameworkService(configuration);
-            services.AddData(configuration);
+            services.AddCoreService(configuration);
             AddConfig(services, configuration);
 
             AddServices(services);
@@ -42,10 +38,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddServices(this IServiceCollection services)
         {
-            services.AddSingleton<ICommonService, CommonService>();
-            services.AddSingleton<IManufactureService, ManufactureService>();
-            services.AddSingleton<IProcessCollectionService, ProcessCollectionService>();
-            services.AddSingleton<ISfcBindingService, SfcBindingService>();
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                services.TryAddSingleton(keyValuePair.Value, keyValuePair.Key);
+            }
         }
 
         /// <summary>
@@ -64,12 +62,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<InBoundDto>, InBoundValidator>();//进站
-            services.AddSingleton<AbstractValidator<InBoundMoreDto>, InBoundMoreValidator>();//进站（多个）
-            services.AddSingleton<AbstractValidator<OutBoundDto>, OutBoundValidator>();//出站
-            services.AddSingleton<AbstractValidator<OutBoundMoreDto>, OutBoundMoreValidator>();//出站（多个）
-
-            services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var abstractValidators = typeFinder.FindClassesOfType(typeof(IValidator<>)).ToList();
+            foreach (var abstractValidator in abstractValidators)
+            {
+                if (abstractValidator.BaseType != null)
+                {
+                    services.TryAddSingleton(abstractValidator.BaseType, abstractValidator);
+                }
+            }
         }
 
     }
