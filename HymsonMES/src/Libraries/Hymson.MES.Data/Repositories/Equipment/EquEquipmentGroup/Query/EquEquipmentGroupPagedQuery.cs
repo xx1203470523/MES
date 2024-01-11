@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query
 {

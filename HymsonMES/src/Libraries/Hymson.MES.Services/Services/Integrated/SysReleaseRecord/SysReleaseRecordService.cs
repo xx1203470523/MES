@@ -220,7 +220,7 @@ namespace Hymson.MES.Services.Services.Integrated
             //DTO转换实体
             var sysReleaseRecordEntity = sysReleaseRecordModifyDto.ToEntity<SysReleaseRecordEntity>();
             sysReleaseRecordEntity.Status = sysReleaseRecordModifyDto.Status ?? SysReleaseRecordStatusEnum.reserve;
-            sysReleaseRecordEntity.RealTime = HymsonClock.Now();
+            sysReleaseRecordEntity.RealTime = sysReleaseRecordModifyDto.Status == SysReleaseRecordStatusEnum.reserve ? null : HymsonClock.Now();
             sysReleaseRecordEntity.UpdatedBy = _currentUser.UserName;
             sysReleaseRecordEntity.UpdatedOn = HymsonClock.Now();
 

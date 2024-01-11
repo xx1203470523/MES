@@ -207,6 +207,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = item.SiteId,
+                        CirculationId = item.Id,
                         NodeId = afterNode.Id,
                         SourceId = beforeNode.Id,
                         CreatedBy = user,
@@ -218,6 +219,7 @@ namespace Hymson.MES.BackgroundServices.Manufacture
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = item.SiteId,
+                        CirculationId = item.Id,
                         NodeId = beforeNode.Id,
                         DestinationId = afterNode.Id,
                         CreatedBy = user,

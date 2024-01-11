@@ -863,6 +863,8 @@
         public const string MES15725 = "配方详细中选择的操作需要有物料组ID";
         public const string MES15726 = "配方详细中选择的操作需要有功能代码";
         public const string MES15727 = "配方详细中选择的操作需要有参数ID";
+
+        public const string MES15728 = "设置编码【{code}】在当前操作中不允许重复！";
         #endregion
 
         #region 工单 16000

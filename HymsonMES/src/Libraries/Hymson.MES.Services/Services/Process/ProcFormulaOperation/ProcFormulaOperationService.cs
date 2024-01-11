@@ -22,6 +22,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Text;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -155,6 +156,26 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
+            #region 验证设置编码是否重复
+
+            if (addDto.FormulaOperationSetDtos != null)
+            {
+                var duplicateCode = addDto.FormulaOperationSetDtos.GroupBy(m => m.Code).Where(m => m.Count() > 1);
+                if (duplicateCode.Any())
+                {
+                    var exCode = new StringBuilder();
+                    foreach (var group in duplicateCode)
+                    {
+                        exCode.Append(group.Key);
+                        exCode.Append(',');
+                    }
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15728)).WithData("code", exCode.ToString());
+                }
+            }
+
+            #endregion
+
             //入库
             using TransactionScope ts = TransactionHelper.GetTransactionScope();
             await _procFormulaOperationRepository.InsertAsync(operationEntity);
@@ -236,6 +257,26 @@ namespace Hymson.MES.Services.Services.Process
                     });
                 }
             }
+
+            #region 验证设置编码是否重复
+
+            if (addDto.FormulaOperationSetDtos != null)
+            {
+                var duplicateCode = addDto.FormulaOperationSetDtos.GroupBy(m => m.Code).Where(m => m.Count() > 1);
+                if (duplicateCode.Any())
+                {
+                    var exCode = new StringBuilder();
+                    foreach (var group in duplicateCode)
+                    {
+                        exCode.Append(group.Key);
+                        exCode.Append(',');
+                    }
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15728)).WithData("code", exCode.ToString());
+                }
+            }
+
+            #endregion
 
             //DTO转换实体
             var operationEntity = addDto.FormulaOperation.ToEntity<ProcFormulaOperationEntity>();

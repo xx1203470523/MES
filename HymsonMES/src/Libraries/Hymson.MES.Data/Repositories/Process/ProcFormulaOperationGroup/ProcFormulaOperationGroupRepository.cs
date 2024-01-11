@@ -196,6 +196,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByIdSql = @"SELECT * FROM `proc_formula_operation_group`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `proc_formula_operation_group`  WHERE Id IN @Ids ";
 
-        const string GetByCodeSql = @"SELECT * FROM `proc_formula_operation_group`  WHERE Code = @Code ";
+        const string GetByCodeSql = @"SELECT * FROM `proc_formula_operation_group`  WHERE Code = @Code AND IsDeleted=0 ";
     }
 }
