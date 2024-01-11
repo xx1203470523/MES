@@ -291,7 +291,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (pageQuery.CreatedOn != null && pageQuery.CreatedOn.Length >= 2)
             {
                 sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
-                sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart rbr.CreatedOn < @CreatedOnEnd ");
+                sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart AND rbr.CreatedOn < @CreatedOnEnd ");
             }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
