@@ -52,7 +52,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
             var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
             foreach (var keyValuePair in keyValuePairs)
             {
-                services.TryAddSingleton(keyValuePair.Value,keyValuePair.Key);
+                services.AddSingleton(keyValuePair.Value,keyValuePair.Key);
             }
             return services;
         }
