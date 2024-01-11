@@ -225,9 +225,18 @@ namespace Hymson.MES.Data.Repositories.Equipment
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Select("esp.Id,ESP.`Code`,ESP.`Name`,ESP.`Status`,esp.Remark,esp.CreatedBy,esp.CreatedOn,esp.UpdatedOn,esp.UpdatedBy,esp.IsDeleted");
+
             sqlBuilder.Where("esp.SiteId = @SiteId");
+
+            if (pagedQuery.Status.HasValue)
+            {
+                sqlBuilder.Where("esp.Status = @Status");
+            }
+
             sqlBuilder.Where("esp.IsDeleted = 0");
+
             sqlBuilder.Where("(esp.SparePartsGroupId is null Or esp.SparePartsGroupId=0 Or esp.SparePartsGroupId=@Id)");
+
             sqlBuilder.OrderBy("esp.UpdatedOn DESC");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
