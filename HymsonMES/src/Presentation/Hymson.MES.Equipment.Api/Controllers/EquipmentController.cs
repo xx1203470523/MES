@@ -707,6 +707,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             return await _equipmentService.GetEquipmentBootupRecipeSetAsync(dto);
         }
+
         /// <summary>
         /// 获取指定配方明细
         /// </summary>
@@ -719,6 +720,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             return await _equipmentService.GetEquipmentBootupRecipeDetailAsync(dto);
         }
+
         /// <summary>
         /// 开机参数采集
         /// </summary>

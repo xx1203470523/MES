@@ -205,7 +205,17 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //如果有不存在的SFC就提示
             var noIncludeSfcs = sfcs.Where(sfc => sfclist.Select(s => s.SFC).Contains(sfc) == false);
             if (noIncludeSfcs.Any() == true)
-                throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
+            {
+                //Pack绑定模组时增加BMU绑定逻辑,同时跳过该校验逻辑
+                if (sfcCirculationBindDto.SFC.Contains("ES") && noIncludeSfcs.Count() == 1)
+                {
+
+                }
+                else
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES19125)).WithData("SFCS", string.Join(',', noIncludeSfcs));
+                }
+            }
 
             //SFC有条码信息，但已经没有生产信息不允许出站
             var noProduceSfcs = sfclist.Where(w => sfcProduceList.Select(s => s.SFC).Contains(w.SFC) == false);
@@ -234,40 +244,81 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //条码流转信息
             List<ManuSfcCirculationEntity> manuSfcCirculationEntities = new List<ManuSfcCirculationEntity>();
             List<ManuSfcEntity> manuSfcEntities = new List<ManuSfcEntity>();
+            ManuSfcProduceEntity lastSfcProduceEntity = new();
             foreach (var circulationBindSFC in sfcCirculationBindDto.BindSFCs)
             {
-                var sfcEntity = sfclist.Where(c => c.SFC == circulationBindSFC.SFC).First();
-                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == circulationBindSFC.SFC).First();
-                //更新为使用
-                sfcEntity.IsUsed = YesOrNoEnum.Yes;
-                sfcEntity.UpdatedBy = _currentEquipment.Name;
-                sfcEntity.UpdatedOn = HymsonClock.Now();
-                manuSfcEntities.Add(sfcEntity);
-                //记录流转信息
-                manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                var sfcEntity = sfclist.Where(c => c.SFC == circulationBindSFC.SFC).FirstOrDefault();
+                var sfcProduceEntity = sfcProduceList.Where(c => c.SFC == circulationBindSFC.SFC).FirstOrDefault();
+
+                //记录最后一次绑定的条码在制信息，用于BMU新增绑定关系
+                if (sfcProduceEntity != null)
+                    lastSfcProduceEntity = sfcProduceEntity;
+
+                if (sfcEntity != null)
                 {
-                    Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentEquipment.SiteId,
-                    ProcedureId = sfcProduceEntity.ProcedureId,
-                    ResourceId = sfcProduceEntity.ResourceId,
-                    SFC = circulationBindSFC.SFC,
-                    Name = circulationBindSFC.Name ?? string.Empty,
-                    WorkOrderId = sfcProduceEntity.WorkOrderId,
-                    ProductId = sfcProduceEntity.ProductId,
-                    EquipmentId = _currentEquipment.Id,
-                    CirculationBarCode = sfcCirculationBindDto.SFC,
-                    CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
-                    CirculationMainProductId = sfcProduceEntity.ProductId,
-                    Location = circulationBindSFC.Location.ToString(),
-                    CirculationQty = 1,
-                    ModelCode = sfcCirculationBindDto.ModelCode ?? string.Empty,
-                    //使用虚拟码记录为转换
-                    CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
-                    CreatedBy = _currentEquipment.Name,
-                    CreatedOn = HymsonClock.Now(),
-                    UpdatedBy = _currentEquipment.Name,
-                    UpdatedOn = HymsonClock.Now()
-                });
+                    //更新为使用
+                    sfcEntity.IsUsed = YesOrNoEnum.Yes;
+                    sfcEntity.UpdatedBy = _currentEquipment.Name;
+                    sfcEntity.UpdatedOn = HymsonClock.Now();
+                    manuSfcEntities.Add(sfcEntity);
+                    //记录流转信息
+                    manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                    {
+                        Id = IdGenProvider.Instance.CreateId(),
+                        SiteId = _currentEquipment.SiteId,
+                        ProcedureId = sfcProduceEntity.ProcedureId,
+                        ResourceId = sfcProduceEntity.ResourceId,
+                        SFC = circulationBindSFC.SFC,
+                        Name = circulationBindSFC.Name ?? string.Empty,
+                        WorkOrderId = sfcProduceEntity.WorkOrderId,
+                        ProductId = sfcProduceEntity.ProductId,
+                        EquipmentId = _currentEquipment.Id,
+                        CirculationBarCode = sfcCirculationBindDto.SFC,
+                        CirculationProductId = sfcProduceEntity.ProductId,//暂时使用原有产品ID
+                        CirculationMainProductId = sfcProduceEntity.ProductId,
+                        Location = circulationBindSFC.Location.ToString(),
+                        CirculationQty = 1,
+                        ModelCode = sfcCirculationBindDto.ModelCode ?? string.Empty,
+                        //使用虚拟码记录为转换
+                        CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
+                        CreatedBy = _currentEquipment.Name,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedBy = _currentEquipment.Name,
+                        UpdatedOn = HymsonClock.Now()
+                    });
+
+                }
+                else
+                {
+                    //如果没有条码信息，则判断是BMU码，只填写必要信息方便追溯
+                    if (lastSfcProduceEntity != null)
+                    {
+                        manuSfcCirculationEntities.Add(new ManuSfcCirculationEntity
+                        {
+                            Id = IdGenProvider.Instance.CreateId(),
+                            SiteId = _currentEquipment.SiteId,
+                            ProcedureId = lastSfcProduceEntity.ProcedureId,
+                            ResourceId = lastSfcProduceEntity?.ResourceId,
+                            SFC = circulationBindSFC.SFC,
+                            Name = circulationBindSFC.Name ?? string.Empty,
+                            WorkOrderId = lastSfcProduceEntity.WorkOrderId,
+                            ProductId = lastSfcProduceEntity.ProductId,
+                            EquipmentId = _currentEquipment.Id,
+                            CirculationBarCode = sfcCirculationBindDto.SFC,
+                            CirculationProductId = lastSfcProduceEntity.ProductId,//暂时使用原有产品ID
+                            CirculationMainProductId = lastSfcProduceEntity.ProductId,
+                            Location = circulationBindSFC.Location.ToString(),
+                            CirculationQty = 1,
+                            ModelCode = sfcCirculationBindDto.ModelCode ?? string.Empty,
+                            //使用虚拟码记录为转换
+                            CirculationType = sfcCirculationBindDto.IsVirtualSFC == true ? SfcCirculationTypeEnum.Change : SfcCirculationTypeEnum.Merge,
+                            CreatedBy = _currentEquipment.Name,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedBy = _currentEquipment.Name,
+                            UpdatedOn = HymsonClock.Now()
+                        });
+                    }
+                }
             }
             //绑定条码信息
             if (mpManuSfc == null && sfcCirculationBindDto.IsVirtualSFC != true)
