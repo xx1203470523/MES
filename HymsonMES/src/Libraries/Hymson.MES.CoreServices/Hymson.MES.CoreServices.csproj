@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hymson.Localization" Version="2.1.92" />
-    <PackageReference Include="Hymson.Sequences" Version="2.1.92" />
-    <PackageReference Include="Hymson.Snowflake" Version="2.1.92" />
+    <PackageReference Include="Hymson.Localization" Version="2.1.128" />
+    <PackageReference Include="Hymson.Sequences" Version="2.1.128" />
+    <PackageReference Include="Hymson.Snowflake" Version="2.1.128" />
   </ItemGroup>
 
   <ItemGroup>
