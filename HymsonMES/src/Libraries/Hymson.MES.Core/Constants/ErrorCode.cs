@@ -1007,7 +1007,7 @@
         public const string MES19134 = "条码：{SFCS}没找到关联虚拟码绑定关系";
         public const string MES19135 = "IsBindVirtualSFC为True时不能传递多个条码";
         public const string MES19136 = "条码：{SFCS}出站存在NG信息，Passed字段应传0";
-        public const string MES19137 = "条码：{SFCS}状态为不合格，不允许进站";
+        public const string MES19137 = "条码：{SFCS}状态为不合格，不允许进站，请先通过不良复判功能确认不合格状态!";
         public const string MES19138 = "条码：{SFCS}已经存在绑定记录";
         public const string MES19139 = "位置：{Location}已经存在条码：{SFCS}绑定记录";
         public const string MES19140 = "错误的Location {SFCLocation}，只能为：{Location}";

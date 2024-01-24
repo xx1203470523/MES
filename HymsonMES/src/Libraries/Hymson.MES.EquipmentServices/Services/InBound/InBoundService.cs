@@ -165,7 +165,6 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 ResourceId = procResource.Id,
             };
             //TODO 需要添加资源对应工序和条码对应进站工序检查
-            //TODO 需要添加拦截NG条码进站检查
 
             var resEquipentBind = await _procResourceEquipmentBindRepository.GetByResourceIdAsync(resourceEquipmentBindQuery);
             if (resEquipentBind.Any() == false)
@@ -238,13 +237,14 @@ namespace Hymson.MES.EquipmentServices.Services.InBound
                 SFCS = inBoundMoreDto.SFCs
             };
             var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
             //进站不允许不合格产品
-            //var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
-            //if (includeNoQuality.Any())
-            //{
-            //    //允许进站不合格产品
-            //    //throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
-            //}
+            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+            if (includeNoQuality.Any())
+            {
+                //允许进站不合格产品
+                throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+            }
 
             var resourceIds = sfcProduceList.Select(a => a.ResourceId.GetValueOrDefault());
             var resourceEntities = await _procResourceRepository.GetListByIdsAsync(resourceIds.ToArray());

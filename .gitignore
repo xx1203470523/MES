@@ -406,3 +406,4 @@ dist-ssr
 *-lock.*
 pnpm-debug
 /HymsonMES/src/Libraries/Hymson.MES.ServicesTests/Hymson.MES.ServicesTests.csproj
+Resources/.back_MES/

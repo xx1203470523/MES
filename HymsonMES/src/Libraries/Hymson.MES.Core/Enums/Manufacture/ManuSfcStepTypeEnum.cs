@@ -40,7 +40,7 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// <summary>
         /// 取消锁
         /// </summary>
-        [Description("取消锁")]
+        [Description("取消锁定")]
         Unlock = 7,
         /// <summary>
         /// 不良录入

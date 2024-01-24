@@ -259,7 +259,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                 //ProcedureIds = new long[] { currentProcedureId },
                 SFCS = sfclist.Select(c => c.SFC).ToArray()
             };
-            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(manuSfcSummaryQuery);
 
             //根据设备资源获取工序
             //根据资源获取工序
@@ -320,6 +320,14 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound
                     {
                         var msgSfc = outBoundMoreDto.SFCs.Select(a => a.SFC);
                         throw new CustomerValidationException(nameof(ErrorCode.MES16353)).WithData("SFC", string.Join(",", msgSfc));
+                    }
+
+                    //判断前段是否存在NG，如果存在则卡站
+                    var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+                    if (includeNoQuality.Any())
+                    {
+                        //允许进站不合格产品
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19137)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
                     }
 
                     #endregion
