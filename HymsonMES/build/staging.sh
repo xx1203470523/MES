@@ -2,7 +2,7 @@
 PublishEnvironment=Release
 timestamp=$(date +%Y%m%d%H%M%S)
 serviceName=hymson-mes-battery-api-test
-registryUrl=10.10.79.13:8081/test
+registryUrl=192.168.0.14:8081/test
 imageName=hymson.mes.api
 docker build  --build-arg PublishEnvironment=$PublishEnvironment  -t $imageName:$timestamp -f ./HymsonMES/src/Presentation/Hymson.MES.Api/Dockerfile .
 docker tag $imageName:$timestamp  $registryUrl/$imageName:$timestamp
