@@ -198,7 +198,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
 
             //校验工序对应的生产记录是否存在
-            if (manuSfcSummaryEntities.Count() != sfcs.Length)
+            if (manuSfcSummaryEntities.Count() != sfcs.Distinct().Count())
                 throw new CustomerValidationException(nameof(ErrorCode.MES15430))
                     .WithData("SFC", string.Join(",", sfcs.Where(a => !manuSfcSummaryEntities.Any(b => b.SFC == a)).ToArray()))
                     .WithData("ProcedureName", proceProcedureEntity.Name);
