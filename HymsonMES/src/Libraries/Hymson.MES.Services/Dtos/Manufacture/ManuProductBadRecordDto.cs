@@ -234,7 +234,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 不合格记录开关;1、开启  2、关闭
         /// </summary>
-        public ProductBadRecordStatusEnum? Status { get; set; }
+        public ProductBadRecordStatusEnum? Status { get; set; } = ProductBadRecordStatusEnum.Open;
 
         /// <summary>
         /// 产品条码

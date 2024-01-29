@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.WMS.Data.Repositories.ManuManufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -41,6 +42,23 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         #endregion
 
+        #region 更新
+
+        /// <summary>
+        /// 批量更新生产汇总合格状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQuanlityStatusAsync(ManuSfcSummaryUpdateCommand command);
+
+        /// <summary>
+        /// 批量更新生产汇总合格状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> UpdateQuanlityStatusAsync(List<ManuSfcSummaryUpdateCommand> command);
+
+        #endregion
 
         #region 
         /// <summary>

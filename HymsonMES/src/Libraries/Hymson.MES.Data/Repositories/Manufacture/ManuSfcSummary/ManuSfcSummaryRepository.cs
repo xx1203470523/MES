@@ -11,6 +11,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.WMS.Data.Repositories.ManuManufacture;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -67,7 +68,7 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
         WhereFill(sqlBuilder, query);
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryAsync<ManuSfcSummaryEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -102,6 +103,48 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
         return new PagedInfo<ManuSfcSummaryEntity>(manuSfcSummaryEntities, query.PageIndex, query.PageSize, totalCount);
+    }
+
+    #endregion
+
+    #region 更新
+
+    /// <summary>
+    /// 更新生产合格状态
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateQuanlityStatusAsync(ManuSfcSummaryUpdateCommand command)
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+        var sqlTemplete = sqlBuilder.AddTemplate(UpdateQuanlityStatusSql);
+
+        sqlBuilder.Where(" SFC = @SFC ");
+        if (command.ProcedureId != null) sqlBuilder.Where(" ProcedureId = @ProcedureId");
+
+        sqlBuilder.AddParameters(command);
+
+        using var conn = GetMESDbConnection();
+        return await conn.ExecuteAsync(sqlTemplete.RawSql, sqlTemplete.Parameters);
+    }
+
+    /// <summary>
+    /// 批量更新生产合格状态
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public async Task<int> UpdateQuanlityStatusAsync(List<ManuSfcSummaryUpdateCommand> command)
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+        var sqlTemplete = sqlBuilder.AddTemplate(UpdateQuanlityStatusSql);
+
+        sqlBuilder.Where("SFC = @SFC");
+        if (command.Any(a => a.ProcedureId != null)) sqlBuilder.Where("ProcedureId = @ProcedureId");
+
+        sqlBuilder.AddParameters(command);
+
+        using var conn = GetMESDbConnection();
+        return await conn.ExecuteAsync(sqlTemplete.RawSql, command);
     }
 
     #endregion
@@ -288,6 +331,12 @@ public partial class ManuSfcSummaryRepository
 
     #endregion
 
+    #region 更新
+
+    const string UpdateQuanlityStatusSql = "UPDATE manu_sfc_summary SET QualityStatus = @QualityStatus, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn /**where**/";
+
+    #endregion
+
     #region 
     const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_summary` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
     const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_summary` /**where**/ ";
@@ -436,6 +485,8 @@ public partial class ManuSfcSummaryRepository
             sqlBuilder.Where("Id IN @Ids");
         }
 
+        if (query.SFCS?.Any() == true)
+            sqlBuilder.Where(" SFC IN @SFCS ");
 
         if (query.SiteId.HasValue)
         {
