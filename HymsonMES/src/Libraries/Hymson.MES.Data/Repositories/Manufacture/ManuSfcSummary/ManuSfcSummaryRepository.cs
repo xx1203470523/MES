@@ -30,6 +30,7 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
 
     public ManuSfcSummaryRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
     {
+        _connectionOptions = connectionOptions.Value;
     }
 
 
@@ -49,7 +50,7 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
         WhereFill(sqlBuilder, query);
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryFirstOrDefaultAsync<ManuSfcSummaryEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -97,7 +98,7 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
         sqlBuilder.AddParameters(new { Rows = query.PageSize });
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         var manuSfcSummaryEntities = await conn.QueryAsync<ManuSfcSummaryEntity>(templateData.RawSql, templateData.Parameters);
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
