@@ -46,6 +46,7 @@ using Hymson.MES.Services.Services.Report;
 using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.MES.Services.Services.Report.EquHeartbeatReport;
 using Hymson.MES.Services.Services.Report.ManuProductParameterReport;
+using Hymson.MES.Services.Services.Report.PackBindOtherReport;
 using Hymson.MES.Services.Services.Report.ProductionManagePanel;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
@@ -298,6 +299,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<INgRecordService, NgRecordService>();
 
+            #endregion
+
+            #region MyRegion
+
+            services.AddSingleton<IPackBindOtherReportService, PackBindOtherReportService>();
+            
             #endregion
 
             #endregion

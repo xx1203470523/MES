@@ -11,6 +11,31 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public interface IManuSfcCirculationRepository
     {
+        #region 查询
+
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcCirculationEntity> GetOneAsync(ManuSfcCirculationQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetListAsync(ManuSfcCirculationQuery query);
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery query);
+
+        #endregion
+
         /// <summary>
         /// 根据ID获取数据
         /// </summary>
@@ -45,13 +70,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcCirculationQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcCirculationEntity>> GetManuSfcCirculationEntitiesAsync(ManuSfcCirculationQuery manuSfcCirculationQuery);
-
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="manuSfcCirculationPagedQuery"></param>
-        /// <returns></returns>
-        Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery manuSfcCirculationPagedQuery);
 
         /// <summary>
         /// 根据流转前和流转后条码获取绑定记录

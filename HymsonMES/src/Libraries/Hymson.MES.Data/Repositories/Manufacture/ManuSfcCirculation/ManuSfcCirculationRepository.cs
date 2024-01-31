@@ -31,6 +31,78 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
         _connectionOptions = connectionOptions.Value;
     }
 
+    #region 查询
+
+    /// <summary>
+    /// 单条数据查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<ManuSfcCirculationEntity> GetOneAsync(ManuSfcCirculationQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+
+        var templateData = sqlBuilder.AddTemplate(GetOneSqlTemplate);
+
+        WhereFill(sqlBuilder, query);
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+
+        return await conn.QueryFirstOrDefaultAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
+    }
+
+    /// <summary>
+    /// 数据集查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<ManuSfcCirculationEntity>> GetListAsync(ManuSfcCirculationQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+
+        var templateData = sqlBuilder.AddTemplate(GetListSqlTemplate);
+
+        WhereFill(sqlBuilder, query);
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+
+        return await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
+    }
+
+    /// <summary>
+    /// 分页查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+
+        var templateData = sqlBuilder.AddTemplate(GetPagedSqlTemplate);
+        var templateCount = sqlBuilder.AddTemplate(GetCountSqlTemplate);
+
+        WhereFill(sqlBuilder, query);
+
+        sqlBuilder.OrderBy("CreatedOn");
+
+        var offSet = (query.PageIndex - 1) * query.PageSize;
+        sqlBuilder.AddParameters(new { OffSet = offSet });
+        sqlBuilder.AddParameters(new { Rows = query.PageSize });
+        sqlBuilder.AddParameters(query);
+
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+
+        var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
+        var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+
+        return new PagedInfo<ManuSfcCirculationEntity>(manuSfcCirculationEntities, query.PageIndex, query.PageSize, totalCount);
+    }
+
+    #endregion
 
     /// <summary>
     /// 根据ID获取数据
@@ -62,7 +134,7 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
             sqlBuilder.Where("SFC = @Sfc");
         }
 
-        if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
+        if (query.CirculationTypes?.Any() == true)
         {
             sqlBuilder.Where("CirculationType IN @CirculationTypes");
         }
@@ -111,7 +183,7 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
             sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
         }
 
-        if (query.CirculationTypes != null && query.CirculationTypes.Length > 0)
+        if (query.CirculationTypes?.Any() == true)
         {
             sqlBuilder.Where("CirculationType IN @CirculationTypes");
         }
@@ -145,47 +217,6 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
     {
         using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
         return await conn.QueryAsync<ManuSfcCirculationEntity>(GetByIdsSql, new { ids = ids });
-    }
-
-    /// <summary>
-    /// 分页查询
-    /// </summary>
-    /// <param name="pageQuery"></param>
-    /// <returns></returns>
-    public async Task<PagedInfo<ManuSfcCirculationEntity>> GetPagedInfoAsync(ManuSfcCirculationPagedQuery pageQuery)
-    {
-        var sqlBuilder = new SqlBuilder();
-        var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-        var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-        sqlBuilder.Where("IsDeleted=0");
-        sqlBuilder.Select("*");
-
-        if (pageQuery.SFC != null)
-        {
-            sqlBuilder.Where("SFC=@SFC");
-        }
-        if (pageQuery.SFCs?.Any() == true)
-        {
-            sqlBuilder.Where("SFC=@SFC");
-        }
-        if (pageQuery.CirculationBarCode != null)
-        {
-            sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
-        }
-        if (pageQuery.CirculationBarCodes?.Any() == true)
-        {
-            sqlBuilder.Where("CirculationBarCode IN @CirculationBarCodes");
-        }
-
-        var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
-        sqlBuilder.AddParameters(new { OffSet = offSet });
-        sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
-        sqlBuilder.AddParameters(pageQuery);
-
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-        var manuSfcCirculationEntities = await conn.QueryAsync<ManuSfcCirculationEntity>(templateData.RawSql, templateData.Parameters);
-        var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-        return new PagedInfo<ManuSfcCirculationEntity>(manuSfcCirculationEntities, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
     }
 
     /// <summary>
@@ -309,7 +340,6 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
         return await conn.ExecuteAsync(DisassemblyUpdateSql, command);
     }
 
-
     /// <summary>
     /// 组件使用报告 分页查询
     /// </summary>
@@ -428,6 +458,18 @@ public partial class ManuSfcCirculationRepository : BaseRepository, IManuSfcCirc
 /// </summary>
 public partial class ManuSfcCirculationRepository
 {
+    #region 查询
+
+    const string GetOneSqlTemplate = "SELECT * FROM `manu_sfc_circulation` /**where**/ LIMIT 1;";
+
+    const string GetListSqlTemplate = "SELECT * FROM `manu_sfc_circulation` /**where**/;";
+
+    const string GetPagedSqlTemplate = "SELECT * FROM `manu_sfc_circulation` /**where**/ /**orderby**/ LIMIT @Offset,@Rows;";
+
+    const string GetCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_circulation` /**where**/;";
+
+    #endregion
+
     const string UpdateSFCSql = "UPDATE manu_sfc_circulation SET SFC = @SFC WHERE Id = @Id";
 
     const string GetPageInfoSql = "SELECT /**select**/ FROM `manu_sfc_circulation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows";
@@ -492,5 +534,607 @@ public partial class ManuSfcCirculationRepository
             )
             /*主查询*/
             SELECT count(1) FROM recursion T";
+
+}
+
+/// <summary>
+/// <para>@层级：仓储层</para>
+/// <para>@作用：通用操作</para>
+/// <para>@描述：条码流转表;</para>
+/// <para>@作者：Jim</para>
+/// <para>@创建时间：2024-1-31</para>
+/// </summary>
+public partial class ManuSfcCirculationRepository
+{
+
+    /// <summary>
+    /// 根据查询对象填充Where条件
+    /// </summary>
+    /// <param name="query">查询对象</param>
+    /// <returns></returns>
+    private static SqlBuilder WhereFill(SqlBuilder sqlBuilder, ManuSfcCirculationPagedQuery query)
+    {
+        sqlBuilder.Where("IsDeleted = 0");
+
+        if (query.Id.HasValue)
+        {
+            sqlBuilder.Where("Id = @Id");
+        }
+
+        if (query.Ids != null && query.Ids.Any())
+        {
+            sqlBuilder.Where("Id IN @Ids");
+        }
+
+        if (query.SiteId.HasValue)
+        {
+            sqlBuilder.Where("SiteId = @SiteId");
+        }
+
+        if (query.SiteIds != null && query.SiteIds.Any())
+        {
+            sqlBuilder.Where("SiteId IN @SiteIds");
+        }
+
+        if (query.ProcedureId.HasValue)
+        {
+            sqlBuilder.Where("ProcedureId = @ProcedureId");
+        }
+
+        if (query.ProcedureIds != null && query.ProcedureIds.Any())
+        {
+            sqlBuilder.Where("ProcedureId IN @ProcedureIds");
+        }
+
+        if (query.ResourceId.HasValue)
+        {
+            sqlBuilder.Where("ResourceId = @ResourceId");
+        }
+
+        if (query.ResourceIds != null && query.ResourceIds.Any())
+        {
+            sqlBuilder.Where("ResourceId IN @ResourceIds");
+        }
+
+        if (query.EquipmentId.HasValue)
+        {
+            sqlBuilder.Where("EquipmentId = @EquipmentId");
+        }
+
+        if (query.EquipmentIds != null && query.EquipmentIds.Any())
+        {
+            sqlBuilder.Where("EquipmentId IN @EquipmentIds");
+        }
+
+        if (query.FeedingPointId.HasValue)
+        {
+            sqlBuilder.Where("FeedingPointId = @FeedingPointId");
+        }
+
+        if (query.FeedingPointIds != null && query.FeedingPointIds.Any())
+        {
+            sqlBuilder.Where("FeedingPointId IN @FeedingPointIds");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.SFC))
+        {
+            sqlBuilder.Where("SFC = @SFC");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.SFCLike))
+        {
+            query.SFCLike = $"{query.SFCLike}%";
+            sqlBuilder.Where("SFC Like @SFCLike");
+        }
+
+        if (query.WorkOrderId.HasValue)
+        {
+            sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+        }
+
+        if (query.WorkOrderIds != null && query.WorkOrderIds.Any())
+        {
+            sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
+        }
+
+        if (query.ProductId.HasValue)
+        {
+            sqlBuilder.Where("ProductId = @ProductId");
+        }
+
+        if (query.ProductIds != null && query.ProductIds.Any())
+        {
+            sqlBuilder.Where("ProductId IN @ProductIds");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Location))
+        {
+            sqlBuilder.Where("Location = @Location");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.LocationLike))
+        {
+            query.LocationLike = $"{query.LocationLike}%";
+            sqlBuilder.Where("Location Like @LocationLike");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CirculationBarCode))
+        {
+            sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CirculationBarCodeLike))
+        {
+            query.CirculationBarCodeLike = $"{query.CirculationBarCodeLike}%";
+            sqlBuilder.Where("CirculationBarCode Like @CirculationBarCodeLike");
+        }
+
+        if (query.CirculationWorkOrderId.HasValue)
+        {
+            sqlBuilder.Where("CirculationWorkOrderId = @CirculationWorkOrderId");
+        }
+
+        if (query.CirculationWorkOrderIds != null && query.CirculationWorkOrderIds.Any())
+        {
+            sqlBuilder.Where("CirculationWorkOrderId IN @CirculationWorkOrderIds");
+        }
+
+        if (query.CirculationProductId.HasValue)
+        {
+            sqlBuilder.Where("CirculationProductId = @CirculationProductId");
+        }
+
+        if (query.CirculationProductIds != null && query.CirculationProductIds.Any())
+        {
+            sqlBuilder.Where("CirculationProductId IN @CirculationProductIds");
+        }
+
+        if (query.CirculationMainProductId.HasValue)
+        {
+            sqlBuilder.Where("CirculationMainProductId = @CirculationMainProductId");
+        }
+
+        if (query.CirculationMainProductIds != null && query.CirculationMainProductIds.Any())
+        {
+            sqlBuilder.Where("CirculationMainProductId IN @CirculationMainProductIds");
+        }
+
+        if (query.CirculationMainSupplierId.HasValue)
+        {
+            sqlBuilder.Where("CirculationMainSupplierId = @CirculationMainSupplierId");
+        }
+
+        if (query.CirculationMainSupplierIds != null && query.CirculationMainSupplierIds.Any())
+        {
+            sqlBuilder.Where("CirculationMainSupplierId IN @CirculationMainSupplierIds");
+        }
+
+        if (query.CirculationQtyMin.HasValue)
+        {
+            sqlBuilder.Where("CirculationQty >= @CirculationQtyMin");
+        }
+
+        if (query.CirculationQtyMax.HasValue)
+        {
+            sqlBuilder.Where("CirculationQty <= @CirculationQtyMax");
+        }
+
+        if (query.CirculationType.HasValue)
+        {
+            sqlBuilder.Where("CirculationType = @CirculationType");
+        }
+
+        if (query.CirculationTypes?.Any() == true)
+        {
+            sqlBuilder.Where("CirculationType IN @CirculationTypes");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CirculationTypeLike))
+        {
+            query.CirculationTypeLike = $"{query.CirculationTypeLike}%";
+            sqlBuilder.Where("CirculationType Like @CirculationTypeLike");
+        }
+
+        if (query.IsDisassemble.HasValue)
+        {
+            sqlBuilder.Where("IsDisassemble = @IsDisassemble");
+        }
+
+        if (query.IsDisassembles != null && query.IsDisassembles.Any())
+        {
+            sqlBuilder.Where("IsDisassemble IN @IsDisassembles");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.DisassembledBy))
+        {
+            sqlBuilder.Where("DisassembledBy = @DisassembledBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.DisassembledByLike))
+        {
+            query.DisassembledByLike = $"{query.DisassembledByLike}%";
+            sqlBuilder.Where("DisassembledBy Like @DisassembledByLike");
+        }
+
+        if (query.DisassembledOnStart.HasValue)
+        {
+            sqlBuilder.Where("DisassembledOn >= @DisassembledOnStart");
+        }
+
+        if (query.DisassembledOnEnd.HasValue)
+        {
+            sqlBuilder.Where("DisassembledOn <= @DisassembledOnEnd");
+        }
+
+        if (query.SubstituteId.HasValue)
+        {
+            sqlBuilder.Where("SubstituteId = @SubstituteId");
+        }
+
+        if (query.SubstituteIds != null && query.SubstituteIds.Any())
+        {
+            sqlBuilder.Where("SubstituteId IN @SubstituteIds");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedBy))
+        {
+            sqlBuilder.Where("CreatedBy = @CreatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedByLike))
+        {
+            query.CreatedByLike = $"{query.CreatedByLike}%";
+            sqlBuilder.Where("CreatedBy Like @CreatedByLike");
+        }
+
+        if (query.CreatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn >= @CreatedOnStart");
+        }
+
+        if (query.CreatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn <= @CreatedOnEnd");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedBy))
+        {
+            sqlBuilder.Where("UpdatedBy = @UpdatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedByLike))
+        {
+            query.UpdatedByLike = $"{query.UpdatedByLike}%";
+            sqlBuilder.Where("UpdatedBy Like @UpdatedByLike");
+        }
+
+        if (query.UpdatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn >= @UpdatedOnStart");
+        }
+
+        if (query.UpdatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn <= @UpdatedOnEnd");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Name))
+        {
+            sqlBuilder.Where("Name = @Name");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.NameLike))
+        {
+            query.NameLike = $"{query.NameLike}%";
+            sqlBuilder.Where("Name Like @NameLike");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.ModelCode))
+        {
+            sqlBuilder.Where("ModelCode = @ModelCode");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.ModelCodeLike))
+        {
+            query.ModelCodeLike = $"{query.ModelCodeLike}%";
+            sqlBuilder.Where("ModelCode Like @ModelCodeLike");
+        }
+
+        sqlBuilder.Where("IsDeleted = 0");
+
+        return sqlBuilder;
+    }
+
+    /// <summary>
+    /// 根据查询对象填充Where条件
+    /// </summary>
+    /// <param name="query">查询对象</param>
+    /// <returns></returns>
+    private static SqlBuilder WhereFill(SqlBuilder sqlBuilder, ManuSfcCirculationQuery query)
+    {
+        sqlBuilder.Where("IsDeleted = 0");
+
+        if (query.Id.HasValue)
+        {
+            sqlBuilder.Where("Id = @Id");
+        }
+
+        if (query.Ids?.Any() == true)
+        {
+            sqlBuilder.Where("Id IN @Ids");
+        }
+
+        if (query.SiteId.HasValue)
+        {
+            sqlBuilder.Where("SiteId = @SiteId");
+        }
+
+        if (query.SiteIds?.Any() == true)
+        {
+            sqlBuilder.Where("SiteId IN @SiteIds");
+        }
+
+        if (query.ProcedureId.HasValue)
+        {
+            sqlBuilder.Where("ProcedureId = @ProcedureId");
+        }
+
+        if (query.ProcedureIds != null && query.ProcedureIds.Any())
+        {
+            sqlBuilder.Where("ProcedureId IN @ProcedureIds");
+        }
+
+        if (query.ResourceId.HasValue)
+        {
+            sqlBuilder.Where("ResourceId = @ResourceId");
+        }
+
+        if (query.ResourceIds != null && query.ResourceIds.Any())
+        {
+            sqlBuilder.Where("ResourceId IN @ResourceIds");
+        }
+
+        if (query.EquipmentId.HasValue)
+        {
+            sqlBuilder.Where("EquipmentId = @EquipmentId");
+        }
+
+        if (query.EquipmentIds != null && query.EquipmentIds.Any())
+        {
+            sqlBuilder.Where("EquipmentId IN @EquipmentIds");
+        }
+
+        if (query.FeedingPointId.HasValue)
+        {
+            sqlBuilder.Where("FeedingPointId = @FeedingPointId");
+        }
+
+        if (query.FeedingPointIds != null && query.FeedingPointIds.Any())
+        {
+            sqlBuilder.Where("FeedingPointId IN @FeedingPointIds");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.SFC))
+        {
+            sqlBuilder.Where("SFC = @SFC");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.SFCLike))
+        {
+            query.SFCLike = $"{query.SFCLike}%";
+            sqlBuilder.Where("SFC Like @SFCLike");
+        }
+
+        if (query.WorkOrderId.HasValue)
+        {
+            sqlBuilder.Where("WorkOrderId = @WorkOrderId");
+        }
+
+        if (query.WorkOrderIds != null && query.WorkOrderIds.Any())
+        {
+            sqlBuilder.Where("WorkOrderId IN @WorkOrderIds");
+        }
+
+        if (query.ProductId.HasValue)
+        {
+            sqlBuilder.Where("ProductId = @ProductId");
+        }
+
+        if (query.ProductIds != null && query.ProductIds.Any())
+        {
+            sqlBuilder.Where("ProductId IN @ProductIds");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Location))
+        {
+            sqlBuilder.Where("Location = @Location");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.LocationLike))
+        {
+            query.LocationLike = $"{query.LocationLike}%";
+            sqlBuilder.Where("Location Like @LocationLike");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CirculationBarCode))
+        {
+            sqlBuilder.Where("CirculationBarCode = @CirculationBarCode");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CirculationBarCodeLike))
+        {
+            query.CirculationBarCodeLike = $"{query.CirculationBarCodeLike}%";
+            sqlBuilder.Where("CirculationBarCode Like @CirculationBarCodeLike");
+        }
+
+        if (query.CirculationWorkOrderId.HasValue)
+        {
+            sqlBuilder.Where("CirculationWorkOrderId = @CirculationWorkOrderId");
+        }
+
+        if (query.CirculationWorkOrderIds != null && query.CirculationWorkOrderIds.Any())
+        {
+            sqlBuilder.Where("CirculationWorkOrderId IN @CirculationWorkOrderIds");
+        }
+
+        if (query.CirculationProductId.HasValue)
+        {
+            sqlBuilder.Where("CirculationProductId = @CirculationProductId");
+        }
+
+        if (query.CirculationProductIds != null && query.CirculationProductIds.Any())
+        {
+            sqlBuilder.Where("CirculationProductId IN @CirculationProductIds");
+        }
+
+        if (query.CirculationMainProductId.HasValue)
+        {
+            sqlBuilder.Where("CirculationMainProductId = @CirculationMainProductId");
+        }
+
+        if (query.CirculationMainProductIds != null && query.CirculationMainProductIds.Any())
+        {
+            sqlBuilder.Where("CirculationMainProductId IN @CirculationMainProductIds");
+        }
+
+        if (query.CirculationMainSupplierId.HasValue)
+        {
+            sqlBuilder.Where("CirculationMainSupplierId = @CirculationMainSupplierId");
+        }
+
+        if (query.CirculationMainSupplierIds != null && query.CirculationMainSupplierIds.Any())
+        {
+            sqlBuilder.Where("CirculationMainSupplierId IN @CirculationMainSupplierIds");
+        }
+
+        if (query.CirculationQtyMin.HasValue)
+        {
+            sqlBuilder.Where("CirculationQty >= @CirculationQtyMin");
+        }
+
+        if (query.CirculationQtyMax.HasValue)
+        {
+            sqlBuilder.Where("CirculationQty <= @CirculationQtyMax");
+        }
+
+        if (query.CirculationType.HasValue)
+        {
+            sqlBuilder.Where("CirculationType = @CirculationType");
+        }
+
+        if (query.CirculationTypes?.Any() == true)
+        {
+            sqlBuilder.Where("CirculationType IN @CirculationTypes");
+        }
+
+        if (query.IsDisassemble.HasValue)
+        {
+            sqlBuilder.Where("IsDisassemble = @IsDisassemble");
+        }
+
+        if (query.IsDisassembles != null && query.IsDisassembles.Any())
+        {
+            sqlBuilder.Where("IsDisassemble IN @IsDisassembles");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.DisassembledBy))
+        {
+            sqlBuilder.Where("DisassembledBy = @DisassembledBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.DisassembledByLike))
+        {
+            query.DisassembledByLike = $"{query.DisassembledByLike}%";
+            sqlBuilder.Where("DisassembledBy Like @DisassembledByLike");
+        }
+
+        if (query.DisassembledOnStart.HasValue)
+        {
+            sqlBuilder.Where("DisassembledOn >= @DisassembledOnStart");
+        }
+
+        if (query.DisassembledOnEnd.HasValue)
+        {
+            sqlBuilder.Where("DisassembledOn <= @DisassembledOnEnd");
+        }
+
+        if (query.SubstituteId.HasValue)
+        {
+            sqlBuilder.Where("SubstituteId = @SubstituteId");
+        }
+
+        if (query.SubstituteIds != null && query.SubstituteIds.Any())
+        {
+            sqlBuilder.Where("SubstituteId IN @SubstituteIds");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedBy))
+        {
+            sqlBuilder.Where("CreatedBy = @CreatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedByLike))
+        {
+            query.CreatedByLike = $"{query.CreatedByLike}%";
+            sqlBuilder.Where("CreatedBy Like @CreatedByLike");
+        }
+
+        if (query.CreatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn >= @CreatedOnStart");
+        }
+
+        if (query.CreatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn <= @CreatedOnEnd");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedBy))
+        {
+            sqlBuilder.Where("UpdatedBy = @UpdatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedByLike))
+        {
+            query.UpdatedByLike = $"{query.UpdatedByLike}%";
+            sqlBuilder.Where("UpdatedBy Like @UpdatedByLike");
+        }
+
+        if (query.UpdatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn >= @UpdatedOnStart");
+        }
+
+        if (query.UpdatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn <= @UpdatedOnEnd");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.Name))
+        {
+            sqlBuilder.Where("Name = @Name");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.NameLike))
+        {
+            query.NameLike = $"{query.NameLike}%";
+            sqlBuilder.Where("Name Like @NameLike");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.ModelCode))
+        {
+            sqlBuilder.Where("ModelCode = @ModelCode");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.ModelCodeLike))
+        {
+            query.ModelCodeLike = $"{query.ModelCodeLike}%";
+            sqlBuilder.Where("ModelCode Like @ModelCodeLike");
+        }
+
+        sqlBuilder.Where("IsDeleted = 0");
+
+        return sqlBuilder;
+    }
 
 }
