@@ -271,7 +271,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             var pagedInfo = await _manuSfcProduceRepository.GetPagedInfoAsync(manuSfcProducePagedQuery);
-            
+
             //实体到DTO转换 装载数据
             List<ManuSfcProduceViewDto> manuSfcProduceDtos = new List<ManuSfcProduceViewDto>();
             foreach (var item in pagedInfo.Data)
@@ -1295,6 +1295,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new BusinessException(nameof(ErrorCode.MES16415)).WithData("orderCode", workOrder.OrderCode);
                 }
                 processRouteId = manuSfcProduceList.FirstOrDefault().ProcessRouteId;
+
+                //过滤条码信息，只查询选择的在制品工单信息
+                manuSfcInfos = manuSfcInfos.Where(a => manuSfcProduceList.Any(b => b.WorkOrderId == a.WorkOrderId));
             }
             var processRouteNodes = await GetProcessRouteNode(manuSfcInfos, processRouteId);
 
@@ -1422,7 +1425,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw new CustomerValidationException(nameof(ErrorCode.MES18001));
             }
 
-            if (manuSfcs.Length != manuSfcInfos.GroupBy(a=>a.SFC).Select(a=>a.Key).Count())
+            if (manuSfcs.Length != manuSfcInfos.GroupBy(a => a.SFC).Select(a => a.Key).Count())
             {
                 var differentSfcs = manuSfcs.Where(it => !manuSfcInfos.Where(info => info.SFC.Contains(it)).Any()).Select(it => it).ToList();
                 throw new CustomerValidationException(nameof(ErrorCode.MES18006)).WithData("SFC", string.Join(",", differentSfcs));
@@ -1503,6 +1506,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             var manuSfcs = sfcProduceStepDto.Sfcs.Select(it => it.Sfc).ToArray();
 
+            //获取条码信息
+            var manuSfcInfos = await GetManuSfcInfos(manuSfcs);
 
 
             long processRouteId = 0;
@@ -1518,12 +1523,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES18004));
                 }
-              
+
                 processRouteId = sfcProduces.FirstOrDefault().ProcessRouteId;
+
+                //根据选择在制条码的工单信息过滤条码信息
+                manuSfcInfos = manuSfcInfos.Where(a => sfcProduces.Any(b => b.WorkOrderId == a.WorkOrderId));
             }
 
-            //获取条码信息
-            var manuSfcInfos = await GetManuSfcInfos(manuSfcs);
             //工艺、工序
             var processRouteNodes = await GetProcessRouteNode(manuSfcInfos, processRouteId);
             var endProcessRouteDetailId = processRouteNodes.OrderByDescending(it => it.SerialNo).FirstOrDefault().ProcedureId;
