@@ -17,6 +17,7 @@ using Hymson.MES.EquipmentServicesTests.Dtos;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquEquipment;
 using Hymson.MES.Services.Validators.Process;
+using Hymson.Sequences;
 using Hymson.Utils;
 using Hymson.Web.Framework.WorkContext;
 using Microsoft.Extensions.Configuration;
@@ -73,6 +74,7 @@ namespace Hymson.MES.EquipmentServicesTests
                 .AddSingleton<ISfcCirculationService, SfcCirculationService>()
                 .AddSingleton<AbstractValidator<SfcCirculationBindDto>, SfcCirculationBindValidator>()//条码流转绑定
                 .AddSingleton<AbstractValidator<SfcCirculationUnBindDto>, SfcCirculationUnBindValidator>()//条码流转解绑
+                .AddSingleton<ISequenceService, SequenceService>()
                 .BuildServiceProvider();
 
             ConnectionOptions = ServiceProvider.GetRequiredService<IOptions<ConnectionOptions>>().Value;

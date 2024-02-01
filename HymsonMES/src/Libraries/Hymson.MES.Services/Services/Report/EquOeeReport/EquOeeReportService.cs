@@ -93,36 +93,34 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 DayEndTime = new DateTime(checkTime.Year, checkTime.Month, checkTime.Day, 08, 30, 0); // 开始时间
             }
 
-            if (DayStartTime >= now)
-            {
-                DayStartTime = now;
-            }
-            if (DayEndTime>= now)
-            {
-                DayEndTime = now;
-            }
+            //if (DayStartTime >= now)
+            //{
+            //    DayStartTime = now;
+            //}
+            //if (DayEndTime>= now)
+            //{
+            //    DayEndTime = now;
+            //}
 
-            var workingHours = Convert.ToInt32((DayEndTime - DayStartTime).TotalMinutes);//12;//正常出勤时间/计划时间(小时)
+            var workingHours = Convert.ToInt32((DayEndTime - DayStartTime).TotalHours);//12;//正常出勤时间/计划时间(小时)
 
             var dtos = new List<EquOeeReportViewDto>();
             //查询需要统计的设备信息
-            var equEquipmentEntities = await _equipmentRepository.GetPagedListAsync(new EquEquipmentPagedQuery { SiteId = pagedQuery.SiteId, EquipmentCodes = pagedQuery.EquipmentCodes, PageIndex = pageQuery.PageIndex, PageSize = 1000 });
-            var equIds = equEquipmentEntities.Data.Select(c => c.Id).ToArray();
+            var equEquipmentEntities = await _equipmentRepository.GetBaseListAsync();
+            var equIds = equEquipmentEntities.Select(c => c.Id).ToArray();
             if (!equIds.Any())
             {
-                return new PagedInfo<EquOeeReportViewDto>(dtos, pageQuery.PageIndex, pageQuery.PageSize);
+                return new PagedInfo<EquOeeReportViewDto>(dtos, pageQuery.PageIndex, pageQuery.PageSize, 0);
             }
-           
 
-            //查询设备当天异常时长汇总（除了运行以外的状态）
+            //查询设备当天异常时长汇总（除了运行以外的状态）      
             var equipmentStopTimeDtos = await GetEquipmentStopTimeAsync(pagedQuery.SiteId, equIds, DayStartTime, DayEndTime);
             //查询设备当天生产数据汇总
             var equipmentYieldDtos = await GetEquipmentYieldAsync(pagedQuery.SiteId, equIds, DayStartTime, DayEndTime);
             var equTheoryDtos = await GetEquipmentTheoryAsync(pageQuery.EquipmentCodes);
 
-           
             //统计设备OEE
-            foreach (var equEquipmentEntity in equEquipmentEntities.Data)
+            foreach (var equEquipmentEntity in equEquipmentEntities)
             {
                 //当前设备
                 string equCode = equEquipmentEntity.EquipmentCode;
@@ -132,20 +130,21 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 {
                     continue;
                 }
-                var TheoryOutputQty = equTheoryEntity?.TheoryOutputQty;//理论ct(s)
-                var theory = equTheoryEntity?.OutputQty;//每小时产量
-               
+                var TheoryOutputQty = equTheoryEntity?.TheoryOutputQty;//理论设备每小时茶能
+                var theory = equTheoryEntity?.OutputQty * workingHours;//每小时产量
+
                 //获取当前设备异常时长
                 var equipmentStopTime = equipmentStopTimeDtos?.Where(c => c.EquipmentId == equEquipmentEntity?.Id)?.FirstOrDefault();
                 //获取当前设备生产数据
                 var equipmentYield = equipmentYieldDtos?.Where(c => c.EquipmentId == equEquipmentEntity?.Id)?.FirstOrDefault();
                 //计划工作分钟
-                var workingSeconds = workingHours * 60;
-                var lostTimeDuration = (equipmentStopTime?.StopSeconds ?? 0); // 停机时长
+                var workingSeconds = workingHours;
+                var lostTimeDuration = (equipmentStopTime?.StopSeconds ?? 0) / 60 / 60; // 停机时长
                 if (workingSeconds < lostTimeDuration)
                 {
                     lostTimeDuration = workingSeconds;
                 }
+
                 //操作时间
                 var operateTime = workingSeconds - lostTimeDuration;
                 var equipmentUtilizationRateDto = new EquOeeReportViewDto
@@ -154,15 +153,15 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                     EquipmentCode = equCode,
                     EquipmentName = equEquipmentEntity?.EquipmentName ?? "",
                     PlanTimeDuration = workingSeconds,
-                    WorkTimeDuration = operateTime,
-                    LostTimeDuration = lostTimeDuration,
+                    WorkTimeDuration = Math.Round(operateTime, 2),
+                    LostTimeDuration = Math.Round(lostTimeDuration, 2),
                     TheoryOutputQty = theory,
                     OutputQty = (equipmentYield?.Total ?? 0),
                     OutputSumQty = (equipmentYield?.Total ?? 0),
                     QualifiedQty = (equipmentYield?.YieldQty ?? 0),
                 };
 
-                equipmentUtilizationRateDto.AvailableRatio = operateTime / (workingSeconds == 0 ? 1 : workingSeconds);
+                equipmentUtilizationRateDto.AvailableRatio = Math.Round(operateTime / (workingSeconds == 0 ? 1 : workingSeconds), 2);
                 if (theory == null || theory == 0)
                 {
                     equipmentUtilizationRateDto.WorkpieceRatio = 0;
@@ -175,7 +174,7 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                     }
                     else
                     {
-                        equipmentUtilizationRateDto.WorkpieceRatio = (equipmentYield?.Total ?? 0) / (theory ?? 1);
+                        equipmentUtilizationRateDto.WorkpieceRatio = Math.Round((equipmentYield?.Total ?? 0) / (theory ?? 1), 4);
                     }
                 }
 
@@ -185,15 +184,18 @@ namespace Hymson.MES.Services.Services.Report.EquHeartbeatReport
                 }
                 else
                 {
-                    equipmentUtilizationRateDto.QualifiedRatio = (equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1);
+                    equipmentUtilizationRateDto.QualifiedRatio = Math.Round((equipmentYield?.YieldQty ?? 0) / (equipmentYield?.Total ?? 1), 4);
                 }
 
-                equipmentUtilizationRateDto.Oee = Math.Round((equipmentUtilizationRateDto.AvailableRatio * equipmentUtilizationRateDto.WorkpieceRatio * equipmentUtilizationRateDto.QualifiedRatio),4);
+                equipmentUtilizationRateDto.Oee = Math.Round((equipmentUtilizationRateDto.AvailableRatio * equipmentUtilizationRateDto.WorkpieceRatio * equipmentUtilizationRateDto.QualifiedRatio), 4);
 
 
                 dtos.Add(equipmentUtilizationRateDto);
             }
-            var res = new PagedInfo<EquOeeReportViewDto>(dtos, pageQuery.PageIndex, dtos.Count);
+
+            var reurnData = dtos.Skip((pageQuery.PageIndex - 1) * pageQuery.PageSize).Take(pageQuery.PageSize);
+
+            var res = new PagedInfo<EquOeeReportViewDto>(reurnData, pageQuery.PageIndex, pageQuery.PageSize, dtos.Count);
             return res;
         }
 

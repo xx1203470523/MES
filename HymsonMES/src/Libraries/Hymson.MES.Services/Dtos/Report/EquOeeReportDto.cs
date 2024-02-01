@@ -91,12 +91,12 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 0白班+夜班、1白班、2夜班
         /// </summary>
-        public int DayShift { get; set; }
+        public int? DayShift { get; set; }
 
         /// <summary>
         /// 查询时间
         /// </summary>
-        public DateTime[] QueryTime { get; set; }
+        public DateTime[]? QueryTime { get; set; }
 
     }
 
