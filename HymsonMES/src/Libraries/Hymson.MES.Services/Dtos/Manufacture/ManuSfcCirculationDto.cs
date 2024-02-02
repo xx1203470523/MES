@@ -422,7 +422,7 @@ public class ManuSfcCirculationPagedQueryDto : PagerInfo
 /// <summary>
 /// 条码流转表分页Dto
 /// </summary>
-public class ManuSfcCirculationQueryDto : PagerInfo
+public class ManuSfcCirculationQueryDto : QueryDtoAbstraction
 {
     /// <summary>
     /// 条码

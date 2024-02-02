@@ -131,4 +131,40 @@ namespace Hymson.MES.Services.Dtos.Report
         public DateTime[]? RealEnd { get; set; }
     }
 
+    /// <summary>
+    /// 工单产量报表 分页参数
+    /// </summary>
+    public class PlanWorkOrderProductionReportQueryDto : QueryDtoAbstraction
+    {
+        /// <summary>
+        /// 工单类型
+        /// </summary>
+        public PlanWorkOrderTypeEnum? OrderType { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string? OrderCode { get; set; }
+
+        /// <summary>
+        /// 产线编码
+        /// </summary>
+        public string? WorkCenterCode { get; set; }
+
+        /// <summary>
+        /// 实际完成时间
+        /// </summary>
+        public DateTime[]? RealEnd { get; set; }
+    }
+
 }

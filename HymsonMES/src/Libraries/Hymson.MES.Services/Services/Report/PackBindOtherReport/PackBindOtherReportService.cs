@@ -1,8 +1,13 @@
-﻿using Hymson.Infrastructure;
+﻿using Hymson.Excel.Abstractions;
+using Hymson.Infrastructure;
+using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.Minio;
 using Microsoft.AspNetCore.Components.Web;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +18,24 @@ namespace Hymson.MES.Services.Services.Report.PackBindOtherReport
 {
     public class PackBindOtherReportService : IPackBindOtherReportService
     {
+        private IMinioService _minioService;
+        private IExcelService _excelService;
+
         private IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="minioService"></param>
+        /// <param name="excelService"></param>
         /// <param name="manuSfcCirculationRepository"></param>
-        public PackBindOtherReportService(IManuSfcCirculationRepository manuSfcCirculationRepository)
+        public PackBindOtherReportService(
+            IMinioService minioService,
+            IExcelService excelService,
+            IManuSfcCirculationRepository manuSfcCirculationRepository)
         {
+            _excelService = excelService;
+            _minioService = minioService;   
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
         }
 
@@ -55,6 +70,40 @@ namespace Hymson.MES.Services.Services.Report.PackBindOtherReport
             }
 
             return new PagedInfo<PackBindOtherReportViewDto>(pageInfo, query.PageIndex, query.PageSize);
+        }
+
+        public async Task<ExportResultDto> ExportExcelAsync(PackBindOtherQueryDto query)
+        {
+            var fileName = "门包箱条码绑定报表";
+            var result = new ExportResultDto();
+            //只查询绑定类型为外箱码绑定的条码
+            var manuSfcCirculationEntities = await _manuSfcCirculationRepository.GetListAsync(new()
+            {
+                SFC = query.Sfc,
+                CirculationBarCode = query.BindSfc,
+                CirculationTypes = new SfcCirculationTypeEnum[] { SfcCirculationTypeEnum.BindPack1, SfcCirculationTypeEnum.BindPack2, SfcCirculationTypeEnum.BindPack3, SfcCirculationTypeEnum.BindPack4 }
+            });
+
+            var resultData = new List<PackBindOtherReportExcelDto>();
+            foreach (var item in manuSfcCirculationEntities)
+            {
+                PackBindOtherReportExcelDto newItem = item.ToExcelModel<PackBindOtherReportExcelDto>();
+
+                resultData.Add(newItem);
+            }
+
+            
+            if (resultData?.Any() == true)
+            {
+                var filePath = await _excelService.ExportAsync(resultData, fileName, fileName);
+                //上传到文件服务器  
+                var uploadResult = await _minioService.PutObjectAsync(filePath);
+                result.FileName = "";
+                result.Path = uploadResult.AbsoluteUrl;
+                result.RelativePath = uploadResult.RelativeUrl;
+            }
+
+            return result;
         }
     }
 }

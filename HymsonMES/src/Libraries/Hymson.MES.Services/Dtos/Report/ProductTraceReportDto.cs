@@ -1,6 +1,7 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -146,6 +147,40 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 创建时间
         /// </summary>
+        public DateTime? CreatedOn { get; set; }
+    }
+
+
+    public record ManuSfcCirculationExcelDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        [EpplusTableColumn(Header = "工序", Order = 1)]
+        public string ProcedureName { get; set; }
+
+        /// <summary>
+        /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
+        /// </summary>
+        [EpplusTableColumn(Header = "类型", Order = 2)]
+        public SfcCirculationTypeEnum CirculationType { get; set; }
+
+        /// <summary>
+        /// 流转前条码
+        /// </summary>
+        [EpplusTableColumn(Header = "条码", Order = 3)]
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 流转后条码信息
+        /// </summary>
+        [EpplusTableColumn(Header = "绑定条码", Order = 4)]
+        public string CirculationBarCode { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        [EpplusTableColumn(Header = "绑定日期", Order = 5)]
         public DateTime? CreatedOn { get; set; }
     }
     #endregion
@@ -418,7 +453,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public int NGJudgeType { get; set; }
     }
-    
+
     #endregion
 
     #region 生产工艺

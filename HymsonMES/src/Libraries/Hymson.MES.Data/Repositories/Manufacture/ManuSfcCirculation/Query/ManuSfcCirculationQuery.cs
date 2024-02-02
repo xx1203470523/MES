@@ -1,13 +1,14 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
 {
     /// <summary>
     /// 条码流转表 查询参数
     /// </summary>
-    public class ManuSfcCirculationQuery
+    public class ManuSfcCirculationQuery : QueryAbstraction
     {
         /// <summary>
         /// 站点id

@@ -535,6 +535,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationViewDto>();
             CreateMap<ManuSfcCirculationCreateDto, ManuSfcCirculationEntity>();
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationCreateDto>();
+            CreateMap<ManuSfcCirculationQuery, ManuSfcCirculationQueryDto>();
+            CreateMap<ManuSfcCirculationQueryDto, ManuSfcCirculationQuery>();
+            CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationExcelDto > ();
 
             #endregion
         }
@@ -669,6 +672,11 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<NgRecordReportPageQueryDto, NgRecordReportPageQuery>();
             CreateMap<NgRecordReportQueryDto, NgRecordReportQuery>();
             CreateMap<NgRecordReportView, NgRecordReportDto>();
+
+            #endregion
+
+            #region PackBindOtherReport
+
 
             #endregion
         }

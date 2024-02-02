@@ -5,6 +5,7 @@ using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using IdGen;
+using Hymson.MES.Services.Dtos.Common;
 
 namespace Hymson.MES.Api.Controllers.Manufacture;
 
@@ -41,6 +42,18 @@ public class ManuSfcCirculationController : ControllerBase
     public async Task BindSfcAsync(ManuSfcCirculationBindDto modifyDto)
     {
         await _manuSfcCirculationService.CreateManuSfcCirculationAsync(modifyDto);
+    }
+
+    /// <summary>
+    /// 增加条码绑定关系
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("bindSfc/export")]
+    public async Task<ExportResultDto> ExportExcelAsync([FromQuery]ManuSfcCirculationQueryDto queryDto)
+    {
+        return await _manuSfcCirculationService.ExportBindSfcAsync(queryDto);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 ﻿using Hymson.Authentication;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -9,24 +10,22 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.MES.Services.Extension;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
 
 namespace Hymson.MES.Services.Services.Manufacture;
 
 public class ManuSfcCirculationService : IManuSfcCirculationService
 {
     private readonly ICurrentUser _currentUser;
-
+    private readonly IExcelService _excelService;
+    private readonly IMinioService _minioService;
     private readonly IManuSfcRepository _manuSfcRepository;
     private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
     private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
@@ -35,6 +34,8 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
     private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
 
     public ManuSfcCirculationService(ICurrentUser currentUser,
+        IMinioService minioService,
+        IExcelService excelService,
         IManuSfcRepository manuSfcRepository,
         IManuSfcInfoRepository manuSfcInfoRepository,
         IManuSfcCirculationRepository manuSfcCirculationRepository,
@@ -43,6 +44,8 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
         IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository)
     {
         _currentUser = currentUser;
+        _excelService = excelService;
+        _minioService = minioService;
         _manuSfcRepository = manuSfcRepository;
         _manuSfcInfoRepository = manuSfcInfoRepository;
         _manuSfcCirculationRepository = manuSfcCirculationRepository;
@@ -83,6 +86,45 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
         return result;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<ExportResultDto> ExportBindSfcAsync(ManuSfcCirculationQueryDto queryDto)
+    {
+        var fileName = "条码绑定报表";
+        ExportResultDto result = new();
+
+        var query = queryDto.ToQuery<ManuSfcCirculationQuery>();
+        var dataList = await _manuSfcCirculationRepository.GetListAsync(query);
+
+        var procedureIds = dataList.Select(a => a.ProcedureId);
+        var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
+
+        var excelData = new List<ManuSfcCirculationExcelDto>();
+        foreach (var item in dataList)
+        {
+            var manuSfcCirculation = item.ToExcelModel<ManuSfcCirculationExcelDto>();
+
+            var procedureEntity = procedureEntities.FirstOrDefault(a => a.Id == item.ProcedureId);
+            manuSfcCirculation.ProcedureName = procedureEntity?.Name ?? "";
+
+            excelData.Add(manuSfcCirculation);
+        }
+
+        if (excelData?.Any() == true)
+        {
+            var filePath = await _excelService.ExportAsync(excelData, fileName, fileName);
+            //上传到文件服务器  
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            result.FileName = "";
+            result.Path = uploadResult.AbsoluteUrl;
+            result.RelativePath = uploadResult.RelativeUrl;
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// 根据绑定类型绑定Sfc和circulationBarCode
@@ -96,7 +138,7 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
         if (modifyDto.CirculationType == SfcCirculationTypeEnum.Merge)
         {
             var manuSfcEntities = await _manuSfcRepository.GetBySFCsAsync(new string[] { modifyDto.SFC })
-                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17401)).WithData("SFC",modifyDto.SFC); 
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES17401)).WithData("SFC", modifyDto.SFC);
         }
 
     }
@@ -368,7 +410,8 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
     /// <returns></returns>
     public async Task UpdateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto)
     {
-        await _manuSfcCirculationRepository.UpdateSfcAsync(new() { 
+        await _manuSfcCirculationRepository.UpdateSfcAsync(new()
+        {
             Id = bindDto.Id,
             SFC = bindDto.SFC,
         });

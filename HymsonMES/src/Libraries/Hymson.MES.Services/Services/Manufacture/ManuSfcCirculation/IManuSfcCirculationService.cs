@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Report;
 using System;
@@ -42,5 +43,12 @@ public interface IManuSfcCirculationService
     /// <param name="bindDto"></param>
     /// <returns></returns>
     Task UpdateManuSfcCirculationAsync(ManuSfcCirculationBindDto bindDto);
+
+    /// <summary>
+    /// 导出条码绑定关系
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    Task<ExportResultDto> ExportBindSfcAsync(ManuSfcCirculationQueryDto queryDto);
 
 }
