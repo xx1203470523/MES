@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码工序生产汇总表 分页参数

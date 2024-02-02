@@ -1,6 +1,6 @@
 using Hymson.MES.Core.Domain.Manufacture;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 上卸料记录表仓储接口

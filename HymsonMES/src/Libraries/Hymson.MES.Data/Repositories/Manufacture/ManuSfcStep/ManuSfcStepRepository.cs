@@ -176,6 +176,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 获取SFC的进站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetInStationStepsBySFCAsync(EntityBySFCQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetInStepBySFCSql, PrepareTableName(query.SiteId, query.SFC, false)), query);
+        }
+
+        /// <summary>
+        /// 获取SFC的出站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcStepEntity>> GetOutStationStepsBySFCAsync(EntityBySFCQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcStepEntity>(string.Format(GetOutStepBySFCSql, PrepareTableName(query.SiteId, query.SFC, false)), query);
+        }
+
+        /// <summary>
         /// 获取SFC的进出站步骤
         /// </summary>
         /// <param name="query"></param>
@@ -381,6 +403,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                         and SFC = @Sfc
                         AND SiteId = @SiteId 
                         ORDER BY Id ASC ";
+        const string GetInStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 3 AND SFC = @SFC ORDER BY Id ASC ";
+        const string GetOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype = 4 AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC = @SFC ORDER BY Id ASC ";
         const string GetInOutStepBySFCsSql = @"SELECT * FROM `{0}` WHERE IsDeleted = 0 AND SiteId = @SiteId AND Operatetype IN (3, 4) AND SFC IN @SFCs ORDER BY Id ASC ";
         const string GetBySFCPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY Id desc LIMIT @Offset, @Rows ";

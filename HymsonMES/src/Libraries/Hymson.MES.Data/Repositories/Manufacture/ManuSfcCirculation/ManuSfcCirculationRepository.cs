@@ -4,9 +4,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 

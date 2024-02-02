@@ -1,10 +1,4 @@
-﻿using Hymson.MES.Core.Domain.Parameter;
-using Hymson.MES.CoreServices.Dtos.Parameter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.CoreServices.Dtos.Parameter;
 
 namespace Hymson.MES.CoreServices.Services.Parameter
 {

@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 时间通配（转换）    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  Karl
- *build datetime: 2023-10-13 06:33:21
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Integrated;
 

@@ -1,21 +1,12 @@
 ﻿using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -154,7 +145,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
             if (obj is not OutputModifyResponseBo data) return responseBo;

@@ -8,16 +8,13 @@ using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.HttpClients;
@@ -25,10 +22,7 @@ using Hymson.MES.HttpClients.Requests.Print;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
-using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using OfficeOpenXml.VBA;
 
 namespace Hymson.MES.Services.Services.Plan
 {
@@ -299,7 +293,7 @@ namespace Hymson.MES.Services.Services.Plan
                     throw new CustomerValidationException(nameof(ErrorCode.MES16138));
                 }
 
-                rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new Data.Repositories.Manufacture.ManuSfcProduce.Command.DeletePhysicalBySfcsCommand()
+                rows += await _manuSfcProduceRepository.DeletePhysicalRangeAsync(new DeletePhysicalBySfcsCommand()
                 {
                     SiteId = _currentSite.SiteId ?? 0,
                     Sfcs = sfcEntities.Select(s => s.SFC).ToArray()

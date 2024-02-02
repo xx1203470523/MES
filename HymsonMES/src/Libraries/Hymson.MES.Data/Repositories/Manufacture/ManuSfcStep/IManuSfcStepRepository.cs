@@ -103,6 +103,20 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Dictionary<string, IGrouping<string, ManuSfcStepEntity>> GetTableNames(IEnumerable<ManuSfcStepEntity> entities);
 
         /// <summary>
+        /// 获取SFC的进站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetInStationStepsBySFCAsync(EntityBySFCQuery query);
+
+        /// <summary>
+        /// 获取SFC的出站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetOutStationStepsBySFCAsync(EntityBySFCQuery query);
+
+        /// <summary>
         /// 获取SFC的进出站步骤
         /// </summary>
         /// <param name="query"></param>

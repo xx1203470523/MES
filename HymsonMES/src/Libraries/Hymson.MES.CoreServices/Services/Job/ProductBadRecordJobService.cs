@@ -10,14 +10,10 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
@@ -120,7 +116,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             //获取不合格代码信息
-            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodesAsync!, bo.UnqualifiedIds);
+            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetUnqualifiedEntitiesByIdsAsync!, bo.UnqualifiedIds);
             if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15405));
@@ -196,7 +192,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var sfcs = manuSfcs.Select(x => x.SFC).ToArray();
 
             //获取不合格代码信息
-            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetQualUnqualifiedCodesAsync!, bo.UnqualifiedIds);
+            var qualUnqualifiedCodes = await bo.Proxy.GetValueAsync(_masterDataService.GetUnqualifiedEntitiesByIdsAsync!, bo.UnqualifiedIds);
             if (qualUnqualifiedCodes == null || !qualUnqualifiedCodes.Any())
             {
                 return default;
@@ -335,7 +331,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
             if (obj is not ProductBadRecordResponseBo data)

@@ -5,11 +5,10 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 
-namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 
@@ -34,7 +33,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             var sfcPackList = await sfcPackListTask;
 
             var manuSfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(manuSfcEntities.Select(x => x.Id));
-            var planWorkOrderEntities = await _planWorkOrderRepository.GetByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId));
+            var planWorkOrderEntities = await _masterDataService.GetWorkOrderEntitiesByIdsAsync(manuSfcInfoEntities.Select(x => x.WorkOrderId));
 
             List<ManuSfcBo> list = new List<ManuSfcBo>();
             var validationFailures = new List<ValidationFailure>();

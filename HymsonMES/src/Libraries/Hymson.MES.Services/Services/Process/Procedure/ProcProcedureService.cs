@@ -11,15 +11,14 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.CoreServices.Services.Parameter;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
@@ -28,9 +27,6 @@ using Hymson.Snowflake;
 using Hymson.SqlActuator.Services;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using OfficeOpenXml.ConditionalFormatting;
-using Org.BouncyCastle.Crypto;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process.Procedure

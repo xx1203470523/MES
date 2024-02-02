@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 系统Token    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  zhaoqing
- *build datetime: 2023-06-15 02:09:57
- */
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Integrated

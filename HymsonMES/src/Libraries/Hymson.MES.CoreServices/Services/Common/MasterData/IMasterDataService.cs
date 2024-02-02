@@ -1,26 +1,49 @@
-﻿using Hymson.MES.Core.Domain.Manufacture;
+﻿using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
+using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Resource;
+using Hymson.MES.Data.Repositories.Quality;
 
-namespace Hymson.MES.CoreServices.Services.Common.MasterData
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 
     /// </summary>
     public partial interface IMasterDataService
     {
+        /// <summary>
+        /// 根据掩码ID获取掩码规则
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaskCodeRuleEntity>> GetMaskCodeRuleEntitiesByMaskCodeIdAsync(long maskCodeId);
+
+        /// <summary>
+        /// 根据Code获取实体（设备）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquEquipmentEntity> GetEquipmentEntityByCodeAsync(EntityByCodeQuery query);
+
+        /// <summary>
+        /// 根据ID获取实体（物料）
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<ProcMaterialEntity> GetMaterialEntityByIdAsync(long materialId);
+
         /// <summary>
         /// 获取物料基础信息（带空检查）
         /// </summary>
@@ -49,6 +72,19 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <returns></returns>
         Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo);
 
+        /// <summary>
+        /// 根据ID获取工单实体
+        /// </summary>
+        /// <param name="workOrderId"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderEntity> GetWorkOrderEntityByIdAsync(long workOrderId);
+
+        /// <summary>
+        /// 根据ID获取工单实体
+        /// </summary>
+        /// <param name="workOrderIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetWorkOrderEntitiesByIdsAsync(IEnumerable<long> workOrderIds);
 
         /// <summary>
         /// 获取生产工单
@@ -93,11 +129,46 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
+        /// 获取工艺路线集合（连线）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetProcessRouteLinkEntitiesAsync(EntityBySiteIdQuery query);
+
+        /// <summary>
+        /// 获取工艺路线集合（节点）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcessRouteNodeEntitiesAsync(EntityBySiteIdQuery query);
+
+        /// <summary>
         /// 获取首工序
         /// </summary>
         /// <param name="processRouteId"></param>
         /// <returns></returns>
         Task<ProcessRouteProcedureDto> GetFirstProcedureAsync(long processRouteId);
+
+        /// <summary>
+        /// 根据ID获取工序实体
+        /// </summary>
+        /// <param name="procedureId"></param>
+        /// <returns></returns>
+        Task<ProcProcedureEntity> GetProcedureEntityByIdAsync(long procedureId);
+
+        /// <summary>
+        /// 根据ID获取实体（工序）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetProcedureEntitiesByResourceIdAsync(EntityByLinkIdQuery query);
+
+        /// <summary>
+        /// 根据ID获取工序实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureRejudgeEntity>> GetProcedureRejudgeEntitiesAsync(EntityByParentIdQuery query);
 
         /// <summary>
         /// 获当前工序对应的下一工序
@@ -135,6 +206,20 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<bool> IsBeforeProcedureAsync(ManuRouteProcedureWithCompareBo routeProcedureWithCompareBo);
 
         /// <summary>
+        /// 根据Code获取实体（资源）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcResourceEntity> GetResourceEntityByCodeAsync(EntityByCodeQuery query);
+
+        /// <summary>
+        /// 根据设备Code获取实体（资源）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetResourceEntitiesByEquipmentCodeAsync(ProcResourceQuery query);
+
+        /// <summary>
         /// 获取工序关联的资源
         /// </summary>
         /// <param name="procedureId"></param>
@@ -149,6 +234,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<ProcProcedureEntity>?> GetProcProcedureIdByResourceIdAsync(QueryByIdBo query);
 
         /// <summary>
+        /// 获取资源关联的工序
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetLoadPointLinkEntitiesByResourceIdAsync(long resourceId);
+
+        /// <summary>
         /// 获取生产配置中产品id
         /// </summary>
         /// <param name="param"></param>
@@ -161,6 +253,13 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="param"></param>
         /// <returns></returns>
         Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
+
+        /// <summary>
+        /// 获取BOM关联的物料
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcBomDetailEntity>> GetBomDetailEntitiesByBomIdAsync(long bomId);
 
         /// <summary>
         /// 获取即将扣料的物料数据
@@ -188,7 +287,14 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// </summary>
         /// <param name="unqualifiedIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodesAsync(long[] unqualifiedIds);
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetUnqualifiedEntitiesByIdsAsync(IEnumerable<long> unqualifiedIds);
+
+        /// <summary>
+        /// 获取不合格代码列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetUnqualifiedEntitiesByCodesAsync(QualUnqualifiedCodeByCodesQuery query);
 
         /// <summary>
         /// 创建条码步骤数据
@@ -208,7 +314,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="sfcProduceEntity">条码在制信息</param>
         /// <param name="manuFeedingsDictionary">已分组的物料库存集合</param>
         /// <param name="mainMaterialBo">主物料BO对象</param>
-        /// <param name="currentBo">替代料BO对象</param>
+        /// <param name="currentBo">当前进行消耗的物料BO对象</param>
         /// <param name="isMain">是否主物料</param>
         void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
              ref List<ManuSfcCirculationEntity> adds,
@@ -219,7 +325,7 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
              MaterialDeductResponseBo currentBo,
              bool isMain = true);
 
-        
+
         /// <summary>
         /// 读取分选规则信息
         /// </summary>
@@ -233,5 +339,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="parameterBySfcQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
+
     }
 }

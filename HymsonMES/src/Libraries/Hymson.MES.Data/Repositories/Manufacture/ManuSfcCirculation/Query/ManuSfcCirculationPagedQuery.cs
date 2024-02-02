@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码流转表 分页参数

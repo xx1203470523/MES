@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Process;
 
-namespace Hymson.MES.CoreServices.Services.Common.MasterData
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 

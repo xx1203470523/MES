@@ -12,15 +12,9 @@ using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Logging;
@@ -64,27 +58,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
         /// <summary>
-        /// 仓储接口（工单信息）
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-
-        /// <summary>
-        /// 仓储接口（工艺路线工序节点）
-        /// </summary>
-        private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
-
-        /// <summary>
-        /// 仓储接口（工艺路线工序连线）
-        /// </summary>
-        private readonly IProcProcessRouteDetailLinkRepository _procProcessRouteDetailLinkRepository;
-
-        /// <summary>
-        /// 仓储接口（工序）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
-        /// 
+        /// 多语言服务
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
@@ -97,10 +71,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcStepRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="procProcessRouteDetailNodeRepository"></param>
-        /// <param name="procProcessRouteDetailLinkRepository"></param>
-        /// <param name="procProcedureRepository"></param>
         /// <param name="localizationService"></param>
         public InStationJobService(ILogger<InStationJobService> logger,
             IManuCommonService manuCommonService,
@@ -108,10 +78,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IManuSfcStepRepository manuSfcStepRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository,
-            IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
-            IProcProcessRouteDetailLinkRepository procProcessRouteDetailLinkRepository,
-            IProcProcedureRepository procProcedureRepository,
             ILocalizationService localizationService)
         {
             _logger = logger;
@@ -120,10 +86,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcStepRepository = manuSfcStepRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
-            _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
-            _procProcessRouteDetailLinkRepository = procProcessRouteDetailLinkRepository;
-            _procProcedureRepository = procProcedureRepository;
             _localizationService = localizationService;
         }
 
@@ -149,7 +111,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 进站工序信息
-            var procedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+            var procedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(commonBo.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
             // 读取工序关联的资源
@@ -209,13 +171,13 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (sfcProduceEntitiesOfNoMatchProcedure != null && sfcProduceEntitiesOfNoMatchProcedure.Any())
             {
                 var query = new EntityBySiteIdQuery { SiteId = commonBo.SiteId };
-                var allProcessRouteDetailLinks = await _procProcessRouteDetailLinkRepository.GetListAsync(query);
-                var allProcessRouteDetailNodes = await _procProcessRouteDetailNodeRepository.GetListAsync(query);
+                var allProcessRouteDetailLinks = await _masterDataService.GetProcessRouteLinkEntitiesAsync(query);
+                var allProcessRouteDetailNodes = await _masterDataService.GetProcessRouteNodeEntitiesAsync(query);
 
                 var validationFailures = new List<ValidationFailure>();
                 foreach (var sfcProduce in sfcProduceEntitiesOfNoMatchProcedure)
                 {
-                    var sfcProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduce.ProcedureId)
+                    var sfcProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(sfcProduce.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16369))
                         .WithData("SFC", sfcProduce.SFC)
                         .WithData("Procedure", sfcProduce.ProcedureId);
@@ -264,7 +226,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     if (!nodesOfOrdered.Any())
                     {
                         // 当前工序
-                        var currentEntity = await _procProcedureRepository.GetByIdAsync(endNode.ProcedureId);
+                        var currentEntity = await _masterDataService.GetProcedureEntityByIdAsync(endNode.ProcedureId);
 
                         var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfcProduce.SFC);
@@ -312,7 +274,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
 
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
@@ -342,7 +304,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 进站工序信息
-            var currentProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+            var currentProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(commonBo.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
             // 遍历所有条码
@@ -464,7 +426,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
             if (obj is not InStationResponseSummaryBo data) return responseBo;
@@ -534,7 +496,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
 
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,

@@ -1,23 +1,8 @@
-/*
- *creator: Karl
- *
- *describe: QualUnqualifiedGroupEntity仓储类 | 代码由框架生成
- *builder:  wangkeming
- *build datetime: 2023-02-13 02:05:50
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup
+namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
     /// 不合格组仓储接口

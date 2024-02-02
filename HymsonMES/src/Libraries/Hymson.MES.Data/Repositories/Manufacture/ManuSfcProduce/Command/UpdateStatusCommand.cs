@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 
@@ -119,25 +119,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         public int RepeatedCount { get; set; }
     }
 
-    public class UpdateStatusAndQtyBySfcsCommand: UpdateCommand
-    {
-        public long SiteId {  get; set; }
-
-        /// <summary>
-        /// 条码
-        /// </summary>
-        public string[] Sfcs { get; set; }
-
-        /// <summary>
-        /// 更改为的状态
-        /// </summary>
-        public SfcStatusEnum Status { get; set; }
-
-        /// <summary>
-        /// 数量
-        /// </summary>
-        public decimal Qty { get; set; }
-    }
+    /// <summary>
+    /// 
+    /// </summary>
     public class UpdateManuSfcProduceQtyByIdCommand : UpdateCommand
     {
         /// <summary>

@@ -4,7 +4,6 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;

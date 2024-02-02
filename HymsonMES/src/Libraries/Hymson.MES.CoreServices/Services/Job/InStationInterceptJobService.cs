@@ -7,10 +7,10 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
+using Hymson.MES.Data.Repositories.Quality;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -36,7 +36,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
-            _masterDataService= masterDataService;
+            _masterDataService = masterDataService;
         }
 
         /// <summary>
@@ -56,8 +56,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult<IEnumerable<JobBo>?>(default);
         }
 
         /// <summary>
@@ -98,10 +97,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult<JobResponseBo?>(default);
         }
 
         /// <summary>
@@ -111,8 +109,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult<IEnumerable<JobBo>?>(default);
         }
     }
 }

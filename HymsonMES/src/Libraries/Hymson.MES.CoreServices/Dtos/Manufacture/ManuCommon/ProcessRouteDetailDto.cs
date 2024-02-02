@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon
+﻿namespace Hymson.MES.CoreServices.Dtos.Manufacture
 {
     /// <summary>
     /// 工艺路线详情

@@ -3,7 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 
-namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 扩展方法

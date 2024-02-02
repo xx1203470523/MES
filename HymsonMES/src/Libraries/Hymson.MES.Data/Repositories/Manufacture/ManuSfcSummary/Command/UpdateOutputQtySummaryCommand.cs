@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Data.Repositories.Common.Command;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 合格产出更新

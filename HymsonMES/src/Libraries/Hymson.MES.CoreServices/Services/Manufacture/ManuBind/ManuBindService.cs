@@ -8,17 +8,13 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
-using Hymson.MES.CoreServices.Bos.Common.MasterData;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -27,7 +23,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 
-namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
+namespace Hymson.MES.CoreServices.Services.Manufacture
 {
     /// <summary>
     /// 
@@ -286,12 +282,12 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
             //        throw new CustomerValidationException(nameof(ErrorCode.MES17407)).WithData("MaterialName", pprocMaterialEntity?.MaterialName ?? "")
             //            .WithData("WorkOrder", planWorkOrderEntity?.OrderCode ?? "").WithData("BomName", procBomEntity?.BomName ?? "").WithData("ProcedureName", procProcedureEntity?.Name ?? "");
             //    }
-                //if ((manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0) + manuSfcProduceList!.Sum(x => x.Qty) > bom.Usages)
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES17411)).WithData("BindQty", manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0)
-                //        .WithData("TreatQty", manuSfcProduceList!.Sum(x => x.Qty))
-                //         .WithData("TreatQty", bom.Usages);
-                //}
+            //if ((manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0) + manuSfcProduceList!.Sum(x => x.Qty) > bom.Usages)
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES17411)).WithData("BindQty", manuSfcCirculationBySFCEntities!.Sum(x => x.CirculationQty) ?? 0)
+            //        .WithData("TreatQty", manuSfcProduceList!.Sum(x => x.Qty))
+            //         .WithData("TreatQty", bom.Usages);
+            //}
             //}
             //else
             //{

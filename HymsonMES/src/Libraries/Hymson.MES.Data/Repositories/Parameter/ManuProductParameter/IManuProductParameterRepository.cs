@@ -1,8 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Parameter;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Command;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 
-namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
+namespace Hymson.MES.Data.Repositories.Parameter
 {
     /// <summary>
     /// 产品过程参数

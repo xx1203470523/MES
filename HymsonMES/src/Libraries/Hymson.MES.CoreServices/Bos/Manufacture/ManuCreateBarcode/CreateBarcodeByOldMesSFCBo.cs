@@ -1,10 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
 {

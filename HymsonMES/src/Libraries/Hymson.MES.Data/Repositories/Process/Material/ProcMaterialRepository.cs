@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -88,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(long[] ids)
         {
-            if (ids.Length <= 0) 
+            if (ids.Length <= 0)
             {
                 return new List<ProcMaterialEntity>();
             }
@@ -295,7 +296,22 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<ProcMaterialEntity> GetByCodeAsync(ProcMaterialQuery query)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetByCodeSql, query);
+            return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetByCodeAndVersionSql, query);
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcMaterialEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            var key = $"proc_material&Site-{query.Site}&Code-{query.Code}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcMaterialEntity>(GetByCodeSql, query);
+            });
         }
 
         /// <summary>
@@ -397,7 +413,8 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcMaterialEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_material` /**where**/  ";
-        const string GetByCodeSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @SiteId AND MaterialCode= @MaterialCode AND Version =@Version LIMIT 1";
+        const string GetByCodeAndVersionSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @SiteId AND MaterialCode= @MaterialCode AND Version =@Version LIMIT 1";
+        const string GetByCodeSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @Site AND MaterialCode = @Code LIMIT 1";
 
         const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio`,`MaskCodeId`, QuantityLimit ) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio,@MaskCodeId ,@QuantityLimit )  ";
         const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, PackageNum = @PackageNum, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, MaskCodeId=@MaskCodeId, QuantityLimit=@QuantityLimit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio  WHERE Id = @Id ";
@@ -463,7 +480,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string UpdateProcMaterialUnboundSql = "UPDATE `proc_material` SET GroupId= 0 WHERE GroupId = @GroupId ";
 
         const string UpdateStatusSql = "UPDATE `proc_material` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
-        
+
         const string GetByCodesSql = @"SELECT * FROM `proc_material` WHERE MaterialCode IN @MaterialCodes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

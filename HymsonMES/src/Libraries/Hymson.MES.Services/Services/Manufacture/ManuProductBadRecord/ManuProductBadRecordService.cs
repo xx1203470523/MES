@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
@@ -15,26 +16,25 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Query;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -132,6 +132,11 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
 
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -151,7 +156,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 IProcMaterialRepository procMaterialRepository,
                 AbstractValidator<ManuProductBadRecordModifyDto> validationModifyRules,
                 IInteVehicleRepository inteVehicleRepository,
-                IInteVehiceFreightStackRepository inteVehiceFreightStackRepository)
+                IInteVehiceFreightStackRepository inteVehiceFreightStackRepository, IProcProcedureRepository procProcedureRepository, IExcelService excelService, IMinioService minioService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -171,6 +176,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             _manuSfcScrapRepository = manuSfcScrapRepository;
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
+            _procProcedureRepository = procProcedureRepository;
+            _excelService = excelService;
+            _minioService = minioService;
         }
 
         /// <summary>
@@ -1494,5 +1502,353 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
             return isLast;
         }
+
+        #region 录入标识
+        /// <summary>
+        /// 录入标识
+        /// </summary>
+        /// <param name="productBadRecordMarkSaveDtos"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task SaveBadRecordMarkEntryAsync(List<ManuProductBadRecordMarkSaveDto> productBadRecordMarkSaveDtos) 
+        {
+            #region 校验数据
+            if (productBadRecordMarkSaveDtos == null || !productBadRecordMarkSaveDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15431));
+
+            foreach (var item in productBadRecordMarkSaveDtos)
+            {
+                if (string.IsNullOrEmpty(item.SFC)) throw new CustomerValidationException(nameof(ErrorCode.MES15432));
+                if (item.FoundBadOperationId<=0) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
+                if (item.UnqualifiedId <= 0) throw new CustomerValidationException(nameof(ErrorCode.MES15434));
+            }
+
+            var needHandleSfcs = productBadRecordMarkSaveDtos.Select(x => x.SFC).Distinct();
+
+            //检测是否与数据库中的重复
+            var reaps= productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId }).Where(group => group.Count() > 1);
+            if (reaps!=null&& reaps.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15435));
+
+            var sfcsBadRecords= await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery { SiteId=_currentSite.SiteId??0,SFCs= needHandleSfcs,Status=  ProductBadRecordStatusEnum.Open });
+
+            var addGroupKeys = productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId });
+            var groups= sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId });
+            foreach (var item in groups)
+            {
+                if (addGroupKeys.Any(x => x.Key.SFC == item.Key.SFC && x.Key.FoundBadOperationId == item.Key.FoundBadOperationId && x.Key.UnqualifiedId == item.Key.UnqualifiedId)) 
+                {
+                    //查询工序
+                    var procedure = await _procProcedureRepository.GetByIdAsync(item.Key.FoundBadOperationId);
+                    //查询不合格代码
+                    var unqualifiedCode = await _qualUnqualifiedCodeRepository.GetByIdAsync(item.Key.UnqualifiedId);
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15436)).WithData("sfc", item.Key.SFC).WithData("foundBadOperationCode", procedure.Code??"").WithData("unqualifiedCode",unqualifiedCode?.UnqualifiedCode??""); 
+                }
+            }
+
+            //检测条码是否是符合要求的
+            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 0 });
+
+            //检测条码状态
+            var notAllowStatus = new[] { SfcStatusEnum.Locked, SfcStatusEnum.Delete, SfcStatusEnum.Invalid };
+            var notAllowSfcs = sfcEntities.Where(x => notAllowStatus.Contains(x.Status)).Select(x => x.SFC);
+            if (notAllowSfcs != null && notAllowSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15438)).WithData("sfc", string.Join(",", notAllowSfcs.ToArray()));
+            }
+            //检测条码是否存在
+            var notExistSfcs = needHandleSfcs.Except(sfcEntities.Select(x => x.SFC).Distinct());
+            if (notAllowSfcs != null && notAllowSfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15439)).WithData("sfc", string.Join(",", notExistSfcs));
+
+            //检测不合格代码
+            // 获取不合格代码列表
+            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByIdsAsync(productBadRecordMarkSaveDtos.Select(x => x.UnqualifiedId));
+
+            if (qualUnqualifiedCodes.Any(x => x.Type != QualUnqualifiedCodeTypeEnum.Mark)) throw new CustomerValidationException(nameof(ErrorCode.MES15437));
+
+            #endregion
+
+            //条码信息表
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 00 };
+            //在制品信息
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+
+
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
+
+            foreach (var item in productBadRecordMarkSaveDtos)
+            {
+                var sfcEntity = sfcEntities.Where(x => x.SFC == item.SFC).FirstOrDefault();
+                var sfcInfoEntity = sfcInfoEntities.Where(x => x.SfcId==sfcEntity?.Id).FirstOrDefault();
+
+                var manuSfcProduceInfoEntity = manuSfcProduces.FirstOrDefault(x => x.SFC == item.SFC);
+
+                //步骤表-不良录入
+                var manuSfcStepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = item.SFC,
+                    ProductId = sfcInfoEntity?.ProductId??0,
+                    WorkOrderId = sfcInfoEntity?.WorkOrderId??0,
+                    WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
+                    ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
+                    Qty = sfcEntity?.Qty??0,
+                    EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,
+                    ResourceId = manuSfcProduceInfoEntity?.ResourceId,
+                    ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.BadEntry,
+                    CurrentStatus = sfcEntity!.Status,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CreatedOn = HymsonClock.Now(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                };
+                sfcStepList.Add(manuSfcStepEntity);
+
+                var manuProductBadRecordEntity = new ManuProductBadRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    FoundBadOperationId = item.FoundBadOperationId,
+                    //OutflowOperationId = manuProductBadRecordCreateDto.OutflowOperationId,
+                    UnqualifiedId = item.UnqualifiedId,
+                    SfcStepId = manuSfcStepEntity.Id,
+                    SFC = item.SFC,
+                    SfcInfoId = sfcInfoEntity?.Id,
+                    Qty = sfcEntity.Qty,
+                    Source = ProductBadRecordSourceEnum.BadManualEntry,
+                    Remark = item.Remark ?? "",
+                    CreatedOn = HymsonClock.Now(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+
+                    Status = ProductBadRecordStatusEnum.Open,
+                };
+
+                manuProductBadRecords.Add(manuProductBadRecordEntity);
+            }
+
+            using (var trans = TransactionHelper.GetTransactionScope()) 
+            {
+                //插入不合格记录
+                if (manuProductBadRecords != null && manuProductBadRecords.Any())
+                {
+                    await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                }
+                //插入步骤表
+                if (sfcStepList != null && sfcStepList.Any())
+                {
+                    await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                }
+
+                trans.Complete();
+            }
+
+        }
+
+        /// <summary>
+        /// 录入标识导出模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ManuProductBadRecordMarkEntryImportDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "录入标识导入模板");
+        }
+
+        /// <summary>
+        /// 导入数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task ImportBadRecordMarkEntryAsync(IFormFile formFile) 
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<ManuProductBadRecordMarkEntryImportDto>(memoryStream);
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES14908));
+            }
+
+            #region 验证数据
+            foreach (var item in excelImportDtos)
+            {
+                if (string.IsNullOrEmpty(item.SFC)) throw new CustomerValidationException(nameof(ErrorCode.MES15432));
+                if (string.IsNullOrEmpty( item.FoundBadOperationCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15433));
+                if (string.IsNullOrEmpty(item.UnqualifiedCode)) throw new CustomerValidationException(nameof(ErrorCode.MES15434));
+            }
+
+            var needHandleSfcs = excelImportDtos.Select(x => x.SFC).Distinct();
+
+            //检测 传入数据中内部是否重复
+            var reaps = excelImportDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationCode, x.UnqualifiedCode }).Where(group => group.Count() > 1);
+            if (reaps != null && reaps.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15435));
+
+            //检测 传入的数据 是否正确
+            //检测条码是否是符合要求的
+            var sfcEntities = await _manuSfcRepository.GetManuSfcEntitiesAsync(new EntityBySFCsQuery { SFCs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 0 });
+
+            var notAllowStatus = new[] { SfcStatusEnum.Locked, SfcStatusEnum.Delete, SfcStatusEnum.Invalid };//检测条码状态
+            var notAllowSfcs = sfcEntities.Where(x => notAllowStatus.Contains(x.Status)).Select(x => x.SFC);
+            if (notAllowSfcs != null && notAllowSfcs.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES15438)).WithData("sfc", string.Join(",", notAllowSfcs.ToArray()));
+            }
+            
+            var notExistSfcs = needHandleSfcs.Except(sfcEntities.Select(x => x.SFC).Distinct());//检测条码是否存在
+            if (notExistSfcs != null && notExistSfcs.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15439)).WithData("sfc", string.Join(",", notExistSfcs));
+
+            //检测 不合格代码
+            // 获取不合格代码列表
+            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync( new QualUnqualifiedCodeByCodesQuery { Codes = excelImportDtos.Select(x => x.UnqualifiedCode), SiteId = _currentSite.SiteId ?? 0 });
+
+            var notExistUnquaCodes = excelImportDtos.Select(x => x.UnqualifiedCode).Distinct().Except(qualUnqualifiedCodes.Select(x => x.UnqualifiedCode).Distinct());
+            if(notExistUnquaCodes != null && notExistUnquaCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15441)).WithData("unqualifiedCode", string.Join(",", notExistUnquaCodes)); //检测不合格代码是否存在
+
+            var notMarkUnqualifiedCodes = qualUnqualifiedCodes.Where(x => x.Type != QualUnqualifiedCodeTypeEnum.Mark);//获取不是标识的不合格代码
+            if (notMarkUnqualifiedCodes!=null&& notMarkUnqualifiedCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15437)).WithData("unqualifiedCode",string.Join(",", notMarkUnqualifiedCodes));
+
+            //检测 发现工序
+            var procedures = await _procProcedureRepository.GetProcProcedureEntitiesAsync(new ProcProcedureQuery() { SiteId = _currentSite.SiteId ?? 0, Codes = excelImportDtos.Select(x => x.FoundBadOperationCode).ToArray() });
+
+            var notExistProcedureCodes = excelImportDtos.Select(x => x.FoundBadOperationCode).Distinct().Except(procedures.Select(x => x.Code).Distinct());
+            if (notExistProcedureCodes != null && notExistProcedureCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15443)).WithData("foundBadOperationCode", string.Join(",", notExistProcedureCodes)); //检测工序是否存在
+
+            //检测 拦截工序
+            var interceptProcedureCodes = excelImportDtos.Where(x=>!string.IsNullOrWhiteSpace( x.InterceptProcedureCode))?.Select(x => x.InterceptProcedureCode??"")?.Distinct();
+
+            var interceptProcedures = interceptProcedureCodes!=null&& interceptProcedureCodes.Any()? await _procProcedureRepository.GetProcProcedureEntitiesAsync(new ProcProcedureQuery() { SiteId = _currentSite.SiteId ?? 0, Codes = interceptProcedureCodes.ToArray() }):null;
+
+            if (interceptProcedureCodes!=null&& interceptProcedureCodes.Any()) 
+            {
+                var notExistInterceptProcedureCodes = interceptProcedureCodes!.Except(interceptProcedures!=null&& interceptProcedures.Any()? interceptProcedures.Select(x => x.Code).Distinct() :new List<string>() );
+                if (notExistInterceptProcedureCodes != null && notExistInterceptProcedureCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15444)).WithData("interceptProcedureCode", string.Join(",", notExistInterceptProcedureCodes)); //检测拦截工序是否存在
+            }
+
+            //检测是否与数据库中的重复
+            var sfcsBadRecords = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery { SiteId = _currentSite.SiteId ?? 0, SFCs = needHandleSfcs, Status = ProductBadRecordStatusEnum.Open });
+
+            
+
+            var handleExcelDtos = excelImportDtos.Select(x => new {
+                x.SFC,
+
+                FoundBadOperationId = procedures.FirstOrDefault(y=>y.Code==x.FoundBadOperationCode)?.Id, 
+                x.FoundBadOperationCode,
+
+                UnqualifiedId = qualUnqualifiedCodes .FirstOrDefault(y=>y.UnqualifiedCode==x.UnqualifiedCode)?.Id,
+                x.UnqualifiedCode,
+
+                InterceptProcedureId= interceptProcedures?.FirstOrDefault(y=>y.Code==x.InterceptProcedureCode)?.Id,
+                x.InterceptProcedureCode,
+                x.Remark
+            });
+            var addGroupKeys = handleExcelDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId }); 
+
+            var groups = sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId });
+            foreach (var item in groups)
+            {
+                if (addGroupKeys.Any(x => x.Key.SFC == item.Key.SFC && x.Key.FoundBadOperationId == item.Key.FoundBadOperationId && x.Key.UnqualifiedId == item.Key.UnqualifiedId))
+                {
+                    //查询工序
+                    var procedure = procedures.FirstOrDefault(x=>x.Id== item.Key.FoundBadOperationId);
+                    //查询不合格代码
+                    var unqualifiedCode = qualUnqualifiedCodes.FirstOrDefault(x=>x.Id== item.Key.UnqualifiedId);
+
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15436)).WithData("sfc", item.Key.SFC).WithData("foundBadOperationCode", procedure?.Code ?? "").WithData("unqualifiedCode", unqualifiedCode?.UnqualifiedCode ?? "");
+                }
+            }
+            #endregion
+
+            //条码信息表
+            var sfcInfoEntities = await _manuSfcInfoRepository.GetBySFCIdsAsync(sfcEntities.Select(x => x.Id));
+            var manuSfcProducePagedQuery = new ManuSfcProduceQuery { Sfcs = needHandleSfcs, SiteId = _currentSite.SiteId ?? 00 };
+            //在制品信息
+            var manuSfcProduces = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(manuSfcProducePagedQuery);
+
+
+            var sfcStepList = new List<ManuSfcStepEntity>();
+            var manuProductBadRecords = new List<ManuProductBadRecordEntity>();
+
+            foreach (var item in handleExcelDtos)
+            {
+                var sfcEntity = sfcEntities.Where(x => x.SFC == item.SFC).FirstOrDefault();
+                var sfcInfoEntity = sfcInfoEntities.Where(x => x.SfcId == sfcEntity?.Id).FirstOrDefault();
+
+                var manuSfcProduceInfoEntity = manuSfcProduces.FirstOrDefault(x => x.SFC == item.SFC);
+
+                //步骤表-不良录入
+                var manuSfcStepEntity = new ManuSfcStepEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SFC = item.SFC,
+                    ProductId = sfcInfoEntity?.ProductId ?? 0,
+                    WorkOrderId = sfcInfoEntity?.WorkOrderId ?? 0,
+                    WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
+                    ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
+                    Qty = sfcEntity?.Qty ?? 0,
+                    EquipmentId = manuSfcProduceInfoEntity?.EquipmentId,
+                    ResourceId = manuSfcProduceInfoEntity?.ResourceId,
+                    ProcedureId = manuSfcProduceInfoEntity?.ProcedureId,
+                    Operatetype = ManuSfcStepTypeEnum.BadEntry,
+                    CurrentStatus = sfcEntity!.Status,
+                    SiteId = _currentSite.SiteId ?? 0,
+                    CreatedOn = HymsonClock.Now(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                };
+                sfcStepList.Add(manuSfcStepEntity);
+
+                var manuProductBadRecordEntity = new ManuProductBadRecordEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    FoundBadOperationId = item.FoundBadOperationId??0,
+                    //OutflowOperationId = manuProductBadRecordCreateDto.OutflowOperationId,
+                    UnqualifiedId = item.UnqualifiedId??0,
+                    SfcStepId = manuSfcStepEntity.Id,
+                    SFC = item.SFC,
+                    SfcInfoId = sfcInfoEntity?.Id,
+                    Qty = sfcEntity.Qty,
+                    Source = ProductBadRecordSourceEnum.BadManualEntry,
+                    Remark = item.Remark ?? "",
+                    CreatedOn = HymsonClock.Now(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+
+                    Status = ProductBadRecordStatusEnum.Open,
+                };
+                manuProductBadRecords.Add(manuProductBadRecordEntity);
+            }
+
+            using (var trans = TransactionHelper.GetTransactionScope())
+            {
+                //插入不合格记录
+                if (manuProductBadRecords != null && manuProductBadRecords.Any())
+                {
+                    await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                }
+                //插入步骤表
+                if (sfcStepList != null && sfcStepList.Any())
+                {
+                    await _manuSfcStepRepository.InsertRangeAsync(sfcStepList);
+                }
+
+                trans.Complete();
+            }
+        }
+
+        #endregion
     }
 }

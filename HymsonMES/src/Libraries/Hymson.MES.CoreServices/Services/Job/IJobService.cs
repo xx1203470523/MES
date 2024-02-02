@@ -38,7 +38,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        Task<JobResponseBo> ExecuteAsync(object obj);
+        Task<JobResponseBo?> ExecuteAsync(object obj);
 
         /// <summary>
         /// 执行后

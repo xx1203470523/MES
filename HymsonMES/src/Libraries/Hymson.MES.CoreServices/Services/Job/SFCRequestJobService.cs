@@ -3,7 +3,7 @@ using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.Utils;
 
@@ -83,7 +83,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             var responseBo = new JobResponseBo();
 

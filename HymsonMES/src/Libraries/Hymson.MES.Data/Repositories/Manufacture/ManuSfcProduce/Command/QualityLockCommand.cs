@@ -1,11 +1,4 @@
-﻿using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Data.Repositories.Manufacture
+﻿namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 质量锁定实体类

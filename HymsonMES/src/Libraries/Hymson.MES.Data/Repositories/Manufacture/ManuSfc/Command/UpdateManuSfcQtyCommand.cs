@@ -1,11 +1,6 @@
 ﻿using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 更新条码表

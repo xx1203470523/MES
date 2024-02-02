@@ -78,6 +78,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public string? Sfc { get; set; }
 
         /// <summary>
+        /// 产品序列码  硬查，不模糊查询
+        /// </summary>
+        public string? SfcHard { get; set; }
+
+
+        /// <summary>
         /// 状态
         /// </summary>
         public SfcStatusEnum? Status { get; set; }
@@ -170,6 +176,11 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 物料编码/版本
         /// </summary>
         public string MaterialCodeVersion { get; set; }
+
+        public string MaterialCode {  get; set; }
+        public string MaterialVersion { get; set; }
+        public string MaterialName {  get; set; }
+
         /// <summary>
         /// 工艺路线/版本
         /// </summary>

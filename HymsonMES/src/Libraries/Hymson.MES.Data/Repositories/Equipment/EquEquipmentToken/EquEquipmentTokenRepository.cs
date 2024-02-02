@@ -1,18 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 设备Token 仓储类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-06-07 02:17:26
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment
 {

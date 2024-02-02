@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 

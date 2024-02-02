@@ -1,7 +1,7 @@
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码流转表 查询参数

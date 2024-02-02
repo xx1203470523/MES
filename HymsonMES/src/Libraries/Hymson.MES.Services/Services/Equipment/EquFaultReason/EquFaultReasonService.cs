@@ -205,7 +205,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquFaultReasonDto>> GetPagedListAsync(EquFaultReasonPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<EquFaultReasonPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;

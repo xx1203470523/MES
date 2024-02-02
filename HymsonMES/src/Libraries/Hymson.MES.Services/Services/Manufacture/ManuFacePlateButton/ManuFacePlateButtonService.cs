@@ -14,7 +14,7 @@ using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.CoreServices.Services.Parameter;

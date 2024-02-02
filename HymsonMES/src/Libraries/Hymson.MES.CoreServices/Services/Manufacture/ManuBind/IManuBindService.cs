@@ -1,12 +1,7 @@
 ﻿using Hymson.Localization.Services;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
 
-namespace Hymson.MES.CoreServices.Services.Manufacture.ManuBind
+namespace Hymson.MES.CoreServices.Services.Manufacture
 {
     /// <summary>
     /// 

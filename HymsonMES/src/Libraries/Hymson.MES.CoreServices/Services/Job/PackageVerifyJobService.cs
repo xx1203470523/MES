@@ -6,8 +6,7 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -96,7 +95,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             // 面板需要的数据
             List<PanelModuleEnum> panelModules = new() { PanelModuleEnum.Package };

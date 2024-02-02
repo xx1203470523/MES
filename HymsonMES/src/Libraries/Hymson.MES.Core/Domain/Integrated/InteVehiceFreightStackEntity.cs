@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 二维载具条码明细    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  wxk
- *build datetime: 2023-07-19 08:14:38
- */
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Integrated

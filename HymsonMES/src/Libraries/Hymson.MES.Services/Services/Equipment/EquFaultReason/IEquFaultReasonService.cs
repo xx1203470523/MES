@@ -37,7 +37,7 @@ namespace Hymson.MES.Services.Services.Equipment
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquFaultReasonDto>> GetPageListAsync(EquFaultReasonPagedQueryDto pagedQueryDto);
+        Task<PagedInfo<EquFaultReasonDto>> GetPagedListAsync(EquFaultReasonPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 根据ID查询

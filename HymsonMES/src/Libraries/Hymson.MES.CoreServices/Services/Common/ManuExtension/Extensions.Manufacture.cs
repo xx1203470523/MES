@@ -13,7 +13,7 @@ using Hymson.Utils;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Hymson.MES.CoreServices.Services.Common.ManuExtension
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 扩展方法

@@ -11,6 +11,7 @@ using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
+using Hymson.MES.Services.Plan;
 using Hymson.MES.Services.Services;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
@@ -31,6 +32,7 @@ using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuOutStation;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPackage;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.OutStation;
+using Hymson.MES.Services.Services.Manufacture.ManuMarking;
 using Hymson.MES.Services.Services.Manufacture.ManuSfc;
 using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.MES.Services.Services.Plan;
@@ -51,6 +53,7 @@ using Hymson.MES.Services.Services.WhWareHouse;
 using Hymson.MES.Services.Services.WhWarehouseLocation;
 using Hymson.MES.Services.Services.WhWarehouseRegion;
 using Hymson.MES.Services.Services.WhWarehouseShelf;
+using Hymson.MES.Services.Validators;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
 using Hymson.MES.Services.Validators.Manufacture;
@@ -196,9 +199,12 @@ namespace Microsoft.Extensions.DependencyInjection
             //配方操作组
             services.AddSingleton<IProcFormulaOperationGroupService, ProcFormulaOperationGroupService>();
 
+            services.AddSingleton<IProcProcedureTimeControlService, ProcProcedureTimeControlService>();
             #endregion
 
             #region Quality
+            services.AddSingleton<IQualAQLLevelService, QualAQLLevelService>();
+            services.AddSingleton<IQualAQLPlanService, QualAQLPlanService>();
             services.AddSingleton<IQualEnvParameterGroupService, QualEnvParameterGroupService>();
             services.AddSingleton<IQualInspectionParameterGroupService, QualInspectionParameterGroupService>();
             services.AddSingleton<IQualUnqualifiedCodeService, QualUnqualifiedCodeService>();
@@ -242,6 +248,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IManuBarcodeAdjustService, ManuBarcodeAdjustService>();
 
+            services.AddSingleton<IManuMarkingService, ManuMarkingService>();
+
             #endregion
 
             #region Warehouse 
@@ -255,8 +263,11 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Plan
+            services.AddSingleton<IPlanShiftService, PlanShiftService>();
+
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
+            
             #endregion
 
             #region PlanSfcReceive
@@ -274,6 +285,20 @@ namespace Microsoft.Extensions.DependencyInjection
             #region PlanWorkOrderBind
             services.AddSingleton<IPlanWorkOrderBindService, PlanWorkOrderBindService>();
             #endregion
+
+            #region PlanCalendar
+
+            services.AddSingleton<IPlanCalendarService, PlanCalendarService>();
+            services.AddSingleton<IPlanCalendarDetailService, PlanCalendarDetailService>();
+
+            #endregion
+
+            #region PlanShift
+
+            services.AddSingleton<IPlanShiftService, PlanShiftService>();
+
+            #endregion
+
             #endregion
 
             #region Report
@@ -438,6 +463,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<ProcFormulaOperationGroupSaveDto>, ProcFormulaOperationGroupSaveValidator>();
             #endregion
 
+            services.AddSingleton<AbstractValidator<ProcProcedureTimeControlCreateDto>, ProcProcedureTimeControlCreateValidator>();
+            services.AddSingleton<AbstractValidator<ProcProcedureTimeControlModifyDto>, ProcProcedureTimeControlModifyValidator>();
             #endregion
 
             #region Integrated
@@ -572,9 +599,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<WhWarehouseLocationSaveDto>, WhWarehouseLocationSaveValidator>();
             services.AddSingleton<AbstractValidator<WhWarehouseLocationModifyDto>, WhWarehouseLocationModifyValidator>();
 
+            services.AddSingleton<AbstractValidator<ManuMarkingCheckDto>, ManuMarkingValidator>();
+
             #endregion
 
             #region Plan
+
+            services.AddSingleton<AbstractValidator<PlanShiftSaveDto>, PlanShiftSaveValidator>();
+            services.AddSingleton<AbstractValidator<PlanShiftDetailModifyDto>, PlanShiftDetailValidator>();
+
             #region PlanWorkOrder
             services.AddSingleton<AbstractValidator<PlanWorkOrderCreateDto>, PlanWorkOrderCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanWorkOrderModifyDto>, PlanWorkOrderModifyValidator>();
@@ -596,9 +629,28 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<PlanSfcPrintCreatePrintDto>, PlanSfcPrintCreatePrintValidator>();
             #endregion
 
-            #region PlanWorkOrderBind 
+            #region PlanWorkOrderBind
+
             services.AddSingleton<AbstractValidator<PlanWorkOrderBindCreateDto>, PlanWorkOrderBindCreateValidator>();
             services.AddSingleton<AbstractValidator<PlanWorkOrderBindModifyDto>, PlanWorkOrderBindModifyValidator>();
+
+            #endregion
+
+            #region PlanCalendar
+
+            services.AddSingleton<AbstractValidator<PlanCalendarDto>, PlanCalendarCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanCalendarUpdateDto>, PlanCalendarUpdateValidator>();
+            services.AddSingleton<AbstractValidator<PlanCalendarDeleteDto>, PlanCalendarDeleteValidator>();
+
+            services.AddSingleton<AbstractValidator<PlanCalendarDetailDto>, PlanCalendarDetailCreateValidator>();
+            services.AddSingleton<AbstractValidator<PlanCalendarDetailUpdateDto>, PlanCalendarDetailUpdateValidator>();
+            services.AddSingleton<AbstractValidator<PlanCalendarDetailDeleteDto>, PlanCalendarDetailDeleteValidator>();
+
+            #endregion
+
+            #region PlanShift
+
+            services.AddSingleton<AbstractValidator<PlanShiftSaveDto>, PlanShiftSaveValidator>();
 
             #endregion
 

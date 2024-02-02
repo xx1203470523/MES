@@ -1,12 +1,7 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 在制品拆解更新实体类

@@ -9,17 +9,12 @@ using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Dtos.Parameter;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Parameter;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcGrade.Command;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
+using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using MailKit.Search;
 using System.Data;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -476,7 +471,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
             if (obj is not ProductsSortingResponseBo data)

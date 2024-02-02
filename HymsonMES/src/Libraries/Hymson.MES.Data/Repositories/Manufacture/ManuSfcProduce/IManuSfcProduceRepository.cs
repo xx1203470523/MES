@@ -1,9 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.View;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -390,7 +386,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        Task<int> UpdateStatusAndQtyBySfcsAsync(ManuSfcProduce.Command.UpdateStatusAndQtyBySfcsCommand command);
+        Task<int> UpdateStatusAndQtyBySfcsAsync(UpdateStatusAndQtyBySfcsCommand command);
 
         /// <summary>
         /// 根据id更改数量

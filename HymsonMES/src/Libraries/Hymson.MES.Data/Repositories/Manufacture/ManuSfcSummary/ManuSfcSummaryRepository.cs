@@ -3,9 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Query;
-using Hymson.MES.Data.Repositories.Manufacture.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture

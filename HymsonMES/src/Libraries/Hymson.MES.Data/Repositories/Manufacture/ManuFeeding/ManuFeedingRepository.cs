@@ -2,13 +2,11 @@ using Dapper;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 using System.Text;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 仓储（物料加载）

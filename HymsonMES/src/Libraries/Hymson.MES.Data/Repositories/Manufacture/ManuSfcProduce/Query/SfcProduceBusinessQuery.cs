@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 

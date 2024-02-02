@@ -1,17 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 条码表仓储类 | 代码由框架生成
- *builder:  wangkeming
- *build datetime: 2023-04-10 04:55:42
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {

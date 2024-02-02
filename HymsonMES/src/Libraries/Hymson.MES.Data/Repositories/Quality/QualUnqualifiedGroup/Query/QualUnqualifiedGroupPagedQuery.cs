@@ -1,6 +1,6 @@
 using Hymson.Infrastructure;
 
-namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query
+namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
     /// 不合格代码组分页参数

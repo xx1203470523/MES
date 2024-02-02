@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
+﻿namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
     /// 查询实体
