@@ -3,16 +3,12 @@ using Force.Crc32;
 using Hymson.MES.Core.Constants.Parameter;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Data.Options;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Command;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
-using System.Numerics;
-using System.Security.Cryptography;
 using System.Text;
 using static Dapper.SqlMapper;
 
-namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
+namespace Hymson.MES.Data.Repositories.Parameter
 {
     /// <summary>
     /// 参数收集仓储

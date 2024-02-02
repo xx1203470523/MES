@@ -1,15 +1,13 @@
 ﻿using FluentValidation;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Services;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Integrated;
 using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.CoreServices.Services.Job.JobUtility;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
 using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
 using Hymson.MES.CoreServices.Services.Manufacture;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuSfcSummary;
@@ -67,6 +65,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
 
             services.AddSingleton<IJobService, BadRecordJobService>();
             services.AddSingleton<IJobService, BarcodeReceiveService>();
+            services.AddSingleton<IJobService, CrossOperationTimeVerifyJobService>();
             services.AddSingleton<IJobService, EsopOutJobService>();
             services.AddSingleton<IJobService, InStationInterceptJobService>();
             services.AddSingleton<IJobService, InStationJobService>();

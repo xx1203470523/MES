@@ -105,8 +105,9 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Execute
                 if (obj == null) continue;
 
                 var responseDto = await service.ExecuteAsync(obj);
-                responseDtos.Add(jobName, responseDto);
+                if (responseDto == null) continue;
 
+                responseDtos.Add(jobName, responseDto);
                 if (!responseDto.IsSuccess) break;
             }
 

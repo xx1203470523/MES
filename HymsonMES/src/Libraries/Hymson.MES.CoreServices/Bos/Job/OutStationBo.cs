@@ -2,9 +2,7 @@
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Bos.Parameter;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcSummary.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {

@@ -1,9 +1,7 @@
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 仓储接口（物料加载）

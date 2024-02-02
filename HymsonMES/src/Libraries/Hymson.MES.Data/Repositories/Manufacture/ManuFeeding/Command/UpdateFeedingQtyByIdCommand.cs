@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Data.Repositories.Common.Command;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 

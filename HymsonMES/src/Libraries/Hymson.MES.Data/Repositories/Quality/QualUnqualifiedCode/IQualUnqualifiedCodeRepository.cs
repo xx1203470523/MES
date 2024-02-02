@@ -1,10 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View;
 
-namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
+namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
     /// 不合格代码仓储接口

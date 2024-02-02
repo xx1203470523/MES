@@ -88,7 +88,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<EquFaultSolutionDto>> QueryPagedListAsync([FromQuery] EquFaultSolutionPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquFaultSolutionDto>> GetPagedListAsync([FromQuery] EquFaultSolutionPagedQueryDto pagedQueryDto)
         {
             return await _equFaultSolutionService.GetPagedListAsync(pagedQueryDto);
         }

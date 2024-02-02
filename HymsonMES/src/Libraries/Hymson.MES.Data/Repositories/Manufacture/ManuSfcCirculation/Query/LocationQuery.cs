@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Data.Repositories.Manufacture.Query
+﻿namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 查询实体

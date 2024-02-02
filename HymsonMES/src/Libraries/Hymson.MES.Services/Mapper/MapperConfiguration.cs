@@ -29,11 +29,10 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
+using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
@@ -43,12 +42,11 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionPatrol.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionTail.View;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup.Query;
 using Hymson.MES.Data.Repositories.Quality.Query;
 using Hymson.MES.Data.Repositories.Quality.View;
 using Hymson.MES.Data.Repositories.Warehouse;
@@ -384,6 +382,10 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<SysReleaseRecordPagedQueryDto, SysReleaseRecordPagedQuery>();
             CreateMap<SysReleaseRecordPagedQueryDto, SysReleaseRecordPagedQuery>();
             #endregion
+
+            #region PlanShift
+            CreateMap<PlanShiftPagedQueryDto, PlanShiftPagedQuery>();
+            #endregion
         }
 
         /// <summary>
@@ -620,6 +622,7 @@ namespace Hymson.MES.Services.Mapper
 
             CreateMap<ProcEsopView, ProcEsopDto>();
             CreateMap<ProcEsopPagedQueryDto, ProcEsopPagedQuery>();
+
             #region Esop 
 
             #endregion
@@ -639,6 +642,12 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ProcFormulaOperationGroupEntity, ProcFormulaOperationGroupSaveDto>();
             CreateMap<ProcFormulaOperationGroupPagedQueryDto, ProcFormulaOperationGroupPagedQuery>();
             #endregion
+
+            CreateMap<ProcProcedureTimeControlPagedQueryDto, ProcProcedureTimeControlPagedQuery>();
+            CreateMap<ProcProcedureTimeControlView, ProcProcedureTimeControlDto>();
+            CreateMap<ProcProcedureTimeControlCreateDto, ProcProcedureTimeControlEntity>();
+            CreateMap<ProcProcedureTimeControlModifyDto, ProcProcedureTimeControlEntity>();
+            CreateMap<ProcProcedureTimeControlEntity, ProcProcedureTimeControlDetailDto>();
         }
 
         /// <summary>
@@ -912,6 +921,9 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreatePlanMaps()
         {
             #region WorkOrder
+            CreateMap<PlanShiftEntity, PlanShiftDto > ();
+            CreateMap<PlanShiftDetailEntity, PlanShiftDetailDto> ();
+            CreateMap<PlanShiftSaveDto, PlanShiftEntity> ();
             CreateMap<PlanWorkOrderCreateDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderModifyDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderPagedQueryDto, PlanWorkOrderPagedQuery>();
@@ -944,6 +956,63 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcPassDownView, PlanSfcPrintDto>();
             #endregion
 
+            #region PlanCalendar
+
+            #region 数据传输对象（操作对象）转换为实体对象
+
+            CreateMap<PlanCalendarDto, PlanCalendarCreateCommand>();
+
+            CreateMap<PlanCalendarUpdateDto, PlanCalendarUpdateCommand>();
+
+            #endregion
+
+            #region 数据传输对象（查询对象）转换为数据查询对象
+
+            CreateMap<PlanCalendarPagedQueryDto, PlanCalendarPagedQuery>();
+
+            CreateMap<PlanCalendarQueryDto, PlanCalendarQuery>();
+
+            #endregion
+
+            #region 实体对象转换为数据传输对象（页面输出）
+
+            CreateMap<PlanCalendarEntity, PlanCalendarOutputDto>();
+
+            #endregion
+
+            #endregion
+
+            #region PlanCalendarDetail
+
+            #region 数据传输对象（操作对象）转换为实体对象
+
+            CreateMap<PlanCalendarDetailDto, PlanCalendarDetailCreateCommand>();
+
+            CreateMap<PlanCalendarDetailUpdateDto, PlanCalendarDetailUpdateCommand>();
+
+            #endregion
+
+            #region 数据传输对象（查询对象）转换为数据查询对象
+
+            CreateMap<PlanCalendarDetailPagedQueryDto, PlanCalendarDetailPagedQuery>();
+
+            CreateMap<PlanCalendarDetailQueryDto, PlanCalendarDetailQuery>();
+
+            #endregion
+
+            #region 实体对象转换为数据传输对象（页面输出）
+
+            CreateMap<PlanCalendarDetailEntity, PlanCalendarDetailOutputDto>();
+
+            #endregion
+
+            #endregion
+
+            #region PlanShift
+
+            CreateMap<PlanShiftEntity, PlanShiftDto>();
+
+            #endregion
         }
 
         /// <summary>

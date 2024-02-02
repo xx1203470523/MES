@@ -16,15 +16,12 @@ using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteJobClass;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Quality;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WhWareHouse;
 using Hymson.MES.Data.Repositories.WhWarehouseLocation;
@@ -64,6 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #region Commonm
             services.AddSingleton<IMessageTemplateRepository, MessageTemplateRepository>();
             services.AddSingleton<IMessagePushRepository, MessagePushRepository>();
+            services.AddSingleton<ISysConfigRepository, SysConfigRepository>();
             #endregion
 
             #region Equipment
@@ -255,6 +253,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IProcFormulaDetailsRepository, ProcFormulaDetailsRepository>();
             #endregion
 
+            services.AddSingleton<IProcProcedureTimeControlRepository, ProcProcedureTimeControlRepository>();
             #endregion
 
             #region Quality
@@ -339,6 +338,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Plan
+            services.AddSingleton<IPlanShiftRepository, PlanShiftRepository>();            
+     
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();
@@ -358,6 +359,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IPlanWorkOrderBindRepository, PlanWorkOrderBindRepository>();
             services.AddSingleton<IPlanWorkOrderBindRecordRepository, PlanWorkOrderBindRecordRepository>();
             #endregion
+
+            #region PlanCalendar
+
+            services.AddSingleton<IPlanCalendarRepository, PlanCalendarRepository>();
+            services.AddSingleton<IPlanCalendarDetailRepository, PlanCalendarDetailRepository>();
+
+            #endregion
+
             #endregion
 
             #region Parameter

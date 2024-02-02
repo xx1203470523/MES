@@ -1,5 +1,5 @@
 ﻿using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
 {
@@ -8,6 +8,8 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
     /// </summary>
     public class CreateBarcodeByExternalSFCBo : CoreBaseBo
     {
+        private IEnumerable<BarcodeDto> _externalSFCs = new List<BarcodeDto>();
+
         /// <summary>
         /// 设备Id
         /// </summary>
@@ -26,6 +28,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// <summary>
         /// 就条码
         /// </summary>
-        public IEnumerable<BarcodeDto> ExternalSFCs { set; get; }=new List<BarcodeDto>();
+        public IEnumerable<BarcodeDto> ExternalSFCs { get => _externalSFCs; set => _externalSFCs = value; }
     }
 }

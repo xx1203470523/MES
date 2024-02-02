@@ -1,9 +1,8 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.CoreServices.Bos.Common;
-using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 
-namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 生产公共类

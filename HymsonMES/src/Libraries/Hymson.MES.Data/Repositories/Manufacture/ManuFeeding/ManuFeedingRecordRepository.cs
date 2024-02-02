@@ -4,7 +4,7 @@ using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 上卸料记录表仓储

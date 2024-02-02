@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     ///更新工序

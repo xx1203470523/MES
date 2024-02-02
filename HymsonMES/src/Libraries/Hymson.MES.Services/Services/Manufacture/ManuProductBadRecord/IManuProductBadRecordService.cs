@@ -6,7 +6,9 @@
  *build datetime: 2023-03-27 03:49:17
  */
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Services.Dtos.Manufacture;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,5 +85,30 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuProductBadRecordDto> QueryManuProductBadRecordByIdAsync(long id);
+
+        #region 录入标识
+        /// <summary>
+        /// 录入标识
+        /// </summary>
+        /// <param name="productBadRecordMarkSaveDtos"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task SaveBadRecordMarkEntryAsync(List<ManuProductBadRecordMarkSaveDto> productBadRecordMarkSaveDtos);
+
+        /// <summary>
+        /// 录入标识导出模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task ImportBadRecordMarkEntryAsync(IFormFile formFile);
+        #endregion
     }
 }

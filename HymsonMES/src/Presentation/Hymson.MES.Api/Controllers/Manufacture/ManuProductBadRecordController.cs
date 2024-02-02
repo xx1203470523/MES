@@ -141,5 +141,52 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             await _manuProductBadRecordService.DeletesManuProductBadRecordAsync(deleteDto.Ids);
         }
 
+        #region
+
+        /// <summary>
+        /// 保存（不良标识录入）
+        /// </summary>
+        /// <param name="productBadRecordMarkSaveDtos"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("saveBadRecordMarkEntry")]
+        ///[PermissionDescription("manu:sfcMarking:save")]
+        public async Task SaveBadRecordMarkEntryAsync([FromBody] List<ManuProductBadRecordMarkSaveDto> productBadRecordMarkSaveDtos)
+        {
+            await _manuProductBadRecordService.SaveBadRecordMarkEntryAsync(productBadRecordMarkSaveDtos);
+        }
+
+        /// <summary>
+        /// 导入 不良标识 数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importBadRecordMark")]
+        ///[PermissionDescription("manu:BadRecordMark:import")]
+        public async Task ImportBadRecordMarkAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _manuProductBadRecordService.ImportBadRecordMarkEntryAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportBadRecordMarkTemplate")]
+        [LogDescription("不良标识导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            //throw new NotImplementedException();
+
+            using MemoryStream stream = new MemoryStream();
+            await _manuProductBadRecordService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"录入标识导入模板.xlsx");
+        }
+
+
+
+        #endregion
+
     }
 }

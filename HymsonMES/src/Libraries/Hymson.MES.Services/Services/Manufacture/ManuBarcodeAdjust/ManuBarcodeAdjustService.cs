@@ -1,12 +1,4 @@
-/*
- *creator: Karl
- *
- *describe:条码调整    服务 | 代码由框架生成
- *builder:  wxk
- *build datetime: 2023-07-28 05:41:12
- */
 using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -15,28 +7,20 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Constants.Manufacture;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using Hymson.MES.Core.Enums.Warehouse;
-using Hymson.MES.CoreServices.Bos.Common.MasterData;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -47,10 +31,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.IdentityModel.Tokens;
-using Minio.DataModel;
-using System.Security.Policy;
 using System.Transactions;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
@@ -277,6 +257,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 itemDto.VehicleCode = vehicle?.Code ?? "";
                 itemDto.ProcedureCode = procedure?.Code ?? "";
                 itemDto.MaterialCodeVersion = material == null ? "" : $"{material.MaterialCode}/{material.Version}";
+                itemDto.MaterialCode = material?.MaterialCode ?? "";
+                itemDto.MaterialVersion = material?.Version ?? "";
+                itemDto.MaterialName = material?.MaterialName ?? "";
                 itemDto.ProcessRouteCodeVersion = procProcessRoute == null ? "" : $"{procProcessRoute.Code}/{procProcessRoute.Version}";
                 itemDto.BomCodeVersion = bom == null ? "" : $"{bom.BomCode}/{bom.Version}";
                 resultViews.Add(itemDto);
@@ -412,7 +395,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             #endregion
 
             //查询数据
-            var manuSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new Data.Repositories.Manufacture.ManuSfc.Query.ManuSfcStatusQuery()
+            var manuSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery()
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcs
@@ -700,7 +683,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 #region 父级相关操作
                 //设置条码为无效，数量为0  manu_sfc与 manu_sfc_produce
-                await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(new Data.Repositories.Manufacture.ManuSfc.Command.UpdateStatusAndQtyBySfcsCommand()
+                await _manuSfcRepository.UpdateStatusAndQtyBySfcsAsync(new UpdateStatusAndQtyBySfcsCommand()
                 {
                     SiteId = _currentSite.SiteId,
                     SFCs = sfcs,
@@ -710,10 +693,10 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UpdatedOn = HymsonClock.Now()
                 });
                 if (isProduce)
-                    await _manuSfcProduceRepository.UpdateStatusAndQtyBySfcsAsync(new Data.Repositories.Manufacture.ManuSfcProduce.Command.UpdateStatusAndQtyBySfcsCommand
+                    await _manuSfcProduceRepository.UpdateStatusAndQtyBySfcsAsync(new UpdateStatusAndQtyBySfcsCommand
                     {
                         SiteId = _currentSite.SiteId ?? 0,
-                        Sfcs = sfcs,
+                        SFCs = sfcs,
                         Status = SfcStatusEnum.Invalid,
                         Qty = 0,
                         UpdatedBy = _currentUser.UserName,
@@ -826,7 +809,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             if (manuProductBadRecordEntities != null && manuProductBadRecordEntities.Any())
             {
-                if (manuProductBadRecordEntities.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.WaitingJudge)) 
+                if (manuProductBadRecordEntities.Any(x => x.DisposalResult == ProductBadDisposalResultEnum.WaitingJudge))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12838)).WithData("sfc", param.SFC);
                 }
@@ -844,7 +827,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     .WithData("SplitQty", param.Qty);
             }
 
-            
+
             #endregion
 
             var barCodeList = await GenerateBarcodeByproductId(manuSfcInfoEntity?.ProductId ?? 0);
@@ -857,7 +840,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12831)).WithData("ProductCode", procMaterialEntitity.MaterialCode);
             }
-            
+
             string? newSplitSFC = barCodeList.SelectMany(x => x.BarCodes.Select(x => x)).FirstOrDefault();
             if (newSplitSFC == null)
             {
@@ -1285,7 +1268,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //1. 在条码信息（manu_sfc）中查询是否有数据
             //var manuSfcs= await _manuSfcRepository.GetBySFCsAsync(distinctSfcs);
-            var manuSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new Data.Repositories.Manufacture.ManuSfc.Query.ManuSfcStatusQuery()
+            var manuSfcs = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery()
             {
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = distinctSfcs.ToArray()
@@ -1356,7 +1339,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES12839)).WithData("sfc", string.Join(",", ngSfcs.Select(x => x.SFC).Distinct()));
                 }
 
-                
+
             }
 
             //是否验证 不允许的工单状态
@@ -1398,7 +1381,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //    SiteId = _currentSite.SiteId ?? 0,
                 //    BarCodes = distinctSfcs.ToArray(),
                 //});
-                var containerPacks=  await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { SiteId=_currentSite.SiteId??0,LadeBarCodes= distinctSfcs });
+                var containerPacks = await _manuContainerPackRepository.GetByLadeBarCodesAsync(new ManuContainerPackQuery { SiteId = _currentSite.SiteId ?? 0, LadeBarCodes = distinctSfcs });
                 if (containerPacks != null && containerPacks.Any())
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12804)).WithData("sfc", string.Join(",", containerPacks.Select(x => x.LadeBarCode)));
@@ -1448,7 +1431,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //是否验证 物料清单必相同
-            if (sfcs.Length > 1 && verifyConditions.IsVerifySameBom) 
+            if (sfcs.Length > 1 && verifyConditions.IsVerifySameBom)
             {
                 var sfcsGroupByBoms = manuSfcs.GroupBy(x => x.ProductBOMId);
                 if (sfcsGroupByBoms.Count() > 1)
@@ -1458,7 +1441,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             //是否验证 工艺路线必相同
-            if (sfcs.Length > 1 && verifyConditions.IsVerifySameProcessRoute) 
+            if (sfcs.Length > 1 && verifyConditions.IsVerifySameProcessRoute)
             {
                 var sfcsGroupByProcessRoutes = manuSfcs.GroupBy(x => x.ProcessRouteId);
                 if (sfcsGroupByProcessRoutes.Count() > 1)

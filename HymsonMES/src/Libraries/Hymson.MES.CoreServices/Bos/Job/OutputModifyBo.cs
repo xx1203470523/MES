@@ -1,6 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
+using Hymson.MES.Data.Repositories.Manufacture;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {

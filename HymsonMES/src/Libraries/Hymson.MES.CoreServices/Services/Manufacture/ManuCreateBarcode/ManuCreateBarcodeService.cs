@@ -3,21 +3,20 @@ using FluentValidation.Results;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -184,7 +183,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             var procBomEntity = await _procBomRepository.GetByIdAsync(planWorkOrderEntity.ProductBOMId);
 
             // 获取产出设置的产品ID
-            var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new Bos.Common.MasterData.ProductSetBo
+            var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new ProductSetBo
             {
                 SiteId = param.SiteId,
                 ProductId = planWorkOrderEntity.ProductId,
@@ -731,7 +730,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode
             var procedureId = proc.FirstOrDefault()!.Id;
 
             // 获取产出设置的产品ID
-            var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new Bos.Common.MasterData.ProductSetBo
+            var productIdOfSet = await _masterDataService.GetProductSetIdAsync(new ProductSetBo
             {
                 SiteId = param.SiteId,
                 ProductId = wo.ProductId,

@@ -3,9 +3,6 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 

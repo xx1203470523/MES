@@ -2,7 +2,7 @@
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
 
-namespace Hymson.MES.CoreServices.Services.Common.MasterData
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 主数据公用类

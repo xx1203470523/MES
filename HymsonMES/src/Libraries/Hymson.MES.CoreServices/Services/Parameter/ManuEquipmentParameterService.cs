@@ -1,7 +1,7 @@
 ﻿using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
-using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter;
+using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.Snowflake;
 using Hymson.Utils.Tools;
 

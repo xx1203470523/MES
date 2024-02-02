@@ -13,19 +13,11 @@ using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
+using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -54,26 +46,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// 仓储接口（降级品继承）
         /// </summary>
         private readonly IManuDegradedProductExtendService _manuDegradedProductExtendService;
-
-        /// <summary>
-        /// 仓储接口（工序）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
-        /// 仓储接口（工序复投设置）
-        /// </summary>
-        private readonly IProcProcedureRejudgeRepository _procProcedureRejudgeRepository;
-
-        /// <summary>
-        ///  仓储（上料点关联资源）
-        /// </summary>
-        private readonly IProcLoadPointLinkResourceRepository _procLoadPointLinkResourceRepository;
-
-        /// <summary>
-        /// 仓储接口（生产工单）
-        /// </summary>  
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 仓储接口（上料信息）
@@ -121,11 +93,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
 
         /// <summary>
-        /// 仓储接口（不合格代码）
-        /// </summary>
-        private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
-
-        /// <summary>
         /// 仓储接口（物料库存）
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
@@ -136,7 +103,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
 
         /// <summary>
-        /// 
+        /// 多语言服务
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
@@ -146,10 +113,6 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="logger"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuDegradedProductExtendService"></param>
-        /// <param name="procProcedureRepository"></param>
-        /// <param name="procProcedureRejudgeRepository"></param>
-        /// <param name="procLoadPointLinkResourceRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
         /// <param name="manuFeedingRepository"></param>
         /// <param name="manuSfcRepository"></param>
         /// <param name="manuSfcProduceRepository"></param>
@@ -159,17 +122,12 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="manuDowngradingRecordRepository"></param>
         /// <param name="manuProductBadRecordRepository"></param>
         /// <param name="manuProductNgRecordRepository"></param>
-        /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="localizationService"></param>
         public OutStationJobService(ILogger<OutStationJobService> logger,
             IMasterDataService masterDataService,
             IManuDegradedProductExtendService manuDegradedProductExtendService,
-            IProcProcedureRepository procProcedureRepository,
-            IProcProcedureRejudgeRepository procProcedureRejudgeRepository,
-            IProcLoadPointLinkResourceRepository procLoadPointLinkResourceRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository,
             IManuFeedingRepository manuFeedingRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
@@ -179,7 +137,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             IManuDowngradingRecordRepository manuDowngradingRecordRepository,
             IManuProductBadRecordRepository manuProductBadRecordRepository,
             IManuProductNgRecordRepository manuProductNgRecordRepository,
-            IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             ILocalizationService localizationService)
@@ -187,10 +144,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _logger = logger;
             _masterDataService = masterDataService;
             _manuDegradedProductExtendService = manuDegradedProductExtendService;
-            _procProcedureRepository = procProcedureRepository;
-            _procProcedureRejudgeRepository = procProcedureRejudgeRepository;
-            _procLoadPointLinkResourceRepository = procLoadPointLinkResourceRepository;
-            _planWorkOrderRepository = planWorkOrderRepository;
             _manuFeedingRepository = manuFeedingRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
@@ -200,7 +153,6 @@ namespace Hymson.MES.CoreServices.Services.Job
             _manuDowngradingRecordRepository = manuDowngradingRecordRepository;
             _manuProductBadRecordRepository = manuProductBadRecordRepository;
             _manuProductNgRecordRepository = manuProductNgRecordRepository;
-            _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
             _whMaterialInventoryRepository = whMaterialInventoryRepository;
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _localizationService = localizationService;
@@ -251,10 +203,10 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 foreach (var sfcProduceEntity in noMatchSFCProcedureEntities)
                 {
-                    var inProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcProduceEntity.ProcedureId)
+                    var inProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(sfcProduceEntity.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", sfcProduceEntity.ProcedureId);
 
-                    var outProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+                    var outProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(commonBo.ProcedureId)
                         ?? throw new CustomerValidationException(nameof(ErrorCode.MES16358)).WithData("Procedure", commonBo.ProcedureId);
 
                     var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
@@ -290,7 +242,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
 
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
@@ -342,7 +294,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (resourceFeeds != null) allFeedingEntities.AddRange(resourceFeeds);
 
             // 通过资源 -> 上料点
-            var loadPoints = await _procLoadPointLinkResourceRepository.GetByResourceIdAsync(commonBo.ResourceId);
+            var loadPoints = await _masterDataService.GetLoadPointLinkEntitiesByResourceIdAsync(commonBo.ResourceId);
             var pointFeeds = await _manuFeedingRepository.GetByFeedingPointIdWithOutZeroAsync(new GetByFeedingPointIdsQuery
             {
                 FeedingPointIds = loadPoints.Select(s => s.LoadPointId)
@@ -350,7 +302,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (pointFeeds != null) allFeedingEntities = allFeedingEntities.UnionBy(pointFeeds, s => s.Id).ToList();
 
             // 查询工序信息
-            var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(commonBo.ProcedureId)
+            var procProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(commonBo.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17114)).WithData("Procedure", commonBo.ProcedureId);
 
             // 复投所需参数对象
@@ -380,7 +332,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 var manuSfcEntity = manuSFCEntities.FirstOrDefault(s => s.Id == sfcProduceEntity.SFCId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES17102)).WithData("SFC", requestBo.SFC);
 
-                var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(sfcProduceEntity.WorkOrderId)
+                var workOrderEntity = await _masterDataService.GetWorkOrderEntityByIdAsync(sfcProduceEntity.WorkOrderId)
                     ?? throw new CustomerValidationException(nameof(ErrorCode.MES16373)).WithData("SFC", requestBo.SFC);
 
                 // 单条码返回值
@@ -507,7 +459,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             JobResponseBo responseBo = new();
             if (obj is not OutStationResponseSummaryBo data) return responseBo;
@@ -634,7 +586,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (param is not JobRequestBo commonBo) return default;
             if (commonBo == null) return default;
 
-            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new Bos.Common.MasterData.JobRelationBo
+            return await _masterDataService.GetJobRelationJobByProcedureIdOrResourceIdAsync(new JobRelationBo
             {
                 ProcedureId = commonBo.ProcedureId,
                 ResourceId = commonBo.ResourceId,
@@ -839,7 +791,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             }
 
             // 如果有传不合格代码，进行校验是否存在
-            var qualUnqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByCodesAsync(new QualUnqualifiedCodeByCodesQuery
+            var qualUnqualifiedCodeEntities = await _masterDataService.GetUnqualifiedEntitiesByCodesAsync(new QualUnqualifiedCodeByCodesQuery
             {
                 SiteId = commonBo.SiteId,
                 Codes = unqualifiedCodes
@@ -927,7 +879,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             var isMatchBlockCode = false;
             if (procedureRejudgeBo.BlockUnqualifiedIds != null && procedureRejudgeBo.BlockUnqualifiedIds.Any())
             {
-                var blockUnqualifiedEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
+                var blockUnqualifiedEntities = await _masterDataService.GetUnqualifiedEntitiesByIdsAsync(procedureRejudgeBo.BlockUnqualifiedIds);
 
                 // 判断NGCode中是否含有首次不良工序
                 var ngCodeInBlock = unqualifiedCodes.Intersect(blockUnqualifiedEntities.Select(s => s.UnqualifiedCode));
@@ -1337,7 +1289,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         private async Task<ProcedureRejudgeBo> FillingProcedureRejudgeBoAsync(ProcedureRejudgeBo procedureRejudgeBo)
         {
             // 查询工序关联的复投不合格代码
-            var procedureRejudgeEntities = await _procProcedureRejudgeRepository.GetEntitiesAsync(new EntityByParentIdQuery
+            var procedureRejudgeEntities = await _masterDataService.GetProcedureRejudgeEntitiesAsync(new EntityByParentIdQuery
             {
                 SiteId = procedureRejudgeBo.SiteId,
                 ParentId = procedureRejudgeBo.ProcedureId
@@ -1347,7 +1299,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             if (!procedureRejudgeEntities.Any()) return procedureRejudgeBo;
 
             // 不合格代码
-            var unqualifiedCodeEntities = await _qualUnqualifiedCodeRepository.GetByIdsAsync(procedureRejudgeEntities.Select(s => s.UnqualifiedCodeId));
+            var unqualifiedCodeEntities = await _masterDataService.GetUnqualifiedEntitiesByIdsAsync(procedureRejudgeEntities.Select(s => s.UnqualifiedCodeId));
 
             // 复投相关设置分组
             var procedureRejudgeEntitiesDic = procedureRejudgeEntities.ToLookup(e => e.DefectType).ToDictionary(d => d.Key, d => d);
@@ -1391,7 +1343,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 .WithData("Ids", procedureRejudgeBo.LastUnqualified.ProcessRouteId);
 
             // 首工序信息
-            var nextProcedureEntity = await _procProcedureRepository.GetByIdAsync(processRouteProcedureDto.ProcedureId)
+            var nextProcedureEntity = await _masterDataService.GetProcedureEntityByIdAsync(processRouteProcedureDto.ProcedureId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES17114))
                 .WithData("Procedure", processRouteProcedureDto.ProcedureId);
 

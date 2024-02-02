@@ -2,31 +2,18 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Dtos.Manufacture.ManuBind;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuBind;
+using Hymson.MES.CoreServices.Dtos.Manufacture;
+using Hymson.MES.CoreServices.Services.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
-using Hymson.MES.EquipmentServices.Dtos;
 using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.MES.EquipmentServices.Services.Manufacture;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
 using Hymson.Web.Framework.WorkContext;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Hymson.MES.EquipmentServices.Services.SfcBinding
 {

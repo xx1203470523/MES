@@ -8,7 +8,7 @@ using MySql.Data.MySqlClient;
 using System.Text;
 using static Dapper.SqlMapper;
 
-namespace Hymson.MES.Data.Repositories.Parameter.ManuProductParameter
+namespace Hymson.MES.Data.Repositories.Parameter
 {
     /// <summary>
     /// 设备过程参数仓储

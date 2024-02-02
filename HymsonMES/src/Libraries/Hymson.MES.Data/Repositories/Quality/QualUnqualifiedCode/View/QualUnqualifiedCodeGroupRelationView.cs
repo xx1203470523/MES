@@ -1,11 +1,4 @@
-﻿using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View
+﻿namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
     /// 不合格代码关联不合格代码组视图

@@ -4,9 +4,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.View;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -322,6 +319,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 query.Sfc = $"%{query.Sfc}%";
                 sqlBuilder.Where("ms.Sfc like  @Sfc");
+            }
+            if (!string.IsNullOrEmpty(query.SfcHard))
+            {
+                sqlBuilder.Where("ms.Sfc = @SfcHard ");
             }
             if (query.WorkOrderId.HasValue && query.WorkOrderId > 0)
             {

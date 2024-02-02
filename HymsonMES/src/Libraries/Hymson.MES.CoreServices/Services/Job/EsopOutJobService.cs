@@ -5,12 +5,7 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Services.Job
@@ -193,7 +188,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <param name="obj"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
             //JobResponseBo responseBo = new();
             //if (obj is not EsopOutResponseBo data) { 

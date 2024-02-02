@@ -10,10 +10,8 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
+using Hymson.MES.CoreServices.Services.Common;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
@@ -534,7 +532,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
                 foreach (var processRouteDetail in processRouteDetails.Select(x=>x.ProcedureIds))
                 {
                     var startIndex = processRouteDetail.ToList().IndexOf(startProcedureId);
-                    var endIndex = processRouteDetail.ToList().IndexOf(startProcedureId);
+                    var endIndex = processRouteDetail.ToList().IndexOf(endProcedureId);
                     if (startIndex < endIndex)
                     {
                         return true;

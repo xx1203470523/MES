@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
+﻿namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 删除 (物料删除)

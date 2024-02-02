@@ -7,21 +7,14 @@ using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
-using Hymson.MES.Data.Repositories.Plan;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using System.Data;
 using System.Text.Json;
 
-namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
+namespace Hymson.MES.CoreServices.Services.Common
 {
     /// <summary>
     /// 生产公共类
@@ -29,7 +22,12 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
     public partial class ManuCommonService : IManuCommonService
     {
         /// <summary>
-        /// 
+        /// 服务接口（主数据）
+        /// </summary>
+        private readonly IMasterDataService _masterDataService;
+
+        /// <summary>
+        /// 多语言
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
@@ -47,36 +45,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// 仓储接口（容器包装）
         /// </summary>
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
-
-        /// <summary>
-        /// 仓储接口（设备注册）
-        /// </summary>
-        private readonly IEquEquipmentRepository _equEquipmentRepository;
-
-        /// <summary>
-        /// 仓储接口（资源维护）
-        /// </summary>
-        private readonly IProcResourceRepository _procResourceRepository;
-
-        /// <summary>
-        /// 仓储接口（工序维护）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
-        /// 仓储接口（BOM明细）
-        /// </summary>
-        private readonly IProcBomDetailRepository _procBomDetailRepository;
-
-        /// <summary>
-        /// 仓储接口（物料维护）
-        /// </summary>
-        private readonly IProcMaterialRepository _procMaterialRepository;
-
-        /// <summary>
-        /// 仓储接口（掩码规则维护）
-        /// </summary>
-        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
         /// <summary>
         /// 仓储接口（载具注册）
@@ -104,60 +72,39 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         /// <summary>
-        /// 工单
-        /// </summary>
-        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
+        /// <param name="masterDataService"></param>
         /// <param name="localizationService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="manuContainerPackRepository"></param>
-        /// <param name="equEquipmentRepository"></param>
-        /// <param name="procResourceRepository"></param>
-        /// <param name="procProcedureRepository"></param>
-        /// <param name="procBomDetailRepository"></param>
-        /// <param name="procMaterialRepository"></param>
-        /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="inteVehicleRepository"></param>
         /// <param name="inteVehiceFreightStackRepository"></param>
         /// <param name="inteVehicleTypeRepository"></param>
-        public ManuCommonService(ILocalizationService localizationService,
-                           IManuSfcProduceRepository manuSfcProduceRepository,
-                           IManuSfcCirculationRepository manuSfcCirculationRepository,
-                           IManuContainerPackRepository manuContainerPackRepository,
-                           IEquEquipmentRepository equEquipmentRepository,
-                           IProcResourceRepository procResourceRepository,
-                           IProcProcedureRepository procProcedureRepository,
-                           IProcBomDetailRepository procBomDetailRepository,
-                           IProcMaterialRepository procMaterialRepository,
-                           IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
-                           IInteVehicleRepository inteVehicleRepository,
-                           IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
-                           IInteVehicleTypeRepository inteVehicleTypeRepository,
-                           IManuSfcInfoRepository manuSfcInfoRepository,
-                           IPlanWorkOrderRepository planWorkOrderRepository,
-                           IManuSfcRepository manuSfcRepository
-                           )
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        public ManuCommonService(IMasterDataService masterDataService,
+            ILocalizationService localizationService,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuSfcCirculationRepository manuSfcCirculationRepository,
+            IManuContainerPackRepository manuContainerPackRepository,
+            IInteVehicleRepository inteVehicleRepository,
+            IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+            IInteVehicleTypeRepository inteVehicleTypeRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            IManuSfcRepository manuSfcRepository)
         {
+            _masterDataService = masterDataService;
             _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
-            _equEquipmentRepository = equEquipmentRepository;
-            _procResourceRepository = procResourceRepository;
-            _procProcedureRepository = procProcedureRepository;
-            _procBomDetailRepository = procBomDetailRepository;
-            _procMaterialRepository = procMaterialRepository;
-            _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
             _inteVehicleRepository = inteVehicleRepository;
             _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
             _inteVehicleTypeRepository = inteVehicleTypeRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
-            _planWorkOrderRepository= planWorkOrderRepository;
-            _manuSfcRepository= manuSfcRepository;
+            _manuSfcRepository = manuSfcRepository;
         }
 
         /// <summary>
@@ -235,7 +182,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <returns></returns>
         public async Task VerifyBomQtyAsync(ManuProcedureBomBo procedureBomBo)
         {
-            var procBomDetailEntities = await _procBomDetailRepository.GetByBomIdAsync(procedureBomBo.BomId);
+            var procBomDetailEntities = await _masterDataService.GetBomDetailEntitiesByBomIdAsync(procedureBomBo.BomId);
             if (procBomDetailEntities == null) return;
 
             // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
@@ -273,7 +220,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
                 if (currentQty < targetQty)
                 {
-                    var materialEntity = await _procMaterialRepository.GetByIdAsync(item.Key);
+                    var materialEntity = await _masterDataService.GetMaterialEntityByIdAsync(item.Key);
                     if (materialEntity == null) continue;
 
                     throw new CustomerValidationException(nameof(ErrorCode.MES16321)).WithData("Code", materialEntity.MaterialCode);
@@ -290,14 +237,14 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <exception cref="CustomerValidationException"></exception>
         public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
         {
-            var material = await _procMaterialRepository.GetByIdAsync(materialId)
+            var material = await _masterDataService.GetMaterialEntityByIdAsync(materialId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
             if (!material.MaskCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             // 未设置规则
-            var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
+            var maskCodeRules = await _masterDataService.GetMaskCodeRuleEntitiesByMaskCodeIdAsync(material.MaskCodeId.Value);
             if (maskCodeRules == null || !maskCodeRules.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             return barCode.VerifyBarCode(maskCodeRules);
@@ -409,21 +356,21 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         public async Task<ManufactureResponseBo> GetManufactureBoAsync(ManufactureRequestBo requestBo)
         {
             // 查询资源
-            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            var resourceEntity = await _masterDataService.GetResourceEntityByCodeAsync(new EntityByCodeQuery
             {
                 Site = requestBo.SiteId,
                 Code = requestBo.ResourceCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", requestBo.ResourceCode);
 
             // 根据设备
-            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
+            var equipmentEntity = await _masterDataService.GetEquipmentEntityByCodeAsync(new EntityByCodeQuery
             {
                 Site = requestBo.SiteId,
                 Code = requestBo.EquipmentCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", requestBo.EquipmentCode);
 
             // 读取设备绑定的资源
-            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
+            var resourceBindEntities = await _masterDataService.GetResourceEntitiesByEquipmentCodeAsync(new ProcResourceQuery
             {
                 SiteId = requestBo.SiteId,
                 EquipmentCode = requestBo.EquipmentCode
@@ -436,10 +383,10 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             }
 
             // 读取资源对应的工序（只查询启用状态）
-            var procProcedureEntities = await _procProcedureRepository.GetProcProduresByResourceIdAsync(new ProcProdureByResourceIdQuery
+            var procProcedureEntities = await _masterDataService.GetProcedureEntitiesByResourceIdAsync(new EntityByLinkIdQuery
             {
                 SiteId = requestBo.SiteId,
-                ResourceId = resourceEntity.Id
+                LinkId = resourceEntity.Id
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", requestBo.ResourceCode);
 
             var procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Status == SysDataStatusEnum.Enable || f.Status == SysDataStatusEnum.Retain)

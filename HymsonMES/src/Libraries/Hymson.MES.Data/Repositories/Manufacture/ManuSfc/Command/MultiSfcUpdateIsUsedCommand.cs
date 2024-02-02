@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码使用状态更新

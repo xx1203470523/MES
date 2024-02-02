@@ -36,9 +36,11 @@
         public const string MES10127 = "状态已经是[{status}],无法重复设置";
         public const string MES10128 = "变更状态的状态不能为新建";
         public const string MES10129 = "只有新建或者保留才能编辑";
-        public const string MES10130 = "操作数据已经不存在了";
+        public const string MES10130 = "操作数据丢失";
         public const string MES10131 = "编码只能是英文或数字组合";
         public const string MES10132 = "编码不能包含特殊字符";
+        public const string MES10133 = "未获取到导入数据！";
+        public const string MES10134 = "未获取到导出数据！";        
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -794,6 +796,22 @@
         public const string MES15427 = "条码工单未激活,无法取消报废";
         public const string MES15428 = "数据有变动，请刷新后再操作!";
         public const string MES15430 = "载具编码不能为空";
+
+        public const string MES15431 = "参数为空";
+        public const string MES15432 = "条码不能为空";
+        public const string MES15433 = "发现工序不能为空";
+        public const string MES15434 = "不合格代码不能为空";
+        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,发现工序,不合格代码)数据！";
+        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现工序[{foundBadOperationCode}]，不合格代码[{unqualifiedCode}]！";
+        public const string MES15437 = "存在不是缺陷的不合格代码";
+        public const string MES15438 = "条码[{sfc}]是锁定、删除或无效状态，无法使用";
+        public const string MES15439 = "条码[{sfc}]不存在";
+        public const string MES15440 = "导入的不合格记录录入标识数据为空";
+        public const string MES15441 = "不合格代码[{unqualifiedCode}]不存在";
+        public const string MES15442 = "存在不是缺陷的不合格代码[{unqualifiedCode}]";
+        public const string MES15443 = "发现工序编码[{foundBadOperationCode}]不存在";
+        public const string MES15444 = "拦截工序编码[{interceptProcedureCode}]不存在";
+
         #endregion
 
         #region 物料加载 15500
@@ -1060,6 +1078,9 @@
         public const string MES16382 = "产品序列码存在NULL值，请检查参数！";
         public const string MES16383 = "返修数据不存在，请联系管理员！！！";
         public const string MES16384 = "物料编码【{BarCodes}】已过期！";
+
+        public const string MES16385 = "产品序列码【{SFC}】开始时间不符合跨工序时间校验规则，小于下限值【{Value}分钟】！";
+        public const string MES16386 = "产品序列码【{SFC}】开始时间不符合跨工序时间校验规则，大于上限值【{Value}分钟】！";
         #endregion
 
         #region 工单激活 MES16400
@@ -1659,18 +1680,51 @@
         #endregion
 
         #region 发布记录 19300 
-        public const string MES19301 = "版本已存在!";
-        public const string MES19302 = "发布已超过24小时，不允许预留!";
-        public const string MES19303 = "已发布，不允许删除!"; 
+        public const string MES19301 = "版本已存在！";
+        public const string MES19302 = "发布已超过24小时，不允许预留！";
+        public const string MES19303 = "已发布，不允许删除！";
         #endregion
+
+        #region AQL校验 19400
+        public const string MES19401 = "列【批次最小数量】值有重复！";
+        public const string MES19402 = "列【批次最大数量】值有重复！";
+        public const string MES19403 = "列【批次最小数量】值【{Value}】存在跟其他水平值交叉！";
+        public const string MES19404 = "列【批次最大数量】值【{Value}】存在跟其他水平值交叉！";
+        public const string MES19405 = "列【样本代码】值有重复！";
+        #endregion
+
         #endregion
 
         #region 系统执行出错 业务逻辑出错
+        
 
         #endregion
 
         #region 调用第三方服务出错
 
+        #endregion
+
+        #region 计划
+        public const string MES19501 = "班制编码为空";
+        public const string MES19502 = "班制名称为空";
+        public const string MES19503 = "班制开始时间为空";
+        public const string MES19504 = "班制结束时间为空";
+        public const string MES19505 = "班制编码已存在,请重新输入!";
+        public const string MES19506 = "班次类型不允许重复";
+        public const string MES19507 = "未跨天班次的结束时间必须大于开始时间！";
+        public const string MES19508 = "没有添加任何班次数据";
+        #endregion
+
+        #region Marking标识 19700
+        public const string MES19701 = "发现不良工序不允许为空!";
+        public const string MES19702 = "不合格代码不允许为空!";
+        public const string MES19703 = "产品序列码不允许为空!";
+        public const string MES19704 = "发现工序【code】不存在!";
+        public const string MES19705 = "拦截工序【code】不存在!";
+        public const string MES19706 = "产品序列码【code】不存在!";
+        public const string MES19707 = "产品序列码【code】状态为【status】!";
+        public const string MES19708 = "不合格代码【code】不存在!";
+        public const string MES19709 = "产品序列码【code】信息不存在!";
         #endregion
     }
 }

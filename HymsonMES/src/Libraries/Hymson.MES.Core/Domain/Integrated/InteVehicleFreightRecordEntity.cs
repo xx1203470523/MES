@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具装载记录    实体类 | 代码由框架生成  如果数据库字段发生变化,则手动调整
- *builder:  wxk
- *build datetime: 2023-07-24 04:45:45
- */
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Core.Domain.Integrated

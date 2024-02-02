@@ -8,7 +8,7 @@ using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
-using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode;
+using Hymson.MES.Data.Repositories.Quality;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -81,8 +81,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult<IEnumerable<JobBo>?>(default);
         }
 
         /// <summary>
@@ -100,10 +99,9 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public async Task<JobResponseBo> ExecuteAsync(object obj)
+        public async Task<JobResponseBo?> ExecuteAsync(object obj)
         {
-            await Task.CompletedTask;
-            return new JobResponseBo();
+            return await Task.FromResult<JobResponseBo?>(default);
         }
 
         /// <summary>
@@ -113,8 +111,7 @@ namespace Hymson.MES.CoreServices.Services.Job
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> AfterExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            await Task.CompletedTask;
-            return null;
+            return await Task.FromResult<IEnumerable<JobBo>?>(default);
         }
 
     }

@@ -2,7 +2,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 
-namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query
+namespace Hymson.MES.Data.Repositories.Quality
 {
     /// <summary>
     /// 不合格代码分页参数

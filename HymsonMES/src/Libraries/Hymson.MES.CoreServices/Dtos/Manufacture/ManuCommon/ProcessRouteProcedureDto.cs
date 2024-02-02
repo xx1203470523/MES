@@ -1,7 +1,7 @@
 ﻿using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Process;
 
-namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon
+namespace Hymson.MES.CoreServices.Dtos.Manufacture
 {
     /// <summary>
     /// 工艺路线工序

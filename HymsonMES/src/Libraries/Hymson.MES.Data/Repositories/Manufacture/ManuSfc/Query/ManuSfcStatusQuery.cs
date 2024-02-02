@@ -1,14 +1,6 @@
-/*
- *creator: Karl
- *
- *describe: 条码信息表 查询类 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-21 04:00:29
- */
-
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码信息表 查询参数

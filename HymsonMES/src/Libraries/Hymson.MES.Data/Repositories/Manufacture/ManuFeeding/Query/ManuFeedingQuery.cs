@@ -1,6 +1,6 @@
 using Hymson.MES.Core.Enums;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Query
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 查询参数

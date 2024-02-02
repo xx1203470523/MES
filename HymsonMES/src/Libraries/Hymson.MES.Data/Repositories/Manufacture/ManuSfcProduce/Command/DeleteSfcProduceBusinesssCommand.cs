@@ -1,6 +1,6 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
 
-namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
+namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 删除在制品业务实体类
