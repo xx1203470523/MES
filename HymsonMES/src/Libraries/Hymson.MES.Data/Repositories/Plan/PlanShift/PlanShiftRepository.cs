@@ -232,7 +232,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string InsertSql = "INSERT INTO plan_shift(  `Id`, `SiteId`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO plan_shift(  `Id`, `SiteId`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
-        const string InsertDetailSql = @"INSERT INTO mes_master_dev.plan_shift_detail
+        const string InsertDetailSql = @"INSERT INTO plan_shift_detail
                                         (`Id`, `ShfitId`, `ShiftType`, `StartTime`, `EndTime`, `IsDaySpan`, `IsOverTime`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`)
                                         VALUES(@Id, @ShfitId, @ShiftType, @StartTime, @EndTime, @IsDaySpan, @IsOverTime, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)";
 
