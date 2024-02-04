@@ -118,7 +118,7 @@ public class ManuSfcCirculationService : IManuSfcCirculationService
             var filePath = await _excelService.ExportAsync(excelData, fileName, fileName);
             //上传到文件服务器  
             var uploadResult = await _minioService.PutObjectAsync(filePath);
-            result.FileName = "";
+            result.FileName = fileName;
             result.Path = uploadResult.AbsoluteUrl;
             result.RelativePath = uploadResult.RelativeUrl;
         }

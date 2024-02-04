@@ -92,13 +92,12 @@ namespace Hymson.MES.Services.Services.Report.PackBindOtherReport
                 resultData.Add(newItem);
             }
 
-            
             if (resultData?.Any() == true)
             {
                 var filePath = await _excelService.ExportAsync(resultData, fileName, fileName);
                 //上传到文件服务器  
                 var uploadResult = await _minioService.PutObjectAsync(filePath);
-                result.FileName = "";
+                result.FileName = fileName;
                 result.Path = uploadResult.AbsoluteUrl;
                 result.RelativePath = uploadResult.RelativeUrl;
             }

@@ -537,7 +537,7 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationCreateDto>();
             CreateMap<ManuSfcCirculationQuery, ManuSfcCirculationQueryDto>();
             CreateMap<ManuSfcCirculationQueryDto, ManuSfcCirculationQuery>();
-            CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationExcelDto > ();
+            CreateMap<ManuSfcCirculationEntity, ManuSfcCirculationExcelDto>();
 
             #endregion
         }
@@ -677,6 +677,7 @@ namespace Hymson.MES.Services.Mapper
 
             #region PackBindOtherReport
 
+            CreateMap<ManuSfcCirculationEntity, PackBindOtherReportExcelDto>();
 
             #endregion
         }
