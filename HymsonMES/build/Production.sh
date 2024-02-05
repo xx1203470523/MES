@@ -1,5 +1,5 @@
 #! /bin/bash
-PublishEnvironment=Release
+PublishEnvironment=Production
 timestamp=$(date +%Y%m%d%H%M%S)
 serviceName=hymson-mes-battery-api-prod
 registryUrl=harbor.xnebula.com/new-energy
