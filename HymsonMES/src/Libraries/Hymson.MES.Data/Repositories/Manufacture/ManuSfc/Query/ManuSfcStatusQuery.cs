@@ -15,14 +15,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query
     /// </summary>
     public class ManuSfcStatusQuery
     {
+        public long SiteId { get; set; }
+
         /// <summary>
         /// 条码列表
         /// </summary>
-        public string[] Sfcs { get; set; }
+        public  IEnumerable<string>  Sfcs { get; set; }
 
         /// <summary>
         /// 条码状态
         /// </summary>
-        public SfcStatusEnum?[] Statuss { get; set; } 
+        public IEnumerable<SfcStatusEnum>? Statuss { get; set; } 
     }
 }

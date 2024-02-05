@@ -26,5 +26,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// 载具类型编码
         /// </summary>
         public string? VehicleTypeCode { get; set; }
+
+        /// <summary>
+        /// 载具id 数组
+        /// </summary>
+        public long[]? Ids { get; set; } 
     }
 }

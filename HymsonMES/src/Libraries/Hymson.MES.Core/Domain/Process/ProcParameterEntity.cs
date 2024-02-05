@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :参数单位（字典定义） 
         /// 空值 : false  
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public string? ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 

@@ -1,23 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 条码生产信息（物理删除）    服务接口 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-18 05:37:27
- */
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
-using Hymson.MES.Core.Constants.Process;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
 {
@@ -32,6 +16,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="manuSfcProducePagedQueryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcProduceViewDto>> GetPageListAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
+
+        /// <summary>
+        /// 根据查询条件获取分页数据
+        /// </summary>
+        /// <param name="manuSfcProducePagedQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuSfcProduceViewDto>> GetPageListNewAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
 
         /// <summary>
         /// 质量锁定
@@ -104,19 +95,21 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task<PagedInfo<ManuSfcProduceViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProducePagedQueryDto manuSfcProducePagedQueryDto);
 
         /// <summary>
-        /// 分页查询（查询所有条码信息）
+        /// 分页查询（查询所有条码信息:不包含锁定和报废的）
         /// 优化
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcSelectPagedInfoAsync(ManuSfcProduceSelectPagedQueryDto queryDto);
 
+        Task<PagedInfo<ManuSfcProduceSelectViewDto>> GetManuSfcPagedInfoAsync(ManuSfcProduceSelectPagedQueryDto queryDto);
+
         /// <summary>
         /// 根据SFC查询在制品步骤列表
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        Task<List<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs);
+        Task<IEnumerable<ManuSfcProduceStepViewDto>> QueryManuSfcProduceStepBySFCsAsync(List<ManuSfcProduceStepSFCDto> sfcs);
 
         /// <summary>
         /// 保存在制品步骤
@@ -140,6 +133,13 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         Task<List<ManuUpdateProcedureViewDto>> GetProcedureByOrderIdListAsync(long workOrderId);
 
         /// <summary>
+        /// 获取更改生产工序列表数据
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        Task<List<ManuUpdateProcedureViewDto>> GetProcedureByRouteIdListsync(long processRouteId);
+
+        /// <summary>
         /// 保存生产更改
         /// </summary>
         /// <param name="manuUpdateSaveDto"></param>
@@ -159,5 +159,35 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
         /// <param name="sfcs"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcProduceAboutDowngradingViewDto>> GetManuSfcAboutManuDowngradingBySfcsAsync(string[] sfcs);
+
+
+        /// <summary>
+        /// 根据工序ID与资源ID获取活动的在制品
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ActivityManuSfcProduceViewDto>> GetActivityListByProcedureIdAndResIdAsync(ManuSfcProduceByProcedureIdAndResourceIdDto query);
+
+        /// <summary>
+        /// 根据工序与资源查询活动的载具
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<IEnumerable<ActivityVehicleViewDto>> GetVehicleActivityListByProcedureIdAndResIdAsync(ActivityVehicleByProcedureIdAndResourceIdDto query);
+
+        /// <summary>
+        /// 查询工序下排队中的载具分页信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<InteVehicleViewDto>> GetVehicleLineUpPageByProcedureIdPagedInfoAsync(LineUpVehicleByProcedureIdDto query);
+
+        /// <summary>
+        /// 分页查询（查询所有在制条码信息，加入载具）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ManuUpdateViewDto>> GetManuSfcPageListAsync(ManuSfcProduceVehiclePagedQueryDto queryDto);
     }
 }

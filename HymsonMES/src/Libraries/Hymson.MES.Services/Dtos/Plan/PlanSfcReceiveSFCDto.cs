@@ -5,7 +5,7 @@ namespace Hymson.MES.Services.Dtos.Plan
     /// <summary>
     /// 条码接收
     /// </summary>
-    public class PlanSfcReceiveSFCDto
+    public class PlanSfcReceiveSfcDto
     {
         /// <summary>
         /// 工单号

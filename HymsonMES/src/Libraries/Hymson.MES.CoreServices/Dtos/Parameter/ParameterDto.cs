@@ -10,7 +10,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
     /// <summary>
     /// 参数采集实体类
     /// </summary>
-    public record ParameterDto : BaseEntityDto
+    public record EquipmentParameterDto : BaseEntityDto
     {
         /// <summary>
         /// 站点Id
@@ -18,14 +18,9 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         public long SiteId { get; set; }
 
         /// <summary>
-        /// 条码
+        /// 设备Id
         /// </summary>
-        public string SFC { get; set; }
-
-        /// <summary>
-        /// 工序Id
-        /// </summary>
-        public long ProcedureId { get; set; }
+        public long EquipmentId { get; set; }
 
         /// <summary>
         /// 参数Id
@@ -35,7 +30,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 参数值
         /// </summary>
-        public string ParameterValue { get; set; }
+        public string ParameterValue { get; set; } = "";
 
         /// <summary>
         /// 采集时间
@@ -45,7 +40,7 @@ namespace Hymson.MES.CoreServices.Dtos.Parameter
         /// <summary>
         /// 
         /// </summary>
-        public string UserName { get; set; }
+        public string UserName { get; set; } = "";
 
         public DateTime Date { get; set; }
     }

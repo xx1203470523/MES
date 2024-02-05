@@ -27,7 +27,6 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public class ManuDowngradingRecordService : IManuDowngradingRecordService
     {
-        private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
@@ -35,9 +34,8 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuDowngradingRecordRepository _manuDowngradingRecordRepository;
 
-        public ManuDowngradingRecordService(ICurrentUser currentUser, ICurrentSite currentSite, IManuDowngradingRecordRepository manuDowngradingRecordRepository)
+        public ManuDowngradingRecordService(ICurrentSite currentSite, IManuDowngradingRecordRepository manuDowngradingRecordRepository)
         {
-            _currentUser = currentUser;
             _currentSite = currentSite;
             _manuDowngradingRecordRepository = manuDowngradingRecordRepository;
         }

@@ -117,11 +117,5 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long? Id { get; set; }
 
-        /// <summary>
-        /// 操作类型
-        /// </summary>
-       // [Required(ErrorMessage = "操作类型不可为空")]
-       // [Range(1, 3)]
-        //public int OperationType { get; set; }
     }
 }

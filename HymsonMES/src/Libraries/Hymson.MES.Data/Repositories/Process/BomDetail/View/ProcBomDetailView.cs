@@ -35,11 +35,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public string Version { get; set; }
 
-        ///// <summary>
-        ///// 数据收集方式
-        ///// </summary>
-        //public MaterialSerialNumberEnum? SerialNumber { get; set; }
-
         /// <summary>
         /// 用量
         /// </summary>

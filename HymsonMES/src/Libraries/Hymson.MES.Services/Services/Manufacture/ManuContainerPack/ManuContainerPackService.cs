@@ -20,7 +20,6 @@ using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -50,30 +49,49 @@ namespace Hymson.MES.Services.Services.Manufacture
 
         private readonly AbstractValidator<ManuContainerPackCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ManuContainerPackModifyDto> _validationModifyRules;
-        private readonly IManuContainerPackRecordService _manuContainerPackRecordService;
         /// <summary>
         /// 接口（操作面板按钮）
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
-        private readonly IManuSfcStepRepository _manuSfcStepRepository;
         private readonly IManuSfcRepository _manuSfcRepository;
         private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
+        private readonly IManuSfcStepRepository _manuSfcStepRepository;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuContainerBarcodeRepository"></param>
+        /// <param name="manuContainerPackRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="manuContainerPackRecordRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="manuFacePlateButtonService"></param>
+        /// <param name="manuSfcStepRepository"></param>
         public ManuContainerPackService(ICurrentUser currentUser, ICurrentSite currentSite,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository,
             IManuContainerPackRepository manuContainerPackRepository,
             IPlanWorkOrderRepository planWorkOrderRepository,
-            IManuContainerPackRecordService manuContainerPackRecordService,
             IManuContainerPackRecordRepository manuContainerPackRecordRepository,
-            IManuSfcStepRepository manuSfcStepRepository,
             IManuSfcRepository manuSfcRepository,
             IManuSfcInfoRepository manuSfcInfoRepository,
             IManuSfcProduceRepository manuSfcProduceRepository,
             AbstractValidator<ManuContainerPackCreateDto> validationCreateRules,
             AbstractValidator<ManuContainerPackModifyDto> validationModifyRules,
             IProcMaterialRepository procMaterialRepository,
-            IManuFacePlateButtonService manuFacePlateButtonService)
+            IManuFacePlateButtonService manuFacePlateButtonService,
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -84,12 +102,11 @@ namespace Hymson.MES.Services.Services.Manufacture
             _validationModifyRules = validationModifyRules;
             _procMaterialRepository = procMaterialRepository;
             _manuContainerPackRecordRepository = manuContainerPackRecordRepository;
-            _manuSfcStepRepository = manuSfcStepRepository;
             _manuSfcInfoRepository = manuSfcInfoRepository;
             _manuSfcRepository = manuSfcRepository;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuFacePlateButtonService = manuFacePlateButtonService;
-            _manuContainerPackRecordService = manuContainerPackRecordService;
+            _manuSfcStepRepository = manuSfcStepRepository;
         }
 
         /// <summary>
@@ -137,7 +154,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16732));
             }
-            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault().ContainerBarCodeId);
+            var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(manuContainerPackList.FirstOrDefault()!.ContainerBarCodeId.GetValueOrDefault());
 
             IEnumerable<ManuSfcEntity> manuSfclist = new List<ManuSfcEntity>();
             IEnumerable<ManuSfcInfoEntity> manuSfcInfolist = new List<ManuSfcInfoEntity>();
@@ -168,7 +185,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = param.ProcedureId ?? 0,
                     ContainerBarCodeId = item.ContainerBarCodeId,
                     LadeBarCode = item.LadeBarCode,
-                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+                    OperateType = ManuContainerPackRecordOperateTypeEnum.Remove
                 });
 
                 if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
@@ -188,14 +205,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 UpdatedBy = _currentUser.UserName,
                                 SFC = item.LadeBarCode,
                                 ProductId = manuSfcInfoEntity.ProductId,
-                                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
+                                WorkOrderId = manuSfcInfoEntity.WorkOrderId ?? 0,
                                 ResourceId = param.ResourceId,
                                 ProcedureId = param.ProcedureId,
                                 Operatetype = ManuSfcStepTypeEnum.Unpack,
                                 Qty = manuSfcEntity.Qty,
                                 WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
                                 ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
-                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcStatusEnum.Complete : manuSfcProduceEntity.Status
                             });
                         }
                     }
@@ -252,7 +269,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     ProcedureId = param.ProcedureId ?? 0,
                     ContainerBarCodeId = item.ContainerBarCodeId,
                     LadeBarCode = item.LadeBarCode,
-                    OperateType = (int)ManuContainerBarcodeOperateTypeEnum.Unload
+                    OperateType = ManuContainerPackRecordOperateTypeEnum.Remove
                 });
 
                 if (manuContainerBarcodeEntity.PackLevel == (int)LevelEnum.One)
@@ -272,14 +289,14 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 UpdatedBy = _currentUser.UserName,
                                 SFC = item.LadeBarCode,
                                 ProductId = manuSfcInfoEntity.ProductId,
-                                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
+                                WorkOrderId = manuSfcInfoEntity.WorkOrderId ?? 0,
                                 ResourceId = param.ResourceId,
                                 ProcedureId = param.ProcedureId,
                                 Operatetype = ManuSfcStepTypeEnum.Unpack,
                                 Qty = manuSfcEntity.Qty,
                                 WorkCenterId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
                                 ProductBOMId = manuSfcProduceEntity == null ? null : manuSfcProduceEntity.WorkCenterId,
-                                CurrentStatus = manuSfcProduceEntity == null ? SfcProduceStatusEnum.Complete : manuSfcProduceEntity.Status
+                                CurrentStatus = manuSfcProduceEntity == null ? SfcStatusEnum.Complete : manuSfcProduceEntity.Status
                             });
                         }
                     }
@@ -421,7 +438,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             {
                 return manuContainerPackEntity.ToModel<ManuContainerPackDto>();
             }
-            return null;
+            return new ManuContainerPackDto();
         }
 
 
@@ -434,10 +451,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         public async Task<Dictionary<string, JobResponseBo>> ExecuteJobAsync(ManuFacePlateContainerPackExJobDto manuFacePlateContainerPackExJobDto)
         {
             #region  验证数据
-            //if (string.IsNullOrWhiteSpace(manuFacePlateContainerPackExJobDto.SFC))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES16708));
-            //}
+
             #endregion
 
             #region 调用作业
@@ -448,10 +462,6 @@ namespace Hymson.MES.Services.Services.Manufacture
                 FacePlateButtonId = manuFacePlateContainerPackExJobDto.FacePlateButtonId,
                 Param = new Dictionary<string, string>()
             };
-            //jobDto.Param?.Add("SFC", manuFacePlateContainerPackExJobDto.SFC);
-            //jobDto.Param?.Add("ProcedureId", $"{manuFacePlateContainerPackExJobDto.ProcedureId}");
-            //jobDto.Param?.Add("ResourceId", $"{manuFacePlateContainerPackExJobDto.ResourceId}");
-            //jobDto.Param?.Add("ContainerId", $"{manuFacePlateContainerPackExJobDto.ContainerId}");
             var sfcs = new List<string>() { manuFacePlateContainerPackExJobDto.SFC };
             JobRequestBo bo = new()
             {
@@ -465,8 +475,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             // 调用作业
             var resJob = await _manuFacePlateButtonService.NewClickAsync(jobDto, bo);
-            //var resJob = await _manuFacePlateButtonService.ClickAsync(jobDto);
-            if (resJob == null || resJob.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16709));
+            if (resJob == null || !resJob.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16709));
             return resJob;
             #endregion
         }

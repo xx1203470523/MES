@@ -1,9 +1,4 @@
 ﻿using Hymson.MES.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
 {
@@ -20,7 +15,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public SfcProduceStatusEnum Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工序
@@ -46,7 +41,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
+
+        // 2023.11.01 add
+        /// <summary>
+        /// 是否维修
+        /// </summary>
+        public TrueOrFalseEnum IsRepair { get; set; } = TrueOrFalseEnum.No;
     }
+
     /// <summary>
     /// 根据SFC批量更新工序与状态 (参数)
     /// </summary>
@@ -77,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 状态
         /// </summary>
-        public SfcProduceStatusEnum? Status { get; set; }
+        public SfcStatusEnum? Status { get; set; }
 
         /// <summary>
         /// 操作人员
@@ -106,8 +108,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command
         /// <summary>
         /// 工序
         /// </summary>
-        public long ProcedureId { get; set; } 
-        
+        public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源
         /// </summary>

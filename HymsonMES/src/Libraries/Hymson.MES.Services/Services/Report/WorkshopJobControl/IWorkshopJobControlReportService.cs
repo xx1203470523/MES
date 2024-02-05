@@ -21,12 +21,14 @@ namespace Hymson.MES.Services.Services.Report
     /// </summary>
     public interface IWorkshopJobControlReportService
     {
+
         /// <summary>
         /// 根据查询条件获取车间作业控制报表分页数据
+        /// 优化: 不模糊查询，且通过关联ID查询
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param);
+        Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportOptimizePagedQueryDto param);
 
         /// <summary>
         /// 获取SFC的车间作业控制步骤
@@ -40,6 +42,6 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam);
+        Task<PagedInfo<ManuSfcStepBySfcViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySfcPagedQueryDto queryParam);
     }
 }

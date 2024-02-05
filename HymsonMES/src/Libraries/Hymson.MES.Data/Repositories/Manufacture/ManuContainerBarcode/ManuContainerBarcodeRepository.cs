@@ -290,7 +290,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetByCodesSql = @"SELECT 
                                `Id`, `SiteId`, `ProductId`, `BarCode`,`WorkOrderId`, `ContainerId`,`PackLevel`,`MaterialVersion`, `MaterialCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_container_barcode`  WHERE BarCode in @BarCodes and SiteId=@SiteId ";
+                            FROM `manu_container_barcode`  WHERE BarCode in @BarCodes and SiteId=@SiteId and IsDeleted=0 ";
         const string GetByProductIdSql = @"SELECT 
                                `Id`, `SiteId`, `ProductId`,`WorkOrderId`, `BarCode`, `ContainerId`,`PackLevel`,`MaterialVersion`, `MaterialCode`, `Status`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_container_barcode`  WHERE IsDeleted =0 and ProductId = @ProductId and Status=@Status and PackLevel=@PackLevel ";

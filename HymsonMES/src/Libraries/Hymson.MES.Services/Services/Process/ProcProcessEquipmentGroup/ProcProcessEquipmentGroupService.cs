@@ -18,6 +18,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using System.Linq;
+using static Mysqlx.Expect.Open.Types.Condition.Types;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -53,11 +54,6 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IEquEquipmentRepository _equipmentRepository;
 
         /// <summary>
-        /// 仓储接口（工序）
-        /// </summary>
-        private readonly IProcProcedureRepository _procProcedureRepository;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -66,12 +62,10 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procProcessEquipmentGroupRepository"></param>
         /// <param name="procProcessEquipmentGroupRelationRepository"></param>
         /// <param name="equipmentRepository"></param>
-        /// <param name="procProcedureRepository"></param>
         public ProcProcessEquipmentGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcProcessEquipmentGroupSaveDto> validationSaveRules,
             IProcProcessEquipmentGroupRepository procProcessEquipmentGroupRepository,
             IProcProcessEquipmentGroupRelationRepository procProcessEquipmentGroupRelationRepository,
-            IEquEquipmentRepository equipmentRepository,
-            IProcProcedureRepository procProcedureRepository)
+            IEquEquipmentRepository equipmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -79,7 +73,6 @@ namespace Hymson.MES.Services.Services.Process
             _procProcessEquipmentGroupRepository = procProcessEquipmentGroupRepository;
             _procProcessEquipmentGroupRelationRepository = procProcessEquipmentGroupRelationRepository;
             _equipmentRepository = equipmentRepository;
-            _procProcedureRepository = procProcedureRepository;
         }
 
         /// <summary>
@@ -94,7 +87,7 @@ namespace Hymson.MES.Services.Services.Process
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
-            if (saveDto.Code.Contains(" ")) throw new CustomerValidationException(nameof(ErrorCode.MES18901));
+            if (saveDto.Code.Contains(' ')) throw new CustomerValidationException(nameof(ErrorCode.MES18901));
             if (saveDto.Name.ToTrimSpace() == "") throw new CustomerValidationException(nameof(ErrorCode.MES18902));
             
             // 更新时间
@@ -120,7 +113,7 @@ namespace Hymson.MES.Services.Services.Process
             IEnumerable<string> equipmentIds = procProcessEquipmentGroupRelations.EquipmentIDs;
             if (equipmentIds != null)
             {
-                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new Dictionary<long, List<long>>();
+                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new();
                 var processEquGroupRelationRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetEntitiesAsync(entity.SiteId);
                 foreach (var processEquipmentGroupRelationEntity in processEquGroupRelationRelationEntities)
                 {
@@ -133,32 +126,27 @@ namespace Hymson.MES.Services.Services.Process
                         allProcProcessEquipmentGroupRelations[processEquipmentGroupRelationEntity.EquipmentGroupId] = new List<long>() { processEquipmentGroupRelationEntity.EquipmentId };
                     }
                 }
-                List<long> EquipmentGroupIds = new List<long>();//设备与当前设备组相同的所有设备组Id
-                foreach (var key in allProcProcessEquipmentGroupRelations.Keys)
+                List<long> EquipmentGroupIds = new();//设备与当前设备组相同的所有设备组Id
+                foreach (var key in allProcProcessEquipmentGroupRelations.Keys
+                    .Where(x=> allProcProcessEquipmentGroupRelations[x].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList())))
                 {
-                    if (allProcProcessEquipmentGroupRelations[key].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList()))
-                    {
-                        EquipmentGroupIds.Add(key);
-                    }
+                    EquipmentGroupIds.Add(key);
                 }
-                IEnumerable< ProcProcessEquipmentGroupEntity > procProcessEquipmentGroupEntityList=new List<ProcProcessEquipmentGroupEntity >();
-                //找到相对应的工序+设备组
-                if (saveDto.ProcedureId != null)
-                    procProcessEquipmentGroupEntityList= await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
-                if(procProcessEquipmentGroupEntityList.Count()>0 )
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
+               
                 //Insert Relation
                 foreach (var item in equipmentIds)
                 {
-                    ProcProcessEquipmentGroupRelationEntity procProcessEquipmentGroupRelationEntity = new ProcProcessEquipmentGroupRelationEntity();
-                    procProcessEquipmentGroupRelationEntity.EquipmentGroupId = entity.Id;
-                    procProcessEquipmentGroupRelationEntity.EquipmentId = long.Parse(item);
-                    procProcessEquipmentGroupRelationEntity.SiteId = _currentSite.SiteId ?? 0;
-                    procProcessEquipmentGroupRelationEntity.Id = IdGenProvider.Instance.CreateId();
-                    procProcessEquipmentGroupRelationEntity.CreatedBy = updatedBy;
-                    procProcessEquipmentGroupRelationEntity.CreatedOn = updatedOn;
-                    procProcessEquipmentGroupRelationEntity.UpdatedBy = updatedBy;
-                    procProcessEquipmentGroupRelationEntity.UpdatedOn = updatedOn;
+                    ProcProcessEquipmentGroupRelationEntity procProcessEquipmentGroupRelationEntity = new()
+                    {
+                        EquipmentGroupId = entity.Id,
+                        EquipmentId = long.Parse(item),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
+                    };
 
                     //添加
                     procProcessEquipmentGroupRelationEntities.Add(procProcessEquipmentGroupRelationEntity);
@@ -207,7 +195,7 @@ namespace Hymson.MES.Services.Services.Process
             IEnumerable<string> equipmentIds = procProcessEquipmentGroupRelations.EquipmentIDs;
             if (equipmentIds != null)
             {
-                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new Dictionary<long, List<long>>();
+                Dictionary<long, List<long>> allProcProcessEquipmentGroupRelations = new();
                 var processEquGroupRelationRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetEntitiesAsync(entity.SiteId);
                 foreach (var processEquipmentGroupRelationEntity in processEquGroupRelationRelationEntities)
                 {
@@ -222,32 +210,26 @@ namespace Hymson.MES.Services.Services.Process
                 }
                 if(saveDto.Id!=null)
                     allProcProcessEquipmentGroupRelations.Remove(saveDto.Id.ParseToLong());
-                List<long> EquipmentGroupIds = new List<long>();//设备与当前设备组相同的所有设备组Id
-                foreach (var key in allProcProcessEquipmentGroupRelations.Keys)
+                List<long> EquipmentGroupIds = new();//设备与当前设备组相同的所有设备组Id
+                foreach (var key in allProcProcessEquipmentGroupRelations.Keys
+                    .Where(x=> allProcProcessEquipmentGroupRelations[x].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList())))
                 {
-                    if (allProcProcessEquipmentGroupRelations[key].SequenceEqual(equipmentIds.Select(s => Convert.ToInt64(s)).ToList()))
-                    {
-                        EquipmentGroupIds.Add(key);
-                    }
+                    EquipmentGroupIds.Add(key);
                 }
-                IEnumerable<ProcProcessEquipmentGroupEntity> procProcessEquipmentGroupEntityList = new List<ProcProcessEquipmentGroupEntity>();
-                //找到相对应的工序+设备组
-                if (saveDto.ProcedureId != null)
-                    procProcessEquipmentGroupEntityList = await _procProcessEquipmentGroupRepository.GetCountByIdsAndProcedureIdAsync(EquipmentGroupIds.ToArray(), saveDto.ProcedureId.ParseToLong());
-                if (procProcessEquipmentGroupEntityList.Count() > 0)
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18904));
 
                 foreach (var item in equipmentIds)
                 {
-                    ProcProcessEquipmentGroupRelationEntity procProcessEquipmentGroupRelationEntity = new ProcProcessEquipmentGroupRelationEntity();
-                    procProcessEquipmentGroupRelationEntity.EquipmentGroupId = entity.Id;
-                    procProcessEquipmentGroupRelationEntity.EquipmentId = long.Parse(item);
-                    procProcessEquipmentGroupRelationEntity.SiteId = _currentSite.SiteId ?? 0;
-                    procProcessEquipmentGroupRelationEntity.Id = IdGenProvider.Instance.CreateId();
-                    procProcessEquipmentGroupRelationEntity.CreatedBy = updatedBy;
-                    procProcessEquipmentGroupRelationEntity.CreatedOn = updatedOn;
-                    procProcessEquipmentGroupRelationEntity.UpdatedBy = updatedBy;
-                    procProcessEquipmentGroupRelationEntity.UpdatedOn = updatedOn;
+                    ProcProcessEquipmentGroupRelationEntity procProcessEquipmentGroupRelationEntity = new()
+                    {
+                        EquipmentGroupId = entity.Id,
+                        EquipmentId = long.Parse(item),
+                        SiteId = _currentSite.SiteId ?? 0,
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = updatedBy,
+                        CreatedOn = updatedOn,
+                        UpdatedBy = updatedBy,
+                        UpdatedOn = updatedOn
+                    };
 
                     //添加
                     procProcessEquipmentGroupRelationEntities.Add(procProcessEquipmentGroupRelationEntity);
@@ -255,7 +237,7 @@ namespace Hymson.MES.Services.Services.Process
             }
                 
             IEnumerable<long> Ids = new List<long>() { saveDto.Id ?? 0 };
-            DeleteCommand deleteCommand = new DeleteCommand()
+            DeleteCommand deleteCommand = new()
             {
                 Ids = Ids,
                 DeleteOn = updatedOn,
@@ -328,12 +310,6 @@ namespace Hymson.MES.Services.Services.Process
                 var procProcessEquipmentGroupEntity = await _procProcessEquipmentGroupRepository.GetByIdAsync(id);
                 dto.Info = procProcessEquipmentGroupEntity.ToModel<ProcProcessEquipmentGroupListDto>();
 
-                //读取工序数据
-                var procedureId = dto.Info.ProcedureId;
-                var procedureEntity = await _procProcedureRepository.GetByIdAsync(procedureId);
-                dto.Info.ProcedureCode = procedureEntity.Code;
-                dto.Info.ProcedureName = procedureEntity.Name;
-
                 processEquipmentGroupRelationEntities = await _procProcessEquipmentGroupRelationRepository.GetByGroupIdAsync(new ProcProcessEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, ProcessEquipmentGroupId = id });
             }
 
@@ -372,21 +348,6 @@ namespace Hymson.MES.Services.Services.Process
 
             // 实体到DTO转换 装载数据
             var dtos = pagedInfo.Data.Select(s => s.ToModel<ProcProcessEquipmentGroupListDto>());
-            var procedureIds = dtos.Select(s => s.ProcedureId);
-            var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
-
-            List<ProcProcessEquipmentGroupListDto> newDtos = new();
-            foreach (var item in dtos)
-            {
-                var procedure = procedureEntities.Where(p => p.Id == item.ProcedureId).FirstOrDefault();
-                if (procedure == null) continue;
-
-                item.ProcedureCode = procedure.Code;
-                item.ProcedureName = procedure.Name;
-                newDtos.Add(item);
-            }
-            dtos = newDtos;
-
             return new PagedInfo<ProcProcessEquipmentGroupListDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 

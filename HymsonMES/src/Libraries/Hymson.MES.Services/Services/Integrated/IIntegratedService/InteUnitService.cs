@@ -31,11 +31,6 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
-        /// 参数验证器
-        /// </summary>
-        private readonly AbstractValidator<InteUnitSaveDto> _validationSaveRules;
-
-        /// <summary>
         /// 仓储接口（单位维护）
         /// </summary>
         private readonly IInteUnitRepository _inteUnitRepository;
@@ -45,18 +40,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
-        /// <param name="validationSaveRules"></param>
         /// <param name="inteUnitRepository"></param>
-        public InteUnitService(ICurrentUser currentUser, ICurrentSite currentSite, 
+        public InteUnitService(ICurrentUser currentUser, ICurrentSite currentSite,
             //AbstractValidator<InteUnitSaveDto> validationSaveRules, 
             IInteUnitRepository inteUnitRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
-            //_validationSaveRules = validationSaveRules;
             _inteUnitRepository = inteUnitRepository;
         }
-
 
         /// <summary>
         /// 创建
@@ -65,16 +57,15 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> CreateInteUnitAsync(InteUnitSaveDto saveDto)
         {
-
+            // 判断是否有获取到站点码 
+            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
             // 验证DTO
-            if(saveDto.Code.Contains(" "))
+            if (saveDto.Code.Contains(' '))
                 throw new CustomerValidationException(nameof(ErrorCode.MES18800));
-            
+
             saveDto.Name = saveDto.Name.ToTrimSpace();
             if (saveDto.Name == "")
                 throw new CustomerValidationException(nameof(ErrorCode.MES18801));
-
-            //await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // 更新时间
             var updatedBy = _currentUser.UserName;
@@ -92,7 +83,7 @@ namespace Hymson.MES.Services.Services.Integrated
             // 编码唯一性验证
             var checkEntity = await _inteUnitRepository.GetByCodeAsync(new EntityByCodeQuery
             {
-                Site = entity.SiteId,
+                Site = _currentSite.SiteId ?? 0,
                 Code = entity.Code
             });
             if (checkEntity != null) throw new CustomerValidationException(nameof(ErrorCode.MES10521)).WithData("Code", entity.Code);
@@ -109,17 +100,20 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<int> ModifyInteUnitAsync(InteUnitSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            if (_currentSite.SiteId == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            }
 
-             // 验证DTO
-             saveDto.Name = saveDto.Name.ToTrimSpace();
-             if (saveDto.Name == "")   throw new CustomerValidationException(nameof(ErrorCode.MES18801));
-             // await _validationSaveRules.ValidateAndThrowAsync(saveDto);
+            // 验证DTO
+            saveDto.Name = saveDto.Name.ToTrimSpace();
+            if (saveDto.Name == "") throw new CustomerValidationException(nameof(ErrorCode.MES18801));
 
             // DTO转换实体
             var entity = saveDto.ToEntity<InteUnitEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
+            entity.SiteId = _currentSite.SiteId ?? 0;
             return await _inteUnitRepository.UpdateAsync(entity);
         }
 
@@ -153,12 +147,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteUnitDto?> QueryInteUnitByIdAsync(long id) 
+        public async Task<InteUnitDto?> QueryInteUnitByIdAsync(long id)
         {
-           var inteUnitEntity = await _inteUnitRepository.GetByIdAsync(id);
-           if (inteUnitEntity == null) return null;
-           
-           return inteUnitEntity.ToModel<InteUnitDto>();
+            var inteUnitEntity = await _inteUnitRepository.GetByIdAsync(id);
+            if (inteUnitEntity == null) return null;
+
+            return inteUnitEntity.ToModel<InteUnitDto>();
         }
 
         /// <summary>
@@ -169,7 +163,7 @@ namespace Hymson.MES.Services.Services.Integrated
         public async Task<PagedInfo<InteUnitDto>> GetPagedListAsync(InteUnitPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<InteUnitPagedQuery>();
-            pagedQuery.Id = _currentSite.SiteId ?? 0;
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _inteUnitRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

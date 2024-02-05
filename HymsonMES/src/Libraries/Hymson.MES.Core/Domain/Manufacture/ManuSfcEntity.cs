@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -27,13 +28,28 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public decimal Qty { get; set; }
 
         /// <summary>
-        /// 状态;1：在制；2：完成；3：已入库；4：报废
+        /// 状态: 1：排队中 2：活动中 3：完成-在制 4：完成 5：锁定 6：报废 7：删除
         /// </summary>
         public SfcStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 条码类型 1、生产条码 2、非生产条码
+        /// </summary>
+        public SfcTypeEnum Type { get; set; } = SfcTypeEnum.Produce;
 
         /// <summary>
         /// 是否使用
         /// </summary>
         public YesOrNoEnum IsUsed { get; set; } = YesOrNoEnum.No;
+
+        /// <summary>
+        /// 报废表Id
+        /// </summary>
+        public long? SfcScrapId { get; set; }
+
+        /// <summary>
+        /// 备份字段  用户状态回撤
+        /// </summary>
+        public SfcStatusEnum StatusBack { get; set; }
     }
 }

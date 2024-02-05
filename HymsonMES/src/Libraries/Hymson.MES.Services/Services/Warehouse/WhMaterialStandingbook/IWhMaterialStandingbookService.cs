@@ -30,14 +30,14 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="whMaterialStandingbookDto"></param>
+        /// <param name="whMaterialStandingbookCreateDto"></param>
         /// <returns></returns>
         Task CreateWhMaterialStandingbookAsync(WhMaterialStandingbookCreateDto whMaterialStandingbookCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="whMaterialStandingbookDto"></param>
+        /// <param name="whMaterialStandingbookModifyDto"></param>
         /// <returns></returns>
         Task ModifyWhMaterialStandingbookAsync(WhMaterialStandingbookModifyDto whMaterialStandingbookModifyDto);
 

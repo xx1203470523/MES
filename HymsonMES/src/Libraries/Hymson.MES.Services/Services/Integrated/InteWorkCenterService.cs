@@ -4,6 +4,7 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums;
@@ -39,6 +40,8 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IProcResourceRepository _procResourceRepository;
         private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -49,12 +52,13 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="inteWorkCenterRepository"></param>
         /// <param name="procResourceRepository"></param>
         /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="localizationService"></param>
         public InteWorkCenterService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<InteWorkCenterCreateDto> validationCreateRules,
             AbstractValidator<InteWorkCenterModifyDto> validationModifyRules,
             IInteWorkCenterRepository inteWorkCenterRepository,
             IProcResourceRepository procResourceRepository,
-            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
+            IPlanWorkOrderActivationRepository planWorkOrderActivationRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -63,6 +67,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _inteWorkCenterRepository = inteWorkCenterRepository;
             _procResourceRepository = procResourceRepository;
             _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -183,7 +188,8 @@ namespace Hymson.MES.Services.Services.Integrated
             var workShops = await _inteWorkCenterRepository.GetWorkCenterListByTypeAsync(new EntityByTypeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Type = WorkCenterTypeEnum.Farm
+                Type = WorkCenterTypeEnum.Farm,
+                Status = SysDataStatusEnum.Enable
             });
 
             return workShops.Select(s => new SelectOptionDto
@@ -216,6 +222,8 @@ namespace Hymson.MES.Services.Services.Integrated
             entity.Source = WorkCenterSourceEnum.MES;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
+            entity.Status = SysDataStatusEnum.Build;
+
             List<InteWorkCenterRelation> inteWorkCenterRelations = new();
             List<InteWorkCenterResourceRelation> inteWorkCenterResourceRelations = new();
 
@@ -242,7 +250,7 @@ namespace Hymson.MES.Services.Services.Integrated
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
-                    if (param.ResourceIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
+                    if (!param.ResourceIds.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
 
                     inteWorkCenterResourceRelations.AddRange(param.ResourceIds.Select(s => new InteWorkCenterResourceRelation
                     {
@@ -262,7 +270,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     // 判断资源的状态是否存在新建和废除状态
                     var resources = await _procResourceRepository.GetListByIdsAsync(param.ResourceIds.ToArray());
-                    if (resources != null && resources.Any(a => a.Status == (int)SysDataStatusEnum.Build || a.Status == (int)SysDataStatusEnum.Abolish) == true)
+                    if (resources != null && resources.Any(a => a.Status == (int)SysDataStatusEnum.Build || a.Status == (int)SysDataStatusEnum.Abolish))
                     {
                         // TODO 上面的资源类型要改为枚举
                         throw new CustomerValidationException(nameof(ErrorCode.MES12121));
@@ -270,7 +278,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     // 判断资源是否被重复绑定
                     var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
-                    if (workCenterIds != null && workCenterIds.Any() == true) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
+                    if (workCenterIds != null && workCenterIds.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
                     break;
                 default:
                     break;
@@ -297,9 +305,11 @@ namespace Hymson.MES.Services.Services.Integrated
             var entity = await _inteWorkCenterRepository.GetByIdAsync(param.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES12111));
 
-            if (entity.Status != SysDataStatusEnum.Build && param.Status == SysDataStatusEnum.Build)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == entity.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             // 如果有修改混线类型（从允许混线修改为不允许混线）
@@ -345,7 +355,6 @@ namespace Hymson.MES.Services.Services.Integrated
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
-                    //if (param.ResourceIds.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES12116));
 
                     inteWorkCenterResourceRelations.AddRange(param.ResourceIds.Select(s => new InteWorkCenterResourceRelation
                     {
@@ -365,7 +374,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     // 判断资源的状态是否存在新建和废除状态
                     var resources = await _procResourceRepository.GetListByIdsAsync(param.ResourceIds.ToArray());
-                    if (resources != null && resources.Any(a => a.Status == (int)SysDataStatusEnum.Build || a.Status == (int)SysDataStatusEnum.Abolish) == true)
+                    if (resources != null && resources.Any(a => a.Status == (int)SysDataStatusEnum.Build || a.Status == (int)SysDataStatusEnum.Abolish))
                     {
                         // TODO 上面的资源类型要改为枚举
                         throw new CustomerValidationException(nameof(ErrorCode.MES12121));
@@ -373,7 +382,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
                     // 判断资源是否被重复绑定
                     var workCenterIds = await _inteWorkCenterRepository.GetWorkCenterIdByResourceIdAsync(param.ResourceIds);
-                    if (workCenterIds != null && workCenterIds.Any() == true && workCenterIds.Contains(entity.Id) == false) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
+                    if (workCenterIds != null && workCenterIds.Any() && !workCenterIds.Contains(entity.Id)) throw new CustomerValidationException(nameof(ErrorCode.MES12117));
                     break;
                 default:
                     break;
@@ -417,10 +426,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // 只可删除新建状态
             var workCenters = await _inteWorkCenterRepository.GetByIdsAsync(ids);
-            //if (workCenters.Any(a => a.Status == SysDataStatusEnum.Enable || a.Status == SysDataStatusEnum.Retain))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES12113));
-            //}
+
             if (workCenters != null && workCenters.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -428,13 +434,65 @@ namespace Hymson.MES.Services.Services.Integrated
 
             // 检查产线是否有下级资源
             var inteWorkCenterRelations = await _inteWorkCenterRepository.GetResourceIdsByWorkCenterIdAsync(ids);
-            if (inteWorkCenterRelations != null && inteWorkCenterRelations.Any() == true)
+            if (inteWorkCenterRelations != null && inteWorkCenterRelations.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12114));
             }
 
             return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _inteWorkCenterRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES12125));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _inteWorkCenterRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
 
     }
 }

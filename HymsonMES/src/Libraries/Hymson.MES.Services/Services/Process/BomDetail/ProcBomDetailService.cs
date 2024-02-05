@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Process;
@@ -9,6 +10,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -33,6 +35,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procBomDetailRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// /// <param name="currentSite"></param>
         public ProcBomDetailService(ICurrentUser currentUser, IProcBomDetailRepository procBomDetailRepository, AbstractValidator<ProcBomDetailCreateDto> validationCreateRules, AbstractValidator<ProcBomDetailModifyDto> validationModifyRules, ICurrentSite currentSite)
         {
             _currentUser = currentUser;
@@ -40,6 +43,7 @@ namespace Hymson.MES.Services.Services.Process
             _procBomDetailRepository = procBomDetailRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
+
         }
 
 
@@ -144,9 +148,10 @@ namespace Hymson.MES.Services.Services.Process
         public async Task<ProcBomDetailDto> QueryProcBomDetailByIdAsync(long id)
         {
             var procBomDetailEntity = await _procBomDetailRepository.GetByIdAsync(id);
-            if (procBomDetailEntity == null) return null;
+            if (procBomDetailEntity == null) return new ProcBomDetailDto();
 
             return procBomDetailEntity.ToModel<ProcBomDetailDto>();
         }
+
     }
 }

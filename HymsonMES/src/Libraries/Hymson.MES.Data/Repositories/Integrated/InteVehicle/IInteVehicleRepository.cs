@@ -1,13 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 载具注册表仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-14 10:03:53
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
@@ -23,7 +17,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteVehicleEntity inteVehicleEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteVehicleEntity inteVehicleEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -61,12 +55,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteVehicleEntity>> GetByCodesAsync(EntityByCodesQuery query);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteVehicleEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -102,5 +103,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<InteVehicleEntity>> GetByVehicleTypeIdsAsync(InteVehicleVehicleTypeIdsQuery query);
+
+        /// <summary>
+        /// 根据Ids查询载具信息包含载具类型
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteVehicleAboutVehicleTypeView>> GetAboutVehicleTypeByIdsAsync(InteVehicleIdsQuery query);
     }
 }

@@ -31,8 +31,6 @@ namespace Hymson.MES.Services.Validators.Warehouse
             RuleFor(x => x.Quantity).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15205));
             RuleFor(x => x.Type).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15206));
             RuleFor(x => x.Source).NotEmpty().WithErrorCode(nameof(ErrorCode.MES15208));
-            //uleFor(x => x.Source).WithErrorCode(nameof(ErrorCode.MES15208));
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
         }
     }
 
@@ -43,8 +41,7 @@ namespace Hymson.MES.Services.Validators.Warehouse
     {
         public WhMaterialStandingbookModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+
         }
     }
 }

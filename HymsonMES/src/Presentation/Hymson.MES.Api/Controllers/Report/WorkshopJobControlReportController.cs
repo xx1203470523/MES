@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +7,7 @@ namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（车间作业控制报告）
-    /// @author Karl
-    /// @date 2023-04-21 17:34:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class WorkshopJobControlReportController : ControllerBase
@@ -43,7 +38,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("pagelist")]
-        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> QueryPagedWorkshopJobControlAsync([FromQuery] WorkshopJobControlReportPagedQueryDto param)
+        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> QueryPagedWorkshopJobControlAsync([FromQuery] WorkshopJobControlReportOptimizePagedQueryDto param)
         {
             return await _workshopJobControlReportService.GetWorkshopJobControlPageListAsync(param);
         }
@@ -67,7 +62,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <returns></returns>
         [HttpGet]
         [Route("getSfcStepBySFCPageList")]
-        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySFCPagedQueryDto param)
+        public async Task<PagedInfo<ManuSfcStepBySfcViewDto>> QueryPagedSFCStepBySFCAsync([FromQuery] ManuSfcStepBySfcPagedQueryDto param)
         {
             return await _workshopJobControlReportService.GetSFCStepsBySFCPageListAsync(param);
         }

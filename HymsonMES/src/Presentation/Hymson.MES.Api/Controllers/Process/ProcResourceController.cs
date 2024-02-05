@@ -1,24 +1,18 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.Resource;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
-    /// 资源维护表Controller
-    /// @tableName proc_resource
-    /// @author zhaoqing
-    /// @date 2023-02-08
+    /// 资源维护表
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcResourceController : ControllerBase
@@ -75,8 +69,20 @@ namespace Hymson.MES.Api.Controllers
             return await _procResourceService.GetByIdAsync(id);
         }
 
+
         /// <summary>
-        /// 查询资源类型下关联的资源
+        /// 查询资源维护表详情
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet("workCenterLineresAndResTypeRources")]
+        public async Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureId([FromQuery] ProcResourcePagedlineIdAndProcProcedureIdDto param)
+        {
+            return await _procResourceService.GetPageListBylineIdAndProcProcedureIdAsync(param);
+        }
+
+        /// <summary>
+        /// 查询资源类型下关    联的资源
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -94,7 +100,7 @@ namespace Hymson.MES.Api.Controllers
         /// <returns></returns>
         [Route("listByProcedure")]
         [HttpGet]
-        public async Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync([FromQuery] ProcResourceProcedurePagedQueryDto query)
+        public async Task<PagedInfo<ProcResourceViewDto>> GettPageListByProcedureIdAsync([FromQuery] ProcResourceProcedurePagedQueryDto query)
         {
             return await _procResourceService.GettPageListByProcedureIdAsync(query);
         }
@@ -183,7 +189,7 @@ namespace Hymson.MES.Api.Controllers
         public async Task UpdateProcResourceAsync([FromBody] ProcResourceModifyDto parm)
         {
             await _procResourceService.UpdateProcResrouceAsync(parm);
-        }
+        }   
 
         /// <summary>
         /// 删除资源维护表
@@ -209,6 +215,49 @@ namespace Hymson.MES.Api.Controllers
             return await _procResourceService.QueryEquipmentsByResourceIdAsync(resourceId);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（资源维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("资源维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:resource:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procResourceService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
 
+        /// <summary>
+        /// 保留（资源维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("资源维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:resource:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procResourceService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（资源维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("资源维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:resource:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procResourceService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

@@ -100,7 +100,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
             using (var trans = TransactionHelper.GetTransactionScope())
             {
                 rows += await _equEquipmentGroupRepository.InsertAsync(entity);
-                if (createDto.EquipmentIDs.Any() == true)
+                if (createDto.EquipmentIDs.Any())
                 {
                     rows += await _equEquipmentRepository.UpdateEquipmentGroupIdAsync(new UpdateEquipmentGroupIdCommand
                     {
@@ -193,19 +193,16 @@ namespace Hymson.MES.Services.Services.EquEquipmentGroup
         public async Task<EquEquipmentGroupDto> GetDetailAsync(long id)
         {
             EquEquipmentGroupDto dto = new();
-            IEnumerable<EquEquipmentEntity> equipmentEntitys;
 
-            if (id == 0)
-            {
-                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupId = id });
-            }
-            else
-            {
-                dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(id)).ToModel<EquEquipmentGroupListDto>();
-                equipmentEntitys = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery { SiteId = _currentSite.SiteId ?? 0, EquipmentGroupId = id });
-            }
+            if (id > 0) dto.Info = (await _equEquipmentGroupRepository.GetByIdAsync(id)).ToModel<EquEquipmentGroupListDto>();
 
-            dto.Equipments = equipmentEntitys.Select(s => s.ToModel<EquEquipmentBaseDto>());
+            var equipmentEntities = await _equEquipmentRepository.GetByGroupIdAsync(new EquEquipmentGroupIdQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                EquipmentGroupId = id
+            });
+            dto.Equipments = equipmentEntities.Select(s => s.ToModel<EquEquipmentBaseDto>());
+
             return dto;
         }
     }

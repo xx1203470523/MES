@@ -28,10 +28,21 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
             RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
             RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
-            RuleFor(x => x.Status).Must(s => Enum.IsDefined(typeof(SysDataStatusEnum), s)).WithErrorCode(nameof(ErrorCode.MES10717));
+
             RuleFor(x => x.LinkMaterials).NotNull().WithErrorCode(nameof(ErrorCode.MES10718));
             RuleFor(x => x.LinkResources).NotNull().WithErrorCode(nameof(ErrorCode.MES10719));
 
+        }
+    }
+
+    internal class ProcLoadPointImportValidator : AbstractValidator<ImportLoadPointDto>
+    {
+        public ProcLoadPointImportValidator()
+        {
+            RuleFor(x => x.LoadPoint).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10712));
+            RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
+            RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
+            RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
         }
     }
 
@@ -46,7 +57,7 @@ namespace Hymson.MES.Services.Validators.Process
             RuleFor(x => x.LoadPoint).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES10714));
             RuleFor(x => x.LoadPointName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10713));
             RuleFor(x => x.LoadPointName).MaximumLength(60).WithErrorCode(nameof(ErrorCode.MES10715));
-            RuleFor(x => x.Status).Must(s => Enum.IsDefined(typeof(SysDataStatusEnum), s)).WithErrorCode(nameof(ErrorCode.MES10717));
+
             RuleFor(x => x.LinkMaterials).NotNull().WithErrorCode(nameof(ErrorCode.MES10718));
             RuleFor(x => x.LinkResources).NotNull().WithErrorCode(nameof(ErrorCode.MES10719));
         }

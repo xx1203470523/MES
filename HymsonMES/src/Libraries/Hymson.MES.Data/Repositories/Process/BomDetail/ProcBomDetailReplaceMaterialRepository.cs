@@ -92,12 +92,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailReplaceMaterialEntity>> GetByBomIdAsync(long bomId)
         {
-            var key = $"proc_bom_detail_replace_material&{bomId}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomIdSql, new { bomId });
-            });
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcBomDetailReplaceMaterialEntity>(GetByBomIdSql, new { bomId });
         }
 
         /// <summary>

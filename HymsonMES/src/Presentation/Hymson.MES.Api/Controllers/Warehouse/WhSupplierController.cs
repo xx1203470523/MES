@@ -1,27 +1,14 @@
-/*
- *creator: Karl
- *
- *describe: 供应商    控制器 | 代码由框架生成  
- *builder:  pengxin
- *build datetime: 2023-03-03 01:51:43
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
-//using Hymson.Utils.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Warehouse
 {
     /// <summary>
     /// 控制器（供应商）
-    /// @author pengxin
-    /// @date 2023-03-03 01:51:43
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class WhSupplierController : ControllerBase
@@ -36,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// 构造函数（供应商）
         /// </summary>
         /// <param name="whSupplierService"></param>
+        /// <param name="logger"></param>
         public WhSupplierController(IWhSupplierService whSupplierService, ILogger<WhSupplierController> logger)
         {
             _whSupplierService = whSupplierService;
@@ -116,6 +104,45 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         public async Task DeleteWhSupplierAsync([FromBody] long[] ids)
         {
             await _whSupplierService.DeletesWhSupplierAsync(ids);
+        }
+
+        /// <summary>
+        /// 导入供应商数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [PermissionDescription("wh:supplier:import")]
+        public async Task ImportWhSupplierAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _whSupplierService.ImportWhSupplierAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _whSupplierService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"供应商导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导出供应商信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("wh:supplier:export")]
+        public async Task<WhSupplierExportResultDto> ExprotWhSupplierListAsync([FromQuery] WhSupplierPagedQueryDto param)
+        {
+            return await _whSupplierService.ExprotWhSupplierListAsync(param);
         }
 
     }

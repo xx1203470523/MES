@@ -33,4 +33,20 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         public long SiteId { get; set; }
     }
+
+    /// <summary>
+    ///根据编码查询参数
+    /// </summary>
+    public class WhSuppliersByCodeQuery
+    {
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
+        /// 编码集合
+        /// </summary>
+        public IEnumerable<string> Codes { get; set; }
+    }
 }

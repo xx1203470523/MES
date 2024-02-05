@@ -88,6 +88,11 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialEntity>> GetByIdsAsync(long[] ids)
         {
+            if (ids.Length <= 0) 
+            {
+                return new List<ProcMaterialEntity>();
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialEntity>(GetByIdsSql, new { ids = ids });
         }
@@ -223,15 +228,12 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 if (procMaterialPagedQuery.GroupId == 0)
                 {
-                    //predicate = predicate.And(it => it.GroupId == 0);
                     sqlBuilder.Where(" GroupId = 0 ");
                 }
                 else
                 {
                     sqlBuilder.Where(" ( GroupId = 0 or GroupId =@GroupId ) ");
                 }
-
-                //sqlBuilder.Where(" GroupId = @GroupId ");
             }
             if (procMaterialPagedQuery.Status.HasValue)
             {
@@ -350,6 +352,42 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateProcMaterialUnboundSql, new { GroupId = groupId });
         }
+
+        /// <summary>
+        /// 更新某物料 的状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
+
+        /// <summary>
+        /// 根据编码获取物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaterialEntity>> GetByCodesAsync(ProcMaterialsByCodeQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaterialEntity>(GetByCodesSql, param);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ProcMaterialEntity> entities)
+        {
+            if (entities == null || !entities.Any()) return 0;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertSql, entities);
+        }
+
     }
 
     public partial class ProcMaterialRepository
@@ -361,8 +399,8 @@ namespace Hymson.MES.Data.Repositories.Process
                                            FROM `proc_material` /**where**/  ";
         const string GetByCodeSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @SiteId AND MaterialCode= @MaterialCode AND Version =@Version LIMIT 1";
 
-        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio`,`MaskCodeId` ) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio,@MaskCodeId )  ";
-        const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Status = @Status, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, PackageNum = @PackageNum, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, MaskCodeId=@MaskCodeId, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio  WHERE Id = @Id ";
+        const string InsertSql = "INSERT INTO `proc_material`(  `Id`, `SiteId`, `GroupId`, `MaterialCode`, `MaterialName`, `Status`, `Origin`, `Version`, `IsDefaultVersion`, `Remark`, `BuyType`, `ProcessRouteId`, `BomId`, `Batch`, PackageNum, `Unit`, `SerialNumber`, `BaseTime`, `ConsumptionTolerance`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `ConsumeRatio`,`MaskCodeId`, QuantityLimit ) VALUES (   @Id, @SiteId, @GroupId, @MaterialCode, @MaterialName, @Status, @Origin, @Version, @IsDefaultVersion, @Remark, @BuyType, @ProcessRouteId, @BomId, @Batch, @PackageNum, @Unit, @SerialNumber, @BaseTime, @ConsumptionTolerance, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @ConsumeRatio,@MaskCodeId ,@QuantityLimit )  ";
+        const string UpdateSql = "UPDATE `proc_material` SET  GroupId = @GroupId, MaterialName = @MaterialName, Origin = @Origin, Version = @Version, Remark = @Remark, BuyType = @BuyType, ProcessRouteId = @ProcessRouteId, BomId = @BomId, Batch = @Batch, PackageNum = @PackageNum, Unit = @Unit, SerialNumber = @SerialNumber, BaseTime = @BaseTime, ConsumptionTolerance = @ConsumptionTolerance, IsDefaultVersion=@IsDefaultVersion, MaskCodeId=@MaskCodeId, QuantityLimit=@QuantityLimit, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn , ConsumeRatio=@ConsumeRatio  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_material` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
         const string GetViewByIdSql = @"SELECT 
@@ -394,12 +432,14 @@ namespace Hymson.MES.Data.Repositories.Process
                                         g.UpdatedBy,
                                         g.UpdatedOn,
                                         g.ConsumeRatio,
-                                        g.MaskCodeId
+                                        g.MaskCodeId,
+                                        g.QuantityLimit
                             FROM `proc_material` g 
                             LEFT JOIN proc_material_group o on o.Id=g.GroupId
                             LEFT JOIN proc_process_route p on g.ProcessRouteId = p.Id
                             LEFT JOIN proc_bom q on g.BomId = q.Id 
                             WHERE g.Id = @Id and g.SiteId=@SiteId ";
+
         const string GetMaterialByIdSql = @"SELECT * FROM `proc_material`
                             WHERE Id = @Id";
         const string GetByIdsSql = @"SELECT * FROM `proc_material`
@@ -422,5 +462,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 更新某物料组下的物料为未绑定物料组
         /// </summary>
         const string UpdateProcMaterialUnboundSql = "UPDATE `proc_material` SET GroupId= 0 WHERE GroupId = @GroupId ";
+
+        const string UpdateStatusSql = "UPDATE `proc_material` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+        
+        const string GetByCodesSql = @"SELECT * FROM `proc_material` WHERE MaterialCode IN @MaterialCodes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

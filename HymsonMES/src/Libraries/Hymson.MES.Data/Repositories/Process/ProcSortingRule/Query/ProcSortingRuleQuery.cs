@@ -26,8 +26,18 @@ namespace Hymson.MES.Data.Repositories.Process
         public long? MaterialId { get; set; }
 
         /// <summary>
+        /// 物料id列表
+        /// </summary>
+        public long[]? MaterialIds { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
     }
 }

@@ -1,4 +1,7 @@
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Process.ProcessRoute.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -51,11 +54,25 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetProcessRouteDetailNodesByProcessRouteIdAsync(long processRouteId);
 
         /// <summary>
+        /// 获取工艺路线工序信息
+        /// </summary>
+        /// <param name="processRouteId"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcProcedureEntity>> GetProcedureListByProcessRouteIdAsync(ProcessRouteProcedureQuery pagedQuery);
+
+        /// <summary>
         /// 查询List
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcProcessRouteDetailNodeView>> GetListAsync(ProcProcessRouteDetailNodeQuery query);
+
+        /// <summary>
+        /// 查询List（已缓存）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteDetailNodeEntity>> GetListAsync(EntityBySiteIdQuery query);
 
         /// <summary>
         /// 批量新增

@@ -1,11 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -53,6 +48,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 资源编码
         /// </summary>
         public string ResCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码Id
+        /// </summary>
+        public long UnqualifiedId { get; set; }
 
         /// <summary>
         /// 不合格代码

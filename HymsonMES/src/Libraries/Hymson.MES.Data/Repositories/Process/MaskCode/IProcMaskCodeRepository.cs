@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
+using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process.MaskCode
 {
@@ -52,6 +53,20 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcMaskCodeEntity>> GetPagedListAsync(ProcMaskCodePagedQuery pagedQuery);
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaskCodeEntity>> GetByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 根据编码获取掩码信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaskCodeEntity>> GetByCodesAsync(ProcMaskCodesByCodeQuery param);
 
     }
 }

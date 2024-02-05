@@ -11,6 +11,11 @@ namespace Hymson.MES.Core.Domain.Integrated
     public class InteUnitEntity : BaseEntity
     {
         /// <summary>
+        /// 站点Id
+        /// </summary>
+        public long? SiteId { get; set; }
+
+        /// <summary>
         /// 单位编码
         /// </summary>
         public string Code { get; set; }
@@ -24,7 +29,5 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 备注
         /// </summary>
         public string Remark { get; set; }
-
-        public long SiteId { get; set; }
     }
 }

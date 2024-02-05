@@ -1,31 +1,18 @@
-/*
- *creator: Karl
- *
- *describe: 降级录入    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-08-10 10:15:26
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
-using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -56,9 +43,30 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
 
+        /// <summary>
+        /// 仓储接口（条码步骤）
+        /// </summary>
         private readonly IManuSfcStepRepository _manuSfcStepRepository;
 
-        public ManuDowngradingService(ICurrentUser currentUser, ICurrentSite currentSite, IManuDowngradingRepository manuDowngradingRepository, IManuDowngradingRecordRepository manuDowngradingRecordRepository, IManuSfcRepository manuSfcRepository, IManuSfcProduceRepository manuSfcProduceRepository, IManuDowngradingRuleRepository manuDowngradingRuleRepository, IManuSfcStepRepository manuSfcStepRepository)
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="manuDowngradingRepository"></param>
+        /// <param name="manuDowngradingRecordRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcProduceRepository"></param>
+        /// <param name="manuDowngradingRuleRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        public ManuDowngradingService(ICurrentUser currentUser,
+            ICurrentSite currentSite,
+            IManuDowngradingRepository manuDowngradingRepository,
+            IManuDowngradingRecordRepository manuDowngradingRecordRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcProduceRepository manuSfcProduceRepository,
+            IManuDowngradingRuleRepository manuDowngradingRuleRepository,
+            IManuSfcStepRepository manuSfcStepRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
@@ -77,13 +85,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <returns></returns>
         public async Task SaveManuDowngradingAsync(ManuDowngradingSaveDto manuDowngradingSaveDto)
         {
-             // 判断是否有获取到站点码 
+            // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0)
             {
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-            if (string.IsNullOrEmpty(manuDowngradingSaveDto.Grade)) 
+            if (string.IsNullOrEmpty(manuDowngradingSaveDto.Grade))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11401));
             }
@@ -94,39 +102,43 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             #region 验证录入对应的降级编码是否存在
-            var manuDowngradingRule= await _manuDowngradingRuleRepository.GetByCodeAsync(new ManuDowngradingRuleCodeQuery 
-            { 
-                Code=manuDowngradingSaveDto.Grade,
-                SiteId=_currentSite.SiteId??0 
+            var manuDowngradingRule = await _manuDowngradingRuleRepository.GetByCodeAsync(new ManuDowngradingRuleCodeQuery
+            {
+                Code = manuDowngradingSaveDto.Grade,
+                SiteId = _currentSite.SiteId ?? 0
             });
-            if (manuDowngradingRule == null) 
+            if (manuDowngradingRule == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11406)).WithData("code", manuDowngradingSaveDto.Grade);
             }
             #endregion
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = manuDowngradingSaveDto.Sfcs });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery 
+            { 
+                SiteId = _currentSite.SiteId ??0,
+                Sfcs = manuDowngradingSaveDto.Sfcs 
+            });
 
             var noFindSfcs = new List<string>();
             foreach (var item in manuDowngradingSaveDto.Sfcs)
             {
-                if (!sfcList.Any(y => y.SFC == item)) 
+                if (!sfcList.Any(y => y.SFC == item))
                 {
                     noFindSfcs.Add(item);
                 }
             }
 
-            if (noFindSfcs.Any()) 
+            if (noFindSfcs.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11403)).WithData("sfc", string.Join(",", noFindSfcs));
             }
 
             //查询已经废弃的
-            var scrappingSfcs=new List<string>();
+            var scrappingSfcs = new List<string>();
             foreach (var item in sfcList)
             {
-                if (item.Status == SfcStatusEnum.Scrapping) 
+                if (item.Status == SfcStatusEnum.Scrapping)
                 {
                     scrappingSfcs.Add(item.SFC);
                 }
@@ -143,27 +155,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcList.Select(x => x.SFC).ToArray(),
             });
-            //找到锁定状态的
-            var lockedSfcs = new List<string>();
-            foreach (var item in sfcProduces)
-            {
-                if (item.Status == SfcProduceStatusEnum.Locked) 
-                {
-                    lockedSfcs.Add(item.SFC);
-                }
-            }
-            if (lockedSfcs.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
-            }
             #endregion
 
             ////DTO转换实体
-            //var manuDowngradingEntity = manuDowngradingSaveDto.ToEntity<ManuDowngradingEntity>();
-            var downgradings = await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery 
+            var downgradings = await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery
             {
-                SiteId=_currentSite.SiteId??0,
-                Sfcs= manuDowngradingSaveDto.Sfcs
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = manuDowngradingSaveDto.Sfcs
             });
 
             #region 校验 当前录入的等级不能高于之前等级 （按照等级编码的顺序，排序靠前等级越高）:表示 录入的等级的排序需要大于之前的等级的排序号
@@ -175,47 +173,35 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             allRuleList = allRuleList.OrderBy(x => x.SerialNumber);
 
-            //上面有该验证，这块就注释了
-            //var currentEntryGrade= allRuleList.FirstOrDefault(x => x.Code == manuDowngradingSaveDto.Grade);
-            //if (currentEntryGrade == null)
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES21206)).WithData("code", manuDowngradingSaveDto.Grade);
-            //}
-
             //查询sfc的降级等级是否大于当前需要修改的等级 （按照等级编码的顺序，排序靠前等级越高）
             foreach (var item in downgradings)
             {
                 var oldRule = allRuleList.FirstOrDefault(x => x.Code == item.Grade);
-                if (oldRule != null) 
+                if (oldRule != null && manuDowngradingRule.SerialNumber < oldRule.SerialNumber)
                 {
-                    if (manuDowngradingRule.SerialNumber < oldRule.SerialNumber)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES11409)).WithData("sfc",item.SFC);
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES11409)).WithData("sfc", item.SFC);
                 }
-                //else   //该验证 不需要了，海龙说： 如果移除了，重新录入，不用判断之前的信息，就当成第一次录入就好
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES11408)).WithData("sfc", item.SFC);
             }
 
 
             #endregion
 
 
-            List< ManuDowngradingEntity > addEntities = new List< ManuDowngradingEntity >();
-            List< ManuDowngradingEntity > updateEntities = new List< ManuDowngradingEntity >();
+            List<ManuDowngradingEntity> addEntities = new List<ManuDowngradingEntity>();
+            List<ManuDowngradingEntity> updateEntities = new List<ManuDowngradingEntity>();
 
-            List<ManuDowngradingRecordEntity> addRecordEntitys=new List<ManuDowngradingRecordEntity> ();
+            List<ManuDowngradingRecordEntity> addRecordEntitys = new List<ManuDowngradingRecordEntity>();
             List<ManuSfcStepEntity> manuSfcStepList = new();
 
             foreach (var item in manuDowngradingSaveDto.Sfcs)
             {
                 //记录
-                var rocordEntity = new ManuDowngradingRecordEntity() 
+                var rocordEntity = new ManuDowngradingRecordEntity()
                 {
-                    SFC=item,
-                    Grade= manuDowngradingSaveDto.Grade,
-                    IsCancellation= ManuDowngradingRecordTypeEnum.Entry,
-                    Remark= manuDowngradingSaveDto.Remark,
+                    SFC = item,
+                    Grade = manuDowngradingSaveDto.Grade,
+                    IsCancellation = ManuDowngradingRecordTypeEnum.Entry,
+                    Remark = manuDowngradingSaveDto.Remark,
 
                     Id = IdGenProvider.Instance.CreateId(),
                     SiteId = _currentSite.SiteId ?? 0,
@@ -252,19 +238,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (currentDowngrading != null)
                 {
                     currentDowngrading.Grade = manuDowngradingSaveDto.Grade;
-                    currentDowngrading.Remark = manuDowngradingSaveDto.Remark??"";
+                    currentDowngrading.Remark = manuDowngradingSaveDto.Remark ?? "";
 
                     currentDowngrading.UpdatedOn = HymsonClock.Now();
                     currentDowngrading.UpdatedBy = _currentUser.UserName;
                     updateEntities.Add(currentDowngrading);
                 }
-                else 
+                else
                 {
                     addEntities.Add(new ManuDowngradingEntity
                     {
                         SFC = item,
                         Grade = manuDowngradingSaveDto.Grade,
-                        Remark = manuDowngradingSaveDto.Remark??"",
+                        Remark = manuDowngradingSaveDto.Remark ?? "",
 
                         Id = IdGenProvider.Instance.CreateId(),
                         SiteId = _currentSite.SiteId ?? 0,
@@ -278,17 +264,21 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                if(addEntities.Any())
+                if (addEntities.Any())
                     await _manuDowngradingRepository.InsertsAsync(addEntities);
-                if(updateEntities.Any())
+                if (updateEntities.Any())
                     await _manuDowngradingRepository.UpdatesAsync(updateEntities);
 
                 //保存记录 
-                if(addRecordEntitys.Any())
+                if (addRecordEntitys.Any())
+                {
                     await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+                }
 
-                if (manuSfcStepList.Any()) 
+                if (manuSfcStepList.Any())
+                {
                     await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                }
 
                 ts.Complete();
             }
@@ -300,12 +290,12 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// </summary>
         /// <param name="sfcs"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuDowngradingDto>> GetManuDowngradingBySfcsAsync(string[] sfcs) 
+        public async Task<IEnumerable<ManuDowngradingDto>> GetManuDowngradingBySfcsAsync(string[] sfcs)
         {
-            var entitys= await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery()
+            var entitys = await _manuDowngradingRepository.GetBySfcsAsync(new ManuDowngradingBySfcsQuery()
             {
-                SiteId=_currentSite.SiteId??0,
-                Sfcs=sfcs
+                SiteId = _currentSite.SiteId ?? 0,
+                Sfcs = sfcs
             });
 
             var dtos = entitys.Select(s => s.ToModel<ManuDowngradingDto>());
@@ -332,7 +322,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             }
 
             #region 验证对应的sfc 是否符合要求：如是否存在,是否锁定或者报废 
-            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery { Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
+            var sfcList = await _manuSfcRepository.GetManuSfcInfoEntitiesAsync(new ManuSfcStatusQuery {SiteId = _currentSite.SiteId ?? 0, Sfcs = manuDowngradingSaveRemoveDto.Sfcs });
 
             var noFindSfcs = new List<string>();
             foreach (var item in manuDowngradingSaveRemoveDto.Sfcs)
@@ -369,19 +359,19 @@ namespace Hymson.MES.Services.Services.Manufacture
                 SiteId = _currentSite.SiteId ?? 0,
                 Sfcs = sfcList.Select(x => x.SFC).ToArray(),
             });
-            //找到锁定状态的
-            var lockedSfcs = new List<string>();
-            foreach (var item in sfcProduces)
-            {
-                if (item.Status == SfcProduceStatusEnum.Locked)
-                {
-                    lockedSfcs.Add(item.SFC);
-                }
-            }
-            if (lockedSfcs.Any())
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
-            }
+            ////找到锁定状态的
+            //var lockedSfcs = new List<string>();
+            //foreach (var item in sfcProduces)
+            //{
+            //    if (item.Status == SfcProduceStatusEnum.Locked)
+            //    {
+            //        lockedSfcs.Add(item.SFC);
+            //    }
+            //}
+            //if (lockedSfcs.Any())
+            //{
+            //    throw new CustomerValidationException(nameof(ErrorCode.MES11405)).WithData("sfc", string.Join(",", lockedSfcs));
+            //}
             #endregion
 
             ////DTO转换实体
@@ -426,16 +416,16 @@ namespace Hymson.MES.Services.Services.Manufacture
                 manuSfcStepList.Add(new ManuSfcStepEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
-                    SiteId = _currentSite.SiteId??0,
+                    SiteId = _currentSite.SiteId ?? 0,
                     SFC = item,
-                    ProductId = sfcInfo?.ProductId??0,
-                    WorkOrderId = sfcInfo?.WorkOrderId??0,
+                    ProductId = sfcInfo?.ProductId ?? 0,
+                    WorkOrderId = sfcInfo?.WorkOrderId ?? 0,
                     ProductBOMId = sfcProduce?.ProductBOMId,
                     WorkCenterId = sfcProduce?.WorkCenterId ?? 0,
-                    Qty = sfcProduce?.Qty??0,
+                    Qty = sfcProduce?.Qty ?? 0,
                     ProcedureId = sfcProduce?.ProcedureId,
                     Operatetype = ManuSfcStepTypeEnum.RemoveDowngrading,
-                    CurrentStatus = sfcProduce?.Status??0,
+                    CurrentStatus = sfcProduce?.Status ?? 0,
                     CreatedBy = _currentUser.UserName,
                     UpdatedBy = _currentUser.UserName
                 });
@@ -450,15 +440,29 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
+                var result = 0;
                 if (delIds.Any())
-                    await _manuDowngradingRepository.DeletesTrueByIdsAsync(delIds.ToArray());
-                
-                //保存记录 
-                if (addRecordEntitys.Any())
-                    await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+                {
+                    result = await _manuDowngradingRepository.DeletesTrueByIdsAsync(delIds.ToArray());
 
-                if (manuSfcStepList.Any())
-                    await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                    if (result > 0 && result == delIds.Distinct().Count())
+                    {
+                        //保存记录 
+                        if (addRecordEntitys.Any())
+                        {
+                            await _manuDowngradingRecordRepository.InsertsAsync(addRecordEntitys);
+                        }
+
+                        if (manuSfcStepList.Any())
+                        {
+                            await _manuSfcStepRepository.InsertRangeAsync(manuSfcStepList);
+                        }
+                    }
+                    else
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES11410));
+                    }
+                }
 
                 ts.Complete();
             }

@@ -17,7 +17,6 @@ using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
-//using Hymson.Utils.Extensions;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Warehouse
@@ -54,7 +53,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="whMaterialStandingbookDto"></param>
+        /// <param name="whMaterialStandingbookCreateDto"></param>
         /// <returns></returns>
         public async Task CreateWhMaterialStandingbookAsync(WhMaterialStandingbookCreateDto whMaterialStandingbookCreateDto)
         {
@@ -142,7 +141,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="whMaterialStandingbookDto"></param>
+        /// <param name="whMaterialStandingbookModifyDto"></param>
         /// <returns></returns>
         public async Task ModifyWhMaterialStandingbookAsync(WhMaterialStandingbookModifyDto whMaterialStandingbookModifyDto)
         {
@@ -169,7 +168,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 return whMaterialStandingbookEntity.ToModel<WhMaterialStandingbookDto>();
             }
-            return null;
+            return new WhMaterialStandingbookDto();
         }
     }
 }

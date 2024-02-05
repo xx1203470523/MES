@@ -18,7 +18,7 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon
         /// 描述 :序号( 程序生成) 
         /// 空值 : true  
         /// </summary>
-        public string SerialNo { get; set; }
+        public string SerialNo { get; set; } = "";
 
         /// <summary>
         /// 描述 :所属工序ID 
@@ -49,13 +49,13 @@ namespace Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon
         /// 描述 :工序BOM代码 
         /// 空值 : false  
         /// </summary>
-        public string ProcedureCode { get; set; }
+        public string ProcedureCode { get; set; } = "";
 
         /// <summary>
         /// 描述 :工序BOM名称 
         /// 空值 : false  
         /// </summary>
-        public string ProcedureName { get; set; }
+        public string ProcedureName { get; set; } = "";
 
         /// <summary>
         /// 描述 :类型 

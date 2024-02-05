@@ -169,7 +169,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
 
             var resourceIds = param.ResourceIds;
             var updateCommand = new ProcResourceUpdateCommand();
-            if (resourceIds != null && resourceIds.Any() == true)
+            if (resourceIds != null && resourceIds.Any())
             {
                 updateCommand.UpdatedBy = userName;
                 updateCommand.ResTypeId = id;
@@ -229,14 +229,6 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             updateCommand.ResTypeId = param?.Id ?? 0;
             updateCommand.IdsArr = resourceIds.ToArray();
 
-            //var resources = _procResourceRepository.GetProcResrouces(ids, parm.Id);
-            //if (resources.Count > 0)
-            //{
-            //    apiResult.Code = (int)ResultCode.PARAM_ERROR;
-            //    apiResult.Msg = "一个资源只能关联一个资源类型！";
-            //    return apiResult;
-            //}
-
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
                 //更新
@@ -245,7 +237,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
                 //清除之前的绑定关系
                 await _resourceRepository.ResetResTypeAsync(updateCommand);
 
-                if (resourceIds != null && resourceIds.Any() == true)
+                if (resourceIds != null)
                 {
                     //更新资源的资源类型（重新绑定）
                     await _resourceRepository.UpdateResTypeAsync(updateCommand);

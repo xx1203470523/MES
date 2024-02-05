@@ -25,57 +25,57 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型;1、生产过站；2、在制品维修
         /// </summary>
         public ManuFacePlateTypeEnum Type { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;1、新建、2、启用、3、保留、4、废除；
         /// </summary>
         public SysDataStatusEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 会话时间（分钟）
         /// </summary>
         public int ConversationTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
@@ -88,39 +88,34 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     public record ManuFacePlateCreateDto : BaseEntityDto
     {
         /// <summary>
-        /// 主键
-        /// </summary>
-        public long Id { get; set; }
-
-       /// <summary>
         /// 编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型;1、生产过站；2、在制品维修
         /// </summary>
         public ManuFacePlateTypeEnum Type { get; set; }
 
-       /// <summary>
-        /// 状态;0、新建、1、启用、2、保留、3、废除；
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 会话时间（分钟）
         /// </summary>
         public int ConversationTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string ContainerCode { get; set; }
     }
 
     /// <summary>
@@ -133,35 +128,30 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 编码
-        /// </summary>
-        public string Code { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型;1、生产过站；2、在制品维修
         /// </summary>
         public ManuFacePlateTypeEnum Type { get; set; }
 
-       /// <summary>
-        /// 状态;0、新建、1、启用、2、保留、3、废除；
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
-
-       /// <summary>
+        /// <summary>
         /// 会话时间（分钟）
         /// </summary>
         public int ConversationTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string ContainerCode { get; set; }
     }
 
     /// <summary>

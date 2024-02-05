@@ -50,8 +50,17 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.Where("ParameterGroupId = @ParameterGroupId");
             sqlBuilder.Select("*");
+
+            if (query.ParameterGroupId.HasValue)
+            {
+                sqlBuilder.Where("ParameterGroupId = @ParameterGroupId");
+            }
+
+            if (query.ParameterGroupIds != null && query.ParameterGroupIds.Any())
+            {
+                sqlBuilder.Where("ParameterGroupId in @ParameterGroupIds");
+            }
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProductParameterGroupDetailEntity>(template.RawSql, query);

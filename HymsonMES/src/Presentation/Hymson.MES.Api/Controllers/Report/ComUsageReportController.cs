@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（组件使用报告）
-    /// @author Karl
-    /// @date 2023-04-27 14:55:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ComUsageReportController : ControllerBase
@@ -28,7 +23,8 @@ namespace Hymson.MES.Api.Controllers.Report
         /// <summary>
         /// 构造函数（组件使用报告）
         /// </summary>
-        /// <param name="badRecordReportService"></param>
+        /// <param name="comUsageReportService"></param>
+        /// <param name="logger"></param>
         public ComUsageReportController( ILogger<BadRecordReportController> logger, IComUsageReportService comUsageReportService)
         {
             _logger = logger;

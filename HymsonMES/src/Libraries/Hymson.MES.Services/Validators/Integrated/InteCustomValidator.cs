@@ -30,6 +30,24 @@ namespace Hymson.MES.Services.Validators.Integrated
         }
     }
 
+
+    internal class InteCustomImportValidator : AbstractValidator<InteCustomImportDto>
+    {
+        public InteCustomImportValidator()
+        {
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18403));
+            RuleFor(x => x.Code).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18410));
+            RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18404));
+            RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18405));
+            RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18406));
+            RuleFor(x => x.Address).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18407));
+            RuleFor(x => x.Describe).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18408));
+            RuleFor(x => x.Telephone).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18409));
+        }
+    }
+
+
     /// <summary>
     /// 客户维护 修改 验证
     /// </summary>
@@ -38,9 +56,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         public InteCustomModifyValidator()
         {
             RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
-            //RuleFor(x => x.Code).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18403));
             RuleFor(x => x.Name).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18404));
-            //RuleFor(x => x.Code).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18405));
             RuleFor(x => x.Name).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18406));
             RuleFor(x => x.Address).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18407));
             RuleFor(x => x.Describe).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18408));

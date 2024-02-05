@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.ProcessRoute;
@@ -9,10 +10,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（工艺路线表）
-    /// @author zhaoqing
-    /// @date 2023-02-14 10:07:11
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcProcessRouteController : ControllerBase
@@ -27,6 +25,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（工艺路线表）
         /// </summary>
         /// <param name="procProcessRouteService"></param>
+        /// <param name="logger"></param>
         public ProcProcessRouteController(IProcProcessRouteService procProcessRouteService, ILogger<ProcProcessRouteController> logger)
         {
             _procProcessRouteService = procProcessRouteService;
@@ -82,6 +81,18 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("procedureList")]    
+        public async Task<PagedInfo<ProcProcedureDto>> GetProcedureListByRouteId([FromQuery] ProcessRouteProcedureQueryDto parm)
+        {
+            return await _procProcessRouteService.GetPagedInfoByProcessRouteIdAsync(parm);
+        }
+
+        /// <summary>
         /// 添加（工艺路线表）
         /// </summary>
         /// <param name="parm"></param>
@@ -120,5 +131,49 @@ namespace Hymson.MES.Api.Controllers.Process
             await _procProcessRouteService.DeleteProcProcessRouteAsync(deleteDto.Ids);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（工艺路线）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("工艺路线", BusinessType.UPDATE)]
+        [PermissionDescription("proc:processRoute:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procProcessRouteService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（工艺路线）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("工艺路线", BusinessType.UPDATE)]
+        [PermissionDescription("proc:processRoute:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procProcessRouteService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（工艺路线）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("工艺路线", BusinessType.UPDATE)]
+        [PermissionDescription("proc:processRoute:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procProcessRouteService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

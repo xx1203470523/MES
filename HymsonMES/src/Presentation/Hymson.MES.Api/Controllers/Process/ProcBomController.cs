@@ -1,28 +1,17 @@
-/*
- *creator: Karl
- *
- *describe: BOM表    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-02-14 10:04:25
- */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（BOM表）
-    /// @author Karl
-    /// @date 2023-02-14 10:04:25
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcBomController : ControllerBase
@@ -37,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（BOM表）
         /// </summary>
         /// <param name="procBomService"></param>
+        /// <param name="logger"></param>
         public ProcBomController(IProcBomService procBomService, ILogger<ProcBomController> logger)
         {
             _procBomService = procBomService;
@@ -119,5 +109,101 @@ namespace Hymson.MES.Api.Controllers.Process
             await _procBomService.DeletesProcBomAsync(ids);
         }
 
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（BOM维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("BOM维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:bom:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procBomService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（BOM维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("BOM维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:bom:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procBomService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（BOM维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("BOM维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:bom:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procBomService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procBomService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Bom导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入Bom数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importBom")]
+        public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+
+            await _procBomService.ImportBomAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导出客户维护信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<BomExportResultDto> ExprotBomPageListAsync([FromQuery] ProcBomPagedQuery param)
+        {
+            return await _procBomService.ExprotBomPageListAsync(param);
+        }
+
+        /// <summary>
+        /// 判断bom是否被激活工单引用
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("judgeBomIdIsUsedByActivatedOrder/{id}")]
+        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long id) 
+        {
+            return await _procBomService.JudgeBomIsReferencedByActivatedWorkOrder(id);
+        }
     }
 }

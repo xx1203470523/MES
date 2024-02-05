@@ -1,5 +1,4 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup;
 using Hymson.Web.Framework.Attributes;
@@ -9,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 控制器（不合格代码组）
-    /// @author wangkeming
-    /// @date 2023-02-13 02:05:50
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -23,6 +20,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// 构造函数（不合格代码组）
         /// </summary>
         /// <param name="qualUnqualifiedGroupService"></param>
+        /// <param name="logger"></param>
         public QualUnqualifiedGroupController(IQualUnqualifiedGroupService qualUnqualifiedGroupService, ILogger<QualUnqualifiedGroupController> logger)
         {
             _qualUnqualifiedGroupService = qualUnqualifiedGroupService;

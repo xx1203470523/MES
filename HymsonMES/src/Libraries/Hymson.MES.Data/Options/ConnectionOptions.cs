@@ -14,5 +14,10 @@
         /// MES参数数据库连接
         /// </summary>
         public string MESParamterConnectionString { get; set; } = "";
+
+        /// <summary>
+        /// Doris参数数据库连接
+        /// </summary>
+        public string DorisParamterConnectionString { get; set; } = "";
     }
 }

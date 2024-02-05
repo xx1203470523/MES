@@ -1,4 +1,5 @@
-﻿using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto
@@ -17,7 +18,17 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
         /// 数量
         /// </summary>
         public decimal Qty { set; get; }
-    }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { set; get; }
+    }    
 
     /// <summary>
     /// 
@@ -75,7 +86,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
     /// <summary>
     /// 根据老条码生成新条码
     /// </summary>
-    public class CreateBarcodeByOldMesSFCDto
+    public class CreateBarcodeByOldMesSfcDto
     {
         /// <summary>
         /// 设备Id
@@ -101,7 +112,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCrea
     /// <summary>
     /// 根据外部条码接收
     /// </summary>
-    public class CreateBarcodeByExternalSFCDto
+    public class CreateBarcodeByExternalSfcDto
     {
         /// <summary>
         /// 设备Id

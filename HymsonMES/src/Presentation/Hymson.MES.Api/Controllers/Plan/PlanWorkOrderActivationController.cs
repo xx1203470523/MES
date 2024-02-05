@@ -1,26 +1,14 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-03-29 10:23:51
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Plan
 {
     /// <summary>
     /// 控制器（工单激活）
-    /// @author Karl
-    /// @date 2023-03-29 10:23:51
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class PlanWorkOrderActivationController : ControllerBase
@@ -35,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Plan
         /// 构造函数（工单激活）
         /// </summary>
         /// <param name="planWorkOrderActivationService"></param>
+        /// <param name="logger"></param>
         public PlanWorkOrderActivationController(IPlanWorkOrderActivationService planWorkOrderActivationService, ILogger<PlanWorkOrderActivationController> logger)
         {
             _planWorkOrderActivationService = planWorkOrderActivationService;

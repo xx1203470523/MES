@@ -91,12 +91,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 更新
         /// </summary>
-        /// <param name="procResourceConfigRess"></param>
+        /// <param name="procResourceConfigRes"></param>
         /// <returns></returns>
-        public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
+        public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRes)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(UpdateSql, procResourceConfigRess);
+            return await conn.ExecuteAsync(UpdateSql, procResourceConfigRes);
         }
 
         /// <summary>

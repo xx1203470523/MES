@@ -1,21 +1,31 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.Data.Repositories.Warehouse;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -31,15 +41,25 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcMaterialRepository _procMaterialRepository;
         private readonly AbstractValidator<ProcMaterialCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcMaterialModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<ProcMaterialImportDto> _validationImportRules;
 
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
         private readonly IProcMaterialSupplierRelationRepository _procMaterialSupplierRelationRepository;
         private readonly IProcMaskCodeRepository _procMaskCodeRepository;
+        private readonly IProcProcessRouteRepository _procProcessRouteRepository;
+        private readonly IProcBomRepository _procBomRepository;
 
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
         private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
+
+        private readonly ILocalizationService _localizationService;
+
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
+
+        private readonly IProcMaterialGroupRepository _procMaterialGroupRepository;
 
         /// <summary>
         /// 
@@ -48,30 +68,52 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procMaterialRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
+        /// <param name="validationImportRules"></param>
         /// <param name="procReplaceMaterialRepository"></param>
         /// <param name="currentSite"></param>
         /// <param name="procMaterialSupplierRelationRepository"></param>
         /// <param name="procMaskCodeRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
+        /// <param name="procBomRepository"></param>
         /// <param name="planWorkOrderRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
+        /// <param name="procMaterialGroupRepository"></param>
         public ProcMaterialService(ICurrentUser currentUser, IProcMaterialRepository procMaterialRepository,
             AbstractValidator<ProcMaterialCreateDto> validationCreateRules,
             AbstractValidator<ProcMaterialModifyDto> validationModifyRules,
+            AbstractValidator<ProcMaterialImportDto> validationImportRules,
             IProcReplaceMaterialRepository procReplaceMaterialRepository,
             ICurrentSite currentSite,
             IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository,
             IProcMaskCodeRepository procMaskCodeRepository,
-            IPlanWorkOrderRepository planWorkOrderRepository)
+            IProcProcessRouteRepository procProcessRouteRepository,
+            IProcBomRepository procBomRepository,
+            IPlanWorkOrderRepository planWorkOrderRepository, ILocalizationService localizationService,
+            IExcelService excelService,
+            IMinioService minioService, IProcMaterialGroupRepository procMaterialGroupRepository)
         {
             _currentUser = currentUser;
             _procMaterialRepository = procMaterialRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
-
+            _validationImportRules = validationImportRules;
+            _procProcessRouteRepository = procProcessRouteRepository;
+            _procBomRepository = procBomRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
             _currentSite = currentSite;
             _procMaterialSupplierRelationRepository = procMaterialSupplierRelationRepository;
             _procMaskCodeRepository = procMaskCodeRepository;
+
             _planWorkOrderRepository = planWorkOrderRepository;
+
+            _localizationService = localizationService;
+
+            _excelService = excelService;
+            _minioService = minioService;
+
+            _procMaterialGroupRepository = procMaterialGroupRepository;
         }
 
 
@@ -87,11 +129,11 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialCreateDto.MaterialName = procMaterialCreateDto.MaterialName.Trim();
             procMaterialCreateDto.Version = procMaterialCreateDto.Version.Trim();
             procMaterialCreateDto.Remark = procMaterialCreateDto?.Remark ?? "".Trim();
-            procMaterialCreateDto.Unit = procMaterialCreateDto?.Unit ?? "".Trim();
+            procMaterialCreateDto!.Unit = procMaterialCreateDto?.Unit ?? "".Trim();
             //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(procMaterialCreateDto);
+            await _validationCreateRules!.ValidateAndThrowAsync(procMaterialCreateDto);
 
-            procMaterialCreateDto.MaterialCode = procMaterialCreateDto.MaterialCode.ToUpper();
+            procMaterialCreateDto!.MaterialCode = procMaterialCreateDto.MaterialCode.ToUpper();
             procMaterialCreateDto.Origin = MaterialOriginEnum.ManualEntry; // ERP/EIS（sys_source_type）
 
             //判断编号是否已存在
@@ -118,6 +160,8 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialEntity.CreatedOn = HymsonClock.Now();
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
             procMaterialEntity.SiteId = _currentSite.SiteId ?? 0;
+
+            procMaterialEntity.Status = SysDataStatusEnum.Build;
 
             //替代品数据
             List<ProcReplaceMaterialEntity> addProcReplaceList = new List<ProcReplaceMaterialEntity>();
@@ -220,14 +264,14 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeletesProcMaterialAsync(long[] idsArr)
+        public async Task DeletesProcMaterialAsync(long[] idsArr)
         {
             if (idsArr.Length < 1) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
 
             //var statusArr = new int[] { 2, 3 }; //可下达和保留 时无法删除
             //判断这些ID 对应的物料是否在 可下达和保留中  （1:新建;2:可下达;3:保留;4:废除）
             var entitys = await _procMaterialRepository.GetByIdsAsync(idsArr);
-            
+
             if (entitys != null && entitys.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -248,12 +292,21 @@ namespace Hymson.MES.Services.Services.Process
                 throw new CustomerValidationException(nameof(ErrorCode.MES10225));
             }
 
-            return await _procMaterialRepository.DeletesAsync(new DeleteCommand
+            #region 删除物料的关联供应商关系
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                Ids = idsArr,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+                await _procMaterialRepository.DeletesAsync(new DeleteCommand
+                {
+                    Ids = idsArr,
+                    DeleteOn = HymsonClock.Now(),
+                    UserId = _currentUser.UserName
+                });
+
+                await _procMaterialSupplierRelationRepository.DeleteTrueByMaterialIdsAsync(idsArr);
+
+                ts.Complete();
+            }
+            #endregion
         }
 
         /// <summary>
@@ -265,10 +318,39 @@ namespace Hymson.MES.Services.Services.Process
         {
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
             procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            // 判断是否需要查询物料组编码 -- 全匹配查询
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQueryDto.MaterialGroupCode)) 
+            {
+                var materialGroup=(await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
+                if (materialGroup == null) 
+                {
+                    return new PagedInfo<ProcMaterialDto>(new List<ProcMaterialDto>(), procMaterialPagedQueryDto.PageIndex, procMaterialPagedQueryDto.PageSize,0);
+                }
+                procMaterialPagedQuery.GroupId = materialGroup?.Id;
+            }
+
             var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(procMaterialPagedQuery);
 
-            //实体到DTO转换 装载数据
+            // 实体到DTO转换 装载数据
             List<ProcMaterialDto> procMaterialDtos = PrepareProcMaterialDtos(pagedInfo);
+
+            if (pagedInfo.Data.Any())
+            {
+                var procMaterialGroupIds = pagedInfo.Data.Select(m => m.GroupId);
+                var procMaterialGroupEntities = await _procMaterialGroupRepository.GetByIdsAsync(procMaterialGroupIds);
+
+                foreach(var item in procMaterialDtos)
+                {
+                    var procMaterialGroupEntity = procMaterialGroupEntities.FirstOrDefault(m => m.Id == item.GroupId);
+
+                    if (procMaterialGroupEntity != null)
+                    {
+                        item.MaterialGroupCode = procMaterialGroupEntity.GroupCode;
+                    }
+                }
+            }
+
             return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -315,26 +397,28 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialModifyDto.MaterialName = procMaterialModifyDto.MaterialName.Trim();
             procMaterialModifyDto.Version = procMaterialModifyDto.Version.Trim();
             procMaterialModifyDto.Remark = procMaterialModifyDto?.Remark ?? "".Trim();
-            procMaterialModifyDto.Unit = procMaterialModifyDto?.Unit ?? "".Trim();
+            procMaterialModifyDto!.Unit = procMaterialModifyDto?.Unit ?? "".Trim();
 
             //DTO转换实体
-            var procMaterialEntity = procMaterialModifyDto.ToEntity<ProcMaterialEntity>();
+            var procMaterialEntity = procMaterialModifyDto!.ToEntity<ProcMaterialEntity>();
             procMaterialEntity.UpdatedBy = _currentUser.UserName;
             procMaterialEntity.UpdatedOn = HymsonClock.Now();
 
             #region 校验
             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(procMaterialModifyDto);
+            await _validationModifyRules!.ValidateAndThrowAsync(procMaterialModifyDto);
 
-            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto.Id, _currentSite.SiteId ?? 0);
+            var modelOrigin = await _procMaterialRepository.GetByIdAsync(procMaterialModifyDto!.Id, _currentSite.SiteId ?? 0);
             if (modelOrigin == null)
             {
                 throw new NotFoundException(nameof(ErrorCode.MES10204));
             }
 
-            if (modelOrigin.Status != SysDataStatusEnum.Build && procMaterialModifyDto.Status == SysDataStatusEnum.Build)
+            //验证某些是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             if (procMaterialModifyDto.Origin != modelOrigin.Origin)
@@ -343,8 +427,8 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             // 判断替代品是否包含当前物料
-            var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList, procMaterialEntity);
-            if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id) == true)
+            var replaceMaterialList = ConvertProcReplaceMaterialList(procMaterialModifyDto.DynamicList!, procMaterialEntity);
+            if (replaceMaterialList.Any(a => a.ReplaceMaterialId == procMaterialEntity.Id))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10206));
             }
@@ -358,7 +442,7 @@ namespace Hymson.MES.Services.Services.Process
             });
             if (exists != null && exists.Id != procMaterialEntity.Id)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version);
+                throw new CustomerValidationException(nameof(ErrorCode.MES10201)).WithData("materialCode", procMaterialEntity.MaterialCode).WithData("version", procMaterialEntity.Version!);
             }
 
             #endregion
@@ -418,7 +502,7 @@ namespace Hymson.MES.Services.Services.Process
                     Id = procMaterialEntity.Id,
                     GroupId = procMaterialEntity.GroupId,
                     MaterialName = procMaterialEntity.MaterialName,
-                    Status = procMaterialEntity.Status,
+                    //Status = procMaterialEntity.Status,
                     Origin = procMaterialEntity.Origin,
                     Version = procMaterialEntity.Version,
                     Remark = procMaterialEntity.Remark,
@@ -436,6 +520,7 @@ namespace Hymson.MES.Services.Services.Process
                     UpdatedBy = procMaterialEntity.UpdatedBy,
                     UpdatedOn = procMaterialEntity.UpdatedOn,
                     ConsumeRatio = procMaterialEntity.ConsumeRatio,
+                    QuantityLimit = procMaterialEntity.QuantityLimit,
                 });
 
                 if (response == 0)
@@ -447,12 +532,9 @@ namespace Hymson.MES.Services.Services.Process
                 response = await _procReplaceMaterialRepository.DeleteTrueByMaterialIdsAsync(new long[] { procMaterialEntity.Id });
 
                 //替代组设置数据
-                if (addProcReplaceList != null && addProcReplaceList.Count > 0)
+                if (addProcReplaceList != null && addProcReplaceList.Count > 0 && (await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList)) <= 0)
                 {
-                    if ((await _procReplaceMaterialRepository.InsertsAsync(addProcReplaceList)) <= 0)
-                    {
-                        throw new CustomerValidationException(nameof(ErrorCode.MES10209));
-                    }
+                    throw new CustomerValidationException(nameof(ErrorCode.MES10209));
                 }
 
 
@@ -508,7 +590,7 @@ namespace Hymson.MES.Services.Services.Process
 
                 return procMaterialViewDto;
             }
-            return null;
+            return new ProcMaterialViewDto();
         }
 
         /// <summary>
@@ -539,16 +621,376 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public static List<ProcReplaceMaterialEntity> ConvertProcReplaceMaterialList(IEnumerable<ProcMaterialReplaceDto> dynamicList, ProcMaterialEntity model)
         {
-            if (dynamicList == null || dynamicList.Any() == false) return new List<ProcReplaceMaterialEntity> { };
+            if (dynamicList == null || !dynamicList.Any()) return new List<ProcReplaceMaterialEntity> { };
             return dynamicList.Select(s => new ProcReplaceMaterialEntity
             {
                 MaterialId = model.Id,
                 ReplaceMaterialId = s.Id,
                 IsUse = s.IsEnabled,
-                CreatedBy = model.UpdatedBy,
+                CreatedBy = model.UpdatedBy!,
                 CreatedOn = model.UpdatedOn ?? HymsonClock.Now()
             }).ToList();
         }
         #endregion
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var material = await _procMaterialRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (material == null || material.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10204));
+            }
+            if (material.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), material.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procMaterialRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 导入物料表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportProcMaterialAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<ProcMaterialImportDto>(memoryStream);
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入的物料数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach (var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            //检测导入数据是否重复
+            var repeats = new List<string>();
+            //检验重复  目前只设定检验 物料编码+版本 是否重复
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.MaterialCode, x.Version });
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add($@"[{item.Key.MaterialCode},{item.Key.Version}]");
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("{repeats}相关的编码重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            List<ProcMaterialEntity> addEntities = new List<ProcMaterialEntity>();
+
+            #region 验证数据到数据库比对   且组装数据
+            //物料编码 
+            var materials = await _procMaterialRepository.GetByCodesAsync(new ProcMaterialsByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                MaterialCodes = excelImportDtos.Select(x => x.MaterialCode).Distinct().ToArray()
+            });
+            //工艺路线编码
+            var processRoutes = await _procProcessRouteRepository.GetByCodesAsync(new ProcProcessRoutesByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.ProcessRouteCode).Where(y=>!string.IsNullOrEmpty(y)).Distinct().ToArray()
+            });
+            //Bom编码
+            var boms = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.BomCode).Where(y => !string.IsNullOrEmpty(y)).Distinct().ToArray()
+            });
+            //掩码编码
+            var maskCodes = await _procMaskCodeRepository.GetByCodesAsync(new ProcMaskCodesByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.MaskCode).Where(y => !string.IsNullOrEmpty(y)).Distinct().ToArray()
+            });
+
+            var cuurrentRow = 0;
+            foreach (var item in excelImportDtos)
+            {
+                var procMaterialEntity = item.ToEntity<ProcMaterialEntity>();
+                //单独给是否默认版本赋值
+                if(item.DefaultVersion.HasValue)
+                {
+                    if (item.DefaultVersion == YesOrNoEnum.Yes)
+                        procMaterialEntity.IsDefaultVersion = true;
+                    else
+                        if (item.DefaultVersion == YesOrNoEnum.No)
+                        procMaterialEntity.IsDefaultVersion = false;
+                }
+                cuurrentRow++;
+
+                var haveError = false;
+                //判断是否已经录入    编码+版本  唯一标识
+                if (materials.Any(x => x.MaterialCode == item.MaterialCode && x.Version == item.Version))
+                {
+                    haveError = true;
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10201), item.MaterialCode, item.Version, cuurrentRow, "materialCode", "version"));
+                }
+                //工艺路线
+                if (item.ProcessRouteCode != null)
+                {
+                    var processRouteCode = processRoutes.FirstOrDefault(x => x.Code == item.ProcessRouteCode);
+                    if (processRouteCode == null)
+                    {
+                        haveError = true;
+                        validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10232), item.ProcessRouteCode, cuurrentRow));
+                    }
+                    else
+                    {
+                        procMaterialEntity.ProcessRouteId = processRouteCode.Id;
+                    }
+                }
+                //Bom
+                if (item.BomCode != null)
+                {
+                    var bomCode = boms.FirstOrDefault(x => x.BomCode == item.BomCode);
+                    if (bomCode == null)
+                    {
+                        haveError = true;
+                        validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10233), item.BomCode, cuurrentRow, "bomCode"));
+                    }
+                    else
+                    {
+                        procMaterialEntity.BomId = bomCode.Id;
+                    }
+                }
+                //掩码
+                if (item.MaskCode != null)
+                {
+                    var maskCode = maskCodes.FirstOrDefault(x => x.Code == item.MaskCode);
+                    if (maskCode == null)
+                    {
+                        haveError = true;
+                        validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10234), item.MaskCode, cuurrentRow));
+                    }
+                    else
+                    {
+                        procMaterialEntity.MaskCodeId = maskCode.Id;
+                    }
+                }
+                if (haveError)
+                {
+                    continue;
+                }
+
+                #region 组装数据
+                //标准参数信息 记录
+                procMaterialEntity.Id = IdGenProvider.Instance.CreateId();
+                procMaterialEntity.CreatedBy = _currentUser.UserName;
+                procMaterialEntity.UpdatedBy = _currentUser.UserName;
+                procMaterialEntity.CreatedOn = HymsonClock.Now();
+                procMaterialEntity.UpdatedOn = HymsonClock.Now();
+                procMaterialEntity.SiteId = _currentSite.SiteId ?? 0;
+
+                procMaterialEntity.Status = SysDataStatusEnum.Build;
+                procMaterialEntity.Origin = MaterialOriginEnum.ManualEntry;
+
+                addEntities.Add(procMaterialEntity);
+                #endregion
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            #endregion
+
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+            //插入数据
+            if (addEntities.Any())
+                await _procMaterialRepository.InsertsAsync(addEntities);
+            ts.Complete();
+
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, string versionFormattedMessage, int cuurrentRow = 1, string codeKey = "code", string versionKey = "version")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { codeKey, codeFormattedMessage },
+                { versionKey, versionFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ProcMaterialImportDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "物料导入模板");
+        }
+
+        /// <summary>
+        /// 根据查询条件导出物料数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ProcMaterialExportResultDto> ExprotProcMaterialListAsync(ProcMaterialPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<ProcMaterialPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.PageSize = 1000;
+            var pagedInfo = await _procMaterialRepository.GetPagedInfoAsync(pagedQuery);
+
+            List<ProcMaterialExportDto> listDto = new List<ProcMaterialExportDto>();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("Material"), _localizationService.GetResource("Material"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new ProcMaterialExportResultDto
+                {
+                    FileName = _localizationService.GetResource("Material"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            //工艺路线
+            var processRouteIds = pagedInfo.Data.Select(x => x.ProcessRouteId.GetValueOrDefault()).Distinct().ToArray();
+            var processRoutes = await _procProcessRouteRepository.GetByIdsAsync(processRouteIds);
+            //Bom
+            var bomIds = pagedInfo.Data.Select(x => x.BomId.GetValueOrDefault()).Distinct().ToArray();
+            var boms = await _procBomRepository.GetByIdsAsync(bomIds);
+            //掩码
+            var maskCodeIds = pagedInfo.Data.Select(x => x.MaskCodeId.GetValueOrDefault()).Distinct().ToArray();
+            var maskCodes = await _procMaskCodeRepository.GetByIdsAsync(maskCodeIds);
+
+            foreach (var item in pagedInfo.Data)
+            {
+                var procMaterialDto = item.ToExcelModel<ProcMaterialExportDto>();
+                //单独给是否默认版本赋值
+                if(item.IsDefaultVersion)
+                {
+                    procMaterialDto.DefaultVersion=YesOrNoEnum.Yes;
+                }
+                else
+                {
+                    procMaterialDto.DefaultVersion = YesOrNoEnum.No;
+                }
+
+                if (item.ProcessRouteId.HasValue)
+                {
+                    var processRouteInfo = processRoutes.FirstOrDefault(y => y.Id == item.ProcessRouteId);
+                    if (processRouteInfo != null) { procMaterialDto.ProcessRouteCode = processRouteInfo.Code; }
+                }
+                if (item.BomId.HasValue)
+                {
+                    var bomInfo = boms.FirstOrDefault(y => y.Id == item.BomId);
+                    if (bomInfo != null) { procMaterialDto.BomCode = bomInfo.BomCode; }
+                }
+                if (item.MaskCodeId.HasValue)
+                {
+                    var maskCodeInfo = maskCodes.FirstOrDefault(y => y.Id == item.MaskCodeId);
+                    if (maskCodeInfo != null) { procMaterialDto.MaskCode = maskCodeInfo.Code; }
+                }
+
+                listDto.Add(procMaterialDto);
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("Material"), _localizationService.GetResource("Material"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ProcMaterialExportResultDto
+            {
+                FileName = _localizationService.GetResource("Material"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+        }
     }
 }

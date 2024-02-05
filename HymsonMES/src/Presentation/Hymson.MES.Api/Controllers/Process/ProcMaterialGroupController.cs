@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（物料组维护表）
-    /// @author Karl
-    /// @date 2023-02-10 03:54:07
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialGroupController : ControllerBase
@@ -26,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（物料组维护表）
         /// </summary>
         /// <param name="procMaterialGroupService"></param>
+        /// <param name="logger"></param>
         public ProcMaterialGroupController(IProcMaterialGroupService procMaterialGroupService, ILogger<ProcMaterialGroupController> logger)
         {
             _procMaterialGroupService = procMaterialGroupService;
@@ -107,7 +105,6 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:materialGroup:delete")]
         public async Task DeleteProcMaterialGroupAsync(long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procMaterialGroupService.DeletesProcMaterialGroupAsync(ids);
         }
 

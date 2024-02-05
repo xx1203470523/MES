@@ -96,5 +96,18 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<PagedInfo<ProcProductParameterGroupView>> GetPagedListAsync(ProcProductParameterGroupPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 更改物料与工序的 非当前版本
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> UpdateSameMaterialIdProcedureIdToNoVersionAsync(ProcProductParameterGroupEntity entity);
     }
 }

@@ -1,10 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Parameter;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.CoreServices.Services.Parameter
 {
@@ -14,45 +10,17 @@ namespace Hymson.MES.CoreServices.Services.Parameter
     public interface IManuProductParameterService
     {
         /// <summary>
-        /// 插入数据
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task InsertRangeAsync(IEnumerable<ParameterDto> param);
-
-        /// <summary>
         /// 更具工序参数信息
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedure(QueryParameterByProcedureDto param);
+        Task<IEnumerable<ManuProductParameterEntity>?> GetProductParameterListByProcedureAsync(QueryParameterByProcedureDto param);
 
         /// <summary>
-        /// 更具条码获取参数信息
+        /// 参数采集（产品过程参数）
         /// </summary>
-        /// <param name="param"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterListBySFC(QueryParameterBySFCDto param);
-
-        /// <summary>
-        /// 修改参数
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        Task UpdateProductParameterById(List<UpdateParameterDto> param);
-
-        /// <summary>
-        ///创建数据库表
-        /// </summary>
-        /// <returns></returns>
-        Task CreateProductParameterTable(string tabname);
-
-        /// <summary>
-        /// 根据工序创建数据库表
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <param name="procedureCode"></param>
-        /// <returns></returns>
-        Task CreateProductParameterProcedureCodeTable(long siteId, string procedureCode);
+        Task<int> ProductProcessCollectAsync(ProductProcessParameterBo bo);
     }
 }

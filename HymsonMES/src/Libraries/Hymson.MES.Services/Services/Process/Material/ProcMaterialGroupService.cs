@@ -71,7 +71,7 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialGroupCreateDto.Remark = procMaterialGroupCreateDto?.Remark ?? "".Trim();
 
             //DTO转换实体
-            var procMaterialGroupEntity = procMaterialGroupCreateDto.ToEntity<ProcMaterialGroupEntity>();
+            var procMaterialGroupEntity = procMaterialGroupCreateDto!.ToEntity<ProcMaterialGroupEntity>();
             procMaterialGroupEntity.Id = IdGenProvider.Instance.CreateId();
             procMaterialGroupEntity.CreatedBy = _currentUser.UserName;
             procMaterialGroupEntity.UpdatedBy = _currentUser.UserName;
@@ -81,8 +81,8 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 参数校验
             //判断编号是否已存在
-            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialGroupCreateDto.GroupCode });
-            if (existGroupCodes != null && existGroupCodes.Count() > 0)
+            var existGroupCodes = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialGroupCreateDto!.GroupCode });
+            if (existGroupCodes != null && existGroupCodes.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10216)).WithData("groupCode", procMaterialGroupCreateDto.GroupCode);
             }
@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Process
 
             // 判断物料是否已被使用
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialIds);
-            if (procMaterials.Count() > 0 && procMaterials.Where(x => x.GroupId != 0).Count() > 0)
+            if (procMaterials.Any() && procMaterials.Any(x => x.GroupId != 0))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
@@ -134,26 +134,26 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="dto"></param>
+        /// <param name="procMaterialGroupModifyDto"></param>
         /// <returns></returns>
-        public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto dto)
+        public async Task ModifyProcMaterialGroupAsync(ProcMaterialGroupModifyDto procMaterialGroupModifyDto)
         {
-            dto.Remark ??= "".Trim();
+            procMaterialGroupModifyDto.Remark ??= "".Trim();
 
             // 物料组是否存在
-            var entity = await _procMaterialGroupRepository.GetByIdAsync(dto.Id)
+            var entity = await _procMaterialGroupRepository.GetByIdAsync(procMaterialGroupModifyDto.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10219));
 
-            entity.Remark = dto.Remark;
+            entity.Remark = procMaterialGroupModifyDto.Remark;
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            var procMaterialList = ConvertProcMaterialList(dto.DynamicList, entity);
+            var procMaterialList = ConvertProcMaterialList(procMaterialGroupModifyDto.DynamicList, entity);
 
             // 判断物料是否已被使用
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(procMaterialList.Select(x => x.Id).ToArray());
-            if (procMaterials.Any() == true
-                && procMaterials.Any(x => x.GroupId != 0 && x.GroupId != entity.Id) == true)
+            if (procMaterials.Any()
+                && procMaterials.Any(x => x.GroupId != 0 && x.GroupId != entity.Id))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10217));
             }
@@ -169,7 +169,6 @@ namespace Hymson.MES.Services.Services.Process
                 await _procMaterialRepository.UpdateProcMaterialUnboundAsync(entity.Id);
 
                 rows = await _procMaterialRepository.UpdateProcMaterialGroupAsync(procMaterialList);
-                //if (rows < procMaterialList.Count()) throw new BusinessException(nameof(ErrorCode.MES10220));
 
                 trans.Complete();
             }
@@ -201,7 +200,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断物料中是否有当前物料组
             var procMaterials = await _procMaterialRepository.GetByGroupIdsAsync(idsArr);
-            if (procMaterials != null && procMaterials.Count() > 0)
+            if (procMaterials != null && procMaterials.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10221));
             }
@@ -287,7 +286,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 return procMaterialGroupEntity.ToModel<ProcMaterialGroupDto>();
             }
-            return null;
+            return new ProcMaterialGroupDto();
         }
 
 
@@ -300,7 +299,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public static IEnumerable<ProcMaterialEntity> ConvertProcMaterialList(IEnumerable<string>? dynamicList, ProcMaterialGroupEntity entity)
         {
-            if (dynamicList == null || dynamicList.Any() == false) return new List<ProcMaterialEntity> { };
+            if (dynamicList == null || !dynamicList.Any()) return new List<ProcMaterialEntity> { };
 
             return dynamicList.Select(s => new ProcMaterialEntity
             {

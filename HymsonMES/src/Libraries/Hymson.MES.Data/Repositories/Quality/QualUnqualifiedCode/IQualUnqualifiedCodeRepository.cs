@@ -3,11 +3,6 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.Query;
 using Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
 {
@@ -37,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 新增
@@ -82,6 +77,13 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         Task<QualUnqualifiedCodeEntity> GetByCodeAsync(QualUnqualifiedCodeByCodeQuery parm);
 
         /// <summary>
+        /// 根据编码获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetByCodesAsync(QualUnqualifiedCodeByCodesQuery query);
+
+        /// <summary>
         /// 获取不合格代码关联不合格代码关系表
         /// </summary>
         /// <param name="Id"></param>
@@ -94,5 +96,13 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedCode
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListByGroupIdAsync(QualUnqualifiedCodeQuery query);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

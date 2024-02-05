@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleTypeEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteVehicleTypeEntity inteVehicleTypeEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleTypeEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteVehicleTypeEntity inteVehicleTypeEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -73,13 +73,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteVehicleTypeEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -87,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteVehicleTypeQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<InteVehicleTypeEntity>> GetInteVehicleTypeEntitiesAsync(InteVehicleTypeQuery inteVehicleTypeQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

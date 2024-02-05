@@ -65,8 +65,6 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<ManuContainerBarcodeViewDto> QueryManuContainerByCodeAsync(PackagingQueryDto queryDto)
         {
-            var barcodeViewDto = new ManuContainerBarcodeViewDto();
-
             var barcodeEntity = new ManuContainerBarcodeEntity();
             if (queryDto.Type == PackagingTypeEnum.Container)
             {
@@ -74,7 +72,7 @@ namespace Hymson.MES.Services.Services.Report
                 barcodeEntity = await _manuContainerBarcodeRepository.GetByCodeAsync(query);
                 if (barcodeEntity == null)
                 {
-                    return null;
+                    return new ManuContainerBarcodeViewDto();
                 }
             }
             else
@@ -88,13 +86,13 @@ namespace Hymson.MES.Services.Services.Report
                 var containerPackEntity = await _manuContainerPackRepository.GetByLadeBarCodeAsync(query);
                 if (containerPackEntity == null)
                 {
-                    return null;
+                    return new ManuContainerBarcodeViewDto();
                 }
 
-                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId);
+                barcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(containerPackEntity.ContainerBarCodeId.GetValueOrDefault());
                 if (barcodeEntity == null)
                 {
-                    return null;
+                    return new ManuContainerBarcodeViewDto();
                 }
             }
 
@@ -162,7 +160,7 @@ namespace Hymson.MES.Services.Services.Report
             if (manuContainerPacks.Any())
             {
                 //父容器id列表
-                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId).ToArray();
+                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId.GetValueOrDefault()).ToArray();
                 parentContainers = await _manuContainerBarcodeRepository.GetByIdsAsync(parentContainerIds);
             }
 
@@ -212,7 +210,7 @@ namespace Hymson.MES.Services.Services.Report
             if (manuContainerPacks.Any())
             {
                 //父容器id列表
-                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId).ToArray();
+                var parentContainerIds = manuContainerPacks.Select(x => x.ContainerBarCodeId.GetValueOrDefault()).ToArray();
                 parentContainers = await _manuContainerBarcodeRepository.GetByIdsAsync(parentContainerIds);
             }
 
@@ -232,7 +230,7 @@ namespace Hymson.MES.Services.Services.Report
                     CreatedBy = item.CreatedBy,
                     CreatedOn = item.CreatedOn,
                     ParentContainerCode = parentContainers.FirstOrDefault(x => x.Id == pack?.ContainerBarCodeId)?.BarCode ?? "",
-                    PackQuantity = containerPackEntities.Where(x => x.ContainerBarCodeId == item.Id).Count()
+                    PackQuantity = containerPackEntities.Count(x => x.ContainerBarCodeId == item.Id)
                 });
             }
             return new PagedInfo<PlanWorkPackingDto>(workPackingDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);

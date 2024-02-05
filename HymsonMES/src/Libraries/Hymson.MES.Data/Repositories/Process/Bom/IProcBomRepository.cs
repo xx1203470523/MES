@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ProcBomEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -97,5 +98,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procBomPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcBomEntity>> GetPagedInfoAsync(ProcBomPagedQuery procBomPagedQuery);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据编码获取Bom信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+       Task<IEnumerable<ProcBomEntity>> GetByCodesAsync(ProcBomsByCodeQuery param);
+
     }
 }

@@ -31,8 +31,9 @@ namespace Hymson.MES.Equipment.Api
             // Add services to the container.
             builder.Services.AddControllers(options =>
             {
-                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-                options.Filters.Add(typeof(HttpGlobalActionFilter));
+                options.Filters.Add(typeof(EquipmentExceptionFilter));
+                options.Filters.Add(typeof(EquipmentActionFilter));
+                options.Filters.Add(typeof(EquipmentAsyncResultFilter));
                 options.Filters.Add(new AuthorizeFilter());
             }).AddJsonOptions((jsonOptions) =>
             {
@@ -42,13 +43,11 @@ namespace Hymson.MES.Equipment.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
-#if DEBUG
+            builder.Services.AddEventBusRabbitMQService(builder.Configuration);
             builder.Services.AddHostedService<HostedService>();
-#endif
             AddSwaggerGen(builder.Services);
 
             builder.Services.AddJwtBearerService(builder.Configuration);
-            builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddEquipmentService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
@@ -64,7 +63,7 @@ namespace Hymson.MES.Equipment.Api
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (!app.Environment.IsProduction())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
@@ -104,7 +103,7 @@ namespace Hymson.MES.Equipment.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-#if DEBUG
+            //#if DEBUG
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
@@ -128,10 +127,10 @@ namespace Hymson.MES.Equipment.Api
 
                 // using System.Reflection;
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), true);
 
                 var xmlFilename2 = $"Hymson.MES.EquipmentServices.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2));
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2), true);
 
                 options.OperationFilter<AddResponseHeadersFilter>();
                 //options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
@@ -139,12 +138,12 @@ namespace Hymson.MES.Equipment.Api
                 // 在header 中添加token，传递到后台
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
                 // JwtBearerDefaults.AuthenticationScheme
-                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
                     Description = "前置Bearer。示例：Bearer {Token}",
                     Name = "Authorization",//jwt默认的参数名称,
-                    Type = SecuritySchemeType.ApiKey, //指定ApiKey
+                    Type = SecuritySchemeType.Http, //指定ApiKey
                     BearerFormat = "JWT",//标识承载令牌的格式 该信息主要是出于文档目的
                     Scheme = JwtBearerDefaults.AuthenticationScheme//授权中要使用的HTTP授权方案的名称
                 });
@@ -162,7 +161,7 @@ namespace Hymson.MES.Equipment.Api
                 //options.OperationFilter<SecurityRequirementsOperationFilter>();
                 //options.OperationFilter<AuthorizationOperationFilter>();
             });
-#endif
+            //#endif
         }
 
         /// <summary>

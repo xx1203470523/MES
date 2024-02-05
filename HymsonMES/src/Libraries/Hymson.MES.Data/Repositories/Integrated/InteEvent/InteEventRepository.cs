@@ -17,19 +17,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteEventRepository : BaseRepository, IInteEventRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly IMemoryCache _memoryCache;
+
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public InteEventRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public InteEventRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _memoryCache = memoryCache;
+   
         }
 
         /// <summary>
@@ -171,9 +168,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteEventEntity>> GetEntitiesAsync(EntityBySiteIdQuery query)
         {
-            //var key = $"inte_event&SiteId-{query.SiteId}";
-            //return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            //{
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
@@ -182,7 +176,6 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteEventEntity>(template.RawSql, query);
-            //});
         }
 
         /// <summary>
@@ -211,19 +204,19 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where("T.EventTypeId = @EventTypeId");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("T.Name LIKE @Name");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.EventTypeName) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.EventTypeName))
             {
                 pagedQuery.EventTypeName = $"%{pagedQuery.EventTypeName}%";
                 sqlBuilder.Where("IET.Name LIKE @EventTypeName");
@@ -254,8 +247,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_event T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event /**where**/  ";
 
-        const string InsertSql = "INSERT INTO inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertSql = "INSERT IGNORE inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
+        const string InsertsSql = "INSERT IGNORE inte_event(  `Id`, `Code`, `Name`, `EventTypeId`, `Status`, `IsAutoClose`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @Code, @Name, @EventTypeId, @Status, @IsAutoClose, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
         const string UpdateSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE inte_event SET   Code = @Code, Name = @Name, EventTypeId = @EventTypeId, Status = @Status, IsAutoClose = @IsAutoClose, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, SiteId = @SiteId, IsDeleted = @IsDeleted WHERE Id = @Id ";

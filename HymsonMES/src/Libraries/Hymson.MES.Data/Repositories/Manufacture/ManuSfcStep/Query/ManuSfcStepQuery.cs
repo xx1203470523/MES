@@ -6,11 +6,7 @@
  *build datetime: 2023-03-22 05:17:57
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -19,9 +15,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public class ManuSfcStepQuery
     {
+        /// <summary>
+        /// 步骤类型
+        /// </summary>
+        public ManuSfcStepTypeEnum? Operatetype { get; set; }
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public IEnumerable<string>? SFCs { get; set; }
+        /// <summary>
+        /// 工序
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        public long SiteId { get; set; }
     }
 
-    public class SfcInOutStepQuery
+
+    public class SfcInStepQuery
+    {
+        public long SiteId { get; set; }
+
+        public string[] Sfcs { get; set; }
+
+    }
+
+    public class SfcMergeOrSplitAddStepQuery
     {
         public long SiteId { get; set; }
 

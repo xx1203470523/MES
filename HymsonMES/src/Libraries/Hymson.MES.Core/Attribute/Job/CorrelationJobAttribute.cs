@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Core.Attribute.Job
 {
+    [AttributeUsage(AttributeTargets.All)]
     public class CorrelationJobAttribute : System.Attribute
     {
         public CorrelationJobAttribute(ConnectionTypeEnum connectionType)
@@ -17,6 +18,6 @@ namespace Hymson.MES.Core.Attribute.Job
         /// <summary>
         /// 关联类型
         /// </summary>
-        public ConnectionTypeEnum ConnectionType { get; set; } = ConnectionTypeEnum.procedureAndResource;
+        public ConnectionTypeEnum ConnectionType { get; set; }
     }
 }

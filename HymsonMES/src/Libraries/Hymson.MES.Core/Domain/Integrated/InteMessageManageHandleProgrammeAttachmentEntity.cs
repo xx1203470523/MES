@@ -11,7 +11,7 @@ namespace Hymson.MES.Core.Domain.Integrated
     public class InteMessageManageHandleProgrammeAttachmentEntity : BaseEntity
     {
         /// <summary>
-        /// 首检检验单Id
+        /// 消息Id
         /// </summary>
         public long MessageManageId { get; set; }
 

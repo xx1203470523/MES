@@ -70,9 +70,9 @@ namespace Hymson.MES.Services.Validators.Plan
         {
             if (param.RelevanceWorkOrderId == param.WorkOrderId)
             {
-                return false;
+                return await Task.FromResult(false); 
             }
-            return true;
+            return await Task.FromResult(true); 
         }
     }
 }

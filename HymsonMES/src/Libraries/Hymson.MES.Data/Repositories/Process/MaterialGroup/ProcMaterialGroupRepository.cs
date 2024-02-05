@@ -78,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcMaterialGroupEntity>(GetByIdsSql, new { ids = ids });
@@ -139,7 +139,6 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedCustomInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedCustomInfoCountSqlTemplate);
             sqlBuilder.Where("g.IsDeleted=0");
-            // sqlBuilder.Select("*");
             sqlBuilder.Where("g.SiteId = @SiteId");
             sqlBuilder.OrderBy("g.UpdatedOn DESC");
 

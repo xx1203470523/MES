@@ -12,5 +12,10 @@ namespace Hymson.MES.Data.Repositories.Process.ProcessRoute.Command
         /// </summary>
         public long SiteId { get; set; } = 0;
 
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public string Code { get; set; }
+
     }
 }

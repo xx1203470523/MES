@@ -9,7 +9,7 @@ using System.Net;
 namespace Hymson.MES.Api.Controllers
 {
     /// <summary>
-    /// 
+    /// 通用接口
     /// </summary>
     [Route("api/v1/[controller]")]
     [ApiController]
@@ -60,6 +60,7 @@ namespace Hymson.MES.Api.Controllers
 
             return keyValuePairs;
         }
+
         /// <summary>
         /// 打印所有缓存key
         /// </summary>
@@ -97,6 +98,7 @@ namespace Hymson.MES.Api.Controllers
             { return NotFound(); }
 
         }
+
         /// <summary>
         /// 根据缓存key删除缓存
         /// </summary>
@@ -125,5 +127,6 @@ namespace Hymson.MES.Api.Controllers
             return Ok();
 
         }
+
     }
 }

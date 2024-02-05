@@ -38,11 +38,18 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<ProcProcedureEntity> GetByIdAsync(long id);
 
         /// <summary>
-        /// 根据资源ID获取工序 
+        /// 根据资源ID获取工序（这个方法是有问题的，因为程序没有限制一个资源可以绑定多个工序）
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity> GetProcProdureByResourceIdAsync(ProcProdureByResourceIdQuery param);
+        Task<ProcProcedureEntity> GetProcProcedureByResourceIdAsync(ProcProdureByResourceIdQuery param);
+
+        /// <summary>
+        /// 根据资源ID获取工序
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetProcProduresByResourceIdAsync(ProcProdureByResourceIdQuery param);
 
         /// <summary>
         /// 判断工序是否存在
@@ -56,7 +63,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(IEnumerable<long>  ids);
+        Task<IEnumerable<ProcProcedureEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -85,5 +92,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

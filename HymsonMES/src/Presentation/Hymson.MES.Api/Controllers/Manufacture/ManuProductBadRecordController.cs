@@ -1,13 +1,7 @@
-/*
- *describe: 产品不良录入    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-03-27 03:49:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
-using Hymson.MES.Services.Services.Manufacture.ManuSfcProduce;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（产品不良录入）
-    /// @author zhaoqing
-    /// @date 2023-03-27 03:49:17
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -32,6 +24,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（产品不良录入）
         /// </summary>
         /// <param name="manuProductBadRecordService"></param>
+        /// <param name="logger"></param>
         public ManuProductBadRecordController(IManuProductBadRecordService manuProductBadRecordService, ILogger<ManuProductBadRecordController> logger)
         {
             _manuProductBadRecordService = manuProductBadRecordService;
@@ -72,6 +65,20 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         public async Task AddManuProductBadRecordAsync([FromBody] ManuProductBadRecordCreateDto parm)
         {
             await _manuProductBadRecordService.CreateManuProductBadRecordAsync(parm);
+        }
+
+        /// <summary>
+        /// 面板添加（产品不良录入）
+        /// </summary>
+        /// <param name="parm"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("addManuProductBadRecordByFacePlate")]
+        [LogDescription("面板添加产品不良录入", BusinessType.INSERT)]
+        [PermissionDescription("manu:badRecord:insert")]
+        public async Task FacePlateAddManuProductBadRecordAsync([FromBody] FacePlateManuProductBadRecordCreateDto parm)
+        {
+            await _manuProductBadRecordService.CreateManuProductBadRecordAboutCodeTypeAsync(parm);
         }
 
         /// <summary>

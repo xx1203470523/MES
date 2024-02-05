@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 降级品录入记录    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-08-10 10:15:49
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
@@ -15,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（降级品录入记录）
-    /// @author Karl
-    /// @date 2023-08-10 10:15:49
     /// </summary>
     [Authorize]
     [ApiController]
@@ -33,6 +24,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（降级品录入记录）
         /// </summary>
         /// <param name="manuDowngradingRecordService"></param>
+        /// <param name="logger"></param>
         public ManuDowngradingRecordController(IManuDowngradingRecordService manuDowngradingRecordService, ILogger<ManuDowngradingRecordController> logger)
         {
             _manuDowngradingRecordService = manuDowngradingRecordService;

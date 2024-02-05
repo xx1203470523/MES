@@ -9,28 +9,32 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（操作面板按钮）
-    /// @author Karl
-    /// @date 2023-04-01 02:58:19
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFacePlateButtonController : ControllerBase
     {
         /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILogger<ManuFacePlateButtonController> _logger;
+
+        /// <summary>
         /// 接口（操作面板按钮）
         /// </summary>
         private readonly IManuFacePlateButtonService _manuFacePlateButtonService;
-        private readonly ILogger<ManuFacePlateButtonController> _logger;
+
 
         /// <summary>
         /// 构造函数（操作面板按钮）
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="manuFacePlateButtonService"></param>
-        public ManuFacePlateButtonController(IManuFacePlateButtonService manuFacePlateButtonService, ILogger<ManuFacePlateButtonController> logger)
+        public ManuFacePlateButtonController(ILogger<ManuFacePlateButtonController> logger,
+            IManuFacePlateButtonService manuFacePlateButtonService)
         {
-            _manuFacePlateButtonService = manuFacePlateButtonService;
             _logger = logger;
+            _manuFacePlateButtonService = manuFacePlateButtonService;
         }
 
         /// <summary>
@@ -105,6 +109,18 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 
 
         /// <summary>
+        /// 按钮（回车）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut("enter")]
+        [AllowAnonymous]
+        public async Task<Dictionary<string, JobResponseDto>> EnterAsync(EnterRequestDto dto)
+        {
+            return await _manuFacePlateButtonService.EnterAsync(dto);
+        }
+
+        /// <summary>
         /// 按钮（点击）
         /// </summary>
         /// <param name="dto"></param>
@@ -117,27 +133,15 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
-        /// 进站
+        /// 参数收集（点击）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut("inStation")]
+        [HttpPut("parameterCollect")]
         [AllowAnonymous]
-        public async Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto)
+        public async Task<int> ParameterCollectAsync(ProductProcessParameterDto dto)
         {
-            return await _manuFacePlateButtonService.InStationAsync(dto);
-        }
-
-        /// <summary>
-        /// 出站
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPut("outStation")]
-        [AllowAnonymous]
-        public async Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto)
-        {
-            return await _manuFacePlateButtonService.OutStationAsync(dto);
+            return await _manuFacePlateButtonService.ProductParameterCollectAsync(dto);
         }
 
         /// <summary>

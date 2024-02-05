@@ -26,6 +26,6 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode
         /// <summary>
         /// 就条码
         /// </summary>
-        public IEnumerable<BarcodeDto> ExternalSFCs { set; get; }
+        public IEnumerable<BarcodeDto> ExternalSFCs { set; get; }=new List<BarcodeDto>();
     }
 }

@@ -1,16 +1,12 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public record WorkshopJobControlReportViewDto:BaseEntityDto
     {
         /// <summary>
@@ -23,7 +19,10 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public SfcStatusEnum SFCStatus { get; set; }
 
-        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public SfcStatusEnum SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 物料编码/版本
@@ -43,7 +42,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 工单类型
         /// </summary>
-        public PlanWorkOrderTypeEnum OrderType { get; set; }
+        public PlanWorkOrderTypeEnum? OrderType { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -109,12 +108,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 条码在制状态
         /// </summary>
-        public SfcProduceStatusEnum? SFCProduceStatus { get; set; }
-
-        ///// <summary>
-        ///// 是否锁
-        ///// </summary>
-        //public TrueOrFalseEnum? SFCIsLock { get; set; }
+        public SfcStatusEnum? SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 工序编码
@@ -126,6 +120,43 @@ namespace Hymson.MES.Services.Dtos.Report
         /// </summary>
         public string? ResourceCode { get; set; }
     }
+
+    /// <summary>
+    /// 车间作业控制 分页参数
+    /// </summary>
+    public class WorkshopJobControlReportOptimizePagedQueryDto : PagerInfo
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string? SFC { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum? SFCStatus { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long? ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long? ResourceId { get; set; }
+    }
+
 
     public class WorkshopJobControlStepReportDto 
     {
@@ -144,6 +175,11 @@ namespace Hymson.MES.Services.Dtos.Report
 
     public class WorkshopJobControlInOutSteptDto 
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public long Id { get; set; }
+
         /// <summary>
         /// 工单号
         /// </summary>
@@ -173,7 +209,7 @@ namespace Hymson.MES.Services.Dtos.Report
     /// <summary>
     /// 条码步骤表 分页参数
     /// </summary>
-    public class ManuSfcStepBySFCPagedQueryDto : PagerInfo
+    public class ManuSfcStepBySfcPagedQueryDto : PagerInfo
     {
         /// <summary>
         /// 条码
@@ -181,7 +217,7 @@ namespace Hymson.MES.Services.Dtos.Report
         public string? SFC { get; set; }
     }
 
-    public class ManuSfcStepBySFCViewDto 
+    public class ManuSfcStepBySfcViewDto 
     {
         /// <summary>
         /// sfc_step Id

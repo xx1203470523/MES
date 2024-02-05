@@ -6,6 +6,7 @@
  *build datetime: 2023-06-15 02:09:57
  */
 using FluentValidation;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Validators.Integrated
@@ -17,8 +18,12 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteSystemTokenCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.SystemCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18301));
+            RuleFor(x => x.SystemCode).Must(x => !x.Any(x => Char.IsWhiteSpace(x))).WithErrorCode(nameof(ErrorCode.MES18302));
+            RuleFor(x => x.SystemName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18303));
+            RuleFor(x => x.SystemCode).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18304));
+            RuleFor(x => x.SystemName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18305));
         }
     }
 
@@ -29,8 +34,9 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteSystemTokenModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.SystemName).NotEmpty().WithErrorCode(nameof(ErrorCode.MES18303));
+            RuleFor(x => x.SystemName).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18305));
         }
     }
 }

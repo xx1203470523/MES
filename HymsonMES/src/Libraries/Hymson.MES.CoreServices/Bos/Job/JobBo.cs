@@ -1,4 +1,6 @@
-﻿using Hymson.Utils;
+﻿using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Job
 {
@@ -14,6 +16,68 @@ namespace Hymson.MES.CoreServices.Bos.Job
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public class PanelRequestBo
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 载具条码
+        /// </summary>
+        public string? VehicleCode { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class CommonResponseBo
+    {
+        /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
+
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
+
+        /// <summary>
+        /// 条码/载具数量
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// 产品序列码/载具编码
+        /// </summary>
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 是否尾工序
+        /// </summary>
+        public bool IsLastProcedure { get; set; } = true;
+
+        /// <summary>
+        /// 工序编码
+        /// </summary>
+        public string ProcedureCode { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SfcStatusEnum Status { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class EmptyRequestBo { }
+
+    /// <summary>
     /// 请求Bo
     /// </summary>
     public class JobRequestBo : JobBaseBo
@@ -22,14 +86,17 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 用户名
         /// </summary>
         public string UserName { get; set; } = "";
+
         /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>
-        public long ResourceId { get; set; } 
+        public long ResourceId { get; set; }
+
         /// <summary>
         ///  容器ID
         /// </summary>
@@ -49,6 +116,42 @@ namespace Hymson.MES.CoreServices.Bos.Job
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long? EquipmentId { get; set; }
+
+        /// <summary>
+        /// 请求源
+        /// </summary>
+        public RequestSourceEnum Source { get; set; } = RequestSourceEnum.EquipmentApi;
+
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
+        /// <summary>
+        /// 条码（面板用）
+        /// </summary>
+        public IEnumerable<PanelRequestBo>? PanelRequestBos { get; set; }
+
+        /// <summary>
+        /// 进站对象
+        /// </summary>
+        public IEnumerable<InStationRequestBo>? InStationRequestBos { get; set; }
+
+        /// <summary>
+        /// 出站对象 / 半成品
+        /// </summary>
+        public IEnumerable<OutStationRequestBo>? OutStationRequestBos { get; set; }
+
     }
 
     /// <summary>
@@ -56,6 +159,11 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// </summary>
     public class JobResponseBo
     {
+        /// <summary>
+        /// 是否成功
+        /// </summary>
+        public bool IsSuccess { get; set; } = true;
+
         /// <summary>
         /// 影响行数
         /// </summary>

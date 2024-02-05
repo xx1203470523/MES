@@ -30,6 +30,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
 
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        public string? Version { get; set; }
+
         /// <summary>
         /// 站点id
         /// </summary>
@@ -39,5 +45,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 物料id
         /// </summary>
         public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编码组
+        /// </summary>
+        public IEnumerable<long>? MaterialIds { get; set; }
     }
 }

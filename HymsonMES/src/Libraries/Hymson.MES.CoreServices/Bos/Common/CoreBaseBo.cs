@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.CoreServices.Bos.Common
+﻿namespace Hymson.MES.CoreServices.Bos.Common
 {
     /// <summary>
     /// 核心服务层基类

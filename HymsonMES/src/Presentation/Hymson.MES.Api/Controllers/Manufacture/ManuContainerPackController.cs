@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
@@ -10,10 +9,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（容器装载表（物理删除））
-    /// @author wxk
-    /// @date 2023-04-12 02:33:13
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerPackController : ControllerBase
@@ -28,6 +24,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（容器装载表（物理删除））
         /// </summary>
         /// <param name="manuContainerPackService"></param>
+        /// <param name="logger"></param>
         public ManuContainerPackController(IManuContainerPackService manuContainerPackService, ILogger<ManuContainerPackController> logger)
         {
             _manuContainerPackService = manuContainerPackService;

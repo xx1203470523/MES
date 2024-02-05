@@ -22,11 +22,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
         private readonly ICurrentUser _currentUser;
 
         /// <summary>
-        /// 当前对象（站点）
-        /// </summary>
-        private readonly ICurrentSite _currentSite;
-
-        /// <summary>
         /// 服务接口（生产通用）
         /// </summary>
         private readonly IManuCommonOldService _manuCommonOldService;
@@ -45,17 +40,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
-        /// <param name="currentSite"></param>
         /// <param name="manuCommonOldService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procProcedureRepository"></param>
-        public ManuRepairService(ICurrentUser currentUser, ICurrentSite currentSite,
+        public ManuRepairService(ICurrentUser currentUser,
             IManuCommonOldService manuCommonOldService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             IProcProcedureRepository procProcedureRepository)
         {
             _currentUser = currentUser;
-            _currentSite = currentSite;
             _manuCommonOldService = manuCommonOldService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procProcedureRepository = procProcedureRepository;
@@ -86,7 +79,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuPac
             }
 
             // 更改状态，将条码由"排队"改为"活动"
-            //sfcProduceEntity.Status = SfcProduceStatusEnum.Activity;
             sfcProduceEntity.UpdatedBy = _currentUser.UserName;
             sfcProduceEntity.UpdatedOn = HymsonClock.Now();
             rows += await _manuSfcProduceRepository.UpdateAsync(sfcProduceEntity);

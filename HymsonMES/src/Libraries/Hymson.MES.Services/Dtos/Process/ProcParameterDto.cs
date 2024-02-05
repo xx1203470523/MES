@@ -1,5 +1,8 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using MimeKit;
+using Mysqlx.Crud;
+using OfficeOpenXml.Attributes;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -80,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位
         /// </summary>
-        public string ParameterUnit { get; set; }
+        public string? ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 
@@ -103,18 +106,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 
         /// </summary>
         public long Id { get; set; }
-
-        /*
-        /// <summary>
-        /// 参数代码（这里传值不会修改，仅仅是校验用）
-        /// </summary>
-        public string ParameterCode { get; set; } = "";
-        */
-
-        /// <summary>
-        /// 参数名称
-        /// </summary>
-        public string ParameterName { get; set; } = "";
 
         /// <summary>
         /// 参数单位
@@ -158,10 +149,86 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public DataTypeEnum? DataType { get; set; }
 
+    }
+
+    /// <summary>
+    /// 参数导入模板模型
+    /// </summary>
+    public record ProcParameterImportDto : BaseExcelDto
+    {
         /// <summary>
-        /// 描述（标准参数）
+        /// 编码（标准参数）
         /// </summary>
-        public string? Remark { get; set; } = "";
+        [EpplusTableColumn(Header = "标准参数编码(必填)", Order = 1)]
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（标准参数）
+        /// </summary>
+        [EpplusTableColumn(Header = "标准参数名称(必填)", Order = 2)]
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位（字典定义）
+        /// </summary>
+        [EpplusTableColumn(Header = "参数单位(必填)", Order = 3)]
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        [EpplusTableColumn(Header = "数据类型(必填)", Order = 4)]
+        public DataTypeEnum DataType { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [EpplusTableColumn(Header = "备注", Order = 5)]
+        public string? Remark { get; set; }
+
+    }
+
+    public class ParameterExportResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
+    }
+
+    /// <summary>
+    /// 参数导出
+    /// </summary>
+    public record ProcParameterExportDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 编码（标准参数）
+        /// </summary>
+        [EpplusTableColumn(Header = "标准参数编码(必填)", Order = 1)]
+        public string ParameterCode { get; set; }
+
+        /// <summary>
+        /// 名称（标准参数）
+        /// </summary>
+        [EpplusTableColumn(Header = "标准参数名称(必填)", Order = 2)]
+        public string ParameterName { get; set; }
+
+        /// <summary>
+        /// 参数单位（字典定义）
+        /// </summary>
+        [EpplusTableColumn(Header = "参数单位(必填)", Order = 3)]
+        public string ParameterUnit { get; set; }
+
+        /// <summary>
+        /// 数据类型（字典定义） 
+        /// </summary>
+        [EpplusTableColumn(Header = "数据类型(必填)", Order = 4)]
+        public string DataType { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        [EpplusTableColumn(Header = "备注", Order = 5)]
+        public string? Remark { get; set; }
 
     }
 }

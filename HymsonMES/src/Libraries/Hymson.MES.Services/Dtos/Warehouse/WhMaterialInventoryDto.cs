@@ -36,10 +36,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public long Id { get; set; }
 
-        ///// <summary>
-        ///// 供应商ID
-        ///// </summary>
-        //public long SupplierId { get; set; }
         /// <summary>
         /// 供应商编码
         /// </summary>
@@ -48,11 +44,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// 供应商名称
         /// </summary>
         public string SupplierName { get; set; }
-
-        ///// <summary>
-        ///// 物料ID
-        ///// </summary>
-        //public long MaterialId { get; set; }
 
         /// <summary>
         /// 物料编码
@@ -360,10 +351,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public DateTime? DueDate { get; set; }
 
-        /// <summary>
-        /// 供应商编码
-        /// </summary>
-        // public string SupplierCode { get; set; }
     }
 
     /// <summary>
@@ -455,13 +442,6 @@ namespace Hymson.MES.Services.Dtos.Warehouse
     /// </summary>
     public class WhMaterialInventoryPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
-
-
         /// <summary>
         /// 批次
         /// </summary>

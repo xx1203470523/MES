@@ -2,14 +2,13 @@
 using Hymson.MES.HttpClients;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.NetworkInformation;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// 
     /// </summary>
-    public static class HttpClientCollectionExtensions
+    public static partial class HttpClientCollectionExtensions
     {
         /// <summary>
         /// 业务逻辑层依赖服务添加
@@ -27,8 +26,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddHttpClient<ILabelPrintRequest, FastReportPrintRequest>().ConfigureHttpClient(httpClient =>
             {
                 httpClient.BaseAddress = new Uri(printOptions.BaseAddressUri);
-                //httpClient.BaseAddress = new Uri("http://10.9.1.57:50892/");
-                //httpClient.BaseAddress = new Uri("http://localhost/NFXBaseService/");
             });
 
             return services;
@@ -44,9 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //
             services.Configure<PrintOptions>(configuration.GetSection(nameof(PrintOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
 

@@ -6,36 +6,22 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.Utils;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 包装（关闭）
     /// </summary>
-    [Job("包装", JobTypeEnum.Standard)]
+    [Job("包装（关闭）", JobTypeEnum.Standard)]
     public class PackageCloseJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
         /// <summary>
         /// 服务接口（主数据）
         /// </summary>
-        private readonly IMasterDataService _masterDataService;
-
         private readonly IManuContainerBarcodeRepository _manuContainerBarcodeRepository;
-        private readonly IManuContainerPackRepository _manuContainerPackRepository;
-        private readonly IInteContainerRepository _inteContainerRepository;
 
         private readonly ILocalizationService _localizationService;
 
@@ -49,19 +35,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public PackageCloseJobService(IManuCommonService manuCommonService,
+        public PackageCloseJobService(
             AbstractValidator<PackageCloseRequestBo> validationRepairJob,
-            IMasterDataService masterDataService,
-            IManuContainerBarcodeRepository manuContainerBarcodeRepository,
-            IManuContainerPackRepository manuContainerPackRepository,
-            IInteContainerRepository inteContainerRepository, ILocalizationService localizationService)
+            IManuContainerBarcodeRepository manuContainerBarcodeRepository, ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
-            _masterDataService = masterDataService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
-            _manuContainerPackRepository = manuContainerPackRepository;
-            _inteContainerRepository = inteContainerRepository;
             _localizationService = localizationService;
         }
 
@@ -76,17 +55,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         {
             var bo = param.ToBo<PackageCloseRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
 
-            try
-            {
-
-                // 验证DTO
-                await _validationRepairJob.ValidateAndThrowAsync(bo);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            // 验证DTO
+            await _validationRepairJob.ValidateAndThrowAsync(bo);
         }
 
 
@@ -114,12 +84,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var defaultDto = new PackageCloseResponseBo { };
 
             string success = "true";
-            var manuContainerBarcodeEntity = await param.Proxy.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
+            var manuContainerBarcodeEntity = await param.Proxy!.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
             if (manuContainerBarcodeEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16702));
             }
-            int status = 2;//1打开，2关闭
+            ManuContainerBarcodeStatusEnum status = ManuContainerBarcodeStatusEnum.Close;//1打开，2关闭
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
             defaultDto.Content?.Add("Status", $"{status}".ToString());
             //当前状态不等于修改状态
@@ -129,13 +99,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
                 manuContainerBarcodeEntity.UpdatedBy = bo.UserName;
                 manuContainerBarcodeEntity.UpdatedOn = HymsonClock.Now();
                 defaultDto.ManuContainerBarcode = manuContainerBarcodeEntity;
-                //defaultDto.Message = $"关闭成功！";
+
                 defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16344));
             }
             else
             {
                 success = "false";
-                //defaultDto.Message = $"该容器已经关闭！";
+
                 defaultDto.Message = _localizationService.GetResource(nameof(ErrorCode.MES16345));
             }
             defaultDto.Content?.Add("Success", success);
@@ -155,7 +125,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             responseBo.Rows += await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = responseBo.Rows, Time = data.Time };
+            return new JobResponseBo { Content = data.Content!, Message = data.Message, Rows = responseBo.Rows, Time = data.Time };
         }
 
 

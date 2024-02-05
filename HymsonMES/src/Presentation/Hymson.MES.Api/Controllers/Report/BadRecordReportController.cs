@@ -1,7 +1,5 @@
 using Hymson.Infrastructure;
-using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Services.Plan;
 using Hymson.MES.Services.Services.Report;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +7,7 @@ namespace Hymson.MES.Api.Controllers.Report
 {
     /// <summary>
     /// 控制器（不良报告）
-    /// @author Karl
-    /// @date 2023-04-21 17:34:17
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class BadRecordReportController : ControllerBase
@@ -27,6 +22,7 @@ namespace Hymson.MES.Api.Controllers.Report
         /// 构造函数（不良报告）
         /// </summary>
         /// <param name="badRecordReportService"></param>
+        /// <param name="logger"></param>
         public BadRecordReportController(IBadRecordReportService badRecordReportService, ILogger<BadRecordReportController> logger)
         {
             _badRecordReportService = badRecordReportService;
@@ -69,5 +65,18 @@ namespace Hymson.MES.Api.Controllers.Report
         {
             return await _badRecordReportService.GetLogPageListAsync(parm);
         }
+
+        /// <summary>
+        /// 查询不合格代码列表（不良报告日志）
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("logPageDetailList")]
+        public async Task<IEnumerable<ManuProductBadRecordLogReportResponseDto>> GetLogPageDetailListAsync([FromQuery] ManuProductBadRecordLogReportRequestDto request)
+        {
+            return await _badRecordReportService.GetLogPageDetailListAsync(request);
+        }
+
     }
 }

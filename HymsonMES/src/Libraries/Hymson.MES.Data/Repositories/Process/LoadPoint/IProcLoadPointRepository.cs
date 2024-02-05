@@ -99,5 +99,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procLoadPointPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcLoadPointEntity>> GetPagedInfoAsync(ProcLoadPointPagedQuery procLoadPointPagedQuery);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

@@ -31,7 +31,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 模板内容

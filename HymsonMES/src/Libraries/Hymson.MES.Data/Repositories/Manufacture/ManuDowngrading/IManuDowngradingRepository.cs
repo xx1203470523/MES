@@ -23,13 +23,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuDowngradingEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ManuDowngradingEntity manuDowngradingEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
         /// <param name="manuDowngradingEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ManuDowngradingEntity> manuDowngradingEntitys);
+        Task<int> InsertsAsync(IEnumerable<ManuDowngradingEntity>? manuDowngradingEntitys);
 
         /// <summary>
         /// 更新
@@ -37,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuDowngradingEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ManuDowngradingEntity manuDowngradingEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ManuDowngradingEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -80,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuDowngradingQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuDowngradingEntity>> GetManuDowngradingEntitiesAsync(ManuDowngradingQuery manuDowngradingQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
@@ -95,6 +95,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuDowngradingEntity>> GetBySfcsAsync(ManuDowngradingBySfcsQuery query);
+
+        /// <summary>
+        /// 根据sfcs获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuDowngradingEntity>> GetBySFCsAsync(ManuDowngradingBySFCsQuery query);
 
         /// <summary>
         /// 真实删除

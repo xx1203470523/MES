@@ -8,6 +8,11 @@ namespace Hymson.MES.Data.Repositories.Process.Query
         /// <summary>
         /// 产品检验参数表id
         /// </summary>
-        public long ParameterGroupId { get; set; }
+        public long? ParameterGroupId { get; set; }
+
+        /// <summary>
+        /// 产品检验参数表id列表
+        /// </summary>
+        public IEnumerable<long>? ParameterGroupIds { get; set; }
     }
 }

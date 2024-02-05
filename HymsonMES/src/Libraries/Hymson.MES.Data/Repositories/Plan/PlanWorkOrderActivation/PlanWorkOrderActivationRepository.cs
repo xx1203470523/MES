@@ -16,17 +16,15 @@ namespace Hymson.MES.Data.Repositories.Plan
     public partial class PlanWorkOrderActivationRepository : IPlanWorkOrderActivationRepository
     {
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -102,12 +100,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderActivationEntity> GetByWorkOrderIdAsync(long workOrderId)
         {
-            var key = $"plan_work_order_activation&{workOrderId}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId });
-            });
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId });
+
         }
 
         /// <summary>
@@ -197,13 +192,10 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where(" wo.Status not in  @NotStatus ");//不要显示状态为已关闭的 和未开始的
             }
 
-            if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0)
+            if (planWorkOrderActivationPagedQuery.PlanStartTime != null && planWorkOrderActivationPagedQuery.PlanStartTime.Length > 0 && planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
             {
-                if (planWorkOrderActivationPagedQuery.PlanStartTime.Length >= 2)
-                {
-                    sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
-                    sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
-                }
+                sqlBuilder.AddParameters(new { PlanStartTimeStart = planWorkOrderActivationPagedQuery.PlanStartTime[0], PlanStartTimeEnd = planWorkOrderActivationPagedQuery.PlanStartTime[1].AddDays(1) });
+                sqlBuilder.Where("wo.PlanStartTime >= @PlanStartTimeStart AND wo.PlanStartTime < @PlanStartTimeEnd");
             }
 
             var offSet = (planWorkOrderActivationPagedQuery.PageIndex - 1) * planWorkOrderActivationPagedQuery.PageSize;
@@ -244,6 +236,11 @@ namespace Hymson.MES.Data.Repositories.Plan
             if (planWorkOrderActivationQuery.LineId.HasValue)
             {
                 sqlBuilder.Where(" LineId = @LineId ");
+            }
+
+            if (planWorkOrderActivationQuery.LineIds != null && planWorkOrderActivationQuery.LineIds.Any())
+            {
+                sqlBuilder.Where(" LineId IN @LineIds ");
             }
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -293,6 +290,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationEntitys);
+        }
+
+        /// <summary>
+        /// 通过bomID查找激活的工单
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesByBomIdAsync(PlanWorkOrderActivationByBomIdQuery query) 
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetPlanWorkOrderActivationEntitiesByBomIdSql, query);
         }
     }
 
@@ -348,5 +356,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string DeleteTrueSql = @"DELETE FROM  plan_work_order_activation where Id=@Id ";
         const string DeletesTrueSql = @"DELETE FROM  plan_work_order_activation where Id in @Ids ";
         const string DeletesTrueByWorkOrderIdsSql = @"DELETE FROM  plan_work_order_activation where WorkOrderId in @WorkOrderIds ";
+
+        const string GetPlanWorkOrderActivationEntitiesByBomIdSql = @"SELECT woa.* 
+                        FROM plan_work_order_activation woa 
+                        LEFT JOIN plan_work_order wo on wo.Id=woa.WorkOrderId
+                        WHERE woa.IsDeleted=0 AND  woa.SiteId=@SiteId AND wo.ProductBOMId=@BomId ";
     }
 }

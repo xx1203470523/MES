@@ -12,17 +12,16 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 载具类型维护仓储
     /// </summary>
-    public partial class InteVehicleTypeRepository :BaseRepository, IInteVehicleTypeRepository
+    public partial class InteVehicleTypeRepository : BaseRepository, IInteVehicleTypeRepository
     {
 
-        public InteVehicleTypeRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public InteVehicleTypeRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -68,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteVehicleTypeEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteVehicleTypeEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteVehicleTypeEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -76,18 +75,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteVehicleTypeEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteVehicleTypeEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<InteVehicleTypeEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="inteVehicleTypePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<InteVehicleTypeEntity>> GetPagedInfoAsync(InteVehicleTypePagedQuery query)
+        public async Task<PagedInfo<InteVehicleTypeEntity>> GetPagedInfoAsync(InteVehicleTypePagedQuery inteVehicleTypePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -96,32 +95,32 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Select("*");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            if (!string.IsNullOrWhiteSpace(query.Code))
+            if (!string.IsNullOrWhiteSpace(inteVehicleTypePagedQuery.Code))
             {
-                query.Code = $"%{query.Code}%";
+                inteVehicleTypePagedQuery.Code = $"%{inteVehicleTypePagedQuery.Code}%";
                 sqlBuilder.Where("Code LIKE @Code");
             }
-            if (!string.IsNullOrWhiteSpace(query.Name))
+            if (!string.IsNullOrWhiteSpace(inteVehicleTypePagedQuery.Name))
             {
-                query.Name = $"%{query.Name}%";
+                inteVehicleTypePagedQuery.Name = $"%{inteVehicleTypePagedQuery.Name}%";
                 sqlBuilder.Where("Name LIKE @Name");
             }
-            if (query.Status.HasValue)
+            if (inteVehicleTypePagedQuery.Status.HasValue)
             {
                 sqlBuilder.Where("Status=@Status");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (inteVehicleTypePagedQuery.PageIndex - 1) * inteVehicleTypePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = inteVehicleTypePagedQuery.PageSize });
+            sqlBuilder.AddParameters(inteVehicleTypePagedQuery);
 
             using var conn = GetMESDbConnection();
             var inteVehicleTypeEntitiesTask = conn.QueryAsync<InteVehicleTypeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteVehicleTypeEntities = await inteVehicleTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<InteVehicleTypeEntity>(inteVehicleTypeEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<InteVehicleTypeEntity>(inteVehicleTypeEntities, inteVehicleTypePagedQuery.PageIndex, inteVehicleTypePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>

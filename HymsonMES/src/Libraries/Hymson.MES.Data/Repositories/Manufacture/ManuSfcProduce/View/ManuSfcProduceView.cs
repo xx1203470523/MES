@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public int Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工单
@@ -118,10 +118,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public long? LockProductionId { get; set; }
 
-        ///// <summary>
-        ///// 工艺路线
-        ///// </summary>
-        //public long ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
 
         /// <summary>
         /// BOMId
@@ -136,7 +137,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 状态;1：排队；2：活动；
         /// </summary>
-        public int Status { get; set; }
+        public SfcStatusEnum Status { get; set; }
 
         /// <summary>
         /// 工单Id
@@ -152,10 +153,53 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品Id
         /// </summary>
         public long ProductId { get; set; }
+
+
+        // 2023.10.24 COPY FROM XINSHIJIE
+        /// <summary>
+        /// 
+        /// </summary>
+        public TrueOrFalseEnum? IsScrap { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        public decimal Qty { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ManuSfcProduceInfoView : ManuSfcProduceEntity
     {
         public long SfcInfoId { get; set; }
+    }
+
+    public class ManuSfcAboutInfoView : ManuSfcEntity 
+    {
+        /// <summary>
+        /// 工单ID
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 产品ID
+        /// </summary>
+        public long ProductId { get; set;}
+
+        /// <summary>
+        /// 工单编码
+        /// </summary>
+        public string WorkOrderCode { get; set; }
+
+        /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set;}
+
+        /// <summary>
+        /// BomId
+        /// </summary>
+        public long ProductBomId {  get; set; }
     }
 }

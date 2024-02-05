@@ -19,12 +19,4 @@
         public long ResourceId { get; set; }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class PackageResponseBo
-    {
-       
-
-    }
 }

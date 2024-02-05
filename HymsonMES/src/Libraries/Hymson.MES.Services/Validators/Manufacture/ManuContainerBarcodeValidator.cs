@@ -17,8 +17,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public ManuContainerBarcodeCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+
         }
     }
 
@@ -29,8 +28,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public ManuContainerBarcodeModifyValidator()
         {
-            //RuleFor(x => x.BarCode).NotEmpty().WithErrorCode("MES16707");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+
         }
     }
 
@@ -42,7 +40,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
         public CreateManuContainerBarcodeValidator()
         {
             RuleFor(x => x.FacePlateCode).NotEmpty().WithErrorCode("MES16704");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+
         }
     }
 
@@ -53,8 +51,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public UpdateManuContainerBarcodeStatusValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+
         }
     }
 }

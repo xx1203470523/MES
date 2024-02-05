@@ -9,9 +9,14 @@ namespace Hymson.MES.Data.Repositories.Process
     public class ProcReplaceMaterialView : BaseEntity
     {
         /// <summary>
-        /// 物料ID
+        /// 主物料ID
         /// </summary>
         public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 替代物料ID（已经把 ReplaceMaterialId 复制到ID列）
+        /// </summary>
+        public long ReplaceMaterialId { get; set; }
 
         /// <summary>
         /// 描述 :物料编码 

@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 系统Token    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-06-15 02:09:57
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated;
@@ -16,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（系统Token）
-    /// @author zhaoqing
-    /// @date 2023-06-15 02:09:57
     /// </summary>
     [Authorize]
     [ApiController]
@@ -34,6 +25,7 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// 构造函数（系统Token）
         /// </summary>
         /// <param name="inteSystemTokenService"></param>
+        /// <param name="logger"></param>
         public InteSystemTokenController(IInteSystemTokenService inteSystemTokenService, ILogger<InteSystemTokenController> logger)
         {
             _inteSystemTokenService = inteSystemTokenService;

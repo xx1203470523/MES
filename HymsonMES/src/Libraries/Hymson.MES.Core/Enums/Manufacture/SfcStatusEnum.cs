@@ -3,29 +3,55 @@
 namespace Hymson.MES.Core.Enums
 {
     /// <summary>
-    /// manu_sfc_info条码状态枚举
+    /// 条码状态枚举
     /// </summary>
     public enum SfcStatusEnum : sbyte
     {
         /// <summary>
-        /// 在制
+        /// 排队中
         /// </summary>
-        [Description("在制")]
-        InProcess = 1,
+        [Description("排队中")]
+        lineUp = 1,
+
+        /// <summary>
+        /// 活动中
+        /// </summary>
+        [Description("活动中")]
+        Activity = 2,
+
         /// <summary>
         /// 完成
         /// </summary>
         [Description("完成")]
-        Complete = 2,
+        InProductionComplete = 3,
+
         /// <summary>
-        /// 已入库
+        /// 已完成
         /// </summary>
-        [Description("已入库")]
-        Received = 3,
+        [Description("已完成")]
+        Complete = 4,
+
+        /// <summary>
+        /// 锁定
+        /// </summary>
+        [Description("锁定")]
+        Locked = 5,
+
         /// <summary>
         /// 报废
         /// </summary>
         [Description("报废")]
-        Scrapping = 4
+        Scrapping = 6,
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        [Description("删除")]
+        Delete = 7,
+        /// <summary>
+        /// 无效
+        /// </summary>
+        [Description("无效")]
+        Invalid = 8
     }
 }

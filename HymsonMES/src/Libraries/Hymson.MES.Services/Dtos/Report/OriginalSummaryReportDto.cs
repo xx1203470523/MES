@@ -1,8 +1,10 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.Report;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class OriginalSummaryQueryDto
     {
         /// <summary>
@@ -13,9 +15,12 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 查看类型
         /// </summary>
-        public OriginalSummaryReportTypeEnum Type { get; set; }
+        public SFCCirculationReportTypeEnum Type { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class OriginalSummaryReportDto
     {
         /// <summary>
@@ -84,6 +89,9 @@ namespace Hymson.MES.Services.Dtos.Report
         public List<OriginalSummaryChildDto> Children { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class OriginalSummaryChildDto
     {
         /// <summary>
@@ -124,7 +132,7 @@ namespace Hymson.MES.Services.Dtos.Report
         /// <summary>
         /// 状态,活动、移除、全部
         /// </summary>
-        public InProductDismantleTypeEnum Status { get; set; }
+        public SFCCirculationReportTypeEnum Status { get; set; }
 
         /// <summary>
         /// 更新时间

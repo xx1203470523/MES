@@ -48,9 +48,29 @@ namespace Hymson.MES.Services.Dtos.Process
         public long MaterialId { get; set; }
 
         /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
+
+        /// <summary>
         /// 状态
         /// </summary>
-        public bool Status { get; set; }
+        public SysDataStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 备注
@@ -104,14 +124,14 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Version { get; set; }
 
         /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 备注
@@ -121,12 +141,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数详情
         /// </summary>
-        public IEnumerable<SortingParamDto> SortingParamDtos { get; set; }
+        public IEnumerable<SortingParamDto>? SortingParamDtos { get; set; }
 
         /// <summary>
         /// 档次
         /// </summary>
-        public IEnumerable<SortingRuleGradeDto> SortingRuleGradeDtos { get; set; }
+        public IEnumerable<SortingRuleGradeDto>? SortingRuleGradeDtos { get; set; }
     }
 
     /// <summary>
@@ -144,11 +164,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-
         /// <summary>
-        /// 状态
+        /// 是否默认版本
         /// </summary>
-        public bool Status { get; set; }
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 备注
@@ -172,12 +191,12 @@ namespace Hymson.MES.Services.Dtos.Process
     public class ProcSortingRulePagedQueryDto : PagerInfo
     {
         /// <summary>
-        /// 规则编码
+        /// 编码
         /// </summary>
         public string? Code { get; set; }
 
         /// <summary>
-        /// 规则名称
+        /// 名称
         /// </summary>
         public string? Name { get; set; }
 
@@ -185,6 +204,37 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string? Version { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 站点id
+        /// </summary>
+        public long SiteId { get; set; } = 0;
+
+        /// <summary>
+        /// 物料id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string? MaterialCode { get; set; }
+
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string? MaterialVersion { get; set; }
     }
 
     /// <summary>
@@ -192,6 +242,11 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class SortingParamDto
     {
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int? Serial { get; set; }
+
         /// <summary>
         /// proc_procedure 工序id
         /// </summary>
@@ -208,7 +263,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MinValue { get; set; }
 
         /// <summary>
-        /// 包含最小值类型;1< 2.≤
+        /// 包含最小值类型;1＜ 2.≤
         /// </summary>
         public ContainingTypeEnum? MinContainingType { get; set; }
 
@@ -218,7 +273,7 @@ namespace Hymson.MES.Services.Dtos.Process
         public decimal? MaxValue { get; set; }
 
         /// <summary>
-        /// 包含最大值类型;1< 2.≤
+        /// 包含最大值类型;1＜ 2.≤
         /// </summary>
         public ContainingTypeEnum? MaxContainingType { get; set; }
 
@@ -238,9 +293,9 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class SortingRuleGradeDto
     {
-       /// <summary>
-       /// 等级
-       /// </summary>
+        /// <summary>
+        /// 等级
+        /// </summary>
         public IEnumerable<string> Ratings { get; set; }
 
         /// <summary>

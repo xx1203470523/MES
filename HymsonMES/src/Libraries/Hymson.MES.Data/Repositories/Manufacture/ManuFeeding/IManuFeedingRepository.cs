@@ -22,14 +22,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        Task<int> UpdateQtyByIdAsync(UpdateQtyByIdCommand command);
+        Task<int> UpdateQtyByIdAsync(UpdateFeedingQtyByIdCommand command);
 
         /// <summary>
         /// 更新数量
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands);
+        Task<int> UpdateFeedingQtyByIdAsync(IEnumerable<UpdateFeedingQtyByIdCommand> commands);
 
         /// <summary>
         /// 批量删除（软删除）
@@ -44,6 +44,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeleteByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据Code和物料ID查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetByBarCodeAndMaterialIdAsync(GetByBarCodeAndMaterialIdQuery query);
 
         /// <summary>
         /// 获取加载数据列表
@@ -67,11 +74,38 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsAsync(GetByResourceIdAndMaterialIdsQuery query);
 
         /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndMaterialIdsAsync(GetByFeedingPointIdAndMaterialIdsQuery query);
+
+        /// <summary>
         /// 获取加载数据列表（只读取剩余数量大于0的）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdsWithOutZeroAsync(GetByResourceIdAndMaterialIdsQuery query);
 
+        /// <summary>
+        /// 获取加载数据列表（只读取剩余数量大于0的）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdWithOutZeroAsync(GetByFeedingPointIdsQuery query);
+
+        /// <summary>
+        /// 根据上料点Id与资源IDs获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndResourceIdsAsync(GetByFeedingPointIdAndResourceIdsQuery query);
+
+        /// <summary>
+        /// 获取上料信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuFeedingEntity> GetOneAsync(ManuFeedingQuery query);
     }
 }

@@ -29,11 +29,6 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string Version { get; set; }
 
         /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
-
-        /// <summary>
         /// 物料id
         /// </summary>
         public long MaterialId { get; set; }
@@ -86,6 +81,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
+        /// 物料id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
         /// 物料编码
         /// </summary>
         public string MaterialCode { get; set; }
@@ -94,6 +94,11 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// 物料名称
         /// </summary>
         public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 工序id
+        /// </summary>
+        public long ProcedureId { get; set; }
 
         /// <summary>
         /// 工序编码

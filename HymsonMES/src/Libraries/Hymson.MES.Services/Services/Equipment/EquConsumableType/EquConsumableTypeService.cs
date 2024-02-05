@@ -165,7 +165,6 @@ namespace Hymson.MES.Services.Services.Equipment.EquSparePartType
             var pagedInfo = await _equConsumableTypeRepository.GetPagedInfoAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            //var dtos = pagedInfo.Data.Select(s => s.ToModel<EquConsumableTypeDto>());
             var dtos = pagedInfo.Data.Select(s => new EquConsumableTypeDto()
             {
                 Id = s.Id,

@@ -1,4 +1,5 @@
 ﻿using Hymson.MessagePush.Services;
+using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -12,14 +13,25 @@ namespace Hymson.MES.BackgroundTasks.Jobs
     internal class MessagePushJob : IJob
     {
         private readonly IMessageService _messageService;
+        private readonly ILogger<MessagePushJob> _logger;
 
-        public MessagePushJob(IMessageService messageService)
+        public MessagePushJob(IMessageService messageService,ILogger<MessagePushJob> logger)
         {
             this._messageService = messageService;
+            _logger = logger;
         }
         public async Task Execute(IJobExecutionContext context)
         {
-          await  _messageService.SendMessageAsync("MES.PushMessage.BackGroundService");
+            if (context.CancellationToken.IsCancellationRequested) return;
+            try
+            {
+                await _messageService.SendMessageAsync("MES.PushMessage.BackGroundService");
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex,"定时执行发送消息出错:");
+            }
         }
     }
 }

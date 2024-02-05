@@ -60,9 +60,10 @@ namespace Hymson.MES.Api
                  ServiceTypeEnum.User,
                  ServiceTypeEnum.MES
                 }, stoppingToken);
-                await _resourceService.InitEnumAsync();
-                await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
-                await InitExcelDtoAsync();
+                //await _resourceService.InitEnumAsync();
+                //await _resourceService.InitErrorCodeAsync(typeof(ErrorCode));
+                //await InitExcelDtoAsync();
+                //await _resourceService.HotLoadingAsync();
             }
             catch (Exception e)
             {
@@ -88,7 +89,7 @@ namespace Hymson.MES.Api
                     if (epplusTableColumnAttribute == null) { continue; }
                     var resourceName = $"{type.Namespace}.{type.Name}.{propertyInfo.Name}";
                     var resourceValue = epplusTableColumnAttribute.Header;
-                    foreach (var languageEntity in languageEntities)
+                    foreach (var languageEntity in languageEntities.Select(x => x.Id))
                     {
                         var localeStringResourceEntity = new LocaleStringResourceEntity
                         {
@@ -96,14 +97,14 @@ namespace Hymson.MES.Api
                             CreatedOn = HymsonClock.Now(),
                             IsDeleted = 0,
                             Id = IdGenProvider.Instance.CreateId(),
-                            LanguageId = languageEntity.Id,
+                            LanguageId = languageEntity,
                             ResourceName = resourceName,
                             ResourceValue = resourceValue,
                             ServiceType = Infrastructure.Enums.ServiceTypeEnum.MES,
                             UpdatedBy = "System",
                             UpdatedOn = HymsonClock.Now(),
                         };
-                        if (languageEntity.Id == 1)
+                        if (languageEntity == 1)
                         {
                             await _resourceRepository.InsertOrUpdateAsync(localeStringResourceEntity);
                         }

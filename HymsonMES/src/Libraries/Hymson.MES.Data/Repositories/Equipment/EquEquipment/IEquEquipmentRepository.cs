@@ -1,11 +1,9 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
-using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
@@ -57,6 +55,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         Task<EquEquipmentEntity> GetByIdAsync(long id);
 
         /// <summary>
+        /// 获取设备列表
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquEquipmentEntity>> GetByIdAsync(IEnumerable<long> ids);
+
+        /// <summary>
         /// 根据Code查询对象
         /// </summary>
         /// <param name="query"></param>
@@ -96,6 +101,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="equipmentPagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<EquEquipmentEntity>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
+        Task<PagedInfo<EquEquipmentPageView>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
     }
 }

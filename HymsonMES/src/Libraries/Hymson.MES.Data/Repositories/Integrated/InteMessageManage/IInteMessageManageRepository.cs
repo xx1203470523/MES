@@ -16,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteMessageManageEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -25,18 +25,32 @@ namespace Hymson.MES.Data.Repositories.Integrated
         Task<int> InsertRangeAsync(IEnumerable<InteMessageManageEntity> entities);
 
         /// <summary>
-        /// 更新
+        /// 修改
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteMessageManageEntity entity);
-        
+
         /// <summary>
-        /// 更新（批量）
+        /// 接收
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<InteMessageManageEntity> entities);
+        Task<int> ReceiveAsync(InteMessageManageEntity entity);
+
+        /// <summary>
+        /// 处理
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> HandleAsync(InteMessageManageEntity entity);
+
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task<int> CloseAsync(InteMessageManageEntity entity);
 
         /// <summary>
         /// 软删除  
@@ -44,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -58,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteMessageManageEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
@@ -72,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<InteMessageManageEntity>> GetEntitiesAsync(InteMessageManageQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>

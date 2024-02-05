@@ -4,7 +4,7 @@ namespace Hymson.MES.Services.Dtos.Process
 {
     public record ProcPrinterDto : BaseEntityDto
     {
-        // <summary>
+        /// <summary>
         /// 唯一Id
         /// </summary>
         public long Id { get; set; }
@@ -54,7 +54,7 @@ namespace Hymson.MES.Services.Dtos.Process
     }
     public record ProcPrinterUpdateDto:BaseEntityDto 
     {
-        // <summary>
+        /// <summary>
         /// 唯一Id
         /// </summary>
         public long Id { get; set; }
@@ -63,14 +63,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public string PrintName { get; set; }
-
-        /*
-        /// <summary>
-        /// 描述 :打印机IP 
-        /// 空值 : false  
-        /// </summary>
-        public string PrintIp { get; set; }
-        */
 
         /// <summary>
         /// 描述 :备注 

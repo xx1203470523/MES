@@ -1,4 +1,3 @@
-using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
@@ -8,10 +7,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（产品参数）
-    /// @author zhaoqing
-    /// @date 2023-06-25 08:57:38
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterProductController : ControllerBase
@@ -26,6 +22,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（产品参数）
         /// </summary>
         /// <param name="procParameterLinkTypeService"></param>
+        /// <param name="logger"></param>
         public ProcParameterProductController(IProcParameterLinkTypeService procParameterLinkTypeService, ILogger<ProcParameterLinkTypeController> logger)
         {
             _procParameterLinkTypeService = procParameterLinkTypeService;

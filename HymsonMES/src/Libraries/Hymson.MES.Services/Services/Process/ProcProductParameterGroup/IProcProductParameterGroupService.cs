@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 
 namespace Hymson.MES.Services.Services.Process
@@ -57,5 +59,19 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         Task<PagedInfo<ProcProductParameterGroupDto>> GetPagedListAsync(ProcProductParameterGroupPagedQueryDto pagedQueryDto);
 
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
+        /// <summary>
+        /// 根据(条码或载具编码)与工序查询当前版本的产品参数收集详情
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        Task<IEnumerable<ProcProductParameterGroupDetailDto>> GetBySfcsAndProcedureIdAsync(ProcProductParameterGroupToParameterCollectionQueryDto queryDto);
     }
 }

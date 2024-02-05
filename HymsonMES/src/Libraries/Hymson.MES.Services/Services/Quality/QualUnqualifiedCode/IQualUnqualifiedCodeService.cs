@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
@@ -48,16 +49,16 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="qualUnqualifiedCodeCreateDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto qualUnqualifiedCodeCreateDto);
+        Task CreateQualUnqualifiedCodeAsync(QualUnqualifiedCodeCreateDto param);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="qualUnqualifiedCodeModifyDto"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto qualUnqualifiedCodeModifyDto);
+        Task ModifyQualUnqualifiedCodeAsync(QualUnqualifiedCodeModifyDto param);
 
         /// <summary>
         ///删除
@@ -65,5 +66,13 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedCode
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<int> DeletesQualUnqualifiedCodeAsync(long[] ids);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
     }
 }

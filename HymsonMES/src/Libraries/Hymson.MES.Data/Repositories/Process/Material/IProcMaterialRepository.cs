@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料维护仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-08 04:47:44
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -135,5 +128,27 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcMaterialEntity>> GetPagedInfoForGroupAsync(ProcMaterialPagedQuery procMaterialPagedQuery);
+
+
+        /// <summary>
+        /// 更新某物料 的状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据编码获取物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcMaterialEntity>> GetByCodesAsync(ProcMaterialsByCodeQuery param);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcMaterialEntity> entities);
     }
 }

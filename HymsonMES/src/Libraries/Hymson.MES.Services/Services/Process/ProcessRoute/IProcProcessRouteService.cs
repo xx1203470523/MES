@@ -6,6 +6,7 @@
  *build datetime: 2023-02-14 10:07:11
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,13 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// <param name="id"></param>
         /// <returns></returns>
         Task<CustomProcessRouteDto> GetCustomProcProcessRouteAsync(long id);
+
+        /// <summary>
+        /// 分页查询工艺路线的工序列表
+        /// </summary>
+        /// <param name="processRouteProcedureQueryDto"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcProcedureDto>> GetPagedInfoByProcessRouteIdAsync(ProcessRouteProcedureQueryDto processRouteProcedureQueryDto);
 
         /// <summary>
         /// 根据ID查询工艺路线工序列表
@@ -68,5 +76,13 @@ namespace Hymson.MES.Services.Services.Process.ProcessRoute
         /// <param name="ids"></param>
         /// <returns></returns>
          Task<IEnumerable<ProcProcessRouteDto>> GetListByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
     }
 }

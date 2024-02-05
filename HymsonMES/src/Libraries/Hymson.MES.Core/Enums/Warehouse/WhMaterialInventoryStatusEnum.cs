@@ -21,6 +21,11 @@ namespace Hymson.MES.Core.Enums
         /// 锁定
         /// </summary>
         [Description("锁定")]
-        Locked = 3
+        Locked = 3,
+        /// <summary>
+        /// 报废
+        /// </summary>
+        [Description("报废")]
+        Scrap = 4
     }
 }

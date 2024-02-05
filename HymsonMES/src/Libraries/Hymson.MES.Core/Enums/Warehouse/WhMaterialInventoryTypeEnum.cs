@@ -39,6 +39,16 @@ namespace Hymson.MES.Core.Enums
         /// 库存维护   (仅仅做记录使用)
         /// </summary>
         [Description("库存维护")]
-        InventoryModify = 6
+        InventoryModify = 6,
+        /// <summary>
+        /// 条码拆分
+        /// </summary>
+        [Description("条码拆分")]
+        Split = 7,
+        /// <summary>
+        /// 条码合并
+        /// </summary>
+        [Description("条码合并")]
+        Merge = 8
     }
 }

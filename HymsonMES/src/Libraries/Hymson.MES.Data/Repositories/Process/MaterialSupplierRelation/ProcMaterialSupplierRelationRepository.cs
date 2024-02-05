@@ -87,11 +87,6 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
             var offSet = (procMaterialSupplierRelationPagedQuery.PageIndex - 1) * procMaterialSupplierRelationPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = procMaterialSupplierRelationPagedQuery.PageSize });
@@ -235,16 +230,9 @@ namespace Hymson.MES.Data.Repositories.Process
                                     s.code, s.name
                                 from proc_material_supplier_relation msr
                                 LEFT join wh_supplier s on msr.SupplierId=s.Id
-                                where msr.MaterialId=@materialId
+                                where msr.MaterialId=@materialId and s.IsDeleted = 0
             ";
 
-        const string GetByMaterialIdsSql = @"Select 
-                                    msr.`Id`, msr.`MaterialId`, msr.`SupplierId`, msr.`CreatedBy`, msr.`CreatedOn`,
-                                    s.code, s.name
-                                from proc_material_supplier_relation msr
-                                LEFT join wh_supplier s on msr.SupplierId=s.Id
-                                where msr.MaterialId in @materialIds
-            ";
 
         const string GetBySupplierIdsSql = @"Select *  from proc_material_supplier_relation  where SupplierId in @supplierIds";
     }

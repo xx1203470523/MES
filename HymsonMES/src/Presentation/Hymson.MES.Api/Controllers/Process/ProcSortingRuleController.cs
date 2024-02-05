@@ -1,13 +1,9 @@
-/*
- *creator: Karl
- *
- *describe: 分选规则    控制器 | 代码由框架生成  
- *builder:  zhaoqing
- *build datetime: 2023-07-25 03:24:54
- */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（分选规则）
-    /// @author zhaoqing
-    /// @date 2023-07-25 03:24:54
     /// </summary>
     [Authorize]
     [ApiController]
@@ -33,6 +27,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（分选规则）
         /// </summary>
         /// <param name="procSortingRuleService"></param>
+        /// <param name="logger"></param>
         public ProcSortingRuleController(IProcSortingRuleService procSortingRuleService, ILogger<ProcSortingRuleController> logger)
         {
             _procSortingRuleService = procSortingRuleService;
@@ -93,6 +88,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPost]
         [Route("create")]
+        [PermissionDescription("proc:procSortingRule:insert")]
         public async Task AddProcSortingRuleAsync([FromBody] ProcSortingRuleCreateDto parm)
         {
              await _procSortingRuleService.CreateProcSortingRuleAsync(parm);
@@ -105,6 +101,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
+        [PermissionDescription("proc:procSortingRule:update")]
         public async Task UpdateProcSortingRuleAsync([FromBody] ProcSortingRuleModifyDto parm)
         {
              await _procSortingRuleService.ModifyProcSortingRuleAsync(parm);
@@ -117,6 +114,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
+        [PermissionDescription("proc:procSortingRule:delete")]
         public async Task DeleteProcSortingRuleAsync([FromBody] long[] ids)
         {
             await _procSortingRuleService.DeletesProcSortingRuleAsync(ids);
@@ -130,22 +128,55 @@ namespace Hymson.MES.Api.Controllers.Process
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getDetails")]
-        public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListAsync([FromQuery] ProcSortingRuleDetailQueryDto parm)
-        {
-            return await _procSortingRuleService.GetSortingRuleDetailListAsync(parm);
-        }
-
-        /// <summary>
-        /// 分页查询列表（分选规则）
-        /// </summary>
-        /// <param name="parm"></param>
-        /// <returns></returns>
-        [HttpGet]
         [Route("getDetailsByMaterialId")]
         public async Task<IEnumerable<ProcSortingRuleDetailViewDto>> GetSortingRuleDetailListByMaterialIdAsync([FromQuery] ProcSortingRuleDetailQueryDto parm)
         {
             return await _procSortingRuleService.GetSortingRuleDetailListByMaterialIdAsync(parm);
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（分选规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("分选规则", BusinessType.UPDATE)]
+        [PermissionDescription("proc:procSortingRule:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procSortingRuleService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（分选规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("分选规则", BusinessType.UPDATE)]
+        [PermissionDescription("proc:procSortingRule:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procSortingRuleService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（分选规则）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("分选规则", BusinessType.UPDATE)]
+        [PermissionDescription("proc:procSortingRule:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procSortingRuleService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

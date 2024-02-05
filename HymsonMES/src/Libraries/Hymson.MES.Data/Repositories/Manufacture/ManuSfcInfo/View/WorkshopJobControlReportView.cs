@@ -1,12 +1,5 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -22,7 +15,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         public SfcStatusEnum SFCStatus { get; set; }
 
-        public SfcProduceStatusEnum SFCProduceStatus { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public SfcStatusEnum SFCProduceStatus { get; set; }
 
         /// <summary>
         /// 物料编码/版本
@@ -63,6 +59,62 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// bom名称
         /// </summary>
         public string BomName { get; set; }
+
+        /// <summary>
+        /// 条码数量
+        /// </summary>
+        public decimal Qty { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class WorkshopJobControlReportOptimizeView : BaseEntity
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string SFC { get; set; }
+
+        /// <summary>
+        /// 条码状态
+        /// </summary>
+        public SfcStatusEnum SFCStatus { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public SfcStatusEnum SFCProduceStatus { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工单Id
+        /// </summary>
+        public long WorkOrderId { get; set; }
+
+        /// <summary>
+        /// bomID
+        /// </summary>
+        public long ProductBOMId { get; set; }
+
+        /// <summary>
+        /// 工艺路线Id
+        /// </summary>
+        public long ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// 工序Id
+        /// </summary>
+        public long ProcedureId { get; set; }
+
+        /// <summary>
+        /// 资源Id
+        /// </summary>
+        public long ResourceId { get; set; }
 
         /// <summary>
         /// 条码数量

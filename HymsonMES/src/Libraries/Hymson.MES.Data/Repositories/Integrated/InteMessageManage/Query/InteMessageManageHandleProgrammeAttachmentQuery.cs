@@ -5,6 +5,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.Query
     /// </summary>
     public class InteMessageManageHandleProgrammeAttachmentQuery
     {
-    
+        /// <summary>
+        /// 消息Id
+        /// </summary>
+        public long MessageManageId { get; set; }
+
     }
 }
