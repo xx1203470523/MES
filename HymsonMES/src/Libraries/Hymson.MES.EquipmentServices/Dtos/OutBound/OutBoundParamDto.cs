@@ -54,6 +54,11 @@ namespace Hymson.MES.EquipmentServices.Dtos.OutBound
         /// 测试结果
         /// </summary>
         public string? TestResult { get; set; }
+
+        /// <summary>
+        /// 操作人
+        /// </summary>
+        public string? CreatedBy { get; set; }
     }
 
     /// <summary>

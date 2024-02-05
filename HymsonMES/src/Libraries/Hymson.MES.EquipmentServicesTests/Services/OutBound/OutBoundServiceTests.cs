@@ -60,14 +60,15 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
         {
             string resourceCode = "YTLPACK01ER004";
             string equipmentCode = "YTLPACK01AE004";
-            string prefix = "0IJCBA06011111D7E0000002";
+            string prefix = "0IJCBA06011111D7E0000006";
             List<OutBoundParam> outBoundParams = new List<OutBoundParam>();
             for (int i = 1; i <= 1; i++)
             {
                 outBoundParams.Add(new OutBoundParam
                 {
                     ParamCode = "单元测试出站参数" + i,
-                    ParamValue = i.ToString()
+                    ParamValue = i.ToString(),
+                    CreatedBy = "test12321321321"
                 });
             }
             try
@@ -81,7 +82,7 @@ namespace Hymson.MES.EquipmentServices.Services.OutBound.Tests
                     Passed = 1,
                     LocalTime = HymsonClock.Now(),
                     //SFC = prefix + "1",
-                    SFC = "0IJCBA06011111D7E0000002",
+                    SFC = prefix,
                     ParamList = outBoundParams.ToArray(),
                     IsPassingStation=false
                 });
