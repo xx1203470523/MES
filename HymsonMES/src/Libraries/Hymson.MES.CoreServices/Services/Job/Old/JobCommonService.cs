@@ -2,7 +2,10 @@
 using Hymson.MES.CoreServices.Bos;
 using Hymson.MES.CoreServices.Dtos.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection.Metadata;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using Hymson.MES.Core.Attribute.Job;
 
 namespace Hymson.MES.CoreServices.Services.Job
 {
@@ -37,35 +40,23 @@ namespace Hymson.MES.CoreServices.Services.Job
 
             // 获取所有实现类
             var services = _serviceProvider.GetServices<IJobManufactureService>();
-            //using var trans = new TransactionScope();
-            foreach (var job in jobs)
+            foreach (var item in jobs.Select(x=>x.ClassProgram))
             {
-                var service = services.FirstOrDefault(f => f.GetType().Name == job.ClassProgram);
+                var service = services.FirstOrDefault(f => f.GetType().Name == item);
                 if (service == null) continue;
 
                 // TODO 如果job有额外参数，可以在这里进行拼装
-                //param.Add(job.extra);
 
                 // 验证参数
                 await service.VerifyParamAsync(param);
 
                 // 执行job
-                //result.Add(job.ClassProgram, await service.ExecuteAsync(param));
+
                 var responseDto = await service.ExecuteAsync(param);
-                responseDtos.Add(job.ClassProgram, responseDto);
+                responseDtos.Add(item, responseDto);
 
                 if (responseDto.Rows < 0) break;
             }
-
-            //if (responseDtos.Any(a => a.Value.Rows < 0))
-            //{
-            //    trans.Dispose();
-            //}
-            //else
-            //{
-            //    trans.Complete();
-            //}
-
             return responseDtos;
         }
 
@@ -76,17 +67,19 @@ namespace Hymson.MES.CoreServices.Services.Job
         public async Task<IEnumerable<JobClassBo>> GetJobClassBoListAsync()
         {
             // 获取所有实现类
-            //var services = _serviceProvider.GetServices<IJobManufactureService>();
+
             var services = _serviceProvider.GetServices<IJobService>();
             return await Task.FromResult(services.Select(s =>
             {
                 var type = s.GetType();
+                var jobAttribute = type.GetCustomAttribute<JobAttribute>();
                 var classModule = Regex.Replace(type.Module.Name, ".dll", "");
                 return new JobClassBo
                 {
                     ClassName = type.Name,
                     ClassNamespace = type.Namespace ?? "",
-                    ClassModule = classModule
+                    ClassModule = classModule,
+                    Remark= jobAttribute?.Name
                 };
             }));
         }
@@ -103,7 +96,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 return new SelectOptionDto
                 {
                     Key = $"{s.ClassName}",
-                    Label = $"【{s.ClassModule}】 {s.ClassName}",
+                    Label = $"【{s.ClassModule}】 {s.ClassName}【{s.Remark}】",
                     Value = $"{s.ClassName}"
                 };
             });

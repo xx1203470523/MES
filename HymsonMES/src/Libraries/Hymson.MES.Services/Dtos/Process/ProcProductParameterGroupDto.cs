@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -29,9 +30,9 @@ namespace Hymson.MES.Services.Dtos.Process
         public string Version { get; set; }
 
         /// <summary>
-        /// 状态
+        /// 是否默认版本
         /// </summary>
-        public SysDataStatusEnum Status { get; set; }
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 物料id
@@ -79,6 +80,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 状态
@@ -146,6 +152,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 版本
         /// </summary>
         public string Version { get; set; }
+
+        /// <summary>
+        /// 是否默认版本
+        /// </summary>
+        public bool? IsDefaultVersion { get; set; }
 
         /// <summary>
         /// 状态
@@ -220,4 +231,34 @@ namespace Hymson.MES.Services.Dtos.Process
         public string? ProcedureName { get; set; }
     }
 
+    public class ProcProductParameterGroupBySfcAndProcedureIdQueryDto 
+    { 
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public string Sfc { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+    }
+
+    public class ProcProductParameterGroupToParameterCollectionQueryDto
+    {
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
+
+        /// <summary>
+        /// 产品序列码
+        /// </summary>
+        public string[] Sfcs { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
+    }
 }

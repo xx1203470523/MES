@@ -20,12 +20,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcParameterLinkTypePagedQuery : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :所属站点代码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
-
         //
         // 摘要:
         //     站点id
@@ -50,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        public ParameterUnitEnum? ParameterUnit { get; set; }
+        public string? ParameterUnit { get; set; }
 
         /// <summary>
         /// 数据类型（字典定义） 
@@ -63,12 +57,6 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public class ProcParameterDetailPagerQuery : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :所属站点代码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
-
         //
         // 摘要:
         //     站点id

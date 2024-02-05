@@ -102,6 +102,22 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name=""></param>
         /// <returns></returns>
         Task<ProcSortingRuleEntity> GetByCodeAndMaterialId(ProcSortingRuleCodeAndMaterialIdQuery param);
+
+
+        /// <summary>
+        ///更具编码获取当前版本的分选规则
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        Task<ProcSortingRuleEntity> GetByDefaultVersion(ProcSortingRuleByDefaultVersionQuery param);
         #endregion
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

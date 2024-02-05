@@ -12,7 +12,7 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility
         /// 
         /// </summary>
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private IServiceScope _scope;
+        private IServiceScope? _scope;
 
         /// <summary>
         /// 

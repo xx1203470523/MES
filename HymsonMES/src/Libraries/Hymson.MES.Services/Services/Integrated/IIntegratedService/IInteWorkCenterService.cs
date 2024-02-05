@@ -1,6 +1,7 @@
 using FluentValidation;
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 
 namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
@@ -74,5 +75,13 @@ namespace Hymson.MES.Services.Services.Integrated.IIntegratedService
         /// <param name="param"></param>
         /// <returns></returns>
         Task ModifyInteWorkCenterAsync(InteWorkCenterModifyDto param);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
+
     }
 }

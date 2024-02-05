@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Integrated;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -10,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（消息组）
-    /// @author Czhipu
-    /// @date 2023-08-02 09:34:51
     /// </summary>
     [Authorize]
     [ApiController]

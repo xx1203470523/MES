@@ -6,12 +6,22 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
+using System.Transactions;
+using Hymson.Excel.Abstractions;
+using Hymson.Minio;
+using FluentValidation.Results;
+using Hymson.Localization.Services;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
+using Hymson.MES.Services.Dtos.Report;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -26,11 +36,17 @@ namespace Hymson.MES.Services.Services.Process
         private readonly IProcParameterRepository _procParameterRepository;
         private readonly AbstractValidator<ProcParameterCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcParameterModifyDto> _validationModifyRules;
+        private readonly AbstractValidator<ProcParameterImportDto> _validationImportRules;
+
+        private readonly ILocalizationService _localizationService;
 
         private readonly IProcParameterLinkTypeRepository _procParameterLinkTypeRepository;
 
         private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
+
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
 
         /// <summary>
         /// 
@@ -41,7 +57,20 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="validationModifyRules"></param>
         /// <param name="procParameterLinkTypeRepository"></param>
         /// <param name="currentSite"></param>
-        public ProcParameterService(ICurrentUser currentUser, IProcParameterRepository procParameterRepository, AbstractValidator<ProcParameterCreateDto> validationCreateRules, AbstractValidator<ProcParameterModifyDto> validationModifyRules, IProcParameterLinkTypeRepository procParameterLinkTypeRepository, ICurrentSite currentSite)
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
+        /// <param name="validationImportRules"></param>
+        /// <param name="localizationService"></param>
+        public ProcParameterService(ICurrentUser currentUser,
+            IProcParameterRepository procParameterRepository,
+            AbstractValidator<ProcParameterCreateDto> validationCreateRules,
+            AbstractValidator<ProcParameterModifyDto> validationModifyRules,
+            IProcParameterLinkTypeRepository procParameterLinkTypeRepository,
+            ICurrentSite currentSite,
+            IExcelService excelService,
+            IMinioService minioService,
+            AbstractValidator<ProcParameterImportDto> validationImportRules,
+            ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _procParameterRepository = procParameterRepository;
@@ -49,6 +78,10 @@ namespace Hymson.MES.Services.Services.Process
             _validationModifyRules = validationModifyRules;
             _procParameterLinkTypeRepository = procParameterLinkTypeRepository;
             _currentSite = currentSite;
+            _excelService = excelService;
+            _minioService = minioService;
+            _validationImportRules = validationImportRules;
+            _localizationService = localizationService;
         }
 
         /// <summary>
@@ -99,7 +132,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         public async Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto)
         {
-            procParameterModifyDto.ParameterName = procParameterModifyDto.ParameterName.Trim();
             procParameterModifyDto.Remark = procParameterModifyDto.Remark ?? "".Trim();
 
             //DTO转换实体
@@ -113,20 +145,6 @@ namespace Hymson.MES.Services.Services.Process
 
             var modelOrigin = await _procParameterRepository.GetByIdAsync(procParameterEntity.Id)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10504));
-
-            /*
-            //判断编号是否已经存在
-            var procParams = await _procParameterRepository.GetProcParameterEntitiesAsync(new ProcParameterQuery()
-            {
-                SiteId = procParameterEntity.SiteId,
-                ParameterCode = procParameterEntity.ParameterCode,
-            });
-            var exists = procParams.Count() > 0 ? procParams.Where(x => x.Id != procParameterEntity.Id).ToList() : null;
-            if (exists != null && exists.Count() > 0)
-            {
-                throw new BusinessException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
-            }
-            */
 
             await _procParameterRepository.UpdateAsync(procParameterEntity);
         }
@@ -155,7 +173,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //查询参数是否关联产品参数和设备参数
             var lists = await _procParameterLinkTypeRepository.GetByParameterIdsAsync(idsArr);
-            if (lists != null && lists.Count() > 0)
+            if (lists != null && lists.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10506));
             }
@@ -214,14 +232,208 @@ namespace Hymson.MES.Services.Services.Process
                     SiteId = siteId,
                     ParameterID = dto.Id
                 });
-                //dto.Type = (ParameterTypeShowEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).ToList().Sum();
-                //dto.Type = (ParameterTypeEnum)linkTypes.GroupBy(x => x.ParameterType).Select(x => (int)x.Key).Sum();
                 dto.Type = linkTypes.GroupBy(x => x.ParameterType).Select(x => x.Key).ToArray();
 
                 return dto;
             }
-            return null;
+            return new ProcParameterDto();
         }
 
+        /// <summary>
+        /// 导入参数表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportParameterAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<ProcParameterImportDto>(memoryStream);
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入的参数数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach (var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            //检测导入数据是否重复
+            var repeats = new List<string>();
+            //检验重复  目前只设定检验 参数编码 是否重复
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.ParameterCode });
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add(item.Key.ParameterCode);
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("{repeats}相关的编码重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            List<ProcParameterEntity> addEntities = new List<ProcParameterEntity>();
+
+            #region 验证数据到数据库比对   且组装数据
+            var paramters = await _procParameterRepository.GetByCodesAsync(new ProcParametersByCodeQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                Codes = excelImportDtos.Select(x => x.ParameterCode).Distinct().ToArray()
+            });
+
+            var cuurrentRow = 0;
+            foreach (var item in excelImportDtos)
+            {
+                cuurrentRow++;
+                //判断是否已经录入
+                if (paramters.Any(x => x.ParameterCode == item.ParameterCode))
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10502), item.ParameterCode, cuurrentRow, "parameterCode"));
+                }
+                else
+                {
+                    //判断编码是否重复 无重复则添加
+                    if (!repeats.Contains(item.ParameterCode))
+                    {
+                        #region 组装数据
+                        //标准参数信息 记录
+                        var procParameterEntity = new ProcParameterEntity()
+                        {
+                            ParameterCode = item.ParameterCode,
+                            ParameterName = item.ParameterName,
+                            ParameterUnit = item.ParameterUnit,
+                            DataType = item.DataType,
+                            Remark = item.Remark ?? "",
+
+                            Id = IdGenProvider.Instance.CreateId(),
+                            CreatedBy = _currentUser.UserName,
+                            UpdatedBy = _currentUser.UserName,
+                            CreatedOn = HymsonClock.Now(),
+                            UpdatedOn = HymsonClock.Now(),
+                            SiteId = _currentSite.SiteId ?? 0
+                        };
+                        addEntities.Add(procParameterEntity);
+                        #endregion
+                    }
+                }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            #endregion
+
+            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+            //插入数据
+            if (addEntities.Any())
+                await _procParameterRepository.InsertsAsync(addEntities);
+            ts.Complete();
+
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private static ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ProcParameterImportDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "参数导入模板");
+        }
+
+        /// <summary>
+        /// 根据查询条件导出参数数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<ParameterExportResultDto> ExprotParameterListAsync(ProcParameterPagedQueryDto param)
+        {
+            var pagedQuery = param.ToQuery<ProcParameterPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId;
+            pagedQuery.PageSize = 1000;
+            var pagedInfo = await _procParameterRepository.GetPagedListAsync(pagedQuery);
+
+            List<ProcParameterExportDto> listDto = new List<ProcParameterExportDto>();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("Parameter"), _localizationService.GetResource("Parameter"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new ParameterExportResultDto
+                {
+                    FileName = _localizationService.GetResource("Parameter"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new ProcParameterExportDto()
+                {
+                    ParameterCode = item.ParameterCode??"",
+                    ParameterName = item.ParameterName??"",
+                    ParameterUnit = item.ParameterUnit ?? "",
+                    DataType = Enum.IsDefined(typeof(DataTypeEnum), item.DataType) ? item.DataType.GetDescription() : "",
+                    Remark = item.Remark ?? ""
+                });
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("Parameter"), _localizationService.GetResource("Parameter"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new ParameterExportResultDto
+            {
+                FileName = _localizationService.GetResource("Parameter"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+        }
     }
 }

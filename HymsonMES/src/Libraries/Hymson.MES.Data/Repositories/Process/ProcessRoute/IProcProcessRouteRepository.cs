@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcProcessRouteEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<ProcProcessRouteEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -93,5 +93,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="command"></param>
         /// <returns></returns>
         Task<int> DeleteRangeAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据编码获取工艺路线信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcessRouteEntity>> GetByCodesAsync(ProcProcessRoutesByCodeQuery param);
+
     }
 }

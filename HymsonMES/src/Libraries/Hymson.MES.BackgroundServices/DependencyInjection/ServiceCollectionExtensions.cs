@@ -1,26 +1,18 @@
-﻿using FluentValidation;
-using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Options;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Context;
-using Hymson.MES.CoreServices.Services.Job.JobUtility.Execute;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuCreateBarcode;
-using Hymson.MES.CoreServices.Services.Manufacture.ManuGenerateBarcode;
-using Hymson.MES.CoreServices.Services.NewJob;
-using Hymson.MES.CoreServices.Services.Parameter;
-using Hymson.MES.Services.Validators.Equipment;
+﻿using Hymson.EventBus.Abstractions;
+using Hymson.Infrastructure;
+using Hymson.MES.BackgroundServices.EventHandling;
+using Hymson.MES.CoreServices.IntegrationEvents.Events.Messages;
+using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Hymson.MES.CoreServices.DependencyInjection
 {
     /// <summary>
     /// 依赖注入项配置
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static partial class ServiceCollectionExtensions
     {
         /// <summary>
         /// 业务逻辑层依赖服务添加
@@ -30,33 +22,13 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddCoreService(configuration);  
-            AddServices(services);
-            AddValidators(services);
+            services.AddCoreService(configuration);
             AddConfig(services, configuration);
-            return services;
-        }
 
-        /// <summary>
-        /// 添加服务依赖
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddServices(this IServiceCollection services)
-        {
-           
-            //services.AddSingleton<IManuProductParameterService, ManuProductParameterService>();
-            return services;
-        }
+            AddEventBusServices(services);
+            AddEventBusServicesForXinShiJie(services);
 
-        /// <summary>
-        /// 添加验证器相关服务
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        private static IServiceCollection AddValidators(IServiceCollection services)
-        {
-           
+            AddServices(services);
 
             return services;
         }
@@ -69,10 +41,35 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
+            // 数据库连接
             services.Configure<ParameterOptions>(configuration.GetSection(nameof(ParameterOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
             return services;
         }
+
+        /// <summary>
+        /// 订阅
+        /// </summary>
+        /// <param name="services"></param>
+        static void AddEventBusServices(IServiceCollection services)
+        {
+            services.AddSingleton<IIntegrationEventHandler<MessageHandleUpgradeIntegrationEvent>, MessageHandleUpgradeIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageReceiveUpgradeIntegrationEvent>, MessageReceiveUpgradeIntegrationEventHandler>();
+            services.AddSingleton<IIntegrationEventHandler<MessageTriggerUpgradeIntegrationEvent>, MessageTriggerUpgradeIntegrationEventHandler>();
+        }
+
+        /// <summary>
+        /// 注入服务
+        /// </summary>
+        /// <param name="services"></param>
+        static void AddServices(IServiceCollection services)
+        {
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                services.TryAddSingleton(keyValuePair.Value,keyValuePair.Key);
+            }
+        }
+
     }
 }

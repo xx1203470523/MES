@@ -24,6 +24,22 @@ namespace Hymson.MES.CoreServices.Dtos.Common
     }
 
     /// <summary>
+    /// 按钮Dto（请求）
+    /// </summary>
+    public class EnterRequestDto
+    {
+        /// <summary>
+        /// 面板ID
+        /// </summary>
+        public long FacePlateId { get; set; }
+
+        /// <summary>
+        /// 参数
+        /// </summary>
+        public Dictionary<string, string>? Param { get; set; }
+    }
+
+    /// <summary>
     /// 按钮Dto（响应）
     /// </summary>
     public class ButtonResponseDto

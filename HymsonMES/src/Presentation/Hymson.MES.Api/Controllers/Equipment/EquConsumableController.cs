@@ -2,17 +2,13 @@ using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment.EquSparePart;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（工装注册）
-    /// @author 陈志谱
-    /// @date 2023-02-18
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquConsumableController : ControllerBase
@@ -27,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Equipment
         /// 构造函数（工装注册）
         /// </summary>
         /// <param name="equSparePartService"></param>
+        /// <param name="logger"></param>
         public EquConsumableController(IEquConsumableService equSparePartService, ILogger<EquConsumableController> logger)
         {
             _equConsumableService = equSparePartService;
@@ -96,7 +93,5 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equConsumableService.GetDetailAsync(id);
         }
-
-
     }
 }

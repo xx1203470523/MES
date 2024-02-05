@@ -154,11 +154,11 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterEntity>> GetWorkCenterListByTypeAsync(EntityByTypeQuery query)
         {
-            var key = $"inte_work_center&Type-{query.Type}&SiteId-{query.SiteId}";
+            var key = $"inte_work_center&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
                 using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryAsync<InteWorkCenterEntity>(GetBySiteIdSql, query);
+                return await conn.QueryAsync<InteWorkCenterEntity>(GetByTypeSql, query);
             });
         }
 
@@ -342,6 +342,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             return await conn.QueryAsync<InteWorkCenterResourceRelationView>(GetInteWorkCenterResourceRelatioSqlTemplate, new { Id = id });
         }
         #endregion
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     /// <summary>
@@ -353,13 +364,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_work_center` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_work_center` /**where**/ ";
         const string InsertSql = "INSERT INTO  `inte_work_center` ( Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted) VALUES ( @Id,@SiteId,@Code,@Name,@Type,@Source,@Status,@IsMixLine,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted) ";
-        const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
-        const string UpdateRangSql = "UPDATE `inte_work_center` SET Name=@Name,Type=@Type,Source=@Source,Status=@Status,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
+        const string UpdateSql = "UPDATE `inte_work_center` SET  Name=@Name,Type=@Type,Source=@Source,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
+        const string UpdateRangSql = "UPDATE `inte_work_center` SET Name=@Name,Type=@Type,Source=@Source,IsMixLine=@IsMixLine,Remark=@Remark,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE Id = @Id AND IsDeleted = @IsDeleted ";
         const string DeleteRangSql = "UPDATE `inte_work_center` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id in @ids AND IsDeleted=0";
         const string GetByIdSql = @"SELECT * FROM `inte_work_center` WHERE Id = @Id AND IsDeleted = 0  ";
         const string GetByIdsSql = @"SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Id IN @ids ";
         const string GetByTypeAndParentIdSql = "SELECT /**select**/ FROM inte_work_center IWC /**innerjoin**/ /**leftjoin**/ /**where**/";
-        const string GetBySiteIdSql = "SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Type = @Type AND SiteId = @SiteId ";
+        const string GetByTypeSql = "SELECT * FROM inte_work_center WHERE IsDeleted = 0 AND Type = @Type AND Status = @Status AND SiteId = @SiteId ";
         const string GetByCodeSql = @"SELECT Id,SiteId,Code,Name,Type,Source,Status,IsMixLine,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted FROM `inte_work_center`  WHERE Code = @Code  AND SiteId=@Site AND IsDeleted=0 ";
         const string GetByResourceId = "SELECT IWC.* FROM inte_work_center_resource_relation IWCRR LEFT JOIN inte_work_center IWC ON IWCRR.WorkCenterId = IWC.Id WHERE IWC.IsDeleted = 0 AND IWCRR.ResourceId = @resourceId";
 
@@ -381,5 +392,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                 Where wcr.SubWorkCenterId = @Id ";
         const string GetWorkCenterIdByResourceIdSql = "SELECT WorkCenterId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND ResourceId IN @resourceIds";
         const string GetResourceIdsByWorkCenterIdSql = "SELECT ResourceId FROM inte_work_center_resource_relation WHERE IsDeleted = 0 AND WorkCenterId IN @workCenterIds ";
+
+        const string UpdateStatusSql = "UPDATE `inte_work_center` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
     }
 }

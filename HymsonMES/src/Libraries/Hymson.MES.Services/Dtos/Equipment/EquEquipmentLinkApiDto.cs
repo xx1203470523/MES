@@ -8,11 +8,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
     /// </summary>
     public record EquEquipmentLinkApiCreateDto : BaseEntityDto
     {
-        ///// <summary>
-        ///// 设备id
-        ///// </summary>
-        //public long EquipmentId { get; set; }
-
         /// <summary>
         /// 接口地址
         /// </summary>

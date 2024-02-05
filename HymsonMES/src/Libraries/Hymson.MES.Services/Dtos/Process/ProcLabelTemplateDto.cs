@@ -33,7 +33,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 模板内容
@@ -97,7 +97,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 备注
@@ -107,6 +107,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 模板内容
         /// </summary>
         public string? Content { get; set; }
+
+        /// <summary>
+        /// 模板打印配置信息
+        /// </summary>
+        public ProcLabelTemplateRelationCreateDto ProcLabelTemplateRelationCreateDto { get; set; }
     }
 
     /// <summary>
@@ -127,12 +132,12 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 标签物理路径
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         /// <summary>
         /// 模板内容
         /// </summary>
@@ -167,6 +172,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
+
+        /// <summary>
+        /// 模板打印配置信息
+        /// </summary>
+        public ProcLabelTemplateRelationCreateDto ProcLabelTemplateRelationCreateDto { get; set; }
     }
 
     /// <summary>
@@ -174,14 +184,23 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcLabelTemplatePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
         /// <summary>
         /// 标签名称
         /// </summary>
         public string? Name { get; set; }
+    }
+
+    public record PrintDataResultDto
+    {
+        /// <summary>
+        /// 打印模板打印设计信息
+        /// </summary>
+        public ProcLabelTemplateRelationDto ProcLabelTemplateRelationDto { get; set; }
+
+        /// <summary>
+        /// 打印模型的数据 对应的数据
+        /// </summary>
+        public string PrintBodies { get; set; }
+
     }
 }

@@ -96,5 +96,12 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         Task<PagedInfo<QualInspectionParameterGroupView>> GetPagedListAsync(QualInspectionParameterGroupPagedQuery pagedQuery);
 
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

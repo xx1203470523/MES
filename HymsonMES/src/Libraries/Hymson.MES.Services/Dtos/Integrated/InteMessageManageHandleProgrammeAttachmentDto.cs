@@ -12,8 +12,8 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 首检检验单Id
+        /// <summary>
+        /// 消息Id
         /// </summary>
         public long MessageManageId { get; set; }
 
@@ -65,8 +65,8 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
-        /// 首检检验单Id
+        /// <summary>
+        /// 消息Id
         /// </summary>
         public long MessageManageId { get; set; }
 

@@ -53,11 +53,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         public long? ClassId { get; set; }
 
         /// <summary>
-        /// 默认作休类型
-        /// </summary>
-        //public string RestType { get; set; }
-
-        /// <summary>
         /// 勾选的工作日
         /// </summary>
         public string Weekdays { get; set; }
@@ -94,12 +89,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 空值 : false  
         /// </summary>
         public int CalendarType { get; set; }
-
-        /// <summary>
-        /// 描述 :设备线体类型（字典名称：inte_calendar_equline_type） 
-        /// 空值 : false  
-        /// </summary>
-        //public string EquLineType { get; set; }
 
         /// <summary>
         /// 描述 :设备或者线体id 
@@ -220,12 +209,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record QueryInteCalendarDetailDto : BaseEntityDto
     {
-        ///// <summary>
-        ///// 描述 :日历时间主表 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long CalendarDateId { get; set; }
-
         /// <summary>
         /// 描述 :年月日中的日 
         /// 空值 : false  
@@ -250,12 +233,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public class InteCalendarDateDetailDto
     {
-        ///// <summary>
-        ///// 描述 :日历时间主表 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long CalendarDateId { get; set; }
-
         /// <summary>
         /// 描述 :年月日中的日 
         /// 空值 : false  

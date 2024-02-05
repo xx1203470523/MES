@@ -1,4 +1,5 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Quality;
@@ -10,64 +11,65 @@ using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Dtos.Manufacture.ManuCommon.ManuCommon;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding.Command;
+using Hymson.MES.Data.Repositories.Parameter.ManuProductParameter.Query;
+using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.CoreServices.Services.Common.MasterData
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IMasterDataService
+    public partial interface IMasterDataService
     {
         /// <summary>
         /// 获取物料基础信息（带空检查）
         /// </summary>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheck(long materialId);
+        Task<ProcMaterialEntity> GetProcMaterialEntityWithNullCheckAsync(long materialId);
 
         /// <summary>
-        /// 获取工序基础信息（带空检查）
+        /// 获取物料基础信息（带空检查）
         /// </summary>
-        /// <param name="procedureId"></param>
+        /// <param name="materialIds"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity> GetProcProcedureEntityWithNullCheck(long procedureId);
+        Task<IEnumerable<ProcMaterialEntity>> GetProcMaterialEntityWithNullCheckAsync(IEnumerable<long> materialIds);
 
         /// <summary>
         /// 获取物料基础信息（带空检查）
         /// </summary>
         /// <param name="materialId"></param>
         /// <returns></returns>
-        Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheck(long processRouteId);
+        Task<ProcProcessRouteEntity> GetProcProcessRouteEntityWithNullCheckAsync(long processRouteId);
 
         /// <summary>
         /// 获取条码基础信息（带空检查）
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheck(MultiSFCBo bo);
+        Task<IEnumerable<ManuSfcEntity>> GetManuSFCEntitiesWithNullCheckAsync(MultiSFCBo bo);
 
 
         /// <summary>
         /// 获取生产工单
         /// </summary>
-        /// <param name="workOrderId"></param>
-        /// <param name="isVerifyActivation"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(long workOrderId, bool isVerifyActivation = true);
+        Task<PlanWorkOrderEntity> GetProduceWorkOrderByIdAsync(WorkOrderIdBo bo);
 
         /// <summary>
-        /// 获取生产工单
+        /// 获取生产工单（批量）
         /// </summary>
-        /// <param name="workOrderId"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
-        Task<PlanWorkOrderEntity> GetWorkOrderByIdAsync(long workOrderId);
+        Task<IEnumerable<PlanWorkOrderEntity>> GetProduceWorkOrderByIdsAsync(WorkOrderIdsBo bo);
 
         /// <summary>
         /// 获取生产条码信息
         /// </summary>
-        /// <param name="sfcBo"></param>
+        /// <param name="sfcBos"></param>
         /// <returns></returns>
-        Task<(ManuSfcProduceEntity, ManuSfcProduceBusinessEntity)> GetProduceSFCAsync(SingleSFCBo sfcBo);
+        Task<IEnumerable<ManuSfcProduceEntity>> GetProduceEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
         /// 获取生产条码信息
@@ -91,14 +93,6 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<ManuSfcProduceBusinessEntity>> GetProduceBusinessEntitiesBySFCsAsync(MultiSFCBo sfcBos);
 
         /// <summary>
-        /// 通过BomId获取物料集合（包含替代料）
-        /// </summary>
-        /// <param name="bomId"></param>
-        /// <param name="procedureId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<BomMaterialBo>> GetProcMaterialEntitiesByBomIdAndProcedureIdAsync(long bomId, long procedureId);
-
-        /// <summary>
         /// 获取首工序
         /// </summary>
         /// <param name="processRouteId"></param>
@@ -108,53 +102,37 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <summary>
         /// 获当前工序对应的下一工序
         /// </summary>
-        /// <param name="manuSfcProduce"></param>
+        /// <param name="routeProcedureWithWorkOrderBo"></param>
         /// <returns></returns>
-        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
-
-        /// <summary>
-        /// 获当前工序对应的下一工序
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="workOrderId"></param>
-        /// <returns></returns>
-        Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0);
+        Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuRouteProcedureWithWorkOrderBo routeProcedureWithWorkOrderBo);
 
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="processRouteDetailLinks"></param>
-        /// <param name="processRouteDetailNodes"></param>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureWithInfoBo"></param>
         /// <returns></returns>
-        Task<bool> IsRandomPreProcedureAsync(IEnumerable<ProcProcessRouteDetailLinkEntity> processRouteDetailLinks, IEnumerable<ProcProcessRouteDetailNodeEntity> processRouteDetailNodes, long processRouteId, long procedureId);
+        Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureWithInfoBo routeProcedureWithInfoBo);
 
         /// <summary>
         /// 判断上一工序是否随机工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
-        Task<bool> IsRandomPreProcedureAsync(long processRouteId, long procedureId);
+        Task<bool> IsRandomPreProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
 
         /// <summary>
         /// 判断是否首工序
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
+        /// <param name="routeProcedureBo"></param>
         /// <returns></returns>
-        Task<bool> IsFirstProcedureAsync(long processRouteId, long procedureId);
+        Task<bool> IsFirstProcedureAsync(ManuRouteProcedureBo routeProcedureBo);
 
         /// <summary>
-        /// 验证开始工序是否在结束工序之前
+        /// 判断当前工序是否在指定工序之前
         /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="startProcedureId"></param>
-        /// <param name="endProcedureId"></param>
+        /// <param name="routeProcedureWithCompareBo"></param>
         /// <returns></returns>
-        Task<bool> IsProcessStartBeforeEndAsync(long processRouteId, long startProcedureId, long endProcedureId);
+        Task<bool> IsBeforeProcedureAsync(ManuRouteProcedureWithCompareBo routeProcedureWithCompareBo);
 
         /// <summary>
         /// 获取工序关联的资源
@@ -164,39 +142,53 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         Task<IEnumerable<long>> GetProcResourceIdByProcedureIdAsync(long procedureId);
 
         /// <summary>
-        /// 获取工艺路线
+        /// 获取资源关联的工序
         /// </summary>
-        /// <param name="processRouteId"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessRouteDetailDto>> GetProcessRouteAsync(long processRouteId);
+        Task<IEnumerable<ProcProcedureEntity>?> GetProcProcedureIdByResourceIdAsync(QueryByIdBo query);
 
         /// <summary>
         /// 获取生产配置中产品id
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<long?> GetProductSetId(ProductSetBo param);
+        Task<long?> GetProductSetIdAsync(ProductSetBo param);
 
         /// <summary>
         /// 获取关联的job
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobBo>?> GetJobRalationJobByProcedureIdOrResourceId(JobRelationBo param);
+        Task<IEnumerable<JobBo>?> GetJobRelationJobByProcedureIdOrResourceIdAsync(JobRelationBo param);
 
         /// <summary>
         /// 获取即将扣料的物料数据
         /// </summary>
-        /// <param name="sfcProduceEntity"></param>
+        /// <param name="requestBo"></param>
         /// <returns></returns>
-        Task<IEnumerable<MaterialDeductBo>> GetInitialMaterialsAsync(ManuSfcProduceEntity sfcProduceEntity);
+        Task<IEnumerable<MaterialDeductResponseBo>> GetInitialMaterialsAsync(MaterialDeductRequestBo requestBo);
+
+        /// <summary>
+        /// 获取即将扣料的物料数据（包含半成品信息）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        Task<MaterialDeductResponseSummaryBo> GetInitialMaterialsWithSmiFinishedAsync(MaterialDeductRequestBo requestBo);
+
+        /// <summary>
+        /// 获取流转数据
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcCirculationEntity>> GetSFCCirculationEntitiesByTypesAsync(SFCCirculationBo bo);
 
         /// <summary>
         /// 获取不合格代码列表
         /// </summary>
         /// <param name="unqualifiedIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodes(long[] unqualifiedIds);
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetQualUnqualifiedCodesAsync(long[] unqualifiedIds);
 
         /// <summary>
         /// 创建条码步骤数据
@@ -218,13 +210,28 @@ namespace Hymson.MES.CoreServices.Services.Common.MasterData
         /// <param name="mainMaterialBo">主物料BO对象</param>
         /// <param name="currentBo">替代料BO对象</param>
         /// <param name="isMain">是否主物料</param>
-        void DeductMaterialQty(ref List<UpdateQtyByIdCommand> updates,
+        void DeductMaterialQty(ref List<UpdateFeedingQtyByIdCommand> updates,
              ref List<ManuSfcCirculationEntity> adds,
              ref decimal residue,
              ManuSfcProduceEntity sfcProduceEntity,
              Dictionary<long, IGrouping<long, ManuFeedingEntity>> manuFeedingsDictionary,
-             MaterialDeductBo mainMaterialBo,
-             MaterialDeductBo currentBo,
+             MaterialDeductResponseBo mainMaterialBo,
+             MaterialDeductResponseBo currentBo,
              bool isMain = true);
+
+        
+        /// <summary>
+        /// 读取分选规则信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcSortingRuleEntity>> GetSortingRulesAsync(ProcSortingRuleQuery query);
+
+        /// <summary>
+        /// 获取条码参数列表
+        /// </summary>
+        /// <param name="parameterBySfcQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterBySfcsAsync(ManuProductParameterBySfcQuery parameterBySfcQuery);
     }
 }

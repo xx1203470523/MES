@@ -26,7 +26,6 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
     public class QualUnqualifiedGroupService : IQualUnqualifiedGroupService
     {
         private readonly IQualUnqualifiedGroupRepository _qualUnqualifiedGroupRepository;
-        private readonly IInteJobBusinessRelationRepository _inteJobBusinessRelationRepository;
         private readonly AbstractValidator<QualUnqualifiedGroupCreateDto> _validationCreateRules;
         private readonly AbstractValidator<QualUnqualifiedGroupModifyDto> _validationModifyRules;
         private readonly ICurrentUser _currentUser;
@@ -38,10 +37,11 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
         /// <param name="qualUnqualifiedGroupRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
-        public QualUnqualifiedGroupService(IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository, AbstractValidator<QualUnqualifiedGroupCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedGroupModifyDto> validationModifyRules, IInteJobBusinessRelationRepository inteJobBusinessRelationRepository, ICurrentUser currentUser, ICurrentSite currentSite)
+        /// /// <param name="currentUser"></param>
+        /// /// <param name="currentSite"></param>
+        public QualUnqualifiedGroupService(IQualUnqualifiedGroupRepository qualUnqualifiedGroupRepository, AbstractValidator<QualUnqualifiedGroupCreateDto> validationCreateRules, AbstractValidator<QualUnqualifiedGroupModifyDto> validationModifyRules, ICurrentUser currentUser, ICurrentSite currentSite)
         {
             _qualUnqualifiedGroupRepository = qualUnqualifiedGroupRepository;
-            _inteJobBusinessRelationRepository = inteJobBusinessRelationRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _currentUser = currentUser;
@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Services.Quality.QualUnqualifiedGroup
             }
             else
             {
-                return null;
+                return new QualUnqualifiedGroupDto();
             }
         }
 

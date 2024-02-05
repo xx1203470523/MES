@@ -46,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateQtyByIdAsync(UpdateQtyByIdCommand command)
+        public async Task<int> UpdateQtyByIdAsync(UpdateFeedingQtyByIdCommand command)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
@@ -57,28 +57,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateQtyByIdAsync(IEnumerable<UpdateQtyByIdCommand> commands)
+        public async Task<int> UpdateFeedingQtyByIdAsync(IEnumerable<UpdateFeedingQtyByIdCommand> commands)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
-
-            /*
-            StringBuilder stringBuilder = new();
-            var updatesParams = new DynamicParameters();
-            var i = 0;
-            foreach (var item in commands)
-            {
-                stringBuilder.Append(UpdateQtyHeadSql);
-                stringBuilder.AppendFormat(UpdateQtyTailSql, i);
-
-                updatesParams.Add($"{nameof(item.Id)}{i}", item.Id);
-                updatesParams.Add($"{nameof(item.Qty)}{i}", item.Qty);
-                updatesParams.Add($"{nameof(item.UpdatedBy)}{i}", item.UpdatedBy);
-                updatesParams.Add($"{nameof(item.UpdatedOn)}{i}", item.UpdatedOn);
-                i++;
-            }
-            return await conn.ExecuteAsync(stringBuilder.ToString(), updatesParams);
-            */
         }
 
         /// <summary>
@@ -101,6 +83,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(DeleteByIds, new { ids });
+        }
+
+        /// <summary>
+        /// 根据Code和物料ID查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ManuFeedingEntity> GetByBarCodeAndMaterialIdAsync(GetByBarCodeAndMaterialIdQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ManuFeedingEntity>(GetByBarCodeAndMaterialIdSql, query);
         }
 
         /// <summary>
@@ -135,6 +128,25 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             var sqlBuilder = new StringBuilder();
             sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId ");
 
+            if (query.LoadSource.HasValue) sqlBuilder.Append("AND LoadSource = @LoadSource ");
+            if (query.FeedingPointId.HasValue) sqlBuilder.Append("AND FeedingPointId = @FeedingPointId ");
+            if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
+        }
+
+        /// <summary>
+        /// 获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndMaterialIdsAsync(GetByFeedingPointIdAndMaterialIdsQuery query)
+        {
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND FeedingPointId = @FeedingPointId ");
+
+            if (query.LoadSource.HasValue) sqlBuilder.Append("AND LoadSource = @LoadSource ");
             if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
@@ -158,6 +170,35 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
+
+        /// <summary>
+        /// 获取加载数据列表（只读取剩余数量大于0的）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdWithOutZeroAsync(GetByFeedingPointIdsQuery query)
+        {
+            var sqlBuilder = new StringBuilder();
+            sqlBuilder.Append("SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND FeedingPointId IN @FeedingPointIds ");
+
+            sqlBuilder.Append("AND Qty > 0 ");
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
+        }
+
+        /// <summary>
+        /// 根据上料点Id与资源IDs获取加载数据列表
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndResourceIdsAsync(GetByFeedingPointIdAndResourceIdsQuery query)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ManuFeedingEntity>(GetByFeedingPointIdAndResourceIdsSql, query);
+        }
+
+
     }
 
 
@@ -166,11 +207,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuFeeding
     /// </summary>
     public partial class ManuFeedingRepository
     {
-        const string InsertSql = "INSERT INTO `manu_feeding`(  `Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
+        const string InsertSql = "INSERT INTO `manu_feeding`(`Id`, `ResourceId`, `FeedingPointId`, `ProductId`, SupplierId, `BarCode`, MaterialId, `InitQty`, `Qty`,`MaterialType`,  `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`, WorkOrderId, LoadSource) VALUES (@Id, @ResourceId, @FeedingPointId, @ProductId, @SupplierId, @BarCode, @MaterialId, @InitQty, @Qty,@MaterialType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId, @WorkOrderId, @LoadSource)  ";
         const string UpdateQtyByIdSql = "UPDATE manu_feeding SET Qty = (CASE WHEN @Qty > Qty THEN 0 ELSE Qty - @Qty END), UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Qty > 0 AND Id = @Id; ";
         const string DeleteSql = "UPDATE manu_feeding SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids;";
         const string DeleteByIds = "DELETE FROM manu_feeding WHERE Id IN @ids; ";
+        const string GetByBarCodeAndMaterialIdSql = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND FeedingPointId = @FeedingPointId AND ProductId = @ProductId AND BarCode = @BarCode;";
         const string GetByIds = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND Id IN @ids; ";
         const string GetByResourceIdAndMaterialId = "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId = @ResourceId AND ProductId = @MaterialId; ";
+
+        const string GetByFeedingPointIdAndResourceIdsSql= "SELECT * FROM manu_feeding WHERE IsDeleted = 0 AND ResourceId in @ResourceIds AND FeedingPointId = @FeedingPointId ";
     }
 }

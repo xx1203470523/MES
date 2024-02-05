@@ -73,5 +73,13 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquFaultPhenomenon
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<EquFaultPhenomenonEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

@@ -19,7 +19,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.InBound
         /// <summary>
         /// 条码明细
         /// </summary>
-        public List<SfcBindingDetailDto> BindSfc { get; set; }
+        public IEnumerable<SfcBindingDetailDto> BindSfcs { get; set; } = new List<SfcBindingDetailDto>();
     }
 
     /// <summary>
@@ -33,9 +33,8 @@ namespace Hymson.MES.EquipmentServices.Dtos.InBound
         public string SFC { get; set; } = string.Empty;
 
         /// <summary>
-        /// 位置
+        /// 绑定位置
         /// </summary>
-        public string Seq { get; set; } = string.Empty;
-
+        public string Location { get; set; }
     }
 }

@@ -1,18 +1,16 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Services.Equipment;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Equipment
 {
     /// <summary>
     /// 控制器（设备故障原因表）
-    /// @author pengxin
-    /// @date 2023-02-28 15:15:20
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class EquFaultReasonController : ControllerBase
@@ -98,5 +96,49 @@ namespace Hymson.MES.Api.Controllers.Equipment
             return await _EquFaultReasonService.QueryEquFaultReasonByIdAsync(id);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（设备故障原因表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultReason:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（设备故障原因表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultReason:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（设备故障原因表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("设备故障原因表", BusinessType.UPDATE)]
+        [PermissionDescription("equ:faultReason:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _EquFaultReasonService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

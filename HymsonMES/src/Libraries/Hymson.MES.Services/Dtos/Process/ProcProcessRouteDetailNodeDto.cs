@@ -278,11 +278,7 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcProcessRouteDetailNodePagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public long SiteId { get; set; }
+        
     }
 
     public record ProcProcessRouteDetailNodeViewDto : ProcProcessRouteDetailNodeDto

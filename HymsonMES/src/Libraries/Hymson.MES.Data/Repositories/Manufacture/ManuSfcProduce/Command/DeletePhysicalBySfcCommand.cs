@@ -35,7 +35,23 @@
     /// <summary>
     /// 删除 (物料删除)
     /// </summary>
-    public class DeletePhysicalByProduceIdsCommand
+    public class DeletePhysicalByProduceIdCommand
+    {
+        /// <summary>
+        /// 站点编码 
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 删除条码id
+        /// </summary>
+        public long Id { get; set; }
+    }
+
+    /// <summary>
+    /// 删除 (物料删除)
+    /// </summary>
+    public class PhysicalDeleteSFCProduceByIdsCommand
     {
         /// <summary>
         /// 站点编码 

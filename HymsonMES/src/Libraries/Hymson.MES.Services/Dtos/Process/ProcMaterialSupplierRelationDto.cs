@@ -100,10 +100,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcMaterialSupplierRelationPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        
     }
 }

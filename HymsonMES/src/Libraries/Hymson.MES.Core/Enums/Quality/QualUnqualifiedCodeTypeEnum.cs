@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace Hymson.MES.Core.Enums.QualUnqualifiedCode
 {
@@ -22,6 +17,6 @@ namespace Hymson.MES.Core.Enums.QualUnqualifiedCode
         /// 标识
         /// </summary>
         [Description("标识")]
-        Identification = 1
+        Mark = 1
     }
 }

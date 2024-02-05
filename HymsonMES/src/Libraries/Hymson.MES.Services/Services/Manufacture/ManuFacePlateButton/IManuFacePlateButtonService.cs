@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 操作面板按钮    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-01 02:58:19
- */
 using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Dtos.Common;
@@ -67,6 +60,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<ManuFacePlateButtonDto> QueryManuFacePlateButtonByButtonIdAsync(long buttionId);
 
         /// <summary>
+        /// 按钮（回车）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<Dictionary<string, JobResponseDto>> EnterAsync(EnterRequestDto dto);
+
+        /// <summary>
         /// 按钮（点击）
         /// </summary>
         /// <param name="dto"></param>
@@ -74,25 +74,18 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<Dictionary<string, JobResponseDto>> ClickAsync(ButtonRequestDto dto);
 
         /// <summary>
-        /// 进站（接口）
+        /// 参数收集（点击）
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> InStationAsync(ButtonRequestDto dto);
-
-        /// <summary>
-        /// 出站（接口）
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        Task<Dictionary<string, JobResponseDto>> OutStationAsync(ButtonRequestDto dto);
-
+        Task<int> ProductParameterCollectAsync(ProductProcessParameterDto dto);
 
 
         /// <summary>
         ///  新按钮（点击）
         /// </summary>
         /// <param name="dto"></param>
+        /// <param name="bo"></param>
         /// <returns></returns>
         Task<Dictionary<string, JobResponseBo>> NewClickAsync(ButtonRequestDto dto, dynamic bo);
 

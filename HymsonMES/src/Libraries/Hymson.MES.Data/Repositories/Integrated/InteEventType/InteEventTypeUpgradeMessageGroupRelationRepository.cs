@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -12,11 +13,16 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteEventTypeUpgradeMessageGroupRelationRepository : BaseRepository, IInteEventTypeUpgradeMessageGroupRelationRepository
     {
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteEventTypeUpgradeMessageGroupRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        /// <param name="memoryCache"></param>
+        public InteEventTypeUpgradeMessageGroupRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        {
+
+        }
 
         /// <summary>
         /// 新增（批量）
@@ -50,6 +56,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("PushScene = @PushScene");
             sqlBuilder.Where("EventTypeId = @EventTypeId");
             sqlBuilder.Select("*");
@@ -67,7 +74,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteEventTypeUpgradeMessageGroupRelationRepository
     {
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type_upgrade_message_group_relation /**where**/  ";
-        
+
         const string InsertsSql = "INSERT INTO inte_event_type_upgrade_message_group_relation(  `Id`, `EventTypeId`, `PushScene`, `EventTypeUpgradeId`, `MessageGroupId`, `PushTypes`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @EventTypeId, @PushScene, @EventTypeUpgradeId, @MessageGroupId, @PushTypes, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
 
         const string DeleteByParentId = "DELETE FROM inte_event_type_upgrade_message_group_relation WHERE EventTypeId = @ParentId";

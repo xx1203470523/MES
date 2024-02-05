@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
 using Hymson.MES.Services.Dtos.Plan;
 
@@ -28,7 +29,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="idsArr"></param>
         /// <returns></returns>
-        Task<int> DeletesAsync(long[] idsArr);
+        Task<int> DeletesAsync(IEnumerable<long> idsArr);
 
         /// <summary>
         /// 分页查询列表（条码打印）
@@ -42,7 +43,7 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
-        Task<List<ManuSfcEntity>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto parm);
+        Task<List<CreateBarcodeByWorkOrderOutputBo>> CreateBarcodeByWorkOrderIdAsync(CreateBarcodeByWorkOrderDto parm);
 
         /// <summary>
         /// 生成条码并打印
@@ -50,5 +51,12 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="parm"></param>
         /// <returns></returns>
         Task CreateBarcodeByWorkOrderIdAndPrintAsync(CreateBarcodeByWorkOrderAndPrintDto parm);
+
+        /// <summary>
+        /// 在条码下达时获取最新条码状态
+        /// </summary>
+        /// <param name="planSfcPrintQueryDto"></param>
+        /// <returns></returns>
+        Task<IEnumerable<CreateBarcodeByWorkOrderOutputBo>> GetNewBarCodeOnBarCodeCreatedAsync(PlanSfcPrintQueryDto planSfcPrintQueryDto);
     }
 }

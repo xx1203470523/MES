@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -26,7 +27,6 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             _connectionOptions = connectionOptions.Value;
         }
-
 
         /// <summary>
         /// 删除（软删除）
@@ -104,7 +104,18 @@ namespace Hymson.MES.Data.Repositories.Process
         public async Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByResourceIdAsync(long resourceId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(GetByResourceId, new { resourceId });
+            return await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(GetByResourceIdSql, new { resourceId });
+        }
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="loadPointIds"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByLoadPointIdAsync(IEnumerable<long> loadPointIds)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(GetByLoadPointIdsSql, new { LoadPointIds = loadPointIds });
         }
 
         /// <summary>
@@ -120,11 +131,6 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteId))
-            //{
-            //    sqlBuilder.Where("SiteId=@SiteId");
-            //}
 
             var offSet = (procLoadPointLinkMaterialPagedQuery.PageIndex - 1) * procLoadPointLinkMaterialPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -148,9 +154,20 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcLoadPointLinkMaterialEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Select("*");
+
+            if (procLoadPointLinkMaterialQuery.SiteId.HasValue)
+            {
+                sqlBuilder.Where("SiteId = @SiteId");
+            }
+            if (procLoadPointLinkMaterialQuery.LoadPointId.HasValue)
+            {
+                sqlBuilder.Where("LoadPointId = @LoadPointId");
+            }
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procLoadPointLinkMaterialEntities = await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(template.RawSql, procLoadPointLinkMaterialQuery);
-            return procLoadPointLinkMaterialEntities;
+            return await conn.QueryAsync<ProcLoadPointLinkMaterialEntity>(template.RawSql, procLoadPointLinkMaterialQuery);
         }
 
         /// <summary>
@@ -206,9 +223,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_load_point_link_material` /**where**/ ";
-        const string GetProcLoadPointLinkMaterialEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_load_point_link_material` /**where**/  ";
+        const string GetProcLoadPointLinkMaterialEntitiesSqlTemplate = @"SELECT /**select**/ FROM `proc_load_point_link_material` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_load_point_link_material`(  `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `MaterialId`, `Version`, `ReferencePoint`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SerialNo, @LoadPointId, @MaterialId, @Version, @ReferencePoint, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `proc_load_point_link_material`(  `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `MaterialId`, `Version`, `ReferencePoint`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SerialNo, @LoadPointId, @MaterialId, @Version, @ReferencePoint, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
@@ -217,13 +232,10 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_load_point_link_material` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_load_point_link_material` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";
         const string DeletesByLoadPointIdTrueSql = "DELETE  FROM `proc_load_point_link_material` WHERE LoadPointId in @ids ";
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `MaterialId`, `Version`, `ReferencePoint`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_load_point_link_material`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `SerialNo`, `LoadPointId`, `MaterialId`, `Version`, `ReferencePoint`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `proc_load_point_link_material`  WHERE Id IN @ids ";
-        const string GetByResourceId = @"SELECT PLPLM.* FROM proc_load_point_link_material PLPLM
+        const string GetByIdSql = @"SELECT * FROM `proc_load_point_link_material`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `proc_load_point_link_material`  WHERE Id IN @ids ";
+        const string GetByLoadPointIdsSql = @"SELECT * FROM `proc_load_point_link_material` WHERE LoadPointId IN @LoadPointIds ";
+        const string GetByResourceIdSql = @"SELECT PLPLM.* FROM proc_load_point_link_material PLPLM
                                 LEFT JOIN proc_load_point_link_resource PLPLR ON PLPLR.LoadPointId = PLPLM.LoadPointId
                                 WHERE PLPLR.ResourceId = @resourceId ";
         const string GetLoadPointLinkMaterialByIdsSql = @"SELECT 

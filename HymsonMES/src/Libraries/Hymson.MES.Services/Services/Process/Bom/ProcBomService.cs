@@ -1,19 +1,30 @@
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
+using Hymson.Excel.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
+using FluentValidation.Results;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Http;
 using System.Transactions;
+using Minio.DataModel;
+using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Data.Repositories.Plan;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -37,10 +48,17 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         private readonly IProcBomRepository _procBomRepository;
         private readonly AbstractValidator<ProcBomCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<ImportBomDto> _validationImportRules;
         private readonly AbstractValidator<ProcBomModifyDto> _validationModifyRules;
 
         private readonly IProcBomDetailRepository _procBomDetailRepository;
         private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
+
+        private readonly ILocalizationService _localizationService;
+        private readonly IExcelService _excelService;
+        private readonly IMinioService _minioService;
+
+        private readonly IPlanWorkOrderActivationRepository _planWorkOrderActivationRepository;
 
         /// <summary>
         /// 构造函数
@@ -52,20 +70,36 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="validationModifyRules"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procBomDetailReplaceMaterialRepository"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="excelService"></param>
+        /// <param name="minioService"></param>
+        /// <param name="validationImportRules"></param>
+        /// <param name="planWorkOrderActivationRepository"></param>
         public ProcBomService(ICurrentSite currentSite, ICurrentUser currentUser,
             IProcBomRepository procBomRepository,
             AbstractValidator<ProcBomCreateDto> validationCreateRules,
             AbstractValidator<ProcBomModifyDto> validationModifyRules,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository)
+            AbstractValidator<ImportBomDto> validationImportRules,
+        IProcBomDetailRepository procBomDetailRepository,
+            IExcelService excelService,
+            IMinioService minioService,
+        IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
+            ,ILocalizationService localizationService,
+        IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
             _procBomRepository = procBomRepository;
             _validationCreateRules = validationCreateRules;
+            _validationImportRules= validationImportRules;
             _validationModifyRules = validationModifyRules;
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
+            _localizationService = localizationService;
+            _excelService= excelService;
+            _minioService= minioService;
+
+            _planWorkOrderActivationRepository= planWorkOrderActivationRepository;
         }
 
         /// <summary>
@@ -102,6 +136,8 @@ namespace Hymson.MES.Services.Services.Process
             procBomEntity.UpdatedBy = _currentUser.UserName;
             procBomEntity.BomCode = bomCode;
 
+            procBomEntity.Status = SysDataStatusEnum.Build;
+
             //验证是否存在
             var exists = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
             {
@@ -109,7 +145,7 @@ namespace Hymson.MES.Services.Services.Process
                 Version = procBomEntity.Version,
                 SiteId = _currentSite.SiteId ?? 0
             });
-            if (exists != null && exists.Count() > 0)
+            if (exists != null && exists.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10601)).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
             }
@@ -126,46 +162,32 @@ namespace Hymson.MES.Services.Services.Process
                 if (materialList.Any(a => a.IsMain != 1 && string.IsNullOrWhiteSpace(a.ReplaceMaterialId)))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10604));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料编码不能为空!";
-                    //return apiResult;
                 }
                 var mainList = materialList.Where(a => a.IsMain == 1).ToList();
                 if (mainList.Any(a => string.IsNullOrWhiteSpace(a.Code) || a.ProcedureId == "0"))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10605));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"工序不能为空!";
-                    //return apiResult;
+
                 }
-                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
+                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10606));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料编码+工序不能重复!";
-                    //return apiResult;
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10607));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
-                    //return apiResult;
+
                 }
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
-                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
+                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10608));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料关联的替代物料不能重复!";
-                    //return apiResult;
+
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10607));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
-                    //return apiResult;
+
                 }
 
                 long mainId = 0;
@@ -180,7 +202,7 @@ namespace Hymson.MES.Services.Services.Process
                             BomId = procBomEntity.Id,
                             MaterialId = item.MaterialId.ParseToLong(),
                             ProcedureId = item.ProcedureId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
@@ -201,8 +223,8 @@ namespace Hymson.MES.Services.Services.Process
                             SiteId = _currentSite.SiteId ?? 0,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
-                            ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReplaceMaterialId = item.ReplaceMaterialId!.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss ?? 0,
                             CreatedBy = procBomEntity.CreatedBy,
@@ -292,10 +314,6 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(ids);
-            //if (bomList.Any(x => x.Status == SysDataStatusEnum.Enable))
-            //{
-            //    throw new BusinessException(nameof(ErrorCode.MES10611));
-            //}
             if (bomList != null && bomList.Any(a => a.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
@@ -369,26 +387,17 @@ namespace Hymson.MES.Services.Services.Process
             var modelOrigin = await _procBomRepository.GetByIdAsync(procBomEntity.Id);
             if (modelOrigin == null)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10610));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10612));
             }
 
-            if (modelOrigin.Status != SysDataStatusEnum.Build && procBomEntity.Status == SysDataStatusEnum.Build)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == modelOrigin.Status))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10108));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             var bomCode = modelOrigin.BomCode.ToUpperInvariant();
-            //验证是否存在
-            //var exists = (await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery()
-            //{
-            //    SiteId = siteId,
-            //    BomCode = bomCode,
-            //    Version = procBomEntity.Version,
-            //})).Where(x => x.Id != procBomEntity.Id && x.IsDeleted == 0);
-            //if (exists != null && exists.Count() > 0)
-            //{
-            //    throw new BusinessException(ErrorCode.MES10601).WithData("bomCode", procBomEntity.BomCode).WithData("version", procBomEntity.Version);
-            //}
 
             var materialList = procBomModifyDto.MaterialList.ToList();
             var bomDetails = new List<ProcBomDetailEntity>();
@@ -402,40 +411,30 @@ namespace Hymson.MES.Services.Services.Process
                 if (materialList.Any(a => a.IsMain != 1 && string.IsNullOrWhiteSpace(a.ReplaceMaterialId)))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10604));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料编码不能为空!";
-                    //return apiResult;
+
                 }
                 var mainList = materialList.Where(a => a.IsMain == 1).ToList();
                 if (mainList.Any(a => string.IsNullOrWhiteSpace(a.Code) || a.ProcedureId == "0"))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10605));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"工序不能为空!";
-                    //return apiResult;
+
                 }
-                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Where(g => g.Count() > 1).Count() > 0)
+                if (mainList.GroupBy(m => new { m.MaterialId, m.ProcedureId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10606));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料编码+工序不能重复!";
-                    //return apiResult;
+
                 }
                 if (materialList.Any(a => a.MaterialId == a.ReplaceMaterialId))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10607));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"替代物料不能跟主物料重复!";
-                    //return apiResult;
+
                 }
 
                 var replaceList = materialList.Where(a => a.IsMain == 0).ToList();
-                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Where(g => g.Count() > 1).Count() > 0)
+                if (replaceList.GroupBy(m => new { m.MaterialId, m.ReplaceMaterialId }).Any(g => g.Count() > 1))
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES10608));
-                    //apiResult.Code = (int)ResultCode.PARAM_ERROR;
-                    //apiResult.Msg = $"主物料关联的替代物料不能重复!";
-                    //return apiResult;
+
                 }
 
                 long mainId = 0;
@@ -450,7 +449,7 @@ namespace Hymson.MES.Services.Services.Process
                             BomId = procBomEntity.Id,
                             MaterialId = item.MaterialId.ParseToLong(),
                             ProcedureId = item.ProcedureId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss,
                             CreatedBy = user,
@@ -471,8 +470,8 @@ namespace Hymson.MES.Services.Services.Process
                             SiteId = siteId,
                             BomId = procBomEntity.Id,
                             BomDetailId = mainId,
-                            ReplaceMaterialId = item.ReplaceMaterialId.ParseToLong(),
-                            ReferencePoint = item.ReferencePoint,
+                            ReplaceMaterialId = item.ReplaceMaterialId!.ParseToLong(),
+                            ReferencePoint = item.ReferencePoint!,
                             Usages = item.Usages,
                             Loss = item.Loss ?? 0,
                             CreatedBy = user,
@@ -484,6 +483,58 @@ namespace Hymson.MES.Services.Services.Process
                     }
                 }
             }
+
+            #region 当BOM被工单引用并激活时 
+            //需要做一些判断：不允许增删BOM的行项目数，顺序，不允许修改行项目中的物料编码和工序编码; (替代物料不做顺序考虑)
+            if (await JudgeBomIsReferencedByActivatedWorkOrder(procBomEntity.Id)) 
+            {
+                //获取到所有的旧bom的物料清单
+                var oldMainBomDetails = await _procBomDetailRepository.GetListMainAsync(procBomEntity.Id);
+                var oldReplaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(procBomEntity.Id);
+
+                //比对总行数
+                if (oldMainBomDetails.Count() != bomDetails.Count()|| oldReplaceBomDetails.Count()!= bomReplaceDetails.Count()) 
+                {
+                    throw new CustomerValidationException(ErrorCode.MES10621);
+                }
+
+                //比对新旧物料清单
+                foreach (var item in oldMainBomDetails)
+                {
+                    //找到新的物料里对应的 物料+工序
+                    var newBomDetail= bomDetails.Where(x => x.MaterialId.ToString() == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
+                    if (newBomDetail == null) 
+                    {
+                        throw new CustomerValidationException(ErrorCode.MES10622);
+                    }
+                    if (newBomDetail.Seq != item.Seq) 
+                    {
+                        throw new CustomerValidationException(ErrorCode.MES10623);
+                    }
+
+                    //当前旧主物料下的旧替代物料
+                    var oldReplaceBomDetailsByMain = oldReplaceBomDetails.Where(x => x.BomDetailId == item.Id);
+
+                    //当前新主物料下的新替代物料
+                    var newReplaceBomDetailsByMain = bomReplaceDetails.Where(x => x.BomDetailId == newBomDetail.Id);
+
+                    if (oldReplaceBomDetailsByMain.Count() != newReplaceBomDetailsByMain.Count()) 
+                    {
+                        throw new CustomerValidationException(ErrorCode.MES10621);
+                    }
+
+                    foreach (var replaceItem in oldReplaceBomDetailsByMain)
+                    {
+                        //找到新的替代物料里对应的 物料
+                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId.ToString() == replaceItem.ReplaceMaterialId ).FirstOrDefault();
+                        if (newBomDetailReplace == null)
+                        {
+                            throw new CustomerValidationException(ErrorCode.MES10622);
+                        }
+                    }
+                }
+            }
+            #endregion
 
             #region 操作数据库
 
@@ -560,7 +611,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 return procBomEntity.ToModel<ProcBomDto>();
             }
-            return null;
+            return new ProcBomDto();
         }
 
         /// <summary>
@@ -574,18 +625,288 @@ namespace Hymson.MES.Services.Services.Process
             var mainBomDetails = await _procBomDetailRepository.GetListMainAsync(bomId);
             var replaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(bomId);
 
-            if (mainBomDetails.Count() > 0)
+            if (mainBomDetails.Any())
             {
                 mainBomDetails = mainBomDetails.OrderBy(x => x.Seq).ToList();
 
                 procBomDetailViews.AddRange(mainBomDetails);
             }
-            if (replaceBomDetails.Count() > 0)
+            if (replaceBomDetails.Any())
             {
                 procBomDetailViews.AddRange(replaceBomDetails);
             }
 
             return procBomDetailViews;
+        }
+
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _procBomRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10612));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
+            }
+            #endregion
+
+            #region 操作数据库
+            await _procBomRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 导入Bom录入表格
+        /// </summary>
+        /// <returns></returns>
+        public async Task ImportBomAsync(IFormFile formFile)
+        {
+            using var memoryStream = new MemoryStream();
+            await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
+            var excelImportDtos = _excelService.Import<ImportBomDto>(memoryStream);
+            //备份用户上传的文件，可选
+            var stream = formFile.OpenReadStream();
+            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            if (excelImportDtos == null || !excelImportDtos.Any())
+            {
+                throw new CustomerValidationException("导入数据为空");
+            }
+
+            #region 验证基础数据
+            var validationFailures = new List<ValidationFailure>();
+            var rows = 1;
+            foreach (var item in excelImportDtos)
+            {
+                var validationResult = await _validationImportRules!.ValidateAsync(item);
+                if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
+                {
+                    foreach (var validationFailure in validationResult.Errors)
+                    {
+                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", rows);
+                        validationFailures.Add(validationFailure);
+                    }
+                }
+                rows++;
+            }
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+            #endregion
+
+            #region 检测导入Bon编码是否重复
+            var repeats = new List<string>();
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.BomCode,x.Version});
+            foreach (var item in hasDuplicates)
+            {
+                if (item.Count() > 1)
+                {
+                    repeats.Add($@"[{item.Key.BomCode},{item.Key.Version}]");
+                }
+            }
+            if (repeats.Any())
+            {
+                throw new CustomerValidationException("Bom编码{repeats}重复").WithData("repeats", string.Join(",", repeats));
+            }
+
+            List<ProcBomEntity> importBomList = new();
+            #endregion
+
+            #region  验证数据库中是否存在数据，且组装数据
+
+            var currentRow=0;
+            foreach(var item in excelImportDtos)
+            {
+                currentRow++;
+                 var Boms= await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery
+                 {
+                     SiteId = _currentSite.SiteId ?? 0,
+                     BomCode=item.BomCode,
+                     Version =item.Version
+                 });
+                if (Boms.Any())
+                {
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10601), item.BomCode, currentRow, "bomCode","version"));
+                }
+
+                if (!Boms.Any())
+                {
+                    var BomInfoEntity = new ProcBomEntity()
+                    {
+                        BomCode = item.BomCode,
+                        BomName = item.BomName,
+                        Version = item.Version,
+                        IsCurrentVersion = item.IsCurrentVersion== YesOrNoEnum.Yes,
+                        Remark = item.Remark,
+                        Status = SysDataStatusEnum.Build,
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0
+                    };
+                    importBomList.Add(BomInfoEntity);
+                }
+            }
+            #endregion
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException(_localizationService.GetResource("第{0}行"), validationFailures);
+            }
+
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            {
+
+                //保存记录 
+                if (importBomList.Any())
+                    await _procBomRepository.InsertsAsync(importBomList);
+                ts.Complete();
+            }
+
+        }
+
+        /// <summary>
+        /// 获取验证对象
+        /// </summary>
+        /// <param name="errorCode"></param>
+        /// <param name="codeFormattedMessage"></param>
+        /// <param name="cuurrentRow"></param>
+        /// <param name="key"></param>
+        /// <param name="keys"></param>
+        /// 
+        /// <returns></returns>
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code",string keys="codes")
+        {
+            var validationFailure = new ValidationFailure
+            {
+                ErrorCode = errorCode
+            };
+            validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object>
+            {
+                { "CollectionIndex", cuurrentRow },
+                { key, codeFormattedMessage },
+                {keys,codeFormattedMessage }
+            };
+            return validationFailure;
+        }
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public async Task DownloadImportTemplateAsync(Stream stream)
+        {
+            var excelTemplateDtos = new List<ImportBomDto>();
+            await _excelService.ExportAsync(excelTemplateDtos, stream, "Bom导入模板");
+        }
+
+        /// <summary>
+        /// 根据查询条件导出Bom数据
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<BomExportResultDto> ExprotBomPageListAsync(ProcBomPagedQuery param)
+        {
+            var pagedQuery = param.ToQuery<ProcBomPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            pagedQuery.PageSize = 1000;
+            var pagedInfo = await _procBomRepository.GetPagedInfoAsync(param);
+
+            //实体到DTO转换 装载数据
+            List<ExportBomDto> listDto = new();
+
+            if (pagedInfo.Data == null || !pagedInfo.Data.Any())
+            {
+                var filePathN = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BomInfo"), _localizationService.GetResource("BomInfo"));
+                //上传到文件服务器
+                var uploadResultN = await _minioService.PutObjectAsync(filePathN);
+                return new BomExportResultDto
+                {
+                    FileName = _localizationService.GetResource("BomInfo"),
+                    Path = uploadResultN.AbsoluteUrl,
+                };
+            }
+
+            foreach (var item in pagedInfo.Data)
+            {
+                listDto.Add(new ExportBomDto()
+                {
+                    BomCode = item.BomCode ?? "",
+                    BomName = item.BomName ?? "",
+                    Version = item.Version ?? "",
+                    Status = item.Status.GetDescription()
+                }) ;
+            }
+
+            var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BomInfo"), _localizationService.GetResource("BomInfo"));
+            //上传到文件服务器
+            var uploadResult = await _minioService.PutObjectAsync(filePath);
+            return new BomExportResultDto
+            {
+                FileName = _localizationService.GetResource("BomInfo"),
+                Path = uploadResult.AbsoluteUrl,
+            };
+
+        }
+
+
+        /// <summary>
+        /// 判断bom是否被激活工单引用
+        /// </summary>
+        /// <param name="bomId"></param>
+        /// <returns></returns>
+        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long bomId) 
+        {
+            
+             var planWorkOrderActivations= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId??0, BomId = bomId });
+            if (planWorkOrderActivations.Any())
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
         }
     }
 }

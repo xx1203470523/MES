@@ -2,51 +2,21 @@
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Attribute.Job;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Bos.Manufacture;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.CoreServices.Services.Job.JobUtility;
-using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Command;
-using Hymson.MES.Data.Repositories.Process;
-using Hymson.Snowflake;
-using Hymson.Utils;
-using Hymson.Utils.Tools;
-using MySqlX.XDevAPI.Common;
-using System.Threading.Tasks.Dataflow;
-using System.Linq;
-using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Newtonsoft.Json;
-using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
-using Mysqlx.Resultset;
+using Hymson.MES.Data.Repositories.Manufacture;
+using Hymson.Utils;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 包装（打开）
     /// </summary>
-    [Job("包装", JobTypeEnum.Standard)]
+    [Job(" 包装（打开）", JobTypeEnum.Standard)]
     public class PackageOpenJobService : IJobService
     {
-
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
-        /// <summary>
-        /// 服务接口（主数据）
-        /// </summary>
-        private readonly IMasterDataService _masterDataService;
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -62,14 +32,10 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <param name="manuCommonService"></param>
         /// <param name="procProcessRouteDetailNodeRepository"></param>
         /// <param name="procProcessRouteDetailLinkRepository"></param>
-        public PackageOpenJobService(IManuCommonService manuCommonService,
-            AbstractValidator<PackageOpenRequestBo> validationRepairJob,
-            IMasterDataService masterDataService,
+        public PackageOpenJobService(AbstractValidator<PackageOpenRequestBo> validationRepairJob,
             IManuContainerBarcodeRepository manuContainerBarcodeRepository)
         {
-            _manuCommonService = manuCommonService;
             _validationRepairJob = validationRepairJob;
-            _masterDataService = masterDataService;
             _manuContainerBarcodeRepository = manuContainerBarcodeRepository;
         }
 
@@ -109,12 +75,12 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             var bo = param.ToBo<PackageOpenRequestBo>() ?? throw new CustomerValidationException(nameof(ErrorCode.MES10103));
             var defaultDto = new PackageOpenResponseBo();
             string success = "true";
-            var manuContainerBarcodeEntity = await param.Proxy.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
+            var manuContainerBarcodeEntity = await param.Proxy!.GetValueAsync(_manuContainerBarcodeRepository.GetByIdAsync, bo.ContainerId);
             if (manuContainerBarcodeEntity == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16702));
             }
-            int status = 1;//1打开，2关闭
+            ManuContainerBarcodeStatusEnum status = ManuContainerBarcodeStatusEnum.Open;//1打开，2关闭
             //当前状态不等于修改状态
             if (manuContainerBarcodeEntity.Status != status)
             {
@@ -149,7 +115,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
 
             var rows = await _manuContainerBarcodeRepository.UpdateStatusAsync(data.ManuContainerBarcode);
 
-            return new JobResponseBo { Content = data.Content, Message = data.Message, Rows = rows, Time = data.Time };
+            return new JobResponseBo { Content = data.Content!, Message = data.Message, Rows = rows, Time = data.Time };
         }
 
 

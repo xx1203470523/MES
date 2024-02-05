@@ -1,26 +1,14 @@
-/*
- *creator: Karl
- *
- *describe: 容器条码表    控制器 | 代码由框架生成  
- *builder:  wxk
- *build datetime: 2023-04-12 02:29:23
- */
-using Hymson.Infrastructure;
+    using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.Web.Framework.Attributes;
-using IdGen;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（容器条码表）
-    /// @author wxk
-    /// @date 2023-04-12 02:29:23
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuContainerBarcodeController : ControllerBase
@@ -35,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（容器条码表）
         /// </summary>
         /// <param name="manuContainerBarcodeService"></param>
+        /// <param name="logger"></param>
         public ManuContainerBarcodeController(IManuContainerBarcodeService manuContainerBarcodeService, ILogger<ManuContainerBarcodeController> logger)
         {
             _manuContainerBarcodeService = manuContainerBarcodeService;

@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Warehouse;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -21,7 +23,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         public long? FeedingPointId { get; set; }
 
         /// <summary>
-        /// 上料产品Id
+        /// 上料产品Id（主物料ID）
         /// </summary>
         public long ProductId { get; set; }
 
@@ -55,6 +57,20 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        ///物料类型
+        /// </summary>
+        public MaterialInventoryMaterialTypeEnum MaterialType { get; set; }
+
+        /// <summary>
+        /// 工单id
+        /// </summary>
+        public long? WorkOrderId { get; set; }
+
+        /// <summary>
+        /// 物料加载来源
+        /// </summary>
+        public ManuSFCFeedingSourceEnum? LoadSource { get; set; }
 
     }
 }

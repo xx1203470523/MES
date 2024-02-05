@@ -1,18 +1,16 @@
 ﻿using Hymson.Localization.Services;
 using Hymson.MES.Core.Attribute.Job;
-using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Job;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Job;
-using Hymson.MES.CoreServices.Services.Common.ManuCommon;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
 using Hymson.MES.CoreServices.Services.Common.MasterData;
-using Hymson.MES.CoreServices.Services.Job;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.Utils;
 
-namespace Hymson.MES.CoreServices.Services.NewJob
+namespace Hymson.MES.CoreServices.Services.Job
 {
     /// <summary>
     /// 不良录入
@@ -20,11 +18,6 @@ namespace Hymson.MES.CoreServices.Services.NewJob
     [Job("不良录入", JobTypeEnum.Standard)]
     public class BadRecordJobService : IJobService
     {
-        /// <summary>
-        /// 服务接口（生产通用）
-        /// </summary>
-        private readonly IManuCommonService _manuCommonService;
-
         /// <summary>
         /// 服务接口（主数据）
         /// </summary>
@@ -44,21 +37,18 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="manuCommonService"></param>
         /// <param name="masterDataService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="localizationService"></param>
-        public BadRecordJobService(IManuCommonService manuCommonService,
+        public BadRecordJobService(
             IMasterDataService masterDataService,
             IManuSfcProduceRepository manuSfcProduceRepository,
             ILocalizationService localizationService)
         {
-            _manuCommonService = manuCommonService;
             _masterDataService = masterDataService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _localizationService = localizationService;
         }
-
 
         /// <summary>
         /// 参数校验
@@ -71,13 +61,13 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (bo == null) return;
 
             // 获取生产条码信息
-            var sfcProduceEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
-            if (sfcProduceEntities == null || sfcProduceEntities.Any() == false) return;
+            var sfcProduceEntities = await bo.Proxy!.GetValueAsync(_masterDataService.GetProduceEntitiesBySFCsWithCheckAsync, bo);
+            if (sfcProduceEntities == null || !sfcProduceEntities.Any()) return;
 
-            var sfcProduceBusinessEntities = await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
+            await bo.Proxy.GetValueAsync(_masterDataService.GetProduceBusinessEntitiesBySFCsAsync, bo);
 
             // 合法性校验
-            sfcProduceEntities.VerifySFCStatus(SfcProduceStatusEnum.Activity, _localizationService.GetResource($"{typeof(SfcProduceStatusEnum).FullName}.{nameof(SfcProduceStatusEnum.Activity)}"))
+            sfcProduceEntities.VerifySFCStatus(SfcStatusEnum.Activity, _localizationService)
                               .VerifyProcedure(bo.ProcedureId)
                               .VerifyResource(bo.ResourceId);
         }
@@ -89,13 +79,8 @@ namespace Hymson.MES.CoreServices.Services.NewJob
         /// <returns></returns>
         public async Task<IEnumerable<JobBo>?> BeforeExecuteAsync<T>(T param) where T : JobBaseBo
         {
-            var bo = param.ToBo<InStationRequestBo>();
-            if (bo == null) return null;
-            return await _masterDataService.GetJobRalationJobByProcedureIdOrResourceId(new Bos.Common.MasterData.JobRelationBo
-            {
-                ProcedureId = bo.ProcedureId,
-                ResourceId = bo.ResourceId,
-            });
+            await Task.CompletedTask;
+            return null;
         }
 
         /// <summary>
@@ -120,7 +105,7 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             });
 
             responseBo.SFCs = bo.SFCs;
-            responseBo.IsShow = sfcProduceBusinessEntities.Any() == false;
+            responseBo.IsShow = !sfcProduceBusinessEntities.Any();
             return responseBo;
         }
 
@@ -135,13 +120,14 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             if (obj is not BadRecordResponseBo data) return responseBo;
 
             // 面板需要的数据
-            responseBo.Content = new Dictionary<string, string> {
-                { "PackageCom", "False" },
-                { "BadEntryCom", $"{data.IsShow}" },
-                { "IsShow", $"{data.IsShow}" },
-            };
+            List<PanelModuleEnum> panelModules = new();
+            if (data.IsShow) panelModules.Add(PanelModuleEnum.BadRecord);
+            responseBo.Content = new Dictionary<string, string> { { "PanelModules", panelModules.ToSerialize() } };
 
-            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), data.SFCs.FirstOrDefault());
+            /*
+            var SFCs = string.Join(",", data.SFCs);
+            responseBo.Message = _localizationService.GetResource(data.IsShow ? nameof(ErrorCode.MES16342) : nameof(ErrorCode.MES16343), SFCs);
+            */
             return await Task.FromResult(responseBo);
         }
 
@@ -155,6 +141,5 @@ namespace Hymson.MES.CoreServices.Services.NewJob
             await Task.CompletedTask;
             return null;
         }
-
     }
 }

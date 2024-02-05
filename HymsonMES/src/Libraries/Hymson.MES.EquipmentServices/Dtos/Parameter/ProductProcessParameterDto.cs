@@ -1,62 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.CoreServices.Bos.Parameter;
 
 namespace Hymson.MES.EquipmentServices.Dtos.Parameter
 {
     /// <summary>
     /// 产品过程参数
     /// </summary>
-    public  class ProductProcessParameterDto
-    {
-
-        /// <summary>
-        /// 资源编码
-        /// </summary>
-        public string ResourceCode { get; set; }
-
-        /// <summary>
-        /// 产品列表
-        /// </summary>
-        public IEnumerable<ProductDto> Products { get; set; }
-    }
-
-    /// <summary>
-    /// 产品信息
-    /// </summary>
-    public class ProductDto
+    public record ProductProcessParameterDto : BaseDto
     {
         /// <summary>
-        /// 条码
+        /// 条码类型
         /// </summary>
-        public string SFC { get; set; }
+        public ManuFacePlateBarcodeTypeEnum Type { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
+
+        /// <summary>
+        /// 产品条码/载具编码
+        /// </summary>
+        public IEnumerable<string> SFCs { get; set; }
 
         /// <summary>
         /// 参数
         /// </summary>
-        public IEnumerable<ProductParameterDto> Parameters { get; set; }
+        public IEnumerable<ProductParameterBo> Parameters { get; set; } = new List<ProductParameterBo>();
     }
 
-    /// <summary>
-    /// 参数信息
-    /// </summary>
-    public class ProductParameterDto
-    {
-        /// <summary>
-        /// 参数编码
-        /// </summary>
-        public string ParameterCode { get; set; }
-
-        /// <summary>
-        /// 参数值
-        /// </summary>
-        public string ParameterValue { get; set; }
-
-        /// <summary>
-        /// 采集时间
-        /// </summary>
-        public DateTime CollectionTime { get; set; }
-    }
-    }
+}

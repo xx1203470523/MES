@@ -93,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
+            sqlBuilder.OrderBy(" UpdatedOn DESC ");
             if (!string.IsNullOrWhiteSpace(pagedQuery.SystemCode))
             {
                 pagedQuery.SystemCode = $"%{pagedQuery.SystemCode}%";
@@ -193,14 +193,14 @@ namespace Hymson.MES.Data.Repositories.Integrated
     public partial class InteSystemTokenRepository
     {
         #region 
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_system_token` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_system_token` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_system_token` /**where**/ ";
         const string GetInteSystemTokenEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_system_token` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_system_token`(  `Id`, `SystemCode`, `SystemName`, `Token`, `ExpirationTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @SystemCode, @SystemName, @Token, @ExpirationTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
-        const string UpdateSql = "UPDATE `inte_system_token` SET  SystemCode = @SystemCode, SystemName = @SystemName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `inte_system_token` SET  SystemName = @SystemName, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string UpdateTokenSql = "UPDATE `inte_system_token` SET Token = @Token, ExpirationTime = @ExpirationTime, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `inte_system_token` SET IsDeleted = Id WHERE Id = @Id ";

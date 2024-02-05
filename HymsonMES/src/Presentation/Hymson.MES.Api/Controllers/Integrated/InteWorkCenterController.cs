@@ -1,5 +1,7 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Web.Framework.Attributes;
@@ -9,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     ///  工作中心控制器
-    /// @author admin
-    /// @date 2023-02-21
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -136,5 +136,50 @@ namespace Hymson.MES.Api.Controllers.Integrated
         {
             await _inteWorkCenterService.DeleteRangInteWorkCenterAsync(ids);
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（工作中心）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("工作中心", BusinessType.UPDATE)]
+        [PermissionDescription("inte:workCenter:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _inteWorkCenterService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（工作中心）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("工作中心", BusinessType.UPDATE)]
+        [PermissionDescription("inte:workCenter:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _inteWorkCenterService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（工作中心）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("工作中心", BusinessType.UPDATE)]
+        [PermissionDescription("inte:workCenter:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _inteWorkCenterService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

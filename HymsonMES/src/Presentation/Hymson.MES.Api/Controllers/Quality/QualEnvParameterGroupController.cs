@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Quality;
 using Hymson.Web.Framework.Attributes;
@@ -9,8 +11,6 @@ namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 控制器（环境检验参数表）
-    /// @author Czhipu
-    /// @date 2023-07-22 10:54:48
     /// </summary>
     [Authorize]
     [ApiController]
@@ -111,5 +111,49 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualEnvParameterGroupService.GetPagedListAsync(pagedQueryDto);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（环境检验参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("环境检验参数表", BusinessType.UPDATE)]
+        [PermissionDescription("quality:qualEnvParameterGroup:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _qualEnvParameterGroupService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（环境检验参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("环境检验参数表", BusinessType.UPDATE)]
+        [PermissionDescription("quality:qualEnvParameterGroup:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _qualEnvParameterGroupService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（环境检验参数表）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("环境检验参数表", BusinessType.UPDATE)]
+        [PermissionDescription("quality:qualEnvParameterGroup:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _qualEnvParameterGroupService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

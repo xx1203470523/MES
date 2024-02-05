@@ -147,10 +147,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuFacePlateProductionEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(ManuFacePlateContainerPackEntity manuFacePlateContainerPackEntity)
+        public async Task<int> UpdateAsync(ManuFacePlateContainerPackEntity ManuFacePlateContainerPackEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdateSql, manuFacePlateContainerPackEntity);
+            return await conn.ExecuteAsync(UpdateSql, ManuFacePlateContainerPackEntity);
         }
 
         /// <summary>
@@ -167,12 +167,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量更新
         /// </summary>
-        /// <param name="manuFacePlateContainerPackEntitys"></param>
+        /// <param name="manuFacePlateContainerPackEntity"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<ManuFacePlateContainerPackEntity> manuFacePlateContainerPackEntitys)
+        public async Task<int> UpdatesAsync(List<ManuFacePlateContainerPackEntity> manuFacePlateContainerPackEntity)
         {
             using var conn = GetMESDbConnection();
-            return await conn.ExecuteAsync(UpdatesSql, manuFacePlateContainerPackEntitys);
+            return await conn.ExecuteAsync(UpdatesSql, manuFacePlateContainerPackEntity);
         }
 
      
@@ -189,7 +189,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_face_plate_container_pack` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_face_plate_container_pack`( `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id,@SiteId,@FacePlateId,@ResourceId,@IsResourceEdit,@ProcedureId,@IsProcedureEdit,@ScanJobId,@IsSuccessBeep,@SuccessBeepUrl,@SuccessBeepTime,@IsErrorBeep,@ErrorBeepUrl,@ErrorBeepTime,@IsAllowDifferentMaterial,@IsMixedWorkOrder,@IsAllowQueueProduct,@IsAllowCompleteProduct,@IsAllowActiveProduct,@IsShowMinQty,@IsShowMaxQty,@IsShowCurrentQty,@QualifiedColour,@ErrorsColour,@IsShowLog,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_face_plate_container_pack`( `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `ContainerId`,`IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id,@SiteId,@FacePlateId,@ResourceId,@ContainerId,@IsResourceEdit,@ProcedureId,@IsProcedureEdit,@ScanJobId,@IsSuccessBeep,@SuccessBeepUrl,@SuccessBeepTime,@IsErrorBeep,@ErrorBeepUrl,@ErrorBeepTime,@IsAllowDifferentMaterial,@IsMixedWorkOrder,@IsAllowQueueProduct,@IsAllowCompleteProduct,@IsAllowActiveProduct,@IsShowMinQty,@IsShowMaxQty,@IsShowCurrentQty,@QualifiedColour,@ErrorsColour,@IsShowLog,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted )  ";
         const string InsertsSql = "INSERT INTO `manu_face_plate_container_pack`( `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id,@SiteId,@FacePlateId,@ResourceId,@IsResourceEdit,@ProcedureId,@IsProcedureEdit,@ScanJobId,@IsSuccessBeep,@SuccessBeepUrl,@SuccessBeepTime,@IsErrorBeep,@ErrorBeepUrl,@ErrorBeepTime,@IsAllowDifferentMaterial,@IsMixedWorkOrder,@IsAllowQueueProduct,@IsAllowCompleteProduct,@IsAllowActiveProduct,@IsShowMinQty,@IsShowMaxQty,@IsShowCurrentQty,@QualifiedColour,@ErrorsColour,@IsShowLog,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted )  ";
 
         const string UpdateSql = "UPDATE `manu_face_plate_container_pack` SET  SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,ScanJobId = @ScanJobId,IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime,IsAllowDifferentMaterial = @IsAllowDifferentMaterial, IsMixedWorkOrder = @IsMixedWorkOrder, IsAllowQueueProduct = @IsAllowQueueProduct, IsAllowCompleteProduct = @IsAllowCompleteProduct, IsAllowActiveProduct = @IsAllowActiveProduct,\r\nIsShowMinQty = @IsShowMinQty,IsShowMaxQty = @IsShowMaxQty,IsShowCurrentQty= @IsShowCurrentQty,QualifiedColour= @QualifiedColour,ErrorsColour = @ErrorsColour,\r\n IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
@@ -205,14 +205,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                          `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_face_plate_container_pack`  WHERE Id IN @Ids ";
 
-        const string GetByFacePlateIdSql = @"SELECT 
-                              `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_face_plate_container_pack`  WHERE FacePlateId = @FacePlateId ";
-        const string GetByCodeSql = @"SELECT 
-                              `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`, `ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsAllowDifferentMaterial`, `IsMixedWorkOrder`, `IsAllowQueueProduct`, `IsAllowCompleteProduct`, `IsAllowActiveProduct`, `IsShowMinQty`, `IsShowMaxQty`, `IsShowCurrentQty`, `QualifiedColour`, `ErrorsColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_face_plate_container_pack`  WHERE FacePlateId = @FacePlateId ";
+        const string GetByFacePlateIdSql = @"SELECT * FROM `manu_face_plate_container_pack` WHERE FacePlateId = @FacePlateId ";
 
-        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_container_pack` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,ScanJobId = @ScanJobId,IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime,IsAllowDifferentMaterial = @IsAllowDifferentMaterial, IsMixedWorkOrder = @IsMixedWorkOrder, IsAllowQueueProduct = @IsAllowQueueProduct, IsAllowCompleteProduct = @IsAllowCompleteProduct, IsAllowActiveProduct = @IsAllowActiveProduct,\r\nIsShowMinQty = @IsShowMinQty,IsShowMaxQty = @IsShowMaxQty,IsShowCurrentQty= @IsShowCurrentQty,QualifiedColour= @QualifiedColour,ErrorsColour = @ErrorsColour,\r\n IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE FacePlateId = @FacePlateId ";
+        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_container_pack` SET   SiteId = @SiteId,ContainerId=@ContainerId,FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,ScanJobId = @ScanJobId,IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime,IsAllowDifferentMaterial = @IsAllowDifferentMaterial, IsMixedWorkOrder = @IsMixedWorkOrder, IsAllowQueueProduct = @IsAllowQueueProduct, IsAllowCompleteProduct = @IsAllowCompleteProduct, IsAllowActiveProduct = @IsAllowActiveProduct,\r\nIsShowMinQty = @IsShowMinQty,IsShowMaxQty = @IsShowMaxQty,IsShowCurrentQty= @IsShowCurrentQty,QualifiedColour= @QualifiedColour,ErrorsColour = @ErrorsColour,\r\n IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE FacePlateId = @FacePlateId ";
         #endregion
     }
 }

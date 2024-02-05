@@ -3,16 +3,14 @@ using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process.LabelTemplate;
 using Hymson.Web.Framework.Attributes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（仓库标签模板）
-    /// @author wxk
-    /// @date 2023-03-09 02:51:26
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcLabelTemplateController : ControllerBase
@@ -27,6 +25,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（仓库标签模板）
         /// </summary>
         /// <param name="procLabelTemplateService"></param>
+        /// <param name="logger"></param>
         public ProcLabelTemplateController(IProcLabelTemplateService procLabelTemplateService, ILogger<ProcLabelTemplateController> logger)
         {
             _procLabelTemplateService = procLabelTemplateService;
@@ -95,18 +94,49 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:labelTemplate:delete")]
         public async Task DeleteProcLabelTemplateAsync(DeleteDto deleteDto)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procLabelTemplateService.DeletesProcLabelTemplateAsync(deleteDto.Ids);
         }
         [HttpGet]
         [Route("preview/{id}")]
         public async Task<PreviewImageDataDto> PreviewProcLabelTemplateAsync(long id)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             var foo = await _procLabelTemplateService.PreviewProcLabelTemplateAsync(id);
             return new PreviewImageDataDto() { base64Str = foo.base64Str, result = foo.result };
         }
 
 
+        /// <summary>
+        /// 查询详情（仓库标签模板的打印设计）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("getRelationByLabelTemplateId/{id}")]
+        [AllowAnonymous]
+        public async Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long id)
+        {
+            return await _procLabelTemplateService.QueryProcLabelTemplateRelationByLabelTemplateIdAsync(id);
+        }
+
+        /// <summary>
+        /// 获取打印类对应的选项
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getPrintClassList")]
+        [AllowAnonymous]
+        public async Task<IEnumerable<PrintClassOptionDto>> GetPrintClassListAsync() 
+        {
+            return await _procLabelTemplateService.GetPrintClassListAsync();
+        }
+
+        /// <summary>
+        /// 获取打印任务对应的数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("getPrintData/{id}")]
+        [AllowAnonymous]
+        public async Task<PrintDataResultDto> GetPrintDataAsync(long id)
+        {
+            return await _procLabelTemplateService.GetAboutPrintDataAsync(id);
+        }
     }
 }

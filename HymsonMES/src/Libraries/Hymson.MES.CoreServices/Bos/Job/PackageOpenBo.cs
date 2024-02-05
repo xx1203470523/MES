@@ -33,7 +33,7 @@ namespace Hymson.MES.CoreServices.Bos.Job
     /// <summary>
     ///  
     /// </summary>
-    public class PackageCloseResponseBo : JobResultBo
+    public class PackageCloseResponseBo
     {
         /// <summary>
         /// 内容

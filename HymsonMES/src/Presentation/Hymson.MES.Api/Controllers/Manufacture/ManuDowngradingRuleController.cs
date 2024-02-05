@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 降级规则    控制器 | 代码由框架生成  
- *builder:  Karl
- *build datetime: 2023-08-07 02:00:57
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -17,8 +10,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 控制器（降级规则）
-    /// @author Karl
-    /// @date 2023-08-07 02:00:57
     /// </summary>
     [Authorize]
     [ApiController]
@@ -35,6 +26,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// 构造函数（降级规则）
         /// </summary>
         /// <param name="manuDowngradingRuleService"></param>
+        /// <param name="logger"></param>
         public ManuDowngradingRuleController(IManuDowngradingRuleService manuDowngradingRuleService, ILogger<ManuDowngradingRuleController> logger)
         {
             _manuDowngradingRuleService = manuDowngradingRuleService;

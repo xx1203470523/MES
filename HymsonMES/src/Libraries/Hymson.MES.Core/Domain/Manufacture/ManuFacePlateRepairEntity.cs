@@ -51,5 +51,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// 是否显示产品列表
         /// </summary>
         public bool IsShowProductList { get; set; }
+
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 }

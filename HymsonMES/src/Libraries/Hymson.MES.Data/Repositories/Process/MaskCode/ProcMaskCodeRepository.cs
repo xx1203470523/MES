@@ -100,13 +100,13 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("Name LIKE @Name");
@@ -124,6 +124,27 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
             return new PagedInfo<ProcMaskCodeEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaskCodeEntity>> GetByIdsAsync(IEnumerable<long> ids)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaskCodeEntity>(GetByIdsSql, new { ids });
+        }
+
+        /// <summary>
+        /// 根据编码获取掩码信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcMaskCodeEntity>> GetByCodesAsync(ProcMaskCodesByCodeQuery param)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryAsync<ProcMaskCodeEntity>(GetByCodesSql, param);
+        }
     }
 
     /// <summary>
@@ -141,5 +162,8 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         const string GetByCodeSql = "SELECT * FROM proc_maskcode WHERE `IsDeleted` = 0 AND SiteId = @Site AND Code = @Code LIMIT 1";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_maskcode` /**innerjoin**/ /**leftjoin**/ /**where**/";
+        const string GetByIdsSql = @"SELECT * FROM `proc_maskcode` WHERE Id IN @ids AND IsDeleted=0 ";
+
+        const string GetByCodesSql = @"SELECT * FROM `proc_maskcode` WHERE Code IN @Codes AND SiteId= @SiteId  AND IsDeleted=0 ";
     }
 }

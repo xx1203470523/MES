@@ -8,10 +8,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（标准参数表）
-    /// @author Karl
-    /// @date 2023-02-13 02:50:20
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcParameterController : ControllerBase
@@ -26,6 +23,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（标准参数表）
         /// </summary>
         /// <param name="procParameterService"></param>
+        /// <param name="logger"></param>
         public ProcParameterController(IProcParameterService procParameterService, ILogger<ProcParameterController> logger)
         {
             _procParameterService = procParameterService;
@@ -66,7 +64,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:parameter:insert")]
         public async Task<int> AddProcParameterAsync([FromBody] ProcParameterCreateDto parm)
         {
-             return await _procParameterService.CreateProcParameterAsync(parm);
+            return await _procParameterService.CreateProcParameterAsync(parm);
         }
 
         /// <summary>
@@ -80,7 +78,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:parameter:update")]
         public async Task UpdateProcParameterAsync([FromBody] ProcParameterModifyDto parm)
         {
-             await _procParameterService.ModifyProcParameterAsync(parm);
+            await _procParameterService.ModifyProcParameterAsync(parm);
         }
 
         /// <summary>
@@ -94,9 +92,46 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:parameter:delete")]
         public async Task<int> DeleteProcParameterAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             return await _procParameterService.DeletesProcParameterAsync(ids);
         }
 
+        /// <summary>
+        /// 导入参数数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [PermissionDescription("proc:parameter:import")]
+        public async Task ImportParameterAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _procParameterService.ImportParameterAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procParameterService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"参数导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导出标准参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<ParameterExportResultDto> ExprotParameterListAsync([FromQuery] ProcParameterPagedQueryDto param)
+        {
+            return await _procParameterService.ExprotParameterListAsync(param);
+        }
     }
 }

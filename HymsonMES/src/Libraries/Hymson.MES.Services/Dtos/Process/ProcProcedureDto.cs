@@ -10,6 +10,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Quality;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,6 +103,27 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
+
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public TrueOrFalseEnum? IsRejudge { get; set; }
+
+        /// <summary>
+        /// 是否校验NG信息
+        /// </summary>
+        public TrueOrFalseEnum? IsValidNGCode { get; set; }
+
+
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public bool? IsRejudges { get; set; }
+
+        /// <summary>
+        /// 设备NG信息校验
+        /// </summary>
+        public bool? IsValidNGCodes { get; set; }
     }
 
     public record ProcProcedureCreateDto : BaseEntityDto
@@ -116,10 +138,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -155,6 +173,41 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public bool IsRejudges { get; set; }
+
+        /// <summary>
+        /// 设备NG信息校验
+        /// </summary>
+        public bool IsValidNGCodes { get; set; }
+
+        /// <summary>
+        /// 标记不合格id
+        /// </summary>
+        public long? MarkId { get; set; }
+
+        /// <summary>
+        /// 缺陷不合格ID
+        /// </summary>
+        public long? DefectId { get; set; }
+
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public TrueOrFalseEnum? IsRejudge { get; set; }
+
+        /// <summary>
+        /// 是否校验NG信息
+        /// </summary>
+        public TrueOrFalseEnum? IsValidNGCode { get; set; }
+
+        /// <summary>
+        /// 不合格信息
+        /// </summary>
+        public List<QualUnqualifiedCodeResultDto>? FirstUndesirableId { get; set; }
     }
 
     /// <summary>
@@ -232,6 +285,22 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 资源类型
         /// </summary>
         public ProcResourceTypeDto ResourceType { get; set; }
+
+        /// <summary>
+        /// 不合格信息
+        /// </summary>
+        public QualUnqualifiedCodeDto MarkQualUnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格信息
+        /// </summary>
+        public QualUnqualifiedCodeDto LastQualUnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格信息
+        /// </summary>
+        public List<QualUnqualifiedCodeDto> BlockQualUnqualifiedCode { get; set; }
+        
     }
 
     /// <summary>
@@ -298,20 +367,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-        ///// <summary>
-        ///// 工序BOM代码
-        ///// </summary>
-        //public string Code { get; set; }
-
         /// <summary>
         /// 工序BOM名称
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -347,6 +407,41 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public bool IsRejudges { get; set; }
+
+        /// <summary>
+        /// 设备NG信息校验
+        /// </summary>
+        public bool IsValidNGCodes { get; set; }
+
+        /// <summary>
+        /// 标记不合格id
+        /// </summary>
+        public long? MarkId { get; set; }
+
+        /// <summary>
+        /// 缺陷不合格ID
+        /// </summary>
+        public long? DefectId { get; set; }
+
+        /// <summary>
+        /// 是否复判
+        /// </summary>
+        public TrueOrFalseEnum? IsRejudge { get; set; }
+
+        /// <summary>
+        /// 是否校验NG信息
+        /// </summary>
+        public TrueOrFalseEnum? IsValidNGCode { get; set; }
+
+        /// <summary>
+        /// 不合格信息
+        /// </summary>
+        public List<QualUnqualifiedCodeResultDto>? FirstUndesirableId { get; set; }
     }
 
     /// <summary>
@@ -354,11 +449,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public class ProcedureJobReleationDto
     {
-        /// <summary>
-        /// 工序配置工作实体类
-        /// </summary>
-        // public InteJobBusinessRelationDto ProcedureConfigJob { get; set; }
-
         /// <summary>
         /// 关联点
         /// </summary>

@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -17,8 +18,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <summary>
         /// 
         /// </summary>
+        private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteEventTypeRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        /// <param name="memoryCache"></param>
+        public InteEventTypeRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        {
+            _memoryCache = memoryCache;
+        }
 
         /// <summary>
         /// 新增
@@ -104,8 +114,12 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteEventTypeEntity> GetByIdAsync(long id)
         {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteEventTypeEntity>(GetByIdSql, new { Id = id });
+            var key = $"inte_event_type&id-{id}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = GetMESDbConnection();
+                return await conn.QueryFirstOrDefaultAsync<InteEventTypeEntity>(GetByIdSql, new { Id = id });
+            });
         }
 
         /// <summary>
@@ -159,19 +173,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.Where("T.IsDeleted = 0");
             sqlBuilder.Where("T.SiteId = @SiteId");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Code) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
                 sqlBuilder.Where("T.Code LIKE @Code");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.Name) == false)
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
                 sqlBuilder.Where("T.Name LIKE @Name");
             }
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.WorkShopName) == false)
+            if (pagedQuery.WorkShopId.HasValue)
+            {
+                sqlBuilder.Where("T.WorkShopId = @WorkShopId");
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.WorkShopName))
             {
                 pagedQuery.WorkShopName = $"%{pagedQuery.WorkShopName}%";
                 sqlBuilder.Where("IWC.Name LIKE @WorkShopName");
@@ -202,8 +221,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_event_type T /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_event_type /**where**/  ";
 
-        const string InsertSql = "INSERT INTO inte_event_type(  `Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
-        const string InsertsSql = "INSERT INTO inte_event_type(  `Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertSql = "INSERT IGNORE inte_event_type(  `Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
+        const string InsertsSql = "INSERT IGNORE inte_event_type(  `Id`, `SiteId`, `Code`, `Name`, `WorkShopId`, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (  @Id, @SiteId, @Code, @Name, @WorkShopId, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @IsDeleted) ";
 
         const string UpdateSql = "UPDATE inte_event_type SET   SiteId = @SiteId, Code = @Code, Name = @Name, WorkShopId = @WorkShopId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";
         const string UpdatesSql = "UPDATE inte_event_type SET   SiteId = @SiteId, Code = @Code, Name = @Name, WorkShopId = @WorkShopId, Remark = @Remark, CreatedOn = @CreatedOn, CreatedBy = @CreatedBy, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted WHERE Id = @Id ";

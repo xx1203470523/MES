@@ -28,10 +28,6 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public long EquipmentGroupId { get; set; }
 
-        /// <summary>
-        /// 使用状态 0-禁用 1-启用
-        /// </summary>
-        public SysDataStatusEnum UseStatus { get; set; }
 
         /// <summary>
         /// 设备故障先

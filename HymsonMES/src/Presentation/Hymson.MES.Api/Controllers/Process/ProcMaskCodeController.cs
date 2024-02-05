@@ -1,9 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Services.Equipment.EquEquipmentUnit;
 using Hymson.MES.Services.Services.Process.MaskCode;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
@@ -11,7 +9,6 @@ namespace Hymson.MES.Api.Controllers.Process
     /// <summary>
     /// ¿ØÖÆÆ÷£¨ÑÚÂëÎ¬»¤£©
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaskCodeController : ControllerBase

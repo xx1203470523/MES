@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId= sfcId });
+            return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId = sfcId });
         }
 
         /// <summary>
@@ -153,6 +153,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<ManuSfcInfoEntity> ManuSfcInfoEntitys)
         {
+            if (ManuSfcInfoEntitys == null || !ManuSfcInfoEntitys.Any()) return 0;
+
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, ManuSfcInfoEntitys);
         }
@@ -184,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="sfcIds"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand  manuSfcInfoUpdateIsUsedCommand)
+        public async Task<int> UpdatesIsUsedAsync(ManuSfcInfoUpdateIsUsedCommand manuSfcInfoUpdateIsUsedCommand)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesIsUsedSql, manuSfcInfoUpdateIsUsedCommand);
@@ -286,15 +288,70 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 车间作业控制 报表分页查询
+        /// 优化: 不模糊查询，且通过关联ID查询
+        /// </summary>
+        /// <param name="pageQuery"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<WorkshopJobControlReportOptimizeView>> GetPagedInfoWorkshopJobControlReportOptimizeAsync(WorkshopJobControlReportOptimizePagedQuery pageQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportOptimizeDataSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoWorkshopJobControlReportOptimizeCountSqlTemplate);
+
+            sqlBuilder.Where(" si.SiteId = @SiteId ");
+            sqlBuilder.Where(" si.IsDeleted = 0 ");
+            sqlBuilder.Where(" si.IsUsed = 1 ");
+
+            if (pageQuery.MaterialId.HasValue)
+            {
+                sqlBuilder.Where(" si.ProductId = @MaterialId ");
+            }
+            if (pageQuery.WorkOrderId.HasValue)
+            {
+                sqlBuilder.Where(" si.WorkOrderId = @WorkOrderId ");
+            }
+            if (!string.IsNullOrEmpty(pageQuery.SFC))
+            {
+                sqlBuilder.Where(" s.SFC = @SFC ");
+            }
+            if (pageQuery.SFCStatus.HasValue)
+            {
+                sqlBuilder.Where(" s.`Status` =  @SFCStatus ");
+            }
+            if (pageQuery.ProcedureId.HasValue)
+            {
+                sqlBuilder.Where(" sp.ProcedureId =  @ProcedureId ");
+            }
+            if (pageQuery.ResourceId.HasValue)
+            {
+                sqlBuilder.Where(" sp.ResourceId =  @ResourceId ");
+            }
+
+            var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
+            sqlBuilder.AddParameters(pageQuery);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var reportDataTask = conn.QueryAsync<WorkshopJobControlReportOptimizeView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var reportData = await reportDataTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<WorkshopJobControlReportOptimizeView>(reportData, pageQuery.PageIndex, pageQuery.PageSize, totalCount);
+        }
+
+
+        /// <summary>
         /// 根据SFC获取已经使用的
         /// </summary>
         /// <param name="sfc"></param>
         /// <returns></returns>
-        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc) 
+        public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
-        } 
+        }
     }
 
     /// <summary>
@@ -309,11 +366,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_sfc_info` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `ProcessRouteId`,`ProductBOMId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @ProcessRouteId, @ProductBOMId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `manu_sfc_info`(  `Id`, `SiteId`, `SfcId`, `WorkOrderId`, `ProductId`, `ProcessRouteId`,`ProductBOMId`, `IsUsed`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SfcId, @WorkOrderId, @ProductId, @ProcessRouteId, @ProductBOMId, @IsUsed, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
 
-        const string UpdateSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_sfc_info` SET   SiteId = @SiteId, SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, ProcessRouteId = @ProcessRouteId, ProductBOMId = @ProductBOMId, IsUsed = @IsUsed, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_sfc_info` SET   SfcId = @SfcId, WorkOrderId = @WorkOrderId, ProductId = @ProductId, IsUsed = @IsUsed, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_sfc_info` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
@@ -367,5 +424,32 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                                Left join manu_sfc s on s.id=si.SfcId
                                                where si.IsDeleted=0 and si.IsUsed=1 
                                                and s.sfc=@sfc ";
+
+        const string GetPagedInfoWorkshopJobControlReportOptimizeDataSqlTemplate = @"
+                        select 
+                            s.SFC,
+                            s.`Status` as SFCStatus,
+                            si.ProductId,
+                            si.WorkOrderId,
+                            si.ProductBOMId,
+                            si.ProcessRouteId,
+                            sp.ProcedureId,
+                            sp.ResourceId,
+                            s.Qty
+                        from manu_sfc_info si
+                        LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC 
+                        /**where**/ 
+                        Order by si.CreatedOn desc
+                        LIMIT @Offset,@Rows 
+        ";
+        const string GetPagedInfoWorkshopJobControlReportOptimizeCountSqlTemplate = @"
+                        select count(1)
+                        from manu_sfc_info si
+                        LEFT JOIN Manu_sfc s on s.id=si.SfcId -- 为了查询状态
+                        LEFT join manu_sfc_produce sp on sp.SFC=s.SFC 
+                        /**where**/ 
+        ";
+
     }
 }

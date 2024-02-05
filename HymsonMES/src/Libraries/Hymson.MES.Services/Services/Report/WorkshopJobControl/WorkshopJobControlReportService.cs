@@ -1,3 +1,4 @@
+using Dapper;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -7,6 +8,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Hymson.MES.Data.Repositories.Plan;
@@ -40,6 +42,14 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="procProcedureRepository"></param>
+        /// <param name="manuSfcStepRepository"></param>
+        /// <param name="planWorkOrderRepository"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procProcessRouteRepository"></param>
+        /// <param name="procBomRepository"></param>
+
         public WorkshopJobControlReportService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcInfoRepository manuSfcInfoRepository, IManuSfcStepRepository manuSfcStepRepository, IProcProcedureRepository procProcedureRepository, IPlanWorkOrderRepository planWorkOrderRepository, IProcMaterialRepository procMaterialRepository, IProcProcessRouteRepository procProcessRouteRepository, IProcBomRepository procBomRepository)
         {
             _currentUser = currentUser;
@@ -54,23 +64,82 @@ namespace Hymson.MES.Services.Services.Report
             _procBomRepository = procBomRepository;
         }
 
+        ///// <summary>
+        ///// 根据查询条件获取车间作业控制报表分页数据
+        ///// </summary>
+        ///// <param name="param"></param>
+        ///// <returns></returns>
+        //public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param)
+        //{
+        //    var pagedQuery = param.ToQuery<WorkshopJobControlReportPagedQuery>();
+        //    pagedQuery.SiteId = _currentSite.SiteId;
+        //    var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportAsync(pagedQuery);
+
+        //    List<WorkshopJobControlReportViewDto> listDto = new List<WorkshopJobControlReportViewDto>();
+        //    foreach (var item in pagedInfo.Data)
+        //    {
+        //        listDto.Add(item.ToModel<WorkshopJobControlReportViewDto>());
+        //    }
+
+        //    return new PagedInfo<WorkshopJobControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+        //}
+
         /// <summary>
         /// 根据查询条件获取车间作业控制报表分页数据
+        /// 优化: 不模糊查询，且通过关联ID查询
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportPagedQueryDto param)
+        public async Task<PagedInfo<WorkshopJobControlReportViewDto>> GetWorkshopJobControlPageListAsync(WorkshopJobControlReportOptimizePagedQueryDto param)
         {
-            var pagedQuery = param.ToQuery<WorkshopJobControlReportPagedQuery>();
+            var pagedQuery = param.ToQuery<WorkshopJobControlReportOptimizePagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId;
-            var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportAsync(pagedQuery);
+            var pagedInfo = await _manuSfcInfoRepository.GetPagedInfoWorkshopJobControlReportOptimizeAsync(pagedQuery);
 
-            List<WorkshopJobControlReportViewDto> listDto = new List<WorkshopJobControlReportViewDto>();
-            foreach (var item in pagedInfo.Data)
+            List<WorkshopJobControlReportViewDto> listDto = new();
+            if (pagedInfo.Data.Any())
             {
-                listDto.Add(item.ToModel<WorkshopJobControlReportViewDto>());
-            }
+                // 查询工单
+                var workOrders = await _planWorkOrderRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.WorkOrderId));
 
+                // 查询bom
+                var procBomsTask = _procBomRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductBOMId));
+
+                // 查询物料
+                var materialsTask = _procMaterialRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProductId));
+
+                // 查询工序
+                var procProceduresTask = _procProcedureRepository.GetByIdsAsync(pagedInfo.Data.Select(x => x.ProcedureId));
+
+                var procBoms = await procBomsTask;
+                var materials = await materialsTask;
+                var procProcedures = await procProceduresTask;
+
+                foreach (var item in pagedInfo.Data)
+                {
+                    var material = materials.FirstOrDefault(x => x.Id == item.ProductId);
+                    var workOrder = workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId);
+                    var procedure = procProcedures.FirstOrDefault(x => x.Id == item.ProcedureId);
+                    var bom = procBoms.FirstOrDefault(x => x.Id == item.ProductBOMId);
+
+                    listDto.Add(new WorkshopJobControlReportViewDto
+                    {
+                        SFC = item.SFC,
+                        SFCStatus = item.SFCStatus,
+                        SFCProduceStatus = item.SFCStatus,
+                        Qty = item.Qty,
+                        MaterialCodeVersion = material != null ? material.MaterialCode + "/" + material.Version : "",
+                        MaterialName = material?.MaterialName ?? "",
+                        OrderCode = workOrder?.OrderCode ?? "",
+                        OrderType = workOrder?.Type,
+                        ProcedureCode = procedure?.Code ?? "",
+                        ProcedureName = procedure?.Name ?? "",
+                        BomCodeVersion = bom != null ? bom.BomCode + "/" + bom.Version : "",
+                        BomName = bom != null ? bom.BomName : ""
+                    });
+                }
+
+            }
             return new PagedInfo<WorkshopJobControlReportViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
@@ -81,7 +150,7 @@ namespace Hymson.MES.Services.Services.Report
         /// <returns></returns>
         public async Task<WorkshopJobControlStepReportDto> GetSfcInOutInfoAsync(string sfc)
         {
-            var workshopJobControlStepReportDto = new WorkshopJobControlStepReportDto() { SFC = sfc };
+            var responseDto = new WorkshopJobControlStepReportDto() { SFC = sfc };
 
             var sfcInfo = await _manuSfcInfoRepository.GetUsedBySFCAsync(sfc);
             if (sfcInfo == null)
@@ -89,21 +158,20 @@ namespace Hymson.MES.Services.Services.Report
                 throw new CustomerValidationException(nameof(ErrorCode.MES18106)).WithData("sfc", sfc);
             }
 
-            var sfcSteps = await _manuSfcStepRepository.GetSFCInOutStepAsync(new SfcInOutStepQuery() { SiteId = _currentSite.SiteId ?? 0, Sfc = sfc });
+            var sfcSteps = await _manuSfcStepRepository.GetInOutStationStepsBySFCAsync(new EntityBySFCQuery() { SiteId = _currentSite.SiteId ?? 0, SFC = sfc });
 
             if (sfcSteps == null || !sfcSteps.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18101)).WithData("sfc", sfc);
             }
             #region 查询基础数据
-            //var oneSfcStep = sfcSteps.Where(x=>x.WorkOrderId == sfcInfo.WorkOrderId).FirstOrDefault();
             //查询工单信息
-            var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId);
+            var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId ?? 0);
             if (workOrder == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.OrderCode = workOrder.OrderCode;
+            responseDto.OrderCode = workOrder.OrderCode;
 
             //查询物料信息
             var material = await _procMaterialRepository.GetByIdAsync(sfcInfo.ProductId);
@@ -111,7 +179,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18103)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.MaterialCodrNameVersion = material.MaterialCode + "/" + material.MaterialName + "/" + material.Version;
+            responseDto.MaterialCodrNameVersion = material.MaterialCode + "/" + material.MaterialName + "/" + material.Version;
 
             //查询工艺路线
             var processRoute = await _procProcessRouteRepository.GetByIdAsync(workOrder.ProcessRouteId);
@@ -119,7 +187,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18104)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.ProcessRouteCodeNameVersion = processRoute.Code + "/" + processRoute.Name + "/" + processRoute.Version;
+            responseDto.ProcessRouteCodeNameVersion = processRoute.Code + "/" + processRoute.Name + "/" + processRoute.Version;
 
             //查询Bom
             var bom = await _procBomRepository.GetByIdAsync(workOrder.ProductBOMId);
@@ -127,7 +195,7 @@ namespace Hymson.MES.Services.Services.Report
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18105)).WithData("sfc", sfc);
             }
-            workshopJobControlStepReportDto.ProcBomCodeNameVersion = bom.BomCode + "/" + bom.BomName + "/" + bom.Version;
+            responseDto.ProcBomCodeNameVersion = bom.BomCode + "/" + bom.BomName + "/" + bom.Version;
 
             #endregion
 
@@ -154,8 +222,6 @@ namespace Hymson.MES.Services.Services.Report
                     ManuSfcStepEntity? nextStep = null;
                     ManuSfcStepEntity? outStep = null;
 
-                    var viewDto = new WorkshopJobControlStepReportDto();
-
                     //是否有下一个进站
                     if (i + 1 < inSfcSteps.Count)
                     {
@@ -169,8 +235,9 @@ namespace Hymson.MES.Services.Services.Report
                         outStep = outSfcSteps.FirstOrDefault(x => currentStep.CreatedOn < x.CreatedOn);
                     }
 
-                    workshopJobControlStepReportDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto()
+                    responseDto.WorkshopJobControlInOutSteptDtos.Add(new WorkshopJobControlInOutSteptDto
                     {
+                        Id = currentStep.Id,
                         WorkOrderCode = workOrders.FirstOrDefault(x => x.Id == currentStep.WorkOrderId)?.OrderCode ?? string.Empty,
                         ProcedureCode = procedures.FirstOrDefault(x => x.Id == currentStep.ProcedureId)?.Code ?? string.Empty,
                         Status = nextStep != null || outStep != null ? SfcInOutStatusEnum.Finished : SfcInOutStatusEnum.Activity,
@@ -180,7 +247,10 @@ namespace Hymson.MES.Services.Services.Report
                 }
             }
 
-            return workshopJobControlStepReportDto;
+            // 对 workshopJobControlInOutSteptDtos 进行排序
+            responseDto.WorkshopJobControlInOutSteptDtos = responseDto.WorkshopJobControlInOutSteptDtos.OrderBy(o => o.Id).AsList();
+
+            return responseDto;
         }
 
         /// <summary>
@@ -188,7 +258,7 @@ namespace Hymson.MES.Services.Services.Report
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ManuSfcStepBySFCViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySFCPagedQueryDto queryParam)
+        public async Task<PagedInfo<ManuSfcStepBySfcViewDto>> GetSFCStepsBySFCPageListAsync(ManuSfcStepBySfcPagedQueryDto queryParam)
         {
             var pagedQuery = queryParam.ToQuery<ManuSfcStepBySfcPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId.Value;
@@ -200,11 +270,11 @@ namespace Hymson.MES.Services.Services.Report
 
             var pagedInfo = await _manuSfcStepRepository.GetPagedInfoBySFCAsync(pagedQuery);
 
-            List<ManuSfcStepBySFCViewDto> listDto = new List<ManuSfcStepBySFCViewDto>();
+            List<ManuSfcStepBySfcViewDto> listDto = new List<ManuSfcStepBySfcViewDto>();
 
             if (pagedInfo.Data == null || !pagedInfo.Data.Any())
             {
-                return new PagedInfo<ManuSfcStepBySFCViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+                return new PagedInfo<ManuSfcStepBySfcViewDto>(listDto, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
             }
 
             var materialIds = pagedInfo.Data.Select(x => x.ProductId).Distinct().ToArray();
@@ -218,12 +288,11 @@ namespace Hymson.MES.Services.Services.Report
 
             foreach (var item in pagedInfo.Data)
             {
-                var material = materials != null && materials.Any() ? materials.Where(x => x.Id == item.ProductId).FirstOrDefault() : null;
-                var procedure = procedures != null && procedures.Any() ? procedures.Where(x => x.Id == item.ProcedureId).FirstOrDefault() : null;
-                var workOrder = workOrders != null && workOrders.Any() ? workOrders.Where(x => x.Id == item.WorkOrderId).FirstOrDefault() : null;
+                var material = materials != null && materials.Any() ? materials.FirstOrDefault(x => x.Id == item.ProductId) : null;
+                var procedure = procedures != null && procedures.Any() ? procedures.FirstOrDefault(x => x.Id == item.ProcedureId) : null;
+                var workOrder = workOrders != null && workOrders.Any() ? workOrders.FirstOrDefault(x => x.Id == item.WorkOrderId) : null;
 
-
-                listDto.Add(new ManuSfcStepBySFCViewDto()
+                listDto.Add(new ManuSfcStepBySfcViewDto()
                 {
                     Id = item.Id,
                     SFC = item.SFC,
@@ -238,8 +307,8 @@ namespace Hymson.MES.Services.Services.Report
             }
 
             // 因为job合并执行的时候，时间会一样，所以加上类型排序
-            var dtoOrdered = listDto.OrderByDescending(o => o.CreatedOn).OrderByDescending(o => o.Operatetype).AsEnumerable();
-            return new PagedInfo<ManuSfcStepBySFCViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtoOrdered = listDto.OrderBy(o => o.Id).AsEnumerable();
+            return new PagedInfo<ManuSfcStepBySfcViewDto>(dtoOrdered, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
     }
 }

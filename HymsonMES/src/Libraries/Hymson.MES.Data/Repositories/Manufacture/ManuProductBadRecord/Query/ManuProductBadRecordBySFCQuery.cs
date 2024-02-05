@@ -1,14 +1,11 @@
 ﻿using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
 {
-    public  class ManuProductBadRecordBySfcQuery
+    /// <summary>
+    /// 
+    /// </summary>
+    public partial class ManuProductBadRecordBySfcQuery
     {
         /// <summary>
         /// 不合格记录开关;1、开启  2、关闭
@@ -28,6 +25,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
         /// <summary>
         /// 条码列表
         /// </summary>
-        public string[] Sfcs { get; set; }
+        public IEnumerable<string> SFCs { get; set; }
     }
 }

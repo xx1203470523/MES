@@ -33,4 +33,37 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         public string VehicleTypeName { get; set; }
     }
+
+    public class InteVehicleAboutVehicleTypeView : InteVehicleEntity
+    {
+        /// <summary>
+        /// 类型编码
+        /// </summary>
+        public string VehicleTypeCode { get; set; }
+
+        /// <summary>
+        /// 类型名称
+        /// </summary>
+        public string VehicleTypeName { get; set; }
+
+        /// <summary>
+        /// 状态;0-未启用 1-启用
+        /// </summary>
+        public DisableOrEnableEnum VehicleTypeStatus { get; set; }
+
+        /// <summary>
+        /// 行
+        /// </summary>
+        public int Row { get; set; }
+
+        /// <summary>
+        /// 列
+        /// </summary>
+        public int Column { get; set; }
+
+        /// <summary>
+        /// 单元数量
+        /// </summary>
+        public int CellQty { get; set; }
+    }
 }

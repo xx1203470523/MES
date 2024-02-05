@@ -1,20 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活（物理删除） 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-12 11:14:23
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -24,6 +14,12 @@ namespace Hymson.MES.Data.Repositories.Plan
     public partial class PlanWorkOrderBindRepository : BaseRepository, IPlanWorkOrderBindRepository
     {
         private readonly IMemoryCache _memoryCache;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        /// <param name="memoryCache"></param>
         public PlanWorkOrderBindRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
             _memoryCache = memoryCache;
@@ -86,11 +82,6 @@ namespace Hymson.MES.Data.Repositories.Plan
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
 
             var offSet = (planWorkOrderBindPagedQuery.PageIndex - 1) * planWorkOrderBindPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
@@ -214,14 +205,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class PlanWorkOrderBindRepository
     {
-        #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order_bind` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `plan_work_order_bind` /**where**/ ";
-        const string GetPlanWorkOrderBindEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `plan_work_order_bind` /**where**/  ";
+        const string GetPlanWorkOrderBindEntitiesSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order_bind` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `plan_work_order_bind`(  `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId`, UpdatedBy ,UpdatedOn ,IsDeleted ) VALUES (   @Id, @EquipmentId, @ResourceId, @WorkOrderId, @CreatedBy, @CreatedOn, @SiteId , @UpdatedBy ,@UpdatedOn ,@IsDeleted  )  ";
         const string InsertsSql = "INSERT INTO `plan_work_order_bind`(  `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId` , UpdatedBy ,UpdatedOn ,IsDeleted ) VALUES (   @Id, @EquipmentId, @ResourceId, @WorkOrderId, @CreatedBy, @CreatedOn, @SiteId,@UpdatedBy ,@UpdatedOn ,@IsDeleted )  ";
@@ -232,19 +223,14 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string DeleteSql = "UPDATE `plan_work_order_bind` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order_bind` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId`,UpdatedBy ,UpdatedOn ,IsDeleted
-                            FROM `plan_work_order_bind`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId`,UpdatedBy ,UpdatedOn ,IsDeleted
-                            FROM `plan_work_order_bind`  WHERE Id IN @Ids ";
-        #endregion
+        const string GetByIdSql = @"SELECT * FROM `plan_work_order_bind`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `plan_work_order_bind`  WHERE Id IN @Ids ";
 
         const string DeletesTrueByResourceIdSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId ";
         const string DeletesTrueByResourceIdAndWorkOrderIdsSql = "Delete from `plan_work_order_bind` WHERE ResourceId=@ResourceId And WorkOrderId in @WorkOrderIds ";
 
-        const string GetByResourceIdSql = @"SELECT  
-                               `Id`, `EquipmentId`, `ResourceId`, `WorkOrderId`, `CreatedBy`, `CreatedOn`, `SiteId`,UpdatedBy ,UpdatedOn ,IsDeleted
-                            FROM `plan_work_order_bind`  WHERE  IsDeleted=0 AND SiteId=@SiteId AND ResourceId = @ResourceId ";
+        const string GetByResourceIdSql = @"SELECT * FROM `plan_work_order_bind`  WHERE  IsDeleted=0 AND SiteId=@SiteId AND ResourceId = @ResourceId ";
+
     }
+
 }

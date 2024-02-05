@@ -3,7 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process.Parameter.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -88,9 +88,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="pagedQuery"></param>
+        /// <param name="procParameterPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery pagedQuery)
+        public async Task<PagedInfo<ProcParameterEntity>> GetPagedListAsync(ProcParameterPagedQuery procParameterPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -99,48 +99,46 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            //if (procParameterPagedQuery.SiteId != 0)
-            //{
             sqlBuilder.Where(" SiteId = @SiteId ");
-            //}
 
-            if (pagedQuery.ParameterUnit.HasValue)
+            if (!string.IsNullOrEmpty(procParameterPagedQuery.ParameterUnit))
             {
-                sqlBuilder.Where("ParameterUnit = @ParameterUnit");
+                procParameterPagedQuery.ParameterUnit = $"%{procParameterPagedQuery.ParameterUnit}%";
+                sqlBuilder.Where("ParameterUnit LIKE @ParameterUnit");
             }
 
-            if (pagedQuery.DataType.HasValue)
+            if (procParameterPagedQuery.DataType.HasValue)
             {
                 sqlBuilder.Where("DataType = @DataType");
             }
 
-            if (!string.IsNullOrWhiteSpace(pagedQuery.ParameterCode))
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterCode))
             {
-                pagedQuery.ParameterCode = $"%{pagedQuery.ParameterCode}%";
+                procParameterPagedQuery.ParameterCode = $"%{procParameterPagedQuery.ParameterCode}%";
                 sqlBuilder.Where(" ParameterCode LIKE @ParameterCode ");
             }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.ParameterName))
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.ParameterName))
             {
-                pagedQuery.ParameterName = $"%{pagedQuery.ParameterName}%";
+                procParameterPagedQuery.ParameterName = $"%{procParameterPagedQuery.ParameterName}%";
                 sqlBuilder.Where(" ParameterName LIKE @ParameterName ");
             }
-            if (!string.IsNullOrWhiteSpace(pagedQuery.Remark))
+            if (!string.IsNullOrWhiteSpace(procParameterPagedQuery.Remark))
             {
-                pagedQuery.Remark = $"%{pagedQuery.Remark}%";
+                procParameterPagedQuery.Remark = $"%{procParameterPagedQuery.Remark}%";
                 sqlBuilder.Where(" Remark LIKE @Remark ");
             }
 
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            var offSet = (procParameterPagedQuery.PageIndex - 1) * procParameterPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
+            sqlBuilder.AddParameters(new { Rows = procParameterPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procParameterPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procParameterEntitiesTask = conn.QueryAsync<ProcParameterEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procParameterEntities = await procParameterEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcParameterEntity>(procParameterEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcParameterEntity>(procParameterEntities, procParameterPagedQuery.PageIndex, procParameterPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -159,7 +157,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("SiteId = @SiteId");
                 sqlBuilder.Select("*");
 
-                if (string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode) == false)
+                if (!string.IsNullOrWhiteSpace(procParameterQuery.ParameterCode))
                 {
                     sqlBuilder.Where("ParameterCode = @ParameterCode");
                 }
@@ -179,6 +177,19 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertSql, procParameterEntity);
+        }
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<ProcParameterEntity> entities)
+        {
+            if (entities == null || !entities.Any()) return 0;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertsSql, entities);
         }
 
         /// <summary>
@@ -203,6 +214,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetProcParameterEntitiesSqlTemplate = @"SELECT /**select**/ FROM `proc_parameter` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, DataType, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @DataType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `proc_parameter`(  `Id`, `SiteId`, `ParameterCode`, `ParameterName`, `ParameterUnit`, DataType, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @ParameterCode, @ParameterName, @ParameterUnit, @DataType, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_parameter` SET ParameterUnit = @ParameterUnit, DataType = @DataType, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn  WHERE Id = @Id ";
         const string DeleteSql = "UPDATE `proc_parameter` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `proc_parameter` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids";

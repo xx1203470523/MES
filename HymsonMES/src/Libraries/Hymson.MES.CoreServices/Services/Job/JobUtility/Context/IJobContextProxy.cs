@@ -51,5 +51,13 @@ namespace Hymson.MES.CoreServices.Services.Job.JobUtility.Context
         /// <returns></returns>
         Task<TResult?> GetValueAsync<T, TResult>(Func<T, Task<TResult>> func, T parameter);
 
+        /// <summary>
+        /// 存放
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        object Set(uint key, object value);
+
     }
 }

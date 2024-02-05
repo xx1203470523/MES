@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.CoreServices.Dtos.Common;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Process;
 using System;
@@ -36,6 +37,14 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// <returns></returns>
         Task<PagedInfo<ProcResourceDto>> GetListAsync(ProcResourcePagedQueryDto query);
 
+
+        /// <summary>
+        /// 更具线体和工序查询资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceDto>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdDto query);
+
         /// <summary>
         /// 查询资源类型下关联的资源(资源类型详情：可用资源，已分配资源)
         /// </summary>
@@ -48,7 +57,7 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query);
+        Task<PagedInfo<ProcResourceViewDto>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQueryDto query);
 
         /// <summary>
         /// 资源关联打印机数据
@@ -112,6 +121,13 @@ namespace Hymson.MES.Services.Services.Process.Resource
         /// <param name="resourceId"></param>
         /// <returns></returns>
         Task<IEnumerable<SelectOptionDto>> QueryEquipmentsByResourceIdAsync(long resourceId);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
 
     }
 }

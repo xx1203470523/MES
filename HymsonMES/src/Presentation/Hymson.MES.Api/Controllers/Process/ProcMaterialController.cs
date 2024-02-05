@@ -1,4 +1,6 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
@@ -8,10 +10,7 @@ namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（物料维护）
-    /// @author Karl
-    /// @date 2023-02-08 04:47:44
     /// </summary>
-
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcMaterialController : ControllerBase
@@ -26,6 +25,7 @@ namespace Hymson.MES.Api.Controllers.Process
         /// 构造函数（物料维护）
         /// </summary>
         /// <param name="procMaterialService"></param>
+        /// <param name="logger"></param>
         public ProcMaterialController(IProcMaterialService procMaterialService, ILogger<ProcMaterialController> logger)
         {
             _procMaterialService = procMaterialService;
@@ -114,10 +114,94 @@ namespace Hymson.MES.Api.Controllers.Process
         [Route("delete")]
         [LogDescription("物料维护", BusinessType.DELETE)]
         [PermissionDescription("proc:material:delete")]
-        public async Task<int> DeleteProcMaterialAsync([FromBody] long[] ids)
+        public async Task DeleteProcMaterialAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
-           return await _procMaterialService.DeletesProcMaterialAsync(ids);
+           await _procMaterialService.DeletesProcMaterialAsync(ids);
+        }
+
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（物料维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto {Id=id,Status= SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（物料维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（物料维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("物料维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:material:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 导入物料数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [PermissionDescription("proc:material:import")]
+        public async Task ImportProcMaterialAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+            await _procMaterialService.ImportProcMaterialAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procMaterialService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"物料导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导出物料信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:material:export")]
+        public async Task<ProcMaterialExportResultDto> ExprotProcMaterialListAsync([FromQuery] ProcMaterialPagedQueryDto param)
+        {
+            return await _procMaterialService.ExprotProcMaterialListAsync(param);
         }
 
     }

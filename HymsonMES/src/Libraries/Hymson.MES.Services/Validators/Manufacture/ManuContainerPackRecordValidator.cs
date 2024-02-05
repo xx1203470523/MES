@@ -17,8 +17,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public ManuContainerPackRecordCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+
         }
     }
 
@@ -29,8 +28,7 @@ namespace Hymson.MES.Services.Validators.Manufacture
     {
         public ManuContainerPackRecordModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111");
+
         }
     }
 }

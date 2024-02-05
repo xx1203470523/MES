@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -58,6 +59,21 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            var key = $"proc_resource&{query.Site}&{query.Code}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                return await conn.QueryFirstOrDefaultAsync<ProcResourceEntity>(GetByCodeSql, query);
+            });
+        }
+
+        /// <summary>
         /// 查询某些资源类型下关联的资源列表
         /// </summary>
         /// <param name="query"></param>
@@ -84,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids)
+        public async Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync( IEnumerable<long>   ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<ProcResourceEntity>(GetByIdsSql, new { Ids = ids });
@@ -177,14 +193,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             if (query.ResTypeId.HasValue && query.ResTypeId > 0)
             {
-                //if (query.ResTypeId == 0)
-                //{
-                //    sqlBuilder.Where("a.ResTypeId=0");
-                //}
-                //else
-                //{
                 sqlBuilder.Where(" a.ResTypeId=@ResTypeId");
-                //}
             }
 
             // 这个是为了查询指定线体下的资源，大部分情况下这个 WorkCenterLineId 是不会有值的
@@ -207,11 +216,59 @@ namespace Hymson.MES.Data.Repositories.Process
         }
 
         /// <summary>
+        /// 更具线体和工序查询资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<PagedInfo<ProcResourceEntity>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
+            var templateCount = sqlBuilder.AddTemplate(GetPagedListCountSqlTemplate);
+            sqlBuilder.Select("proc_resource.*");
+            sqlBuilder.LeftJoin("inte_work_center_resource_relation  IWCRR ON IWCRR.IsDeleted = 0 AND  IWCRR.ResourceId = proc_resource.Id");
+            sqlBuilder.Where("proc_resource.IsDeleted=0");
+            sqlBuilder.Where("IWCRR.WorkCenterId  IN @WorkCenterLineIds ");
+            sqlBuilder.Where("proc_resource.ResTypeId = @ResTypeId ");
+            if (string.IsNullOrEmpty(query.Sorting))
+            {
+                sqlBuilder.OrderBy("proc_resource.UpdatedOn DESC");
+            }
+            else
+            {
+                sqlBuilder.OrderBy(query.Sorting);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            {
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("proc_resource.ResCode like @ResCode");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResName))
+            {
+                query.ResName = $"%{query.ResName}%";
+                sqlBuilder.Where("proc_resource.ResName like @ResName");
+            }
+
+            var offSet = (query.PageIndex - 1) * query.PageSize;
+            sqlBuilder.AddParameters(new { OffSet = offSet });
+            sqlBuilder.AddParameters(new { Rows = query.PageSize });
+            sqlBuilder.AddParameters(query);
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceView>(templateData.RawSql, templateData.Parameters);
+            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
+            var procResourceEntities = await procResourceEntitiesTask;
+            var totalCount = await totalCountTask;
+            return new PagedInfo<ProcResourceEntity>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
+        }
+
+        /// <summary>
         /// 获取资源分页列表
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceEntity>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query)
+        public async Task<PagedInfo<ProcResourceView>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoJoinDataSqlTemplate);
@@ -219,7 +276,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("r.IsDeleted = 0");
             sqlBuilder.Where("r.SiteId = @SiteId");
             sqlBuilder.OrderBy("r.UpdatedOn DESC");
-            sqlBuilder.Select("r.*");
+            sqlBuilder.Select("r.*,t.ResType,t.ResTypeName");
             sqlBuilder.LeftJoin("proc_resource_type t on r.ResTypeId = t.Id and t.IsDeleted=0");
             sqlBuilder.LeftJoin("proc_procedure p on p.ResourceTypeId =t.Id and p.IsDeleted=0");
 
@@ -235,17 +292,32 @@ namespace Hymson.MES.Data.Repositories.Process
             {
                 sqlBuilder.Where("r.Status = @Status");
             }
+            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            {
+                query.ResCode = $"%{query.ResCode}%";
+                sqlBuilder.Where("r.ResCode like @ResCode");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResName))
+            {
+                query.ResName = $"%{query.ResName}%";
+                sqlBuilder.Where("r.ResName like @ResName");
+            }
+            if (!string.IsNullOrWhiteSpace(query.ResType))
+            {
+                query.ResName = $"%{query.ResType}%";
+                sqlBuilder.Where("t.ResType like @ResType");
+            }
             var offSet = (query.PageIndex - 1) * query.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceEntity>(templateData.RawSql, templateData.Parameters);
+            var procResourceEntitiesTask = conn.QueryAsync<ProcResourceView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceEntities = await procResourceEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceEntity>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcResourceView>(procResourceEntities, query.PageIndex, query.PageSize, totalCount);
         }
 
         /// <summary>
@@ -403,7 +475,6 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.ExecuteAsync(ClearResourceTypeIds, command);
         }
 
-
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -426,6 +497,44 @@ namespace Hymson.MES.Data.Repositories.Process
             return await conn.QueryAsync<ProcResourceEntity>(GetByEquipmentIdsSql, new { EquipmentIds = query.EquipmentIds, SiteId = query.SiteId });
         }
 
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="procResourceQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceEntity>> GetProcResouceEntitiesAsync(ProcResourceQuery procResourceQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcResouceEntitiesSqlTemplate);
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+            sqlBuilder.Select("*");
+
+            if (procResourceQuery.Status.HasValue)
+            {
+                sqlBuilder.Where(" Status= @Status ");
+            }
+            if (procResourceQuery.ResTypeId.HasValue)
+            {
+                sqlBuilder.Where(" ResTypeId= @ResTypeId ");
+            }
+
+            sqlBuilder.AddParameters(procResourceQuery);
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            var procResources = await conn.QueryAsync<ProcResourceEntity>(template.RawSql, procResourceQuery);
+            return procResources;
+        }
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
     }
 
     /// <summary>
@@ -437,6 +546,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetByResTypeIdsSql = "select * from proc_resource where SiteId=@SiteId and ResTypeId in @Ids and IsDeleted =0 ";
         const string GetByIdsAndStatusSql = "select * from proc_resource where  Id  in @Ids and Status=@Status";
         const string GetByIdsSql = "select * from proc_resource  WHERE Id IN @ids and IsDeleted=0";
+        const string GetByCodeSql = "SELECT * FROM proc_resource WHERE `IsDeleted` = 0 AND SiteId = @Site AND ResCode = @Code LIMIT 1";
         const string GetByResourceCode = "SELECT Id, ResCode FROM proc_resource WHERE IsDeleted = 0 AND ResCode = @ResCode and SiteId =@SiteId ";
         const string GetByEquipmentCode = @"SELECT R.Id, R.ResCode FROM proc_resource_equipment_bind REB 
             LEFT JOIN equ_equipment E ON REB.EquipmentId = E.Id
@@ -450,7 +560,7 @@ namespace Hymson.MES.Data.Repositories.Process
         const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource a left join proc_resource_type b on a.ResTypeId =b.Id  /**where**/ ";
 
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource /**where**/";
+        const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM  proc_resource /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetPagedInfoJoinDataSqlTemplate = @"SELECT /**select**/ FROM proc_resource r /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoJoinCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource r /**innerjoin**/ /**leftjoin**/ /**where**/ ";
@@ -460,7 +570,7 @@ namespace Hymson.MES.Data.Repositories.Process
             "WHERE R.IsDeleted = 0 AND P.IsDeleted = 0  AND P.Id = @ProcedureId ";
 
         const string InsertSql = "INSERT INTO `proc_resource`(`Id`, `SiteId`, `ResCode`, `ResName`,`Status`,`ResTypeId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @ResCode, @ResName,@Status,@ResTypeId,@Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted); ";
-        const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId,Status = @Status, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
+        const string UpdateSql = "UPDATE `proc_resource` SET ResName = @ResName,ResTypeId = @ResTypeId, Remark = @Remark, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id;";
         const string DeleteSql = "UPDATE `proc_resource` SET `IsDeleted` = Id,UpdatedBy=@UpdatedBy,UpdatedOn=@UpdatedOn WHERE `Id` in @Ids;";
 
         const string UpdateResTypeSql = "UPDATE `proc_resource` SET ResTypeId = @ResTypeId,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id in @Ids;";
@@ -475,5 +585,10 @@ namespace Hymson.MES.Data.Repositories.Process
             WHERE R.IsDeleted = 0 
             AND REB.EquipmentId IN @EquipmentIds 
             AND REB.SiteId = @SiteId ";
+
+        const string GetProcResouceEntitiesSqlTemplate = @"SELECT  /**select**/ FROM `proc_resource` /**where**/  ";
+
+        const string UpdateStatusSql = "UPDATE `proc_resource` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
+
     }
 }

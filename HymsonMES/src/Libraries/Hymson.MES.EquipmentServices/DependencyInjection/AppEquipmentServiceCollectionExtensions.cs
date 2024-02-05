@@ -1,22 +1,15 @@
 ﻿using FluentValidation;
-using Hymson.MES.CoreServices.Services.Job;
-using Hymson.MES.EquipmentServices;
-using Hymson.MES.EquipmentServices.Dtos.InBound;
-using Hymson.MES.EquipmentServices.Services.Common;
-using Hymson.MES.EquipmentServices.Services.Job.Implementing;
-using Hymson.MES.EquipmentServices.Services.Manufacture.InStation;
-using Hymson.MES.EquipmentServices.Services.Parameter.ProductProcessCollection;
-using Hymson.MES.EquipmentServices.Services.SfcBinding;
-using Hymson.MES.EquipmentServices.Validators.InStation;
-using Hymson.MES.EquipmentServices.Validators.SfcBinding;
+using Hymson.Infrastructure;
+using Hymson.MES.CoreServices.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// 
     /// </summary>
-    public static class AppEquipmentServiceCollectionExtensions
+    public static partial class AppEquipmentServiceCollectionExtensions
     {
         /// <summary>
         /// 业务逻辑层依赖服务添加
@@ -27,10 +20,15 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddEquipmentService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddWebFrameworkService(configuration);
-            services.AddData(configuration);
+            services.AddCoreService(configuration);
             AddConfig(services, configuration);
+
             AddServices(services);
+            AddServicesForXinShiJie(services);
+
             AddValidators(services);
+            AddValidatorsForXinShiJie(services);
+
             return services;
         }
 
@@ -40,11 +38,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddServices(this IServiceCollection services)
         {
-            services.AddSingleton<ICommonService, CommonService>();
-            services.AddSingleton<IInStationService, InStationService>();
-            services.AddSingleton<IJobManufactureService, JobManuSfcConvertService>();
-            services.AddSingleton<ISfcBindingService, SfcBindingService>();
-            services.AddSingleton<IProductProcessCollectionService, ProductProcessCollectionService>();
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var keyValuePairs = typeFinder.GetInterfaceImplPairs("Service");
+            foreach (var keyValuePair in keyValuePairs)
+            {
+                services.TryAddSingleton(keyValuePair.Value, keyValuePair.Key);
+            }
         }
 
         /// <summary>
@@ -54,10 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="configuration"></param>
         private static void AddConfig(IServiceCollection services, IConfiguration configuration)
         {
-            //数据库连接
-            //services.Configure<TestOptions>(configuration.GetSection(nameof(TestOptions)));
-            //services.Configure<ConnectionOptions>(configuration);
-            //return services;
+
         }
 
         /// <summary>
@@ -66,8 +62,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services"></param>
         private static void AddValidators(IServiceCollection services)
         {
-            services.AddSingleton<AbstractValidator<InStationDto>, InStationValidator>();
-            services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
+            var typeFinder = Singleton<ITypeFinder>.Instance;
+            var abstractValidators = typeFinder.FindClassesOfType(typeof(IValidator<>)).ToList();
+            foreach (var abstractValidator in abstractValidators)
+            {
+                if (abstractValidator.BaseType != null)
+                {
+                    services.TryAddSingleton(abstractValidator.BaseType, abstractValidator);
+                }
+            }
         }
 
     }

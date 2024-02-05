@@ -214,50 +214,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
-
         /// <summary>
         /// 计划开始时间  时间范围  数组
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
 
-        //public DateTime? PlanStartTimeS
-        //{
-        //    get
-        //    {
-        //        return this.PlanStartTime != null && this.PlanStartTime.Length > 0 ? this.PlanStartTime[0] : null;
-
-        //        //if (!string.IsNullOrEmpty(this.PlanStartTime))
-        //        //{
-        //        //    var dateArr = this.PlanStartTime.Split(',');
-        //        //    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-        //        //}
-        //        //else 
-        //        //{
-        //        //    return null;
-        //        //}
-        //    }
-        //}
-
-        //public DateTime? PlanStartTimeE
-        //{
-        //    get
-        //    {
-        //        return this.PlanStartTime != null && this.PlanStartTime.Length > 1 ? this.PlanStartTime[1] : null;
-        //        //if (!string.IsNullOrEmpty(this.PlanStartTime))
-        //        //{
-        //        //    var dateArr = this.PlanStartTime.Split(',');
-        //        //    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-        //        //}
-        //        //else
-        //        //{
-        //        //    return null;
-        //        //}
-        //    }
-        //}
     }
 
     /// <summary>
@@ -269,11 +230,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 资源Id
         /// </summary>
         public long? ResourceId { get; set; }
-
-        ///// <summary>
-        ///// 线体Id
-        ///// </summary>
-        //public long? LineId { get; set; }
 
         /// <summary>
         /// 是否激活
@@ -301,50 +257,11 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// </summary>
         public PlanWorkOrderStatusEnum? Status { get; set; }
 
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
-
         /// <summary>
         /// 计划开始时间  时间范围  数组
         /// </summary>
         public DateTime[]? PlanStartTime { get; set; }
 
-        //public DateTime? PlanStartTimeS
-        //{
-        //    get
-        //    {
-        //        return this.PlanStartTime != null && this.PlanStartTime.Length > 0 ? this.PlanStartTime[0] : null;
-
-        //        //if (!string.IsNullOrEmpty(this.PlanStartTime))
-        //        //{
-        //        //    var dateArr = this.PlanStartTime.Split(',');
-        //        //    return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-        //        //}
-        //        //else 
-        //        //{
-        //        //    return null;
-        //        //}
-        //    }
-        //}
-
-        //public DateTime? PlanStartTimeE
-        //{
-        //    get
-        //    {
-        //        return this.PlanStartTime != null && this.PlanStartTime.Length > 1 ? this.PlanStartTime[1] : null;
-        //        //if (!string.IsNullOrEmpty(this.PlanStartTime))
-        //        //{
-        //        //    var dateArr = this.PlanStartTime.Split(',');
-        //        //    return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-        //        //}
-        //        //else
-        //        //{
-        //        //    return null;
-        //        //}
-        //    }
-        //}
     }
 
 
@@ -458,11 +375,6 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 工厂
         /// </summary>
         public long SiteId { get; set; }
-
-        ///// <summary>
-        ///// 是否锁定
-        ///// </summary>
-        //public YesOrNoEnum? IsLocked { get; set; }
 
         /// <summary>
         /// 超生产比例;默认是0，若允许超产，则写超产的%比例

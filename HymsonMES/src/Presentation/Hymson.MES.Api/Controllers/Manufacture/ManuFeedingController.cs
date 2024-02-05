@@ -1,8 +1,6 @@
 using Hymson.MES.CoreServices.Dtos.Common;
-using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Manufacture
@@ -10,7 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
     /// <summary>
     /// 控制器（物料加载）
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ManuFeedingController : ControllerBase
@@ -77,17 +74,15 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuFeedingService.GetFeedingMaterialListAsync(queryDto);
         }
 
-
-
         /// <summary>
         /// 添加（物料加载）
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task CreateAsync(ManuFeedingMaterialSaveDto saveDto)
+        public async Task<ManuFeedingMaterialResponseDto> CreateAsync(ManuFeedingMaterialSaveDto saveDto)
         {
-            await _manuFeedingService.CreateAsync(saveDto);
+            return await _manuFeedingService.CreateAsync(saveDto);
         }
 
         /// <summary>

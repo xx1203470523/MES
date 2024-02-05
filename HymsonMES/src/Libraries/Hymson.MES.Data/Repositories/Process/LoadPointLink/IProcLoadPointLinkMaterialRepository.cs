@@ -8,6 +8,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,6 +98,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="resourceId"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByResourceIdAsync(long resourceId);
+
+        /// <summary>
+        /// 根据IDs批量获取数据
+        /// </summary>
+        /// <param name="loadPointIds"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcLoadPointLinkMaterialEntity>> GetByLoadPointIdAsync(IEnumerable<long> loadPointIds);
 
         /// <summary>
         /// 获取List

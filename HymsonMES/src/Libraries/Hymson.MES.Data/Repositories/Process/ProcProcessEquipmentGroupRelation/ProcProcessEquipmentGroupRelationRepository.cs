@@ -20,11 +20,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 
         /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="connectionOptions"></param>
         public ProcProcessEquipmentGroupRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 

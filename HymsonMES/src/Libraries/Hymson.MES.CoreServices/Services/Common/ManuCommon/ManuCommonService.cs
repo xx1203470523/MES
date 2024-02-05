@@ -8,11 +8,16 @@ using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.CoreServices.Bos.Common;
 using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.CoreServices.Services.Common.ManuExtension;
+using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcProduce.Query;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
+using Hymson.MES.Data.Repositories.Process.Resource;
 using System.Data;
 using System.Text.Json;
 
@@ -21,7 +26,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
     /// <summary>
     /// 生产公共类
     /// </summary>
-    public class ManuCommonService : IManuCommonService
+    public partial class ManuCommonService : IManuCommonService
     {
         /// <summary>
         /// 
@@ -44,6 +49,21 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         private readonly IManuContainerPackRepository _manuContainerPackRepository;
 
         /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
+        /// <summary>
+        /// 仓储接口（资源维护）
+        /// </summary>
+        private readonly IProcResourceRepository _procResourceRepository;
+
+        /// <summary>
+        /// 仓储接口（工序维护）
+        /// </summary>
+        private readonly IProcProcedureRepository _procProcedureRepository;
+
+        /// <summary>
         /// 仓储接口（BOM明细）
         /// </summary>
         private readonly IProcBomDetailRepository _procBomDetailRepository;
@@ -58,39 +78,86 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// </summary>
         private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
 
+        /// <summary>
+        /// 仓储接口（载具注册）
+        /// </summary>
+        private readonly IInteVehicleRepository _inteVehicleRepository;
+
+        /// <summary>
+        /// 仓储接口（二维载具条码明细）
+        /// </summary>
+        private readonly IInteVehiceFreightStackRepository _inteVehiceFreightStackRepository;
+
+        /// <summary>
+        /// 仓储接口（载具类型）
+        /// </summary>
+        private readonly IInteVehicleTypeRepository _inteVehicleTypeRepository;
+
+        /// <summary>
+        /// 条码仓储
+        /// </summary>
+        private readonly IManuSfcRepository _manuSfcRepository;
+
+        /// <summary>
+        /// 条码信息仓储
+        /// </summary>
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+
+        /// <summary>
+        /// 工单
+        /// </summary>
+        private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="sequenceService"></param>
         /// <param name="localizationService"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="manuSfcCirculationRepository"></param>
         /// <param name="manuContainerPackRepository"></param>
-        /// <param name="planWorkOrderRepository"></param>
-        /// <param name="planWorkOrderActivationRepository"></param>
+        /// <param name="equEquipmentRepository"></param>
         /// <param name="procResourceRepository"></param>
+        /// <param name="procProcedureRepository"></param>
         /// <param name="procBomDetailRepository"></param>
         /// <param name="procMaterialRepository"></param>
-        /// <param name="procProcedureRepository"></param>
-        /// <param name="procProcessRouteDetailLinkRepository"></param>
-        /// <param name="procProcessRouteDetailNodeRepository"></param>
-        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="procMaskCodeRuleRepository"></param>
+        /// <param name="inteVehicleRepository"></param>
+        /// <param name="inteVehiceFreightStackRepository"></param>
+        /// <param name="inteVehicleTypeRepository"></param>
         public ManuCommonService(ILocalizationService localizationService,
-            IManuSfcProduceRepository manuSfcProduceRepository,
-            IManuSfcCirculationRepository manuSfcCirculationRepository,
-            IManuContainerPackRepository manuContainerPackRepository,
-            IProcBomDetailRepository procBomDetailRepository,
-            IProcMaterialRepository procMaterialRepository,
-            IProcMaskCodeRuleRepository procMaskCodeRuleRepository)
+                           IManuSfcProduceRepository manuSfcProduceRepository,
+                           IManuSfcCirculationRepository manuSfcCirculationRepository,
+                           IManuContainerPackRepository manuContainerPackRepository,
+                           IEquEquipmentRepository equEquipmentRepository,
+                           IProcResourceRepository procResourceRepository,
+                           IProcProcedureRepository procProcedureRepository,
+                           IProcBomDetailRepository procBomDetailRepository,
+                           IProcMaterialRepository procMaterialRepository,
+                           IProcMaskCodeRuleRepository procMaskCodeRuleRepository,
+                           IInteVehicleRepository inteVehicleRepository,
+                           IInteVehiceFreightStackRepository inteVehiceFreightStackRepository,
+                           IInteVehicleTypeRepository inteVehicleTypeRepository,
+                           IManuSfcInfoRepository manuSfcInfoRepository,
+                           IPlanWorkOrderRepository planWorkOrderRepository,
+                           IManuSfcRepository manuSfcRepository
+                           )
         {
             _localizationService = localizationService;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _manuContainerPackRepository = manuContainerPackRepository;
+            _equEquipmentRepository = equEquipmentRepository;
+            _procResourceRepository = procResourceRepository;
+            _procProcedureRepository = procProcedureRepository;
             _procBomDetailRepository = procBomDetailRepository;
             _procMaterialRepository = procMaterialRepository;
             _procMaskCodeRuleRepository = procMaskCodeRuleRepository;
+            _inteVehicleRepository = inteVehicleRepository;
+            _inteVehiceFreightStackRepository = inteVehiceFreightStackRepository;
+            _inteVehicleTypeRepository = inteVehicleTypeRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _planWorkOrderRepository= planWorkOrderRepository;
+            _manuSfcRepository= manuSfcRepository;
         }
 
         /// <summary>
@@ -158,7 +225,6 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
             if (manuContainerPackEntities != null && manuContainerPackEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18015)).WithData("SFC", string.Join(",", sfcBos.SFCs));
-                //throw new CustomerValidationException(nameof(ErrorCode.MES18019)).WithData("SFC", string.Join(",", sfcs));
             }
         }
 
@@ -174,8 +240,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
 
             // 过滤出当前工序对应的物料（数据收集方式为内部和外部）
             procBomDetailEntities = procBomDetailEntities.Where(w => w.ProcedureId == procedureBomBo.ProcedureId && w.DataCollectionWay != MaterialSerialNumberEnum.Batch);
-            if (procBomDetailEntities == null || procBomDetailEntities.Any() == false) return;
-
+            if (procBomDetailEntities == null || !procBomDetailEntities.Any()) return;
             // 流转信息（多条码）
             var sfcCirculationEntities = await _manuSfcCirculationRepository.GetSfcMoudulesAsync(new ManuSfcCirculationBySfcsQuery
             {
@@ -190,7 +255,7 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
                 IsDisassemble = TrueOrFalseEnum.No
             });
 
-            if (sfcCirculationEntities == null || sfcCirculationEntities.Any() == false)
+            if (sfcCirculationEntities == null || !sfcCirculationEntities.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16323));
             }
@@ -222,23 +287,171 @@ namespace Hymson.MES.CoreServices.Services.Common.ManuCommon
         /// <param name="barCode"></param>
         /// <param name="materialId"></param>
         /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
         public async Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId)
         {
             var material = await _procMaterialRepository.GetByIdAsync(materialId)
                 ?? throw new CustomerValidationException(nameof(ErrorCode.MES10204));
 
             // 物料未设置掩码
-            if (material.MaskCodeId.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (!material.MaskCodeId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             // 未设置规则
             var maskCodeRules = await _procMaskCodeRuleRepository.GetByMaskCodeIdAsync(material.MaskCodeId.Value);
-            if (maskCodeRules == null || maskCodeRules.Any() == false) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
+            if (maskCodeRules == null || !maskCodeRules.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES16616)).WithData("barCode", barCode);
 
             return barCode.VerifyBarCode(maskCodeRules);
         }
 
-        #region 内部方法
+        /// <summary>
+        /// 获取载具里面的条码（带验证）
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<VehicleSFCResponseBo>> GetSFCsByVehicleCodesAsync(VehicleSFCRequestBo requestBo)
+        {
+            if (requestBo.VehicleCodes == null || !requestBo.VehicleCodes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18623)).WithData("Code", "");
+            }
 
-        #endregion
+            // 读取载具信息
+            var vehicleEntities = await _inteVehicleRepository.GetByCodesAsync(new EntityByCodesQuery
+            {
+                SiteId = requestBo.SiteId,
+                Codes = requestBo.VehicleCodes
+            });
+
+            // 不在系统中的载具代码
+            var notInSystem = requestBo.VehicleCodes.Except(vehicleEntities.Select(s => s.Code));
+            if (notInSystem.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18624))
+                    .WithData("Code", string.Join(',', notInSystem));
+            }
+
+            // 检查是否是"禁用"状态的载具
+            var disabledVehicles = vehicleEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicles.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18625))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
+
+            // 检查是否是"禁用"状态的载具类型
+            var vehicleTypeEntities = await _inteVehicleTypeRepository.GetByIdsAsync(vehicleEntities.Select(s => s.VehicleTypeId));
+            var disabledVehicleTypes = vehicleTypeEntities.Where(w => w.Status == DisableOrEnableEnum.Disable);
+            if (disabledVehicleTypes.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18627))
+                    .WithData("Code", string.Join(',', disabledVehicleTypes.Select(s => s.Code)));
+            }
+
+            // 查询载具关联的条码明细
+            var vehicleFreightStackEntities = await _inteVehiceFreightStackRepository.GetEntitiesAsync(new EntityByParentIdsQuery
+            {
+                SiteId = requestBo.SiteId,
+                ParentIds = vehicleEntities.Select(s => s.Id)
+            });
+
+            if (!vehicleFreightStackEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES18626))
+                    .WithData("Code", string.Join(',', disabledVehicles.Select(s => s.Code)));
+            }
+
+            // 查询载具里面所有的条码
+            var allProduceEntities = await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery
+            {
+                SiteId = requestBo.SiteId,
+                Sfcs = vehicleFreightStackEntities.Select(s => s.BarCode)
+            });
+
+            List<VehicleSFCResponseBo> list = new();
+            var validationFailures = new List<ValidationFailure>();
+            var vehicleFreightStackDic = vehicleFreightStackEntities.ToLookup(w => w.VehicleId).ToDictionary(d => d.Key, d => d);
+            foreach (var item in vehicleFreightStackDic)
+            {
+                var vehicleEntity = vehicleEntities.FirstOrDefault(f => f.Id == item.Key);
+                if (vehicleEntity == null) continue;
+
+                // 验证产品序列码的编码/版本是否一致
+                var sfcProduceEntities = allProduceEntities.Where(w => item.Value.Select(s => s.BarCode).Contains(w.SFC));
+                var productIds = sfcProduceEntities.Select(s => s.ProductId).Distinct();
+                if (productIds.Count() > 1)
+                {
+                    var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", vehicleEntity.Code);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("Code", vehicleEntity.Code);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES18628);
+                    validationFailures.Add(validationFailure);
+                    continue;
+                }
+                else
+                {
+                    list.AddRange(item.Value.Select(s => new VehicleSFCResponseBo { SFC = s.BarCode, VehicleCode = vehicleEntity.Code }));
+                }
+            }
+
+            if (validationFailures.Any())
+            {
+                throw new ValidationException("", validationFailures);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// 获取当前生产对象
+        /// </summary>
+        /// <param name="requestBo"></param>
+        /// <returns></returns>
+        public async Task<ManufactureResponseBo> GetManufactureBoAsync(ManufactureRequestBo requestBo)
+        {
+            // 查询资源
+            var resourceEntity = await _procResourceRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = requestBo.SiteId,
+                Code = requestBo.ResourceCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", requestBo.ResourceCode);
+
+            // 根据设备
+            var equipmentEntity = await _equEquipmentRepository.GetByCodeAsync(new EntityByCodeQuery
+            {
+                Site = requestBo.SiteId,
+                Code = requestBo.EquipmentCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19005)).WithData("Code", requestBo.EquipmentCode);
+
+            // 读取设备绑定的资源
+            var resourceBindEntities = await _procResourceRepository.GetByEquipmentCodeAsync(new ProcResourceQuery
+            {
+                SiteId = requestBo.SiteId,
+                EquipmentCode = requestBo.EquipmentCode
+            });
+            if (resourceBindEntities == null || !resourceBindEntities.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19131))
+                    .WithData("ResCode", requestBo.ResourceCode)
+                    .WithData("EquCode", requestBo.EquipmentCode);
+            }
+
+            // 读取资源对应的工序（只查询启用状态）
+            var procProcedureEntities = await _procProcedureRepository.GetProcProduresByResourceIdAsync(new ProcProdureByResourceIdQuery
+            {
+                SiteId = requestBo.SiteId,
+                ResourceId = resourceEntity.Id
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19913)).WithData("ResCode", requestBo.ResourceCode);
+
+            var procProcedureEntity = procProcedureEntities.FirstOrDefault(f => f.Status == SysDataStatusEnum.Enable || f.Status == SysDataStatusEnum.Retain)
+                ?? throw new CustomerValidationException(nameof(ErrorCode.MES19935)).WithData("ResCode", requestBo.ResourceCode);
+
+            return new ManufactureResponseBo
+            {
+                ResourceId = resourceEntity.Id,
+                ProcedureId = procProcedureEntity.Id,
+                EquipmentId = equipmentEntity.Id
+            };
+        }
+
     }
 }

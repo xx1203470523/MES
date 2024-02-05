@@ -1,5 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Report;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -18,14 +20,14 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterCreateDto"></param>
         /// <returns></returns>
         Task<int> CreateProcParameterAsync(ProcParameterCreateDto procParameterCreateDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procParameterDto"></param>
+        /// <param name="procParameterModifyDto"></param>
         /// <returns></returns>
         Task ModifyProcParameterAsync(ProcParameterModifyDto procParameterModifyDto);
 
@@ -49,5 +51,25 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcParameterDto> QueryProcParameterByIdAsync(long id);
+
+        /// <summary>
+        /// 导入参数表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportParameterAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 根据查询条件导出标准参数信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<ParameterExportResultDto> ExprotParameterListAsync(ProcParameterPagedQueryDto param);
     }
 }

@@ -1,11 +1,4 @@
-﻿using Confluent.Kafka;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hymson.MES.Core.Attribute.Job
+﻿namespace Hymson.MES.Core.Attribute.Job
 {
     /// <summary>
     /// 作业特性

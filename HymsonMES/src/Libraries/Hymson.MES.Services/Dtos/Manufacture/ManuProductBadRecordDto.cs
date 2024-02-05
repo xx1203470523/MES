@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.QualUnqualifiedCode;
 
@@ -120,20 +121,21 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long? BadProcessRouteId { get; set; }
 
-        ///// <summary>
-        // /// 不合格记录开关;1、开启  2、关闭
-        // /// </summary>
-        // public int? Status { get; set; }
-
-        ///// <summary>
-        // /// 不良来源;·1、设备复投不良  2、人工录入不良
-        // /// </summary>
-        // public int? Source { get; set; }
-
         /// <summary>
         /// 说明
         /// </summary>
         public string? Remark { get; set; }
+    }
+
+    /// <summary>
+    /// 面板的产品不良录入新增Dto
+    /// </summary>
+    public record FacePlateManuProductBadRecordCreateDto: ManuProductBadRecordCreateDto
+    {
+        /// <summary>
+        /// 条码类型
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; } = ManuFacePlateBarcodeTypeEnum.Product;
     }
 
     /// <summary>
@@ -222,11 +224,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
     /// </summary>
     public class ManuProductBadRecordPagedQueryDto : PagerInfo
     {
-        ///// <summary>
-        ///// 描述 :站点编码 
-        ///// 空值 : false  
-        ///// </summary>
-        //public string SiteCode { get; set; }
+        
     }
 
     public class ManuProductBadRecordQueryDto
@@ -314,6 +312,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 不合格代码
         /// </summary>
         public long UnqualifiedId { get; set; }
+
+        /// <summary>
+        /// 是否关闭
+        /// </summary>
+        public bool? IsClosed { get; set; }
+
         /// <summary>
         /// 备注
         /// </summary>

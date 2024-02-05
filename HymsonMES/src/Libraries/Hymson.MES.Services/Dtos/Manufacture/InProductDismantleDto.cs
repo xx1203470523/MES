@@ -106,7 +106,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 组件的产品描述信息
         /// </summary>
-        public string MaterialRemark{get;set;}
+        public string MaterialRemark { get; set; }
 
         /// <summary>
         /// 资源
@@ -116,12 +116,12 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 状态,活动、移除、全部
         /// </summary>
-        public InProductDismantleTypeEnum Status { get; set; }
+        public SFCCirculationReportTypeEnum Status { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        public  string UpdatedBy { get; set; }
+        public string UpdatedBy { get; set; }
 
         /// <summary>
         /// 操作人员
@@ -144,7 +144,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 查看类型
         /// </summary>
-        public InProductDismantleTypeEnum Type { get; set; }
+        public SFCCirculationReportTypeEnum Type { get; set; }
     }
 
     public class InProductDismantleRemoveDto
@@ -165,6 +165,9 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public long ProcedureId { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class InProductDismantleAddDto
     {
         /// <summary>
@@ -205,10 +208,18 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 是否组装
         /// </summary>
-        public bool IsAssemble { get; set; }=true;
+        public bool IsAssemble { get; set; } = true;
+
+        /// <summary>
+        /// 位置号
+        /// </summary>
+        public string? Location { get; set; }
     }
 
-    public class InProductDismantleReplaceDto: InProductDismantleAddDto
+    /// <summary>
+    /// 
+    /// </summary>
+    public class InProductDismantleReplaceDto : InProductDismantleAddDto
     {
         /// <summary>
         /// 被替换的旧的条码
@@ -258,7 +269,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 查看类型
         /// </summary>
-        public InProductDismantleTypeEnum Type { get; set; }
+        public SFCCirculationReportTypeEnum Type { get; set; }
     }
 
     public class BarCodeDataCollectionWayQueryDto

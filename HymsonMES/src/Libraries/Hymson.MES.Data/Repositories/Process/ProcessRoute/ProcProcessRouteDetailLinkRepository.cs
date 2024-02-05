@@ -3,6 +3,7 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Constants.Process;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
@@ -97,9 +98,9 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procProcessRouteDetailLinkPagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcProcessRouteDetailLinkEntity>> GetPagedInfoAsync(ProcProcessRouteDetailLinkPagedQuery query)
+        public async Task<PagedInfo<ProcProcessRouteDetailLinkEntity>> GetPagedInfoAsync(ProcProcessRouteDetailLinkPagedQuery procProcessRouteDetailLinkPagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -110,36 +111,40 @@ namespace Hymson.MES.Data.Repositories.Process
 
             sqlBuilder.Where("SiteId = @SiteId");
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procProcessRouteDetailLinkPagedQuery.PageIndex - 1) * procProcessRouteDetailLinkPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procProcessRouteDetailLinkPagedQuery.PageSize });
+            sqlBuilder.AddParameters(procProcessRouteDetailLinkPagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procProcessRouteDetailLinkEntitiesTask = conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcessRouteDetailLinkEntities = await procProcessRouteDetailLinkEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcProcessRouteDetailLinkEntity>(procProcessRouteDetailLinkEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcProcessRouteDetailLinkEntity>(procProcessRouteDetailLinkEntities, procProcessRouteDetailLinkPagedQuery.PageIndex, procProcessRouteDetailLinkPagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
-        /// 查询List
+        /// 查询List（已缓存）
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(ProcProcessRouteDetailLinkQuery query)
+        public async Task<IEnumerable<ProcProcessRouteDetailLinkEntity>> GetListAsync(EntityBySiteIdQuery query)
         {
-            var sqlBuilder = new SqlBuilder();
-            var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Select("*");
-            sqlBuilder.Where("ProcessRouteId=@ProcessRouteId");
-            sqlBuilder.AddParameters(query);
+            var key = $"proc_process_route_detail_link&SiteId={query.SiteId}";
+            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
+            {
+                var sqlBuilder = new SqlBuilder();
+                var template = sqlBuilder.AddTemplate(GetListSqlTemplate);
+                sqlBuilder.Where("IsDeleted = 0");
+                sqlBuilder.Select("*");
+                sqlBuilder.Where("SiteId = @SiteId");
+                sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
-            return procProcessRouteDetailLinkEntities;
+                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                var procProcessRouteDetailLinkEntities = await conn.QueryAsync<ProcProcessRouteDetailLinkEntity>(template.RawSql, template.Parameters);
+                return procProcessRouteDetailLinkEntities;
+            });
         }
 
         /// <summary>
@@ -227,9 +232,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_link` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_process_route_detail_link` /**where**/ ";
-        const string GetListSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_process_route_detail_link` /**where**/  ";
+        const string GetListSqlTemplate = @"SELECT /**select**/ FROM `proc_process_route_detail_link` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_process_route_detail_link`(  `Id`, `SiteId`, `SerialNo`, `ProcessRouteId`, `PreProcessRouteDetailId`, `ProcessRouteDetailId`, `Extra1`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SerialNo, @ProcessRouteId, @PreProcessRouteDetailId, @ProcessRouteDetailId, @Extra1, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
         const string UpdateSql = "UPDATE `proc_process_route_detail_link` SET  SerialNo = @SerialNo, ProcessRouteId = @ProcessRouteId, PreProcessRouteDetailId = @PreProcessRouteDetailId, ProcessRouteDetailId = @ProcessRouteDetailId, Extra1 = @Extra1, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";

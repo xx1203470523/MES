@@ -1,24 +1,81 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
+using Hymson.Utils;
 
 namespace Hymson.MES.CoreServices.Bos.Manufacture
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ManufactureBo
+    public record ManufactureBo
     {
+        /// <summary>
+        /// 工厂Id
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string UserName { get; set; } = "";
+
+        /// <summary>
+        /// 当前时间
+        /// </summary>
+        public DateTime Time { get; set; } = HymsonClock.Now();
+
         /// <summary>
         /// 工序ID
         /// </summary>
         public long ProcedureId { get; set; }
+
         /// <summary>
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
+    }
+
+    /// <summary>
+    /// 当前生成对象
+    /// </summary>
+    public class ManufactureRequestBo
+    {
         /// <summary>
-        /// 产品条码
+        /// 站点ID
         /// </summary>
-        public string SFC { get; set; } = "";
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        public string ResourceCode { get; set; } = "";
+
+        /// <summary>
+        /// 设备编码
+        /// </summary>
+        public string EquipmentCode { get; set; } = "";
+    }
+
+    /// <summary>
+    /// 当前生成对象
+    /// </summary>
+    public class ManufactureResponseBo
+    {
+        /// <summary>
+        /// 资源ID
+        /// </summary>
+        public long ResourceId { get; set; }
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public long EquipmentId { get; set; }
+
+        /// <summary>
+        /// 工序ID
+        /// </summary>
+        public long ProcedureId { get; set; }
 
     }
 
@@ -41,6 +98,7 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 资源ID
         /// </summary>
         public long ResourceId { get; set; }
+
         /// <summary>
         /// 产品条码
         /// </summary>
@@ -50,23 +108,55 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
     /// <summary>
     /// 扣料
     /// </summary>
-    public class MaterialDeductBo : MaterialDeductItemBo
+    public class MaterialDeductRequestBo
     {
         /// <summary>
-        /// 数据收集方式 
+        /// 站点Id
         /// </summary>
-        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+        public long SiteId { get; set; }
 
         /// <summary>
-        /// 描述 :数据收集方式
-        /// 空值 : true  
+        /// 工序id
         /// </summary>
-        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+        public long ProcedureId { get; set; }
 
+        /// <summary>
+        /// BOMId
+        /// </summary>
+        public long ProductBOMId { get; set; }
+
+        /// <summary>
+        /// 产品ID
+        /// </summary>
+        public long ProductId { get; set; }
+    }
+
+    /// <summary>
+    /// 扣料
+    /// </summary>
+    public class MaterialDeductResponseBo : MaterialDeductItemBo
+    {
         /// <summary>
         /// 替代料集合
         /// </summary>
         public IEnumerable<MaterialDeductItemBo> ReplaceMaterials { get; set; } = new List<MaterialDeductItemBo>();
+
+    }
+
+    /// <summary>
+    /// 扣料
+    /// </summary>
+    public class MaterialDeductResponseSummaryBo
+    {
+        /// <summary>
+        /// 属于半成品的物料
+        /// </summary>
+        public IEnumerable<ProcBomDetailEntity> SmiFinisheds { get; set; }
+
+        /// <summary>
+        /// 即将扣料的物料数据
+        /// </summary>
+        public List<MaterialDeductResponseBo> InitialMaterials { get; set; }
 
     }
 
@@ -79,6 +169,11 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 物料ID
         /// </summary>
         public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料Code
+        /// </summary>
+        public string MaterialCode { get; set; }
 
         /// <summary>
         /// 用量
@@ -94,8 +189,17 @@ namespace Hymson.MES.CoreServices.Bos.Manufacture
         /// 消耗系数
         /// </summary>
         public decimal ConsumeRatio { get; set; } = 100;
-    }
 
+        /// <summary>
+        /// 数据收集方式（用之前要确认是否有赋值）
+        /// </summary>
+        public MaterialSerialNumberEnum? DataCollectionWay { get; set; }
+
+        /// <summary>
+        /// 数据收集方式（用之前要确认是否有赋值）
+        /// </summary>
+        public MaterialSerialNumberEnum? SerialNumber { get; set; }
+    }
 
     /// <summary>
     /// 容器包装

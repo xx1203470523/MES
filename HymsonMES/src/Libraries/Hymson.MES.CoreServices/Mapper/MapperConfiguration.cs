@@ -2,7 +2,9 @@
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Parameter;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.CoreServices.Bos.Job;
+using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
 
 namespace Hymson.MES.CoreServices.Mapper
@@ -38,6 +40,8 @@ namespace Hymson.MES.CoreServices.Mapper
             CreateMap<JobRequestBo, PackageCloseRequestBo>();
             CreateMap<JobRequestBo, BarcodeSfcReceiveBo>();
             CreateMap<JobRequestBo, ProductBadRecordRequestBo>();
+            CreateMap<JobRequestBo, OutputModifyBo>();
+            CreateMap<JobRequestBo, EsopOutRequestBo>();
         }
 
 
@@ -46,7 +50,10 @@ namespace Hymson.MES.CoreServices.Mapper
         /// </summary>
         protected virtual void CreateParameterBoMaps()
         {
-            CreateMap<ParameterDto,ManuProductParameterEntity> ();
+            CreateMap<ParameterDto, ManuProductParameterEntity>();
+            CreateMap<ParameterBo, ManuProductParameterEntity>();
+            CreateMap<ProcProductParameterGroupDetailEntity, ProcProductParameterGroupDetailBo>();
+            CreateMap<EquipmentParameterDto, EquipmentParameterEntity>();
         }
 
         /// <summary>

@@ -1,10 +1,14 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.Resource;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IProcResourceRepository
     {
         /// <summary>
@@ -13,6 +17,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcResourceView> GetByIdAsync(long id);
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcResourceEntity> GetByCodeAsync(EntityByCodeQuery query);
 
         /// <summary>
         /// 查询详情
@@ -40,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids);
+        Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据资源Code查询资源数据
@@ -48,7 +59,6 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcResourceEntity> GetResourceByResourceCodeAsync(ProcResourceQuery query);
-
 
         /// <summary>
         /// 根据资源Code查询数据
@@ -79,11 +89,18 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<PagedInfo<ProcResourceView>> GetPageListAsync(ProcResourcePagedQuery query);
 
         /// <summary>
+        /// 更具线体和工序查询资源
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<ProcResourceEntity>> GetPageListBylineIdAndProcProcedureIdAsync(ProcResourcePagedlineIdAndProcProcedureIdQuery query);
+
+        /// <summary>
         /// 获取资源分页列表
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceEntity>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query);
+        Task<PagedInfo<ProcResourceView>> GettPageListByProcedureIdAsync(ProcResourceProcedurePagedQuery query);
 
         /// <summary>
         /// 获取资源分页列表
@@ -154,5 +171,20 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="equipmentCode"></param>
         /// <returns></returns>
         Task<IEnumerable<ProcResourceEntity>> GetByEquipmentIdsAsync(ProcResourceByEquipmentIdsQuery query);
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="procResourceQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetProcResouceEntitiesAsync(ProcResourceQuery procResourceQuery);
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
     }
 }

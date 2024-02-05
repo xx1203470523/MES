@@ -12,7 +12,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -22,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuFacePlateProductionRepository : BaseRepository, IManuFacePlateProductionRepository
     {
 
-        public ManuFacePlateProductionRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
+        public ManuFacePlateProductionRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
         }
 
@@ -43,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -57,7 +56,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         public async Task<ManuFacePlateProductionEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateProductionEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<ManuFacePlateProductionEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -77,10 +76,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ManuFacePlateProductionEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ManuFacePlateProductionEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<ManuFacePlateProductionEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<ManuFacePlateProductionEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -96,11 +95,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
             var offSet = (manuFacePlateProductionPagedQuery.PageIndex - 1) * manuFacePlateProductionPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlateProductionPagedQuery.PageSize });
@@ -186,36 +180,29 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ManuFacePlateProductionRepository
     {
-        #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_face_plate_production` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_face_plate_production` /**where**/ ";
-        const string GetManuFacePlateProductionEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `manu_face_plate_production` /**where**/  ";
+        const string GetManuFacePlateProductionEntitiesSqlTemplate = @"SELECT /**select**/ FROM `manu_face_plate_production` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_face_plate_production`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,`ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit, @ScanJobId, @IsSuccessBeep, @SuccessBeepUrl, @SuccessBeepTime, @IsErrorBeep, @ErrorBeepUrl, @ErrorBeepTime, @IsShowBindWorkOrder, @IsShowQualifiedQty, @QualifiedColour, @IsShowUnqualifiedQty, @UnqualifiedColour, @IsShowLog, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_face_plate_production`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,`ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit, @ScanJobId, @IsSuccessBeep, @SuccessBeepUrl, @SuccessBeepTime, @IsErrorBeep, @ErrorBeepUrl, @ErrorBeepTime, @IsShowBindWorkOrder, @IsShowQualifiedQty, @QualifiedColour, @IsShowUnqualifiedQty, @UnqualifiedColour, @IsShowLog, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_face_plate_production`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,`ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, BarcodeType, IsShowActivityList) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit, @ScanJobId, @IsSuccessBeep, @SuccessBeepUrl, @SuccessBeepTime, @IsErrorBeep, @ErrorBeepUrl, @ErrorBeepTime, @IsShowBindWorkOrder, @IsShowQualifiedQty, @QualifiedColour, @IsShowUnqualifiedQty, @UnqualifiedColour, @IsShowLog, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @BarcodeType, @IsShowActivityList )  ";
+        const string InsertsSql = "INSERT INTO `manu_face_plate_production`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,`ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, BarcodeType, IsShowActivityList) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit, @ScanJobId, @IsSuccessBeep, @SuccessBeepUrl, @SuccessBeepTime, @IsErrorBeep, @ErrorBeepUrl, @ErrorBeepTime, @IsShowBindWorkOrder, @IsShowQualifiedQty, @QualifiedColour, @IsShowUnqualifiedQty, @UnqualifiedColour, @IsShowLog, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @BarcodeType, @IsShowActivityList )  ";
 
-        const string UpdateSql = "UPDATE `manu_face_plate_production` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit,ScanJobId = @ScanJobId, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_face_plate_production` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit,ScanJobId = @ScanJobId, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_face_plate_production` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit,ScanJobId = @ScanJobId, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, BarcodeType=@BarcodeType , IsShowActivityList=@IsShowActivityList  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_face_plate_production` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit,ScanJobId = @ScanJobId, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted , BarcodeType=@BarcodeType, IsShowActivityList=@IsShowActivityList  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_face_plate_production` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_face_plate_production` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
-        const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`,`ScanJobId`, `ProcedureId`, `IsProcedureEdit`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_face_plate_production`  WHERE Id = @Id ";
-        const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,`ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_face_plate_production`  WHERE Id IN @Ids ";
+        const string GetByIdSql = @"SELECT * FROM `manu_face_plate_production`  WHERE Id = @Id ";
+        const string GetByIdsSql = @"SELECT * FROM `manu_face_plate_production`  WHERE Id IN @Ids ";
 
-        const string GetByFacePlateIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,`ScanJobId`, `IsSuccessBeep`, `SuccessBeepUrl`, `SuccessBeepTime`, `IsErrorBeep`, `ErrorBeepUrl`, `ErrorBeepTime`, `IsShowBindWorkOrder`, `IsShowQualifiedQty`, `QualifiedColour`, `IsShowUnqualifiedQty`, `UnqualifiedColour`, `IsShowLog`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
-                            FROM `manu_face_plate_production`  WHERE FacePlateId = @FacePlateId ";
+        const string GetByFacePlateIdSql = @"SELECT * FROM `manu_face_plate_production` WHERE FacePlateId = @FacePlateId ";
+        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_production` SET  SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ScanJobId = @ScanJobId, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted,BarcodeType=@BarcodeType ,IsShowActivityList=@IsShowActivityList WHERE FacePlateId = @FacePlateId ";
 
-        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_production` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ScanJobId = @ScanJobId, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit, IsSuccessBeep = @IsSuccessBeep, SuccessBeepUrl = @SuccessBeepUrl, SuccessBeepTime = @SuccessBeepTime, IsErrorBeep = @IsErrorBeep, ErrorBeepUrl = @ErrorBeepUrl, ErrorBeepTime = @ErrorBeepTime, IsShowBindWorkOrder = @IsShowBindWorkOrder, IsShowQualifiedQty = @IsShowQualifiedQty, QualifiedColour = @QualifiedColour, IsShowUnqualifiedQty = @IsShowUnqualifiedQty, UnqualifiedColour = @UnqualifiedColour, IsShowLog = @IsShowLog, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE FacePlateId = @FacePlateId ";
-        #endregion
     }
 }

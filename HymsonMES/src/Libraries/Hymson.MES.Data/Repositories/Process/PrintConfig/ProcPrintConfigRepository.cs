@@ -153,23 +153,23 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="Query"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcPrinterEntity>> GetEntitiesAsync(ProcPrinterQuery query)
+        public async Task<IEnumerable<ProcPrinterEntity>> GetEntitiesAsync(ProcPrinterQuery Query)
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var Entities = await conn.QueryAsync<ProcPrinterEntity>(template.RawSql, query);
+            var Entities = await conn.QueryAsync<ProcPrinterEntity>(template.RawSql, Query);
             return Entities;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pagedQuery"></param>
+        /// <param name="PagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcPrinterEntity>> GetPagedListAsync(ProcPrinterPagedQuery pagedQuery)
+        public async Task<PagedInfo<ProcPrinterEntity>> GetPagedListAsync(ProcPrinterPagedQuery PagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
@@ -179,23 +179,23 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.OrderBy("UpdatedOn DESC");
             sqlBuilder.Select("*");
 
-            if (string.IsNullOrWhiteSpace(pagedQuery.PrintName) == false)
+            if (!string.IsNullOrWhiteSpace(PagedQuery.PrintName))
             {
-                pagedQuery.PrintName = $"%{pagedQuery.PrintName}%";
+                PagedQuery.PrintName = $"%{PagedQuery.PrintName}%";
                 sqlBuilder.Where("PrintName LIKE @PrintName");
             }
 
-            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
+            var offSet = (PagedQuery.PageIndex - 1) * PagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
 
-            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
-            sqlBuilder.AddParameters(pagedQuery);
+            sqlBuilder.AddParameters(new { Rows = PagedQuery.PageSize });
+            sqlBuilder.AddParameters(PagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var entities = await conn.QueryAsync<ProcPrinterEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
-            return new PagedInfo<ProcPrinterEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcPrinterEntity>(entities, PagedQuery.PageIndex, PagedQuery.PageSize, totalCount);
         }
     }
 
@@ -212,7 +212,6 @@ namespace Hymson.MES.Data.Repositories.Process
         const string DeleteSql = "UPDATE `proc_printer` SET `IsDeleted` = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE `Id` in @Ids;";
         const string IsExistsSql = "SELECT Id FROM proc_printer WHERE `IsDeleted` = 0 AND PrintName = @PrintName LIMIT 1";
         const string GetByIdSql = "SELECT * FROM `proc_printer` WHERE `Id` = @Id;";
-        //const string GetByGroupIdSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND EquipmentGroupId = @EquipmentGroupId;";
         const string GetBaseListSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0;";
         const string GetByPrintIpSql = "SELECT * FROM proc_printer WHERE SiteId = @Site AND IsDeleted = 0 AND PrintIp = @Code;";
         const string GetByPrintNameSql = "SELECT * FROM `proc_printer` WHERE `IsDeleted` = 0 AND PrintName = @Code AND SiteId = @Site;";

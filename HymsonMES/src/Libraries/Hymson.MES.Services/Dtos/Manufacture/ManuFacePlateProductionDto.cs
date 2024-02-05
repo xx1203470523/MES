@@ -8,6 +8,7 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Dtos.Manufacture
@@ -170,7 +171,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long IsDeleted { get; set; }
 
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
 
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
 
@@ -188,11 +197,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-        ///// <summary>
-        // /// 面板Id
-        // /// </summary>
-        // public long? FacePlateId { get; set; }
 
         /// <summary>
         /// 资源id
@@ -278,32 +282,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public bool? IsShowLog { get; set; }
 
-        ///// <summary>
-        // /// 创建人
-        // /// </summary>
-        // public string CreatedBy { get; set; }
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
 
-        ///// <summary>
-        // /// 创建时间
-        // /// </summary>
-        // public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        // /// 更新人
-        // /// </summary>
-        // public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        // /// 更新时间
-        // /// </summary>
-        // public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        // /// 删除标识
-        // /// </summary>
-        // public long IsDeleted { get; set; }
-
-
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>
@@ -410,30 +397,15 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public bool? IsShowLog { get; set; }
 
-        ///// <summary>
-        // /// 创建人
-        // /// </summary>
-        // public string CreatedBy { get; set; }
+        /// <summary>
+        /// 类型;0、产品序列码   1 载具编码
+        /// </summary>
+        public ManuFacePlateBarcodeTypeEnum BarcodeType { get; set; }
 
-        ///// <summary>
-        // /// 创建时间
-        // /// </summary>
-        // public DateTime CreatedOn { get; set; }
-
-        ///// <summary>
-        // /// 更新人
-        // /// </summary>
-        // public string UpdatedBy { get; set; }
-
-        ///// <summary>
-        // /// 更新时间
-        // /// </summary>
-        // public DateTime UpdatedOn { get; set; }
-
-        ///// <summary>
-        // /// 删除标识
-        // /// </summary>
-        // public long IsDeleted { get; set; }
+        /// <summary>
+        /// 是否显示活动中条码
+        /// </summary>
+        public bool? IsShowActivityList { get; set; }
     }
 
     /// <summary>
@@ -523,7 +495,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public List<MainReplaceMaterial> MainReplaceMaterials { get; set; }
     }
 
-    public class MainReplaceMaterial 
+    public class MainReplaceMaterial
     {
         public long MaterialId { get; set; }
 
@@ -539,7 +511,8 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         public MaterialSerialNumberEnum? SerialNumber { get; set; }
     }
 
-    public class ManuFacePlateProductionPackageAddDto{
+    public class ManuFacePlateProductionPackageAddDto
+    {
         /// <summary>
         /// SFC 产品条码
         /// </summary>
@@ -570,7 +543,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public string CirculationBarCode { get; set; }
 
-        //public decimal CirculationQty { get; set; }
 
         public long BomDetailId { get; set; }
     }

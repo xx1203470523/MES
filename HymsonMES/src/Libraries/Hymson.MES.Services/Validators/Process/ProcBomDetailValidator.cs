@@ -22,8 +22,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcBomDetailCreateValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+
         }
     }
 
@@ -34,8 +33,7 @@ namespace Hymson.MES.Services.Validators.Process
     {
         public ProcBomDetailModifyValidator()
         {
-            //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11").WithMessage("11");
-            //RuleFor(x => x.BatchNo).MaximumLength(10).WithErrorCode("111").WithMessage("111");
+
         }
     }
 }

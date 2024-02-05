@@ -1,17 +1,5 @@
-﻿using Confluent.Kafka;
-using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.Core.Enums.QualUnqualifiedCode;
-using Mysqlx.Crud;
+﻿using Hymson.Infrastructure;
 using OfficeOpenXml.Attributes;
-using Org.BouncyCastle.Asn1.X509;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Report
 {
@@ -29,44 +17,6 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 计划开始时间  时间范围 
         /// </summary>
         public DateTime[]? CreatedOn { get; set; }
-
-        ///// <summary>
-        ///// 开始时间 
-        ///// </summary>
-        //public DateTime? CreatedOnS
-        //{
-        //    get
-        //    {
-        //        if (!string.IsNullOrEmpty(this.CreatedOn))
-        //        {
-        //            var dateArr = this.CreatedOn.Split(',');
-        //            return dateArr.Length > 0 ? Convert.ToDateTime(dateArr[0]) : null;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 结束时间
-        ///// </summary>
-        //public DateTime? CreatedOnE
-        //{
-        //    get
-        //    {
-        //        if (!string.IsNullOrEmpty(this.CreatedOn))
-        //        {
-        //            var dateArr = this.CreatedOn.Split(',');
-        //            return dateArr.Length > 1 ? Convert.ToDateTime(dateArr[1]) : null;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
 
         /// <summary>
         /// 批次条码

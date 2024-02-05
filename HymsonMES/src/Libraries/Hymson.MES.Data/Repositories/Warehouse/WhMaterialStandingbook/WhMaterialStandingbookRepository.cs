@@ -91,12 +91,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.OrderBy(" CreatedOn DESC");
             sqlBuilder.Where("SiteId=@SiteId");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
-
             if (!string.IsNullOrWhiteSpace(whMaterialStandingbookPagedQuery.Batch))
             {
                 whMaterialStandingbookPagedQuery.Batch = $"%{whMaterialStandingbookPagedQuery.Batch}%";
@@ -157,7 +151,6 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         public async Task<int> InsertAsync(WhMaterialStandingbookEntity whMaterialStandingbookEntity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            // TODO var conn = BaseRepositorySingleton.GetMESInstance();
             return await conn.ExecuteAsync(InsertSql, whMaterialStandingbookEntity);
         }
 
@@ -166,8 +159,10 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="whMaterialStandingbookEntitys"></param>
         /// <returns></returns>
-        public async Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys)
+        public async Task<int> InsertsAsync(IEnumerable<WhMaterialStandingbookEntity>? whMaterialStandingbookEntitys)
         {
+            if (whMaterialStandingbookEntitys == null || !whMaterialStandingbookEntitys.Any()) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(InsertsSql, whMaterialStandingbookEntitys);
         }

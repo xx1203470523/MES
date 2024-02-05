@@ -66,6 +66,11 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 等级
         /// </summary>
-        public string Rating { get; set; }       
+        public string Rating { get; set; }
+
+        /// <summary>
+        /// 序号
+        /// </summary>
+        public int? Serial { get; set; }
     }
 }

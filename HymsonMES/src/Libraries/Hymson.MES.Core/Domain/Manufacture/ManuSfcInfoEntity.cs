@@ -23,12 +23,22 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 工单id
         /// </summary>
-        public long WorkOrderId { get; set; }
+        public long? WorkOrderId { get; set; }
 
         /// <summary>
         /// 产品id
         /// </summary>
         public long ProductId { get; set; }
+
+        /// <summary>
+        /// 工艺路线
+        /// </summary>
+        public long? ProcessRouteId { get; set; }
+
+        /// <summary>
+        /// Bom id
+        /// </summary>
+        public long? ProductBOMId { get; set; }
 
         /// <summary>
         /// 是否在用

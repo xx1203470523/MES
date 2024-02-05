@@ -97,11 +97,6 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.Where("IsDeleted=0");
             sqlBuilder.Select("*");
 
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-
             var offSet = (manuFacePlateRepairPagedQuery.PageIndex - 1) * manuFacePlateRepairPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = manuFacePlateRepairPagedQuery.PageSize });
@@ -279,27 +274,27 @@ namespace Hymson.MES.Data.Repositories.Manufacture
                                             /**select**/
                                            FROM `manu_face_plate_Repair` /**where**/  ";
 
-        const string InsertSql = "INSERT INTO `manu_face_plate_Repair`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit,@IsShowProductList,  @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-        const string InsertsSql = "INSERT INTO `manu_face_plate_Repair`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit,@IsShowProductList,  @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertSql = "INSERT INTO `manu_face_plate_Repair`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, IsShowActivityList) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit,@IsShowProductList,  @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @IsShowActivityList )  ";
+        const string InsertsSql = "INSERT INTO `manu_face_plate_Repair`(  `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, IsShowActivityList) VALUES (   @Id, @SiteId, @FacePlateId, @ResourceId, @IsResourceEdit, @ProcedureId, @IsProcedureEdit,@IsShowProductList,  @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted , @IsShowActivityList )  ";
 
-        const string UpdateSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,  IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-        const string UpdatesSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,  IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdateSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,  IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted ,IsShowActivityList=@IsShowActivityList WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,  IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted , IsShowActivityList=@IsShowActivityList  WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE `manu_face_plate_Repair` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `manu_face_plate_Repair` SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,IsShowActivityList
                             FROM `manu_face_plate_Repair`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT 
-                                          `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                                          `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,IsShowActivityList
                             FROM `manu_face_plate_Repair`  WHERE Id IN @Ids ";
 
         const string GetByFacePlateIdSql = @"SELECT 
-                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
+                               `Id`, `SiteId`, `FacePlateId`, `ResourceId`, `IsResourceEdit`, `ProcedureId`, `IsProcedureEdit`,  `IsShowProductList`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`,IsShowActivityList
                             FROM `manu_face_plate_Repair`  WHERE FacePlateId = @FacePlateId ";
 
-        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE FacePlateId = @FacePlateId ";
+        const string UpdateByFacePlateIdSql = "UPDATE `manu_face_plate_Repair` SET   SiteId = @SiteId, FacePlateId = @FacePlateId, ResourceId = @ResourceId, IsResourceEdit = @IsResourceEdit, ProcedureId = @ProcedureId, IsProcedureEdit = @IsProcedureEdit,IsShowProductList = @IsShowProductList, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  ,IsShowActivityList=@IsShowActivityList WHERE FacePlateId = @FacePlateId ";
 
         //维修记录
         const string InsertRecordSql = "INSERT INTO `manu_sfc_repair_record`(  `Id`, `SiteId`, `SFC`, `WorkOrderId`, `ProductId`, `ResourceId`, `ProcedureId`, `ReturnProcedureId`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @SFC, @WorkOrderId, @ProductId, @ResourceId, @ProcedureId, @ReturnProcedureId, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";

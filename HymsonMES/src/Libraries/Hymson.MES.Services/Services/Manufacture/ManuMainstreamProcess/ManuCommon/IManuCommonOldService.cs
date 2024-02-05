@@ -1,8 +1,6 @@
 ﻿using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Enums.Manufacture;
-using Hymson.MES.CoreServices.Bos.Manufacture;
 using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCommonDto;
 
 namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon
@@ -19,14 +17,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="materialId"></param>
         /// <returns></returns>
         Task<bool> CheckBarCodeByMaskCodeRuleAsync(string barCode, long materialId);
-
-        /// <summary>
-        /// 检查条码是否可以执行某流程
-        /// </summary>
-        /// <param name="bo"></param>
-        /// <param name="sfcCirculationType"></param>
-        /// <returns></returns>
-        Task<bool> CheckSFCIsCanDoneStepAsync(ManufactureBo bo, SfcCirculationTypeEnum sfcCirculationType);
 
         /// <summary>
         /// 获取生产条码信息
@@ -63,15 +53,6 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCom
         /// <param name="manuSfcProduce"></param>
         /// <returns></returns>
         Task<ProcProcedureEntity?> GetNextProcedureAsync(ManuSfcProduceEntity manuSfcProduce);
-
-        /// <summary>
-        /// 获当前工序对应的下一工序
-        /// </summary>
-        /// <param name="processRouteId"></param>
-        /// <param name="procedureId"></param>
-        /// <param name="workOrderId"></param>
-        /// <returns></returns>
-        Task<ProcProcedureEntity?> GetNextProcedureAsync(long processRouteId, long procedureId, long workOrderId = 0);
 
         /// <summary>
         /// 判断上一工序是否随机工序

@@ -8,6 +8,9 @@
 
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using MimeKit;
+using Mysqlx.Crud;
+using OfficeOpenXml.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +84,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public bool? IsDeleted { get; set; }
 
-       
     }
 
 
@@ -99,11 +101,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// BOM名称
         /// </summary>
         public string BomName { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
 
        /// <summary>
         /// 版本
@@ -140,11 +137,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// BOM名称
         /// </summary>
         public string BomName { get; set; }
-
-       /// <summary>
-        /// 状态
-        /// </summary>
-        public SysDataStatusEnum Status { get; set; }
 
         public string Version { get; set; }
 
@@ -207,4 +199,78 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long BomId { get; set; }
     }
+
+    /// <summary>
+    /// Bom导入模板模型
+    /// </summary>
+    public record ImportBomDto : BaseExcelDto
+    {
+        /// <summary>
+        /// Bom编码
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom(必填)", Order = 1)]
+        public string BomCode { get; set; }
+
+        /// <summary>
+        /// Bom名称
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom名称(必填)", Order = 2)]
+        public string BomName { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [EpplusTableColumn(Header = "版本(必填)", Order = 3)]
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 是否当前版本
+        /// </summary>
+        [EpplusTableColumn(Header = "是否为当前版本(是/否)", Order = 4)]
+        public YesOrNoEnum IsCurrentVersion { get; set; }
+
+
+        /// <summary>
+        /// Bom描述
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom描述", Order = 5)]
+        public string? Remark { get; set; }
+    }
+
+    public record ExportBomDto : BaseExcelDto
+    {
+        /// <summary>
+        /// Bom编码
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom", Order = 1)]
+        public string BomCode { get; set; }
+
+        /// <summary>
+        /// Bom名称
+        /// </summary>
+        [EpplusTableColumn(Header = "Bom名称", Order = 2)]
+        public string BomName { get; set; }
+
+        /// <summary>
+        /// 版本
+        /// </summary>
+        [EpplusTableColumn(Header = "版本", Order = 3)]
+        public string Version { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        [EpplusTableColumn(Header = "状态", Order = 4)]
+        public string Status { get; set; }
+
+    }
+
+
+    public class BomExportResultDto
+    {
+        public string Path { get; set; }
+
+        public string FileName { get; set; }
+    }
+
 }

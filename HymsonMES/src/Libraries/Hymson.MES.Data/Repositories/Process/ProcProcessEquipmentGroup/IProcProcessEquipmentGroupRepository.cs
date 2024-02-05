@@ -89,11 +89,5 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         Task<ProcProcessEquipmentGroupEntity> GetByCodeAsync(EntityByCodeQuery query);
 
-        /// <summary>
-        /// 根据IDs以及procedureId获取数据（批量）
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProcProcessEquipmentGroupEntity>> GetCountByIdsAndProcedureIdAsync(long[] ids, long procedureId);
     }
 }

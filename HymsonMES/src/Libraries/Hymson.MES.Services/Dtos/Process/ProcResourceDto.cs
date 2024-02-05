@@ -121,6 +121,23 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 空值 : false  
         /// </summary>
         public SysDataStatusEnum? Status { get; set; }
+
+        /// <summary>
+        /// 描述 :资源代码 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 描述 :资源名称 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResName { get; set; }
+
+        /// <summary>
+        /// 资源类型编码
+        /// </summary>
+        public string? ResType { get; set; }
     }
 
     public record ProcResourceViewDto : ProcResourceDto
@@ -154,12 +171,6 @@ namespace Hymson.MES.Services.Dtos.Process
         //[Required(ErrorMessage = "资源名称不能为空")]
         //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
         public string ResName { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        //[Required(ErrorMessage = "状态不能为空")]
-        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 所属资源类型
@@ -198,10 +209,6 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
-        ///// <summary>
-        ///// 自定义
-        ///// </summary>
-        //public List<ProcResourceCustomDto> customList { get; set; }
     }
 
     /// <summary>
@@ -221,12 +228,6 @@ namespace Hymson.MES.Services.Dtos.Process
         //[Required(ErrorMessage = "资源名称不能为空")]
         //[MaxLength(length: 60, ErrorMessage = "资源名称超长")]
         public string ResName { get; set; }
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-       // [Required(ErrorMessage = "状态不能为空")]
-        public int Status { get; set; }
 
         /// <summary>
         /// 所属资源类型
@@ -265,9 +266,33 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public List<ProcProductSetCreateDto> ProductSetList { get; set; }
 
-        ///// <summary>
-        ///// 自定义
-        ///// </summary>
-        //public List<ProcResourceCustomDto> customList { get; set; }
+    }
+
+    /// <summary>
+    /// 资源维护表查询对象
+    /// </summary>
+    public class ProcResourcePagedlineIdAndProcProcedureIdDto : PagerInfo
+    {
+        /// <summary>
+        /// 描述 :资源代码 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResCode { get; set; }
+
+        /// <summary>
+        /// 描述 :资源名称 
+        /// 空值 : false  
+        /// </summary>
+        public string? ResName { get; set; }
+
+        /// <summary>
+        /// 产线ID
+        /// </summary>
+        public long? WorkCenterLineId { get; set; }
+
+        /// <summary>
+        /// 资源类型id
+        /// </summary>
+        public long? ResTypeId { get; set; }
     }
 }

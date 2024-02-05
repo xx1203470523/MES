@@ -82,6 +82,12 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public decimal? CirculationQty { get; set; }
 
+
+        /// <summary>
+        /// 流转条码位置号
+        /// </summary>
+        public string? Location { get; set; }
+
         /// <summary>
         /// 流转类型;1：拆分；2：合并；3：转换;4：消耗;5：拆解;6：组件添加 7.换件
         /// </summary>

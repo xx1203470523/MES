@@ -54,65 +54,64 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         ///  查询资源类型维护表列表(关联资源：一个类型被多个资源关联就展示多条)
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procResourceTypePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery query)
+        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where("a.IsDeleted=0");
-            if (string.IsNullOrEmpty(query.Sorting))
+            if (string.IsNullOrEmpty(procResourceTypePagedQuery.Sorting))
             {
                 sqlBuilder.OrderBy("a.CreatedOn DESC");
             }
             else
             {
-                sqlBuilder.OrderBy(query.Sorting);
+                sqlBuilder.OrderBy(procResourceTypePagedQuery.Sorting);
             }
 
-            //sqlBuilder.Select("*");
             sqlBuilder.Where("a.SiteId = @SiteId");
-            if (!string.IsNullOrWhiteSpace(query.ResType))
+            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResType))
             {
-                query.ResType = $"%{query.ResType}%";
+                procResourceTypePagedQuery.ResType = $"%{procResourceTypePagedQuery.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (!string.IsNullOrWhiteSpace(query.ResTypeName))
+            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResTypeName))
             {
-                query.ResTypeName = $"%{query.ResTypeName}%";
+                procResourceTypePagedQuery.ResTypeName = $"%{procResourceTypePagedQuery.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
             }
-            if (!string.IsNullOrWhiteSpace(query.ResCode))
+            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResCode))
             {
-                query.ResCode = $"%{query.ResCode}%";
+                procResourceTypePagedQuery.ResCode = $"%{procResourceTypePagedQuery.ResCode}%";
                 sqlBuilder.Where("ResCode like @ResCode");
             }
-            if (!string.IsNullOrWhiteSpace(query.ResName))
+            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResName))
             {
-                query.ResName = $"%{query.ResName}%";
+                procResourceTypePagedQuery.ResName = $"%{procResourceTypePagedQuery.ResName}%";
                 sqlBuilder.Where("ResName like @ResName");
             }
 
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procResourceTypePagedQuery.PageIndex - 1) * procResourceTypePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
+            sqlBuilder.AddParameters(procResourceTypePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceTypeView>(procResourceTypeEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcResourceTypeView>(procResourceTypeEntities, procResourceTypePagedQuery.PageIndex, procResourceTypePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
         /// 获取资源类型分页列表
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="procResourceTypePagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeEntity>> GetListAsync(ProcResourceTypePagedQuery query)
+        public async Task<PagedInfo<ProcResourceTypeEntity>> GetListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedListSqlTemplate);
@@ -122,27 +121,27 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Select("*");
 
             sqlBuilder.Where("SiteId = @SiteId");
-            if (!string.IsNullOrWhiteSpace(query.ResType))
+            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResType))
             {
-                query.ResType = $"%{query.ResType}%";
+                procResourceTypePagedQuery.ResType = $"%{procResourceTypePagedQuery.ResType}%";
                 sqlBuilder.Where("ResType like @ResType");
             }
-            if (!string.IsNullOrWhiteSpace(query.ResTypeName))
+            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResTypeName))
             {
-                query.ResTypeName = $"%{query.ResTypeName}%";
+                procResourceTypePagedQuery.ResTypeName = $"%{procResourceTypePagedQuery.ResTypeName}%";
                 sqlBuilder.Where("ResTypeName like @ResTypeName");
             }
-            var offSet = (query.PageIndex - 1) * query.PageSize;
+            var offSet = (procResourceTypePagedQuery.PageIndex - 1) * procResourceTypePagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = query.PageSize });
-            sqlBuilder.AddParameters(query);
+            sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
+            sqlBuilder.AddParameters(procResourceTypePagedQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceTypeEntity>(procResourceTypeEntities, query.PageIndex, query.PageSize, totalCount);
+            return new PagedInfo<ProcResourceTypeEntity>(procResourceTypeEntities, procResourceTypePagedQuery.PageIndex, procResourceTypePagedQuery.PageSize, totalCount);
         }
 
         /// <summary>

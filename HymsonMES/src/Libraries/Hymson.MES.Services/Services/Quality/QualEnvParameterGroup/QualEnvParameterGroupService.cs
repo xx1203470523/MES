@@ -13,8 +13,10 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -54,12 +56,10 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 仓储接口（工作中心）
         /// </summary>
-        /// </summary>
         private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
         /// <summary>
         /// 仓储接口（工序）
-        /// </summary>
         /// </summary>
         private readonly IProcProcedureRepository _procProcedureRepository;
 
@@ -131,6 +131,8 @@ namespace Hymson.MES.Services.Services.Quality
             entity.UpdatedOn = updatedOn;
             entity.SiteId = _currentSite.SiteId ?? 0;
 
+            entity.Status = SysDataStatusEnum.Build;
+
             // 验证唯一性
             await CheckUniqueWorkCenterProcedureAsync(entity);
 
@@ -154,9 +156,16 @@ namespace Hymson.MES.Services.Services.Quality
             var rows = 0;
             using (var trans = TransactionHelper.GetTransactionScope())
             {
-                rows += await _qualEnvParameterGroupRepository.InsertAsync(entity);
-                rows += await _qualEnvParameterGroupDetailRepository.InsertRangeAsync(details);
-                trans.Complete();
+                rows = await _qualEnvParameterGroupRepository.InsertAsync(entity);
+                if (rows <= 0)
+                {
+                    trans.Dispose();
+                }
+                else
+                {
+                    rows += await _qualEnvParameterGroupDetailRepository.InsertRangeAsync(details);
+                    trans.Complete();
+                }
             }
             return rows;
         }
@@ -183,17 +192,11 @@ namespace Hymson.MES.Services.Services.Quality
 
             // 检查数据之前的状态是否允许修改
             var dbEntity = await _qualEnvParameterGroupRepository.GetByIdAsync(entity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-            switch (dbEntity.Status)
+            //验证某些状态是不能编辑的
+            var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
+            if (!canEditStatusEnum.Any(x => x == dbEntity.Status))
             {
-                case SysDataStatusEnum.Enable:
-                case SysDataStatusEnum.Retain:
-                case SysDataStatusEnum.Abolish:
-                    if (saveDto.Status == SysDataStatusEnum.Build) throw new CustomerValidationException(nameof(ErrorCode.MES12510));
-                    if (dbEntity.Status == SysDataStatusEnum.Enable) throw new CustomerValidationException(nameof(ErrorCode.MES10123));
-                    break;
-                case SysDataStatusEnum.Build:
-                default:
-                    break;
+                throw new CustomerValidationException(nameof(ErrorCode.MES10129));
             }
 
             // 验证唯一性
@@ -319,7 +322,7 @@ namespace Hymson.MES.Services.Services.Quality
                 {
                     dto.Code = parameterEntity.ParameterCode;
                     dto.Name = parameterEntity.ParameterName;
-                    dto.Unit = parameterEntity.ParameterUnit;
+                    dto.Unit = parameterEntity.ParameterUnit ?? "";
                     dto.DataType = parameterEntity.DataType;
                 }
 
@@ -376,7 +379,7 @@ namespace Hymson.MES.Services.Services.Quality
                 WorkCenterId = entity.WorkCenterId,
                 ProcedureId = entity.ProcedureId
             });
-            if (checkUniqueWorkCenterProcedureEntities == null || checkUniqueWorkCenterProcedureEntities.Any() == false) return;
+            if (checkUniqueWorkCenterProcedureEntities == null || !checkUniqueWorkCenterProcedureEntities.Any()) return;
 
             // 校验工作中心编码+工序编码+版本是否唯一
             if (checkUniqueWorkCenterProcedureEntities.Any(a => a.WorkCenterId == entity.WorkCenterId
@@ -391,7 +394,8 @@ namespace Hymson.MES.Services.Services.Quality
             }
 
             // 状态为启用时，校验启用状态的 工作中心编码+工序编码 唯一性
-            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueWorkCenterProcedureEntities.Any(a => a.ProcedureId == entity.ProcedureId
+            if (entity.Status == SysDataStatusEnum.Enable && checkUniqueWorkCenterProcedureEntities.Any(a => a.WorkCenterId == entity.WorkCenterId
+            && a.ProcedureId == entity.ProcedureId
             && a.Status == entity.Status
             && a.Id != entity.Id))
             {
@@ -430,11 +434,65 @@ namespace Hymson.MES.Services.Services.Quality
             // 是否存在错误
             if (validationFailures.Any())
             {
-                //throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
                 throw new ValidationException("", validationFailures);
             }
         }
         #endregion
 
+        #region 状态变更
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+            if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10126));
+            }
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _qualEnvParameterGroupRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10104));
+            }
+            if (entity.Status == changeStatusCommand.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
+            }
+
+            // 验证唯一性
+            entity.Status = changeStatusCommand.Status;
+            await CheckUniqueWorkCenterProcedureAsync(entity);
+            #endregion
+
+            #region 操作数据库
+            await _qualEnvParameterGroupRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
+        }
+
+        #endregion
     }
 }

@@ -62,11 +62,11 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("不良复判")]
         BadRejudgment = 11,
-        ///// <summary>
-        ///// 合并
-        ///// </summary>
-        //[Description("合并")]
-        //Merge = 12,
+        /// <summary>
+        /// 返修
+        /// </summary>
+        [Description("返修")]
+        Maintenance = 12,
         /// <summary>
         /// 转换
         /// </summary>
@@ -137,16 +137,16 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("替换")]
         Replace = 26,
-        ///// <summary>
-        ///// 条码绑定
-        ///// </summary>
-        //[Description("条码绑定")]
-        //BarcodeBinding = 27,
-        ///// <summary>
-        ///// 条码解绑
-        ///// </summary>
-        //[Description("条码解绑")]
-        //BarcodeUnbinding = 28,
+        /// <summary>
+        /// 条码绑定
+        /// </summary>
+        [Description("条码绑定")]
+        BarcodeBinding = 27,
+        /// <summary>
+        /// 条码解绑
+        /// </summary>
+        [Description("条码解绑")]
+        BarcodeUnbinding = 28,
         /// <summary>
         /// 包装
         /// </summary>
@@ -163,10 +163,67 @@ namespace Hymson.MES.Core.Enums.Manufacture
         /// </summary>
         [Description("录入等级")]
         EnterDowngrading = 31,
+
         /// <summary>
         /// 移除降级
         /// </summary>
         [Description("移除降级")]
-        RemoveDowngrading = 32
+        RemoveDowngrading = 32,
+
+        /// <summary>
+        /// Marking
+        /// </summary>
+        [Description("Marking录入")]
+        Marking = 33,
+
+        /// <summary>
+        /// 关闭Marking
+        /// </summary>
+        [Description("关闭Marking")]
+        CloseMarking = 34,
+
+        /// <summary>
+        /// 产出上报
+        /// </summary>
+        [Description("产出上报")]
+        OutputReport = 35,
+
+        /// <summary>
+        /// 供应商条码接收
+        /// </summary>
+        [Description("供应商条码接收")]
+        SupplierReceive = 36,
+
+        /// <summary>
+        /// 部分报废
+        /// </summary>
+        [Description("部分报废")]
+        PartialScrap = 37,
+
+        /// <summary>
+        /// 条码合并
+        /// </summary>
+        [Description("条码合并")]
+        SfcMerge = 38,
+        /// <summary>
+        /// 条码合并-新增
+        /// </summary>
+        [Description("条码合并-新增")]
+        SfcMergeAdd = 39,
+        /// <summary>
+        /// 条码数量调整
+        /// </summary>
+        [Description("条码数量调整")]
+        SfcQtyAdjust = 40,
+        /// <summary>
+        /// 条码拆分
+        /// </summary>
+        [Description("条码拆分")]
+        Split = 41,
+        /// <summary>
+        /// 条码拆分-新增
+        /// </summary>
+        [Description("条码拆分-新增")]
+        SplitCreate = 42
     }
 }

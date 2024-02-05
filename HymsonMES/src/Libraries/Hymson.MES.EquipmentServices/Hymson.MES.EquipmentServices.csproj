@@ -8,21 +8,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dtos\Bootup\**" />
+    <Compile Remove="Validators\EquipmentCollect\**" />
+    <Compile Remove="Validators\Recipe\**" />
+    <EmbeddedResource Remove="Dtos\Bootup\**" />
+    <EmbeddedResource Remove="Validators\EquipmentCollect\**" />
+    <EmbeddedResource Remove="Validators\Recipe\**" />
+    <None Remove="Dtos\Bootup\**" />
+    <None Remove="Validators\EquipmentCollect\**" />
+    <None Remove="Validators\Recipe\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hymson.MES.CoreServices\Hymson.MES.CoreServices.csproj" />
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Crc32.NET" Version="1.2.0" />
-		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.73" />
-		<PackageReference Include="Hymson.Snowflake" Version="2.1.73" />
-		<PackageReference Include="Hymson.Web.Framework" Version="2.1.73" />
+		<PackageReference Include="Hymson.Authentication.JwtBearer" Version="2.1.129" />
+		<PackageReference Include="Hymson.Snowflake" Version="2.1.129" />
+		<PackageReference Include="Hymson.Web.Framework" Version="2.1.129" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Dtos\Bootup\" />
-	  <Folder Include="Dtos\Parameter\" />
+	  <Folder Include="Bos\Manufacture\" />
 	  <Folder Include="Services\Bootup\" />
-	  <Folder Include="Validators\Recipe\" />
 	</ItemGroup>
 
 </Project>

@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         public async Task InsertAsync(InteCalendarDateEntity entity)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity);
+            var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity) ;
             entity.Id = id;
         }
 
@@ -71,12 +71,12 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <summary>
         /// 批量删除
         /// </summary>
-        /// <param name="calendarIdsArr"></param>
+        /// <param name="idsArr"></param>
         /// <returns></returns>
-        public async Task<int> DeleteByCalendarIdsAsync(long[] calendarIdsArr)
+        public async Task<int> DeleteByCalendarIdsAsync(long[] idsArr)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.ExecuteAsync(DeleteSql, new { calendarId = calendarIdsArr });
+            return await conn.ExecuteAsync(DeleteSql, new { calendarId = idsArr });
 
         }
 
@@ -105,48 +105,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             return entities;
         }
 
-        /*
-        /// <summary>
-        /// 分页查询
-        /// </summary>
-        /// <param name="inteCalendarPagedQuery"></param>
-        /// <returns></returns>
-        public async Task<PagedInfo<InteCalendarDateEntity>> GetPagedInfoAsync(InteCalendarPagedQuery inteCalendarPagedQuery)
-        {
-            var sqlBuilder = new SqlBuilder();
-            var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
-            var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
-            sqlBuilder.OrderBy("UpdatedOn DESC");
-            //sqlBuilder.Select("*");
-
-            //if (!string.IsNullOrWhiteSpace(procMaterialPagedQuery.SiteCode))
-            //{
-            //    sqlBuilder.Where("SiteCode=@SiteCode");
-            //}
-           
-            var offSet = (inteCalendarPagedQuery.PageIndex - 1) * inteCalendarPagedQuery.PageSize;
-            sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = inteCalendarPagedQuery.PageSize });
-            sqlBuilder.AddParameters(inteCalendarPagedQuery);
-
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            var inteCalendarEntitiesTask = conn.QueryAsync<InteCalendarDateEntity>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var inteCalendarEntities = await inteCalendarEntitiesTask;
-            var totalCount = await totalCountTask;
-            return new PagedInfo<InteCalendarDateEntity>(inteCalendarEntities, inteCalendarPagedQuery.PageIndex, inteCalendarPagedQuery.PageSize, totalCount);
-        }
-
-
-        */
-
     }
 
     public partial class InteCalendarDateRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/";
         const string GetInteCalendarEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `inte_calendar` /**innerjoin**/ /**leftjoin**/ /**where**/  ";

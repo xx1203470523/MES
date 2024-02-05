@@ -101,7 +101,6 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
             sqlBuilder.Where(" g.IsDeleted = 0 ");
-            //sqlBuilder.Select("*");
 
             sqlBuilder.Where(" g.SiteId=@SiteId ");
             if (procParameterLinkTypePagedQuery.ParameterType > 0)
@@ -119,9 +118,10 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" o.ParameterName like @ParameterName ");
             }
 
-            if (procParameterLinkTypePagedQuery.ParameterUnit.HasValue) 
+            if (!string.IsNullOrEmpty(procParameterLinkTypePagedQuery.ParameterUnit)) 
             {
-                sqlBuilder.Where(" o.ParameterUnit = @ParameterUnit ");
+                procParameterLinkTypePagedQuery.ParameterUnit = $"%{procParameterLinkTypePagedQuery.ParameterUnit}%";
+                sqlBuilder.Where(" o.ParameterUnit LIKE @ParameterUnit ");
             }
             if (procParameterLinkTypePagedQuery.DataType.HasValue)
             {
@@ -152,12 +152,9 @@ namespace Hymson.MES.Data.Repositories.Process
             var templateData = sqlBuilder.AddTemplate(GetPagedProcParameterLinkTypeByTypeSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedProcParameterLinkTypeByTypeCountSqlTemplate);
             sqlBuilder.Where(" g.IsDeleted=0 ");
-            //sqlBuilder.Select("*");
 
-            //if (procParameterDetailPagerQuery.SiteId != 0)
-            //{
             sqlBuilder.Where(" g.SiteId=@SiteId ");
-            //}
+
             if (!string.IsNullOrWhiteSpace(procParameterDetailPagerQuery.ParameterCode))
             {
                 procParameterDetailPagerQuery.ParameterCode = $"%{procParameterDetailPagerQuery.ParameterCode}%";

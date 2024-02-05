@@ -9,8 +9,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
 {
     /// <summary>
     /// 控制器（消息管理）
-    /// @author Czhipu
-    /// @date 2023-08-15 08:47:52
     /// </summary>
     [Authorize]
     [ApiController]
@@ -39,29 +37,101 @@ namespace Hymson.MES.Api.Controllers.Integrated
         }
 
         /// <summary>
-        /// 添加（消息管理）
+        /// 触发（消息管理）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("create")]
+        [Route("trigger")]
         [PermissionDescription("integrated:inteMessageManage:insert")]
-        public async Task AddAsync([FromBody] InteMessageManageSaveDto saveDto)
+        public async Task TriggerAsync([FromBody] InteMessageManageTriggerSaveDto dto)
         {
-            await _inteMessageManageService.CreateAsync(saveDto);
+            await _inteMessageManageService.TriggerAsync(dto);
         }
 
         /// <summary>
-        /// 更新（消息管理）
+        /// 修改（消息管理）
         /// </summary>
-        /// <param name="saveDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPost]
         [Route("update")]
-        [PermissionDescription("integrated:inteMessageManage:update")]
-        public async Task UpdateAsync([FromBody] InteMessageManageSaveDto saveDto)
+        [PermissionDescription("integrated:inteMessageManage:insert")]
+        public async Task UpdateAsync([FromBody] InteMessageManageTriggerSaveDto dto)
         {
-            await _inteMessageManageService.ModifyAsync(saveDto);
+            await _inteMessageManageService.UpdateAsync(dto);
+        }
+
+        /// <summary>
+        /// 接收（消息管理）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("receive")]
+        [PermissionDescription("integrated:inteMessageManage:update")]
+        public async Task ReceiveAsync([FromBody] InteMessageManageReceiveSaveDto dto)
+        {
+            await _inteMessageManageService.ReceiveAsync(dto);
+        }
+
+        /// <summary>
+        /// 处理（消息管理）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("handle")]
+        [PermissionDescription("integrated:inteMessageManage:update")]
+        public async Task HandleAsync([FromBody] InteMessageManageHandleSaveDto dto)
+        {
+            await _inteMessageManageService.HandleAsync(dto);
+        }
+
+        /// <summary>
+        /// 关闭（消息管理）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("close")]
+        [PermissionDescription("integrated:inteMessageManage:update")]
+        public async Task CloseAsync([FromBody] InteMessageManageCloseSaveDto dto)
+        {
+            await _inteMessageManageService.CloseAsync(dto);
+        }
+
+        /// <summary>
+        /// 查询详情（消息管理）（触发）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("trigger/{id}")]
+        public async Task<InteMessageManageTriggerDto?> QueryTriggerByIdAsync(long id)
+        {
+            return await _inteMessageManageService.QueryTriggerByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（消息管理）（处理）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("handle/{id}")]
+        public async Task<InteMessageManageHandleDto?> QueryHandleByIdAsync(long id)
+        {
+            return await _inteMessageManageService.QueryHandleByIdAsync(id);
+        }
+
+        /// <summary>
+        /// 查询详情（消息管理）（关闭）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("close/{id}")]
+        public async Task<InteMessageManageCloseDto?> QueryCloseByIdAsync(long id)
+        {
+            return await _inteMessageManageService.QueryCloseByIdAsync(id);
         }
 
         /// <summary>
@@ -75,17 +145,6 @@ namespace Hymson.MES.Api.Controllers.Integrated
         public async Task DeleteAsync([FromBody] long[] ids)
         {
             await _inteMessageManageService.DeletesAsync(ids);
-        }
-
-        /// <summary>
-        /// 查询详情（消息管理）
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<InteMessageManageDto?> QueryByIdAsync(long id)
-        {
-            return await _inteMessageManageService.QueryByIdAsync(id);
         }
 
         /// <summary>

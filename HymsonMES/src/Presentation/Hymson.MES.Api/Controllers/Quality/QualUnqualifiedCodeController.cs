@@ -1,18 +1,15 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Quality;
-using Hymson.MES.Services.Services.Quality;
 using Hymson.MES.Services.Services.Quality.QualUnqualifiedCode;
-using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 
 namespace Hymson.MES.Api.Controllers.Quality
 {
     /// <summary>
     /// 不合格代码控制器
-    /// @author wangkeming
-    /// @date 2023-02-11 04:45:25
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -116,5 +113,50 @@ namespace Hymson.MES.Api.Controllers.Quality
         {
             await _qualUnqualifiedCodeService.DeletesQualUnqualifiedCodeAsync(ids);
         }
+
+        #region 状态变更
+        /// <summary>
+        /// 启用（不合格代码）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("不合格代码", BusinessType.UPDATE)]
+        [PermissionDescription("qual:unqualifiedCode:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _qualUnqualifiedCodeService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（不合格代码）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("不合格代码", BusinessType.UPDATE)]
+        [PermissionDescription("qual:unqualifiedCode:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _qualUnqualifiedCodeService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（不合格代码）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("不合格代码", BusinessType.UPDATE)]
+        [PermissionDescription("qual:unqualifiedCode:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _qualUnqualifiedCodeService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
     }
 }

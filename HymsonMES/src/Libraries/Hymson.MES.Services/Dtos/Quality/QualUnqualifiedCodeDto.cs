@@ -50,6 +50,16 @@ namespace Hymson.MES.Services.Dtos.Quality
         public long ProcessRouteId { get; set; }
 
         /// <summary>
+        /// 拦截工序Id
+        /// </summary>
+        public long? InterceptProcedureId { get; set; }
+
+        /// <summary>
+        /// 拦截工序编码
+        /// </summary>
+        public string? InterceptProcedureCode { get; set; }
+
+        /// <summary>
         /// 说明
         /// </summary>
         public string Remark { get; set; }
@@ -77,6 +87,24 @@ namespace Hymson.MES.Services.Dtos.Quality
 
     }
 
+    public record QualUnqualifiedCodeResultDto
+    {
+        /// <summary>
+        /// 主键id
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 不合格代码
+        /// </summary>
+        public string UnqualifiedCode { get; set; }
+
+        /// <summary>
+        /// 不合格代码名称
+        /// </summary>
+        public string UnqualifiedCodeName { get; set; }
+    }
+
     public record UnqualifiedCodeGroupRelationDto
     {
         /// <summary>
@@ -89,7 +117,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public long UnqualifiedGroupId { get; set; }
 
-        // <summary>
+        /// <summary>
         /// 不合格组
         /// </summary>
         public string UnqualifiedGroup { get; set; }
@@ -136,11 +164,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// </summary>
         public string UnqualifiedCodeName { get; set; }
 
-        /// <summary>
-        /// 描述 :状态 
-        /// 空值 : true  
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 描述 :状态 
+        ///// 空值 : true  
+        ///// </summary>
 
         /// <summary>
         /// 类型
@@ -186,11 +213,10 @@ namespace Hymson.MES.Services.Dtos.Quality
         public string UnqualifiedCodeName { get; set; }
 
 
-        /// <summary>
-        /// 描述 :状态 
-        /// 空值 : true  
-        /// </summary>
-        public SysDataStatusEnum? Status { get; set; }
+        ///// <summary>
+        ///// 描述 :状态 
+        ///// 空值 : true  
+        ///// </summary>
 
         /// <summary>
         /// 类型
@@ -227,7 +253,7 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// </summary>
     public class QualUnqualifiedCodePagedQueryDto : PagerInfo
     {
-        // <summary>
+        /// <summary>
         /// 不合格代码
         /// </summary>
         public string? UnqualifiedCode { get; set; }

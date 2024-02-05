@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料库存    服务 | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-06 03:27:59
- */
 using FluentValidation;
 using FluentValidation.Results;
 using Hymson.Authentication;
@@ -14,10 +7,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
+using Hymson.MES.Core.Enums.Warehouse;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
-using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.Warehouse.WhMaterialInventory.Command;
@@ -26,8 +23,6 @@ using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Minio.DataModel;
-//using Hymson.Utils.Extensions;
 
 namespace Hymson.MES.Services.Services.Warehouse
 {
@@ -37,54 +32,71 @@ namespace Hymson.MES.Services.Services.Warehouse
     public class WhMaterialInventoryService : IWhMaterialInventoryService
     {
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentSite _currentSite;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly ILocalizationService _localizationService;
+
+        /// <summary>
+        /// 物料维护 仓储
+        /// </summary>
+        private readonly IProcMaterialRepository _procMaterialRepository;
 
         /// <summary>
         /// 物料库存 仓储
         /// </summary>
         private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
         private readonly IWhMaterialStandingbookRepository _whMaterialStandingbookRepository;
+        private readonly IWhSupplierRepository _whSupplierRepository;
 
-        /// <summary>
-        /// 物料维护 仓储
-        /// </summary>
-        private readonly IProcMaterialRepository _procMaterialRepository;
         /// <summary>
         /// 条码信息表 仓储
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
-        private readonly IWhSupplierRepository _whSupplierRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
+
+        private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
+        private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
 
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
-        private readonly ILocalizationService _localizationService;
-        private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
-        private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
-        private readonly ICurrentSite _currentSite;
-
-
-        public WhMaterialInventoryService(ICurrentUser currentUser,
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="whMaterialInventoryRepository"></param>
+        /// <param name="whMaterialStandingbookRepository"></param>
+        /// <param name="whSupplierRepository"></param>
+        /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        public WhMaterialInventoryService(ICurrentUser currentUser, ICurrentSite currentSite,
+            ILocalizationService localizationService,
+            IProcMaterialRepository procMaterialRepository,
             IWhMaterialInventoryRepository whMaterialInventoryRepository,
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
-             IProcMaterialRepository procMaterialRepository,
-              IManuSfcRepository manuSfcRepository,
-        AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
-            AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules,
-            ICurrentSite currentSite,
-            ILocalizationService localizationService, IWhSupplierRepository whSupplierRepository)
+            IWhSupplierRepository whSupplierRepository,
+            IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
+            AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
+            AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules)
         {
             _currentUser = currentUser;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
-            _procMaterialRepository = procMaterialRepository;
-            _manuSfcRepository = manuSfcRepository;
-
-            _validationCreateRules = validationCreateRules;
-            _validationModifyRules = validationModifyRules;
             _currentSite = currentSite;
             _localizationService = localizationService;
+            _procMaterialRepository = procMaterialRepository;
+            _whMaterialInventoryRepository = whMaterialInventoryRepository;
+            _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _whSupplierRepository = whSupplierRepository;
+            _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
+            _validationCreateRules = validationCreateRules;
+            _validationModifyRules = validationModifyRules;
         }
 
 
@@ -95,10 +107,10 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task CreateWhMaterialInventoryAsync(WhMaterialInventoryCreateDto whMaterialInventoryCreateDto)
         {
-            //验证DTO
+            // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(whMaterialInventoryCreateDto);
 
-            //DTO转换实体
+            // DTO转换实体
             var whMaterialInventoryEntity = whMaterialInventoryCreateDto.ToEntity<WhMaterialInventoryEntity>();
             whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
             whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
@@ -107,191 +119,167 @@ namespace Hymson.MES.Services.Services.Warehouse
             whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
             whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            //入库
+            // 入库
             await _whMaterialInventoryRepository.InsertAsync(whMaterialInventoryEntity);
         }
 
         /// <summary>
         /// 批量创建
         /// </summary>
-        /// <param name="whMaterialInventoryLists"></param>
+        /// <param name="requestDtos"></param>
         /// <returns></returns> 
-        public async Task CreateWhMaterialInventoryListAsync(List<WhMaterialInventoryListCreateDto> whMaterialInventoryLists)
+        public async Task CreateWhMaterialInventoryListAsync(IEnumerable<WhMaterialInventoryListCreateDto> requestDtos)
         {
-            var list = new List<WhMaterialInventoryEntity>();
-            var listStandingbook = new List<WhMaterialStandingbookEntity>();
+            if (requestDtos == null || !requestDtos.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15106));
 
-            if (whMaterialInventoryLists == null || whMaterialInventoryLists.Count() <= 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15106));
-            }
+            //List<ManuSfcEntity> sfcEntities = new();
+            List<WhMaterialInventoryEntity> materialInventories = new();
+            List<WhMaterialStandingbookEntity> materialStandingBooks = new();
+            List<ManuSfcEntity> manuSfcEntities = new();
+            List<ManuSfcInfoEntity> manuSfcInfoEntities = new();
+
+            // 检查条码Id是否在物料里面
+            var procMaterials = await _procMaterialRepository.GetByIdsAsync(requestDtos.Select(it => it.MaterialId).Distinct());
+            if (procMaterials == null || !procMaterials.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15101));
+            var procMaterialDict = procMaterials.ToDictionary(node => node.Id);
+
             var validationFailures = new List<ValidationFailure>();
-            var procMaterials = await _procMaterialRepository.GetByIdsAsync(whMaterialInventoryLists.Select(it => it.MaterialId).Distinct().ToArray());
-            if (procMaterials == null || !procMaterials.Any())
+            foreach (var item in requestDtos)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15101));
-            }
-            foreach (var item in whMaterialInventoryLists)
-            {
-                #region 校验
+                var validationFailure = new ValidationFailure() { FormattedMessagePlaceholderValues = new() };
+                validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
+                validationFailure.FormattedMessagePlaceholderValues.Add("MaterialCode", item.MaterialBarCode);
 
+                // 校验是否有重复条码
                 item.MaterialBarCode = item.MaterialBarCode.Trim();
-                var isMaterialBarCodeList = whMaterialInventoryLists.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode);
+                var isMaterialBarCodeList = requestDtos.Where(it => it.MaterialBarCode.Trim() == item.MaterialBarCode);
                 if (isMaterialBarCodeList.Count() > 1)
                 {
-                    validationFailures.Add(new ValidationFailure
-                    {
-                        FormattedMessagePlaceholderValues = new Dictionary<string, object> { { "CollectionIndex", item.MaterialBarCode } },
-                        ErrorCode = nameof(ErrorCode.MES15107)
-                    });
-                    //var validationFailure = new ValidationFailure();
-                    //if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    //{
-                    //    validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                    //        { "CollectionIndex", item.MaterialBarCode}
-                    //    };
-                    //}
-                    //else
-                    //{
-                    //    validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
-                    //}
-                    //validationFailure.ErrorCode = nameof(ErrorCode.MES15107);
-                    //validationFailures.Add(validationFailure);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15107);
+                    validationFailures.Add(validationFailure);
                     continue;
                 }
 
+                // 是否未设置供应商
                 if (item.SupplierId <= 0)
                 {
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.MaterialBarCode}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
-                    }
                     validationFailure.ErrorCode = nameof(ErrorCode.MES15108);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
+
+                // 是否数量不足
                 if (item.QuantityResidue <= 0)
                 {
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.MaterialBarCode}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
-                    }
                     validationFailure.ErrorCode = nameof(ErrorCode.MES15103);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                var materialInfo = procMaterials.Where(it => it.Id == item.MaterialId).FirstOrDefault();
-                if (materialInfo == null)
+
+                // 是否存在该物料
+                if (!procMaterialDict.ContainsKey(item.MaterialId))
                 {
-                    var validationFailure = new ValidationFailure();
-                    if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues = new Dictionary<string, object> {
-                            { "CollectionIndex", item.MaterialBarCode}
-                        };
-                    }
-                    else
-                    {
-                        validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", item.MaterialBarCode);
-                    }
                     validationFailure.ErrorCode = nameof(ErrorCode.MES15101);
                     validationFailures.Add(validationFailure);
                     continue;
                 }
-                //var supplierInfo = await _whMaterialInventoryRepository.GetWhSupplierByMaterialIdAsync(materialInfo.Id, item.SupplierId);
-                //if (materialInfo == null || supplierInfo.Count() <= 0)
-                //{
-                //    throw new CustomerValidationException(nameof(ErrorCode.MES15102)).WithData("MaterialCode", item.MaterialCode);
-                //}
+                var materialEntity = procMaterialDict[item.MaterialId];
 
-                await GetMaterialBarCodeAnyAsync(item.MaterialBarCode);
-
-                #endregion
+                // 查询是否已存在物料条码
+                await CheckMaterialBarCodeAnyAsync(item.MaterialBarCode);
 
                 #region 数据组装
-                //物料库存
-                var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
-                whMaterialInventoryEntity.SupplierId = item.SupplierId;// supplierInfo.FirstOrDefault().Id;//item.SupplierId;//
-                whMaterialInventoryEntity.MaterialId = materialInfo.Id;
-                whMaterialInventoryEntity.MaterialBarCode = item.MaterialBarCode;
-                whMaterialInventoryEntity.Batch = item.Batch;
-                whMaterialInventoryEntity.QuantityResidue = item.QuantityResidue;
-                whMaterialInventoryEntity.Status = WhMaterialInventoryStatusEnum.ToBeUsed;
-                whMaterialInventoryEntity.DueDate = item.DueDate;
-                whMaterialInventoryEntity.Source = item.Source;
-                whMaterialInventoryEntity.SiteId = _currentSite.SiteId ?? 0;
 
-
-                whMaterialInventoryEntity.Id = IdGenProvider.Instance.CreateId();
-                whMaterialInventoryEntity.CreatedBy = _currentUser.UserName;
-                whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
-                whMaterialInventoryEntity.CreatedOn = HymsonClock.Now();
-                whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
-                list.Add(whMaterialInventoryEntity);
-
-
-                //台账数据
-                var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
-                whMaterialStandingbookEntity.MaterialCode = materialInfo.MaterialCode;
-                whMaterialStandingbookEntity.MaterialName = materialInfo.MaterialName;
-                string version = materialInfo.Version;
-                if (!string.IsNullOrWhiteSpace(item.Version))
+                var manuSfcEntity = new ManuSfcEntity
                 {
-                    version = item.Version;
-                }
-                whMaterialStandingbookEntity.MaterialVersion = version;
-                whMaterialStandingbookEntity.MaterialBarCode = item.MaterialBarCode;
-                whMaterialStandingbookEntity.Batch = item.Batch;
-                whMaterialStandingbookEntity.Quantity = item.QuantityResidue;
-                whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
-                whMaterialStandingbookEntity.Type = item.Type; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
-                whMaterialStandingbookEntity.Source = item.Source;
-                whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item.MaterialBarCode,
+                    Qty = item.QuantityResidue,
+                    Type = SfcTypeEnum.NoProduce,
+                    IsUsed = YesOrNoEnum.No,
+                    Status = SfcStatusEnum.Complete,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                };
 
-                whMaterialStandingbookEntity.SupplierId = item.SupplierId;
+                manuSfcEntities.Add(manuSfcEntity);
 
-                whMaterialStandingbookEntity.Id = IdGenProvider.Instance.CreateId();
-                whMaterialStandingbookEntity.CreatedBy = _currentUser.UserName;
-                whMaterialStandingbookEntity.UpdatedBy = _currentUser.UserName;
-                whMaterialStandingbookEntity.CreatedOn = HymsonClock.Now();
-                whMaterialStandingbookEntity.UpdatedOn = HymsonClock.Now();
+                manuSfcInfoEntities.Add(new ManuSfcInfoEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcId = manuSfcEntity.Id,
+                    ProductId = materialEntity.Id,
+                    IsUsed = true,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                });
 
-                listStandingbook.Add(whMaterialStandingbookEntity);
+                // 物料库存
+                materialInventories.Add(new WhMaterialInventoryEntity
+                {
+                    SupplierId = item.SupplierId,// supplierInfo.FirstOrDefault().Id;//item.SupplierId;//
+                    MaterialId = materialEntity.Id,
+                    MaterialBarCode = item.MaterialBarCode,
+                    Batch = item.Batch,
+                    MaterialType = MaterialInventoryMaterialTypeEnum.PurchaseParts,
+                    QuantityResidue = item.QuantityResidue,
+                    Status = WhMaterialInventoryStatusEnum.ToBeUsed,
+                    DueDate = item.DueDate,
+                    Source = item.Source,
+
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                });
+
+                string version = materialEntity.Version ?? "";
+                if (!string.IsNullOrWhiteSpace(item.Version)) version = item.Version;
+
+                // 台账数据
+                materialStandingBooks.Add(new WhMaterialStandingbookEntity
+                {
+                    MaterialCode = materialEntity.MaterialCode,
+                    MaterialName = materialEntity.MaterialName,
+                    MaterialBarCode = item.MaterialBarCode,
+                    Batch = item.Batch,
+                    Quantity = item.QuantityResidue,
+                    Unit = materialEntity.Unit ?? "",
+                    Type = item.Type,
+                    Source = item.Source,
+                    SupplierId = item.SupplierId,
+                    MaterialVersion = version,
+
+                    SiteId = _currentSite.SiteId ?? 0,
+                    Id = IdGenProvider.Instance.CreateId(),
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedOn = HymsonClock.Now()
+                });
                 #endregion
             }
+
             // 是否存在错误
-            if (validationFailures.Any() == true)
+            if (validationFailures.Any())
             {
-                throw new ValidationException(_localizationService.GetResource("SFCError"), validationFailures);
+                throw new ValidationException("", validationFailures);
             }
-            #region 入库
+
             // 保存实体
             var rows = 0;
-            using (var trans = TransactionHelper.GetTransactionScope())
-            {
-                rows += await _whMaterialInventoryRepository.InsertsAsync(list);
-                rows += await _whMaterialStandingbookRepository.InsertsAsync(listStandingbook);
-                trans.Complete();
-            }
-            if (rows == 0)
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES15105));
-            }
-            #endregion
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _whMaterialInventoryRepository.InsertsAsync(materialInventories);
+            rows += await _whMaterialStandingbookRepository.InsertsAsync(materialStandingBooks);
+            rows += await _manuSfcRepository.InsertRangeAsync(manuSfcEntities);
+            rows += await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoEntities);
+            trans.Complete();
+
+            if (rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES15105));
         }
 
         /// <summary>
@@ -354,7 +342,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="materialBarCode"></param>
         /// <returns></returns>
-        public async Task<bool> GetMaterialBarCodeAnyAsync(string materialBarCode)
+        public async Task<bool> CheckMaterialBarCodeAnyAsync(string materialBarCode)
         {
             var pagedInfo = await _whMaterialInventoryRepository.GetWhMaterialInventoryEntitiesAsync(new WhMaterialInventoryQuery
             {
@@ -367,7 +355,7 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15104)).WithData("MaterialCode", materialBarCode);
             }
 
-            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = materialBarCode, SiteId = _currentSite.SiteId });
+            var sfcEntit = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = materialBarCode, SiteId = _currentSite.SiteId ?? 0 });
             if (sfcEntit != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES152016)).WithData("MaterialCode", materialBarCode);
@@ -405,7 +393,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 return whMaterialInventoryEntity.ToModel<WhMaterialInventoryDto>();
             }
-            return null;
+            return new WhMaterialInventoryDto();
         }
 
         /// <summary>
@@ -415,8 +403,14 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialInventoryDto?> QueryWhMaterialInventoryByBarCodeAsync(string barCode)
         {
-            var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery { SiteId = _currentSite.SiteId, BarCode = barCode });
-            if (entity == null) return null;
+            var entity = await _whMaterialInventoryRepository.GetByBarCodeAsync(new WhMaterialInventoryBarCodeQuery
+            {
+                SiteId = _currentSite.SiteId,
+                BarCode = barCode
+            }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES152017)).WithData("Code", barCode);
+
+            // 只有【待使用】的库存才能上料！
+            if (entity.Status != WhMaterialInventoryStatusEnum.ToBeUsed) throw new CustomerValidationException(nameof(ErrorCode.MES152018));
 
             return entity.ToModel<WhMaterialInventoryDto>();
         }
@@ -489,7 +483,7 @@ namespace Hymson.MES.Services.Services.Warehouse
 
                 return detailDto;
             }
-            else 
+            else
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15120));
             }
@@ -501,29 +495,29 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<WhMaterialInventoryDetailDto> QueryWhMaterialInventoryDetailByIdAsync(long id) 
+        public async Task<WhMaterialInventoryDetailDto> QueryWhMaterialInventoryDetailByIdAsync(long id)
         {
-            var entitys= await _whMaterialInventoryRepository.GetByIdsAsync(new long[] { id });
+            var entitys = await _whMaterialInventoryRepository.GetByIdsAsync(new long[] { id });
             if (entitys != null && entitys.Any())
             {
                 var entity = entitys.FirstOrDefault();
 
-                var detailDto= entity!.ToModel<WhMaterialInventoryDetailDto>();
+                var detailDto = entity!.ToModel<WhMaterialInventoryDetailDto>();
 
                 //查询关联信息
                 var materialInfo = (await _procMaterialRepository.GetByIdsAsync(new long[] { entity!.MaterialId })).FirstOrDefault();
                 var supplierInfo = (await _whSupplierRepository.GetByIdsAsync(new long[] { entity.SupplierId })).FirstOrDefault();
 
-                detailDto.MaterialCode = materialInfo?.MaterialCode??"";
+                detailDto.MaterialCode = materialInfo?.MaterialCode ?? "";
                 detailDto.MaterialName = materialInfo?.MaterialName ?? "";
                 detailDto.MaterialVersion = materialInfo?.Version ?? "";
 
                 detailDto.SupplierCode = supplierInfo?.Code ?? "";
                 detailDto.SupplierName = supplierInfo?.Name ?? "";
 
-                return  detailDto;
+                return detailDto;
             }
-            else 
+            else
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15124));
             }
@@ -534,7 +528,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// </summary>
         /// <param name="modifyDto"></param>
         /// <returns></returns>
-        public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto) 
+        public async Task UpdateOutsideWhMaterialInventoryAsync(OutsideWhMaterialInventoryModifyDto modifyDto)
         {
             //查询到库存的信息
             var oldWhMIEntirty = await _whMaterialInventoryRepository.GetByIdAsync(modifyDto.Id);
@@ -549,24 +543,24 @@ namespace Hymson.MES.Services.Services.Warehouse
                 throw new CustomerValidationException(nameof(ErrorCode.MES15123));
             }
 
-            if (modifyDto.QuantityResidue<0 || modifyDto.QuantityResidue > oldWhMIEntirty.ReceivedQty) 
+            if (modifyDto.QuantityResidue < 0 || modifyDto.QuantityResidue > oldWhMIEntirty.ReceivedQty)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15121));
             }
 
-            if (oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.InUse || oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.Locked) 
+            if (oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.InUse || oldWhMIEntirty.Status == WhMaterialInventoryStatusEnum.Locked)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15122)).WithData("materialBarCode", oldWhMIEntirty.MaterialBarCode).WithData("status", _localizationService.GetResource($"{typeof(WhMaterialInventoryStatusEnum).FullName}.{oldWhMIEntirty.Status.ToString()}"));
             }
 
-                var whMaterialInventoryEntity= new WhMaterialInventoryEntity();
+            var whMaterialInventoryEntity = new WhMaterialInventoryEntity();
             whMaterialInventoryEntity.UpdatedBy = _currentUser.UserName;
             whMaterialInventoryEntity.UpdatedOn = HymsonClock.Now();
 
             whMaterialInventoryEntity.Id = modifyDto.Id;
-            whMaterialInventoryEntity.MaterialId= modifyDto.MaterialId;
+            whMaterialInventoryEntity.MaterialId = modifyDto.MaterialId;
             whMaterialInventoryEntity.QuantityResidue = modifyDto.QuantityResidue;
-            whMaterialInventoryEntity.Batch = modifyDto.Batch??"";
+            whMaterialInventoryEntity.Batch = modifyDto.Batch ?? "";
             whMaterialInventoryEntity.SupplierId = modifyDto.SupplierId;
 
 
@@ -577,11 +571,11 @@ namespace Hymson.MES.Services.Services.Warehouse
             var whMaterialStandingbookEntity = new WhMaterialStandingbookEntity();
             whMaterialStandingbookEntity.MaterialCode = materialInfo.MaterialCode;
             whMaterialStandingbookEntity.MaterialName = materialInfo.MaterialName;
-            whMaterialStandingbookEntity.MaterialVersion = materialInfo.Version??"";
+            whMaterialStandingbookEntity.MaterialVersion = materialInfo.Version ?? "";
             whMaterialStandingbookEntity.Unit = materialInfo.Unit ?? "";
 
             whMaterialStandingbookEntity.MaterialBarCode = oldWhMIEntirty.MaterialBarCode;
-            whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.InventoryModify; //(int)WhMaterialInventorySourceEnum.MaterialReceiving;
+            whMaterialStandingbookEntity.Type = WhMaterialInventoryTypeEnum.InventoryModify;
             whMaterialStandingbookEntity.Source = MaterialInventorySourceEnum.InventoryModify;
             whMaterialStandingbookEntity.SiteId = _currentSite.SiteId ?? 0;
 
@@ -604,5 +598,6 @@ namespace Hymson.MES.Services.Services.Warehouse
                 trans.Complete();
             }
         }
+
     }
 }

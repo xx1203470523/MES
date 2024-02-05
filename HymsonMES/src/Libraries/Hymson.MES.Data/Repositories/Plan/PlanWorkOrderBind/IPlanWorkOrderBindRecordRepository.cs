@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 工单激活日志（日志中心）仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-04-12 11:17:05
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;

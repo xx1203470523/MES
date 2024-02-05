@@ -24,11 +24,11 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// <summary>
         /// 模板路径 
         /// </summary>
-        public string TemplatePath { get; set; }
+        public string TemplatePath { get; set; } = "";
         /// <summary>
         /// 打印机名称
         /// </summary>
-        public string PrinterName { get; set; }
+        public string PrinterName { get; set; } = "";
         /// <summary>
         /// 打印份数
         /// </summary>
@@ -36,7 +36,7 @@ namespace Hymson.MES.HttpClients.Requests.Print
         /// <summary>
         /// 传递给报表的参数集合
         /// </summary>
-        public List<ParamEntity> Params { get; set; }
+        public List<ParamEntity> Params { get; set; } = new List<ParamEntity>();
         /// <summary>
         /// 入参实体
         /// </summary>
@@ -45,18 +45,18 @@ namespace Hymson.MES.HttpClients.Requests.Print
             /// <summary>
             /// 入参变量名称
             /// </summary>
-            public string ParamName { get; set; }
+            public string ParamName { get; set; } = "";
             /// <summary>
             /// 入参变量值内容
             /// </summary>
-            public string ParamValue { get; set; }
+            public string ParamValue { get; set; } = "";
 
         }
     }
     public class PrintResponse
     {
-        public string Data { get; set;}
+        public string Data { get; set; } = "";
         public bool Success { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = "";
     }
 }

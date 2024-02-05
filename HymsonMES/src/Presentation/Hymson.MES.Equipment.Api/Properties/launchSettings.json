@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Hymson.MES.Equipment.Api": {
+    "Hymson.MES.Equipment.Api【开发环境】": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -10,28 +10,16 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5022"
     },
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "Hymson.MES.Equipment.Api【测试环境】": {
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "publishAllPorts": true
+        "ASPNETCORE_ENVIRONMENT": "Staging"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5022"
     }
   },
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:45037",
-      "sslPort": 0
-    }
-  }
+  "$schema": "https://json.schemastore.org/launchsettings.json"
 }

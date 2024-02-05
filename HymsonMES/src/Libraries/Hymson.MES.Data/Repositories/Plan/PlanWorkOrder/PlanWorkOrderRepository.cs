@@ -21,17 +21,15 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 
         /// </summary>
         private readonly ConnectionOptions _connectionOptions;
-        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
+        public PlanWorkOrderRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
             _connectionOptions = connectionOptions.Value;
-            _memoryCache = memoryCache;
         }
 
 
@@ -64,12 +62,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderEntity> GetByIdAsync(long id)
         {
-            var key = $"plan_work_order&{id}";
-            return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
-            {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-                return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByIdSql, new { Id = id });
-            });
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -88,8 +82,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<PlanWorkOrderEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
+            if (!ids.Any()) return new List<PlanWorkOrderEntity>();
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<PlanWorkOrderEntity>(GetByIdsSql, new { ids = ids });
         }
@@ -334,7 +330,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyCommand param)
+        public async Task<int> UpdateInputQtyByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateInputQtySql, param);
@@ -345,8 +341,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public async Task<int> UpdateInputQtyByWorkOrderIdAsync(IEnumerable<UpdateQtyCommand> commands)
+        public async Task<int> UpdateInputQtyByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands)
         {
+            if (commands == null || !commands.Any()) return 0;
+
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateInputQtySql, commands);
         }
@@ -356,10 +354,23 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyCommand param)
+        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdAsync(UpdateQtyByWorkOrderIdCommand param)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, param);
+        }
+
+        /// <summary>
+        /// 更新数量（完工数量）
+        /// </summary>
+        /// <param name="commands"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateFinishProductQuantityByWorkOrderIdsAsync(IEnumerable<UpdateQtyByWorkOrderIdCommand>? commands)
+        {
+            if (commands == null || !commands.Any()) return 0;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateFinishProductQuantitySql, commands);
         }
 
         #region 工单记录表
@@ -453,10 +464,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string UpdateInputQtySql = "UPDATE plan_work_order_record SET " +
             "InputQty = (CASE WHEN InputQty IS NULL THEN 0 ELSE InputQty END) + @Qty, " +
             "RealStart = (CASE WHEN RealStart IS NULL THEN @UpdatedOn ELSE RealStart END), " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
+            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
         const string UpdateFinishProductQuantitySql = "UPDATE plan_work_order_record SET " +
             "FinishProductQuantity = (CASE WHEN FinishProductQuantity IS NULL THEN 0 ELSE FinishProductQuantity END) + @Qty, " +
-            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId";
+            "UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE IsDeleted = 0 AND WorkOrderId = @WorkOrderId;";
 
         const string DeleteSql = "UPDATE `plan_work_order` SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE `plan_work_order`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";

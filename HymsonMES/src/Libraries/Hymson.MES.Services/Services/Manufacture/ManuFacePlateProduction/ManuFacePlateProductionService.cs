@@ -21,7 +21,6 @@ namespace Hymson.MES.Services.Services.Manufacture
     /// </summary>
     public class ManuFacePlateProductionService : IManuFacePlateProductionService
     {
-        private readonly ICurrentUser _currentUser;
         private readonly ICurrentSite _currentSite;
 
         /// <summary>
@@ -30,24 +29,16 @@ namespace Hymson.MES.Services.Services.Manufacture
         private readonly IManuSfcProduceRepository _manuSfcProduceRepository;
 
         private readonly IProcBomDetailRepository _procBomDetailRepository;
-        private readonly IProcBomDetailReplaceMaterialRepository _procBomDetailReplaceMaterialRepository;
         /// <summary>
         /// 条码流转表仓储
         /// </summary>
         private readonly IManuSfcCirculationRepository _manuSfcCirculationRepository;
         private readonly IProcMaterialRepository _procMaterialRepository;
-        private readonly IProcMaskCodeRuleRepository _procMaskCodeRuleRepository;
         private readonly IProcReplaceMaterialRepository _procReplaceMaterialRepository;
-
-        /// <summary>
-        ///  仓储（物料库存）
-        /// </summary>
-        private readonly IWhMaterialInventoryRepository _whMaterialInventoryRepository;
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="manuSfcProduceRepository"></param>
         /// <param name="procBomDetailRepository"></param>
@@ -57,17 +48,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         /// <param name="whMaterialInventoryRepository"></param>
         /// <param name="procMaskCodeRuleRepository"></param>
         /// <param name="procReplaceMaterialRepository"></param>
-        public ManuFacePlateProductionService(ICurrentUser currentUser, ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository)
+        public ManuFacePlateProductionService(ICurrentSite currentSite, IManuSfcProduceRepository manuSfcProduceRepository, IProcBomDetailRepository procBomDetailRepository, IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository, IManuSfcCirculationRepository manuSfcCirculationRepository, IProcMaterialRepository procMaterialRepository, IWhMaterialInventoryRepository whMaterialInventoryRepository, IProcMaskCodeRuleRepository procMaskCodeRuleRepository, IProcReplaceMaterialRepository procReplaceMaterialRepository)
         {
-            _currentUser = currentUser;
             _currentSite = currentSite;
             _manuSfcProduceRepository = manuSfcProduceRepository;
             _procBomDetailRepository = procBomDetailRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _manuSfcCirculationRepository = manuSfcCirculationRepository;
             _procMaterialRepository = procMaterialRepository;
-            _whMaterialInventoryRepository = whMaterialInventoryRepository;
-            _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _procReplaceMaterialRepository = procReplaceMaterialRepository;
         }
 
@@ -126,15 +113,15 @@ namespace Hymson.MES.Services.Services.Manufacture
                 var hasAssembleNum = manuSfcCirculationEntitys.Where(x => x.CirculationMainProductId == mainMaterialId).Sum(x => x.CirculationQty);
                 if (hasAssembleNum >= item.Usages)
                 {
-                    continue;
+                    
                 }
                 else
                 {
                     var mainReplaceMaterials = new List<MainReplaceMaterial>();
 
-                    if (replaceBomDetails == null || replaceBomDetails.Count() == 0)
+                    if (replaceBomDetails == null || replaceBomDetails.Count == 0)
                     {
-                        replaceBomDetails = new List<ProcBomDetailView>();
+                        replaceBomDetails = null;
 
                         if (item.IsEnableReplace)
                         {
@@ -151,7 +138,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                     MaterialId = replace.Id,
                                     MaterialCode = replace.MaterialCode,
                                     MaterialName = replace.MaterialName,
-                                    MaterialVersion = replace.Version,
+                                    MaterialVersion = replace.Version!,
 
                                     SerialNumber = replace.SerialNumber
                                 });
@@ -184,7 +171,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                                 MaterialName = replace.MaterialName,
                                 MaterialVersion = replace.Version,
 
-                                SerialNumber = replace.DataCollectionWay.HasValue ? replace.DataCollectionWay.Value : needQueryMaterialInfos.Where(x => x.Id == replace.ReplaceMaterialId.ParseToLong()).FirstOrDefault()?.SerialNumber
+                                SerialNumber = replace.DataCollectionWay.HasValue ? replace.DataCollectionWay.Value : needQueryMaterialInfos.FirstOrDefault(x => x.Id == replace.ReplaceMaterialId.ParseToLong())?.SerialNumber
                             });
                         }
                     }
@@ -201,14 +188,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                         BomMainMaterialNum = mainBomDetails.Count,
                         CurrentMainMaterialIndex = mainBomDetails.IndexOf(item) + 1,
-
-                        Id = item.Id,// 表proc_bom_detail对应的ID
+                        // 表proc_bom_detail对应的ID
+                        Id = item.Id,
                         MainReplaceMaterials = mainReplaceMaterials
                     };
                 }
             }
 
-            return null;
+            return new ManuFacePlateProductionPackageDto();
         }
 
     }

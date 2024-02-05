@@ -1,25 +1,13 @@
-/*
- *creator: Karl
- *
- *describe: 条码步骤表仓储类 | 代码由框架生成
- *builder:  zhaoqing
- *build datetime: 2023-03-22 05:17:57
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
-using Hymson.MES.Data.Repositories.Common.Command;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 条码步骤表仓储接口
     /// </summary>
-    public interface IManuSfcStepRepository
+    public partial interface IManuSfcStepRepository
     {
         /// <summary>
         /// 根据ID获取数据
@@ -34,6 +22,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcStepEntity>> GetByIdsAsync(long[] ids);
+
+        /// <summary>
+        /// 根据水位批量获取数据
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetListByStartWaterMarkIdAsync(EntityByWaterMarkQuery query);
 
         /// <summary>
         /// 获取List
@@ -59,9 +54,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 批量新增
         /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
+        /// <param name="manuSfcStepEntities"></param>
         /// <returns></returns>
-        Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys);
+        Task<int> InsertRangeAsync(IEnumerable<ManuSfcStepEntity>? manuSfcStepEntities);
 
         /// <summary>
         /// 更新
@@ -70,19 +65,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> UpdateAsync(ManuSfcStepEntity manuSfcStepEntity);
 
-        /// <summary>
-        /// 批量更新 
-        /// </summary>
-        /// <param name="manuSfcStepEntitys"></param>
-        /// <returns></returns>
-        Task<int> UpdateRangeAsync(IEnumerable<ManuSfcStepEntity> manuSfcStepEntitys);
 
-        /// <summary>
-        /// 批量删除
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        Task<int> DeleteRangeAsync(DeleteCommand command);
 
         /// <summary>
         /// 插入步骤业务表
@@ -99,17 +82,47 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertSfcStepBusinessRangeAsync(IEnumerable<MaunSfcStepBusinessEntity> maunSfcStepBusinessEntities);
 
         /// <summary>
-        /// 获取SFC的进出站步骤
-        /// </summary>
-        /// <param name="sfc"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInOutStepAsync(SfcInOutStepQuery sfcQuery);
-
-        /// <summary>
         /// 分页查询 根据SFC
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepEntity>> GetPagedInfoBySFCAsync(ManuSfcStepBySfcPagedQuery queryParam);
+
+        /// <summary>
+        /// 获取一些条码的所有进站信息
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetSFCInStepAsync(SfcInStepQuery query);
+
+        /// <summary>
+        /// 根据实体列表对数据进行按表名分组
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Dictionary<string, IGrouping<string, ManuSfcStepEntity>> GetTableNames(IEnumerable<ManuSfcStepEntity> entities);
+
+        /// <summary>
+        /// 获取SFC的进出站步骤
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCAsync(EntityBySFCQuery query);
+
+        /// <summary>
+        /// 指定表情查询条码的进出站步骤
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepEntity>> GetInOutStationStepsBySFCsAsync(string tableName, EntityBySFCsQuery query);
+
+
+        /// <summary>
+        /// 获取一个条码的合并新增或拆分新增步骤记录
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcStepEntity> GetSfcMergeOrSplitAddStepAsync(SfcMergeOrSplitAddStepQuery query);
     }
 }

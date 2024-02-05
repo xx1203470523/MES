@@ -186,11 +186,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public DisableOrEnableEnum? Status { get; set; }
 
-        ///// <summary>
-        ///// 载具类型id
-        ///// </summary>
-        //public long VehicleTypeId { get; set; }
-
         /// <summary>
         /// 载具类型编码
         /// </summary>
@@ -250,7 +245,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         ///// <summary>
         ///// 载具id
         ///// </summary>
-        //public long VehicleId { get; set; }
 
         /// <summary>
         /// 有效期

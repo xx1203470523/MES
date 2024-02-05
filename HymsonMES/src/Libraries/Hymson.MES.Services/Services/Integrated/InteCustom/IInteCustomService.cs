@@ -7,6 +7,8 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
+using Hymson.MES.Services.Dtos.Process;
+using Microsoft.AspNetCore.Http;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -56,5 +58,26 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteCustomDto> QueryInteCustomByIdAsync(long id);
+
+        /// <summary>
+        /// 下载导入模板
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        Task DownloadImportTemplateAsync(Stream stream);
+
+        /// <summary>
+        /// 导入客户信息表格
+        /// </summary>
+        /// <returns></returns>
+        Task ImportInteCustomAsync(IFormFile formFile);
+
+        /// <summary>
+        /// 根据查询条件导出客户维护信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<InteCustomExportResultDto> ExprotInteCustomPageListAsync(InteCustomPagedQueryDto param);
+
     }
 }

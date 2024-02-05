@@ -3,6 +3,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Integrated
@@ -12,11 +13,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
     /// </summary>
     public partial class InteEventTypePushRuleRepository : BaseRepository, IInteEventTypePushRuleRepository
     {
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteEventTypePushRuleRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
+        /// <param name="memoryCache"></param>
+        public InteEventTypePushRuleRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
+        {
+        }
 
         /// <summary>
         /// 新增（批量）
@@ -50,6 +55,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("EventTypeId = @ParentId");
             sqlBuilder.Select("*");
 

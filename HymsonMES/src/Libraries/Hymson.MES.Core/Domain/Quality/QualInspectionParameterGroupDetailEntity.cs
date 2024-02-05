@@ -36,6 +36,11 @@ namespace Hymson.MES.Core.Domain.Quality
         public decimal? LowerLimit { get; set; }
 
         /// <summary>
+        /// 参考值
+        /// </summary>
+        public string? ReferenceValue { get; set; }
+
+        /// <summary>
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }

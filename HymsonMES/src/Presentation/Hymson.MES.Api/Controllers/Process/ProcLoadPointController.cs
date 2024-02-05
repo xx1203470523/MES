@@ -1,18 +1,16 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
 using Hymson.Web.Framework.Attributes;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Api.Controllers.Process
 {
     /// <summary>
     /// 控制器（上料点表）
-    /// @author Karl
-    /// @date 2023-02-17 08:57:53
     /// </summary>
-    
     [ApiController]
     [Route("api/v1/[controller]")]
     public class ProcLoadPointController : ControllerBase
@@ -97,9 +95,91 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:loadPoint:delete")]
         public async Task DeleteProcLoadPointAsync([FromBody] long[] ids)
         {
-            //long[] idsArr = StringExtension.SpitLongArrary(ids);
             await _procLoadPointService.DeletesProcLoadPointAsync(ids);
         }
 
+        #region 状态变更
+        /// <summary>
+        /// 启用（上料点维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusEnable")]
+        [LogDescription("上料点维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:loadPoint:updateStatusEnable")]
+        public async Task UpdateStatusEnable([FromBody] long id)
+        {
+            await _procLoadPointService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
+        }
+
+        /// <summary>
+        /// 保留（上料点维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusRetain")]
+        [LogDescription("上料点维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:loadPoint:updateStatusRetain")]
+        public async Task UpdateStatusRetain([FromBody] long id)
+        {
+            await _procLoadPointService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Retain });
+        }
+
+        /// <summary>
+        /// 废除（上料点维护）
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatusAbolish")]
+        [LogDescription("上料点维护", BusinessType.UPDATE)]
+        [PermissionDescription("proc:loadPoint:updateStatusAbolish")]
+        public async Task UpdateStatusAbolish([FromBody] long id)
+        {
+            await _procLoadPointService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Abolish });
+        }
+
+        #endregion
+
+        /// <summary>
+        /// 导入模板下载
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("downloadImportTemplate")]
+        [LogDescription("导入模板下载", BusinessType.EXPORT, IsSaveRequestData = false, IsSaveResponseData = false)]
+        public async Task<IActionResult> DownloadTemplateExcel()
+        {
+            using MemoryStream stream = new MemoryStream();
+            await _procLoadPointService.DownloadImportTemplateAsync(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"上料点导入模板.xlsx");
+        }
+
+        /// <summary>
+        /// 导入上料点数据
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importLoadPoint")]
+        public async Task ImportCustomAsync([FromForm(Name = "file")] IFormFile formFile)
+        {
+
+            await _procLoadPointService.ImportLoadPointAsync(formFile);
+        }
+
+        /// <summary>
+        /// 导出客户维护信息
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("export")]
+        [PermissionDescription("proc:parameter:export")]
+        public async Task<LoadPointExportResultDto> ExprotBomPageListAsync([FromQuery] ProcLoadPointPagedQueryDto param)
+        {
+            return await _procLoadPointService.ExprotLoadPointPageListAsync(param);
+        }
     }
 }

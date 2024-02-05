@@ -1,4 +1,6 @@
-﻿using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
+﻿using Hymson.MES.CoreServices.Bos.Manufacture.ManuCreateBarcode;
+using Hymson.MES.Services.Dtos.Manufacture.ManuMainstreamProcessDto.ManuCreateBarcodeDto;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,8 +8,6 @@ namespace Hymson.MES.Api.Controllers.Manufacture
 {
     /// <summary>
     /// 下达条码控制器
-    /// @author wangkeming
-    /// @date 2023-02-11 04:45:25
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -20,16 +20,27 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         }
 
         /// <summary>
+        /// 在条码下达时获取最新条码信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetNewBarCodeOnBarCodeCreatedAsync")]
+        public async Task<IEnumerable<CreateBarcodeByWorkOrderOutputBo>> GetNewBarCodeOnBarCodeCreatedAsync(PlanSfcPrintQueryDto query)
+        {
+            return await _planSfcPrintService.GetNewBarCodeOnBarCodeCreatedAsync(query);
+        }
+
+        /// <summary>
         /// 生成条码
         /// </summary>
         /// <param name="parm"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("CreateBarcodeByWorkOrder")]
-        public async Task GenerateBarcodeAsync(CreateBarcodeByWorkOrderDto parm)
+        public async Task<List<CreateBarcodeByWorkOrderOutputBo>> GenerateBarcodeAsync(CreateBarcodeByWorkOrderDto parm)
         {
-            await _planSfcPrintService.CreateBarcodeByWorkOrderIdAsync(parm);
+            return await _planSfcPrintService.CreateBarcodeByWorkOrderIdAsync(parm);
         }
+
         /// <summary>
         /// 生成条码并打印
         /// </summary>

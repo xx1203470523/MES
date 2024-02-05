@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -101,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteMessageManageAnalysisReportAttachmentEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteMessageManageAnalysisReportAttachmentEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteMessageManageAnalysisReportAttachmentEntity>(GetByIdsSql, new { Ids = ids });
@@ -116,6 +116,8 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("MessageManageId = @MessageManageId");
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteMessageManageAnalysisReportAttachmentEntity>(template.RawSql, query);
         }
@@ -158,9 +160,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM inte_message_manage_analysis_report_attachment /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM inte_message_manage_analysis_report_attachment /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
-        const string GetEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM inte_message_manage_analysis_report_attachment /**where**/  ";
+        const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM inte_message_manage_analysis_report_attachment /**where**/  ";
 
         const string InsertSql = "INSERT INTO inte_message_manage_analysis_report_attachment(  `Id`, `MessageManageId`, `AttachmentId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @MessageManageId, @AttachmentId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
         const string InsertsSql = "INSERT INTO inte_message_manage_analysis_report_attachment(  `Id`, `MessageManageId`, `AttachmentId`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @MessageManageId, @AttachmentId, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";

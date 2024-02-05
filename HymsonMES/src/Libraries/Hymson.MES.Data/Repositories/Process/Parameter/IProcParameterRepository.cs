@@ -1,7 +1,7 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process.Parameter.Query;
+using Hymson.MES.Data.Repositories.Process.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -16,6 +16,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procParameterEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcParameterEntity procParameterEntity);
+
+        /// <summary>
+        /// 批量新增
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcParameterEntity> entities);
 
         /// <summary>
         /// 更新

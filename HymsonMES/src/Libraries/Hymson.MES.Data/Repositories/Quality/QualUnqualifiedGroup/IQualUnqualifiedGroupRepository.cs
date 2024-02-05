@@ -104,6 +104,13 @@ namespace Hymson.MES.Data.Repositories.Quality.QualUnqualifiedGroup
         Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long id);
 
         /// <summary>
+        /// 删除不合格组关联不合格代码
+        /// </summary>
+        /// <param name="unqualifiedCodeId"></param>
+        /// <returns></returns>
+        Task<int> RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(long unqualifiedCodeId);
+
+        /// <summary>
         /// 插入不合格组关联工序
         /// </summary>
         /// <param name="param"></param>
