@@ -188,10 +188,8 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<ProcProcedureTimeControlView>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var manuProcedureTimecontrolEntities = await entitiesTask;
-            var totalCount = await totalCountTask;
+            var manuProcedureTimecontrolEntities = await conn.QueryAsync<ProcProcedureTimeControlView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<ProcProcedureTimeControlView>(manuProcedureTimecontrolEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 

@@ -321,7 +321,9 @@ namespace Hymson.MES.Services.Services.Process
                     Site = pagedQuery.SiteId,
                     Code = pagedQueryDto.ProductCode
                 });
-                pagedQuery.ProductId = procMaterialEntity.Id;
+
+                if (procMaterialEntity != null) pagedQuery.ProductId = procMaterialEntity.Id;
+                else pagedQuery.ProductId = 0;
             }
 
             // 转换起始工序编码变为工序ID
@@ -332,7 +334,9 @@ namespace Hymson.MES.Services.Services.Process
                     Site = pagedQuery.SiteId,
                     Code = pagedQueryDto.FromProcedure
                 });
-                pagedQuery.FromProcedureId = procProcedureEntity.Id;
+
+                if (procProcedureEntity != null) pagedQuery.FromProcedureId = procProcedureEntity.Id;
+                else pagedQuery.FromProcedureId = 0;
             }
 
             // 转换到达工序编码变为工序ID
@@ -343,7 +347,9 @@ namespace Hymson.MES.Services.Services.Process
                     Site = pagedQuery.SiteId,
                     Code = pagedQueryDto.ToProcedure
                 });
-                pagedQuery.ToProcedureId = procProcedureEntity.Id;
+
+                if (procProcedureEntity != null) pagedQuery.ToProcedureId = procProcedureEntity.Id;
+                else pagedQuery.ToProcedureId = 0;
             }
 
             // 查询数据
