@@ -1,11 +1,16 @@
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+ 
+using Hymson.MES.Core.Domain.Plan; 
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Plan.Query;
-using Microsoft.Extensions.Options;
+ 
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
@@ -187,7 +192,16 @@ namespace Hymson.MES.Data.Repositories.Plan
             return await conn.QueryAsync<PlanShiftDetailEntity>(template.RawSql, new { Id = id });
         }
 
-
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateStatusSql, command);
+        }
 
         /// <summary>
         /// 分页查询
@@ -204,6 +218,16 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (pagedQuery.Code != null && pagedQuery.Code.Any())
+            {
+                sqlBuilder.Where("Code = @Code");
+            }
+
+            if (pagedQuery.Name != null && pagedQuery.Name.Any())
+            {
+                sqlBuilder.Where("Name = @Name");
+            }
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
@@ -216,6 +240,8 @@ namespace Hymson.MES.Data.Repositories.Plan
             var totalCount = await totalCountTask;
             return new PagedInfo<PlanShiftEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
+
 
     }
 
@@ -248,6 +274,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByMainIdSql = @"SELECT * FROM plan_shift_detail WHERE ShfitId = @Id ";
 
         const string DeletesDetailByIdSql = @"DELETE FROM plan_shift_detail WHERE ShfitId IN @Ids ";
+
+        const string UpdateStatusSql = "UPDATE `plan_shift` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 
     }
 }
