@@ -216,6 +216,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string? Code { get; set; }
 
         public string? Name { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 
 }

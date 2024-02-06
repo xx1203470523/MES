@@ -299,10 +299,7 @@ namespace Hymson.MES.Services.Services.Plan
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10125));
             }
-            //if (!Enum.IsDefined(typeof(SysDataStatusEnum), param.Status))
-            //{
-            //    throw new CustomerValidationException(nameof(ErrorCode.MES10126));
-            //}
+
             if (param.Status == SysDataStatusEnum.Build)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10128));
