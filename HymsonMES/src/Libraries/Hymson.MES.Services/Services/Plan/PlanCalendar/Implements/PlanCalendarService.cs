@@ -1,15 +1,14 @@
 
 using FluentValidation;
-using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Authentication;
-using Hymson.Infrastructure.Exceptions;
+using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
+using Hymson.Infrastructure.Exceptions;
+using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Constants;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
-using Hymson.Utils;
-using Hymson.Infrastructure.Mapper;
-using Hymson.MES.Core.Constants;
 using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Plan;
@@ -211,8 +210,13 @@ public class PlanCalendarService : IPlanCalendarService
 
         using var scope = TransactionHelper.GetTransactionScope();
 
-        var count = await _planCalendarRepository.InsertAsync(command);
-        if(count > 0 && detailCreateCommands.Any())
+        var count = await _planCalendarRepository.InsertIgnoreAsync(command);
+        if(count == 0)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES19801));
+        }
+
+        if(detailCreateCommands.Any())
         {
             await _planCalendarDetailRepository.InsertAsync(detailCreateCommands);
         }

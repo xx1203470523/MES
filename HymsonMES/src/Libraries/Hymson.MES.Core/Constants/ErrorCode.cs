@@ -1726,5 +1726,13 @@
         public const string MES19708 = "不合格代码【code】不存在!";
         public const string MES19709 = "产品序列码【code】信息不存在!";
         #endregion
+
+        #region 生产日历
+
+        public const string MES19801 = "生产日历新增失败，可能存在相同年月的生产日历！";
+        public const string MES19802 = "必须填写年份！";
+        public const string MES19803 = "必须填写月份！";
+
+        #endregion
     }
 }

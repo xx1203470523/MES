@@ -508,6 +508,20 @@ public partial class PlanCalendarRepository
 /// </summary>
 public partial class PlanCalendarRepository
 {
+    #region 新增
+
+    /// <summary>
+    /// 创建数据 - 忽略
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public async Task<int> InsertIgnoreAsync(PlanCalendarCreateCommand command)
+    {
+        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        return await conn.ExecuteAsync(InsertIgnoreSql, command);
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -519,4 +533,9 @@ public partial class PlanCalendarRepository
 /// </summary>
 public partial class PlanCalendarRepository
 {
+    #region 新增
+
+    const string InsertIgnoreSql = "INSERT IGNORE INTO `plan_calendar` (`Id`,`SiteId`,`ShiftId`,`Year`,`Month`,`Workday`,`Status`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`,`Remark`) VALUES (@Id,@SiteId,@ShiftId,@Year,@Month,@Workday,@Status,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@Remark);";
+
+    #endregion
 }
