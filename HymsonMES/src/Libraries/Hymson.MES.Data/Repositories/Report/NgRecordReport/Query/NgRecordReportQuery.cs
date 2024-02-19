@@ -31,14 +31,9 @@ public class NgRecordReportQuery : PagerInfo
     public IEnumerable<long>? EquipmentIds { get; set; }
 
     /// <summary>
-    /// 工序Id
-    /// </summary>
-    public long? ProcedureId { get; set; }
-
-    /// <summary>
     /// 工序Ids
     /// </summary>
-    public IEnumerable<long>? ProcedureIds { get; set; }
+    public IEnumerable<long>? ProcedureId { get; set; }
 
     /// <summary>
     /// 资源Id
@@ -90,14 +85,9 @@ public class NgRecordReportPageQuery : PagerInfo
     public IEnumerable<long>? EquipmentIds { get; set; }
 
     /// <summary>
-    /// 工序Id
-    /// </summary>
-    public long? ProcedureId { get; set; }
-
-    /// <summary>
     /// 工序Ids
     /// </summary>
-    public IEnumerable<long>? ProcedureIds { get; set; }
+    public IEnumerable<long>? ProcedureId { get; set; }
 
     /// <summary>
     /// 资源Id

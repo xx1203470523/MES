@@ -34,8 +34,7 @@ public partial class NgRecordReportRepository : BaseRepository, INgRecordReportR
         var sqlBuilder = new SqlBuilder();
         var templateData = sqlBuilder.AddTemplate(GetJoinPagedInfoDataSqlTemplate);
         var templateCount = sqlBuilder.AddTemplate(GetJoinPagedInfoCountSqlTemplate);
-        sqlBuilder.InnerJoin("manu_sfc_step mss ON mss.Id  = BarCodeStepId");
-        sqlBuilder.Where("mssn.IsDeleted=0");
+        sqlBuilder.Where("mss.IsDeleted=0");
         sqlBuilder.Select("mss.*");
 
 
@@ -61,8 +60,7 @@ public partial class NgRecordReportRepository : BaseRepository, INgRecordReportR
     {
         var sqlBuilder = new SqlBuilder();
         var templateData = sqlBuilder.AddTemplate(GetJoinListSqlTemplete);
-        sqlBuilder.InnerJoin("manu_sfc_step mss ON mss.Id  = BarCodeStepId");
-        sqlBuilder.Where("mssn.IsDeleted=0");
+        sqlBuilder.Where("mss.IsDeleted=0");
         sqlBuilder.Select("mss.*");
 
         WhereFill(sqlBuilder, query);
@@ -94,10 +92,6 @@ public partial class NgRecordReportRepository
         {
             sqlBuilder.Where("mss.ProcedureId = @ProcedureId");
         }
-        if (pageQuery.ProcedureIds?.Any() == true)
-        {
-            sqlBuilder.Where("mss.ProcedureId IN @ProcedureIds");
-        }
         if (pageQuery.ResourceId != null)
         {
             sqlBuilder.Where("mss.ResourceId = @ResourceId");
@@ -108,11 +102,11 @@ public partial class NgRecordReportRepository
         }
         if (pageQuery.BeginTime != null)
         {
-            sqlBuilder.Where("mssn.CreatedOn >= @BeginTime");
+            sqlBuilder.Where("mss.EndTime >= @BeginTime");
         }
         if (pageQuery.EndTime != null)
         {
-            sqlBuilder.Where("mssn.CreatedOn < @EndTime");
+            sqlBuilder.Where("mss.EndTime < @EndTime");
         }
     }
 
@@ -130,11 +124,7 @@ public partial class NgRecordReportRepository
         {
             sqlBuilder.Where("mss.EquipmentId IN @EquipmentIds");
         }
-        if (query.ProcedureId != null)
-        {
-            sqlBuilder.Where("mss.ProcedureId = @ProcedureId");
-        }
-        if (query.ProcedureIds?.Any() == true)
+        if (query.ProcedureId?.Any() == true)
         {
             sqlBuilder.Where("mss.ProcedureId IN @ProcedureIds");
         }
@@ -148,11 +138,11 @@ public partial class NgRecordReportRepository
         }
         if (query.BeginTime != null)
         {
-            sqlBuilder.Where("mssn.CreatedOn >= @BeginTime");
+            sqlBuilder.Where("mss.EndTime >= @BeginTime");
         }
         if (query.EndTime != null)
         {
-            sqlBuilder.Where("mssn.CreatedOn < @EndTime");
+            sqlBuilder.Where("mss.EndTime < @EndTime");
         }
     }
 }
@@ -163,9 +153,9 @@ public partial class NgRecordReportRepository
 
 public partial class NgRecordReportRepository
 {
-    const string GetJoinPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step_ng` mssn /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-    const string GetJoinPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_step_ng` mssn /**innerjoin**/ /**where**/ ";
+    const string GetJoinPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_summary` mss /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+    const string GetJoinPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `manu_sfc_summary` mss /**innerjoin**/ /**where**/ ";
 
-    const string GetJoinListSqlTemplete = "SELECT /**select**/ FROM `manu_sfc_step_ng` mssn /**innerjoin**/ /**leftjoin**/ /**where**/";
+    const string GetJoinListSqlTemplete = "SELECT /**select**/ FROM `manu_sfc_summary` mss /**innerjoin**/ /**leftjoin**/ /**where**/";
 }
 #endregion

@@ -71,8 +71,22 @@ public class NgRecordService : INgRecordService
             query.EndTime = query.DateList[1];
         }
 
-        var ngRecordReportEntities = await _ngRecordReportRepository.GetJoinListAsync(query);
+        if (query.EquipmentCode?.Any() == true)
+        {
+            var equipmentEntity = await _equipmentRepository.GetByCodeAsync(new() { Code = query.EquipmentCode, Site = 123456 });
+            if (equipmentEntity == null) return list;
+            query.EquipmentId = equipmentEntity.Id;
+        }
 
+        if (query.ProcedureId != null)
+        {
+            var searchProcedureEntities = await _procProcedureRepository.GetByIdsAsync(query.ProcedureId.ToArray());
+            if (searchProcedureEntities == null) return list;
+            query.ProcedureId = searchProcedureEntities.Select(a => a.Id);
+        }
+
+
+        var ngRecordReportEntities = await _ngRecordReportRepository.GetJoinListAsync(query);
 
         var equipmentIds = ngRecordReportEntities.Select(a => a.EquipmentId.GetValueOrDefault());
         var equipmentEntities = await _equipmentRepository.GetByIdsAsync(equipmentIds.ToArray());
@@ -93,10 +107,10 @@ public class NgRecordService : INgRecordService
             NgRecordReportDto ngData = new NgRecordReportDto()
             {
                 SFC = item?.SFC,
-                CreatedOn = item?.CreatedOn,
+                EndTime = item?.EndTime,
                 EquipmentCode = equipment?.EquipmentCode,
                 EquipmentName = equipment?.EquipmentName,
-                Passed = item?.Passed,
+                QualityStatus = item?.QualityStatus,
                 ProcedureCode = procedure?.Code,
                 ProcedureName = procedure?.Name,
                 ResourceCode = resource?.ResCode,
@@ -124,6 +138,21 @@ public class NgRecordService : INgRecordService
             pageQuery.EndTime = pageQuery.DateList[1];
         }
 
+        if (pageQuery.EquipmentCode?.Any() == true)
+        {
+            var equipmentEntity = await _equipmentRepository.GetByCodeAsync(new() { Code = pageQuery.EquipmentCode, Site = 123456 });
+            if (equipmentEntity == null) return pagedInfo;
+            pageQuery.EquipmentId = equipmentEntity.Id;
+        }
+
+        if (pageQuery.ProcedureId != null)
+        {
+            var searchProcedureEntities = await _procProcedureRepository.GetByIdsAsync(pageQuery.ProcedureId.ToArray());
+            if (searchProcedureEntities == null) return pagedInfo;
+            pageQuery.ProcedureId = searchProcedureEntities.Select(a=>a.Id);
+        }
+
+
         var ngRecordReportEntities = await _ngRecordReportRepository.GetJoinPagedInfoAsync(pageQuery);
 
         var pageData = ngRecordReportEntities.Data;
@@ -147,10 +176,11 @@ public class NgRecordService : INgRecordService
             NgRecordReportDto ngData = new NgRecordReportDto()
             {
                 SFC = item?.SFC,
-                CreatedOn = item?.CreatedOn,
+                EndTime = item?.EndTime,
+                BeginTime = item?.BeginTime,
                 EquipmentCode = equipment?.EquipmentCode,
                 EquipmentName = equipment?.EquipmentName,
-                Passed = item?.Passed,
+                QualityStatus = item?.QualityStatus,
                 ProcedureCode = procedure?.Code,
                 ProcedureName = procedure?.Name,
                 ResourceCode = resource?.ResCode,
@@ -168,7 +198,7 @@ public class NgRecordService : INgRecordService
 
     public async Task<ExportResultDto> ExportExcelAsync(NgRecordReportQueryDto queryDto)
     {
-        string fileName = string.Format("({0})Ng记录报表", DateTime.Now.ToString("yyyyMMddHHmmss"));
+        string fileName = string.Format("({0})生产明细报表", DateTime.Now.ToString("yyyyMMddHHmmss"));
 
         var listData = await GetListAsync(queryDto);
 
@@ -179,10 +209,10 @@ public class NgRecordService : INgRecordService
             NgRecordReportExportDto exportExcel = new()
             {
                 SFC = item.SFC,
-                CreatedOn = item?.CreatedOn,
+                CreatedOn = item?.EndTime,
                 EquipmentCode = item?.EquipmentCode,
                 EquipmentName = item?.EquipmentName,
-                Passed = item?.Passed,
+                Passed = item?.QualityStatus,
                 ProcedureCode = item?.ProcedureCode,
                 ProcedureName = item?.ProcedureName,
                 ResourceCode = item?.ResourceCode,

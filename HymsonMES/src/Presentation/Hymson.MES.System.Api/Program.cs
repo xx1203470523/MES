@@ -46,13 +46,15 @@ namespace Hymson.MES.System.Api
             builder.Services.AddMemoryCache();
             builder.Services.AddClearCacheService(builder.Configuration);
             AddSwaggerGen(builder.Services);
-
+            
             builder.Services.AddJwtBearerService(builder.Configuration);
             builder.Services.AddCoreService(builder.Configuration);
             builder.Services.AddSystemService(builder.Configuration);
             builder.Services.AddSqlLocalization(builder.Configuration);
             builder.Services.AddSequenceService(builder.Configuration);
             builder.Services.AddLocalization();
+            builder.Services.AddMinioService(builder.Configuration);
+            builder.Services.AddExcelService();
 #if DEBUG
             builder.Services.AddHttpLogging(logging =>
             {

@@ -47,11 +47,16 @@ public class NgRecordReportDto
     /// <summary>
     /// 是否合格状态
     /// </summary>
-    public TrueOrFalseEnum? Passed { get; set; }
+    public TrueOrFalseEnum? QualityStatus { get; set; }
+
+    /// <summary>
+    /// 进站时间
+    /// </summary>
+    public string? BeginTime { get; set; }
 
     /// <summary>
     /// 过站时间
     /// </summary>
-    public string? CreatedOn { get; set; }
+    public string? EndTime { get; set; }
 
 }
