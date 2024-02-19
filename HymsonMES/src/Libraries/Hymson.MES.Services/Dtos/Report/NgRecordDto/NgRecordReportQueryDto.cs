@@ -1,4 +1,5 @@
 ﻿using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,11 @@ public class NgRecordReportQueryDto : PagerInfo
     /// 截止日期
     /// </summary>
     public DateTime? EndTime { get; set; }
+
+    /// <summary>
+    /// 是否合格状态
+    /// </summary>
+    public TrueOrFalseEnum? QualityStatus { get; set; }
 }
 
 /// <summary>
@@ -77,4 +83,9 @@ public class NgRecordReportPageQueryDto : PagerInfo
     /// 截止日期
     /// </summary>
     public DateTime? EndTime { get; set; }
+
+    /// <summary>
+    /// 是否合格状态
+    /// </summary>
+    public TrueOrFalseEnum? QualityStatus { get; set; }
 }

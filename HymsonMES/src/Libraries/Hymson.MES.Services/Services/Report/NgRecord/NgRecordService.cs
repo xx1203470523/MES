@@ -85,7 +85,6 @@ public class NgRecordService : INgRecordService
             query.ProcedureId = searchProcedureEntities.Select(a => a.Id);
         }
 
-
         var ngRecordReportEntities = await _ngRecordReportRepository.GetJoinListAsync(query);
 
         var equipmentIds = ngRecordReportEntities.Select(a => a.EquipmentId.GetValueOrDefault());
@@ -145,14 +144,14 @@ public class NgRecordService : INgRecordService
             pageQuery.EquipmentId = equipmentEntity.Id;
         }
 
-        if (pageQuery.ProcedureId != null)
+        if (pageQuery.ProcedureId?.Any() == true)
         {
             var searchProcedureEntities = await _procProcedureRepository.GetByIdsAsync(pageQuery.ProcedureId.ToArray());
             if (searchProcedureEntities == null) return pagedInfo;
             pageQuery.ProcedureId = searchProcedureEntities.Select(a=>a.Id);
         }
 
-
+        
         var ngRecordReportEntities = await _ngRecordReportRepository.GetJoinPagedInfoAsync(pageQuery);
 
         var pageData = ngRecordReportEntities.Data;

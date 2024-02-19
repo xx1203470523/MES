@@ -778,7 +778,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Passed = passed,
                 Remark = remark,
                 SiteId = _currentSite.SiteId ?? 0,
-                CreatedBy = sfc.CreatedBy,
+                CreatedBy = _currentUser.UserName ?? sfc.CreatedBy,
                 UpdatedBy = sfc.UpdatedBy
             };
         }

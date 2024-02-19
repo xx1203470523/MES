@@ -37,7 +37,6 @@ public partial class NgRecordReportRepository : BaseRepository, INgRecordReportR
         sqlBuilder.Where("mss.IsDeleted=0");
         sqlBuilder.Select("mss.*");
 
-
         WhereFill(sqlBuilder, pageQuery);
 
         var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;
@@ -88,9 +87,9 @@ public partial class NgRecordReportRepository
         {
             sqlBuilder.Where("mss.EquipmentId IN @EquipmentIds");
         }
-        if (pageQuery.ProcedureId != null)
+        if (pageQuery.ProcedureId?.Any() == true)
         {
-            sqlBuilder.Where("mss.ProcedureId = @ProcedureId");
+            sqlBuilder.Where("mss.ProcedureId IN @ProcedureId");
         }
         if (pageQuery.ResourceId != null)
         {
@@ -107,6 +106,10 @@ public partial class NgRecordReportRepository
         if (pageQuery.EndTime != null)
         {
             sqlBuilder.Where("mss.EndTime < @EndTime");
+        }
+        if (pageQuery.QualityStatus != null)
+        {
+            sqlBuilder.Where("mss.QualityStatus = @QualityStatus");
         }
     }
 
@@ -143,6 +146,10 @@ public partial class NgRecordReportRepository
         if (query.EndTime != null)
         {
             sqlBuilder.Where("mss.EndTime < @EndTime");
+        }
+        if (query.QualityStatus != null)
+        {
+            sqlBuilder.Where("mss.QualityStatus = @QualityStatus");
         }
     }
 }
