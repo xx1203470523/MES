@@ -4,13 +4,16 @@ using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
+using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Plan;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
@@ -49,6 +52,8 @@ namespace Hymson.MES.Services.Services.Plan
         /// </summary>
         private readonly IPlanShiftRepository _planShiftRepository;
 
+        private readonly ILocalizationService _localizationService;
+
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -59,13 +64,14 @@ namespace Hymson.MES.Services.Services.Plan
         /// <param name="planShiftRepository"></param>
         public PlanShiftService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<PlanShiftSaveDto> validationSaveRules,
             AbstractValidator<PlanShiftDetailModifyDto> validationDetailRules,
-            IPlanShiftRepository planShiftRepository)
+            IPlanShiftRepository planShiftRepository, ILocalizationService localizationService)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _validationDetailRules = validationDetailRules;
             _planShiftRepository = planShiftRepository;
+            _localizationService = localizationService;
         }
 
 
@@ -278,6 +284,55 @@ namespace Hymson.MES.Services.Services.Plan
             var result = await _planShiftRepository.GetByMainIdAsync(id);
 
             return result.Select(m => m.ToModel<PlanShiftDetailDto>());
+        }
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomerValidationException"></exception>
+        public async Task UpdateStatusAsync(ChangeStatusDto param)
+        {
+            #region 参数校验
+            if (param.Id == 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10125));
+            }
+
+            if (param.Status == SysDataStatusEnum.Build)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10128));
+            }
+
+            #endregion
+
+            var changeStatusCommand = new ChangeStatusCommand()
+            {
+                Id = param.Id,
+                Status = param.Status,
+
+                UpdatedBy = _currentUser.UserName,
+                UpdatedOn = HymsonClock.Now()
+            };
+
+            #region 校验数据
+            var entity = await _planShiftRepository.GetByIdAsync(changeStatusCommand.Id);
+            if (entity == null || entity.IsDeleted != 0)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10705));
+            }
+
+            if(entity.Status== param.Status)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
+            }
+ 
+            #endregion
+
+            #region 操作数据库
+            await _planShiftRepository.UpdateStatusAsync(changeStatusCommand);
+            #endregion
         }
 
         /// <summary>

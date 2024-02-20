@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Core.Domain.Plan
 {
@@ -25,7 +26,13 @@ namespace Hymson.MES.Core.Domain.Plan
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 描述 :状态 
+        /// 空值 : false  
+        /// </summary>
+        public SysDataStatusEnum Status { get; set; }
+
+        /// <summary>
         /// 物料组描述
         /// </summary>
         public string Remark { get; set; }

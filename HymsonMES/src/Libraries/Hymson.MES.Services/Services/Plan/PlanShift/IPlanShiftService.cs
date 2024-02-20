@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums.Plan;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Plan;
 
@@ -61,5 +62,12 @@ namespace Hymson.MES.Services.Services.Plan
 
 
         Task<IEnumerable<PlanShiftDetailDto>> GetByMainIdAsync(long mainId);
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task UpdateStatusAsync(ChangeStatusDto param);
     }
 }

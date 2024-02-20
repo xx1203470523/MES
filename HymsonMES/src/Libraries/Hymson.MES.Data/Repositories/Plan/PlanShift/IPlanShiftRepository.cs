@@ -102,5 +102,13 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         Task<PagedInfo<PlanShiftEntity>> GetPagedListAsync(PlanShiftPagedQuery pagedQuery);
         Task<IEnumerable<PlanShiftEntity>> GetAllAsync(PlanShiftQuery query);
+
+
+        /// <summary>
+        /// 更新状态
+        /// </summary>
+        /// <param name="procMaterialEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateStatusAsync(ChangeStatusCommand command);
     }
 }
