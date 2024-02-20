@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Plan;
 using Hymson.MES.Services.Dtos.Integrated;
 
@@ -88,6 +89,12 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// 名称
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// 描述 :状态 
+        /// 空值 : false  
+        /// </summary>
+        public SysDataStatusEnum Status { get; set; }
 
         /// <summary>
         /// 物料组描述
@@ -209,6 +216,10 @@ namespace Hymson.MES.Services.Dtos.Plan
         public string? Code { get; set; }
 
         public string? Name { get; set; }
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
     }
 
 }

@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 
 namespace Hymson.MES.Data.Repositories.Plan.Query
 {
@@ -11,6 +12,12 @@ namespace Hymson.MES.Data.Repositories.Plan.Query
         public string? Code { get; set; }
 
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public SysDataStatusEnum? Status { get; set; }
+
         /// <summary>
         /// 站点Id
         /// </summary>
