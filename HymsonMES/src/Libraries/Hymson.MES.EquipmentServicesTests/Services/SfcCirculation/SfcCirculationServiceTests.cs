@@ -69,12 +69,12 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation.Tests
             await SetEquInfoAsync(equipmentCode);
             SfcCirculationBindDto sfcCirculationCCS = new SfcCirculationBindDto()
             {
-                SFC = "test202312270001",
+                SFC = "YTP280024A23970001EVE",
                 ModelCode="12S",  //ModelCode
                 //IsVirtualSFC=false,
                 BindSFCs = new CirculationBindDto[] {
                     new CirculationBindDto{
-                        SFC="0IJCBA05011111D7E0011905",
+                        SFC="0IJCBA05011111D7D0005386",
                         Location="0",
                         //Name="CCS01"
                     }

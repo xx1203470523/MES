@@ -16,6 +16,7 @@ using Hymson.MES.Data.Repositories.Manufacture.ManuSfc.Query;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcCirculation.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Dtos.SfcCirculation;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -213,6 +214,22 @@ namespace Hymson.MES.EquipmentServices.Services.SfcCirculation
             //}
             //模组/PACK码信息
             var mpManuSfc = await _manuSfcRepository.GetBySFCAsync(new GetBySfcQuery { SFC = sfcCirculationBindDto.SFC, SiteId = _currentEquipment.SiteId });
+
+
+            //查询已有汇总信息
+            ManuSfcSummaryQuery manuSfcSummaryQuery = new ManuSfcSummaryQuery
+            {
+                SiteId = _currentEquipment.SiteId,
+                SFCS = sfcs
+            };
+            var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetManuSfcSummaryEntitiesAsync(manuSfcSummaryQuery);
+
+            //绑定时检验不合格
+            var includeNoQuality = manuSfcSummaryEntities.Where(c => c.QualityStatus == 0);
+            if (includeNoQuality.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19146)).WithData("SFCS", string.Join(',', includeNoQuality.Select(c => c.SFC)));
+            }
 
             //需要写入的实体
             var manuSfc = new ManuSfcEntity();

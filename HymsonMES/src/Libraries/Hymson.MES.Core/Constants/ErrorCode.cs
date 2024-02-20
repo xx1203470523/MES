@@ -1018,6 +1018,7 @@
         public const string MES19143 = "条码：{SFC}指定位置未关联CCS码或和指定CSS码不存在绑定关系";
         public const string MES19144 = "Location不能为空";
         public const string MES19145 = "模组对应型号编码ModelCode不能为空";
+        public const string MES19146 = "条码：{SFCS}状态为不合格，不允许绑定，请先通过不良复判功能确认不合格状态!";
 
         #endregion
 
