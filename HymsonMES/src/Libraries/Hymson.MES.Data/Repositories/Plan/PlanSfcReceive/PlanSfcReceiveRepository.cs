@@ -12,20 +12,16 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
     /// <summary>
     /// 条码接收仓储
     /// </summary>
-    public partial class PlanSfcReceiveRepository : IPlanSfcReceiveRepository
+    public partial class PlanSfcReceiveRepository : BaseRepository, IPlanSfcReceiveRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public PlanSfcReceiveRepository(IOptions<ConnectionOptions> connectionOptions)
+        public PlanSfcReceiveRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -59,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.AddParameters(new { Rows = planSfcInfoPagedQuery.PageSize });
             sqlBuilder.AddParameters(planSfcInfoPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var planSfcInfoEntitiesTask = conn.QueryAsync<PlanSfcReceiveView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var planSfcInfoEntities = await planSfcInfoEntitiesTask;
@@ -88,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             {
                 sqlBuilder.Where(" WorkOrderId=@WorkOrderId");
             }
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var planSfcInfo = await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(template.RawSql, query);
             return planSfcInfo;
         }

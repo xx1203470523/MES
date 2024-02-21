@@ -4,30 +4,25 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
-using Hymson.Utils;
-using IdGen;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// 工序表仓储
     /// </summary>
-    public partial class ProcProcedureRepository : IProcProcedureRepository
+    public partial class ProcProcedureRepository : BaseRepository, IProcProcedureRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ProcProcedureRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public ProcProcedureRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
 
@@ -106,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procProcedurePagedQuery.PageSize });
             sqlBuilder.AddParameters(procProcedurePagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procProcedureEntitiesTask = conn.QueryAsync<ProcProcedureView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcedureEntities = await procProcedureEntitiesTask;
@@ -150,7 +145,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procProcedureEntitiesTask = conn.QueryAsync<ProcProcedureView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procProcedureEntities = await procProcedureEntitiesTask;
@@ -168,7 +163,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var key = $"proc_procedure&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetByIdSql, new { Id = id });
             });
         }
@@ -183,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var key = $"proc_procedure&Site-{query.Site}&Code-{query.Code}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetByCodeSql, query);
             });
         }
@@ -195,7 +190,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcProcedureEntity> GetProcProcedureByResourceIdAsync(ProcProdureByResourceIdQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcProcedureEntity>(GetProcProdureByResourceIdSql, param);
         }
 
@@ -206,7 +201,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcProcedureEntity>> GetProcProduresByResourceIdAsync(ProcProdureByResourceIdQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProcedureEntity>(GetProcProdureByResourceIdSql, param);
         }
 
@@ -218,7 +213,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<bool> IsExistsAsync(ProcProcedureQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entity = await conn.QueryAsync<ProcProcedureEntity>(ExistsSql, new { Code = query.Code, SiteId = query.SiteId });
             return entity != null && entity.Any();
         }
@@ -235,7 +230,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 return new List<ProcProcedureEntity>();
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcProcedureEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -262,7 +257,7 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             sqlBuilder.AddParameters(procProcedureQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procProcedureEntities = await conn.QueryAsync<ProcProcedureEntity>(template.RawSql, procProcedureQuery);
             return procProcedureEntities;
         }
@@ -274,7 +269,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcProcedureEntity procProcedureEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procProcedureEntity);
         }
 
@@ -285,7 +280,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcProcedureEntity procProcedureEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procProcedureEntity);
         }
 
@@ -296,7 +291,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
 
@@ -307,7 +302,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
     }

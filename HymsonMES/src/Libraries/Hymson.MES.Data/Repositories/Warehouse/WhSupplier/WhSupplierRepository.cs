@@ -8,26 +8,20 @@
 
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
     /// <summary>
     /// 供应商仓储
     /// </summary>
-    public partial class WhSupplierRepository : IWhSupplierRepository
+    public partial class WhSupplierRepository : BaseRepository, IWhSupplierRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public WhSupplierRepository(IOptions<ConnectionOptions> connectionOptions)
+        public WhSupplierRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -37,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -48,9 +42,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
-
         }
 
         /// <summary>
@@ -60,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<WhSupplierEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<WhSupplierEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -71,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhSupplierEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhSupplierEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -108,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.AddParameters(new { Rows = whSupplierPagedQuery.PageSize });
             sqlBuilder.AddParameters(whSupplierPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var whSupplierEntitiesTask = conn.QueryAsync<WhSupplierEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var whSupplierEntities = await whSupplierEntitiesTask;
@@ -137,10 +130,9 @@ namespace Hymson.MES.Data.Repositories.Warehouse
                 sqlBuilder.Where("Name=@Name");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, whSupplierQuery);
             return whSupplierEntities;
-
         }
 
         /// <summary>
@@ -150,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertAsync(WhSupplierEntity whSupplierEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, whSupplierEntity);
         }
 
@@ -161,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<WhSupplierEntity> whSupplierEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, whSupplierEntitys);
         }
 
@@ -172,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> UpdateAsync(WhSupplierEntity whSupplierEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, whSupplierEntity);
         }
 
@@ -183,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<WhSupplierEntity> whSupplierEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, whSupplierEntitys);
         }
 
@@ -194,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhSupplierEntity>> GetByCodesAsync(WhSuppliersByCodeQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhSupplierEntity>(GetByCodesSql, param);
         }
 

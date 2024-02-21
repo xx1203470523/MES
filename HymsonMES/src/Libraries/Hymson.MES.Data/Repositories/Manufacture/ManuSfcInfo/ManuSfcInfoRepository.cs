@@ -5,7 +5,6 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuSfcInfo.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -15,19 +14,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuSfcInfoRepository : BaseRepository, IManuSfcInfoRepository
     {
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
-        /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         public ManuSfcInfoRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
-
 
         #region 方法
         /// <summary>
@@ -70,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuSfcInfoEntity> GetBySFCAsync(long sfcId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetBySFCSql, new { SfcId = sfcId });
         }
 
@@ -81,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuSfcInfoEntity>> GetBySFCIdsAsync(IEnumerable<long> sfcIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuSfcInfoEntity>(GetBySFCIdsSql, new { sfcIds });
         }
 
@@ -279,7 +271,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
             sqlBuilder.AddParameters(pageQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var reportDataTask = conn.QueryAsync<WorkshopJobControlReportView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var reportData = await reportDataTask;
@@ -333,7 +325,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
             sqlBuilder.AddParameters(pageQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var reportDataTask = conn.QueryAsync<WorkshopJobControlReportOptimizeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var reportData = await reportDataTask;
@@ -349,7 +341,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuSfcInfoEntity> GetUsedBySFCAsync(string sfc)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuSfcInfoEntity>(GetUsedBySFC, new { sfc });
         }
     }

@@ -21,7 +21,7 @@ public partial class PlanCalendarDetailRepository
     /// <returns></returns>
     public async Task<int> DeleteByPlanCalendarIdAsync(long planCalendarId)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByPlanCalendarIdSql, new { PlanCalendarId = planCalendarId });
     }
 

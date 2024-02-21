@@ -2,25 +2,20 @@ using Dapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
-using System.Globalization;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
 {
     /// <summary>
     /// 日历维护仓储
     /// </summary>
-    public partial class InteCalendarDateRepository : IInteCalendarDateRepository
+    public partial class InteCalendarDateRepository : BaseRepository, IInteCalendarDateRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public InteCalendarDateRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteCalendarDateRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -30,7 +25,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task InsertAsync(InteCalendarDateEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var id = await conn.ExecuteScalarAsync<long>(InsertSql, entity) ;
             entity.Id = id;
         }
@@ -42,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<InteCalendarDateEntity> entitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entitys);
         }
 
@@ -53,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteCalendarDateEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -64,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> DeleteByCalendarIdAsync(long calendarId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { calendarId });
         }
 
@@ -75,7 +70,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> DeleteByCalendarIdsAsync(long[] idsArr)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { calendarId = idsArr });
 
         }
@@ -87,7 +82,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<InteCalendarDateEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteCalendarDateEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -100,7 +95,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCalendarEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<InteCalendarDateEntity>(template.RawSql, new { calendarId });
             return entities;
         }

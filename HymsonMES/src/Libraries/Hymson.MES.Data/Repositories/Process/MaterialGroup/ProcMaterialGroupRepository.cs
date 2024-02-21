@@ -12,20 +12,16 @@ using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// 物料组维护表仓储
     /// </summary>
-    public partial class ProcMaterialGroupRepository : IProcMaterialGroupRepository
+    public partial class ProcMaterialGroupRepository : BaseRepository, IProcMaterialGroupRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public ProcMaterialGroupRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcMaterialGroupRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -35,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -46,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -57,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialGroupEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -69,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcMaterialGroupEntity> GetByIdAndSiteIdAsync(long id, long SiteId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcMaterialGroupEntity>(GetByIdAndSiteIdSql, new { Id = id, SiteId = SiteId });
         }
 
@@ -80,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaterialGroupEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcMaterialGroupEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -120,7 +116,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procMaterialGroupPagedQuery.PageSize });
             sqlBuilder.AddParameters(procMaterialGroupPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procMaterialGroupEntitiesTask = conn.QueryAsync<ProcMaterialGroupEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procMaterialGroupEntities = await procMaterialGroupEntitiesTask;
@@ -163,7 +159,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procMaterialGroupCustomPagedQuery.PageSize });
             sqlBuilder.AddParameters(procMaterialGroupCustomPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var customProcMaterialGroupViewTask = conn.QueryAsync<CustomProcMaterialGroupView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var customProcMaterialGroupView = await customProcMaterialGroupViewTask;
@@ -190,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" GroupCode = @GroupCode ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procMaterialGroupEntities = await conn.QueryAsync<ProcMaterialGroupEntity>(template.RawSql, procMaterialGroupQuery);
             return procMaterialGroupEntities;
         }
@@ -202,7 +198,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcMaterialGroupEntity procMaterialGroupEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procMaterialGroupEntity);
         }
 
@@ -213,7 +209,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<ProcMaterialGroupEntity> procMaterialGroupEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, procMaterialGroupEntitys);
         }
 
@@ -224,7 +220,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcMaterialGroupEntity procMaterialGroupEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procMaterialGroupEntity);
         }
 
@@ -235,7 +231,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<ProcMaterialGroupEntity> procMaterialGroupEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procMaterialGroupEntitys);
         }
 

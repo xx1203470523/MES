@@ -11,20 +11,16 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// 资源配置表仓储
     /// </summary>
-    public partial class ProcResourceConfigResRepository : IProcResourceConfigResRepository
+    public partial class ProcResourceConfigResRepository : BaseRepository, IProcResourceConfigResRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public ProcResourceConfigResRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcResourceConfigResRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -47,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procResourceConfigResEntitiesTask = conn.QueryAsync<ProcResourceConfigResEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceConfigResEntities = await procResourceConfigResEntitiesTask;
@@ -62,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -73,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesRangeAsync(long[] idsArr)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, idsArr);
         }
 
@@ -84,7 +80,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task InsertRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRess)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             await conn.ExecuteAsync(InsertSql, procResourceConfigRess);
         }
 
@@ -95,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceConfigResEntity> procResourceConfigRes)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procResourceConfigRes);
         }
 
@@ -106,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteByResourceIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByResourceIdSql, new { ResourceId = id });
         }
     }

@@ -4,20 +4,17 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// job业务配置配置表仓储
     /// </summary>
-    public partial class InteJobBusinessRelationRepository : IInteJobBusinessRelationRepository
+    public partial class InteJobBusinessRelationRepository : BaseRepository, IInteJobBusinessRelationRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public InteJobBusinessRelationRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteJobBusinessRelationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
+         
         }
 
         /// <summary>
@@ -27,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteJobBusinessRelationEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteJobBusinessRelationEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -38,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -50,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobIdsAsync(IEnumerable<long> jobIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobIdsSql, new { jobIds = jobIds });
         }
 
@@ -61,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteJobBusinessRelationEntity>> GetByJobByBusinessIdAsync(InteJobBusinessRelationByBusinessIdQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteJobBusinessRelationEntity>(GetByJobBybusinessIdSql, query);
         }
 
@@ -90,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteJobBusinessRelationEntitiesTask = conn.QueryAsync<InteJobBusinessRelationEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteJobBusinessRelationEntities = await inteJobBusinessRelationEntitiesTask;
@@ -122,7 +119,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             }
 
             var template = sqlBuilder.AddTemplate(GetInteJobBusinessRelationEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteJobBusinessRelationEntities = await conn.QueryAsync<InteJobBusinessRelationEntity>(template.RawSql, inteJobBusinessRelationQuery);
             return inteJobBusinessRelationEntities;
         }
@@ -134,7 +131,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertAsync(InteJobBusinessRelationEntity inteJobBusinessRelationEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntity);
         }
 
@@ -145,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, inteJobBusinessRelationEntitys);
         }
 
@@ -156,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteJobBusinessRelationEntity inteJobBusinessRelationEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteJobBusinessRelationEntity);
         }
 
@@ -167,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<InteJobBusinessRelationEntity> inteJobBusinessRelationEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteJobBusinessRelationEntitys);
         }
 
@@ -178,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteByBusinessIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByBusinessIdSql, new { BusinessId = id });
         }
 
@@ -189,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteByBusinessIdRangeAsync(IEnumerable<long> ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByBusinessIdRangeSql, new { BusinessIds = ids });
         }
 
@@ -200,7 +197,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteRangeAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
         }
     }

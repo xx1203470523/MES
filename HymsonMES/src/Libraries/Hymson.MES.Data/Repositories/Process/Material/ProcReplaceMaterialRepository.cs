@@ -13,26 +13,23 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// 物料替代组件表仓储
     /// </summary>
-    public partial class ProcReplaceMaterialRepository : IProcReplaceMaterialRepository
+    public partial class ProcReplaceMaterialRepository : BaseRepository, IProcReplaceMaterialRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ProcReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public ProcReplaceMaterialRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
 
@@ -43,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -54,9 +51,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
-
         }
 
         /// <summary>
@@ -66,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteTrueByMaterialIdsAsync(long[] materialIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteTrueByMaterialIdsSql, new { materialIds = materialIds });
         }
 
@@ -77,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcReplaceMaterialEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcReplaceMaterialEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -88,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcReplaceMaterialEntity>> GetByMaterialIdAsync(long materialId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcReplaceMaterialEntity>(GetByMaterialIdSql, new { MaterialId = materialId });
         }
 
@@ -111,7 +107,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procReplaceMaterialPagedQuery.PageSize });
             sqlBuilder.AddParameters(procReplaceMaterialPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procReplaceMaterialEntitiesTask = conn.QueryAsync<ProcReplaceMaterialEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procReplaceMaterialEntities = await procReplaceMaterialEntitiesTask;
@@ -137,7 +133,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" MaterialId=@MaterialId ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procReplaceMaterialEntities = await conn.QueryAsync<ProcReplaceMaterialEntity>(template.RawSql, procReplaceMaterialQuery);
             return procReplaceMaterialEntities;
         }
@@ -159,7 +155,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where(" r.MaterialId = @MaterialId ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, procReplaceMaterialQuery);
             return ProcReplaceMaterialViews;
         }
@@ -179,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("r.IsDeleted = 0");
                 sqlBuilder.Where("r.SiteId = @SiteId");
 
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, new { SiteId = siteId });
                 return ProcReplaceMaterialViews;
             });
@@ -200,7 +196,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("r.IsDeleted = 0");
                 sqlBuilder.Where("r.SiteId = @SiteId");
 
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, new { SiteId = siteId });
                 return ProcReplaceMaterialViews;
             });
@@ -226,7 +222,7 @@ namespace Hymson.MES.Data.Repositories.Process
                     sqlBuilder.Where(" r.MaterialId IN @MaterialIds ");
                 }
 
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 var ProcReplaceMaterialViews = await conn.QueryAsync<ProcReplaceMaterialView>(template.RawSql, procReplaceMaterialQuery);
                 return ProcReplaceMaterialViews;
             });
@@ -239,7 +235,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcReplaceMaterialEntity procReplaceMaterialEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procReplaceMaterialEntity);
         }
 
@@ -250,7 +246,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<ProcReplaceMaterialEntity> procReplaceMaterialEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procReplaceMaterialEntitys);
         }
 
@@ -261,7 +257,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcReplaceMaterialEntity procReplaceMaterialEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procReplaceMaterialEntity);
         }
 
@@ -272,7 +268,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<ProcReplaceMaterialEntity> procReplaceMaterialEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procReplaceMaterialEntitys);
         }
     }
