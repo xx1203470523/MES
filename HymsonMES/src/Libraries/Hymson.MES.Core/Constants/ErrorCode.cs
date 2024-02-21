@@ -1734,5 +1734,12 @@
         public const string MES19803 = "必须填写月份！";
 
         #endregion
+
+        #region IQC检验项目
+
+        public const string MES19901 = "IQC检验项目编码不可重复";
+        public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
+
+        #endregion
     }
 }

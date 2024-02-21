@@ -281,6 +281,11 @@ namespace Hymson.MES.Data.Repositories.Process
                 procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
                 sqlBuilder.Where(" Version like @Version ");
             }
+            if (!string.IsNullOrWhiteSpace(procMaterialQuery.MaterialName))
+            {
+                procMaterialQuery.MaterialName = $"%{procMaterialQuery.MaterialName}%";
+                sqlBuilder.Where(" MaterialName like @MaterialName ");
+            }
             sqlBuilder.AddParameters(procMaterialQuery);
 
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
