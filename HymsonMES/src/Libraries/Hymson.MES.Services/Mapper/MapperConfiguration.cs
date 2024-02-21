@@ -631,7 +631,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region ProcFormulaOperation
-            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationDto > ();
+            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationDto>();
             CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationSaveDto>();
             CreateMap<ProcFormulaOperationSaveDto, ProcFormulaOperationEntity>();
             CreateMap<ProcFormulaOperationPagedQueryDto, ProcFormulaOperationPagedQuery>();
@@ -809,6 +809,19 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionPatrolSampleCreateDto, QualIpqcInspectionPatrolSampleEntity>();
             #endregion
 
+            CreateMap<QualIqcLevelPagedQueryDto, QualIqcLevelPagedQuery>();
+            CreateMap<QualIqcLevelEntity, QualIqcLevelDto>();
+            CreateMap<QualIqcLevelSaveDto, QualIqcLevelEntity>();
+            CreateMap<QualIqcLevelDetailDto, QualIqcLevelDetailEntity>();
+            CreateMap<QualIqcLevelDetailEntity, QualIqcLevelDetailDto>();
+
+            CreateMap<QualOqcLevelPagedQueryDto, QualOqcLevelPagedQuery>();
+            CreateMap<QualOqcLevelEntity, QualOqcLevelDto>();
+            CreateMap<QualOqcLevelSaveDto, QualOqcLevelEntity>();
+            CreateMap<QualOqcLevelDetailDto, QualOqcLevelDetailEntity>();
+            CreateMap<QualOqcLevelDetailEntity, QualOqcLevelDetailDto>();
+
+
             #region QualIqcInspectionItem
 
             #region 数据传输对象（操作对象）转换为实体对象
@@ -976,9 +989,9 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreatePlanMaps()
         {
             #region WorkOrder
-            CreateMap<PlanShiftEntity, PlanShiftDto > ();
-            CreateMap<PlanShiftDetailEntity, PlanShiftDetailDto> ();
-            CreateMap<PlanShiftSaveDto, PlanShiftEntity> ();
+            CreateMap<PlanShiftEntity, PlanShiftDto>();
+            CreateMap<PlanShiftDetailEntity, PlanShiftDetailDto>();
+            CreateMap<PlanShiftSaveDto, PlanShiftEntity>();
             CreateMap<PlanWorkOrderCreateDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderModifyDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderPagedQueryDto, PlanWorkOrderPagedQuery>();

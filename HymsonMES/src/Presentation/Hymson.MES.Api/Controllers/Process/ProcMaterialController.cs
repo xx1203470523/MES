@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Process;
@@ -78,6 +79,18 @@ namespace Hymson.MES.Api.Controllers.Process
         }
 
         /// <summary>
+        /// 查询物料关联的供应商信息（物料维护）
+        /// </summary>
+        /// <param name="materialId"></param>
+        /// <returns></returns>
+        [HttpGet("suppliers/{materialId}")]
+        public async Task<IEnumerable<SelectOptionDto>> QuerySuppliersAsync(long materialId)
+        {
+            return await _procMaterialService.QuerySuppliersAsync(materialId);
+        }
+
+
+        /// <summary>
         /// 添加（物料维护）
         /// </summary>
         /// <param name="parm"></param>
@@ -102,7 +115,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:material:update")]
         public async Task UpdateProcMaterialAsync([FromBody] ProcMaterialModifyDto parm)
         {
-             await _procMaterialService.ModifyProcMaterialAsync(parm);
+            await _procMaterialService.ModifyProcMaterialAsync(parm);
         }
 
         /// <summary>
@@ -116,7 +129,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:material:delete")]
         public async Task DeleteProcMaterialAsync([FromBody] long[] ids)
         {
-           await _procMaterialService.DeletesProcMaterialAsync(ids);
+            await _procMaterialService.DeletesProcMaterialAsync(ids);
         }
 
 
@@ -132,7 +145,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:material:updateStatusEnable")]
         public async Task UpdateStatusEnable([FromBody] long id)
         {
-            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto {Id=id,Status= SysDataStatusEnum.Enable });
+            await _procMaterialService.UpdateStatusAsync(new ChangeStatusDto { Id = id, Status = SysDataStatusEnum.Enable });
         }
 
         /// <summary>

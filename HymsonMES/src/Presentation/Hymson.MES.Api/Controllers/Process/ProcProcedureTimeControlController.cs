@@ -129,7 +129,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPut]
         [Route("retain")]
         [PermissionDescription("process:procProcedureTimeControl:retain")]
-        public async Task RetainAsyn([FromBody] long id)
+        public async Task RetainAsync([FromBody] long id)
         {
             await _manuProcedureTimeControlService.UpdateStatusAsync(new ChangeStatusDto
             {
@@ -146,7 +146,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [HttpPut]
         [Route("abolish")]
         [PermissionDescription("process:procProcedureTimeControl:abolish")]
-        public async Task AbolishAsyn([FromBody] long id)
+        public async Task AbolishAsync([FromBody] long id)
         {
             await _manuProcedureTimeControlService.UpdateStatusAsync(new ChangeStatusDto
             {

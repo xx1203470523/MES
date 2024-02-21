@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="whSupplierEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(WhSupplierEntity whSupplierEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -43,7 +43,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="whSupplierEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(WhSupplierEntity whSupplierEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -57,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -71,7 +71,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WhSupplierEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -85,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <param name="whSupplierQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<WhSupplierEntity>> GetWhSupplierEntitiesAsync(WhSupplierQuery whSupplierQuery);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
