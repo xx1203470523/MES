@@ -40,7 +40,7 @@
         public const string MES10131 = "编码只能是英文或数字组合";
         public const string MES10132 = "编码不能包含特殊字符";
         public const string MES10133 = "未获取到导入数据！";
-        public const string MES10134 = "未获取到导出数据！";        
+        public const string MES10134 = "未获取到导出数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -1691,12 +1691,26 @@
         public const string MES19403 = "列【批次最小数量】值【{Value}】存在跟其他水平值交叉！";
         public const string MES19404 = "列【批次最大数量】值【{Value}】存在跟其他水平值交叉！";
         public const string MES19405 = "列【样本代码】值有重复！";
+
+        public const string MES19406 = "物料编码不能为空！";
+        public const string MES19407 = "供应商编码不能为空！";
+        public const string MES19408 = "通用设置类型数据已存在，不允许重复创建！";
+        public const string MES19409 = "物料编码【{MaterialCode}】+ 供应商【{SupplierCode}】已在系统存在！";
+        public const string MES19410 = "设置类型不合法！";
+        public const string MES19411 = "状态不合法！";
+        public const string MES19412 = "校验水平不合法！";
+        public const string MES19413 = "整体接收标准不能小于0！";
+        public const string MES19414 = "检验类型不合法！";
+        public const string MES19415 = "检验水准不合法！";
+        public const string MES19416 = "接收水准不能小于0！";
+        public const string MES19417 = "物料编码【{MaterialCode}】+ 客户【{CustomCode}】已在系统存在！";
+        public const string MES19418 = "检验类型不允许设置多次！";
         #endregion
 
         #endregion
 
         #region 系统执行出错 业务逻辑出错
-        
+
 
         #endregion
 

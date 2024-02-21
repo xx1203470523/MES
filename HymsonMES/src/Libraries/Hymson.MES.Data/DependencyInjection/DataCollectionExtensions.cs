@@ -284,6 +284,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionTailSampleRepository, QualIpqcInspectionTailSampleRepository>();
             services.AddSingleton<IQualIpqcInspectionTailAnnexRepository, QualIpqcInspectionTailAnnexRepository>();
             services.AddSingleton<IManuEquipmentParameterRepository, ManuEquipmentParameterRepository>();
+            services.AddSingleton<IQualIqcLevelRepository, QualIqcLevelRepository>();
+            services.AddSingleton<IQualIqcLevelDetailRepository, QualIqcLevelDetailRepository>();
+            services.AddSingleton<IQualOqcLevelRepository, QualOqcLevelRepository>();
+            services.AddSingleton<IQualOqcLevelDetailRepository, QualOqcLevelDetailRepository>();
 
             services.AddSingleton<IQualIqcInspectionItemRepository, QualIqcInspectionItemRepository>();
             services.AddSingleton<IQualIqcInspectionItemDetailRepository, QualIqcInspectionItemDetailRepository>();
@@ -342,8 +346,8 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Plan
-            services.AddSingleton<IPlanShiftRepository, PlanShiftRepository>();            
-     
+            services.AddSingleton<IPlanShiftRepository, PlanShiftRepository>();
+
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderRepository, PlanWorkOrderRepository>();

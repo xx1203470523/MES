@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 客户维护仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-11 09:33:26
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
@@ -23,7 +16,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteCustomEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(InteCustomEntity inteCustomEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="inteCustomEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(InteCustomEntity inteCustomEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -73,13 +66,13 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteCustomEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteCustomEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<InteCustomEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List

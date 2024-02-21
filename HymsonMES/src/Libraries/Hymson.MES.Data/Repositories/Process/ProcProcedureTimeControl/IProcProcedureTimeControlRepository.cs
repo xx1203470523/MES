@@ -41,7 +41,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 更新状态
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
 

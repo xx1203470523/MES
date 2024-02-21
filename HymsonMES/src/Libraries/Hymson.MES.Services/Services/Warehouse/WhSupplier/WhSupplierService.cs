@@ -57,11 +57,11 @@ namespace Hymson.MES.Services.Services.Warehouse
         private readonly ILocalizationService _localizationService;
 
 
-        public WhSupplierService(ICurrentUser currentUser, 
-            IWhSupplierRepository whSupplierRepository, 
-            AbstractValidator<WhSupplierCreateDto> validationCreateRules, 
-            AbstractValidator<WhSupplierModifyDto> validationModifyRules, 
-            ICurrentSite currentSite, 
+        public WhSupplierService(ICurrentUser currentUser,
+            IWhSupplierRepository whSupplierRepository,
+            AbstractValidator<WhSupplierCreateDto> validationCreateRules,
+            AbstractValidator<WhSupplierModifyDto> validationModifyRules,
+            ICurrentSite currentSite,
             IProcMaterialSupplierRelationRepository procMaterialSupplierRelationRepository,
             IExcelService excelService,
             IMinioService minioService,
@@ -228,7 +228,17 @@ namespace Hymson.MES.Services.Services.Warehouse
             var whSupplierEntity = await _whSupplierRepository.GetByIdAsync(id);
             if (whSupplierEntity != null)
             {
-                return new WhSupplierDto { Id = whSupplierEntity.Id, Code = whSupplierEntity.Code, Name = whSupplierEntity.Name, Remark = whSupplierEntity.Remark, CreatedBy = whSupplierEntity.CreatedBy, CreatedOn = whSupplierEntity.CreatedOn };
+                return new WhSupplierDto
+                {
+                    Id = whSupplierEntity.Id,
+                    Code = whSupplierEntity.Code,
+                    Name = whSupplierEntity.Name,
+                    Remark = whSupplierEntity.Remark,
+                    CreatedBy = whSupplierEntity.CreatedBy,
+                    CreatedOn = whSupplierEntity.CreatedOn,
+                    UpdatedBy = whSupplierEntity.UpdatedBy,
+                    UpdatedOn = whSupplierEntity.UpdatedOn
+                };
             }
             return new WhSupplierDto();
         }
@@ -331,8 +341,8 @@ namespace Hymson.MES.Services.Services.Warehouse
                         //标准参数信息 记录
                         var procParameterEntity = new WhSupplierEntity()
                         {
-                            Code=item.Code,
-                            Name=item.Name,
+                            Code = item.Code,
+                            Name = item.Name,
                             Remark = item.Remark ?? "",
 
                             Id = IdGenProvider.Instance.CreateId(),
@@ -426,8 +436,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             {
                 listDto.Add(new WhSupplierExportDto()
                 {
-                    Code= item.Code,
-                    Name= item.Name,
+                    Code = item.Code,
+                    Name = item.Name,
                     Remark = item.Remark ?? ""
                 });
             }

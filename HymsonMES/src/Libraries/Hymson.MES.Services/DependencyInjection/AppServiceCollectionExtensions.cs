@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -215,6 +214,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionHeadService, QualIpqcInspectionHeadService>();
             services.AddSingleton<IQualIpqcInspectionPatrolService, QualIpqcInspectionPatrolService>();
             services.AddSingleton<IQualIpqcInspectionTailService, QualIpqcInspectionTailService>();
+            services.AddSingleton<IQualIqcLevelService, QualIqcLevelService>();
+            services.AddSingleton<IQualOqcLevelService, QualOqcLevelService>();
             services.AddSingleton<IQualIqcInspectionItemService, QualIqcInspectionItemService>();
             services.AddSingleton<IQualIqcInspectionItemDetailService, QualIqcInspectionItemDetailService>();
             #endregion
@@ -271,7 +272,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
-            
+
             #endregion
 
             #region PlanSfcReceive
@@ -530,6 +531,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionPatrolSampleCreateDto>>, QualIpqcInspectionPatrolSampleAddValidator>();
             services.AddSingleton<AbstractValidator<QualIpqcInspectionTailSaveDto>, QualIpqcInspectionTailSaveValidator>();
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionTailSampleCreateDto>>, QualIpqcInspectionTailSampleAddValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcLevelSaveDto>, QualIqcLevelSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcLevelDetailDto>, QualIqcLevelDetailSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualOqcLevelSaveDto>, QualOqcLevelSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualOqcLevelDetailDto>, QualOqcLevelDetailSaveValidator>();
 
             services.AddSingleton<AbstractValidator<QualIqcInspectionItemDto>, QualIqcInspectionItemCreateValidator>();
             services.AddSingleton<AbstractValidator<QualIqcInspectionItemUpdateDto>, QualIqcInspectionItemUpdateValidator>();
