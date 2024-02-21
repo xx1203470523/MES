@@ -14,20 +14,16 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated.InteCodeRule.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 编码规则仓储
     /// </summary>
-    public partial class InteCodeRulesRepository : IInteCodeRulesRepository
+    public partial class InteCodeRulesRepository : BaseRepository, IInteCodeRulesRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public InteCodeRulesRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteCodeRulesRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -37,7 +33,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -48,7 +44,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -59,7 +55,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteCodeRulesEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -70,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteCodeRulesEntity> GetInteCodeRulesByProductIdAsync(InteCodeRulesByProductQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteCodeRulesEntity>(GetInteCodeRulesByProductIdSql, param);
         }
 
@@ -81,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteCodeRulesEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteCodeRulesEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -126,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(new { Rows = inteCodeRulesPagedQuery.PageSize });
             sqlBuilder.AddParameters(inteCodeRulesPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteCodeRulesEntitiesTask = conn.QueryAsync<InteCodeRulesPageView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteCodeRulesEntities = await inteCodeRulesEntitiesTask;
@@ -143,7 +139,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCodeRulesEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteCodeRulesEntities = await conn.QueryAsync<InteCodeRulesEntity>(template.RawSql, inteCodeRulesQuery);
             return inteCodeRulesEntities;
         }
@@ -174,7 +170,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where(" PackType=@PackType ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteCodeRulesEntities = await conn.QueryAsync<InteCodeRulesEntity>(template.RawSql, inteCodeRulesQuery);
             return inteCodeRulesEntities;
         }
@@ -186,7 +182,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertAsync(InteCodeRulesEntity inteCodeRulesEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, inteCodeRulesEntity);
         }
 
@@ -197,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<InteCodeRulesEntity> inteCodeRulesEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, inteCodeRulesEntitys);
         }
 
@@ -208,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteCodeRulesEntity inteCodeRulesEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteCodeRulesEntity);
         }
 
@@ -219,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdatesAsync(IEnumerable<InteCodeRulesEntity> inteCodeRulesEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, inteCodeRulesEntitys);
         }
 

@@ -8,7 +8,6 @@ using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Integrated.InteJob.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteJob
 {
@@ -17,22 +16,17 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
     /// @author admin
     /// @date 2023-02-21
     /// </summary>
-    public partial class InteJobRepository : IInteJobRepository
+    public partial class InteJobRepository : BaseRepository, IInteJobRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public InteJobRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public InteJobRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
 
@@ -79,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             sqlBuilder.AddParameters(new { Rows = param.PageSize });
             sqlBuilder.AddParameters(param);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteJobEntitiesTask = conn.QueryAsync<InteJobEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteJobEntities = await inteJobEntitiesTask;
@@ -94,7 +88,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<InteJobEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteJobEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -105,7 +99,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<IEnumerable<InteJobEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteJobEntity>(GetByIdsSql, new { ids });
         }
 
@@ -119,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
             var key = $"inte_job&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryAsync<InteJobEntity>(GetAllBySiteIdSql, query);
             });
         }
@@ -131,7 +125,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<InteJobEntity> GetByCodeAsync(EntityByCodeQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteJobEntity>(GetByCodeSql, param);
         }
 
@@ -142,7 +136,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<int> InsertAsync(InteJobEntity param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, param);
         }
 
@@ -153,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<int> InsertRangAsync(IEnumerable<InteJobEntity> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateRangSql, param);
         }
 
@@ -164,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteJobEntity param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, param);
         }
 
@@ -175,7 +169,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<int> UpdateRangAsync(IEnumerable<InteJobEntity> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateRangSql, param);
         }
 
@@ -186,7 +180,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteJob
         /// <returns></returns>
         public async Task<int> DeleteRangAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteRangSql, param);
         }
 

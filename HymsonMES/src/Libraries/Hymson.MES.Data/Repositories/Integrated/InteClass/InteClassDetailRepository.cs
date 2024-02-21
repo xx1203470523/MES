@@ -4,20 +4,16 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteClass
 {
     /// <summary>
     /// 班制维护明细仓储
     /// </summary>
-    public partial class InteClassDetailRepository : IInteClassDetailRepository
+    public partial class InteClassDetailRepository : BaseRepository, IInteClassDetailRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public InteClassDetailRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteClassDetailRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -27,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task InsertAsync(InteClassDetailEntity inteClassDetailEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var id = await conn.ExecuteScalarAsync<long>(InsertSql, inteClassDetailEntity);
             inteClassDetailEntity.Id = id;
         }
@@ -39,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<InteClassDetailEntity> entitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entitys);
         }
 
@@ -50,7 +46,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteClassDetailEntity inteClassDetailEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteClassDetailEntity);
         }
 
@@ -61,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -72,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<int> DeleteByClassIdAsync(long classId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByClassId, new { classId });
         }
 
@@ -83,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] idsArr)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = idsArr });
         }
 
@@ -94,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<InteClassDetailEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteClassDetailEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -105,7 +101,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         /// <returns></returns>
         public async Task<IEnumerable<InteClassDetailEntity>> GetListByClassIdAsync(long classId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteClassDetailEntity>(GetListByClassId, new { classId });
         }
 
@@ -128,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
             sqlBuilder.AddParameters(new { Rows = inteClassDetailPagedQuery.PageSize });
             sqlBuilder.AddParameters(inteClassDetailPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<InteClassDetailEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
@@ -144,7 +140,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteClass
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteClassDetailEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteClassDetailEntities = await conn.QueryAsync<InteClassDetailEntity>(template.RawSql, inteClassDetailQuery);
             return inteClassDetailEntities;
         }

@@ -5,29 +5,21 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
-    /// 
+    /// 打印配置
     /// </summary>
-    public partial class ProcPrintConfigRepository : IProcPrintConfigRepository
+    public partial class ProcPrintConfigRepository : BaseRepository, IProcPrintConfigRepository
     {
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
-        /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcPrintConfigRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcPrintConfigRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
-
 
         /// <summary>
         /// 
@@ -36,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcPrinterEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -47,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcPrinterEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -58,7 +50,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
         }
 
@@ -69,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<bool> IsExistsAsync(string PrintName)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteScalarAsync(IsExistsSql, new { PrintName }) != null;
         }
 
@@ -80,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcPrinterEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByIdSql, new { id });
         }
 
@@ -91,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcPrinterEntity> GetByPrintNameAsync(EntityByCodeQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByPrintNameSql, param);
         }
 
@@ -102,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcPrinterEntity> GetByPrintIpAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcPrinterEntity>(GetByPrintIpSql, query);
         }
 
@@ -113,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcPrinterEntity>> GetBaseListAsync()
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcPrinterEntity>(GetBaseListSql);
         }
 
@@ -142,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = query.PageSize });
             sqlBuilder.AddParameters(query);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procResourceEntitiesTask = conn.QueryAsync<ProcPrinterEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceEntities = await procResourceEntitiesTask;
@@ -159,7 +151,7 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var Entities = await conn.QueryAsync<ProcPrinterEntity>(template.RawSql, Query);
             return Entities;
         }
@@ -191,7 +183,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = PagedQuery.PageSize });
             sqlBuilder.AddParameters(PagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<ProcPrinterEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 

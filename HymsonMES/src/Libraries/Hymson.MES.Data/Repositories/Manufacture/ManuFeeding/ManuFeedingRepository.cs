@@ -3,7 +3,6 @@ using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 using System.Text;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -14,18 +13,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     public partial class ManuFeedingRepository : BaseRepository, IManuFeedingRepository
     {
         /// <summary>
-        /// 数据库连接
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
-        /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
         public ManuFeedingRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -35,7 +28,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertAsync(ManuFeedingEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -46,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateQtyByIdAsync(UpdateFeedingQtyByIdCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, command);
         }
 
@@ -57,7 +50,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateFeedingQtyByIdAsync(IEnumerable<UpdateFeedingQtyByIdCommand> commands)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateQtyByIdSql, commands);
         }
 
@@ -68,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
         }
 
@@ -79,7 +72,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByIds, new { ids });
         }
 
@@ -101,7 +94,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuFeedingEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(GetByIds, new { ids });
         }
 
@@ -112,7 +105,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuFeedingEntity>> GetByResourceIdAndMaterialIdAsync(GetByResourceIdAndMaterialIdQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(GetByResourceIdAndMaterialId, query);
         }
 
@@ -130,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.FeedingPointId.HasValue) sqlBuilder.Append("AND FeedingPointId = @FeedingPointId ");
             if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
 
@@ -147,7 +140,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             if (query.LoadSource.HasValue) sqlBuilder.Append("AND LoadSource = @LoadSource ");
             if (query.MaterialIds != null) sqlBuilder.Append("AND ProductId IN @MaterialIds; ");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
 
@@ -165,7 +158,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Append("AND Qty > 0 ");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
 
@@ -181,7 +174,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
             sqlBuilder.Append("AND Qty > 0 ");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(sqlBuilder.ToString(), query);
         }
 
@@ -192,7 +185,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndResourceIdsAsync(GetByFeedingPointIdAndResourceIdsQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuFeedingEntity>(GetByFeedingPointIdAndResourceIdsSql, query);
         }
 

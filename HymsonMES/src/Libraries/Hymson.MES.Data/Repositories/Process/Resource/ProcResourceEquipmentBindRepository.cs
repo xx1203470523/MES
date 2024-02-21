@@ -11,20 +11,16 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// 资源设备绑定表仓储
     /// </summary>
-    public partial class ProcResourceEquipmentBindRepository : IProcResourceEquipmentBindRepository
+    public partial class ProcResourceEquipmentBindRepository : BaseRepository, IProcResourceEquipmentBindRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public ProcResourceEquipmentBindRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcResourceEquipmentBindRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -46,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procResourceEquipmentBindPagedQuery.PageSize });
             sqlBuilder.AddParameters(procResourceEquipmentBindPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procResourceEquipmentBindEntitiesTask = conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceEquipmentBindEntities = await procResourceEquipmentBindEntitiesTask;
@@ -81,7 +77,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("SiteId = @SiteId");
             }
             sqlBuilder.AddParameters(query);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcResourceEquipmentBindView>(templateData.RawSql, templateData.Parameters);
         }
 
@@ -93,7 +89,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task InsertRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             await conn.ExecuteAsync(InsertSql, procResourceEquipmentBinds);
         }
 
@@ -104,7 +100,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<ProcResourceEquipmentBindEntity> procResourceEquipmentBinds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procResourceEquipmentBinds);
         }
 
@@ -115,7 +111,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesRangeAsync(long[] idsArr)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Ids = idsArr });
         }
 
@@ -126,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteByResourceIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByResourceIdSql, new { ResourceId = id });
         }
     }

@@ -8,28 +8,22 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
     /// <summary>
-    /// 
+    /// 设备表仓储
     /// </summary>
-    public partial class EquEquipmentRepository : IEquEquipmentRepository
+    public partial class EquEquipmentRepository : BaseRepository, IEquEquipmentRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public EquEquipmentRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
 
@@ -40,7 +34,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> InsertAsync(EquEquipmentEntity equipmentUnitEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, equipmentUnitEntity);
         }
 
@@ -51,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> UpdateAsync(EquEquipmentEntity equipmentUnitEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, equipmentUnitEntity);
         }
 
@@ -62,7 +56,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> UpdateEquipmentGroupIdAsync(UpdateEquipmentGroupIdCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateEquipmentGroupIdSql, command);
         }
 
@@ -73,7 +67,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> ClearEquipmentGroupIdAsync(long equipmentGroupId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(ClearEquipmentGroupIdSql, new { equipmentGroupId });
         }
 
@@ -84,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
         }
 
@@ -98,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             var key = $"equ_equipment&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByIdSql, new { id });
             });
         }
@@ -108,9 +102,9 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task< IEnumerable<EquEquipmentEntity> > GetByIdAsync(IEnumerable<long> ids)
+        public async Task<IEnumerable<EquEquipmentEntity>> GetByIdAsync(IEnumerable<long> ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquEquipmentEntity>(GetByIdsSql, new { ids });
         }
 
@@ -121,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByCodeSql, query);
         }
 
@@ -132,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<IEnumerable<EquEquipmentEntity>> GetByGroupIdAsync(EquEquipmentGroupIdQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquEquipmentEntity>(GetByGroupIdSql, param);
         }
 
@@ -143,7 +137,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<EquEquipmentEntity> GetByEquipmentCodeAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquEquipmentEntity>(GetByEquipmentCodeSql, query);
         }
 
@@ -154,7 +148,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <returns></returns>
         public async Task<IEnumerable<EquEquipmentEntity>> GetBaseListAsync(EntityBySiteIdQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<EquEquipmentEntity>(GetBaseListSql, query);
         }
 
@@ -167,7 +161,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, equipmentQuery);
             return equipmentEntities;
         }
@@ -232,7 +226,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<EquEquipmentPageView>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 

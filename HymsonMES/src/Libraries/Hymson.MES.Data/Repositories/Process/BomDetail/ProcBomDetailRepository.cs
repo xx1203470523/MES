@@ -5,26 +5,23 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// BOM明细表仓储
     /// </summary>
-    public partial class ProcBomDetailRepository : IProcBomDetailRepository
+    public partial class ProcBomDetailRepository : BaseRepository, IProcBomDetailRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public ProcBomDetailRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public ProcBomDetailRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
 
@@ -35,7 +32,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -46,9 +43,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
-
         }
 
         /// <summary>
@@ -58,7 +54,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteBomIDAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteBomIDsSql, new { command.UserId, command.DeleteOn, bomIds = command.Ids, command });
         }
 
@@ -69,7 +65,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcBomDetailEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcBomDetailEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -80,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcBomDetailEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -94,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var key = $"proc_bom_detail&{bomId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdSql, new { bomId });
             });
         }
@@ -106,7 +102,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdAndProcedureIdAsync(ProcBomDetailByBomIdAndProcedureIdQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdAndProcedureIdSql, query);
         }
 
@@ -117,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailEntity>> GetByBomIdsAsync(IEnumerable<long> bomIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcBomDetailEntity>(GetByBomIdsSql, new { bomIds });
         }
 
@@ -128,7 +124,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailView>> GetListMainAsync(long bomId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcBomDetailView>(GetListMainSql, new { bomId = bomId });
         }
 
@@ -139,7 +135,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcBomDetailView>> GetListReplaceAsync(long bomId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
 
             return await conn.QueryAsync<ProcBomDetailView>(GetListReplaceSql, new { bomId = bomId });
         }
@@ -168,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procBomDetailPagedQuery.PageSize });
             sqlBuilder.AddParameters(procBomDetailPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procBomDetailEntitiesTask = conn.QueryAsync<ProcBomDetailEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procBomDetailEntities = await procBomDetailEntitiesTask;
@@ -185,7 +181,7 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcBomDetailEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procBomDetailEntities = await conn.QueryAsync<ProcBomDetailEntity>(template.RawSql, query);
             return procBomDetailEntities;
         }
@@ -197,7 +193,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcBomDetailEntity procBomDetailEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procBomDetailEntity);
         }
 
@@ -208,7 +204,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<ProcBomDetailEntity> procBomDetailEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procBomDetailEntitys);
         }
 
@@ -219,7 +215,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcBomDetailEntity procBomDetailEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procBomDetailEntity);
         }
 
@@ -230,7 +226,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<ProcBomDetailEntity> procBomDetailEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procBomDetailEntitys);
         }
 

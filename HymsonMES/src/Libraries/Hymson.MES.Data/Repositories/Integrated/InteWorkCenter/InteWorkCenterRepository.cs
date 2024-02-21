@@ -10,7 +10,6 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter.View;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
 {
@@ -19,22 +18,19 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
     /// @author admin
     /// @date 2023-02-22
     /// </summary>
-    public partial class InteWorkCenterRepository : IInteWorkCenterRepository
+    public partial class InteWorkCenterRepository : BaseRepository, IInteWorkCenterRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public InteWorkCenterRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache)
+        public InteWorkCenterRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
-
 
         /// <summary>
         /// 分页查询
@@ -82,7 +78,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             sqlBuilder.AddParameters(new { Rows = param.PageSize });
             sqlBuilder.AddParameters(param);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteWorkCenterEntitiesTask = conn.QueryAsync<InteWorkCenterEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteWorkCenterEntities = await inteWorkCenterEntitiesTask;
@@ -100,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             var key = $"inte_work_center&{id}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByIdSql, new { Id = id });
             });
         }
@@ -112,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterEntity>(GetByIdsSql, new { ids });
         }
 
@@ -143,7 +139,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                     break;
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterEntity>(templateData.RawSql, templateData.Parameters);
         }
 
@@ -157,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             var key = $"inte_work_center&Type-{query.Type}&Status-{query.Status}&SiteId-{query.SiteId}";
             return await _memoryCache.GetOrCreateLazyAsync(key, async (cacheEntry) =>
             {
-                using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+                using var conn = GetMESDbConnection();
                 return await conn.QueryAsync<InteWorkCenterEntity>(GetByTypeSql, query);
             });
         }
@@ -169,7 +165,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<InteWorkCenterEntity> GetByCodeAsync(EntityByCodeQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByCodeSql, param);
         }
 
@@ -180,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<InteWorkCenterEntity> GetByResourceIdAsync(long resourceId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetByResourceId, new { resourceId });
         }
 
@@ -191,7 +187,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> InsertAsync(InteWorkCenterEntity param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, param);
         }
 
@@ -202,7 +198,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> InsertRangAsync(IEnumerable<InteWorkCenterEntity> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, param);
         }
 
@@ -213,7 +209,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteWorkCenterEntity param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, param);
         }
 
@@ -224,7 +220,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> UpdateRangAsync(IEnumerable<InteWorkCenterEntity> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateRangSql, param);
         }
 
@@ -235,7 +231,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> DeleteRangAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteRangSql, param);
         }
 
@@ -247,7 +243,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> InsertInteWorkCenterRelationRangAsync(IEnumerable<InteWorkCenterRelation> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertInteWorkCenterRelationRangSql, param);
         }
 
@@ -258,7 +254,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> RealDelteInteWorkCenterRelationRangAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(RealDelteInteWorkCenterRelationSql, new { Id = id });
         }
 
@@ -269,7 +265,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterRelationView>> GetInteWorkCenterRelationAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterRelationView>(GetInteWorkCenterRelationSqlTemplate, new { Id = id });
         }
 
@@ -281,7 +277,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<InteWorkCenterEntity> GetHigherInteWorkCenterAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteWorkCenterEntity>(GetHigherInteWorkCenterSql, new { Id = id });
         }
         #endregion
@@ -294,7 +290,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<long>> GetWorkCenterIdByResourceIdAsync(IEnumerable<long> resourceIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<long>(GetWorkCenterIdByResourceIdSql, new { resourceIds });
         }
 
@@ -305,7 +301,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<long>> GetResourceIdsByWorkCenterIdAsync(long[] workCenterIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<long>(GetResourceIdsByWorkCenterIdSql, new { workCenterIds });
         }
 
@@ -316,7 +312,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> InsertInteWorkCenterResourceRelationRangAsync(IEnumerable<InteWorkCenterResourceRelation> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InteWorkCenterResourceRelationRangSql, param);
         }
 
@@ -327,7 +323,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> RealDelteInteWorkCenterResourceRelationRangAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(RealDelteInteWorkCenterResourceRelationSql, new { Id = id });
         }
 
@@ -338,7 +334,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<IEnumerable<InteWorkCenterResourceRelationView>> GetInteWorkCenterResourceRelatioAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterResourceRelationView>(GetInteWorkCenterResourceRelatioSqlTemplate, new { Id = id });
         }
         #endregion
@@ -350,7 +346,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
         /// <returns></returns>
         public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, command);
         }
     }

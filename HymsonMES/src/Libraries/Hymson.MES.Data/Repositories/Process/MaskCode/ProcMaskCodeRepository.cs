@@ -1,33 +1,25 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
-using Hymson.Infrastructure.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process.MaskCode
 {
     /// <summary>
     /// 仓储（掩码维护）
     /// </summary>
-    public partial class ProcMaskCodeRepository : IProcMaskCodeRepository
+    public partial class ProcMaskCodeRepository : BaseRepository, IProcMaskCodeRepository
     {
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
-        /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcMaskCodeRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcMaskCodeRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -37,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcMaskCodeEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -48,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcMaskCodeEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -59,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
         }
 
@@ -70,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<ProcMaskCodeEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcMaskCodeEntity>(GetByIdSql, new { IsDeleted = 0, id });
         }
 
@@ -81,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<ProcMaskCodeEntity> GetByCodeAsync(EntityByCodeQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcMaskCodeEntity>(GetByCodeSql, query);
         }
 
@@ -117,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<ProcMaskCodeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
@@ -131,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaskCodeEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcMaskCodeEntity>(GetByIdsSql, new { ids });
         }
 
@@ -142,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaskCodeEntity>> GetByCodesAsync(ProcMaskCodesByCodeQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcMaskCodeEntity>(GetByCodesSql, param);
         }
     }
