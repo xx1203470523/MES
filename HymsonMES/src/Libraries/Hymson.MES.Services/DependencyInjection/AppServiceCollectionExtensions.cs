@@ -5,6 +5,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Dtos.WhWareHouse;
@@ -12,6 +13,7 @@ using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
 using Hymson.MES.Services.Plan;
+using Hymson.MES.Services.Qual;
 using Hymson.MES.Services.Services;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
@@ -213,6 +215,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionHeadService, QualIpqcInspectionHeadService>();
             services.AddSingleton<IQualIpqcInspectionPatrolService, QualIpqcInspectionPatrolService>();
             services.AddSingleton<IQualIpqcInspectionTailService, QualIpqcInspectionTailService>();
+            services.AddSingleton<IQualIqcInspectionItemService, QualIqcInspectionItemService>();
+            services.AddSingleton<IQualIqcInspectionItemDetailService, QualIqcInspectionItemDetailService>();
             #endregion
 
             #region Manufacture
@@ -526,6 +530,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionPatrolSampleCreateDto>>, QualIpqcInspectionPatrolSampleAddValidator>();
             services.AddSingleton<AbstractValidator<QualIpqcInspectionTailSaveDto>, QualIpqcInspectionTailSaveValidator>();
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionTailSampleCreateDto>>, QualIpqcInspectionTailSampleAddValidator>();
+
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDto>, QualIqcInspectionItemCreateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemUpdateDto>, QualIqcInspectionItemUpdateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDeleteDto>, QualIqcInspectionItemDeleteValidator>();
+
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDetailDto>, QualIqcInspectionItemDetailCreateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDetailUpdateDto>, QualIqcInspectionItemDetailUpdateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDetailDeleteDto>, QualIqcInspectionItemDetailDeleteValidator>();
             #endregion
 
             #region Manufacture

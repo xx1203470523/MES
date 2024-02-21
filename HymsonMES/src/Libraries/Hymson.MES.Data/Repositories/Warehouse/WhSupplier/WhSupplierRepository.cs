@@ -69,7 +69,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<WhSupplierEntity>> GetByIdsAsync(long[] ids)
+        public async Task<IEnumerable<WhSupplierEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
             return await conn.QueryAsync<WhSupplierEntity>(GetByIdsSql, new { ids = ids });

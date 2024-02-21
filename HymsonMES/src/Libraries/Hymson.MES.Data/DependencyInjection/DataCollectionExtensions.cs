@@ -21,6 +21,7 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
+using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Data.Repositories.WhWareHouse;
@@ -283,6 +284,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionTailSampleRepository, QualIpqcInspectionTailSampleRepository>();
             services.AddSingleton<IQualIpqcInspectionTailAnnexRepository, QualIpqcInspectionTailAnnexRepository>();
             services.AddSingleton<IManuEquipmentParameterRepository, ManuEquipmentParameterRepository>();
+
+            services.AddSingleton<IQualIqcInspectionItemRepository, QualIqcInspectionItemRepository>();
+            services.AddSingleton<IQualIqcInspectionItemDetailRepository, QualIqcInspectionItemDetailRepository>();
             #endregion
 
             #region Manufacture
