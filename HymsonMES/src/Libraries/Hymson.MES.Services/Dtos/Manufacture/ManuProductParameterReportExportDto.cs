@@ -57,43 +57,6 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         [EpplusTableColumn(Header = "参数值", Order = 12)]
         public string Paramvalue { get; set; }
-        #region 导出不需要这些字段 已注释
-        /// <summary>
-        /// 状态;1：触发 2、恢复
-        /// </summary>
-        //   [EpplusTableColumn(Header = "设备状态", Order = 4)]
-        //  public EquipmentAlarmStatusEnum? Status { get; set; }
-        ///// <summary>
-        ///// 上限
-        ///// </summary>
-        //[EpplusTableColumn(Header = "参数上限", Order = 11)]
-        //public string StandardUpperLimit { get; set; }
-        ///// <summary>
-        ///// 下限
-        ///// </summary>
-        //[EpplusTableColumn(Header = "参数下限", Order = 12)]
-        //public string StandardLowerLimit { get; set; }
-        ///// <summary>
-        ///// 判定结果（LA梁工硬要添加只做展示）
-        ///// </summary>
-        //[EpplusTableColumn(Header = "判断结果", Order = 13)]
-        //public string JudgmentResult { get; set; }
-        ///// <summary>
-        ///// 测试持续时间（LA梁工硬要添加只做展示）
-        ///// </summary>
-        //[EpplusTableColumn(Header = "测试持续时间", Order = 14)]
-        //public string TestDuration { get; set; }
-        ///// <summary>
-        ///// 测试时间（LA梁工硬要添加只做展示）
-        ///// </summary>
-        //[EpplusTableColumn(Header = "测试时间", Order = 15)]
-        //public string TestTime { get; set; }
-        ///// <summary>
-        ///// 测试结果（LA梁工硬要添加只做展示）
-        ///// </summary>
-        //[EpplusTableColumn(Header = "测试结果", Order = 16)]
-        //public string TestResult { get; set; }
-        #endregion
 
         /// <summary>
         /// 上报时间
@@ -101,5 +64,51 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         [EpplusTableColumn(Header = "上报时间", Order = 13)]
         public DateTime LocalTime { get; set; }
 
+
+        #region 导出不需要这些字段 已注释（客户反馈导出信息不全，取消注释）
+
+        /// <summary>
+        /// 状态;1：触发 2、恢复
+        /// </summary>
+        [EpplusTableColumn(Header = "设备状态", Order = 14)]
+        public EquipmentAlarmStatusEnum? Status { get; set; }
+
+        ///// <summary>
+        ///// 上限
+        ///// </summary>
+        [EpplusTableColumn(Header = "参数上限", Order = 15)]
+        public string StandardUpperLimit { get; set; }
+
+        ///// <summary>
+        ///// 下限
+        ///// </summary>
+        [EpplusTableColumn(Header = "参数下限", Order = 16)]
+        public string StandardLowerLimit { get; set; }
+
+        /// <summary>
+        /// 判定结果（LA梁工硬要添加只做展示）
+        /// </summary>
+        [EpplusTableColumn(Header = "判断结果", Order = 17)]
+        public string JudgmentResult { get; set; }
+
+        /// <summary>
+        /// 测试持续时间（LA梁工硬要添加只做展示）
+        /// </summary>
+        [EpplusTableColumn(Header = "测试持续时间", Order = 18)]
+        public string TestDuration { get; set; }
+
+        /// <summary>
+        /// 测试时间（LA梁工硬要添加只做展示）
+        /// </summary>
+        [EpplusTableColumn(Header = "测试时间", Order = 19)]
+        public string TestTime { get; set; }
+
+        /// <summary>
+        /// 测试结果（LA梁工硬要添加只做展示）
+        /// </summary>
+        [EpplusTableColumn(Header = "测试结果", Order = 20)]
+        public string TestResult { get; set; }
+
+        #endregion
     }
 }
