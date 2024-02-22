@@ -1514,6 +1514,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             manuSfcAboutInfoViewDto.MaterialCodeVersion = material == null ? "" : $"{material.MaterialCode}/{material.Version}";
             manuSfcAboutInfoViewDto.ProcessRouteCodeVersion = procProcessRoute == null ? "" : $"{procProcessRoute.Code}/{procProcessRoute.Version}";
             manuSfcAboutInfoViewDto.BomCodeVersion = bom == null ? "" : $"{bom.BomCode}/{bom.Version}";
+            manuSfcAboutInfoViewDto.MaterialCode = material?.MaterialCode??"";
+            manuSfcAboutInfoViewDto.MaterialName = material?.MaterialName ??"";
+            manuSfcAboutInfoViewDto.MaterialVersion = material?.Version ?? "";
             return manuSfcAboutInfoViewDto;
         }
 

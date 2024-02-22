@@ -35,6 +35,7 @@ using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
+using Minio.DataModel;
 using Newtonsoft.Json;
 
 namespace Hymson.MES.Services.Services.Manufacture
@@ -1504,6 +1505,7 @@ namespace Hymson.MES.Services.Services.Manufacture
         }
 
         #region 录入标识
+
         /// <summary>
         /// 录入标识
         /// </summary>
@@ -1525,23 +1527,32 @@ namespace Hymson.MES.Services.Services.Manufacture
             var needHandleSfcs = productBadRecordMarkSaveDtos.Select(x => x.SFC).Distinct();
 
             //检测是否与数据库中的重复
-            var reaps= productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId }).Where(group => group.Count() > 1);
+            var reaps= productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId,x.InterceptProcedureId }).Where(group => group.Count() > 1);
             if (reaps!=null&& reaps.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15435));
 
             var sfcsBadRecords= await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new Data.Repositories.Manufacture.ManuProductBadRecord.Query.ManuProductBadRecordBySfcQuery { SiteId=_currentSite.SiteId??0,SFCs= needHandleSfcs,Status=  ProductBadRecordStatusEnum.Open });
 
-            var addGroupKeys = productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId });
-            var groups= sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId });
+            var addGroupKeys = productBadRecordMarkSaveDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId, x.InterceptProcedureId });
+            var groups= sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId,x.InterceptOperationId });
+
+            //查询工序信息
+            var procProcedureEntities = await _procProcedureRepository.GetProcProcedureEntitiesAsync(new ProcProcedureQuery {SiteId=_currentSite.SiteId??0 });
+
             foreach (var item in groups)
             {
-                if (addGroupKeys.Any(x => x.Key.SFC == item.Key.SFC && x.Key.FoundBadOperationId == item.Key.FoundBadOperationId && x.Key.UnqualifiedId == item.Key.UnqualifiedId)) 
+                if (addGroupKeys.Any(x => x.Key.SFC == item.Key.SFC && x.Key.FoundBadOperationId == item.Key.FoundBadOperationId && x.Key.UnqualifiedId == item.Key.UnqualifiedId && x.Key.InterceptProcedureId == item.Key.InterceptOperationId))
                 {
                     //查询工序
-                    var procedure = await _procProcedureRepository.GetByIdAsync(item.Key.FoundBadOperationId);
+                    //var procedure = await _procProcedureRepository.GetByIdAsync(item.Key.FoundBadOperationId);
+                    //发现不良工序
+                    var foundBadprocedure = procProcedureEntities.FirstOrDefault(a => a.Id == item.Key.FoundBadOperationId);
+                    //拦截工序
+                    var interceptprocedure = procProcedureEntities.FirstOrDefault(a => a.Id == item.Key.InterceptOperationId);
+
                     //查询不合格代码
                     var unqualifiedCode = await _qualUnqualifiedCodeRepository.GetByIdAsync(item.Key.UnqualifiedId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15436)).WithData("sfc", item.Key.SFC).WithData("foundBadOperationCode", procedure.Code??"").WithData("unqualifiedCode",unqualifiedCode?.UnqualifiedCode??""); 
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15436)).WithData("sfc", item.Key.SFC).WithData("foundBadOperationCode", foundBadprocedure?.Code ?? "").WithData("unqualifiedCode", unqualifiedCode?.UnqualifiedCode ?? "").WithData("InterceptOperationCode", interceptprocedure?.Code ?? "");
                 }
             }
 
@@ -1626,6 +1637,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UpdatedBy = _currentUser.UserName,
 
                     Status = ProductBadRecordStatusEnum.Open,
+                    InterceptOperationId = item.InterceptProcedureId.GetValueOrDefault()
                 };
 
                 manuProductBadRecords.Add(manuProductBadRecordEntity);
@@ -1636,7 +1648,11 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //插入不合格记录
                 if (manuProductBadRecords != null && manuProductBadRecords.Any())
                 {
-                    await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                    //await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                    var insertResult = await _manuProductBadRecordRepository.InsertIgnoreRangeAsync(manuProductBadRecords);
+                    if (insertResult != manuProductBadRecords.Count) {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19710));
+                    }
                 }
                 //插入步骤表
                 if (sfcStepList != null && sfcStepList.Any())
@@ -1672,8 +1688,8 @@ namespace Hymson.MES.Services.Services.Manufacture
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             var excelImportDtos = _excelService.Import<ManuProductBadRecordMarkEntryImportDto>(memoryStream);
             //备份用户上传的文件，可选
-            var stream = formFile.OpenReadStream();
-            var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            //var stream = formFile.OpenReadStream();
+            //var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES14908));
@@ -1690,7 +1706,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var needHandleSfcs = excelImportDtos.Select(x => x.SFC).Distinct();
 
             //检测 传入数据中内部是否重复
-            var reaps = excelImportDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationCode, x.UnqualifiedCode }).Where(group => group.Count() > 1);
+            var reaps = excelImportDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationCode, x.UnqualifiedCode,x.InterceptProcedureCode }).Where(group => group.Count() > 1);
             if (reaps != null && reaps.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15435));
 
             //检测 传入的数据 是否正确
@@ -1709,7 +1725,8 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //检测 不合格代码
             // 获取不合格代码列表
-            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync( new QualUnqualifiedCodeByCodesQuery { Codes = excelImportDtos.Select(x => x.UnqualifiedCode), SiteId = _currentSite.SiteId ?? 0 });
+            var unqualifiedCodes = excelImportDtos.Select(x => x.UnqualifiedCode).Distinct();
+            var qualUnqualifiedCodes = await _qualUnqualifiedCodeRepository.GetByCodesAsync( new QualUnqualifiedCodeByCodesQuery { Codes = unqualifiedCodes, SiteId = _currentSite.SiteId ?? 0 });
 
             var notExistUnquaCodes = excelImportDtos.Select(x => x.UnqualifiedCode).Distinct().Except(qualUnqualifiedCodes.Select(x => x.UnqualifiedCode).Distinct());
             if(notExistUnquaCodes != null && notExistUnquaCodes.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES15441)).WithData("unqualifiedCode", string.Join(",", notExistUnquaCodes)); //检测不合格代码是否存在
@@ -1752,19 +1769,29 @@ namespace Hymson.MES.Services.Services.Manufacture
                 x.InterceptProcedureCode,
                 x.Remark
             });
-            var addGroupKeys = handleExcelDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId }); 
+            var addGroupKeys = handleExcelDtos.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId,x.InterceptProcedureId }); 
 
-            var groups = sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId });
+            var groups = sfcsBadRecords.GroupBy(x => new { x.SFC, x.FoundBadOperationId, x.UnqualifiedId,x.InterceptOperationId });
+
+            //查询工序信息
+            var procProcedureEntities = await _procProcedureRepository.GetProcProcedureEntitiesAsync(new ProcProcedureQuery { SiteId = _currentSite.SiteId ?? 0 });
+
             foreach (var item in groups)
             {
-                if (addGroupKeys.Any(x => x.Key.SFC == item.Key.SFC && x.Key.FoundBadOperationId == item.Key.FoundBadOperationId && x.Key.UnqualifiedId == item.Key.UnqualifiedId))
+                if (addGroupKeys.Any(x => x.Key.SFC == item.Key.SFC && x.Key.FoundBadOperationId == item.Key.FoundBadOperationId && x.Key.UnqualifiedId == item.Key.UnqualifiedId&&x.Key.InterceptProcedureId==item.Key.InterceptOperationId))
                 {
                     //查询工序
-                    var procedure = procedures.FirstOrDefault(x=>x.Id== item.Key.FoundBadOperationId);
+                    //var procedure = procedures.FirstOrDefault(x=>x.Id== item.Key.FoundBadOperationId);
+
+                    //发现不良工序
+                    var foundBadprocedure = procProcedureEntities.FirstOrDefault(a => a.Id == item.Key.FoundBadOperationId);
+                    //拦截工序
+                    var interceptprocedure = procProcedureEntities.FirstOrDefault(a => a.Id == item.Key.InterceptOperationId);
+
                     //查询不合格代码
                     var unqualifiedCode = qualUnqualifiedCodes.FirstOrDefault(x=>x.Id== item.Key.UnqualifiedId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15436)).WithData("sfc", item.Key.SFC).WithData("foundBadOperationCode", procedure?.Code ?? "").WithData("unqualifiedCode", unqualifiedCode?.UnqualifiedCode ?? "");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15436)).WithData("sfc", item.Key.SFC).WithData("foundBadOperationCode", foundBadprocedure?.Code ?? "").WithData("unqualifiedCode", unqualifiedCode?.UnqualifiedCode ?? "").WithData("InterceptOperationCode", interceptprocedure?.Code??"");
                 }
             }
             #endregion
@@ -1828,6 +1855,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     UpdatedBy = _currentUser.UserName,
 
                     Status = ProductBadRecordStatusEnum.Open,
+                    InterceptOperationId=item.InterceptProcedureId.GetValueOrDefault(),
                 };
                 manuProductBadRecords.Add(manuProductBadRecordEntity);
             }
@@ -1837,7 +1865,12 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //插入不合格记录
                 if (manuProductBadRecords != null && manuProductBadRecords.Any())
                 {
-                    await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                    //await _manuProductBadRecordRepository.InsertRangeAsync(manuProductBadRecords);
+                    var insertResult = await _manuProductBadRecordRepository.InsertIgnoreRangeAsync(manuProductBadRecords);
+                    if (insertResult != manuProductBadRecords.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19710));
+                    }
                 }
                 //插入步骤表
                 if (sfcStepList != null && sfcStepList.Any())

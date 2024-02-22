@@ -106,6 +106,9 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public long? ReJudgmentSfcStepId { get; set; }
 
-
+        /// <summary>
+        /// 拦截工序
+        /// </summary>
+        public long? InterceptOperationId { get; set; }
     }
 }
