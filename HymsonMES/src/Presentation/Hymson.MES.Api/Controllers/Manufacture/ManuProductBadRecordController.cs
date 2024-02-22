@@ -150,7 +150,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("saveBadRecordMarkEntry")]
-        ///[PermissionDescription("manu:sfcMarking:save")]
+        //[PermissionDescription("manu:sfcMarking:save")]
         public async Task SaveBadRecordMarkEntryAsync([FromBody] List<ManuProductBadRecordMarkSaveDto> productBadRecordMarkSaveDtos)
         {
             await _manuProductBadRecordService.SaveBadRecordMarkEntryAsync(productBadRecordMarkSaveDtos);
@@ -163,7 +163,7 @@ namespace Hymson.MES.Api.Controllers.Manufacture
         /// <returns></returns>
         [HttpPost]
         [Route("importBadRecordMark")]
-        ///[PermissionDescription("manu:BadRecordMark:import")]
+        //[PermissionDescription("manu:BadRecordMark:import")]
         public async Task ImportBadRecordMarkAsync([FromForm(Name = "file")] IFormFile formFile)
         {
             await _manuProductBadRecordService.ImportBadRecordMarkEntryAsync(formFile);

@@ -801,8 +801,8 @@
         public const string MES15432 = "条码不能为空";
         public const string MES15433 = "发现工序不能为空";
         public const string MES15434 = "不合格代码不能为空";
-        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,发现工序,不合格代码)数据！";
-        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现工序[{foundBadOperationCode}]，不合格代码[{unqualifiedCode}]！";
+        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,拦截工序,不合格代,发现不良工序)数据！";
+        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}],不合格代码[{unqualifiedCode}]！";
         public const string MES15437 = "存在不是缺陷的不合格代码";
         public const string MES15438 = "条码[{sfc}]是锁定、删除或无效状态，无法使用";
         public const string MES15439 = "条码[{sfc}]不存在";
@@ -1733,12 +1733,16 @@
         public const string MES19701 = "发现不良工序不允许为空!";
         public const string MES19702 = "不合格代码不允许为空!";
         public const string MES19703 = "产品序列码不允许为空!";
-        public const string MES19704 = "发现工序【code】不存在!";
-        public const string MES19705 = "拦截工序【code】不存在!";
-        public const string MES19706 = "产品序列码【code】不存在!";
-        public const string MES19707 = "产品序列码【code】状态为【status】!";
-        public const string MES19708 = "不合格代码【code】不存在!";
-        public const string MES19709 = "产品序列码【code】信息不存在!";
+        public const string MES19704 = "发现工序【{code}】不存在!";
+        public const string MES19705 = "拦截工序【{code}】不存在!";
+        public const string MES19706 = "产品序列码【{code}】不存在!";
+        public const string MES19707 = "产品序列码【{code}】状态为【{status}】!";
+        public const string MES19708 = "不合格代码【{code}】不存在!";
+        public const string MES19709 = "产品序列码【{code}】信息不存在!";
+        public const string MES19710 = "产品序列码，不良发现工序，拦截工序，不合格代码已经存在!";
+        public const string MES19711 = "Marking关闭传入数据为空!";
+        public const string MES19712 = "Marking关闭保存失败!";
+        public const string MES19713 = "产品序列码【{sfc}】在工序【{produceCode}】拦截不合格代码【{unqualifiedCode}】!";
         #endregion
 
         #region 生产日历

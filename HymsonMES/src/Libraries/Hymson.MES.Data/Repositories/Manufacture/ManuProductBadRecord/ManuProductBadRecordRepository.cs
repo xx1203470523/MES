@@ -153,6 +153,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("SFC IN @SFCs");
             }
+            if (query.InterceptOperationId != null) {
+                sqlBuilder.Where("InterceptOperationId = @InterceptOperationId");
+            }
             var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(template.RawSql, query);
             return manuProductBadRecordEntities;
         }
@@ -182,6 +185,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 批量新增(忽略重复)
+        /// </summary>
+        /// <param name="manuProductBadRecordEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertIgnoreRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys)
+        {
+            if (manuProductBadRecordEntitys == null || !manuProductBadRecordEntitys.Any()) return 0;
+
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(InsertIgnoreSql, manuProductBadRecordEntitys);
+        }
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuProductBadRecordEntity"></param>
@@ -201,6 +217,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, manuProductBadRecordEntitys);
+        }
+
+        /// <summary>
+        /// Marking关闭批量更新
+        /// </summary>
+        /// <param name="manuProductBadRecordEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateByMarkingCloseRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys)
+        {
+            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            return await conn.ExecuteAsync(UpdateMarkingCloseSql, manuProductBadRecordEntitys);
         }
 
         /// <summary>
@@ -457,8 +484,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
-        const string InsertSql = "INSERT INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn) ";
+        const string InsertSql = "INSERT INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`,`InterceptOperationId`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn,@InterceptOperationId) ";
+
+        //新增忽略重复
+        const string InsertIgnoreSql = "INSERT IGNORE INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`,`InterceptOperationId`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn,@InterceptOperationId) ";
+
         const string UpdateSql = "UPDATE manu_product_bad_record SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, FoundBadResourceId = @FoundBadResourceId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, SfcInfoId = @SfcInfoId, Qty = @Qty, Status = @Status, Source = @Source, DisposalResult = @DisposalResult, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SfcStepId = @SfcStepId, ReJudgmentSfcStepId = @ReJudgmentSfcStepId, ReJudgmentBy = @ReJudgmentBy, ReJudgmentOn = @ReJudgmentOn, ReJudgmentResult = @ReJudgmentResult, CloseBy = @CloseBy, CloseOn = @CloseOn WHERE Id = @Id ";
+
+        //Marking关闭提交保存
+        const string UpdateMarkingCloseSql = "UPDATE manu_product_bad_record SET Status = @Status,Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+
         const string DeleteSql = "UPDATE `manu_product_bad_record` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_product_bad_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_product_bad_record`  WHERE Id IN @ids ";

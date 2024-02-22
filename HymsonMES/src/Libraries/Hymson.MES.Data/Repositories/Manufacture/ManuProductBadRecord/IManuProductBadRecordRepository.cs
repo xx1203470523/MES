@@ -82,6 +82,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<int> InsertRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys);
 
         /// <summary>
+        /// 批量新增(忽略重复)
+        /// </summary>
+        /// <param name="manuProductBadRecordEntitys"></param>
+        /// <returns></returns>
+        Task<int> InsertIgnoreRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys);
+
+        /// <summary>
         /// 更新
         /// </summary>
         /// <param name="manuProductBadRecordEntity"></param>
@@ -94,6 +101,13 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuProductBadRecordEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys);
+
+        /// <summary>
+        /// Marking关闭批量更新
+        /// </summary>
+        /// <param name="manuProductBadRecordEntitys"></param>
+        /// <returns></returns>
+        Task<int> UpdateByMarkingCloseRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys);
 
         /// <summary>
         /// 批量删除
