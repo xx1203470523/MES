@@ -141,6 +141,9 @@ namespace Hymson.MES.Services.Dtos.Report
         /// 触发时间
         /// </summary>
         public DateTime LocalTime { get; set; }
+
+        public string CreatedBy { get; set; }
+
         public DateTime CreatedOn { get; set; }
 
         public DateTime UpdatedOn { get; set; }

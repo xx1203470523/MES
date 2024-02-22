@@ -109,6 +109,18 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         [EpplusTableColumn(Header = "测试结果", Order = 20)]
         public string TestResult { get; set; }
 
+        /// <summary>
+        /// 测试时间（LA梁工硬要添加只做展示）
+        /// </summary>
+        [EpplusTableColumn(Header = "创建人", Order = 21)]
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 测试结果（LA梁工硬要添加只做展示）
+        /// </summary>
+        [EpplusTableColumn(Header = "创建时间", Order = 22)]
+        public string CreatedOn { get; set; }
+
         #endregion
     }
 }
