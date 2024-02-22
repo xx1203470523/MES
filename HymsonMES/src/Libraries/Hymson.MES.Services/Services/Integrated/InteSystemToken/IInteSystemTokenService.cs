@@ -56,5 +56,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="id"></param>
         /// <returns></returns>
         Task<InteSystemTokenDto> QueryInteSystemTokenByIdAsync(long id);
+
+        /// <summary>
+        /// 根据ID查询 批量获取
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteSystemTokenDto>> QueryInteSystemTokenByIdsAsync(long[] id);
     }
 }
