@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Hymson.Elasticsearch;
+using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
@@ -26,6 +28,7 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.MES.Services.Services.Integrated.InteIntefaceLog;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
@@ -88,6 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddExcelService();
             services.AddMinioService(configuration);
             services.AddData(configuration);
+            services.AddElasticsearchService(configuration);
             AddConfig(services, configuration);
 
             AddServices(services);
@@ -106,6 +110,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+
+            
+
             #region Equipment
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
@@ -123,6 +130,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+       
             services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             services.AddSingleton<IInteJobService, InteJobService>();
@@ -144,7 +152,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventService, InteEventService>();
             services.AddSingleton<IInteMessageManageService, InteMessageManageService>();
             services.AddSingleton<IInteCustomFieldService, InteCustomFieldService>();
+
             services.AddSingleton<ISysReleaseRecordService, SysReleaseRecordService>();
+
+            services.AddSingleton<IInteIntefaceLogService, InteIntefaceLogService>();
             #endregion
 
             #region Process

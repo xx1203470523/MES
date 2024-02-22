@@ -21,6 +21,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -101,6 +102,28 @@ namespace Hymson.MES.Services.Services.Integrated
                 return inteSystemTokenEntity.ToModel<InteSystemTokenDto>();
             }
             return new InteSystemTokenDto();
+
+        }
+
+        /// <summary>
+        /// 根据ID查询 批量获取
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<InteSystemTokenDto>> QueryInteSystemTokenByIdsAsync(long[] id)
+        {
+            var inteSystemTokenEntity = await _inteSystemTokenRepository.GetByIdsAsync(id);
+            List<InteSystemTokenDto> list = new();
+            if (inteSystemTokenEntity != null)
+            {
+                foreach(var item in inteSystemTokenEntity)
+                {
+                    var model = item.ToModel<InteSystemTokenDto>();
+                    list.Add(model);
+                }
+                
+            }
+            return list;
 
         }
 
