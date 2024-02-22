@@ -13,20 +13,15 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
     /// <summary>
     /// 仓储（备件注册）
     /// </summary>
-    public partial class EquSparePartRepository : IEquSparePartRepository
+    public partial class EquSparePartRepository : BaseRepository, IEquSparePartRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
         /// <summary>
         /// 构造函数（备件注册）
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public EquSparePartRepository(IOptions<ConnectionOptions> connectionOptions)
+        public EquSparePartRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
+
         }
 
         /// <summary>
@@ -36,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> InsertAsync(EquSparePartEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -47,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> UpdateAsync(EquSparePartEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -58,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> UpdateSparePartTypeIdAsync(UpdateSparePartTypeIdCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSparePartTypeIdSql, command);
         }
 
@@ -69,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> ClearSparePartTypeIdAsync(long sparePartTypeId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(ClearSparePartTypeIdSql, new { sparePartTypeId });
         }
 
@@ -80,7 +75,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -91,7 +86,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
         }
 
@@ -102,7 +97,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         /// <returns></returns>
         public async Task<EquSparePartEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<EquSparePartEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -127,7 +122,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<EquSparePartEntity>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 
@@ -143,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquSparePart
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEquSparePartEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var equSparePartEntities = await conn.QueryAsync<EquSparePartEntity>(template.RawSql, query);
             return equSparePartEntities;
         }

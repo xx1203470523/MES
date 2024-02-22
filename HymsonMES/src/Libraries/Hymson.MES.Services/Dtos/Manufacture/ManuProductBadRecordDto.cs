@@ -399,29 +399,31 @@ namespace Hymson.MES.Services.Dtos.Manufacture
 
     public record ManuProductBadRecordMarkEntryImportDto : BaseExcelDto 
     {
-        /// <summary>
-        /// 条码
-        /// </summary>
-        [EpplusTableColumn(Header = "条码(必填)", Order = 1)]
-        public string SFC { get; set; }
+        
 
         /// <summary>
         /// 发现不良工序编码
         /// </summary>
-        [EpplusTableColumn(Header = "发现不良工序编码(必填)", Order = 2)]
+        [EpplusTableColumn(Header = "发现不良工序编码(必填)", Order = 1)]
         public string FoundBadOperationCode { get; set; }
 
         /// <summary>
         /// 不合格代码编码
         /// </summary>
-        [EpplusTableColumn(Header = "不合格代码编码(必填)", Order = 3)]
+        [EpplusTableColumn(Header = "不合格代码编码(必填)", Order = 2)]
         public string UnqualifiedCode { get; set; }
 
         /// <summary>
         /// 拦截工序编码
         /// </summary>
-        [EpplusTableColumn(Header = "拦截工序编码", Order = 4)]
+        [EpplusTableColumn(Header = "拦截工序编码", Order = 3)]
         public string? InterceptProcedureCode { get; set; }
+
+        /// <summary>
+        /// 条码
+        /// </summary>
+        [EpplusTableColumn(Header = "产品序列码(必填)", Order = 4)]
+        public string SFC { get; set; }
 
         /// <summary>
         /// 备注

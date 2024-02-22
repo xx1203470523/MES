@@ -1,29 +1,22 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.Infrastructure.Constants;
-using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Equipment.EquEquipmentUnit.Query;
 using Hymson.MES.Data.Repositories.Integrated.InteCalendar.Query;
-using Hymson.MES.Data.Repositories.Integrated.InteClass.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
 {
     /// <summary>
     /// 日历维护仓储
     /// </summary>
-    public partial class InteCalendarRepository : IInteCalendarRepository
+    public partial class InteCalendarRepository : BaseRepository, IInteCalendarRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public InteCalendarRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteCalendarRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -33,7 +26,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> InsertAsync(InteCalendarEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entity);
         }
 
@@ -44,7 +37,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteCalendarEntity entity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, entity);
         }
 
@@ -55,9 +48,8 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
-
         }
 
         /// <summary>
@@ -67,7 +59,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<bool> IsExistsAsync(long equOrLineId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteScalarAsync(ExistsSql, new
             {
                 UseStatus = (int)CalendarUseStatusEnum.Enable,
@@ -84,7 +76,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         public async Task<bool> IsExistsAsync(long equOrLineId, long id)
         {
             // w.Id != modifyDto.Id
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteScalarAsync(ExistsSql, new
             {
                 UseStatus = (int)CalendarUseStatusEnum.Enable,
@@ -100,7 +92,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
         /// <returns></returns>
         public async Task<InteCalendarEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteCalendarEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -157,7 +149,7 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteCalendar
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
             sqlBuilder.AddParameters(pagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var entities = await conn.QueryAsync<InteCalendarView>(templateData.RawSql, templateData.Parameters);
             var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
 

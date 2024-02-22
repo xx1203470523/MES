@@ -5,6 +5,7 @@ using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Qual;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Domain.WhWareHouse;
@@ -42,6 +43,7 @@ using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Hymson.MES.Data.Repositories.Process.View;
+using Hymson.MES.Data.Repositories.Qual;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspection.View;
 using Hymson.MES.Data.Repositories.Quality.QualIpqcInspectionHead.View;
@@ -60,6 +62,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
@@ -628,7 +631,7 @@ namespace Hymson.MES.Services.Mapper
             #endregion
 
             #region ProcFormulaOperation
-            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationDto > ();
+            CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationDto>();
             CreateMap<ProcFormulaOperationEntity, ProcFormulaOperationSaveDto>();
             CreateMap<ProcFormulaOperationSaveDto, ProcFormulaOperationEntity>();
             CreateMap<ProcFormulaOperationPagedQueryDto, ProcFormulaOperationPagedQuery>();
@@ -805,6 +808,71 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIpqcInspectionTailSamplePagedQueryDto, QualIpqcInspectionTailSamplePagedQuery>();
             CreateMap<QualIpqcInspectionPatrolSampleCreateDto, QualIpqcInspectionPatrolSampleEntity>();
             #endregion
+
+            CreateMap<QualIqcLevelPagedQueryDto, QualIqcLevelPagedQuery>();
+            CreateMap<QualIqcLevelEntity, QualIqcLevelDto>();
+            CreateMap<QualIqcLevelSaveDto, QualIqcLevelEntity>();
+            CreateMap<QualIqcLevelDetailDto, QualIqcLevelDetailEntity>();
+            CreateMap<QualIqcLevelDetailEntity, QualIqcLevelDetailDto>();
+
+            CreateMap<QualOqcLevelPagedQueryDto, QualOqcLevelPagedQuery>();
+            CreateMap<QualOqcLevelEntity, QualOqcLevelDto>();
+            CreateMap<QualOqcLevelSaveDto, QualOqcLevelEntity>();
+            CreateMap<QualOqcLevelDetailDto, QualOqcLevelDetailEntity>();
+            CreateMap<QualOqcLevelDetailEntity, QualOqcLevelDetailDto>();
+
+
+            #region QualIqcInspectionItem
+
+            #region 数据传输对象（操作对象）转换为实体对象
+
+            CreateMap<QualIqcInspectionItemDto, QualIqcInspectionItemCreateCommand>();
+
+            CreateMap<QualIqcInspectionItemUpdateDto, QualIqcInspectionItemUpdateCommand>();
+
+            #endregion
+
+            #region 数据传输对象（查询对象）转换为数据查询对象
+
+            CreateMap<QualIqcInspectionItemPagedQueryDto, QualIqcInspectionItemPagedQuery>();
+
+            CreateMap<QualIqcInspectionItemQueryDto, QualIqcInspectionItemQuery>();
+
+            #endregion
+
+            #region 实体对象转换为数据传输对象（页面输出）
+
+            CreateMap<QualIqcInspectionItemEntity, QualIqcInspectionItemOutputDto>();
+
+            #endregion
+
+            #endregion
+
+            #region QualIqcInspectionItemDetail
+
+            #region 数据传输对象（操作对象）转换为实体对象
+
+            CreateMap<QualIqcInspectionItemDetailDto, QualIqcInspectionItemDetailCreateCommand>();
+
+            CreateMap<QualIqcInspectionItemDetailUpdateDto, QualIqcInspectionItemDetailUpdateCommand>();
+
+            #endregion
+
+            #region 数据传输对象（查询对象）转换为数据查询对象
+
+            CreateMap<QualIqcInspectionItemDetailPagedQueryDto, QualIqcInspectionItemDetailPagedQuery>();
+
+            CreateMap<QualIqcInspectionItemDetailQueryDto, QualIqcInspectionItemDetailQuery>();
+
+            #endregion
+
+            #region 实体对象转换为数据传输对象（页面输出）
+
+            CreateMap<QualIqcInspectionItemDetailEntity, QualIqcInspectionItemDetailOutputDto>();
+
+            #endregion
+
+            #endregion
         }
 
         /// <summary>
@@ -921,9 +989,9 @@ namespace Hymson.MES.Services.Mapper
         protected virtual void CreatePlanMaps()
         {
             #region WorkOrder
-            CreateMap<PlanShiftEntity, PlanShiftDto > ();
-            CreateMap<PlanShiftDetailEntity, PlanShiftDetailDto> ();
-            CreateMap<PlanShiftSaveDto, PlanShiftEntity> ();
+            CreateMap<PlanShiftEntity, PlanShiftDto>();
+            CreateMap<PlanShiftDetailEntity, PlanShiftDetailDto>();
+            CreateMap<PlanShiftSaveDto, PlanShiftEntity>();
             CreateMap<PlanWorkOrderCreateDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderModifyDto, PlanWorkOrderEntity>();
             CreateMap<PlanWorkOrderPagedQueryDto, PlanWorkOrderPagedQuery>();

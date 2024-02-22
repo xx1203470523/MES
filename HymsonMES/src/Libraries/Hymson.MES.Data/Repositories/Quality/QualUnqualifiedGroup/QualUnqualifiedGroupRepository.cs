@@ -4,7 +4,6 @@ using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Quality
 {
@@ -13,13 +12,10 @@ namespace Hymson.MES.Data.Repositories.Quality
     /// @author wangkeming
     /// @date 2023-02-11 04:45:25
     /// </summary>
-    public partial class QualUnqualifiedGroupRepository : IQualUnqualifiedGroupRepository
+    public partial class QualUnqualifiedGroupRepository : BaseRepository, IQualUnqualifiedGroupRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public QualUnqualifiedGroupRepository(IOptions<ConnectionOptions> connectionOptions)
+        public QualUnqualifiedGroupRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         #region 不合格代码组
@@ -62,7 +58,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.AddParameters(new { Rows = param.PageSize });
             sqlBuilder.AddParameters(param);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var qualUnqualifiedGroupEntitiesTask = conn.QueryAsync<QualUnqualifiedGroupEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var qualUnqualifiedGroupEntities = await qualUnqualifiedGroupEntitiesTask;
@@ -85,7 +81,7 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.LeftJoin("qual_unqualified_group_procedure_relation pr on ug.Id =pr.UnqualifiedGroupId ");
             sqlBuilder.Where("pr.ProcedureId=@ProcedureId");
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var qualUnqualifiedGroupEntities = await conn.QueryAsync<QualUnqualifiedGroupEntity>(template.RawSql, param);
             return qualUnqualifiedGroupEntities;
         }
@@ -97,7 +93,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<QualUnqualifiedGroupEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedGroupEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -108,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> InsertAsync(QualUnqualifiedGroupEntity param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, param);
         }
 
@@ -119,7 +115,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> InsertRangAsync(List<QualUnqualifiedGroupEntity> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, param);
         }
 
@@ -130,7 +126,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> UpdateAsync(QualUnqualifiedGroupEntity param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, param);
         }
 
@@ -141,7 +137,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> UpdateRangAsync(List<QualUnqualifiedGroupEntity> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, param);
         }
 
@@ -152,7 +148,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> DeleteRangAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -163,7 +159,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<QualUnqualifiedGroupEntity> GetByCodeAsync(QualUnqualifiedGroupByCodeQuery param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<QualUnqualifiedGroupEntity>(GetByCodeSql, param);
         }
         #endregion
@@ -176,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> InsertQualUnqualifiedCodeGroupRelationRangAsync(List<QualUnqualifiedCodeGroupRelation> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertQualUnqualifiedCodeGroupRelationSql, param);
         }
 
@@ -187,7 +183,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationSql, new { UnqualifiedGroupId = id });
         }
 
@@ -198,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> RealDelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdAsync(long unqualifiedCodeId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DelteQualUnqualifiedCodeGroupRelationByUnqualifiedIdSql, new { UnqualifiedCodeId = unqualifiedCodeId });
         }
         #endregion
@@ -211,7 +207,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> InsertQualUnqualifiedGroupProcedureRelationRangAsync(List<QualUnqualifiedGroupProcedureRelation> param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertQualUnqualifiedGroupProcedureRelationSql, param);
         }
 
@@ -222,7 +218,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<int> RealDelteQualUnqualifiedGroupProcedureRelationAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(RealDelteQualUnqualifiedGroupProcedureRelationSql, new { UnqualifiedGroupId = id });
         }
         #endregion
@@ -234,7 +230,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<IEnumerable<QualUnqualifiedGroupProcedureRelationView>> GetQualUnqualifiedCodeProcedureRelationAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualUnqualifiedGroupProcedureRelationView>(GetQualUnqualifiedCodeProcedureRelationSqlTemplate, new { Id = id });
         }
 
@@ -245,7 +241,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// <returns></returns>
         public async Task<IEnumerable<QualUnqualifiedGroupCodeRelationView>> GetQualUnqualifiedCodeGroupRelationAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualUnqualifiedGroupCodeRelationView>(GetQualUnqualifiedCodeGroupRelationSqlTemplate, new { Id = id });
         }
     }

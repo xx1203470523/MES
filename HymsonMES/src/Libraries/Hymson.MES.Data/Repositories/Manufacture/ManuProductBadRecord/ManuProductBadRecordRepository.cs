@@ -6,24 +6,20 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
     /// 产品不良录入仓储
     /// </summary>
-    public partial class ManuProductBadRecordRepository : IManuProductBadRecordRepository
+    public partial class ManuProductBadRecordRepository : BaseRepository, IManuProductBadRecordRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ManuProductBadRecordRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ManuProductBadRecordRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -33,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<ManuProductBadRecordEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ManuProductBadRecordEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -65,7 +61,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("uc.Type =@Type");
             }
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuSfcProduceEntities = await conn.QueryAsync<ManuProductBadRecordView>(template.RawSql, query);
             return manuSfcProduceEntities;
         }
@@ -77,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -89,7 +85,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductBadRecordEntity>> GetBySfcStepIdsAsync(IEnumerable<long> stepIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetBySfcStepIdsSql, new { StepIds = stepIds });
         }
 
@@ -100,7 +96,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductBadRecordEntity>> GetByReJudgmentSfcStepIdsAsync(IEnumerable<long> reJudgmentSfcStepIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ManuProductBadRecordEntity>(GetByReJudgmentSfcStepIdsSql, new { ReJudgmentSfcStepIds = reJudgmentSfcStepIds });
         }
 
@@ -123,7 +119,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = manuProductBadRecordPagedQuery.PageSize });
             sqlBuilder.AddParameters(manuProductBadRecordPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
@@ -138,7 +134,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<IEnumerable<ManuProductBadRecordEntity>> GetManuProductBadRecordEntitiesBySFCAsync(ManuProductBadRecordBySfcQuery query)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.Select("br.*");
@@ -157,6 +153,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("SFC IN @SFCs");
             }
+            if (query.InterceptOperationId != null)
+            {
+                sqlBuilder.Where("InterceptOperationId = @InterceptOperationId");
+            }
             var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(template.RawSql, query);
             return manuProductBadRecordEntities;
         }
@@ -168,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> InsertAsync(ManuProductBadRecordEntity manuProductBadRecordEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, manuProductBadRecordEntity);
         }
 
@@ -181,8 +181,21 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             if (manuProductBadRecordEntitys == null || !manuProductBadRecordEntitys.Any()) return 0;
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, manuProductBadRecordEntitys);
+        }
+
+        /// <summary>
+        /// 批量新增(忽略重复)
+        /// </summary>
+        /// <param name="manuProductBadRecordEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> InsertIgnoreRangeAsync(IEnumerable<ManuProductBadRecordEntity>? manuProductBadRecordEntitys)
+        {
+            if (manuProductBadRecordEntitys == null || !manuProductBadRecordEntitys.Any()) return 0;
+
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertIgnoreSql, manuProductBadRecordEntitys);
         }
 
         /// <summary>
@@ -192,7 +205,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateAsync(ManuProductBadRecordEntity manuProductBadRecordEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, manuProductBadRecordEntity);
         }
 
@@ -203,8 +216,19 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, manuProductBadRecordEntitys);
+        }
+
+        /// <summary>
+        /// Marking关闭批量更新
+        /// </summary>
+        /// <param name="manuProductBadRecordEntitys"></param>
+        /// <returns></returns>
+        public async Task<int> UpdateByMarkingCloseRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateMarkingCloseSql, manuProductBadRecordEntitys);
         }
 
         /// <summary>
@@ -214,7 +238,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> DeleteRangeAsync(DeleteCommand command)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, command);
         }
 
@@ -225,7 +249,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateStatusRangeAsync(List<ManuProductBadRecordCommand> commands)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateStatusSql, commands);
         }
 
@@ -236,7 +260,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateStatusByIdRangeAsync(List<ManuProductBadRecordUpdateCommand> commands)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var rows = await conn.ExecuteAsync(UpdateStatusByIdSql, commands);
             return rows;
         }
@@ -299,7 +323,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
             sqlBuilder.AddParameters(pageQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
@@ -357,7 +381,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
             sqlBuilder.AddParameters(pageQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordReportView>(templateData.RawSql, templateData.Parameters);
             return await manuProductBadRecordEntitiesTask;
         }
@@ -442,7 +466,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             sqlBuilder.AddParameters(new { Rows = pageQuery.PageSize });
             sqlBuilder.AddParameters(pageQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var manuProductBadRecordEntitiesTask = conn.QueryAsync<ManuProductBadRecordLogReportView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var manuProductBadRecordEntities = await manuProductBadRecordEntitiesTask;
@@ -461,8 +485,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
 
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/  FROM `manu_product_bad_record` br  /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
-        const string InsertSql = "INSERT INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn) ";
+        const string InsertSql = "INSERT INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`,`InterceptOperationId`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn,@InterceptOperationId) ";
+
+        //新增忽略重复
+        const string InsertIgnoreSql = "INSERT IGNORE INTO manu_product_bad_record(  `Id`, `SiteId`, `FoundBadOperationId`, `FoundBadResourceId`, `OutflowOperationId`, `UnqualifiedId`, `SFC`, `SfcInfoId`, `Qty`, `Status`, `Source`, `DisposalResult`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SfcStepId`, `ReJudgmentSfcStepId`, `ReJudgmentBy`, `ReJudgmentOn`, `ReJudgmentResult`, `CloseBy`, `CloseOn`,`InterceptOperationId`) VALUES (  @Id, @SiteId, @FoundBadOperationId, @FoundBadResourceId, @OutflowOperationId, @UnqualifiedId, @SFC, @SfcInfoId, @Qty, @Status, @Source, @DisposalResult, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SfcStepId, @ReJudgmentSfcStepId, @ReJudgmentBy, @ReJudgmentOn, @ReJudgmentResult, @CloseBy, @CloseOn,@InterceptOperationId) ";
+
         const string UpdateSql = "UPDATE manu_product_bad_record SET   SiteId = @SiteId, FoundBadOperationId = @FoundBadOperationId, FoundBadResourceId = @FoundBadResourceId, OutflowOperationId = @OutflowOperationId, UnqualifiedId = @UnqualifiedId, SFC = @SFC, SfcInfoId = @SfcInfoId, Qty = @Qty, Status = @Status, Source = @Source, DisposalResult = @DisposalResult, Remark = @Remark, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted, SfcStepId = @SfcStepId, ReJudgmentSfcStepId = @ReJudgmentSfcStepId, ReJudgmentBy = @ReJudgmentBy, ReJudgmentOn = @ReJudgmentOn, ReJudgmentResult = @ReJudgmentResult, CloseBy = @CloseBy, CloseOn = @CloseOn WHERE Id = @Id ";
+
+        //Marking关闭提交保存
+        const string UpdateMarkingCloseSql = "UPDATE manu_product_bad_record SET Status = @Status,Remark = @Remark,UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
+
         const string DeleteSql = "UPDATE `manu_product_bad_record` SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE IsDeleted = 0 AND Id IN @Ids";
         const string GetByIdSql = @"SELECT * FROM `manu_product_bad_record`  WHERE Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `manu_product_bad_record`  WHERE Id IN @ids ";

@@ -4,7 +4,6 @@ using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Warehouse
 {
@@ -13,23 +12,17 @@ namespace Hymson.MES.Data.Repositories.Warehouse
     /// </summary>
     public partial class WhMaterialStandingbookRepository : BaseRepository, IWhMaterialStandingbookRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
         private readonly IMemoryCache _memoryCache;
 
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
         public WhMaterialStandingbookRepository(IOptions<ConnectionOptions> connectionOptions, IMemoryCache memoryCache) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _memoryCache = memoryCache;
         }
-
 
         /// <summary>
         /// 删除（软删除）
@@ -38,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -49,9 +42,8 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, new { ids = ids });
-
         }
 
         /// <summary>
@@ -61,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<WhMaterialStandingbookEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<WhMaterialStandingbookEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -72,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<IEnumerable<WhMaterialStandingbookEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<WhMaterialStandingbookEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -117,7 +109,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.AddParameters(new { Rows = whMaterialStandingbookPagedQuery.PageSize });
             sqlBuilder.AddParameters(whMaterialStandingbookPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var whMaterialStandingbookEntitiesTask = conn.QueryAsync<WhMaterialStandingbookEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var whMaterialStandingbookEntities = await whMaterialStandingbookEntitiesTask;
@@ -138,7 +130,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             sqlBuilder.OrderBy(" CreatedOn DESC");
             sqlBuilder.Where("SiteId=@SiteId");
             var template = sqlBuilder.AddTemplate(GetWhMaterialStandingbookEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var whMaterialStandingbookEntities = await conn.QueryAsync<WhMaterialStandingbookEntity>(template.RawSql, whMaterialStandingbookQuery);
             return whMaterialStandingbookEntities;
         }
@@ -150,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> InsertAsync(WhMaterialStandingbookEntity whMaterialStandingbookEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, whMaterialStandingbookEntity);
         }
 
@@ -163,7 +155,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         {
             if (whMaterialStandingbookEntitys == null || !whMaterialStandingbookEntitys.Any()) return 0;
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, whMaterialStandingbookEntitys);
         }
 
@@ -174,7 +166,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> UpdateAsync(WhMaterialStandingbookEntity whMaterialStandingbookEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, whMaterialStandingbookEntity);
         }
 
@@ -185,7 +177,7 @@ namespace Hymson.MES.Data.Repositories.Warehouse
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<WhMaterialStandingbookEntity> whMaterialStandingbookEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, whMaterialStandingbookEntitys);
         }
 

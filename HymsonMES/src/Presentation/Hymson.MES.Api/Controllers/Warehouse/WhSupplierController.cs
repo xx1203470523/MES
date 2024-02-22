@@ -1,4 +1,5 @@
-using Hymson.Infrastructure;
+    using Hymson.Infrastructure;
+using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.Web.Framework.Attributes;
@@ -29,6 +30,46 @@ namespace Hymson.MES.Api.Controllers.Warehouse
             _whSupplierService = whSupplierService;
             _logger = logger;
         }
+
+        /// <summary>
+        /// 分页查询列表
+        /// </summary>
+        /// <param name="pagedQueryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("pagelistNew")]
+        public async Task<PagedInfo<WhSupplierDto>> GetPagedListAsync([FromQuery] WhSupplierPagedQueryDto pagedQueryDto)
+        {
+            return await _whSupplierService.GetPageListAsync(pagedQueryDto);
+        }
+
+        /// <summary>
+        /// 添加
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("createNew")]
+        [PermissionDescription("integrated:inteSupplier:insert")]
+        public async Task AddAsync([FromBody] WhSupplierCreateDto saveDto)
+        {
+            await _whSupplierService.CreateWhSupplierAsync(saveDto);
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="saveDto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateNew")]
+        [PermissionDescription("integrated:inteSupplier:update")]
+        public async Task UpdateAsync([FromBody] WhSupplierModifyDto saveDto)
+        {
+            await _whSupplierService.ModifyWhSupplierAsync(saveDto);
+        }
+
+
 
         /// <summary>
         /// 分页查询列表（供应商）

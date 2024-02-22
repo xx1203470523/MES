@@ -26,5 +26,10 @@ namespace Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query
         /// 条码列表
         /// </summary>
         public IEnumerable<string> SFCs { get; set; }
+
+        /// <summary>
+        /// 拦截工序Id
+        /// </summary>
+        public long? InterceptOperationId { get; set; }
     }
 }

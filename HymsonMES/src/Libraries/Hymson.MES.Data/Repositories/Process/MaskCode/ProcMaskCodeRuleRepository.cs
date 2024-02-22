@@ -2,27 +2,20 @@
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process.MaskCode
 {
     /// <summary>
     /// 仓储（掩码规则维护）
     /// </summary>
-    public partial class ProcMaskCodeRuleRepository : IProcMaskCodeRuleRepository
+    public partial class ProcMaskCodeRuleRepository : BaseRepository, IProcMaskCodeRuleRepository
     {
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly ConnectionOptions _connectionOptions;
-
-        /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
-        public ProcMaskCodeRuleRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcMaskCodeRuleRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -32,7 +25,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<int> InsertRangeAsync(IEnumerable<ProcMaskCodeRuleEntity> entities)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, entities);
         }
 
@@ -43,7 +36,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<int> ClearByMaskCodeId(long maskCodeId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { maskCodeId });
         }
 
@@ -54,7 +47,7 @@ namespace Hymson.MES.Data.Repositories.Process.MaskCode
         /// <returns></returns>
         public async Task<IEnumerable<ProcMaskCodeRuleEntity>> GetByMaskCodeIdAsync(long maskCodeId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcMaskCodeRuleEntity>(GetByIdSql, new { maskCodeId });
         }
     }

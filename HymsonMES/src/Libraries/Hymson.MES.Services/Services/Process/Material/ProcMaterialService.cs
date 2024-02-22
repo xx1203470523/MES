@@ -11,7 +11,9 @@ using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.CoreServices.Dtos.Common;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query;
 using Hymson.MES.Data.Repositories.Process;
@@ -322,12 +324,12 @@ namespace Hymson.MES.Services.Services.Process
             procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
             //判断是否需要查询物料组编码 -- 全匹配查询
-            if (!string.IsNullOrWhiteSpace(procMaterialPagedQueryDto.MaterialGroupCode)) 
+            if (!string.IsNullOrWhiteSpace(procMaterialPagedQueryDto.MaterialGroupCode))
             {
-                var materialGroup=(await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
-                if (materialGroup == null) 
+                var materialGroup = (await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
+                if (materialGroup == null)
                 {
-                    return new PagedInfo<ProcMaterialDto>(new List<ProcMaterialDto>(), procMaterialPagedQueryDto.PageIndex, procMaterialPagedQueryDto.PageSize,0);
+                    return new PagedInfo<ProcMaterialDto>(new List<ProcMaterialDto>(), procMaterialPagedQueryDto.PageIndex, procMaterialPagedQueryDto.PageSize, 0);
                 }
                 procMaterialPagedQuery.GroupId = materialGroup?.Id;
             }
@@ -597,6 +599,23 @@ namespace Hymson.MES.Services.Services.Process
             return list;
         }
 
+        /// <summary>
+        /// 根据物料ID查询对应的关联供应商
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<SelectOptionDto>> QuerySuppliersAsync(long id)
+        {
+            // 查询关联的供应商
+            var materialSupplierViews = await _procMaterialSupplierRelationRepository.GetByMaterialIdAsync(id);
+            return materialSupplierViews.Select(s => new SelectOptionDto
+            {
+                Key = $"{s.SupplierId}",
+                Label = $"{s.Code} - {s.Name}",
+                Value = $"{s.SupplierId}"
+            });
+        }
+
         #region 业务扩展方法
         /// <summary>
         /// 转换集合（物料替代品）
@@ -738,7 +757,7 @@ namespace Hymson.MES.Services.Services.Process
             var processRoutes = await _procProcessRouteRepository.GetByCodesAsync(new ProcProcessRoutesByCodeQuery
             {
                 SiteId = _currentSite.SiteId ?? 0,
-                Codes = excelImportDtos.Select(x => x.ProcessRouteCode).Where(y=>!string.IsNullOrEmpty(y)).Distinct().ToArray()
+                Codes = excelImportDtos.Select(x => x.ProcessRouteCode).Where(y => !string.IsNullOrEmpty(y)).Distinct().ToArray()
             });
             //Bom编码
             var boms = await _procBomRepository.GetByCodesAsync(new ProcBomsByCodeQuery
@@ -758,7 +777,7 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var procMaterialEntity = item.ToEntity<ProcMaterialEntity>();
                 //单独给是否默认版本赋值
-                if(item.DefaultVersion.HasValue)
+                if (item.DefaultVersion.HasValue)
                 {
                     if (item.DefaultVersion == YesOrNoEnum.Yes)
                         procMaterialEntity.IsDefaultVersion = true;
@@ -940,9 +959,9 @@ namespace Hymson.MES.Services.Services.Process
             {
                 var procMaterialDto = item.ToExcelModel<ProcMaterialExportDto>();
                 //单独给是否默认版本赋值
-                if(item.IsDefaultVersion)
+                if (item.IsDefaultVersion)
                 {
-                    procMaterialDto.DefaultVersion=YesOrNoEnum.Yes;
+                    procMaterialDto.DefaultVersion = YesOrNoEnum.Yes;
                 }
                 else
                 {
