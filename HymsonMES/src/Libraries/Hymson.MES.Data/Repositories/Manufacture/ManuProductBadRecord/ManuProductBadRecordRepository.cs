@@ -153,7 +153,8 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.Where("SFC IN @SFCs");
             }
-            if (query.InterceptOperationId != null) {
+            if (query.InterceptOperationId != null)
+            {
                 sqlBuilder.Where("InterceptOperationId = @InterceptOperationId");
             }
             var manuProductBadRecordEntities = await conn.QueryAsync<ManuProductBadRecordEntity>(template.RawSql, query);
@@ -193,7 +194,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         {
             if (manuProductBadRecordEntitys == null || !manuProductBadRecordEntitys.Any()) return 0;
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertIgnoreSql, manuProductBadRecordEntitys);
         }
 
@@ -226,7 +227,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         public async Task<int> UpdateByMarkingCloseRangeAsync(IEnumerable<ManuProductBadRecordEntity> manuProductBadRecordEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateMarkingCloseSql, manuProductBadRecordEntitys);
         }
 
