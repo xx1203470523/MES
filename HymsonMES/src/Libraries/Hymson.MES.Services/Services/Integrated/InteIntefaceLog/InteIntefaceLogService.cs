@@ -104,7 +104,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 
 
             string queryType = Enum.GetName(typeof(InterfaceLogQueryTyeEnum), pagedQueryDto?.QueryType ?? 0) ?? "EquipmentLog";
-
+            if(pagedQueryDto?.QueryType== InterfaceLogQueryTyeEnum.SystemLog)
+            {
+                logDataPagedQuery.ServiceType = ServiceTypeEnum.MES;
+            }
             logDataPagedQuery.Type = queryType;
             var getlogdate = await _logDataService.GetLogDataPagedAsync(logDataPagedQuery);
 
