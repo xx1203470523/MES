@@ -121,13 +121,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCustomEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (inteCustomQuery.Codes != null && inteCustomQuery.Codes.Any())
             {
-                sqlBuilder.Where(" Code in @Codes ");
+                sqlBuilder.Where(" Code IN @Codes ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(inteCustomQuery.Code))
+            {
+                inteCustomQuery.Code = $"%{inteCustomQuery.Code}%";
+                sqlBuilder.Where(" Code LIKE @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(inteCustomQuery.Name))
+            {
+                inteCustomQuery.Name = $"%{inteCustomQuery.Name}%";
+                sqlBuilder.Where(" Name LIKE @Name ");
             }
 
             using var conn = GetMESDbConnection();
@@ -182,14 +193,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class InteCustomRepository
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_custom` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_custom` /**where**/ ";
-        const string GetInteCustomEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `inte_custom` /**where**/  ";
+        const string GetInteCustomEntitiesSqlTemplate = @"SELECT /**select**/ FROM `inte_custom` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_custom`(  `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Describe, @Address, @Telephone, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `inte_custom`(  `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Describe, @Address, @Telephone, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";

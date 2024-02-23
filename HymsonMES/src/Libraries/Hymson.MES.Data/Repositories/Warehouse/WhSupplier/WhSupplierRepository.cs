@@ -119,19 +119,23 @@ namespace Hymson.MES.Data.Repositories.Warehouse
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetWhSupplierEntitiesSqlTemplate);
             sqlBuilder.Select("*");
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
             if (!string.IsNullOrWhiteSpace(whSupplierQuery.Code))
             {
-                sqlBuilder.Where("Code=@Code");
+                whSupplierQuery.Code = $"%{whSupplierQuery.Code}%";
+                sqlBuilder.Where(" Code LIKE @Code ");
             }
             if (!string.IsNullOrWhiteSpace(whSupplierQuery.Name))
             {
-                sqlBuilder.Where("Name=@Name");
+                whSupplierQuery.Name = $"%{whSupplierQuery.Name}%";
+                sqlBuilder.Where(" Name LIKE @Name ");
             }
+            sqlBuilder.AddParameters(whSupplierQuery);
 
             using var conn = GetMESDbConnection();
-            var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, whSupplierQuery);
+            var whSupplierEntities = await conn.QueryAsync<WhSupplierEntity>(template.RawSql, template.Parameters);
             return whSupplierEntities;
         }
 
@@ -192,13 +196,14 @@ namespace Hymson.MES.Data.Repositories.Warehouse
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class WhSupplierRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `wh_supplier` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `wh_supplier` /**where**/ ";
-        const string GetWhSupplierEntitiesSqlTemplate = @"SELECT  
-                                             /**select**/
-                                            FROM  `wh_supplier`  /**where**/   ";
+        const string GetWhSupplierEntitiesSqlTemplate = @"SELECT /**select**/ FROM  `wh_supplier`  /**where**/   ";
 
         const string InsertSql = "INSERT INTO `wh_supplier`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `wh_supplier`(  `Id`, `Code`, `Name`, `Remark`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Remark, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";

@@ -140,6 +140,11 @@ namespace Hymson.MES.Data.Repositories.Quality
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
 
+            if (pagedQuery.MaterialIds != null) sqlBuilder.Where(" MaterialId IN @MaterialIds ");
+            if (pagedQuery.CustomIds != null) sqlBuilder.Where(" CustomId IN @CustomIds ");
+            if (pagedQuery.Type.HasValue) sqlBuilder.Where("Type = @Type");
+            if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
+
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });

@@ -263,24 +263,24 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcMaterialEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (!string.IsNullOrWhiteSpace(procMaterialQuery.MaterialCode))
             {
                 procMaterialQuery.MaterialCode = $"%{procMaterialQuery.MaterialCode}%";
-                sqlBuilder.Where(" MaterialCode like @MaterialCode ");
+                sqlBuilder.Where(" MaterialCode LIKE @MaterialCode ");
             }
             if (!string.IsNullOrWhiteSpace(procMaterialQuery.Version))
             {
                 procMaterialQuery.Version = $"%{procMaterialQuery.Version}%";
-                sqlBuilder.Where(" Version like @Version ");
+                sqlBuilder.Where(" Version LIKE @Version ");
             }
             if (!string.IsNullOrWhiteSpace(procMaterialQuery.MaterialName))
             {
                 procMaterialQuery.MaterialName = $"%{procMaterialQuery.MaterialName}%";
-                sqlBuilder.Where(" MaterialName like @MaterialName ");
+                sqlBuilder.Where(" MaterialName LIKE @MaterialName ");
             }
             sqlBuilder.AddParameters(procMaterialQuery);
 
@@ -407,13 +407,14 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcMaterialRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_material` /**where**/ ";
-        const string GetProcMaterialEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_material` /**where**/  ";
+        const string GetProcMaterialEntitiesSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**where**/  ";
         const string GetByCodeAndVersionSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @SiteId AND MaterialCode= @MaterialCode AND Version =@Version LIMIT 1";
         const string GetByCodeSql = "SELECT * FROM proc_material WHERE `IsDeleted` = 0 AND SiteId = @Site AND MaterialCode = @Code LIMIT 1";
 
