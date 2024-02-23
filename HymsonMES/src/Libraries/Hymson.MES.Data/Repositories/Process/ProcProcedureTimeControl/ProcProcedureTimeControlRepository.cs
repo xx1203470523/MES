@@ -138,9 +138,9 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuProcedureTimecontrolEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Select("*");
 
             if (query.ProductId.HasValue) sqlBuilder.Where(" ProductId = @ProductId ");
             if (query.FromProcedureId.HasValue) sqlBuilder.Where(" FromProcedureId = @FromProcedureId ");

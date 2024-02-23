@@ -316,7 +316,7 @@ namespace Hymson.MES.Services.Services.Process
                     Version = pagedQueryDto.Version
                 });
                 if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.ProductIds = procMaterialEntities.Select(s => s.Id);
-                else pagedQuery.ProductIds = new List<long>();
+                else pagedQuery.ProductIds = Array.Empty<long>();
             }
 
             // 转换起始工序编码变为工序ID

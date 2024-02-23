@@ -386,6 +386,31 @@ namespace Hymson.MES.Services.Services.Quality
             var pagedQuery = pagedQueryDto.ToQuery<QualIqcLevelPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
+            // 转换产品编码/版本变为产品ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
+            {
+                var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    MaterialCode = pagedQueryDto.MaterialCode,
+                    MaterialName = pagedQueryDto.MaterialName
+                });
+                if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
+                else pagedQuery.MaterialIds = Array.Empty<long>();
+            }
+
+            // 转换供应商编码变为供应商ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.SupplierCode))
+            {
+                var whSupplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    Code = pagedQueryDto.SupplierCode
+                });
+                if (whSupplierEntities != null && whSupplierEntities.Any()) pagedQuery.SupplierIds = whSupplierEntities.Select(s => s.Id);
+                else pagedQuery.SupplierIds = Array.Empty<long>();
+            }
+
             // 查询数据
             var pagedInfo = await _qualIqcLevelRepository.GetPagedListAsync(pagedQuery);
 
