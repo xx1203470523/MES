@@ -84,22 +84,23 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 logDataPagedQuery.Message = pagedQueryDto.InterfaceName;
             }
 
-            var Data = new Dictionary<string, string> { };
+            var data = new Dictionary<string, string> { };
 
             if (pagedQueryDto.Requestor != null)
             {
-                Data.Add("Name", pagedQueryDto.Requestor);
+                data.Add("Name", pagedQueryDto.Requestor);
             }
 
             if (pagedQueryDto.Responsetor != null)
             {
-                Data.Add("ReceiverType", pagedQueryDto.Responsetor);
+                data.Add("ReceiverType", pagedQueryDto.Responsetor);
             }
 
             if (pagedQueryDto.ResponseResult != null)
             {
-                Data.Add("IsSuccess", pagedQueryDto?.ResponseResult.ToString() ?? "0");
+                data.Add("IsSuccess", pagedQueryDto?.ResponseResult.ToString() ?? "0");
             }
+            logDataPagedQuery.Data = data;
 
 
             string queryType = Enum.GetName(typeof(InterfaceLogQueryTyeEnum), pagedQueryDto?.QueryType ?? 0) ?? "EquipmentLog";
@@ -107,23 +108,34 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             logDataPagedQuery.Type = queryType;
             var getlogdate = await _logDataService.GetLogDataPagedAsync(logDataPagedQuery);
 
-            var ids = getlogdate.Data.Select(x => x.Id).Distinct().ToArray();
-            long[] longArray = ConvertToLongArray(ids);
-            var logDataInfo = await _inteSystemTokenService.QueryInteSystemTokenByIdsAsync(longArray);
+            //var ids = getlogdate.Data.Select(x => x.Id).Distinct().ToArray();
+            //long[] longArray = ConvertToLongArray(ids);
+            //var logDataInfo = await _inteSystemTokenService.QueryInteSystemTokenByIdsAsync(longArray);
 
             // 实体到DTO转换 装载数据
             List<InteIntefaceLogDto> dtos = new();
             foreach (var item in getlogdate.Data)
             {
-                var currentData = logDataInfo.Where(x => x.Id.ToString() == item.Id).FirstOrDefault();
+                //var currentData = logDataInfo.Where(x => x.Id.ToString() == item.Id).FirstOrDefault();
                 var dict = item.Data;
 
                 // 提取特定键的值并赋给对应变量
                 string method = dict["Method"];
                 string queryString = dict["QueryString"];
-                string cost = dict["Cost"];
-                string id = dict["Id"];
-                string name = dict["Name"];
+                //string cost = dict["Cost"];
+
+                string id = string.Empty;
+                string name = string.Empty;
+
+                if (dict.ContainsKey("Id"))
+                {
+                    id = dict["Id"];
+                }
+                if (dict.ContainsKey("Name"))
+                {
+                    name = dict["Name"];
+                }
+               
                 string responseBody = dict["ResponseBody"];
                 string receiverType = string.Empty;
                 if (dict.ContainsKey("ReceiverType"))
@@ -132,7 +144,7 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 }
 
                 string path = dict["Path"];
-                string ip = dict["Ip"];
+                //string ip = dict["Ip"];
                 string businessType = dict["BusinessType"];
                 string requestBody = dict["RequestBody"];
 
@@ -153,6 +165,16 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 {
                     isSuccess = dict["IsSuccess"];
                 }
+                string cost = string.Empty;
+                if (dict.ContainsKey("Cost"))
+                {
+                    cost = dict["Cost"];
+                }
+                string ip = string.Empty;
+                if (dict.ContainsKey("Ip"))
+                {
+                    ip = dict["Ip"];
+                }
 
 
                 int.TryParse(isSuccess, out int isResult);
@@ -161,19 +183,32 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 
                 dtos.Add(new InteIntefaceLogDto()
                 {
+                    //自增Id
                     Id = item.Id,
+                    //接口编码
                     InterfaceCode = item.InterfaceCode,
-                    InterfaceName = name,
-                    Requestor = item.Message,
+                    //接口名称
+                    InterfaceName = item.Message,
+                    //请求方
+                    Requestor = name,
+                    //接收方
                     Responsetor = receiverType,
+                    //请求时间
                     RequestTime = requestTime,
                     //返回时间
                     ResponseTime = responseTime,
+                    //是否成功结果
                     ResponseResult = isSuccessEnum,
+                    //入参
                     RequestBody = requestBody,
+                    //路径
                     Path = path,
+                    //返回结果
                     ResponseBody = responseBody,
-                    Method = method
+                    //请求方式
+                    Method = method,
+                    Cost = cost,
+                    Ip = ip
 
                 });
             }

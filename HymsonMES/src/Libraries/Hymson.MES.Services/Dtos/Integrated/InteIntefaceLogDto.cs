@@ -66,7 +66,15 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 请求方式
         /// </summary>
-        public string Method { get; set; }  
+        public string Method { get; set; }
+        /// <summary>
+        /// 请求时间
+        /// </summary>
+        public string Cost { get; set; }
+        /// <summary>
+        /// IP
+        /// </summary>
+        public string Ip { get; set; }  
 
         /// <summary>
         /// 请求时间  时间范围  数组
