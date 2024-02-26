@@ -43,7 +43,7 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// <summary>
         /// 系统调用
         /// </summary>
-        [Description("系统调用")]
+        [Description("系统执行")]
         SystemLog = 2,
         
 
