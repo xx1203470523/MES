@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.EquipmentServices.Dtos.Parameter;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection;
+using Hymson.Web.Framework.Attributes;
 using Hymson.Web.Framework.Filters.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +36,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("product")]
         [ProducesDefaultResponseType(typeof(ResultDto))]
+        [LogDescription("产品过程参数采集", BusinessType.OTHER, "ProductCollection", ReceiverTypeEnum.MES)]
         public async Task ProductCollectionAsync(ProductProcessParameterDto request)
         {
             await _processCollectionService.ProductCollectionAsync(request);
@@ -47,6 +49,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("equipment")]
+        [LogDescription("设备过程参数采集", BusinessType.OTHER, "EquipmentCollection", ReceiverTypeEnum.MES)]
         [ProducesDefaultResponseType(typeof(ResultDto))]
         public async Task EquipmentCollectionAsync(IEnumerable<EquipmentProcessParameterDto> request)
         {
