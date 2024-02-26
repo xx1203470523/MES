@@ -126,7 +126,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 关联的资源Id
         /// </summary>
-        public IEnumerable<long> ResourceIds { get; set; }
+        public IEnumerable<long>? ResourceIds { get; set; }
     }
 
     /// <summary>

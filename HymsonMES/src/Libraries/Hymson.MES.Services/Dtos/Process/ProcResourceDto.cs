@@ -182,7 +182,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
        // [MaxLength(length: 255, ErrorMessage = "工序名称超长")]
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 资源关联打印机
