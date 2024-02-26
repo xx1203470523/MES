@@ -35,7 +35,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///日历描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 年

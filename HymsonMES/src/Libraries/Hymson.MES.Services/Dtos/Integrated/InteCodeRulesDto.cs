@@ -80,7 +80,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 创建人;创建人
@@ -174,7 +174,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
 
         /// <summary>
@@ -274,7 +274,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 物料描述
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 编码类型;1：过程控制序列码；2：包装序列码；
@@ -343,7 +343,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 创建人;创建人
@@ -442,7 +442,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
 
         /// <summary>
