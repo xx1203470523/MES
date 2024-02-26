@@ -93,13 +93,13 @@ namespace Hymson.MES.CoreServices.Services.Job
         {
             if (param is not JobRequestBo commonBo) return;
             if (commonBo == null) return;
-            //if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
+            if (commonBo.InStationRequestBos == null || !commonBo.InStationRequestBos.Any()) return;
 
             // 临时中转变量 commonBo.InStationRequestBos.Select(s => s.SFC)
-            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = new List<string> { "S-864" } };
+            var multiSFCBo = new MultiSFCBo { SiteId = commonBo.SiteId, SFCs = commonBo.InStationRequestBos.Select(s => s.SFC) };
 
-            //获取条码生产信息,判断
-            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { ProcedureId= commonBo.ProcedureId,SiteId= multiSFCBo.SiteId});
+            //获取条码生产信息,判断条码是否在制品
+            var sfcProduceEntities = await _manuSfcProduceRepository.GetManuSfcProduceEntitiesAsync(new ManuSfcProduceQuery { Sfcs= multiSFCBo.SFCs, SiteId= multiSFCBo.SiteId});
             if (sfcProduceEntities == null || !sfcProduceEntities.Any())
             { 
                 return;
