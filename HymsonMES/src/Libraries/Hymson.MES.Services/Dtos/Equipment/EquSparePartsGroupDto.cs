@@ -36,7 +36,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
        /// <summary>
         /// 描述
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 关联设备组
@@ -83,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
        /// <summary>
         /// 创建人
