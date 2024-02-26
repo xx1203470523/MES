@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; } = "";
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 工装ID集合

@@ -483,7 +483,7 @@ namespace Hymson.MES.Services.Services.Process
             }
             param.ResCode = param.ResCode.ToTrimSpace().ToUpperInvariant();
             param.ResName = param.ResName.Trim();
-            param.Remark = param.Remark.Trim();
+            param.Remark = param?.Remark??"".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
