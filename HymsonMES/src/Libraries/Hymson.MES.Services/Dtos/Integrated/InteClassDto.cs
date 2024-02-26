@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         ///描述
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 
@@ -60,7 +60,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 最后修改人

@@ -9,7 +9,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
     public record EquFaultReasonSaveDto : BaseEntityDto
     {
         /// <summary>
-        /// 
+        /// 自增Id
         /// </summary>
         public long Id { get; set; }
 
@@ -64,7 +64,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 最后修改人
@@ -109,7 +109,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 描述（设备故障原因）
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
     }
 
     /// <summary>
