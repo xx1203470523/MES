@@ -30,7 +30,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :备注 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         /// <summary>
         /// 创建人
         /// </summary>
