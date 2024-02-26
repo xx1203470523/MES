@@ -61,6 +61,16 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
                 PageIndex = pagedQueryDto.PageIndex,
                 PageSize = pagedQueryDto.PageSize,
             };
+            string queryType=string.Empty;
+            if (pagedQueryDto.QueryType != null)
+            {
+                queryType = Enum.GetName(typeof(InterfaceLogQueryTyeEnum), pagedQueryDto.QueryType);
+            }
+            if (pagedQueryDto?.QueryType == InterfaceLogQueryTyeEnum.SystemLog)
+            {
+                logDataPagedQuery.ServiceType = ServiceTypeEnum.MES;
+            }
+
 
             if (pagedQueryDto.TimeStamp != null)
             {
@@ -71,6 +81,10 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
             if (pagedQueryDto.Id != null)
             {
                 logDataPagedQuery.Id = pagedQueryDto.Id;
+            }
+            else
+            {
+                logDataPagedQuery.Type = queryType;
             }
 
 
@@ -98,17 +112,13 @@ namespace Hymson.MES.Services.Services.Integrated.InteIntefaceLog
 
             if (pagedQueryDto.ResponseResult != null)
             {
-                data.Add("IsSuccess", pagedQueryDto?.ResponseResult.ToString() ?? "0");
+                var isSuccess = (int)pagedQueryDto.ResponseResult;
+                data.Add("IsSuccess", isSuccess.ToString() ?? "0");
             }
             logDataPagedQuery.Data = data;
 
 
-            string queryType = Enum.GetName(typeof(InterfaceLogQueryTyeEnum), pagedQueryDto?.QueryType ?? 0) ?? "EquipmentLog";
-            if(pagedQueryDto?.QueryType== InterfaceLogQueryTyeEnum.SystemLog)
-            {
-                logDataPagedQuery.ServiceType = ServiceTypeEnum.MES;
-            }
-            logDataPagedQuery.Type = queryType;
+
             var getlogdate = await _logDataService.GetLogDataPagedAsync(logDataPagedQuery);
 
             //var ids = getlogdate.Data.Select(x => x.Id).Distinct().ToArray();
