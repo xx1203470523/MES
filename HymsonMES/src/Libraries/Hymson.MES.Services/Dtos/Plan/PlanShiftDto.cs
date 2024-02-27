@@ -99,7 +99,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 物料组描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 创建人
@@ -155,7 +155,7 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 物料组描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         public IList<PlanShiftDetailModifyDto> PlanShiftDetailList { get; set; }
 

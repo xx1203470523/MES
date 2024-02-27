@@ -37,10 +37,10 @@ namespace Hymson.MES.Core.Domain.Process
         /// </summary>
         public long SortingRuleDetailId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
-        public string remark { get; set; }
+        public string Remark { get; set; } = "";
 
        
     }

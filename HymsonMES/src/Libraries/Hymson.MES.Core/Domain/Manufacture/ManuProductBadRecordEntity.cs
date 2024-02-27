@@ -74,7 +74,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 关闭人

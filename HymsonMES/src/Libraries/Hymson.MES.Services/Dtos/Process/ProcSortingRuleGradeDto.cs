@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 备注
         /// </summary>
-        public string remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 等级

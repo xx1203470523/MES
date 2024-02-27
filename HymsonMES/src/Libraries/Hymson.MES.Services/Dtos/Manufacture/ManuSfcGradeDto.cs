@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
     }
 }

@@ -27,7 +27,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 创建人

@@ -36,7 +36,7 @@ namespace Hymson.MES.Core.Domain.Warehouse
        /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id
