@@ -41,6 +41,7 @@
         public const string MES10132 = "编码不能包含特殊字符";
         public const string MES10133 = "未获取到导入数据！";
         public const string MES10134 = "未获取到导出数据！";
+        public const string MES10135 = "不允许删除【已启用】状态的数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
