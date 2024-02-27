@@ -19,5 +19,10 @@ namespace Hymson.MES.Data.Repositories.Process
         /// 版本
         /// </summary>
         public string? Version { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string? MaterialName {  get; set; }
     }
 }

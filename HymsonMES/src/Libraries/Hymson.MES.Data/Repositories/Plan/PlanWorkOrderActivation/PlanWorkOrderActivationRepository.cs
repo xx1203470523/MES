@@ -4,27 +4,22 @@ using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
     /// <summary>
     /// 工单激活仓储
     /// </summary>
-    public partial class PlanWorkOrderActivationRepository : IPlanWorkOrderActivationRepository
+    public partial class PlanWorkOrderActivationRepository : BaseRepository, IPlanWorkOrderActivationRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
         /// <summary>
-        /// 
+        /// 构造函数
         /// </summary>
         /// <param name="connectionOptions"></param>
         /// <param name="memoryCache"></param>
-        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions)
+        public PlanWorkOrderActivationRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -34,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -45,7 +40,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -56,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> DeleteTrueAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteTrueSql, new { Id = id });
         }
 
@@ -67,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> DeletesTrueAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesTrueSql, new { Ids = ids });
         }
 
@@ -78,7 +73,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> DeletesTrueByWorkOrderIdsAsync(long[] workOrderIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesTrueByWorkOrderIdsSql, new { WorkOrderIds = workOrderIds });
         }
 
@@ -89,7 +84,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderActivationEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -100,9 +95,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderActivationEntity> GetByWorkOrderIdAsync(long workOrderId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdSql, new { workOrderId });
-
         }
 
         /// <summary>
@@ -112,7 +106,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkOrderIdsAsync(long[] orderIds)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByworkOrderIdsSql, new { WorkOrderIds = orderIds });
         }
 
@@ -123,7 +117,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -134,7 +128,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetByWorkCenterIdAsync(long workCenterId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetByWorkCenterIdSql, new { workCenterId });
         }
 
@@ -203,7 +197,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.AddParameters(new { Rows = planWorkOrderActivationPagedQuery.PageSize });
             sqlBuilder.AddParameters(planWorkOrderActivationPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var planWorkOrderActivationEntitiesTask = conn.QueryAsync<PlanWorkOrderActivationListDetailView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var planWorkOrderActivationEntities = await planWorkOrderActivationEntitiesTask;
@@ -243,7 +237,7 @@ namespace Hymson.MES.Data.Repositories.Plan
                 sqlBuilder.Where(" LineId IN @LineIds ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var planWorkOrderActivationEntities = await conn.QueryAsync<PlanWorkOrderActivationEntity>(template.RawSql, planWorkOrderActivationQuery);
             return planWorkOrderActivationEntities;
         }
@@ -255,7 +249,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> InsertAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, planWorkOrderActivationEntity);
         }
 
@@ -266,7 +260,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<PlanWorkOrderActivationEntity> planWorkOrderActivationEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, planWorkOrderActivationEntitys);
         }
 
@@ -277,7 +271,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateAsync(PlanWorkOrderActivationEntity planWorkOrderActivationEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, planWorkOrderActivationEntity);
         }
 
@@ -288,7 +282,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<PlanWorkOrderActivationEntity> planWorkOrderActivationEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationEntitys);
         }
 
@@ -299,7 +293,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<IEnumerable<PlanWorkOrderActivationEntity>> GetPlanWorkOrderActivationEntitiesByBomIdAsync(PlanWorkOrderActivationByBomIdQuery query) 
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<PlanWorkOrderActivationEntity>(GetPlanWorkOrderActivationEntitiesByBomIdSql, query);
         }
     }

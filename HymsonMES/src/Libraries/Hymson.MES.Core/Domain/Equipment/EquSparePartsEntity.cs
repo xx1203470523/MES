@@ -84,7 +84,7 @@ namespace Hymson.MES.Core.Domain.Equipment
        /// <summary>
         /// 描述
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
     }
 
     public class UpdateSparePartsTypeEntity : BaseEntity

@@ -130,7 +130,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
         {
             param.PrintName = param.PrintName.ToTrimSpace();
             param.PrintIp = param.PrintIp.ToTrimSpace();
-            param.Remark = param.Remark.Trim();
+            param.Remark = param.Remark?.Trim();
 
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);

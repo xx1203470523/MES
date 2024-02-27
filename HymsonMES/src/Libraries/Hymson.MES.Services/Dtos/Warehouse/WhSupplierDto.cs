@@ -1,21 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 供应商    Dto | 代码由框架生成
- *builder:  pengxin
- *build datetime: 2023-03-03 01:51:43
- */
-
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Enums;
-using MimeKit;
-using Mysqlx.Crud;
 using OfficeOpenXml.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Warehouse
 {
@@ -54,12 +38,22 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string? UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
     }
 
     /// <summary>
     /// 更改供应商Dto
     /// </summary>
-    public record UpdateWhSupplierDto : BaseEntityDto  
+    public record UpdateWhSupplierDto : BaseEntityDto
     {
         /// <summary>
         /// 主键id
@@ -104,7 +98,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
     }
 
@@ -131,7 +125,7 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
     }
 
@@ -153,11 +147,21 @@ namespace Hymson.MES.Services.Dtos.Warehouse
         public string? Name { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class WhSupplierExportResultDto
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public string Path { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string FileName { get; set; }
+
     }
 
     /// <summary>

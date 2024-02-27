@@ -66,7 +66,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 更新状态
         /// </summary>
-        /// <param name="procMaterialEntitys"></param>
+        /// <param name="command"></param>
         /// <returns></returns>
         public async Task<int> UpdateStatusAsync(ChangeStatusCommand command)
         {
@@ -138,9 +138,9 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuProcedureTimecontrolEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Select("*");
 
             if (query.ProductId.HasValue) sqlBuilder.Where(" ProductId = @ProductId ");
             if (query.FromProcedureId.HasValue) sqlBuilder.Where(" FromProcedureId = @FromProcedureId ");
@@ -178,7 +178,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("Name LIKE @Name");
             }
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
-            if (pagedQuery.ProductId.HasValue) sqlBuilder.Where("ProductId = @ProductId");
+            if (pagedQuery.ProductIds != null) sqlBuilder.Where("ProductId IN @ProductIds");
             if (pagedQuery.FromProcedureId.HasValue) sqlBuilder.Where("FromProcedureId = @FromProcedureId");
             if (pagedQuery.ToProcedureId.HasValue) sqlBuilder.Where("ToProcedureId = @ToProcedureId");
 
@@ -188,10 +188,8 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
-            var entitiesTask = conn.QueryAsync<ProcProcedureTimeControlView>(templateData.RawSql, templateData.Parameters);
-            var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-            var manuProcedureTimecontrolEntities = await entitiesTask;
-            var totalCount = await totalCountTask;
+            var manuProcedureTimecontrolEntities = await conn.QueryAsync<ProcProcedureTimeControlView>(templateData.RawSql, templateData.Parameters);
+            var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             return new PagedInfo<ProcProcedureTimeControlView>(manuProcedureTimecontrolEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 

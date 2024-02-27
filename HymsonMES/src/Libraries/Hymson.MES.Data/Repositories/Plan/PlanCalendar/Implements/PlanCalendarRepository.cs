@@ -1,12 +1,9 @@
-
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Plan;
 
@@ -17,13 +14,11 @@ namespace Hymson.MES.Data.Repositories.Plan;
 /// <para>@作者：Jim</para>
 /// <para>@创建时间：2024-1-31</para>
 /// </summary>
-public partial class PlanCalendarRepository : IPlanCalendarRepository
+public partial class PlanCalendarRepository : BaseRepository, IPlanCalendarRepository
 {
-    private readonly ConnectionOptions _connectionOptions;
-
-    public PlanCalendarRepository(IOptions<ConnectionOptions> connectionOptions)
+    public PlanCalendarRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
     {
-        _connectionOptions = connectionOptions.Value;
+
     }
 
     #region 查询
@@ -43,7 +38,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryFirstOrDefaultAsync<PlanCalendarEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -63,7 +58,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
 
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         return await conn.QueryAsync<PlanCalendarEntity>(templateData.RawSql, templateData.Parameters);
     }
@@ -92,7 +87,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
         sqlBuilder.AddParameters(new { Rows = query.PageSize });
         sqlBuilder.AddParameters(query);
 
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
 
         var planCalendarEntities = await conn.QueryAsync<PlanCalendarEntity>(templateData.RawSql, templateData.Parameters);
         var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
@@ -111,7 +106,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
     /// <returns></returns>
     public async Task<int> InsertAsync(PlanCalendarCreateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, command);
     }
 
@@ -122,7 +117,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
     /// <returns></returns>
     public async Task<int> InsertAsync(IEnumerable<PlanCalendarCreateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(InsertSql, commands);
     }
 
@@ -137,7 +132,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
     /// <returns></returns>
     public async Task<int> UpdateAsync(PlanCalendarUpdateCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, command);
     }
 
@@ -148,7 +143,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
     /// <returns></returns>
     public async Task<int> UpdateAsync(IEnumerable<PlanCalendarUpdateCommand> commands)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(UpdateByIdSql, commands);
     }
 
@@ -163,7 +158,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
     /// <returns></returns>
     public async Task<int> DeleteAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteByIdSql, command);
     }
 
@@ -174,7 +169,7 @@ public partial class PlanCalendarRepository : IPlanCalendarRepository
     /// <returns></returns>
     public async Task<int> DeleteMoreAsync(DeleteCommand command)
     {
-        using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+        using var conn = GetMESDbConnection();
         return await conn.ExecuteAsync(DeleteMoreByIdSql, command);
     }
 
@@ -508,6 +503,20 @@ public partial class PlanCalendarRepository
 /// </summary>
 public partial class PlanCalendarRepository
 {
+    #region 新增
+
+    /// <summary>
+    /// 创建数据 - 忽略
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public async Task<int> InsertIgnoreAsync(PlanCalendarCreateCommand command)
+    {
+        using var conn = GetMESDbConnection();
+        return await conn.ExecuteAsync(InsertIgnoreSql, command);
+    }
+
+    #endregion
 }
 
 /// <summary>
@@ -519,4 +528,9 @@ public partial class PlanCalendarRepository
 /// </summary>
 public partial class PlanCalendarRepository
 {
+    #region 新增
+
+    const string InsertIgnoreSql = "INSERT IGNORE INTO `plan_calendar` (`Id`,`SiteId`,`ShiftId`,`Year`,`Month`,`Workday`,`Status`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`,`Remark`) VALUES (@Id,@SiteId,@ShiftId,@Year,@Month,@Workday,@Status,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@Remark);";
+
+    #endregion
 }

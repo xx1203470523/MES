@@ -5,20 +5,16 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process.LoadPointLink.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
     /// <summary>
     /// 上料点关联资源表仓储
     /// </summary>
-    public partial class ProcLoadPointLinkResourceRepository : IProcLoadPointLinkResourceRepository
+    public partial class ProcLoadPointLinkResourceRepository : BaseRepository, IProcLoadPointLinkResourceRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public ProcLoadPointLinkResourceRepository(IOptions<ConnectionOptions> connectionOptions)
+        public ProcLoadPointLinkResourceRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -28,7 +24,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -39,9 +35,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
-
         }
 
         /// <summary>
@@ -51,9 +46,8 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> DeletesByLoadPointIdTrueAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesByLoadPointIdTrueSql, new { ids = ids });
-
         }
 
         /// <summary>
@@ -63,7 +57,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<ProcLoadPointLinkResourceEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<ProcLoadPointLinkResourceEntity>(GetByIdSql, new { Id = id });
         }
 
@@ -74,7 +68,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByIdsSql, new { ids = ids });
         }
 
@@ -85,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcLoadPointLinkResourceEntity>> GetByResourceIdAsync(long resourceId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(GetByResourceIdSql, new { ResourceId = resourceId });
         }
 
@@ -96,7 +90,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<IEnumerable<ProcLoadPointLinkResourceView>> GetLoadPointLinkResourceAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcLoadPointLinkResourceView>(GetLoadPointLinkResourceByIdsSql, new { ids = ids });
         }
 
@@ -119,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.AddParameters(new { Rows = procLoadPointLinkResourcePagedQuery.PageSize });
             sqlBuilder.AddParameters(procLoadPointLinkResourcePagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var procLoadPointLinkResourceEntitiesTask = conn.QueryAsync<ProcLoadPointLinkResourceEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procLoadPointLinkResourceEntities = await procLoadPointLinkResourceEntitiesTask;
@@ -148,7 +142,7 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("LoadPointId = @LoadPointId");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcLoadPointLinkResourceEntity>(template.RawSql, procLoadPointLinkResourceQuery);
         }
 
@@ -159,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertAsync(ProcLoadPointLinkResourceEntity procLoadPointLinkResourceEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, procLoadPointLinkResourceEntity);
         }
 
@@ -170,7 +164,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<ProcLoadPointLinkResourceEntity> procLoadPointLinkResourceEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, procLoadPointLinkResourceEntitys);
         }
 
@@ -181,7 +175,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdateAsync(ProcLoadPointLinkResourceEntity procLoadPointLinkResourceEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, procLoadPointLinkResourceEntity);
         }
 
@@ -192,7 +186,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <returns></returns>
         public async Task<int> UpdatesAsync(List<ProcLoadPointLinkResourceEntity> procLoadPointLinkResourceEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, procLoadPointLinkResourceEntitys);
         }
 

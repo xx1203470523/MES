@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Domain.Integrated
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id

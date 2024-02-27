@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using Hymson.Elasticsearch;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Manufacture;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Process;
+using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Dtos.WhWareHouse;
@@ -12,6 +14,7 @@ using Hymson.MES.Services.Dtos.WhWarehouseLocation;
 using Hymson.MES.Services.Dtos.WhWarehouseRegion;
 using Hymson.MES.Services.Dtos.WhWarehouseShelf;
 using Hymson.MES.Services.Plan;
+using Hymson.MES.Services.Qual;
 using Hymson.MES.Services.Services;
 using Hymson.MES.Services.Services.EquEquipmentGroup;
 using Hymson.MES.Services.Services.Equipment;
@@ -25,6 +28,7 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.MES.Services.Services.Integrated.InteCalendar;
 using Hymson.MES.Services.Services.Integrated.InteClass;
 using Hymson.MES.Services.Services.Integrated.InteContainer;
+using Hymson.MES.Services.Services.Integrated.InteIntefaceLog;
 using Hymson.MES.Services.Services.Manufacture;
 using Hymson.MES.Services.Services.Manufacture.ManuFeeding;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.GenerateBarcode;
@@ -87,6 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddExcelService();
             services.AddMinioService(configuration);
             services.AddData(configuration);
+            services.AddElasticsearchService(configuration);
             AddConfig(services, configuration);
 
             AddServices(services);
@@ -105,6 +110,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+
+            
+
             #region Equipment
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();
@@ -122,6 +130,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Integrated
+       
             services.AddSingleton<IInteCalendarService, InteCalendarService>();
             services.AddSingleton<IInteClassService, InteClassService>();
             services.AddSingleton<IInteJobService, InteJobService>();
@@ -143,7 +152,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IInteEventService, InteEventService>();
             services.AddSingleton<IInteMessageManageService, InteMessageManageService>();
             services.AddSingleton<IInteCustomFieldService, InteCustomFieldService>();
+
             services.AddSingleton<ISysReleaseRecordService, SysReleaseRecordService>();
+
+            services.AddSingleton<IInteIntefaceLogService, InteIntefaceLogService>();
             #endregion
 
             #region Process
@@ -213,6 +225,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IQualIpqcInspectionHeadService, QualIpqcInspectionHeadService>();
             services.AddSingleton<IQualIpqcInspectionPatrolService, QualIpqcInspectionPatrolService>();
             services.AddSingleton<IQualIpqcInspectionTailService, QualIpqcInspectionTailService>();
+            services.AddSingleton<IQualIqcLevelService, QualIqcLevelService>();
+            services.AddSingleton<IQualOqcLevelService, QualOqcLevelService>();
+            services.AddSingleton<IQualIqcInspectionItemService, QualIqcInspectionItemService>();
+            services.AddSingleton<IQualIqcInspectionItemDetailService, QualIqcInspectionItemDetailService>();
             #endregion
 
             #region Manufacture
@@ -267,7 +283,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region PlanWorkOrder
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
-            
+
             #endregion
 
             #region PlanSfcReceive
@@ -526,6 +542,18 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionPatrolSampleCreateDto>>, QualIpqcInspectionPatrolSampleAddValidator>();
             services.AddSingleton<AbstractValidator<QualIpqcInspectionTailSaveDto>, QualIpqcInspectionTailSaveValidator>();
             services.AddSingleton<AbstractValidator<List<QualIpqcInspectionTailSampleCreateDto>>, QualIpqcInspectionTailSampleAddValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcLevelSaveDto>, QualIqcLevelSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcLevelDetailDto>, QualIqcLevelDetailSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualOqcLevelSaveDto>, QualOqcLevelSaveValidator>();
+            services.AddSingleton<AbstractValidator<QualOqcLevelDetailDto>, QualOqcLevelDetailSaveValidator>();
+
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDto>, QualIqcInspectionItemCreateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemUpdateDto>, QualIqcInspectionItemUpdateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDeleteDto>, QualIqcInspectionItemDeleteValidator>();
+
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDetailDto>, QualIqcInspectionItemDetailCreateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDetailUpdateDto>, QualIqcInspectionItemDetailUpdateValidator>();
+            services.AddSingleton<AbstractValidator<QualIqcInspectionItemDetailDeleteDto>, QualIqcInspectionItemDetailDeleteValidator>();
             #endregion
 
             #region Manufacture

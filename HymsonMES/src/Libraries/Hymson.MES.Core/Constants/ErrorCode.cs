@@ -40,7 +40,7 @@
         public const string MES10131 = "编码只能是英文或数字组合";
         public const string MES10132 = "编码不能包含特殊字符";
         public const string MES10133 = "未获取到导入数据！";
-        public const string MES10134 = "未获取到导出数据！";        
+        public const string MES10134 = "未获取到导出数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -801,8 +801,8 @@
         public const string MES15432 = "条码不能为空";
         public const string MES15433 = "发现工序不能为空";
         public const string MES15434 = "不合格代码不能为空";
-        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,发现工序,不合格代码)数据！";
-        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现工序[{foundBadOperationCode}]，不合格代码[{unqualifiedCode}]！";
+        public const string MES15435 = "传入数据中存在重复的(产品序列码 ,拦截工序,不合格代,发现不良工序)数据！";
+        public const string MES15436 = "已存在产品序列码 [{sfc}], 发现不良工序[{foundBadOperationCode}]，拦截工序[{InterceptOperationCode}],不合格代码[{unqualifiedCode}]！";
         public const string MES15437 = "存在不是缺陷的不合格代码";
         public const string MES15438 = "条码[{sfc}]是锁定、删除或无效状态，无法使用";
         public const string MES15439 = "条码[{sfc}]不存在";
@@ -1691,12 +1691,26 @@
         public const string MES19403 = "列【批次最小数量】值【{Value}】存在跟其他水平值交叉！";
         public const string MES19404 = "列【批次最大数量】值【{Value}】存在跟其他水平值交叉！";
         public const string MES19405 = "列【样本代码】值有重复！";
+
+        public const string MES19406 = "物料编码不能为空！";
+        public const string MES19407 = "供应商编码不能为空！";
+        public const string MES19408 = "通用设置类型数据已存在，不允许重复创建！";
+        public const string MES19409 = "物料编码【{MaterialCode}】+ 供应商【{SupplierCode}】已在系统存在！";
+        public const string MES19410 = "设置类型不合法！";
+        public const string MES19411 = "状态不合法！";
+        public const string MES19412 = "校验水平不合法！";
+        public const string MES19413 = "整体接收标准不能小于0！";
+        public const string MES19414 = "检验类型不合法！";
+        public const string MES19415 = "检验水准不合法！";
+        public const string MES19416 = "接收水准不能小于0！";
+        public const string MES19417 = "物料编码【{MaterialCode}】+ 客户【{CustomCode}】已在系统存在！";
+        public const string MES19418 = "检验类型不允许设置多次！";
         #endregion
 
         #endregion
 
         #region 系统执行出错 业务逻辑出错
-        
+
 
         #endregion
 
@@ -1719,12 +1733,31 @@
         public const string MES19701 = "发现不良工序不允许为空!";
         public const string MES19702 = "不合格代码不允许为空!";
         public const string MES19703 = "产品序列码不允许为空!";
-        public const string MES19704 = "发现工序【code】不存在!";
-        public const string MES19705 = "拦截工序【code】不存在!";
-        public const string MES19706 = "产品序列码【code】不存在!";
-        public const string MES19707 = "产品序列码【code】状态为【status】!";
-        public const string MES19708 = "不合格代码【code】不存在!";
-        public const string MES19709 = "产品序列码【code】信息不存在!";
+        public const string MES19704 = "发现工序【{code}】不存在!";
+        public const string MES19705 = "拦截工序【{code}】不存在!";
+        public const string MES19706 = "产品序列码【{code}】不存在!";
+        public const string MES19707 = "产品序列码【{code}】状态为【{status}】!";
+        public const string MES19708 = "不合格代码【{code}】不存在!";
+        public const string MES19709 = "产品序列码【{code}】信息不存在!";
+        public const string MES19710 = "产品序列码，不良发现工序，拦截工序，不合格代码已经存在!";
+        public const string MES19711 = "Marking关闭传入数据为空!";
+        public const string MES19712 = "Marking关闭保存失败!";
+        public const string MES19713 = "产品序列码【{sfc}】在工序【{produceCode}】拦截不合格代码【{unqualifiedCode}】!";
+        #endregion
+
+        #region 生产日历
+
+        public const string MES19801 = "生产日历新增失败，可能存在相同年月的生产日历！";
+        public const string MES19802 = "必须填写年份！";
+        public const string MES19803 = "必须填写月份！";
+
+        #endregion
+
+        #region IQC检验项目
+
+        public const string MES19901 = "IQC检验项目编码不可重复";
+        public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
+
         #endregion
     }
 }

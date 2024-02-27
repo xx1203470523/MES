@@ -13,7 +13,9 @@ namespace Hymson.MES.Services.Validators;
 internal class PlanCalendarCreateValidator : AbstractValidator<PlanCalendarDto>
 {
     public PlanCalendarCreateValidator()
-    {        
+    {
+        RuleFor(m => m.Year).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19802));
+        RuleFor(m => m.Year).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19803));
     }
 }
 
@@ -27,6 +29,8 @@ internal class PlanCalendarUpdateValidator : AbstractValidator<PlanCalendarUpdat
     public PlanCalendarUpdateValidator()
     {
         RuleFor(m => m.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10130));
+        RuleFor(m => m.Year).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19802));
+        RuleFor(m => m.Year).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19803));
     }
 }
 

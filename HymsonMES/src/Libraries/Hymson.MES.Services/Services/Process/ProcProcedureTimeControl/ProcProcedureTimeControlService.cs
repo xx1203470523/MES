@@ -16,6 +16,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -73,7 +74,6 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         /// <param name="procProcedureTimecontrolRepository"></param>
-        /// <param name="qualUnqualifiedCodeRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="procProcedureRepository"></param>
         /// <param name="manuCommonOldService"></param>
@@ -305,23 +305,18 @@ namespace Hymson.MES.Services.Services.Process
         {
             var pagedQuery = pagedQueryDto.ToQuery<ProcProcedureTimeControlPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            //var pagedQuery = new ProcProcedureTimeControlPagedQuery
-            //{
-            //    SiteId = _currentSite.SiteId ?? 0,
-            //    Code = pagedQueryDto.Code,
-            //    Name = pagedQueryDto.Name,
-            //    Status = pagedQueryDto.Status
-            //};
 
-            // 转换产品编码变为产品ID
-            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ProductCode))
+            // 转换产品编码/版本变为产品ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.ProductCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.Version))
             {
-                var procMaterialEntity = await _procMaterialRepository.GetByCodeAsync(new EntityByCodeQuery
+                var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
                 {
-                    Site = pagedQuery.SiteId,
-                    Code = pagedQueryDto.ProductCode
+                    SiteId = pagedQuery.SiteId,
+                    MaterialCode = pagedQueryDto.ProductCode,
+                    Version = pagedQueryDto.Version
                 });
-                pagedQuery.ProductId = procMaterialEntity.Id;
+                if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.ProductIds = procMaterialEntities.Select(s => s.Id);
+                else pagedQuery.ProductIds = Array.Empty<long>();
             }
 
             // 转换起始工序编码变为工序ID
@@ -332,7 +327,9 @@ namespace Hymson.MES.Services.Services.Process
                     Site = pagedQuery.SiteId,
                     Code = pagedQueryDto.FromProcedure
                 });
-                pagedQuery.FromProcedureId = procProcedureEntity.Id;
+
+                if (procProcedureEntity != null) pagedQuery.FromProcedureId = procProcedureEntity.Id;
+                else pagedQuery.FromProcedureId = 0;
             }
 
             // 转换到达工序编码变为工序ID
@@ -343,7 +340,9 @@ namespace Hymson.MES.Services.Services.Process
                     Site = pagedQuery.SiteId,
                     Code = pagedQueryDto.ToProcedure
                 });
-                pagedQuery.ToProcedureId = procProcedureEntity.Id;
+
+                if (procProcedureEntity != null) pagedQuery.ToProcedureId = procProcedureEntity.Id;
+                else pagedQuery.ToProcedureId = 0;
             }
 
             // 查询数据

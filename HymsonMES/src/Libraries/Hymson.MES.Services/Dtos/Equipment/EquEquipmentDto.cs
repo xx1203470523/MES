@@ -108,7 +108,7 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get;set; }
+        public string Remark { get; set; } = "";
 
         #region 子
         /// <summary>

@@ -11,22 +11,17 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 编码规则组成仓储
     /// </summary>
-    public partial class InteCodeRulesMakeRepository : IInteCodeRulesMakeRepository
+    public partial class InteCodeRulesMakeRepository : BaseRepository, IInteCodeRulesMakeRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public InteCodeRulesMakeRepository(IOptions<ConnectionOptions> connectionOptions)
+        public InteCodeRulesMakeRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -36,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -47,7 +42,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeleteByCodeRulesIdAsync(long codeRulesId)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteByCodeRulesIdSql, new { codeRulesId = codeRulesId });
         }
 
@@ -58,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(DeleteCommand param) 
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -69,7 +64,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<InteCodeRulesMakeEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryFirstOrDefaultAsync<InteCodeRulesMakeEntity>(GetByIdSql, new { Id=id});
         }
 
@@ -80,7 +75,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<IEnumerable<InteCodeRulesMakeEntity>> GetByIdsAsync(long[] ids) 
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteCodeRulesMakeEntity>(GetByIdsSql, new { ids = ids});
         }
 
@@ -103,7 +98,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
             sqlBuilder.AddParameters(new { Rows = inteCodeRulesMakePagedQuery.PageSize });
             sqlBuilder.AddParameters(inteCodeRulesMakePagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteCodeRulesMakeEntitiesTask = conn.QueryAsync<InteCodeRulesMakeEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var inteCodeRulesMakeEntities = await inteCodeRulesMakeEntitiesTask;
@@ -128,7 +123,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where(" CodeRulesId=@CodeRulesId ");
             }
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var inteCodeRulesMakeEntities = await conn.QueryAsync<InteCodeRulesMakeEntity>(template.RawSql, inteCodeRulesMakeQuery);
             return inteCodeRulesMakeEntities;
         }
@@ -140,7 +135,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertAsync(InteCodeRulesMakeEntity inteCodeRulesMakeEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, inteCodeRulesMakeEntity);
         }
 
@@ -151,7 +146,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> InsertsAsync(IEnumerable<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, inteCodeRulesMakeEntitys);
         }
 
@@ -162,7 +157,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdateAsync(InteCodeRulesMakeEntity inteCodeRulesMakeEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, inteCodeRulesMakeEntity);
         }
 
@@ -173,7 +168,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// <returns></returns>
         public async Task<int> UpdatesAsync(IEnumerable<InteCodeRulesMakeEntity> inteCodeRulesMakeEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdatesSql, inteCodeRulesMakeEntitys);
         }
     }

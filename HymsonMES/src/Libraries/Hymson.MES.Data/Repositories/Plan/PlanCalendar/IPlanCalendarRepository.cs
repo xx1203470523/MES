@@ -91,6 +91,7 @@ public partial interface IPlanCalendarRepository
     /// <param name="commands"></param>
     /// <returns></returns>
     Task<int> DeleteMoreAsync(DeleteCommand commands);
+    Task<int> InsertIgnoreAsync(PlanCalendarCreateCommand command);
 
     #endregion
 

@@ -11,22 +11,17 @@ using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Plan;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Plan
 {
     /// <summary>
     /// 工单激活记录仓储
     /// </summary>
-    public partial class PlanWorkOrderActivationRecordRepository : IPlanWorkOrderActivationRecordRepository
+    public partial class PlanWorkOrderActivationRecordRepository : BaseRepository, IPlanWorkOrderActivationRecordRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
-
-        public PlanWorkOrderActivationRecordRepository(IOptions<ConnectionOptions> connectionOptions)
+        public PlanWorkOrderActivationRecordRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
         }
 
         /// <summary>
@@ -36,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { Id = id });
         }
 
@@ -45,9 +40,9 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
         }
 
@@ -58,8 +53,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<PlanWorkOrderActivationRecordEntity> GetByIdAsync(long id)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationRecordEntity>(GetByIdSql, new { Id=id});
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<PlanWorkOrderActivationRecordEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -67,10 +62,10 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlanWorkOrderActivationRecordEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<PlanWorkOrderActivationRecordEntity>> GetByIdsAsync(long[] ids)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-            return await conn.QueryAsync<PlanWorkOrderActivationRecordEntity>(GetByIdsSql, new { ids = ids});
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<PlanWorkOrderActivationRecordEntity>(GetByIdsSql, new { ids = ids });
         }
 
         /// <summary>
@@ -92,7 +87,7 @@ namespace Hymson.MES.Data.Repositories.Plan
             sqlBuilder.AddParameters(new { Rows = planWorkOrderActivationRecordPagedQuery.PageSize });
             sqlBuilder.AddParameters(planWorkOrderActivationRecordPagedQuery);
 
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var planWorkOrderActivationRecordEntitiesTask = conn.QueryAsync<PlanWorkOrderActivationRecordEntity>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var planWorkOrderActivationRecordEntities = await planWorkOrderActivationRecordEntitiesTask;
@@ -109,7 +104,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetPlanWorkOrderActivationRecordEntitiesSqlTemplate);
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             var planWorkOrderActivationRecordEntities = await conn.QueryAsync<PlanWorkOrderActivationRecordEntity>(template.RawSql, planWorkOrderActivationRecordQuery);
             return planWorkOrderActivationRecordEntities;
         }
@@ -121,7 +116,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> InsertAsync(PlanWorkOrderActivationRecordEntity planWorkOrderActivationRecordEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertSql, planWorkOrderActivationRecordEntity);
         }
 
@@ -132,7 +127,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> InsertsAsync(List<PlanWorkOrderActivationRecordEntity> planWorkOrderActivationRecordEntitys)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(InsertsSql, planWorkOrderActivationRecordEntitys);
         }
 
@@ -143,7 +138,7 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// <returns></returns>
         public async Task<int> UpdateAsync(PlanWorkOrderActivationRecordEntity planWorkOrderActivationRecordEntity)
         {
-            using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
+            using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, planWorkOrderActivationRecordEntity);
         }
 
@@ -152,34 +147,33 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// </summary>
         /// <param name="planWorkOrderActivationRecordEntitys"></param>
         /// <returns></returns>
-        public async Task<int> UpdatesAsync(List<PlanWorkOrderActivationRecordEntity>
-    planWorkOrderActivationRecordEntitys)
-    {
-    using var conn = new MySqlConnection(_connectionOptions.MESConnectionString);
-    return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationRecordEntitys);
-    }
+        public async Task<int> UpdatesAsync(List<PlanWorkOrderActivationRecordEntity> planWorkOrderActivationRecordEntitys)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdatesSql, planWorkOrderActivationRecordEntitys);
+        }
 
     }
 
     public partial class PlanWorkOrderActivationRecordRepository
     {
-    const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order_activation_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
-    const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `plan_work_order_activation_record` /**where**/ ";
-    const string GetPlanWorkOrderActivationRecordEntitiesSqlTemplate = @"SELECT
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `plan_work_order_activation_record` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(1) FROM `plan_work_order_activation_record` /**where**/ ";
+        const string GetPlanWorkOrderActivationRecordEntitiesSqlTemplate = @"SELECT
     /**select**/
     FROM `plan_work_order_activation_record` /**where**/  ";
 
-    const string InsertSql = "INSERT INTO `plan_work_order_activation_record`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `ActivateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @ActivateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-    const string InsertsSql = "INSERT INTO `plan_work_order_activation_record`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `ActivateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @ActivateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
-    const string UpdateSql = "UPDATE `plan_work_order_activation_record` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, ActivateType = @ActivateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-    const string UpdatesSql = "UPDATE `plan_work_order_activation_record` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, ActivateType = @ActivateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
-    const string DeleteSql = "UPDATE `plan_work_order_activation_record` SET IsDeleted = Id WHERE Id = @Id ";
-    const string DeletesSql = "UPDATE `plan_work_order_activation_record`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
-    const string GetByIdSql = @"SELECT
+        const string InsertSql = "INSERT INTO `plan_work_order_activation_record`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `ActivateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @ActivateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string InsertsSql = "INSERT INTO `plan_work_order_activation_record`(  `Id`, `SiteId`, `WorkOrderId`, `LineId`, `ActivateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (   @Id, @SiteId, @WorkOrderId, @LineId, @ActivateType, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted )  ";
+        const string UpdateSql = "UPDATE `plan_work_order_activation_record` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, ActivateType = @ActivateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string UpdatesSql = "UPDATE `plan_work_order_activation_record` SET   SiteId = @SiteId, WorkOrderId = @WorkOrderId, LineId = @LineId, ActivateType = @ActivateType, CreatedBy = @CreatedBy, CreatedOn = @CreatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, IsDeleted = @IsDeleted  WHERE Id = @Id ";
+        const string DeleteSql = "UPDATE `plan_work_order_activation_record` SET IsDeleted = Id WHERE Id = @Id ";
+        const string DeletesSql = "UPDATE `plan_work_order_activation_record`  SET IsDeleted = Id , UpdatedBy = @UserId, UpdatedOn = @DeleteOn  WHERE Id in @ids ";
+        const string GetByIdSql = @"SELECT
       `Id`, `SiteId`, `WorkOrderId`, `LineId`, `ActivateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
     FROM `plan_work_order_activation_record`  WHERE Id = @Id ";
-    const string GetByIdsSql = @"SELECT
+        const string GetByIdsSql = @"SELECT
       `Id`, `SiteId`, `WorkOrderId`, `LineId`, `ActivateType`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
     FROM `plan_work_order_activation_record`  WHERE Id IN @ids ";
     }
-    }
+}

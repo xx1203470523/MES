@@ -1,31 +1,22 @@
-/*
- *creator: Karl
- *
- *describe: 客户维护 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-11 09:33:26
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
     /// 客户维护仓储
     /// </summary>
-    public partial class InteCustomRepository :BaseRepository, IInteCustomRepository
+    public partial class InteCustomRepository : BaseRepository, IInteCustomRepository
     {
-
-        public InteCustomRepository(IOptions<ConnectionOptions> connectionOptions): base(connectionOptions)
-        {
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionOptions"></param>
+        public InteCustomRepository(IOptions<ConnectionOptions> connectionOptions) : base(connectionOptions) { }
 
         #region 方法
         /// <summary>
@@ -44,7 +35,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand param) 
+        public async Task<int> DeletesAsync(DeleteCommand param)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
@@ -69,7 +60,7 @@ namespace Hymson.MES.Data.Repositories.Integrated
         public async Task<InteCustomEntity> GetByIdAsync(long id)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<InteCustomEntity>(GetByIdSql, new { Id=id});
+            return await conn.QueryFirstOrDefaultAsync<InteCustomEntity>(GetByIdSql, new { Id = id });
         }
 
         /// <summary>
@@ -77,10 +68,10 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteCustomEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<InteCustomEntity>> GetByIdsAsync(IEnumerable<long> ids)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryAsync<InteCustomEntity>(GetByIdsSql, new { Ids = ids});
+            return await conn.QueryAsync<InteCustomEntity>(GetByIdsSql, new { Ids = ids });
         }
 
         /// <summary>
@@ -130,13 +121,24 @@ namespace Hymson.MES.Data.Repositories.Integrated
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetInteCustomEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
-            sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (inteCustomQuery.Codes != null && inteCustomQuery.Codes.Any())
             {
-                sqlBuilder.Where(" Code in @Codes ");
+                sqlBuilder.Where(" Code IN @Codes ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(inteCustomQuery.Code))
+            {
+                inteCustomQuery.Code = $"%{inteCustomQuery.Code}%";
+                sqlBuilder.Where(" Code LIKE @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(inteCustomQuery.Name))
+            {
+                inteCustomQuery.Name = $"%{inteCustomQuery.Name}%";
+                sqlBuilder.Where(" Name LIKE @Name ");
             }
 
             using var conn = GetMESDbConnection();
@@ -191,14 +193,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class InteCustomRepository
     {
         #region 
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `inte_custom` /**innerjoin**/ /**leftjoin**/ /**where**/ ORDER BY UpdatedOn DESC LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `inte_custom` /**where**/ ";
-        const string GetInteCustomEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `inte_custom` /**where**/  ";
+        const string GetInteCustomEntitiesSqlTemplate = @"SELECT /**select**/ FROM `inte_custom` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `inte_custom`(  `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Describe, @Address, @Telephone, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `inte_custom`(  `Id`, `Code`, `Name`, `Describe`, `Address`, `Telephone`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Describe, @Address, @Telephone, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";

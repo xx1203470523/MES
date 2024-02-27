@@ -15,11 +15,9 @@ namespace Hymson.MES.Data.Repositories.Parameter
     /// </summary>
     public partial class ManuEquipmentParameterRepository : BaseRepository, IManuEquipmentParameterRepository
     {
-        private readonly ConnectionOptions _connectionOptions;
         private readonly ParameterOptions _parameterOptions;
         public ManuEquipmentParameterRepository(IOptions<ConnectionOptions> connectionOptions, IOptions<ParameterOptions> parameterOptions) : base(connectionOptions)
         {
-            _connectionOptions = connectionOptions.Value;
             _parameterOptions = parameterOptions.Value;
         }
 
@@ -41,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 }
                 dic[tableName].Add(entity);
             }
-            using var conn = new MySqlConnection(_connectionOptions.MESParamterConnectionString);
+            using var conn = GetMESDbConnection();
 
             // 插入数据
             List<Task<int>> tasks = new();

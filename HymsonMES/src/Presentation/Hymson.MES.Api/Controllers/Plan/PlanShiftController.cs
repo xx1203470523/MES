@@ -1,8 +1,11 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Plan;
+using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Services.Plan;
+using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -118,6 +121,20 @@ namespace Hymson.MES.Api.Controllers.Plan
         {
             return await _planShiftService.GetByMainIdAsync(mainId);
         }
-        
+
+
+        /// <summary>
+        /// 状态变更
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("updateStatus")]
+        [LogDescription("状态变更", BusinessType.UPDATE)]
+        public async Task UpdateStatus([FromBody] ChangeStatusDto dto)
+        {
+            await _planShiftService.UpdateStatusAsync(new ChangeStatusDto { Id = dto.Id, Status = dto.Status });
+        }
+
     }
 }
