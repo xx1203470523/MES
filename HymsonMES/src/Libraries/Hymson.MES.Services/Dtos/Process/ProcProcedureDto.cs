@@ -102,6 +102,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 是否逻辑删除
         /// </summary>
         public bool? IsDeleted { get; set; }
+
+        #region 扩展
+
+        /// <summary>
+        /// 计划产能
+        /// </summary>
+        public decimal? PlanOutputQty { get; set; }
+
+        #endregion
     }
 
     public record ProcProcedureCreateDto : BaseEntityDto
@@ -155,6 +164,15 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; } = "";
+
+        #region 扩展
+
+        /// <summary>
+        /// 计划产能
+        /// </summary>
+        public decimal? PlanOutputQty { get; set; }
+
+        #endregion
     }
 
     /// <summary>
@@ -227,6 +245,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 资源类型
         /// </summary>
         public ProcResourceTypeDto ResourceType { get; set; }
+
     }
 
     /// <summary>
@@ -342,6 +361,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 说明
         /// </summary>
         public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 计划产能
+        /// </summary>
+        public decimal? PlanOutputQty { get; set; }
     }
 
     /// <summary>
@@ -393,5 +417,10 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 作业描述
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 计划产能
+        /// </summary>
+        public string PlanOutputQty { get; set; } = "";
     }
 }

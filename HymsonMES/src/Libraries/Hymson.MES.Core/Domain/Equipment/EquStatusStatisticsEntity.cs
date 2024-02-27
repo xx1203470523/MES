@@ -77,5 +77,10 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// </summary>
         public decimal? OutputQty { get; set; }
 
+        /// <summary>
+        /// 理论开机时长
+        /// </summary>
+        public decimal? TheoryOnTime { get; set; }
+
     }
 }

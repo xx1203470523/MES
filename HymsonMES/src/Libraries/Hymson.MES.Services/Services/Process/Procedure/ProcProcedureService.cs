@@ -14,6 +14,7 @@ using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
+using Hymson.MES.Data.Repositories.Proc;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.ProductSet.Query;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -78,6 +79,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         /// </summary>
         private readonly ILocalizationService _localizationService;
 
+        /// <summary>
+        /// 工序计划产能
+        /// </summary>
+        private readonly IProcProcedurePlanRepository _procProcedurePlanRepository;
+
         private readonly AbstractValidator<ProcProcedureCreateDto> _validationCreateRules;
         private readonly AbstractValidator<ProcProcedureModifyDto> _validationModifyRules;
 
@@ -94,6 +100,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             IInteJobRepository inteJobRepository,
             IProcLabelTemplateRepository procLabelTemplateRepository,
             IProcProductSetRepository procProductSetRepository,
+            IProcProcedurePlanRepository procProcedurePlanRepository,
             AbstractValidator<ProcProcedureCreateDto> validationCreateRules,
             AbstractValidator<ProcProcedureModifyDto> validationModifyRules, ILocalizationService localizationService)
         {
@@ -110,6 +117,7 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _localizationService = localizationService;
+            _procProcedurePlanRepository = procProcedurePlanRepository;
         }
 
         /// <summary>
@@ -153,7 +161,11 @@ namespace Hymson.MES.Services.Services.Process.Procedure
         public async Task<QueryProcProcedureDto> GetProcProcedureByIdAsync(long id)
         {
             QueryProcProcedureDto queryProcDto = new QueryProcProcedureDto();
+
             var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(id);
+
+            var procProcedurePlanEntity = await _procProcedurePlanRepository.GetOneAsync(new() { ProcedureId = id });
+
             if (procProcedureEntity != null)
             {
                 queryProcDto.Procedure = procProcedureEntity.ToModel<ProcProcedureDto>();
@@ -169,6 +181,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                     };
                 }
             }
+            if (queryProcDto.Procedure!=null)
+                queryProcDto.Procedure.PlanOutputQty = procProcedurePlanEntity?.PlanOutputQty;
             return queryProcDto;
         }
 
@@ -359,6 +373,21 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             procProcedureEntity.CreatedBy = userName;
             procProcedureEntity.UpdatedBy = userName;
 
+            //工序设置计划产能
+            ProcProcedurePlanCreateCommand procProcedurePlanCreateCommand = new();
+            if (parm.Procedure.PlanOutputQty != null)
+            {
+                procProcedurePlanCreateCommand = new()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = 123456,
+                    ProcedureId = procProcedureEntity.Id,
+                    PlanOutputQty = parm.Procedure.PlanOutputQty,
+                    CreatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now()
+                };
+            }
+
             var validationFailures = new List<ValidationFailure>();
 
             //打印
@@ -495,19 +524,16 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 await _procProcedureRepository.InsertAsync(procProcedureEntity);
 
                 if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
-                {
                     await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
-                }
 
                 if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
-                {
                     await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
-                }
 
                 if (productSetList != null && productSetList.Count > 0)
-                {
                     await _procProductSetRepository.InsertsAsync(productSetList);
-                }
+
+                if (procProcedurePlanCreateCommand?.PlanOutputQty != null)
+                    await _procProcedurePlanRepository.InsertAsync(procProcedurePlanCreateCommand);
 
                 //提交
                 ts.Complete();
@@ -547,6 +573,23 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
             //TODO 现在关联表批量删除批量新增，后面再修改
             //打印
+
+            //工序设置计划产能
+            ProcProcedurePlanCreateCommand procedurePlanCreateCommand = new();
+            if (parm.Procedure.PlanOutputQty != null)
+            {
+                procedurePlanCreateCommand = new()
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = 123456,
+                    ProcedureId = procProcedureEntity.Id,
+                    PlanOutputQty = parm.Procedure.PlanOutputQty,
+                    CreatedBy = _currentUser.UserName,
+                    CreatedOn = HymsonClock.Now(),
+                    UpdatedBy = _currentUser.UserName,
+                    UpdatedOn = HymsonClock.Now(),
+                };
+            }
 
             var validationFailures = new List<ValidationFailure>();
             List<ProcProcedurePrintRelationEntity> procedureConfigPrintList = new List<ProcProcedurePrintRelationEntity>();
@@ -679,21 +722,17 @@ namespace Hymson.MES.Services.Services.Process.Procedure
 
                 await _procedurePrintRelationRepository.DeleteByProcedureIdAsync(procProcedureEntity.Id);
                 if (procedureConfigPrintList != null && procedureConfigPrintList.Count > 0)
-                {
                     await _procedurePrintRelationRepository.InsertRangeAsync(procedureConfigPrintList);
-                }
 
                 await _jobBusinessRelationRepository.DeleteByBusinessIdAsync(procProcedureEntity.Id);
                 if (procedureConfigJobList != null && procedureConfigJobList.Count > 0)
-                {
                     await _jobBusinessRelationRepository.InsertRangeAsync(procedureConfigJobList);
-                }
 
                 await _procProductSetRepository.DeleteBySetPointIdAsync(procProcedureEntity.Id);
                 if (productSetList != null && productSetList.Count > 0)
-                {
                     await _procProductSetRepository.InsertsAsync(productSetList);
-                }
+
+                await _procProcedurePlanRepository.InsertOrUpdateAsnyc(procedurePlanCreateCommand);
 
                 //提交
                 ts.Complete();
@@ -734,6 +773,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
                 });
                 rows += await _jobBusinessRelationRepository.DeleteByBusinessIdRangeAsync(idsArr);
                 ts.Complete();
+
+                await _procProcedurePlanRepository.DeleteByProcedureIdAsync(new() { ProcedureIds = idsArr });
             }
             return rows;
         }

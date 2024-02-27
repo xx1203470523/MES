@@ -19,6 +19,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Manufacture.ManuFeeding;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Proc;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
@@ -154,6 +155,7 @@ namespace Microsoft.Extensions.DependencyInjection
             #endregion
 
             #region Procedure
+            services.AddSingleton<IProcProcedurePlanRepository, ProcProcedurePlanRepository>();
             services.AddSingleton<IProcProcedureRepository, ProcProcedureRepository>();
             services.AddSingleton<IProcProcedurePrintRelationRepository, ProcProcedurePrintRelationRepository>();
             #endregion

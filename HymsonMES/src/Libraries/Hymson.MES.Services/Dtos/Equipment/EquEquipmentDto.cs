@@ -123,6 +123,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// </summary>
         public decimal? TheoryQty { get; set; }
 
+        /// <summary>
+        /// 理论产出时间
+        /// </summary>
+        public decimal? TheoryOnTime { get; set; }
+
         #endregion
     }
 
@@ -476,6 +481,11 @@ namespace Hymson.MES.Services.Dtos.Equipment
         /// 理论产能数量
         /// </summary>
         public decimal? TheoryQty { get; set; }
+
+        /// <summary>
+        /// 理论生产时间
+        /// </summary>
+        public decimal? TheoryOnTime { get; set; }
     }
 
     /// <summary>

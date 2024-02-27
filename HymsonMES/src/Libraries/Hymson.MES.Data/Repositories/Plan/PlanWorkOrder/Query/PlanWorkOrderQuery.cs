@@ -23,7 +23,7 @@ namespace Hymson.MES.Data.Repositories.Plan.PlanWorkOrder.Query
         // <summary>
         /// 工单号
         /// </summary>
-        public string OrderCode { get; set; }
+        public string? OrderCode { get; set; }
 
         /// <summary>
         /// 工厂

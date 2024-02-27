@@ -95,14 +95,21 @@ public partial class EquEquipmentTheoryRepository
     const string GetOneSql = @"SELECT * FROM equ_equipment_theory eet /**where**/ LIMIT 1";
     const string GetListSql = @"SELECT * FROM equ_equipment_theory eet /**where**/";
 
-    const string InsertSql = @"INSERT INTO equ_equipment_theory(Id, SiteId, EquipmentCode, TheoryOutputQty, OutputQty, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted)
-VALUES(@Id, @SiteId, @EquipmentCode, @TheoryOutputQty, @OutputQty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted);";
+    const string InsertSql = "INSERT INTO `equ_equipment_theory` (`Id`,`SiteId`,`EquipmentCode`,`TheoryOutputQty`,`OutputQty`,`TheoryOnTime`,`CreatedBy`,`CreatedOn`,`UpdatedBy`,`UpdatedOn`,`IsDeleted`)" +
+        " VALUES (@Id,@SiteId,@EquipmentCode,@TheoryOutputQty,@OutputQty,@TheoryOnTime,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted);";
 
     const string UpdateSql = @"UPDATE mes_master_qingan.equ_equipment_theory
-SET  TheoryOutputQty=@TheoryOutputQty, OutputQty=@OutputQty
+SET  TheoryOutputQty=@TheoryOutputQty, OutputQty=@OutputQty,`TheoryOnTime` = @TheoryOnTime
 WHERE EquipmentCode = EquipmentCode ;";
 
-    const string InsertOrUpdateSql = @"INSERT INTO equ_equipment_theory(Id, SiteId, EquipmentCode, TheoryOutputQty, OutputQty, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted)
-VALUES(@Id, @SiteId, @EquipmentCode, @TheoryOutputQty, @OutputQty, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)
-ON DUPLICATE KEY UPDATE TheoryOutputQty = @TheoryOutputQty,OutputQty = @OutputQty";
+    const string InsertOrUpdateSql = @"INSERT INTO equ_equipment_theory(Id, SiteId, EquipmentCode, TheoryOutputQty, OutputQty, TheoryOnTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted)
+VALUES(@Id, @SiteId, @EquipmentCode, @TheoryOutputQty, @OutputQty, @TheoryOnTime, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted)
+ON DUPLICATE KEY UPDATE TheoryOutputQty = @TheoryOutputQty,OutputQty = @OutputQty,TheoryOnTime = @TheoryOnTime";
+
+
+    #region 修改
+
+    const string UpdateByIdSql = "UPDATE `equ_equipment_theory` SET `TheoryOutputQty` = @TheoryOutputQty ,`OutputQty` = @OutputQty ,`TheoryOnTime` = @TheoryOnTime  ,`UpdatedBy` = @UpdatedBy ,`UpdatedOn` = @UpdatedOn WHERE Id = @id;";
+
+    #endregion
 }

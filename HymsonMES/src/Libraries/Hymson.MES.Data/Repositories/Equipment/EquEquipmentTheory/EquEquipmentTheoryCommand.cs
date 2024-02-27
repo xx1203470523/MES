@@ -30,6 +30,11 @@ public class EquEquipmentTheoryCommand : BaseCommand
     /// 理论产出产出数（EA）
     /// </summary>
     public decimal? OutputQty { get; set; }
+
+    /// <summary>
+    /// 理论开机时长
+    /// </summary>
+    public decimal? TheoryOnTime { get; set; }
 }
 
 /// <summary>
