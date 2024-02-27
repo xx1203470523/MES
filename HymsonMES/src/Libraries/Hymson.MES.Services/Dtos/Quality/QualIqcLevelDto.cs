@@ -59,17 +59,17 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验类型
         /// </summary>
-        public InspectionTypeEnum Type { get; set; }
+        public InspectionTypeEnum? Type { get; set; }
 
         /// <summary>
         /// 检验水准
         /// </summary>
-        public VerificationLevelEnum VerificationLevel { get; set; }
+        public VerificationLevelEnum? VerificationLevel { get; set; }
 
         /// <summary>
         /// 接收水准
         /// </summary>
-        public int AcceptanceLevel { get; set; }
+        public int? AcceptanceLevel { get; set; }
 
     }
 
@@ -141,7 +141,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 更新人

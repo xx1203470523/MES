@@ -35,7 +35,7 @@ namespace Hymson.MES.Core.Domain.Plan
         /// <summary>
         /// 物料组描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        
     }

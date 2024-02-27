@@ -33,7 +33,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         public long[] ResourceIds { get; set; }
 
@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 关联的资源Id

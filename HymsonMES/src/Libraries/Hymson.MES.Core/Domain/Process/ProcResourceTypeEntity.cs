@@ -25,7 +25,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 站点id

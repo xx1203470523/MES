@@ -1,6 +1,5 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Services.Dtos.Quality;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -22,13 +21,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <param name="saveDto"></param>
         /// <returns></returns>
         Task<int> ModifyAsync(InteMessageGroupSaveDto saveDto);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task<int> DeleteAsync(long id);
 
         /// <summary>
         /// 批量删除

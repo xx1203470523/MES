@@ -170,12 +170,17 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
-            var details = saveDto.Details.Select(s =>
+            List<QualOqcLevelDetailEntity> details = new();
+            foreach (var item in saveDto.Details)
             {
-                // 验证DTO
-                //_validationDetailRules.ValidateAndThrowAsync(s);
+                if (item.Type.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19420));
+                if (item.VerificationLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19421));
+                if (item.AcceptanceLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19422));
 
-                var detailEntity = s.ToEntity<QualOqcLevelDetailEntity>();
+                // 验证DTO
+                await _validationDetailRules.ValidateAndThrowAsync(item);
+
+                var detailEntity = item.ToEntity<QualOqcLevelDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
                 detailEntity.SiteId = entity.SiteId;
                 detailEntity.OqcLevelId = entity.Id;
@@ -184,8 +189,8 @@ namespace Hymson.MES.Services.Services.Quality
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
 
-                return detailEntity;
-            });
+                details.Add(detailEntity);
+            }
 
             // 每种检验类型只允许添加一次
             var typeCount = details.DistinctBy(s => s.Type).Count();
@@ -275,22 +280,27 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
-            var details = saveDto.Details.Select(s =>
+            List<QualOqcLevelDetailEntity> details = new();
+            foreach (var item in saveDto.Details)
             {
-                // 验证DTO
-                //_validationDetailRules.ValidateAndThrowAsync(s);
+                if (item.Type.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19420));
+                if (item.VerificationLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19421));
+                if (item.AcceptanceLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19422));
 
-                var detailEntity = s.ToEntity<QualOqcLevelDetailEntity>();
+                // 验证DTO
+                await _validationDetailRules.ValidateAndThrowAsync(item);
+
+                var detailEntity = item.ToEntity<QualOqcLevelDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.SiteId = entity.SiteId;
                 detailEntity.OqcLevelId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
-                detailEntity.SiteId = entity.SiteId;
 
-                return detailEntity;
-            });
+                details.Add(detailEntity);
+            }
 
             // 每种检验类型只允许添加一次
             var typeCount = details.DistinctBy(s => s.Type).Count();

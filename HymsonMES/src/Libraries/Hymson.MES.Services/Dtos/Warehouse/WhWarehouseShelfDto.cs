@@ -169,7 +169,7 @@ namespace Hymson.MES.Services.Dtos.WhWarehouseShelf
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 创建人
