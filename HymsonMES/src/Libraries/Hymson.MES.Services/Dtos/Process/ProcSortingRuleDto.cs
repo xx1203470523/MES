@@ -75,7 +75,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 创建人
@@ -136,7 +136,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 备注
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 参数详情

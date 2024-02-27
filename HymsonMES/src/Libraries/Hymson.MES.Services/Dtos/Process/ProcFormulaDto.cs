@@ -110,7 +110,7 @@ namespace Hymson.MES.Services.Dtos.Process
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 创建人
