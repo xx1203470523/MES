@@ -77,7 +77,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 创建人
@@ -487,7 +487,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 作业描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
     }
 
     public class ProcProcedureCodeDto

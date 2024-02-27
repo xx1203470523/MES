@@ -60,7 +60,7 @@ namespace Hymson.MES.Core.Domain.Process
        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        
     }

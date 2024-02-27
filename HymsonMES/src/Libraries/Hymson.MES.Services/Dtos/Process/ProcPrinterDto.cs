@@ -68,7 +68,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :备注 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :备注 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
     }
     public class ProcPrinterPagedQueryDto:PagerInfo
     {
