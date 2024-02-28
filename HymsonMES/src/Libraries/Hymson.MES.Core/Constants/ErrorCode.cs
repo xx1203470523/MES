@@ -1758,7 +1758,7 @@
         public const string MES19801 = "生产日历新增失败，可能存在相同年月的生产日历！";
         public const string MES19802 = "必须填写年份！";
         public const string MES19803 = "必须填写月份！";
-
+        public const string MES19804 = "日历{Dates}已启用无法被删除！";
         #endregion
 
         #region IQC检验项目
