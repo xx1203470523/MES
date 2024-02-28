@@ -179,8 +179,8 @@ namespace Hymson.MES.Data.Repositories.Process
             }
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
             if (pagedQuery.ProductIds != null) sqlBuilder.Where("ProductId IN @ProductIds");
-            if (pagedQuery.FromProcedureId.HasValue) sqlBuilder.Where("FromProcedureId = @FromProcedureId");
-            if (pagedQuery.ToProcedureId.HasValue) sqlBuilder.Where("ToProcedureId = @ToProcedureId");
+            if (pagedQuery.FromProcedureIds != null) sqlBuilder.Where("FromProcedureId IN @FromProcedureIds");
+            if (pagedQuery.ToProcedureIds != null) sqlBuilder.Where("ToProcedureId IN @ToProcedureIds");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
