@@ -338,6 +338,7 @@
         public const string MES10906 = "推送对象不允许有空格";
         public const string MES10907 = "私钥不允许有空格";
         public const string MES10908 = "关键字不允许有空格";
+        public const string MES10909 = "启用状态无法删除";
         #endregion
 
         #region 降级规则 11000
