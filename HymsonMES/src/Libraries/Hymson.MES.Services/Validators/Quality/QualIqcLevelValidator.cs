@@ -16,7 +16,7 @@ namespace Hymson.MES.Services.Validators.Quality
         /// </summary>
         public QualIqcLevelSaveValidator()
         {
-            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x).NotNull().WithErrorCode(nameof(ErrorCode.MES10100));
             RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(QCMaterialTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES19410));
             RuleFor(x => x.Level).Must(it => Enum.IsDefined(typeof(InspectionLevelEnum), it)).WithErrorCode(nameof(ErrorCode.MES19411));
             RuleFor(x => x.Status).Must(it => Enum.IsDefined(typeof(DisableOrEnableEnum), it)).WithErrorCode(nameof(ErrorCode.MES19412));
@@ -34,11 +34,10 @@ namespace Hymson.MES.Services.Validators.Quality
         /// </summary>
         public QualIqcLevelDetailSaveValidator()
         {
-            RuleFor(x => x).NotEmpty().WithErrorCode(nameof(ErrorCode.MES10100));
-            RuleFor(x => x.Type).Must(it => Enum.IsDefined(typeof(InspectionTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES19414));
-            RuleFor(x => x.VerificationLevel).Must(it => Enum.IsDefined(typeof(VerificationLevelEnum), it)).WithErrorCode(nameof(ErrorCode.MES19415));
+            RuleFor(x => x).NotNull().WithErrorCode(nameof(ErrorCode.MES10100));
+            RuleFor(x => x.Type).Must(it => it.HasValue && Enum.IsDefined(typeof(InspectionTypeEnum), it)).WithErrorCode(nameof(ErrorCode.MES19414));
+            RuleFor(x => x.VerificationLevel).Must(it => it.HasValue && Enum.IsDefined(typeof(VerificationLevelEnum), it)).WithErrorCode(nameof(ErrorCode.MES19415));
             RuleFor(x => x.AcceptanceLevel).NotNull().GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES19416));
-            //RuleFor(x => x.AcceptanceLevel).GreaterThanOrEqualTo(0).WithErrorCode(nameof(ErrorCode.MES19416));
         }
     }
 

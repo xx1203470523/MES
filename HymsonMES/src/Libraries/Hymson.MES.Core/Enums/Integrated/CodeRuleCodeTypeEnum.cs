@@ -16,6 +16,18 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// 包装序列码
         /// </summary>
         [Description("包装序列码")]
-        PackagingSeqCode = 2
+        PackagingSeqCode = 2,
+
+        /// <summary>
+        /// IQC
+        /// </summary>
+        [Description("IQC")]
+        IQC = 3,
+
+        /// <summary>
+        /// OQC
+        /// </summary>
+        [Description("OQC")]
+        OQC = 4
     }
 }

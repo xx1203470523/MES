@@ -70,7 +70,7 @@ namespace Hymson.MES.Services.Services.Integrated
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
             _validationImportRules = validationImportRules;
-            _inteCustomRepository1=inteCustomRepository1;
+            _inteCustomRepository1 = inteCustomRepository1;
 
         }
 
@@ -86,7 +86,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             //DTO转换实体
             var inteCustomEntity = inteCustomCreateDto.ToEntity<InteCustomEntity>();
-            inteCustomEntity.Id= IdGenProvider.Instance.CreateId();
+            inteCustomEntity.Id = IdGenProvider.Instance.CreateId();
             inteCustomEntity.CreatedBy = _currentUser.UserName;
             inteCustomEntity.UpdatedBy = _currentUser.UserName;
             inteCustomEntity.CreatedOn = HymsonClock.Now();
@@ -94,8 +94,8 @@ namespace Hymson.MES.Services.Services.Integrated
             inteCustomEntity.SiteId = _currentSite.SiteId ?? 0;
 
             //验证是否编码唯一
-            var entity= await _inteCustomRepository.GetByCodeAsync(inteCustomEntity.Code.Trim());
-            if (entity != null) 
+            var entity = await _inteCustomRepository.GetByCodeAsync(inteCustomEntity.Code.Trim());
+            if (entity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18402));
             }
@@ -146,7 +146,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<InteCustomDto> PrepareInteCustomDtos(PagedInfo<InteCustomEntity>   pagedInfo)
+        private static List<InteCustomDto> PrepareInteCustomDtos(PagedInfo<InteCustomEntity> pagedInfo)
         {
             var inteCustomDtos = new List<InteCustomDto>();
             foreach (var inteCustomEntity in pagedInfo.Data)
@@ -165,7 +165,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task ModifyInteCustomAsync(InteCustomModifyDto inteCustomModifyDto)
         {
-             //验证DTO
+            //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(inteCustomModifyDto);
 
             //DTO转换实体
@@ -181,14 +181,14 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteCustomDto> QueryInteCustomByIdAsync(long id) 
+        public async Task<InteCustomDto> QueryInteCustomByIdAsync(long id)
         {
-           var inteCustomEntity = await _inteCustomRepository.GetByIdAsync(id);
-           if (inteCustomEntity != null) 
-           {
-               return inteCustomEntity.ToModel<InteCustomDto>();
-           }
-           throw new CustomerValidationException(nameof(ErrorCode.MES18401));
+            var inteCustomEntity = await _inteCustomRepository.GetByIdAsync(id);
+            if (inteCustomEntity != null)
+            {
+                return inteCustomEntity.ToModel<InteCustomDto>();
+            }
+            throw new CustomerValidationException(nameof(ErrorCode.MES18401));
         }
 
         /// <summary>
@@ -211,9 +211,13 @@ namespace Hymson.MES.Services.Services.Integrated
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             var excelImportDtos = _excelService.Import<InteCustomImportDto>(memoryStream);
-            //备份用户上传的文件，可选
+
+            /*
+            // 备份用户上传的文件，可选
             var stream = formFile.OpenReadStream();
             var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            */
+
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
                 throw new CustomerValidationException("导入数据为空");
@@ -222,7 +226,7 @@ namespace Hymson.MES.Services.Services.Integrated
             #region 验证基础数据
             var validationFailures = new List<ValidationFailure>();
             var rows = 1;
-            foreach(var item in excelImportDtos)
+            foreach (var item in excelImportDtos)
             {
                 var validationResult = await _validationImportRules!.ValidateAsync(item);
                 if (!validationResult.IsValid && validationResult.Errors != null && validationResult.Errors.Any())
@@ -242,8 +246,8 @@ namespace Hymson.MES.Services.Services.Integrated
             #endregion
 
             #region 检测导入数据编码是否重复
-            var repeats =new List<string>();
-             var hasDuplicates = excelImportDtos.GroupBy(x => new { x.Code});
+            var repeats = new List<string>();
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.Code });
             foreach (var item in hasDuplicates)
             {
                 if (item.Count() > 1)
@@ -267,8 +271,8 @@ namespace Hymson.MES.Services.Services.Integrated
             });
 
             var currentRow = 0;
-            var customCode=customCodes.Select(x => x.Code).Distinct().ToList();
-            foreach( var item in excelImportDtos) 
+            var customCode = customCodes.Select(x => x.Code).Distinct().ToList();
+            foreach (var item in excelImportDtos)
             {
                 currentRow++;
 

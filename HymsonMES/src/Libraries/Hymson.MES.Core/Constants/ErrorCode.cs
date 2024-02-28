@@ -41,6 +41,7 @@
         public const string MES10132 = "编码不能包含特殊字符";
         public const string MES10133 = "未获取到导入数据！";
         public const string MES10134 = "未获取到导出数据！";
+        public const string MES10135 = "不允许删除【已启用】状态的数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -337,6 +338,7 @@
         public const string MES10906 = "推送对象不允许有空格";
         public const string MES10907 = "私钥不允许有空格";
         public const string MES10908 = "关键字不允许有空格";
+        public const string MES10909 = "启用状态无法删除";
         #endregion
 
         #region 降级规则 11000
@@ -1705,6 +1707,10 @@
         public const string MES19416 = "接收水准不能小于0！";
         public const string MES19417 = "物料编码【{MaterialCode}】+ 客户【{CustomCode}】已在系统存在！";
         public const string MES19418 = "检验类型不允许设置多次！";
+        public const string MES19420 = "检验类型不能为空！";
+        public const string MES19419 = "校验水平不能为空！";
+        public const string MES19421 = "检验水准不能为空！";
+        public const string MES19422 = "接收水准不能为空！";
         #endregion
 
         #endregion

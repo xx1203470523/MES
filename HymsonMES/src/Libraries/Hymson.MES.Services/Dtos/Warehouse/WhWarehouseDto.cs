@@ -98,7 +98,7 @@ namespace Hymson.MES.Services.Dtos.WhWareHouse
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 创建人

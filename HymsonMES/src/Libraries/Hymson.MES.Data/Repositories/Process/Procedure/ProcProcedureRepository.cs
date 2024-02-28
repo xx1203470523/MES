@@ -243,13 +243,13 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcProcedureEntitiesSqlTemplate);
-            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(procProcedureQuery.Code))
             {
-                sqlBuilder.Where(" Code= @Code ");
+                sqlBuilder.Where(" Code = @Code ");
             }
             if (procProcedureQuery.Codes != null && procProcedureQuery.Codes.Any())
             {
@@ -260,6 +260,35 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             var procProcedureEntities = await conn.QueryAsync<ProcProcedureEntity>(template.RawSql, procProcedureQuery);
             return procProcedureEntities;
+        }
+
+        /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcProcedureEntity>> GetEntitiesAsync(ProcProcedureQuery query)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetProcProcedureEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (!string.IsNullOrWhiteSpace(query.Code))
+            {
+                query.Code = $"%{query.Code}%";
+                sqlBuilder.Where(" Code LIKE @Code ");
+            }
+            if (!string.IsNullOrWhiteSpace(query.Name))
+            {
+                query.Name = $"%{query.Name}%";
+                sqlBuilder.Where(" Name LIKE @Name ");
+            }
+            sqlBuilder.AddParameters(query);
+
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ProcProcedureEntity>(template.RawSql, template.Parameters);
         }
 
         /// <summary>

@@ -138,9 +138,9 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetManuProcedureTimecontrolEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Select("*");
 
             if (query.ProductId.HasValue) sqlBuilder.Where(" ProductId = @ProductId ");
             if (query.FromProcedureId.HasValue) sqlBuilder.Where(" FromProcedureId = @FromProcedureId ");
@@ -178,9 +178,9 @@ namespace Hymson.MES.Data.Repositories.Process
                 sqlBuilder.Where("Name LIKE @Name");
             }
             if (pagedQuery.Status.HasValue) sqlBuilder.Where("Status = @Status");
-            if (pagedQuery.ProductId.HasValue) sqlBuilder.Where("ProductId = @ProductId");
-            if (pagedQuery.FromProcedureId.HasValue) sqlBuilder.Where("FromProcedureId = @FromProcedureId");
-            if (pagedQuery.ToProcedureId.HasValue) sqlBuilder.Where("ToProcedureId = @ToProcedureId");
+            if (pagedQuery.ProductIds != null) sqlBuilder.Where("ProductId IN @ProductIds");
+            if (pagedQuery.FromProcedureIds != null) sqlBuilder.Where("FromProcedureId IN @FromProcedureIds");
+            if (pagedQuery.ToProcedureIds != null) sqlBuilder.Where("ToProcedureId IN @ToProcedureIds");
 
             var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });

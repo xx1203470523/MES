@@ -81,6 +81,13 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<IEnumerable<ProcProcedureEntity>> GetProcProcedureEntitiesAsync(ProcProcedureQuery procProcedureQuery);
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcProcedureEntity>> GetEntitiesAsync(ProcProcedureQuery query);
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procProcedureEntity"></param>

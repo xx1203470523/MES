@@ -31,17 +31,22 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 产品ID
         /// </summary>
-        public long? ProductId { get; set; }
+        public IEnumerable<long>? ProductIds { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string? Version { get; set; }
 
         /// <summary>
         /// 起始工序
         /// </summary>
-        public long? FromProcedureId { get; set; }
+        public IEnumerable<long>? FromProcedureIds { get; set; }
 
         /// <summary>
         /// 到达工序
         /// </summary>
-        public long? ToProcedureId { get; set; }
+        public IEnumerable<long>? ToProcedureIds { get; set; }
 
     }
 }

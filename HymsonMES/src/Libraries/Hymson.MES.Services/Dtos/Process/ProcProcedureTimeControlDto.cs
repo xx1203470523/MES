@@ -225,7 +225,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 最后修改人
@@ -303,6 +303,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 产品编码
         /// </summary>
         public string? ProductCode { get; set; }
+
+        /// <summary>
+        /// 产品版本
+        /// </summary>
+        public string? Version { get; set; }
 
         /// <summary>
         /// 起始工序

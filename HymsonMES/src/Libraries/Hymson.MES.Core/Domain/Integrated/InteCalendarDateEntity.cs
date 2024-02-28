@@ -43,7 +43,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
         
         /// <summary>
         /// 描述 :所属站点代码 

@@ -13,6 +13,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
+using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -169,12 +170,17 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
-            var details = saveDto.Details.Select(s =>
+            List<QualOqcLevelDetailEntity> details = new();
+            foreach (var item in saveDto.Details)
             {
-                // 验证DTO
-                //_validationDetailRules.ValidateAndThrowAsync(s);
+                if (item.Type.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19420));
+                if (item.VerificationLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19421));
+                if (item.AcceptanceLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19422));
 
-                var detailEntity = s.ToEntity<QualOqcLevelDetailEntity>();
+                // 验证DTO
+                await _validationDetailRules.ValidateAndThrowAsync(item);
+
+                var detailEntity = item.ToEntity<QualOqcLevelDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
                 detailEntity.SiteId = entity.SiteId;
                 detailEntity.OqcLevelId = entity.Id;
@@ -183,8 +189,8 @@ namespace Hymson.MES.Services.Services.Quality
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
 
-                return detailEntity;
-            });
+                details.Add(detailEntity);
+            }
 
             // 每种检验类型只允许添加一次
             var typeCount = details.DistinctBy(s => s.Type).Count();
@@ -274,22 +280,27 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
-            var details = saveDto.Details.Select(s =>
+            List<QualOqcLevelDetailEntity> details = new();
+            foreach (var item in saveDto.Details)
             {
-                // 验证DTO
-                //_validationDetailRules.ValidateAndThrowAsync(s);
+                if (item.Type.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19420));
+                if (item.VerificationLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19421));
+                if (item.AcceptanceLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19422));
 
-                var detailEntity = s.ToEntity<QualOqcLevelDetailEntity>();
+                // 验证DTO
+                await _validationDetailRules.ValidateAndThrowAsync(item);
+
+                var detailEntity = item.ToEntity<QualOqcLevelDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.SiteId = entity.SiteId;
                 detailEntity.OqcLevelId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
-                detailEntity.SiteId = entity.SiteId;
 
-                return detailEntity;
-            });
+                details.Add(detailEntity);
+            }
 
             // 每种检验类型只允许添加一次
             var typeCount = details.DistinctBy(s => s.Type).Count();
@@ -385,6 +396,31 @@ namespace Hymson.MES.Services.Services.Quality
         {
             var pagedQuery = pagedQueryDto.ToQuery<QualOqcLevelPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
+            // 转换产品编码/版本变为产品ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.MaterialCode) || !string.IsNullOrWhiteSpace(pagedQueryDto.MaterialName))
+            {
+                var procMaterialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    MaterialCode = pagedQueryDto.MaterialCode,
+                    MaterialName = pagedQueryDto.MaterialName
+                });
+                if (procMaterialEntities != null && procMaterialEntities.Any()) pagedQuery.MaterialIds = procMaterialEntities.Select(s => s.Id);
+                else pagedQuery.MaterialIds = Array.Empty<long>();
+            }
+
+            // 转换供应商编码变为供应商ID
+            if (!string.IsNullOrWhiteSpace(pagedQueryDto.CustomCode))
+            {
+                var inteCustomEntities = await _inteCustomRepository.GetInteCustomEntitiesAsync(new InteCustomQuery
+                {
+                    SiteId = pagedQuery.SiteId,
+                    Code = pagedQueryDto.CustomCode
+                });
+                if (inteCustomEntities != null && inteCustomEntities.Any()) pagedQuery.CustomIds = inteCustomEntities.Select(s => s.Id);
+                else pagedQuery.CustomIds = Array.Empty<long>();
+            }
 
             // 查询数据
             var pagedInfo = await _qualOqcLevelRepository.GetPagedListAsync(pagedQuery);

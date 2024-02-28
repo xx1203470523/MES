@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具类型维护    Dto | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-12 10:37:17
- */
-
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -22,27 +14,27 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 行
         /// </summary>
         public int Row { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 列
         /// </summary>
         public int Column { get; set; }
@@ -55,24 +47,24 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 最后修改人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
@@ -84,27 +76,27 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record InteVehicleTypeCreateDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
         /// 类型编码
         /// </summary>
         public string Code { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 行
         /// </summary>
         public int Row { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 列
         /// </summary>
         public int Column { get; set; }
@@ -122,7 +114,8 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 载具类型验证
         /// </summary>
-        public IList<InteVehicleTypeVerifyCreateDto> VehicleTypeVerifyList { get; set; }
+        public IList<InteVehicleTypeVerifyCreateDto>? VehicleTypeVerifyList { get; set; }
+
     }
 
     /// <summary>
@@ -135,22 +128,22 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 类型名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 状态;0-未启用 1-启用
         /// </summary>
         public DisableOrEnableEnum Status { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 行
         /// </summary>
         public int Row { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 列
         /// </summary>
         public int Column { get; set; }
@@ -168,7 +161,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// <summary>
         /// 载具类型验证
         /// </summary>
-        public IList<InteVehicleTypeVerifyCreateDto> VehicleTypeVerifyList { get; set; }
+        public IList<InteVehicleTypeVerifyCreateDto>? VehicleTypeVerifyList { get; set; }
     }
 
     /// <summary>

@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具类型维护    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-12 10:37:17
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Integrated;
 
@@ -25,23 +18,16 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteVehicleTypeCreateDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto inteVehicleTypeCreateDto);
+        Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto dto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteVehicleTypeModifyDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task ModifyInteVehicleTypeAsync(InteVehicleTypeModifyDto inteVehicleTypeModifyDto);
-
-        /// <summary>
-        /// 删除
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task DeleteInteVehicleTypeAsync(long id);
+        Task ModifyInteVehicleTypeAsync(InteVehicleTypeModifyDto dto);
 
         /// <summary>
         /// 批量删除

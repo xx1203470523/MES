@@ -65,7 +65,7 @@ namespace Hymson.MES.Core.Domain.Integrated
         /// <summary>
         /// 手动录入编码规则的描述信息
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 站点Id

@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 客户维护 查询类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-11 09:33:26
- */
-
 namespace Hymson.MES.Data.Repositories.Integrated
 {
     /// <summary>
@@ -22,5 +14,15 @@ namespace Hymson.MES.Data.Repositories.Integrated
         /// 客户编码列表
         /// </summary>
         public string[]? Codes { get; set; }
+
+        /// <summary>
+        /// 编号
+        /// </summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+
     }
 }

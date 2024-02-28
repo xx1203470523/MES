@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料组维护表 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-10 03:54:07
- */
-
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
@@ -127,44 +119,46 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 分页查询 自定义
         /// </summary>
-        /// <param name="procMaterialGroupCustomPagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPagedCustomInfoAsync(ProcMaterialGroupCustomPagedQuery procMaterialGroupCustomPagedQuery)
+        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPageListNewAsync(ProcMaterialGroupCustomPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedCustomInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedCustomInfoCountSqlTemplate);
-            sqlBuilder.Where("g.IsDeleted=0");
+            sqlBuilder.Select("g.Id,g.SiteId,g.GroupCode,g.GroupName,g.GroupVersion,g.Remark,g.CreatedBy,g.CreatedOn,g.UpdatedBy,g.UpdatedOn,g.IsDeleted,o.MaterialCode,o.MaterialName,o.Version");
+            sqlBuilder.LeftJoin("proc_material o ON o.GroupId = g.Id AND o.IsDeleted = 0");
+            sqlBuilder.Where("g.IsDeleted = 0");
             sqlBuilder.Where("g.SiteId = @SiteId");
             sqlBuilder.OrderBy("g.UpdatedOn DESC");
 
-            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.GroupCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.GroupCode))
             {
-                procMaterialGroupCustomPagedQuery.GroupCode = $"%{procMaterialGroupCustomPagedQuery.GroupCode}%";
-                sqlBuilder.Where(" g.GroupCode like @GroupCode ");
+                pagedQuery.GroupCode = $"%{pagedQuery.GroupCode}%";
+                sqlBuilder.Where(" g.GroupCode LIKE @GroupCode ");
             }
-            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.MaterialCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.MaterialCode))
             {
-                procMaterialGroupCustomPagedQuery.MaterialCode = $"%{procMaterialGroupCustomPagedQuery.MaterialCode}%";
-                sqlBuilder.Where(" o.MaterialCode like @MaterialCode ");
+                pagedQuery.MaterialCode = $"%{pagedQuery.MaterialCode}%";
+                sqlBuilder.Where(" o.MaterialCode LIKE @MaterialCode ");
             }
-            if (!string.IsNullOrWhiteSpace(procMaterialGroupCustomPagedQuery.Version))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.Version))
             {
-                procMaterialGroupCustomPagedQuery.Version = $"%{procMaterialGroupCustomPagedQuery.Version}%";
-                sqlBuilder.Where(" o.Version like @Version ");
+                pagedQuery.Version = $"%{pagedQuery.Version}%";
+                sqlBuilder.Where(" o.Version LIKE @Version ");
             }
 
-            var offSet = (procMaterialGroupCustomPagedQuery.PageIndex - 1) * procMaterialGroupCustomPagedQuery.PageSize;
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procMaterialGroupCustomPagedQuery.PageSize });
-            sqlBuilder.AddParameters(procMaterialGroupCustomPagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
             var customProcMaterialGroupViewTask = conn.QueryAsync<CustomProcMaterialGroupView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var customProcMaterialGroupView = await customProcMaterialGroupViewTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<CustomProcMaterialGroupView>(customProcMaterialGroupView, procMaterialGroupCustomPagedQuery.PageIndex, procMaterialGroupCustomPagedQuery.PageSize, totalCount);
+            return new PagedInfo<CustomProcMaterialGroupView>(customProcMaterialGroupView, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
 
         }
 
@@ -178,7 +172,7 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetProcMaterialGroupEntitiesSqlTemplate);
             sqlBuilder.Where("SiteId = @SiteId");
-            sqlBuilder.Where("IsDeleted =0");
+            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
 
             if (!string.IsNullOrWhiteSpace(procMaterialGroupQuery.GroupCode))
@@ -237,31 +231,15 @@ namespace Hymson.MES.Data.Repositories.Process
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcMaterialGroupRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material_group` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_material_group` /**where**/ ";
-        const string GetPagedCustomInfoDataSqlTemplate = @"SELECT 
-g.Id,
-g.SiteId,
-g.GroupCode,
-g.GroupName,
-g.GroupVersion,
-g.Remark,
-g.CreatedBy,
-g.CreatedOn,
-g.UpdatedBy,
-g.UpdatedOn,
-g.IsDeleted,
-o.MaterialCode,
-o.MaterialName,
-o.Version
-                                                            FROM `proc_material_group` g
-                                                            LEFT JOIN proc_material o on o.GroupId = g.Id and o.IsDeleted=0
-/**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(*) 
-                                                FROM `proc_material_group` g
-                                                LEFT JOIN proc_material o on o.GroupId = g.Id  /**where**/ ";
+        const string GetPagedCustomInfoDataSqlTemplate = @"SELECT /**select**/ FROM proc_material_group g /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset, @Rows ";
+        const string GetPagedCustomInfoCountSqlTemplate = @"SELECT COUNT(*) FROM proc_material_group g /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetProcMaterialGroupEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
                                            FROM `proc_material_group` /**where**/  ";

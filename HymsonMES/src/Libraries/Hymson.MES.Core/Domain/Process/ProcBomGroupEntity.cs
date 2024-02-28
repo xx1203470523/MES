@@ -32,11 +32,11 @@ namespace Hymson.MES.Core.Domain.Process
         /// 空值 : true  
         /// </summary>
         public string GroupVersion { get; set; }
-        
+
         /// <summary>
         /// 描述 :物料组描述 
         /// 空值 : true  
         /// </summary>
-        public string GroupRemark { get; set; }
+        public string GroupRemark { get; set; } = "";
         }
 }

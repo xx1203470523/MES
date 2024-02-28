@@ -171,7 +171,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 参数单位（字典定义）
         /// </summary>
-        [EpplusTableColumn(Header = "参数单位(必填)", Order = 3)]
+        [EpplusTableColumn(Header = "参数单位", Order = 3)]
         public string ParameterUnit { get; set; }
 
         /// <summary>

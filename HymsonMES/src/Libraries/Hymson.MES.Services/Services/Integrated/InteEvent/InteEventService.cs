@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -150,6 +151,12 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var getInfo = await _inteEventRepository.GetByIdsAsync(ids);
+            var isStatues = getInfo.Where(x => x.Status == DisableOrEnableEnum.Enable);
+            if (isStatues.Any())
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10909));
+            }
             return await _inteEventRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
