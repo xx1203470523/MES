@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\10100HymsonSharedSDK\HymsonSharedSDK\src\Hymson.Web.Framework\Hymson.Web.Framework.csproj" />
     <ProjectReference Include="..\..\Libraries\Hymson.MES.EquipmentServices\Hymson.MES.EquipmentServices.csproj" />
   </ItemGroup>
 

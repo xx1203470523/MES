@@ -1733,6 +1733,8 @@
         public const string MES19506 = "班次类型不允许重复";
         public const string MES19507 = "未跨天班次的结束时间必须大于开始时间！";
         public const string MES19508 = "没有添加任何班次数据";
+        public const string MES19509 = "班制类型为空";
+        public const string MES19510 = "{type}开始时间与结束时间不能相同";
         #endregion
 
         #region Marking标识 19700

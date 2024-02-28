@@ -167,6 +167,7 @@ namespace Hymson.MES.Data.Repositories.Plan
 
             sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("Status = 1");
 
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
             sqlBuilder.OrderBy("Id desc");

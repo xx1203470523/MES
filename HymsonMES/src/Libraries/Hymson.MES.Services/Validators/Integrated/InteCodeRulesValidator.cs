@@ -26,7 +26,7 @@ namespace Hymson.MES.Services.Validators.Integrated
     {
         public InteCodeRulesCreateValidator()
         {
-            RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
+            //RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
             RuleFor(x => x.CodeMode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12442));
             RuleFor(x => x.CodeType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12411));
             RuleFor(x => x.Base).NotEmpty().GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12412));
@@ -59,7 +59,7 @@ namespace Hymson.MES.Services.Validators.Integrated
         {
             RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12419));
 
-            RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
+            //RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12410));
             RuleFor(x => x.CodeMode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12442));
             RuleFor(x => x.CodeType).NotEmpty().WithErrorCode(nameof(ErrorCode.MES12411));
             RuleFor(x => x.Base).NotEmpty().GreaterThan(0).WithErrorCode(nameof(ErrorCode.MES12412));
