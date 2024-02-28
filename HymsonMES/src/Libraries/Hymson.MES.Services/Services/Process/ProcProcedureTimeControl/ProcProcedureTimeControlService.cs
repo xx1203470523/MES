@@ -16,7 +16,6 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Services.Manufacture.ManuMainstreamProcess.ManuCommon;
 using Hymson.Snowflake;
 using Hymson.Utils;
-using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Hymson.MES.Services.Services.Process
 {

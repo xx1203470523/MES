@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -14,14 +13,10 @@ using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Data.Repositories.Process.MaskCode.Query;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.Sequences;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using Microsoft.IdentityModel.Tokens;
-using Minio.DataModel;
 using System.Data;
-using System.Text;
 
 namespace Hymson.MES.Services.Services.Process.MaskCode
 {
