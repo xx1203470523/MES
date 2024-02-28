@@ -14,6 +14,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.WMS.Data.Repositories.ManuManufacture;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Crypto;
 
 namespace Hymson.MES.Data.Repositories.Manufacture;
 
@@ -316,6 +317,30 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
     }
     #endregion
 
+    #region MyRegion
+
+    /// <summary>
+    /// 分组获取数据
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<ManuSfcSummaryView> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery query)
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+
+        var sqlTemplete = sqlBuilder.AddTemplate(GetManuSFcSummaryViewSql);
+
+
+        sqlBuilder.AddParameters(query);
+
+        if (query.WorkOrderId != null)
+            sqlBuilder.Where("OrderId= @OrderId");
+
+        using var conn = GetMESDbConnection();
+        return await conn.QueryFirstOrDefaultAsync<ManuSfcSummaryView>(sqlTemplete.RawSql, sqlTemplete.Parameters);
+    }
+
+    #endregion
 }
 
 public partial class ManuSfcSummaryRepository
@@ -364,6 +389,12 @@ public partial class ManuSfcSummaryRepository
     const string GetByIdsSql = @"SELECT 
                                           `Id`, `SiteId`, `ProcedureId`, `ResourceId`, `EquipmentId`, `SFC`, `WorkOrderId`, `ProductId`, `BeginTime`, `EndTime`, `RepeatedCount`, `Qty`, `NgNum`, `FirstQualityStatus`, `QualityStatus`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`
                             FROM `manu_sfc_summary`  WHERE Id IN @Ids ";
+    #endregion
+
+    #region 扩展
+
+    const string GetManuSFcSummaryViewSql = "SELECT mss.WorkOrderId,  SUM(Qty) OutputQty,SUM(FirstQualityStatus) OneQualified,sum(QualityStatus) QualifiedQty  FROM manu_sfc_summary mss WHERE /**where**/ GROUP BY WorkOrderId ";
+
     #endregion
 }
 

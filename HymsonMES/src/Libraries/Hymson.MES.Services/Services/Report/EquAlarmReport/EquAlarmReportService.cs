@@ -18,10 +18,10 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
         private readonly IEquAlarmRepository _equAlarmRepository;
         private readonly IMinioService _minioService;
         private readonly IExcelService _excelService;
-        public EquAlarmReportService(IEquAlarmRepository equAlarmRepository, 
+        public EquAlarmReportService(IEquAlarmRepository equAlarmRepository,
             ICurrentUser currentUser,
             ICurrentSite currentSite,
-            IMinioService minioService, 
+            IMinioService minioService,
             IExcelService excelService)
         {
             _equAlarmRepository = equAlarmRepository;
@@ -74,6 +74,84 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
                 Path = uploadResult.RelativeUrl,
                 RelativePath = uploadResult.RelativeUrl
             };
+        }
+
+        /// <summary>
+        /// 获取设备报警持续时间
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquAlarmDurationTimeDto>> GetEquAlarmDurationTimeAsync(EquAlarmDurationTimeQueryDto query)
+        {
+            List<EquAlarmDurationTimeDto> result = new();
+            var equAlarmEntities = await _equAlarmRepository.GetListAsync(new()
+            {
+                EquipmentId = query.EquipmentId,
+                CreatedOnEnd = query.EndTime,
+                CreatedOnStart = query.BeginTime
+            });
+
+            List<EquAlarmComputedDto> list = new List<EquAlarmComputedDto>();
+            foreach (var item in equAlarmEntities)
+            {
+                EquAlarmComputedDto newitem = new EquAlarmComputedDto();
+                newitem.Status = item.Status;
+                newitem.EquipmentId = item.EquipmentId;
+
+                var exitsItem = list.FirstOrDefault(a => a.EquipmentId == item.EquipmentId);
+
+                if (exitsItem != null)
+                {
+                    //触发
+                    if (item.Status == Core.Enums.EquipmentAlarmStatusEnum.Trigger)
+                    {
+                        if (item.Status == exitsItem.Status) continue;
+                        else
+                        {
+                            exitsItem.Status = item.Status;
+                            exitsItem.BeginTime = item.LocalTime;
+                            exitsItem.EndTime = null;
+                        }
+                    }
+                    else
+                    {
+                        if (item.Status == exitsItem.Status) continue;
+                        else
+                        {
+                            if (exitsItem.BeginTime != null && exitsItem.EndTime != null)
+                            {
+                                exitsItem.DurationTime += exitsItem.EndTime.GetValueOrDefault().Subtract(exitsItem.BeginTime.GetValueOrDefault()).Milliseconds;
+                                exitsItem.BeginTime = null;
+                                exitsItem.EndTime = null;
+                                exitsItem.Status = null;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+
+                    if (newitem.Status == Core.Enums.EquipmentAlarmStatusEnum.Trigger)
+                        newitem.BeginTime = item.LocalTime;
+                    else
+                        newitem.EndTime = item.LocalTime;
+
+                    if (newitem.BeginTime != null && newitem.EndTime != null)
+                        newitem.DurationTime = newitem.EndTime.GetValueOrDefault().Subtract(newitem.BeginTime.GetValueOrDefault()).Milliseconds;
+                }
+
+                list.Add(newitem);
+
+            }
+
+            foreach (var item in list)
+            {
+                result.Add(new() { 
+                    EquipmentId = item.EquipmentId,
+                    DurationTime = item.DurationTime
+                });
+            }
+
+            return result;
         }
     }
 }

@@ -14,7 +14,7 @@ public interface ISystemApiService
     /// </summary>
     /// <param name="queryDto"></param>
     /// <returns></returns>
-    Task<IEnumerable<PlanWorkOrderInfoViewDto>> GetPlanWorkOrderInfoAsync(PlanWorkOrderInfoQueryDto queryDto);
+    Task<PlanWorkOrderInfoViewDto> GetPlanWorkOrderInfoAsync(PlanWorkOrderInfoQueryDto queryDto);
 
     /// <summary>
     /// 首页-OEE趋势图

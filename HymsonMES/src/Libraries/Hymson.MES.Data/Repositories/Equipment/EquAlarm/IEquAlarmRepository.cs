@@ -9,6 +9,31 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public interface IEquAlarmRepository
     {
+        #region 查询
+
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquAlarmEntity> GetOneAsync(EquAlarmQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquAlarmEntity>> GetListAsync(EquAlarmQuery query);
+
+        /// <summary>
+        /// 分页查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PagedInfo<EquAlarmEntity>> GetPagedInfoAsync(EquAlarmPagedQuery query);
+
+        #endregion
+
         /// <summary>
         /// 新增
         /// </summary>

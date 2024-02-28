@@ -139,5 +139,16 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<int> InsertOrUpdateRangeAsync(List<ManuSfcSummaryEntity> manuSfcSummaryEntitys);
         #endregion
+
+        #region 扩展
+
+        /// <summary>
+        /// 获取生产汇总数据
+        /// </summary>
+        /// <param name="manuSfcSummaryQuery"></param>
+        /// <returns></returns>
+        Task<ManuSfcSummaryView> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery manuSfcSummaryQuery);
+
+        #endregion
     }
 }

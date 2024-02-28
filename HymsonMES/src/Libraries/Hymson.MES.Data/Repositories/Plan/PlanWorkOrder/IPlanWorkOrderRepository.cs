@@ -12,6 +12,24 @@ namespace Hymson.MES.Data.Repositories.Plan
     /// </summary>
     public interface IPlanWorkOrderRepository
     {
+        #region 查询
+
+        /// <summary>
+        ///  单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<PlanWorkOrderEntity> GetOneAsync(PlanWorkOrderQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlanWorkOrderEntity>> GetListAsync(PlanWorkOrderQuery query);
+
+        #endregion
+
         /// <summary>
         /// 工单产量报表查询
         /// </summary>

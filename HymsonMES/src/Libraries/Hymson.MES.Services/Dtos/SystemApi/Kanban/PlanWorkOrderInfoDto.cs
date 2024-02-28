@@ -20,7 +20,7 @@ public class PlanWorkOrderInfoViewDto
     /// <summary>
     /// 车间名称
     /// </summary>
-    public long? WorkCenterName { get; set; }
+    public string? WorkCenterName { get; set; }
 
     /// <summary>
     /// 完成率
@@ -30,12 +30,12 @@ public class PlanWorkOrderInfoViewDto
     /// <summary>
     /// 班制类型
     /// </summary>
-    public ClassTypeEnum? ClassType { get; set; }
+    public DetailClassTypeEnum? ClassType { get; set; }
 
     /// <summary>
     /// 工艺路线ID
     /// </summary>
-    public string ProcessRouteId { get; set; }
+    public long? ProcessRouteId { get; set; }
 
     /// <summary>
     /// 工艺路线名称
@@ -80,7 +80,17 @@ public class PlanWorkOrderInfoViewDto
     /// <summary>
     /// 产品名称
     /// </summary>
-    public decimal ProductName { get; set; }
+    public string ProductName { get; set; }
+
+    /// <summary>
+    /// 综合良率
+    /// </summary>
+    public decimal? QualifiedRate { get; set; }
+
+    /// <summary>
+    /// 综合计划达成率
+    /// </summary>
+    public decimal? PlanAchievementRate { get; set; }
 
     /// <summary>
     /// 电芯数量

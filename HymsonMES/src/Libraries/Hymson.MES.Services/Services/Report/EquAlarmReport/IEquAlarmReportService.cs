@@ -1,5 +1,6 @@
 ﻿using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.Report;
 
 namespace Hymson.MES.Services.Services.Report.EquAlarmReport
@@ -9,5 +10,7 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
         Task<PagedInfo<EquAlarmReportViewDto>> GetEquAlarmReportPageListAsync(EquAlarmReportPagedQueryDto pageQuery);
 
         Task<ExportResultDto> EquAlarmReportExportAsync(EquAlarmReportPagedQueryDto pageQuery);
+
+        Task<IEnumerable<EquAlarmDurationTimeDto>> GetEquAlarmDurationTimeAsync(EquAlarmDurationTimeQueryDto query);
     }
 }
