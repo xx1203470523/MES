@@ -1,11 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 物料组维护表    Dto | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-10 03:54:07
- */
-
 using Hymson.Infrastructure;
 
 namespace Hymson.MES.Services.Dtos.Process
@@ -20,7 +12,12 @@ namespace Hymson.MES.Services.Dtos.Process
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
+        /// 物料组Id
+        /// </summary>
+        public long GroupId { get; set; }
+
+        /// <summary>
         /// 物料组编号
         /// </summary>
         public string GroupCode { get; set; }
@@ -184,7 +181,6 @@ namespace Hymson.MES.Services.Dtos.Process
     /// </summary>
     public record CustomProcMaterialGroupViewDto : ProcMaterialGroupDto
     {
-
         #region 物料相关属性
         /// <summary>
         /// 描述 :物料编码 

@@ -6,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Equipment;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment;
@@ -151,6 +152,14 @@ namespace Hymson.MES.Services.Services.Equipment
         /// <returns></returns>
         public async Task<int> DeletesEquSparePartsAsync(long[] ids)
         {
+            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+
+            var entities = await _equSparePartsRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            }
+
             return await _equSparePartsRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,

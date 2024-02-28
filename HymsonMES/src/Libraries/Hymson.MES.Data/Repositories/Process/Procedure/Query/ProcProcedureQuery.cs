@@ -8,7 +8,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 工序编码
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
+
+        /// <summary>
+        /// 工序名称
+        /// </summary>
+        public string? Name { get; set; }
 
         /// <summary>
         /// 所属站点id

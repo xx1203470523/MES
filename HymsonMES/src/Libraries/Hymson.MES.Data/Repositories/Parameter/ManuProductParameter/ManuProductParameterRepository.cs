@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         public async Task<int> InsertRangeAsync(IEnumerable<ManuProductParameterEntity> list, string tableName)
         {
             string insertSql = $"INSERT INTO {tableName}(`Id`, `SiteId`, `SFC`, `ProcedureId`, `ParameterId`, `ParameterValue`, `CollectionTime`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`) VALUES (@Id, @SiteId, @SFC,@ProcedureId, @ParameterId,@ParameterValue,@CollectionTime,@CreatedBy,@CreatedOn, @UpdatedBy, @UpdatedOn,@IsDeleted)";
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             return await conn.ExecuteAsync(insertSql, list);
         }
 
@@ -62,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 dic[tableNameByProcedureId].Add(entity);
             }
 
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             List<Task<int>> tasks = new();
             foreach (var dicItem in dic)
             {
@@ -83,7 +83,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         public async Task<IEnumerable<ManuProductParameterEntity>> GetProductParameterEntitiesAsync(ManuProductParameterBySfcQuery param, string tableName)
         {
             string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {tableName}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             return await conn.QueryAsync<ManuProductParameterEntity>(getBySFCSql, param);
         }
 
@@ -108,7 +108,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
             }
 
             List<Task<IEnumerable<ManuProductParameterEntity>>> tasks = new();
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             foreach (var dicItem in dic)
             {
                 string getBySFCSql = $"SELECT Id, SiteId, SFC, ProcedureId, ParameterId, ParameterValue, CollectionTime, CreatedBy, CreatedOn, UpdatedBy, UpdatedOn, IsDeleted  FROM {dicItem.Key}  WHERE SFC IN @SFCs  AND SiteId =@SiteId AND IsDeleted=0";
@@ -140,7 +140,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
             {
                 sqlBuilder.Where("SFC = @SFCs");
             }
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             return await conn.QueryAsync<ManuProductParameterEntity>(templateData.RawSql, param);
         }
 
@@ -153,7 +153,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
         public async Task<int> UpdateRangeAsync(IEnumerable<ManuProductParameterUpdateCommand> list, string tableName)
         {
             string updateSql = $"UPDATE {tableName} SET   ParameterValue = @ParameterValue, UpdatedBy = @UserId, UpdatedOn = @UpdatedOn WHERE Id = @Id AND IsDeleted=0";
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             return await conn.ExecuteAsync(updateSql, list);
         }
 
@@ -184,7 +184,7 @@ namespace Hymson.MES.Data.Repositories.Parameter
                 dic[tableNameByProcedureId].Add(command);
             }
 
-            using var conn = GetMESDbConnection();
+            using var conn = GetMESParamterDbConnection();
             List<Task<int>> tasks = new();
             foreach (var dicItem in dic)
             {

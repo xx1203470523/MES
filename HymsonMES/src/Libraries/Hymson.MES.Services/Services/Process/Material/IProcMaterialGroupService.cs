@@ -1,17 +1,5 @@
-/*
- *creator: Karl
- *
- *describe: 物料组维护表    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-02-10 03:54:07
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Process;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -30,9 +18,9 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 获取分页自定义List
         /// </summary>
-        /// <param name="customProcMaterialGroupPagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto);
+        Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto pagedQueryDto);
 
         /// <summary>
         /// 新增

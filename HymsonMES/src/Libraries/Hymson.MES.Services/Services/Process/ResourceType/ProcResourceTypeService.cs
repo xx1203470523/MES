@@ -11,7 +11,6 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Resource;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Services.Dtos.Process;
-using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -87,22 +86,26 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         /// <summary>
         /// 查询资源类型维护表列表(关联资源：一个类型被多个资源关联就展示多条)
         /// </summary>
-        /// <param name="procResourceTypePagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeViewDto>> GetPageListAsync(ProcResourceTypePagedQueryDto procResourceTypePagedQueryDto)
+        public async Task<PagedInfo<ProcResourceTypeViewDto>> GetPageListAsync(ProcResourceTypePagedQueryDto pagedQueryDto)
         {
-            var procResourceTypePagedQuery = procResourceTypePagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
-            procResourceTypePagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _resourceTypeRepository.GetPageListAsync(procResourceTypePagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _resourceTypeRepository.GetPageListNewAsync(pagedQuery);
 
-            //实体到DTO转换 装载数据
-            var procResourceTypeDtos = new List<ProcResourceTypeViewDto>();
+            // 实体到DTO转换 装载数据
+            var dtos = new List<ProcResourceTypeViewDto>();
             foreach (var entity in pagedInfo.Data)
             {
-                var resourceTypeViewDto = entity.ToModel<ProcResourceTypeViewDto>();
-                procResourceTypeDtos.Add(resourceTypeViewDto);
+                var dto = entity.ToModel<ProcResourceTypeViewDto>();
+
+                dto.ResourceTypeId = dto.Id;
+                dto.Id = IdGenProvider.Instance.CreateId();
+
+                dtos.Add(dto);
             }
-            return new PagedInfo<ProcResourceTypeViewDto>(procResourceTypeDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            return new PagedInfo<ProcResourceTypeViewDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
         /// <summary>
@@ -139,7 +142,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
             }
             param.ResType = param.ResType.ToTrimSpace().ToUpperInvariant();
             param.ResTypeName = param.ResTypeName.Trim();
-            param.Remark = param.Remark??"".Trim();
+            param.Remark = param.Remark ?? "".Trim();
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 

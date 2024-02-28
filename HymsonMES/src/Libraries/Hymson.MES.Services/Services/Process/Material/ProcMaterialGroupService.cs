@@ -1,4 +1,3 @@
-using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Infrastructure;
@@ -245,15 +244,15 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 获取分页自定义List
         /// </summary>
-        /// <param name="customProcMaterialGroupPagedQueryDto"></param>
+        /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto customProcMaterialGroupPagedQueryDto)
+        public async Task<PagedInfo<CustomProcMaterialGroupViewDto>> GetPageCustomListAsync(CustomProcMaterialGroupPagedQueryDto pagedQueryDto)
         {
-            var procMaterialGroupCustomPagedQuery = customProcMaterialGroupPagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
-            procMaterialGroupCustomPagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(procMaterialGroupCustomPagedQuery);
+            var pagedQuery = pagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
+            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            var pagedInfo = await _procMaterialGroupRepository.GetPageListNewAsync(pagedQuery);
 
-            //实体到DTO转换 装载数据
+            // 实体到DTO转换 装载数据
             List<CustomProcMaterialGroupViewDto> procMaterialGroupDtos = PrepareCustomProcMaterialGroupDtos(pagedInfo);
             return new PagedInfo<CustomProcMaterialGroupViewDto>(procMaterialGroupDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
@@ -265,14 +264,18 @@ namespace Hymson.MES.Services.Services.Process
         /// <returns></returns>
         private static List<CustomProcMaterialGroupViewDto> PrepareCustomProcMaterialGroupDtos(PagedInfo<CustomProcMaterialGroupView> pagedInfo)
         {
-            var customProcMaterialGroupViewDtos = new List<CustomProcMaterialGroupViewDto>();
+            var dtos = new List<CustomProcMaterialGroupViewDto>();
             foreach (var customProcMaterialGroupView in pagedInfo.Data)
             {
-                var customProcMaterialGroupViewDto = customProcMaterialGroupView.ToModel<CustomProcMaterialGroupViewDto>();
-                customProcMaterialGroupViewDtos.Add(customProcMaterialGroupViewDto);
+                var dto = customProcMaterialGroupView.ToModel<CustomProcMaterialGroupViewDto>();
+
+                dto.GroupId = dto.Id;
+                dto.Id = IdGenProvider.Instance.CreateId();
+
+                dtos.Add(dto);
             }
 
-            return customProcMaterialGroupViewDtos;
+            return dtos;
         }
 
         /// <summary>
