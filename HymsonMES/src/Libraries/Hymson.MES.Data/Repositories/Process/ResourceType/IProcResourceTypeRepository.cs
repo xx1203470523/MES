@@ -31,7 +31,7 @@ namespace Hymson.MES.Data.Repositories.Process.ResourceType
         /// </summary>
         /// <param name="procResourceTypePagedQuery"></param>
         /// <returns></returns>
-        Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery);
+        Task<PagedInfo<ProcResourceTypeView>> GetPageListNewAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery);
 
         /// <summary>
         /// 获取资源类型分页列表

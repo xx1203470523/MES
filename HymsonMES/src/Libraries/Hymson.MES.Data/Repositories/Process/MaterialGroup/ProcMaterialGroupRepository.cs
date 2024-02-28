@@ -121,7 +121,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPagedCustomInfoAsync(ProcMaterialGroupCustomPagedQuery pagedQuery)
+        public async Task<PagedInfo<CustomProcMaterialGroupView>> GetPageListNewAsync(ProcMaterialGroupCustomPagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedCustomInfoDataSqlTemplate);

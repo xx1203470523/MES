@@ -52,7 +52,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery pagedQuery)
+        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListNewAsync(ProcResourceTypePagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);

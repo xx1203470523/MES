@@ -250,7 +250,7 @@ namespace Hymson.MES.Services.Services.Process
         {
             var pagedQuery = pagedQueryDto.ToQuery<ProcMaterialGroupCustomPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _procMaterialGroupRepository.GetPagedCustomInfoAsync(pagedQuery);
+            var pagedInfo = await _procMaterialGroupRepository.GetPageListNewAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             List<CustomProcMaterialGroupViewDto> procMaterialGroupDtos = PrepareCustomProcMaterialGroupDtos(pagedInfo);

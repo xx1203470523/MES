@@ -92,7 +92,7 @@ namespace Hymson.MES.Services.Services.Process.ResourceType
         {
             var pagedQuery = pagedQueryDto.ToQuery<ProcResourceTypePagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _resourceTypeRepository.GetPageListAsync(pagedQuery);
+            var pagedInfo = await _resourceTypeRepository.GetPageListNewAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = new List<ProcResourceTypeViewDto>();
