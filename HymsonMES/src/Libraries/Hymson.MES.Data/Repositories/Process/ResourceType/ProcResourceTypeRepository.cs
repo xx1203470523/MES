@@ -50,56 +50,51 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         ///  查询资源类型维护表列表(关联资源：一个类型被多个资源关联就展示多条)
         /// </summary>
-        /// <param name="procResourceTypePagedQuery"></param>
+        /// <param name="pagedQuery"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery procResourceTypePagedQuery)
+        public async Task<PagedInfo<ProcResourceTypeView>> GetPageListAsync(ProcResourceTypePagedQuery pagedQuery)
         {
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("a.IsDeleted=0");
-            if (string.IsNullOrEmpty(procResourceTypePagedQuery.Sorting))
-            {
-                sqlBuilder.OrderBy("a.CreatedOn DESC");
-            }
-            else
-            {
-                sqlBuilder.OrderBy(procResourceTypePagedQuery.Sorting);
-            }
-
+            sqlBuilder.Select("a.*,b.ResCode,b.ResName");
+            sqlBuilder.LeftJoin("proc_resource b ON a.Id = b.ResTypeId AND b.IsDeleted = 0");
+            sqlBuilder.Where("a.IsDeleted = 0");
             sqlBuilder.Where("a.SiteId = @SiteId");
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResType))
+            sqlBuilder.OrderBy("a.UpdatedOn DESC");
+
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ResType))
             {
-                procResourceTypePagedQuery.ResType = $"%{procResourceTypePagedQuery.ResType}%";
-                sqlBuilder.Where("ResType like @ResType");
+                pagedQuery.ResType = $"%{pagedQuery.ResType}%";
+                sqlBuilder.Where("ResType LIKE @ResType");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResTypeName))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ResTypeName))
             {
-                procResourceTypePagedQuery.ResTypeName = $"%{procResourceTypePagedQuery.ResTypeName}%";
-                sqlBuilder.Where("ResTypeName like @ResTypeName");
+                pagedQuery.ResTypeName = $"%{pagedQuery.ResTypeName}%";
+                sqlBuilder.Where("ResTypeName LIKE @ResTypeName");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResCode))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ResCode))
             {
-                procResourceTypePagedQuery.ResCode = $"%{procResourceTypePagedQuery.ResCode}%";
-                sqlBuilder.Where("ResCode like @ResCode");
+                pagedQuery.ResCode = $"%{pagedQuery.ResCode}%";
+                sqlBuilder.Where("ResCode LIKE @ResCode");
             }
-            if (!string.IsNullOrWhiteSpace(procResourceTypePagedQuery.ResName))
+            if (!string.IsNullOrWhiteSpace(pagedQuery.ResName))
             {
-                procResourceTypePagedQuery.ResName = $"%{procResourceTypePagedQuery.ResName}%";
-                sqlBuilder.Where("ResName like @ResName");
+                pagedQuery.ResName = $"%{pagedQuery.ResName}%";
+                sqlBuilder.Where("ResName LIKE @ResName");
             }
 
-            var offSet = (procResourceTypePagedQuery.PageIndex - 1) * procResourceTypePagedQuery.PageSize;
+            var offSet = (pagedQuery.PageIndex - 1) * pagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
-            sqlBuilder.AddParameters(new { Rows = procResourceTypePagedQuery.PageSize });
-            sqlBuilder.AddParameters(procResourceTypePagedQuery);
+            sqlBuilder.AddParameters(new { Rows = pagedQuery.PageSize });
+            sqlBuilder.AddParameters(pagedQuery);
 
             using var conn = GetMESDbConnection();
             var procResourceTypeEntitiesTask = conn.QueryAsync<ProcResourceTypeView>(templateData.RawSql, templateData.Parameters);
             var totalCountTask = conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
             var procResourceTypeEntities = await procResourceTypeEntitiesTask;
             var totalCount = await totalCountTask;
-            return new PagedInfo<ProcResourceTypeView>(procResourceTypeEntities, procResourceTypePagedQuery.PageIndex, procResourceTypePagedQuery.PageSize, totalCount);
+            return new PagedInfo<ProcResourceTypeView>(procResourceTypeEntities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
 
         /// <summary>
@@ -174,13 +169,16 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcResourceTypeRepository
     {
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
-        const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType =@ResType and IsDeleted =0 ";
+        const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType = @ResType and IsDeleted =0 ";
 
-        const string GetPagedInfoDataSqlTemplate = "SELECT a.*,b.ResCode,b.ResName  FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId and b.IsDeleted=0 /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
-        const string GetPagedInfoCountSqlTemplate = "SELECT count(*) FROM proc_resource_type a left join proc_resource b on a.Id =b.ResTypeId  /**where**/ ";
+        const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM proc_resource_type a /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset, @Rows";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type a /**innerjoin**/ /**leftjoin**/ /**where**/ ";
 
         const string GetPagedListSqlTemplate = "SELECT /**select**/ FROM proc_resource_type /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedListCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type /**where**/";

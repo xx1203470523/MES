@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
 using Hymson.Excel.Abstractions;
@@ -7,11 +8,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Enums;
-using FluentValidation.Results;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
@@ -21,10 +21,6 @@ using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
 using System.Transactions;
-using Minio.DataModel;
-using Hymson.MES.Data.Repositories.Integrated;
-using Hymson.MES.Services.Dtos.Integrated;
-using Hymson.MES.Data.Repositories.Plan;
 
 namespace Hymson.MES.Services.Services.Process
 {
@@ -84,22 +80,22 @@ namespace Hymson.MES.Services.Services.Process
             IExcelService excelService,
             IMinioService minioService,
         IProcBomDetailReplaceMaterialRepository procBomDetailReplaceMaterialRepository
-            ,ILocalizationService localizationService,
+            , ILocalizationService localizationService,
         IPlanWorkOrderActivationRepository planWorkOrderActivationRepository)
         {
             _currentSite = currentSite;
             _currentUser = currentUser;
             _procBomRepository = procBomRepository;
             _validationCreateRules = validationCreateRules;
-            _validationImportRules= validationImportRules;
+            _validationImportRules = validationImportRules;
             _validationModifyRules = validationModifyRules;
             _procBomDetailRepository = procBomDetailRepository;
             _procBomDetailReplaceMaterialRepository = procBomDetailReplaceMaterialRepository;
             _localizationService = localizationService;
-            _excelService= excelService;
-            _minioService= minioService;
+            _excelService = excelService;
+            _minioService = minioService;
 
-            _planWorkOrderActivationRepository= planWorkOrderActivationRepository;
+            _planWorkOrderActivationRepository = planWorkOrderActivationRepository;
         }
 
         /// <summary>
@@ -487,14 +483,14 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 当BOM被工单引用并激活时 
             //需要做一些判断：不允许增删BOM的行项目数，顺序，不允许修改行项目中的物料编码和工序编码; (替代物料不做顺序考虑)
-            if (await JudgeBomIsReferencedByActivatedWorkOrder(procBomEntity.Id)) 
+            if (await JudgeBomIsReferencedByActivatedWorkOrder(procBomEntity.Id))
             {
                 //获取到所有的旧bom的物料清单
                 var oldMainBomDetails = await _procBomDetailRepository.GetListMainAsync(procBomEntity.Id);
                 var oldReplaceBomDetails = await _procBomDetailRepository.GetListReplaceAsync(procBomEntity.Id);
 
                 //比对总行数
-                if (oldMainBomDetails.Count() != bomDetails.Count()|| oldReplaceBomDetails.Count()!= bomReplaceDetails.Count()) 
+                if (oldMainBomDetails.Count() != bomDetails.Count() || oldReplaceBomDetails.Count() != bomReplaceDetails.Count())
                 {
                     throw new CustomerValidationException(ErrorCode.MES10621);
                 }
@@ -503,12 +499,12 @@ namespace Hymson.MES.Services.Services.Process
                 foreach (var item in oldMainBomDetails)
                 {
                     //找到新的物料里对应的 物料+工序
-                    var newBomDetail= bomDetails.Where(x => x.MaterialId.ToString() == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
-                    if (newBomDetail == null) 
+                    var newBomDetail = bomDetails.Where(x => x.MaterialId.ToString() == item.MaterialId && x.ProcedureId == item.ProcedureId).FirstOrDefault();
+                    if (newBomDetail == null)
                     {
                         throw new CustomerValidationException(ErrorCode.MES10622);
                     }
-                    if (newBomDetail.Seq != item.Seq) 
+                    if (newBomDetail.Seq != item.Seq)
                     {
                         throw new CustomerValidationException(ErrorCode.MES10623);
                     }
@@ -519,7 +515,7 @@ namespace Hymson.MES.Services.Services.Process
                     //当前新主物料下的新替代物料
                     var newReplaceBomDetailsByMain = bomReplaceDetails.Where(x => x.BomDetailId == newBomDetail.Id);
 
-                    if (oldReplaceBomDetailsByMain.Count() != newReplaceBomDetailsByMain.Count()) 
+                    if (oldReplaceBomDetailsByMain.Count() != newReplaceBomDetailsByMain.Count())
                     {
                         throw new CustomerValidationException(ErrorCode.MES10621);
                     }
@@ -527,7 +523,7 @@ namespace Hymson.MES.Services.Services.Process
                     foreach (var replaceItem in oldReplaceBomDetailsByMain)
                     {
                         //找到新的替代物料里对应的 物料
-                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId.ToString() == replaceItem.ReplaceMaterialId ).FirstOrDefault();
+                        var newBomDetailReplace = newReplaceBomDetailsByMain.Where(x => x.ReplaceMaterialId.ToString() == replaceItem.ReplaceMaterialId).FirstOrDefault();
                         if (newBomDetailReplace == null)
                         {
                             throw new CustomerValidationException(ErrorCode.MES10622);
@@ -701,9 +697,13 @@ namespace Hymson.MES.Services.Services.Process
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             var excelImportDtos = _excelService.Import<ImportBomDto>(memoryStream);
+
+            /*
             //备份用户上传的文件，可选
             var stream = formFile.OpenReadStream();
             var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            */
+
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
                 throw new CustomerValidationException("导入数据为空");
@@ -733,7 +733,7 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 检测导入Bon编码是否重复
             var repeats = new List<string>();
-            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.BomCode,x.Version});
+            var hasDuplicates = excelImportDtos.GroupBy(x => new { x.BomCode, x.Version });
             foreach (var item in hasDuplicates)
             {
                 if (item.Count() > 1)
@@ -751,19 +751,19 @@ namespace Hymson.MES.Services.Services.Process
 
             #region  验证数据库中是否存在数据，且组装数据
 
-            var currentRow=0;
-            foreach(var item in excelImportDtos)
+            var currentRow = 0;
+            foreach (var item in excelImportDtos)
             {
                 currentRow++;
-                 var Boms= await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery
-                 {
-                     SiteId = _currentSite.SiteId ?? 0,
-                     BomCode=item.BomCode,
-                     Version =item.Version
-                 });
+                var Boms = await _procBomRepository.GetProcBomEntitiesAsync(new ProcBomQuery
+                {
+                    SiteId = _currentSite.SiteId ?? 0,
+                    BomCode = item.BomCode,
+                    Version = item.Version
+                });
                 if (Boms.Any())
                 {
-                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10601), item.BomCode, currentRow, "bomCode","version"));
+                    validationFailures.Add(GetValidationFailure(nameof(ErrorCode.MES10601), item.BomCode, currentRow, "bomCode", "version"));
                 }
 
                 if (!Boms.Any())
@@ -773,7 +773,7 @@ namespace Hymson.MES.Services.Services.Process
                         BomCode = item.BomCode,
                         BomName = item.BomName,
                         Version = item.Version,
-                        IsCurrentVersion = item.IsCurrentVersion== YesOrNoEnum.Yes,
+                        IsCurrentVersion = item.IsCurrentVersion == YesOrNoEnum.Yes,
                         Remark = item.Remark,
                         Status = SysDataStatusEnum.Build,
 
@@ -815,7 +815,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="keys"></param>
         /// 
         /// <returns></returns>
-        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code",string keys="codes")
+        private ValidationFailure GetValidationFailure(string errorCode, string codeFormattedMessage, int cuurrentRow = 1, string key = "code", string keys = "codes")
         {
             var validationFailure = new ValidationFailure
             {
@@ -876,7 +876,7 @@ namespace Hymson.MES.Services.Services.Process
                     BomName = item.BomName ?? "",
                     Version = item.Version ?? "",
                     Status = item.Status.GetDescription()
-                }) ;
+                });
             }
 
             var filePath = await _excelService.ExportAsync(listDto, _localizationService.GetResource("BomInfo"), _localizationService.GetResource("BomInfo"));
@@ -896,15 +896,15 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="bomId"></param>
         /// <returns></returns>
-        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long bomId) 
+        public async Task<bool> JudgeBomIsReferencedByActivatedWorkOrder(long bomId)
         {
-            
-             var planWorkOrderActivations= await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId??0, BomId = bomId });
+
+            var planWorkOrderActivations = await _planWorkOrderActivationRepository.GetPlanWorkOrderActivationEntitiesByBomIdAsync(new PlanWorkOrderActivationByBomIdQuery { SiteId = _currentSite.SiteId ?? 0, BomId = bomId });
             if (planWorkOrderActivations.Any())
             {
                 return true;
             }
-            else 
+            else
             {
                 return false;
             }
