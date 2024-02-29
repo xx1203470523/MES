@@ -336,6 +336,16 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             return await GetSfcAboutInfoBySfcAsync(sfc);
         }
+
+        /// <summary>
+        /// 获取条码数据(Marking拦截)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        public async Task<ManuSfcAboutInfoViewDto?> GetSfcAboutInfoByMarkingSfcAsync(string sfc)
+        {
+            return await GetSfcAboutInfoBySfcAsync(sfc);
+        }
         #endregion
 
         /// <summary>

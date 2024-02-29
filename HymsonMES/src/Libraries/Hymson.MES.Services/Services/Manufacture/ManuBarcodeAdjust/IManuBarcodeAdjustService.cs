@@ -46,6 +46,13 @@ namespace Hymson.MES.Services.Services.Manufacture
         Task<ManuSfcAboutInfoViewDto?> GetSfcAboutInfoBySfcInQtyAsync(string sfc);
 
         /// <summary>
+        /// 获取条码数据(Marking拦截)
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        Task<ManuSfcAboutInfoViewDto?> GetSfcAboutInfoByMarkingSfcAsync(string sfc);
+
+        /// <summary>
         /// 合并条码
         /// </summary>
         /// <param name="adjustDto"></param>

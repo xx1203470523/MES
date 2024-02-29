@@ -82,6 +82,16 @@ namespace Hymson.MES.Api.Controllers.Manufacture
             return await _manuBarcodeAdjustService.GetSfcAboutInfoBySfcInQtyAsync(sfc);
         }
 
+        /// <summary>
+        /// Marking获取条码
+        /// </summary>
+        /// <param name="sfc"></param>
+        /// <returns></returns>
+        [HttpGet("getSfcAboutInfoBySfcInMarking/{sfc}")]
+        public async Task<ManuSfcAboutInfoViewDto?> GetSfcAboutInfoBySfcInMarkingAsync(string sfc)
+        {
+            return await _manuBarcodeAdjustService.GetSfcAboutInfoByMarkingSfcAsync(sfc);
+        }
 
         /// <summary>
         /// 条码数量调整
