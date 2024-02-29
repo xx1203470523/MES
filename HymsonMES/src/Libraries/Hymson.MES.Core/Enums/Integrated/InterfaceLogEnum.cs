@@ -22,7 +22,7 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("失败")]
         Failure = -1,
- 
+
     }
 
     /// <summary>
@@ -45,7 +45,10 @@ namespace Hymson.MES.Core.Enums.Integrated
         /// </summary>
         [Description("用户操作")]
         SystemLog = 2,
-        
+
+        [Description("错误日志")]
+        ErrorCodeLog = 3,
+
 
     }
 }
