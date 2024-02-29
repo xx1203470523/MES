@@ -1,4 +1,5 @@
 
+using Elastic.Clients.Elasticsearch;
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -6,10 +7,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Utils.Tools;
+using System.Linq;
 
 namespace Hymson.MES.Services.Plan;
 
@@ -137,7 +140,7 @@ public class PlanCalendarService : IPlanCalendarService
         if (planCalendarEntity == null)
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-        }    
+        }
 
         var result = planCalendarEntity.ToModel<PlanCalendarOutputDto>();
         if (result == null)
@@ -189,7 +192,7 @@ public class PlanCalendarService : IPlanCalendarService
         command.SiteId = _currentSite.SiteId;
 
         var detailCreateCommands = Enumerable.Empty<PlanCalendarDetailCreateCommand>();
-        if(createDto.Details != null && createDto.Details.Any())
+        if (createDto.Details != null && createDto.Details.Any())
         {
             detailCreateCommands = createDto.Details.Where(m => m.Day.HasValue && m.ShiftId.HasValue).Select(m =>
             {
@@ -211,12 +214,12 @@ public class PlanCalendarService : IPlanCalendarService
         using var scope = TransactionHelper.GetTransactionScope();
 
         var count = await _planCalendarRepository.InsertIgnoreAsync(command);
-        if(count == 0)
+        if (count == 0)
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES19801));
         }
 
-        if(detailCreateCommands.Any())
+        if (detailCreateCommands.Any())
         {
             await _planCalendarDetailRepository.InsertAsync(detailCreateCommands);
         }
@@ -234,7 +237,7 @@ public class PlanCalendarService : IPlanCalendarService
         await _validationUpdateRules.ValidateAndThrowAsync(updateDto);
 
         var command = updateDto.ToCommand<PlanCalendarUpdateCommand>();
-        command.Init();        
+        command.Init();
         command.SiteId = _currentSite.SiteId;
         command.UpdatedBy = _currentUser.UserName;
 
@@ -266,7 +269,7 @@ public class PlanCalendarService : IPlanCalendarService
         if (count > 0 && detailCreateCommands.Any())
         {
             await _planCalendarDetailRepository.InsertAsync(detailCreateCommands);
-        }        
+        }
 
         scope.Complete();
     }
@@ -279,7 +282,14 @@ public class PlanCalendarService : IPlanCalendarService
     public async Task DeleteAsync(PlanCalendarDeleteDto deleteDto)
     {
         await _validationDeleteRules.ValidateAndThrowAsync(deleteDto);
-
+        var calendarQuery = new PlanCalendarQuery();
+        calendarQuery.Ids = deleteDto.Ids;
+        calendarQuery.Status = YesOrNoEnum.Yes;
+        var list = await _planCalendarRepository.GetListAsync(calendarQuery);
+        if (list != null && list.Any())
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES19804)).WithData("Dates",String.Join(";",list.Select(x => x.Year + "-" + x.Month+1))  );
+        }
         var command = new DeleteCommand { Ids = deleteDto.Ids };
 
         await _planCalendarRepository.DeleteMoreAsync(command);

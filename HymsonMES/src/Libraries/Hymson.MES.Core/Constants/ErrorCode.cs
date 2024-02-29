@@ -1733,6 +1733,8 @@
         public const string MES19506 = "班次类型不允许重复";
         public const string MES19507 = "未跨天班次的结束时间必须大于开始时间！";
         public const string MES19508 = "没有添加任何班次数据";
+        public const string MES19509 = "班制类型为空";
+        public const string MES19510 = "{type}开始时间与结束时间不能相同";
         #endregion
 
         #region Marking标识 19700
@@ -1756,7 +1758,7 @@
         public const string MES19801 = "生产日历新增失败，可能存在相同年月的生产日历！";
         public const string MES19802 = "必须填写年份！";
         public const string MES19803 = "必须填写月份！";
-
+        public const string MES19804 = "日历{Dates}已启用无法被删除！";
         #endregion
 
         #region IQC检验项目

@@ -1,5 +1,6 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Equipment;
+using Hymson.MES.Services.Dtos.Plan;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Services.Equipment;
 using Microsoft.AspNetCore.Authorization;
@@ -107,6 +108,5 @@ namespace Hymson.MES.Api.Controllers.Equipment
         {
             return await _equSparePartsGroupService.GetPagedListAsync(pagedQueryDto);
         }
-
     }
 }
