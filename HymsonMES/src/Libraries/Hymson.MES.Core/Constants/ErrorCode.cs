@@ -254,7 +254,8 @@
         public const string MES10533 = "条码[{sfc}]不在当前工序活动";
         public const string MES10534 = "有条码不是同一个产品";
         public const string MES10535 = "载具没有绑定条码";
-
+        public const string MES10536 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】已存在，请重新输入！";
+        public const string MES10537 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】启用状态的已存在，请重新输入！";
         #endregion
 
         #region Bom 10600
