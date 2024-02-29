@@ -98,6 +98,20 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<int> DeleteRangAsync(DeleteCommand param);
 
         /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteWorkCenterRelationByParentIdsAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteResourceRelationByParentIdsAsync(DeleteCommand command);
+
+        /// <summary>
         /// 批量新增
         /// </summary>
         /// <param name="param"></param>

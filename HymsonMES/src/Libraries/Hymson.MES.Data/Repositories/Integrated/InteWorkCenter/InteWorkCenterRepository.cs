@@ -235,6 +235,28 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             return await conn.ExecuteAsync(DeleteRangSql, param);
         }
 
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteWorkCenterRelationByParentIdsAsync(DeleteCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteWorkCenterRelationByParentIdSql, command);
+        }
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteResourceRelationByParentIdsAsync(DeleteCommand command)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeleteResourceRelationByParentIdSql, command);
+        }
+
         #region 关联工作中心
         /// <summary>
         /// 批量新增
@@ -378,6 +400,10 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
                                                                 WHERE IWCR.IsDeleted=0 AND IWCR.WorkCenterId= @Id";
         const string InteWorkCenterResourceRelationRangSql = "INSERT INTO  `inte_work_center_resource_relation` (  Id,WorkCenterId,ResourceId,Remark,CreatedBy,CreatedOn,UpdatedBy,UpdatedOn,IsDeleted,SiteId) VALUES ( @Id,@WorkCenterId,@ResourceId,@Remark,@CreatedBy,@CreatedOn,@UpdatedBy,@UpdatedOn,@IsDeleted,@SiteId) ";
         const string RealDelteInteWorkCenterResourceRelationSql = "DELETE  FROM `inte_work_center_resource_relation` WHERE  WorkCenterId = @Id AND IsDeleted=0";
+
+        const string DeleteWorkCenterRelationByParentIdSql = "DELETE  FROM inte_work_center_relation WHERE WorkCenterId IN @Ids";
+        const string DeleteResourceRelationByParentIdSql = "DELETE  FROM inte_work_center_resource_relation WHERE WorkCenterId IN @Ids";
+
         const string GetInteWorkCenterResourceRelatioSqlTemplate = @"SELECT  IWRR.Id, IWRR.WorkCenterId, IWRR.ResourceId, IWRR.Remark, IWRR.CreatedBy, IWRR.CreatedOn, IWRR.UpdatedBy, IWRR.UpdatedOn, IWRR.IsDeleted, IWRR.SiteId ,PR.`ResCode` as ResourceCode,PR.`ResName` as ResourceName
                                                                     FROM  inte_work_center_resource_relation IWRR 
                                                                      LEFT JOIN proc_resource PR ON IWRR.ResourceId=PR.Id AND PR.IsDeleted=0 
