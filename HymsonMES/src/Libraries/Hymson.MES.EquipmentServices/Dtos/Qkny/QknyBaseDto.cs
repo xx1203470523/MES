@@ -24,6 +24,27 @@ namespace Hymson.MES.EquipmentServices
     }
 
     /// <summary>
+    /// 顷刻能源设备对接参数基础类
+    /// </summary>
+    public record QknyParamBaseDto
+    {
+        /// <summary>
+        /// 参数编码
+        /// </summary>
+        public string ParamCode { get; set; } = "";
+
+        /// <summary>
+        /// 参数值
+        /// </summary>
+        public string ParamValue { get; set; } = "";
+
+        /// <summary>
+        /// 参数采集时间
+        /// </summary>
+        public DateTime CollectionTime { get; set; }
+    }
+
+    /// <summary>
     /// 顷刻能源设备对接返回结果基础类
     /// </summary>
     public record QknyReturnBaseDto
