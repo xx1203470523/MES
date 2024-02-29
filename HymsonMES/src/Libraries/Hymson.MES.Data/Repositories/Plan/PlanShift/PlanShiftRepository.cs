@@ -114,6 +114,17 @@ namespace Hymson.MES.Data.Repositories.Plan
         }
 
         /// <summary>
+        /// 硬删除
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public async Task<int> DeletesByIdAsync(long[] ids)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(DeletesByIdSql, new { Ids = ids });
+        }        
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
@@ -280,6 +291,8 @@ namespace Hymson.MES.Data.Repositories.Plan
         const string GetByMainIdSql = @"SELECT * FROM plan_shift_detail WHERE ShfitId = @Id ";
 
         const string DeletesDetailByIdSql = @"DELETE FROM plan_shift_detail WHERE ShfitId IN @Ids ";
+
+        const string DeletesByIdSql = @"DELETE FROM plan_shift WHERE Id IN @Ids ";
 
         const string UpdateStatusSql = "UPDATE `plan_shift` SET Status= @Status, UpdatedBy=@UpdatedBy, UpdatedOn=@UpdatedOn  WHERE Id = @Id ";
 

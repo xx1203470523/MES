@@ -149,6 +149,8 @@
         public const string MES10376 = "没有获取对应打印任务的打印模板信息";
         public const string MES10377 = "打印任务的模板名称无法转为ID";
 
+        public const string MES10378 = "IP设定不符合规范!";
+
 
         #endregion
 

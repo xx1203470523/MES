@@ -12,6 +12,7 @@ using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Services.Process.PrintConfig
 {
@@ -135,7 +136,12 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
             // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(param);
 
-            var userName = _currentUser.UserName;
+            if (!IsValidIP(param.PrintIp))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10378));
+            }
+
+                var userName = _currentUser.UserName;
             var entity = new ProcPrinterEntity
             {
                 Id = IdGenProvider.Instance.CreateId(),
@@ -218,6 +224,18 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
                 Ids = idsAr
             };
             return await _printConfigRepository.DeletesAsync(command);
+        }
+
+        private bool IsValidIP(string ipstr)
+        {
+            // IP 地址的正则表达式
+            string pattern = @"^([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])\.([01]?\d\d?|2[0-4]\d|25[0-5])$";
+
+            // 创建 Regex 对象
+            Regex regex = new Regex(pattern);
+
+            // 使用正则表达式测试输入的字符串
+            return regex.IsMatch(ipstr);
         }
 
     }

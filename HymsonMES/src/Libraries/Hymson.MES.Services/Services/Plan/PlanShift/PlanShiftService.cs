@@ -143,11 +143,13 @@ namespace Hymson.MES.Services.Services.Plan
                 {
                     //验证数据
                     await _validationDetailRules.ValidateAndThrowAsync(item);
-                    int startd = CountDown(item.StartTime);
-                    int endd = CountDown(item.EndTime);
-                    if (startd == endd) { throw new CustomerValidationException(nameof(ErrorCode.MES19510)).WithData("type", item.ShiftType.GetDescription()); }
+
                     if (!item.IsDaySpan)
                     {
+                        int startd = CountDown(item.StartTime);
+                        int endd = CountDown(item.EndTime);
+                        if (startd == endd) { throw new CustomerValidationException(nameof(ErrorCode.MES19510)).WithData("type", item.ShiftType.GetDescription()); }
+
                         if (startd > endd)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES19507));
@@ -221,19 +223,20 @@ namespace Hymson.MES.Services.Services.Plan
         public async Task<int> DeletesAsync(long[] ids)
         {
             var planShiftEntity = await _planShiftRepository.GetByIdsAsync(ids);
-            if (planShiftEntity.Any(x => x.Status == SysDataStatusEnum.Enable))
+            if (planShiftEntity.Any(x => x.Status != SysDataStatusEnum.Build))
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
             //先删除
             await _planShiftRepository.DeletesDetailByIdAsync(ids);
-            return await _planShiftRepository.DeletesAsync(new DeleteCommand
-            {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+            return await _planShiftRepository.DeletesByIdAsync(ids);
+            //return await _planShiftRepository.DeletesAsync(new DeleteCommand
+            //{
+            //    Ids = ids,
+            //    DeleteOn = HymsonClock.Now(),
+            //    UserId = _currentUser.UserName
+            //});
         }
 
         /// <summary>
