@@ -358,8 +358,7 @@ namespace Hymson.MES.CoreServices.Services.Common
             // 查询资源
             var resourceEntity = await _masterDataService.GetResourceEntityByCodeAsync(new EntityByCodeQuery
             {
-                //Site = 123456,
-                //Site = requestBo.SiteId,
+                Site = requestBo.SiteId,
                 Code = requestBo.ResourceCode
             }) ?? throw new CustomerValidationException(nameof(ErrorCode.MES19919)).WithData("ResCode", requestBo.ResourceCode);
 
