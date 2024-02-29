@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.Process.MaskCode;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.WMS.Data.Repositories.Process;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process

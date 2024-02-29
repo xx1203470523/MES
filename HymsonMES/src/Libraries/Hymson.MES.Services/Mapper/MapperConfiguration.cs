@@ -51,6 +51,7 @@ using Hymson.MES.Services.Dtos.QualificationRateReport;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
+using Hymson.WMS.Data.Repositories.Process;
 
 namespace Hymson.MES.Services.Mapper
 {

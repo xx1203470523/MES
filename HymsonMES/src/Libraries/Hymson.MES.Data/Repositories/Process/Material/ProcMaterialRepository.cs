@@ -73,38 +73,6 @@ public partial class ProcMaterialRepository : BaseRepository, IProcMaterialRepos
         return await conn.QueryAsync<ProcMaterialEntity>(templateData.RawSql, templateData.Parameters);
     }
 
-    /// <summary>
-    /// 分页查询
-    /// </summary>
-    /// <param name="query"></param>
-    /// <returns></returns>
-    public async Task<PagedInfo<ProcMaterialEntity>> GetPagedInfoAsync(ProcMaterialPagedQuery query)
-    {
-        var sqlBuilder = new SqlBuilder();
-
-        var templateData = sqlBuilder.AddTemplate(GetPagedSqlTemplate);
-        var templateCount = sqlBuilder.AddTemplate(GetCountSqlTemplate);
-
-        WhereFill(sqlBuilder, query);
-
-        if (!string.IsNullOrWhiteSpace(query.Sorting))
-        {
-            sqlBuilder.OrderBy(query.Sorting);
-        }
-
-        var offSet = (query.PageIndex - 1) * query.PageSize;
-        sqlBuilder.AddParameters(new { OffSet = offSet });
-        sqlBuilder.AddParameters(new { Rows = query.PageSize });
-        sqlBuilder.AddParameters(query);
-
-        using var conn = GetMESDbConnection();
-
-        var procMaterialEntities = await conn.QueryAsync<ProcMaterialEntity>(templateData.RawSql, templateData.Parameters);
-        var totalCount = await conn.ExecuteScalarAsync<int>(templateCount.RawSql, templateCount.Parameters);
-
-        return new PagedInfo<ProcMaterialEntity>(procMaterialEntities, query.PageIndex, query.PageSize, totalCount);
-    }
-
     #endregion
 
     /// <summary>
@@ -433,6 +401,19 @@ public partial class ProcMaterialRepository : BaseRepository, IProcMaterialRepos
 
 public partial class ProcMaterialRepository
 {
+    #region 查询
+
+    const string GetOneSqlTemplate = "SELECT * FROM `proc_material` /**where**/ LIMIT 1;";
+
+    const string GetListSqlTemplate = "SELECT * FROM `proc_material` /**where**/;";
+
+    const string GetPagedSqlTemplate = "SELECT * FROM `proc_material` /**where**/ /**orderby**/ LIMIT @Offset,@Rows;";
+
+    const string GetCountSqlTemplate = "SELECT COUNT(*) FROM `proc_material` /**where**/;";
+
+    #endregion
+
+
     const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_material` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
     const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_material` /**where**/ ";
     const string GetProcMaterialEntitiesSqlTemplate = @"SELECT 

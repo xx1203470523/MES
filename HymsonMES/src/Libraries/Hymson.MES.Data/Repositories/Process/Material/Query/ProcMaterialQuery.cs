@@ -288,7 +288,7 @@ public class ProcMaterialPagedQuery : PagerInfo
     /// <summary>
     /// 所属站点代码
     /// </summary>
-    public long SiteId { get; set; }
+    public long? SiteId { get; set; }
 
     /// <summary>
     /// 物料组ID

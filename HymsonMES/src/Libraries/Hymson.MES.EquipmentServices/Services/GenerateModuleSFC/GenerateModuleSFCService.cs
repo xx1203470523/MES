@@ -8,6 +8,7 @@ using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.GenerateModuleSFC;
 using Hymson.Web.Framework.WorkContext;
+using Hymson.WMS.Data.Repositories.Process;
 
 namespace Hymson.MES.EquipmentServices.Services.GenerateModuleSFC
 {
