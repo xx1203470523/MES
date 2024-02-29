@@ -25,7 +25,55 @@ public partial class ManuSfcStepNgRepository :BaseRepository, IManuSfcStepNgRepo
     {
     }
 
+
     #region 方法
+
+
+    #region 查询
+
+    /// <summary>
+    /// 单条数据查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<ManuSfcStepNgEntity> GetOneAsync(ManuSfcStepNgQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+
+        var templateData = sqlBuilder.AddTemplate(GetOneSqlTemplate);
+
+        WhereFill(sqlBuilder, query);
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = GetMESDbConnection();
+
+        return await conn.QueryFirstOrDefaultAsync<ManuSfcStepNgEntity>(templateData.RawSql, templateData.Parameters);
+    }
+
+    /// <summary>
+    /// 数据集查询
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<ManuSfcStepNgEntity>> GetListAsync(ManuSfcStepNgQuery query)
+    {
+        var sqlBuilder = new SqlBuilder();
+
+        var templateData = sqlBuilder.AddTemplate(GetListSqlTemplate);
+
+        WhereFill(sqlBuilder, query);
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = GetMESDbConnection();
+
+        return await conn.QueryAsync<ManuSfcStepNgEntity>(templateData.RawSql, templateData.Parameters);
+    }
+
+    #endregion
+
+
     /// <summary>
     /// 删除（软删除）
     /// </summary>
@@ -174,6 +222,19 @@ public partial class ManuSfcStepNgRepository :BaseRepository, IManuSfcStepNgRepo
 
 public partial class ManuSfcStepNgRepository
 {
+    #region 查询
+
+    const string GetOneSqlTemplate = "SELECT * FROM `manu_sfc_step_ng` /**where**/ LIMIT 1;";
+
+    const string GetListSqlTemplate = "SELECT * FROM `manu_sfc_step_ng` /**where**/;";
+
+    const string GetPagedSqlTemplate = "SELECT * FROM `manu_sfc_step_ng` /**where**/ /**orderby**/ LIMIT @Offset,@Rows;";
+
+    const string GetCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_step_ng` /**where**/;";
+
+    #endregion
+
+
     #region 
     const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `manu_sfc_step_ng` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
     const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `manu_sfc_step_ng` /**where**/ ";
@@ -201,5 +262,251 @@ public partial class ManuSfcStepNgRepository
                                           `Id`, `BarCodeStepId`, `UnqualifiedCode`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`
                             FROM `manu_sfc_step_ng`  WHERE BarCodeStepId IN @BarCodeStepIds AND SiteId = @SiteId";
     #endregion
+
+}
+
+
+
+/// <summary>
+/// <para>@层级：仓储层</para>
+/// <para>@作用：通用操作</para>
+/// <para>@描述：条码步骤ng信息记录表;</para>
+/// <para>@作者：Jim</para>
+/// <para>@创建时间：2024-2-29</para>
+/// </summary>
+public partial class ManuSfcStepNgRepository
+{
+
+    /// <summary>
+    /// 根据查询对象填充Where条件
+    /// </summary>
+    /// <param name="query">查询对象</param>
+    /// <returns></returns>
+    private static SqlBuilder WhereFill(SqlBuilder sqlBuilder, ManuSfcStepNgPagedQuery query)
+    {
+
+        if (query.Id.HasValue)
+        {
+            sqlBuilder.Where("Id = @Id");
+        }
+
+        if (query.Ids != null && query.Ids.Any())
+        {
+            sqlBuilder.Where("Id IN @Ids");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.BarCodeStepId))
+        {
+            sqlBuilder.Where("BarCodeStepId = @BarCodeStepId");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.BarCodeStepIdLike))
+        {
+            query.BarCodeStepIdLike = $"{query.BarCodeStepIdLike}%";
+            sqlBuilder.Where("BarCodeStepId Like @BarCodeStepIdLike");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.UnqualifiedCode))
+        {
+            sqlBuilder.Where("UnqualifiedCode = @UnqualifiedCode");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UnqualifiedCodeLike))
+        {
+            query.UnqualifiedCodeLike = $"{query.UnqualifiedCodeLike}%";
+            sqlBuilder.Where("UnqualifiedCode Like @UnqualifiedCodeLike");
+        }
+
+
+        if (query.IsReplenish.HasValue)
+        {
+            sqlBuilder.Where("IsReplenish = @IsReplenish");
+        }
+
+        if (query.IsReplenishs != null && query.IsReplenishs.Any())
+        {
+            sqlBuilder.Where("IsReplenish IN @IsReplenishs");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedBy))
+        {
+            sqlBuilder.Where("CreatedBy = @CreatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedByLike))
+        {
+            query.CreatedByLike = $"{query.CreatedByLike}%";
+            sqlBuilder.Where("CreatedBy Like @CreatedByLike");
+        }
+
+
+        if (query.CreatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn >= @CreatedOnStart");
+        }
+
+        if (query.CreatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn <= @CreatedOnEnd");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedBy))
+        {
+            sqlBuilder.Where("UpdatedBy = @UpdatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedByLike))
+        {
+            query.UpdatedByLike = $"{query.UpdatedByLike}%";
+            sqlBuilder.Where("UpdatedBy Like @UpdatedByLike");
+        }
+
+
+        if (query.UpdatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn >= @UpdatedOnStart");
+        }
+
+        if (query.UpdatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn <= @UpdatedOnEnd");
+        }
+
+
+        if (query.SiteId.HasValue)
+        {
+            sqlBuilder.Where("SiteId = @SiteId");
+        }
+
+        if (query.SiteIds != null && query.SiteIds.Any())
+        {
+            sqlBuilder.Where("SiteId IN @SiteIds");
+        }
+
+
+        sqlBuilder.Where("IsDeleted = 0");
+
+        return sqlBuilder;
+    }
+
+    /// <summary>
+    /// 根据查询对象填充Where条件
+    /// </summary>
+    /// <param name="query">查询对象</param>
+    /// <returns></returns>
+    private static SqlBuilder WhereFill(SqlBuilder sqlBuilder, ManuSfcStepNgQuery query)
+    {
+
+        if (query.Id.HasValue)
+        {
+            sqlBuilder.Where("Id = @Id");
+        }
+
+        if (query.Ids != null && query.Ids.Any())
+        {
+            sqlBuilder.Where("Id IN @Ids");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.BarCodeStepId))
+        {
+            sqlBuilder.Where("BarCodeStepId = @BarCodeStepId");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.BarCodeStepIdLike))
+        {
+            query.BarCodeStepIdLike = $"{query.BarCodeStepIdLike}%";
+            sqlBuilder.Where("BarCodeStepId Like @BarCodeStepIdLike");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.UnqualifiedCode))
+        {
+            sqlBuilder.Where("UnqualifiedCode = @UnqualifiedCode");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UnqualifiedCodeLike))
+        {
+            query.UnqualifiedCodeLike = $"{query.UnqualifiedCodeLike}%";
+            sqlBuilder.Where("UnqualifiedCode Like @UnqualifiedCodeLike");
+        }
+
+
+        if (query.IsReplenish.HasValue)
+        {
+            sqlBuilder.Where("IsReplenish = @IsReplenish");
+        }
+
+        if (query.IsReplenishs != null && query.IsReplenishs.Any())
+        {
+            sqlBuilder.Where("IsReplenish IN @IsReplenishs");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedBy))
+        {
+            sqlBuilder.Where("CreatedBy = @CreatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.CreatedByLike))
+        {
+            query.CreatedByLike = $"{query.CreatedByLike}%";
+            sqlBuilder.Where("CreatedBy Like @CreatedByLike");
+        }
+
+
+        if (query.CreatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn >= @CreatedOnStart");
+        }
+
+        if (query.CreatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("CreatedOn <= @CreatedOnEnd");
+        }
+
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedBy))
+        {
+            sqlBuilder.Where("UpdatedBy = @UpdatedBy");
+        }
+
+        if (!string.IsNullOrWhiteSpace(query.UpdatedByLike))
+        {
+            query.UpdatedByLike = $"{query.UpdatedByLike}%";
+            sqlBuilder.Where("UpdatedBy Like @UpdatedByLike");
+        }
+
+
+        if (query.UpdatedOnStart.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn >= @UpdatedOnStart");
+        }
+
+        if (query.UpdatedOnEnd.HasValue)
+        {
+            sqlBuilder.Where("UpdatedOn <= @UpdatedOnEnd");
+        }
+
+
+        if (query.SiteId.HasValue)
+        {
+            sqlBuilder.Where("SiteId = @SiteId");
+        }
+
+        if (query.SiteIds != null && query.SiteIds.Any())
+        {
+            sqlBuilder.Where("SiteId IN @SiteIds");
+        }
+
+
+        sqlBuilder.Where("IsDeleted = 0");
+
+        return sqlBuilder;
+    }
 
 }

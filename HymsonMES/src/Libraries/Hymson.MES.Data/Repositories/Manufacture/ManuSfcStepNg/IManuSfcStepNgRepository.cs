@@ -7,7 +7,9 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.WMS.Data.Repositories.Process;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -16,6 +18,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public interface IManuSfcStepNgRepository
     {
+        #region 查询
+
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuSfcStepNgEntity> GetOneAsync(ManuSfcStepNgQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcStepNgEntity>> GetListAsync(ManuSfcStepNgQuery query);
+
+        #endregion
+
         #region 方法
         /// <summary>
         /// 新增
@@ -28,7 +48,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 批量新增
         /// </summary>
         /// <param name="manuSfcStepNgEntitys"></param>
-        /// <returns></returns>
+        /// <returns></returns>1
         Task<int> InsertsAsync(List<ManuSfcStepNgEntity> manuSfcStepNgEntitys);
 
         /// <summary>
@@ -94,6 +114,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <param name="manuSfcStepNgPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<ManuSfcStepNgEntity>> GetPagedInfoAsync(ManuSfcStepNgPagedQuery manuSfcStepNgPagedQuery);
+
         #endregion
     }
 }

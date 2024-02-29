@@ -18,6 +18,24 @@ namespace Hymson.MES.Data.Repositories.Quality.IQualityRepository
     /// </summary>
     public interface IQualUnqualifiedCodeRepository
     {
+        #region 查询
+
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<QualUnqualifiedCodeEntity> GetOneAsync(QualUnqualifiedCodeQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<QualUnqualifiedCodeEntity>> GetListAsync(QualUnqualifiedCodeQuery query);
+
+        #endregion
+
         /// <summary>
         /// 分页查询
         /// </summary>

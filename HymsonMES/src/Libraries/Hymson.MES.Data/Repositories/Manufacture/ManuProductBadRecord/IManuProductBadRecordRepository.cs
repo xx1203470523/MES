@@ -18,6 +18,24 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// </summary>
     public interface IManuProductBadRecordRepository
     {
+        #region 查询
+
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ManuProductBadRecordEntity> GetOneAsync(ManuProductBadRecordQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuProductBadRecordEntity>> GetListAsync(ManuProductBadRecordQuery query);
+
+        #endregion
+
         /// <summary>
         /// 根据ID获取数据
         /// </summary>

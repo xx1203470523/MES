@@ -1,12 +1,16 @@
 ﻿using Hymson.Authentication;
+using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
+using Hymson.MES.Core.Enums.Report;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Process;
+using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
 using Hymson.MES.Services.Dtos.SystemApi;
 using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.Utils;
@@ -37,6 +41,11 @@ public class SystemApiService : ISystemApiService
     private readonly IEquEquipmentTheoryRepository _equEquipmentTheoryRepository;
     private readonly IEquAlarmReportService _equAlarmReportService;
 
+    //不良相关
+    private readonly IManuSfcStepNgRepository _manuSfcStepNgRepository;
+    private readonly IManuProductBadRecordRepository _manuProductBadRecordRepository;
+    private readonly IQualUnqualifiedCodeRepository _qualUnqualifiedCodeRepository;
+
 
     public SystemApiService(ICurrentUser currentUser,
         IProcProcedureRepository procProcedureRepository,
@@ -50,7 +59,10 @@ public class SystemApiService : ISystemApiService
         IEquEquipmentRepository equEquipmentRepository,
         IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
         IEquEquipmentTheoryRepository equEquipmentTheoryRepository,
-        IEquAlarmReportService equAlarmReportService
+        IEquAlarmReportService equAlarmReportService,
+        IManuSfcStepNgRepository manuSfcStepNgRepository,
+        IManuProductBadRecordRepository manuProductBadRecordRepository,
+        IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository
         )
     {
         _currentUser = currentUser;
@@ -66,6 +78,9 @@ public class SystemApiService : ISystemApiService
         _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         _equEquipmentTheoryRepository = equEquipmentTheoryRepository;
         _equAlarmReportService = equAlarmReportService;
+        _manuSfcStepNgRepository = manuSfcStepNgRepository;
+        _manuProductBadRecordRepository = manuProductBadRecordRepository;
+        _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
     }
 
 
@@ -165,6 +180,8 @@ public class SystemApiService : ISystemApiService
                         _ => ""
                     }
                 };
+
+                result.Add(newitem);
             }
 
             startDate = startDate.AddHours(2);
@@ -242,6 +259,262 @@ public class SystemApiService : ISystemApiService
         result.PlanAchievementRate = Math.Round(result.Qty.GetValueOrDefault() / planWorkOrderEntity.Qty, 0);
         result.CellQty = cellManuSfcSummaryView.OutputQty.GetValueOrDefault();
 
+        return result;
+    }
+
+    /// <summary>
+    /// 今日一次合格率（风冷/液冷）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<OneQualifiedViewDto> GetOneQualifiedRateAsync(OneQualifiedQueryDto queryDto)
+    {
+        OneQualifiedViewDto result = new();
+        var productEntity = await _materialRepository.GetListAsync(new()
+        {
+            MaterialNameLike = queryDto.ProductName
+        });
+
+        //根据选择产品过滤工单
+        var productIds = productEntity.Select(a => a.Id).ToList();
+
+        var planWorkOrderEntities = await _planWorkOrderRepository.GetListAsync(new()
+        {
+            ProductIds = productIds
+        });
+        var planWorkOrderIds = planWorkOrderEntities.Select(a => a.Id);
+        ;
+        //获取每个段对应的设备 OP20，OP220，OP170，分别对应电芯，模组，Pack
+        //计算每个段的产出只统计尾工序
+        var procedureCodes = new string[] { "OP20", "OP220", "OP170" };
+        var ProcedureEntities = await _procProcedureRepository.GetByCodesAsync(procedureCodes, 123456);
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+        if (nowDate >= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00")))
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+            endDate = nowDate;
+        }
+        else
+        {
+            startDate = DateTime.Parse(nowDate.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
+            endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+        }
+
+        var procedureIds = ProcedureEntities.Select(a => a.Id).ToArray();
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
+        {
+            StartTime = startDate,
+            EndTime = endDate,
+            ProcedureIds = procedureIds,
+            ProductIds = productIds
+        });
+
+        //电芯段一次合格率
+        var cellProcedure = ProcedureEntities.FirstOrDefault(a => a.Code == "OP20");
+        var cellSummary = manuSfcSummaryEntities.Where(a => a.ProcedureId == cellProcedure?.Id);
+        var cellOneQualifiedQty = cellSummary.Sum(a => a.FirstQualityStatus);
+        var cellOutputQty = cellSummary.Sum(a => a.Qty);
+        result.CellOneQualifiedRate = cellOneQualifiedQty / cellOutputQty;
+
+        //电芯段一次合格率
+        var moduleProcedure = ProcedureEntities.FirstOrDefault(a => a.Code == "OP220");
+        var moduleSummary = manuSfcSummaryEntities.Where(a => a.ProcedureId == cellProcedure?.Id);
+        var moduleOneQualifiedQty = moduleSummary.Sum(a => a.FirstQualityStatus);
+        var moduleOutputQty = moduleSummary.Sum(a => a.Qty);
+        result.ModuleOneQualifiedRate = moduleOneQualifiedQty / moduleOutputQty;
+
+        //电芯段一次合格率
+        var packProcedure = ProcedureEntities.FirstOrDefault(a => a.Code == "OP170");
+        var packSummary = manuSfcSummaryEntities.Where(a => a.ProcedureId == cellProcedure?.Id);
+        var packOneQualifiedQty = packSummary.Sum(a => a.FirstQualityStatus);
+        var packOutputQty = packSummary.Sum(a => a.Qty);
+        result.PackOneQualifiedRate = packOneQualifiedQty / packOutputQty;
+
+        return result;
+    }
+
+    /// <summary>
+    /// 按月获取一次合格率（风冷/液冷）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<OneQualifiedMonthViewDto>> GetMonthOneQualifiedRateAsync(OneQualifiedMonthQueryDto queryDto)
+    {
+        List<OneQualifiedMonthViewDto> result = new();
+
+        var productEntities = await _materialRepository.GetListAsync(new()
+        {
+            MaterialNameLike = queryDto.ProdcutName
+        });
+
+        //根据选择产品过滤工单
+        var productIds = productEntities.Select(a => a.Id).ToList();
+        var planWorkOrderEntities = await _planWorkOrderRepository.GetListAsync(new()
+        {
+            ProductIds = productIds
+        });
+        var planWorkOrderIds = planWorkOrderEntities.Select(a => a.Id);
+        ;
+        //获取每个段对应的设备 OP20，OP220，OP170，分别对应电芯，模组，Pack
+        //计算每个段的产出只统计尾工序
+        var procedureCodes = new string[] { "OP20", "OP220", "OP170" };
+        var ProcedureEntities = await _procProcedureRepository.GetByCodesAsync(procedureCodes, 123456);
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+
+        startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00"));
+        endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+
+        var procedureIds = ProcedureEntities.Select(a => a.Id).ToArray();
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
+        {
+            StartTime = startDate,
+            EndTime = endDate,
+            ProcedureIds = procedureIds,
+            ProductIds = productIds
+        });
+
+
+        while (true)
+        {
+            foreach (var item in procedureCodes)
+            {
+                var procedure = ProcedureEntities.Where(a => a.Code == item).FirstOrDefault();
+                var summary = manuSfcSummaryEntities.Where(a => a.ProcedureId == procedure?.Id
+                && endDate >= startDate && endDate <= startDate.AddDays(1));
+
+                var outputQty = summary.Sum(a => a.Qty);
+                var oneQuanlifiedQty = summary.Sum(a => a.FirstQualityStatus);
+
+                OneQualifiedMonthViewDto newitem = new()
+                {
+                    DayTime = startDate.ToString("dd"),
+                    Type = item switch
+                    {
+                        "OP20" => "电芯段",
+                        "OP220" => "模组段",
+                        "OP170" => "Pack段",
+                        _ => ""
+                    },
+                    OneQualifiedRate = oneQuanlifiedQty / outputQty
+                };
+            }
+
+
+            startDate = startDate.AddDays(1);
+            if (startDate.AddHours(1) == endDate) break;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 电芯，模组，Pack获取不良分布（日/月，风冷/液冷）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<DefectDistributionViewDto>> GetDefectDistributionAsync(DefectDistributionQueryDto queryDto)
+    {
+        List<DefectDistributionViewDto> result = new();
+
+        var productEntities = await _materialRepository.GetListAsync(new()
+        {
+            MaterialNameLike = queryDto.ProdcutName
+        });
+
+        //根据选择产品过滤工单
+        var productIds = productEntities.Select(a => a.Id).ToList();
+
+        var planWorkOrderEntities = await _planWorkOrderRepository.GetListAsync(new()
+        {
+            ProductIds = productIds
+        });
+        var planWorkOrderIds = planWorkOrderEntities.Select(a => a.Id);
+
+        //获取每个段对应的设备 OP20，OP220，OP170，分别对应电芯，模组，Pack
+        //计算每个段的产出只统计尾工序
+        var procedureCodes = new string[] { "OP20", "OP220", "OP170" };
+        var ProcedureEntities = await _procProcedureRepository.GetByCodesAsync(procedureCodes, 123456);
+
+        var procedureEntity = ProcedureEntities.FirstOrDefault(a =>
+                a.Code == (queryDto.Type switch
+                {
+                    SFCTypeEnum.Cell => "OP20",
+                    SFCTypeEnum.Module => "OP220",
+                    SFCTypeEnum.Pack => "OP170",
+                    _ => ""
+                })
+            );
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+
+        if (queryDto.DateType == DateTypeEnum.Month)
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00"));
+            endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+        }
+        else if (queryDto.DateType == DateTypeEnum.Day)
+        {
+            if (nowDate >= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00")))
+            {
+                startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+                endDate = nowDate;
+            }
+            else
+            {
+                startDate = DateTime.Parse(nowDate.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
+                endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+            }
+        }
+
+        //设备上报不良记录
+        var manuSfcStepNgEntities = await _manuSfcStepNgRepository.GetListAsync(new()
+        {
+            CreatedOnStart = startDate,
+            CreatedOnEnd = endDate
+        });
+
+        var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetListAsync(new()
+        {
+            CreatedOnStart = startDate,
+            CreatedOnEnd = endDate
+        });
+
+        List<QualUnqualifiedCodeEntity> unQualifiedList = new();
+        var unQualifiedCodes = manuSfcStepNgEntities.Select(a => a.UnqualifiedCode);
+        var unQualifiedIds = manuProductBadRecordEntities.Select(a => a.UnqualifiedId);
+        var unQualifiedEntities = await _qualUnqualifiedCodeRepository.GetListAsync(new() { Ids = unQualifiedIds });
+        unQualifiedList.AddRange(unQualifiedEntities);
+        unQualifiedEntities = await _qualUnqualifiedCodeRepository.GetListAsync(new() { UnqualifiedCodes = unQualifiedCodes });
+        unQualifiedList.AddRange(unQualifiedEntities);
+
+        foreach (var item in manuSfcStepNgEntities)
+        {
+            var unQualifiedEntity = unQualifiedEntities.FirstOrDefault(a => a.UnqualifiedCode == item.UnqualifiedCode);
+
+            var unQualifiedItem = result.FirstOrDefault(a => a.UnQualifiedName == unQualifiedEntity?.UnqualifiedCodeName);
+
+            if (unQualifiedItem != null) unQualifiedItem.UnQualifiedQty += 1;
+            else result.Add(new() { UnQualifiedName = unQualifiedEntity?.UnqualifiedCodeName ?? "", UnQualifiedQty = 1 });
+        }
+
+        foreach (var item in manuProductBadRecordEntities)
+        {
+            var unQualifiedEntity = unQualifiedEntities.FirstOrDefault(a => a.Id == item.UnqualifiedId);
+
+            var unQualifiedItem = result.FirstOrDefault(a => a.UnQualifiedName == unQualifiedEntity?.UnqualifiedCodeName);
+
+            if (unQualifiedItem != null) unQualifiedItem.UnQualifiedQty += 1;
+            else result.Add(new() { UnQualifiedName = unQualifiedEntity?.UnqualifiedCodeName ?? "", UnQualifiedQty = 1 });
+        }
+        
         return result;
     }
 }
