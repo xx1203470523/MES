@@ -248,6 +248,14 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12119));
                     }
+
+                    //验证产线是否已经绑定过车间，一个产线只能绑定一个车间
+                    //根据产线获取信息
+                    var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery {SubWorkCenterIds= param.WorkCenterIds });
+                    if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any()) {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                    }
+
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
@@ -354,6 +362,15 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12119));
                     }
+
+                    //验证产线是否已经绑定过车间，一个产线只能绑定一个车间
+                    //根据产线获取信息
+                    var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery { SubWorkCenterIds = param.WorkCenterIds });
+                    if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                    }
+
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();

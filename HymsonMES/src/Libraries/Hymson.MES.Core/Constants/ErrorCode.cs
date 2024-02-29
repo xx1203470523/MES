@@ -466,6 +466,7 @@
         public const string MES12123 = "工作中心状态不合法，请检查.";
         public const string MES12124 = "工作中心类型不合法，请检查.";
         public const string MES12125 = "对应工作中心数据不存在.";
+        public const string MES12126 = "存在已被关联产线,不允许重复关联!";
         #endregion
 
         #region 编码规则 12400
@@ -1744,7 +1745,7 @@
         public const string MES19703 = "产品序列码不允许为空!";
         public const string MES19704 = "发现工序【{code}】不存在!";
         public const string MES19705 = "拦截工序【{code}】不存在!";
-        public const string MES19706 = "产品序列码【{code}】不存在!";
+        public const string MES19706 = "产品序列码【{code}】暂无数据!";
         public const string MES19707 = "产品序列码【{code}】状态为【{status}】!";
         public const string MES19708 = "不合格代码【{code}】不存在!";
         public const string MES19709 = "产品序列码【{code}】信息不存在!";
