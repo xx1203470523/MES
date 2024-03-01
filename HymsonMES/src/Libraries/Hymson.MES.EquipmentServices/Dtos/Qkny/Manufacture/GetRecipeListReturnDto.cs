@@ -19,7 +19,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 配方版本
         /// </summary>
-        public string Version { get; set; set; } = "";
+        public string Version { get; set; } = "";
 
         /// <summary>
         /// 产品型号

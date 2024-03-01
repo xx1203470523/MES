@@ -19,6 +19,6 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 电芯条码
         /// </summary>
-        public List<string> SfcList { get; set } = new List<string>();
+        public List<string> SfcList { get; set; } = new List<string>();
     }
 }

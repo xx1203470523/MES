@@ -291,7 +291,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("BindContainer")]
+        [Route("UnBindContainer")]
         [LogDescription("托盘电芯解绑(在制品容器)020", BusinessType.OTHER, "UnBindContainer020", ReceiverTypeEnum.MES)]
         public async Task UnBindContainerAsync(UnBindContainerDto dto)
         {
