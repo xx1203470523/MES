@@ -38,9 +38,9 @@ public class QualIqcInspectionItemEntity : BaseEntity
 
 
     /// <summary>
-    /// 状态 0、已禁用 2、启用
+    /// 状态 0、已禁用 1、已启用
     /// </summary>
-    public YesOrNoEnum? Status { get; set; }
+    public DisableOrEnableEnum? Status { get; set; }
 
 
     /// <summary>
