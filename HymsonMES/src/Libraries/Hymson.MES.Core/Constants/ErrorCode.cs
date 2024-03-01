@@ -889,6 +889,7 @@
         public const string MES15727 = "配方详细中选择的操作需要有参数ID";
 
         public const string MES15728 = "设置编码【{code}】在当前操作中不允许重复！";
+        public const string MES15729 = "配方操作不允许重复！";
         #endregion
 
         #region 工单 16000
