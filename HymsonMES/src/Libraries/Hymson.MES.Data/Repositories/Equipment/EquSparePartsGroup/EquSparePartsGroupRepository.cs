@@ -2,10 +2,12 @@ using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.Query;
+using Hymson.MES.Data.Repositories.Plan.Query;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Equipment

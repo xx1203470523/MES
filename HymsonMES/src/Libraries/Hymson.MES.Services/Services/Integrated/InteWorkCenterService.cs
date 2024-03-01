@@ -22,6 +22,7 @@ using Hymson.MES.Services.Services.Integrated.IIntegratedService;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.Services.Services.Integrated
 {
@@ -247,6 +248,14 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12119));
                     }
+
+                    //验证产线是否已经绑定过车间，一个产线只能绑定一个车间
+                    //根据产线获取信息
+                    var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery {SubWorkCenterIds= param.WorkCenterIds });
+                    if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any()) {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                    }
+
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
@@ -353,6 +362,15 @@ namespace Hymson.MES.Services.Services.Integrated
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12119));
                     }
+
+                    //验证产线是否已经绑定过车间，一个产线只能绑定一个车间
+                    //根据产线获取信息
+                    var inteWorkCenterByLineEntities = await _inteWorkCenterRepository.GetInteWorkCenterRelationEntityAsync(new InteWorkCenterRelationQuery { SubWorkCenterIds = param.WorkCenterIds });
+                    if (inteWorkCenterByLineEntities != null && inteWorkCenterByLineEntities.Any())
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12126));
+                    }
+
                     break;
                 case WorkCenterTypeEnum.Line:
                     param.ResourceIds ??= new List<long>();
@@ -433,14 +451,26 @@ namespace Hymson.MES.Services.Services.Integrated
                 throw new CustomerValidationException(nameof(ErrorCode.MES10106));
             }
 
+            // 禅道有坑货提出可以删除 4146
+            /*
             // 检查产线是否有下级资源
             var inteWorkCenterRelations = await _inteWorkCenterRepository.GetResourceIdsByWorkCenterIdAsync(ids);
             if (inteWorkCenterRelations != null && inteWorkCenterRelations.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES12114));
             }
+            */
 
-            return await _inteWorkCenterRepository.DeleteRangAsync(new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId });
+            var command = new DeleteCommand { Ids = ids, DeleteOn = HymsonClock.Now(), UserId = userId };
+
+            // 删除关联关系
+            var rows = 0;
+            using var ts = TransactionHelper.GetTransactionScope();
+            rows += await _inteWorkCenterRepository.DeleteWorkCenterRelationByParentIdsAsync(command);
+            rows += await _inteWorkCenterRepository.DeleteResourceRelationByParentIdsAsync(command);
+            rows += await _inteWorkCenterRepository.DeleteRangAsync(command);
+            ts.Complete();
+            return rows;
         }
 
         #region 状态变更

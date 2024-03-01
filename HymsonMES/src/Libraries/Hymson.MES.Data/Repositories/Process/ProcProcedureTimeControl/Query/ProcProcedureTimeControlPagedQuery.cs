@@ -41,12 +41,12 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <summary>
         /// 起始工序
         /// </summary>
-        public long? FromProcedureId { get; set; }
+        public IEnumerable<long>? FromProcedureIds { get; set; }
 
         /// <summary>
         /// 到达工序
         /// </summary>
-        public long? ToProcedureId { get; set; }
+        public IEnumerable<long>? ToProcedureIds { get; set; }
 
     }
 }

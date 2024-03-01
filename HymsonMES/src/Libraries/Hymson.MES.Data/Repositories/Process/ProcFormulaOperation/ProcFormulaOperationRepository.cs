@@ -91,7 +91,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -113,7 +113,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcFormulaOperationEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<ProcFormulaOperationEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<ProcFormulaOperationEntity>(GetByIdsSql, new { Ids = ids });
@@ -142,19 +142,20 @@ namespace Hymson.MES.Data.Repositories.Process
             var sqlBuilder = new SqlBuilder();
             var templateData = sqlBuilder.AddTemplate(GetPagedInfoDataSqlTemplate);
             var templateCount = sqlBuilder.AddTemplate(GetPagedInfoCountSqlTemplate);
-            sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
-            sqlBuilder.Where("SiteId=@SiteId");
+            sqlBuilder.OrderBy("UpdatedOn DESC");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
 
             if (!string.IsNullOrWhiteSpace(pagedQuery.Code))
             {
                 pagedQuery.Code = $"%{pagedQuery.Code}%";
-                sqlBuilder.Where("Code like @Code");
+                sqlBuilder.Where("Code LIKE @Code");
             }
             if (!string.IsNullOrWhiteSpace(pagedQuery.Name))
             {
                 pagedQuery.Name = $"%{pagedQuery.Name}%";
-                sqlBuilder.Where("Name like @Name");
+                sqlBuilder.Where("Name LIKE @Name");
             }
             if (pagedQuery.Status.HasValue)
             {
@@ -202,7 +203,7 @@ namespace Hymson.MES.Data.Repositories.Process
             sqlBuilder.Where("IsDeleted = 0");
             sqlBuilder.Select("*");
 
-            if (pagedQuery.Ids!=null && pagedQuery.Ids.Any())
+            if (pagedQuery.Ids != null && pagedQuery.Ids.Any())
             {
                 sqlBuilder.Where("Id In @Ids");
             }
@@ -227,11 +228,9 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public partial class ProcFormulaOperationRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_formula_operation` /**innerjoin**/ /**leftjoin**/ /**where**/ LIMIT @Offset,@Rows ";
+        const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM `proc_formula_operation` /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM `proc_formula_operation` /**where**/ ";
-        const string GetProcFormulaOperationEntitiesSqlTemplate = @"SELECT 
-                                            /**select**/
-                                           FROM `proc_formula_operation` /**where**/  ";
+        const string GetProcFormulaOperationEntitiesSqlTemplate = @"SELECT /**select**/ FROM `proc_formula_operation` /**where**/  ";
 
         const string InsertSql = "INSERT INTO `proc_formula_operation`(  `Id`, `Code`, `Name`, `Status`, `Version`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Version, @Type, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";
         const string InsertsSql = "INSERT INTO `proc_formula_operation`(  `Id`, `Code`, `Name`, `Status`, `Version`, `Type`, `CreatedBy`, `CreatedOn`, `UpdatedBy`, `UpdatedOn`, `IsDeleted`, `SiteId`) VALUES (   @Id, @Code, @Name, @Status, @Version, @Type, @CreatedBy, @CreatedOn, @UpdatedBy, @UpdatedOn, @IsDeleted, @SiteId )  ";

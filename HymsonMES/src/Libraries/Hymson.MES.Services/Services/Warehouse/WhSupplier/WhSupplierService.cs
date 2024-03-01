@@ -15,20 +15,16 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
-using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Data.Repositories.Warehouse;
-using Hymson.MES.Services.Dtos.Process;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.Minio;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
 using Microsoft.AspNetCore.Http;
-using MySqlX.XDevAPI.Common;
 using System.Text.RegularExpressions;
 using System.Transactions;
 
@@ -268,9 +264,13 @@ namespace Hymson.MES.Services.Services.Warehouse
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             var excelImportDtos = _excelService.Import<WhSupplierImportDto>(memoryStream);
-            //备份用户上传的文件，可选
+
+            /*
+            // 备份用户上传的文件，可选
             var stream = formFile.OpenReadStream();
             var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            */
+
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
                 throw new CustomerValidationException("导入的参数数据为空");

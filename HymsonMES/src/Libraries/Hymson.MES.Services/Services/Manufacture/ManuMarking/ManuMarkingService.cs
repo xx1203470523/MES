@@ -247,6 +247,34 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
         /// <returns></returns>
         public async Task<IEnumerable<MarkingCloseViewDto>> GetBarcodePagedListBySFCAsync(string sfc) 
         {
+            //校验产品序列码
+            if (string.IsNullOrWhiteSpace(sfc))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19703));
+            }
+            var sfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery { SFC = sfc, SiteId = _currentSite.SiteId ?? 0 });
+            if (sfcEntity == null)
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES19706)).WithData("code", sfc);
+            }
+            else
+            {
+                switch (sfcEntity.Status)
+                {
+                    case SfcStatusEnum.Scrapping:
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", sfc).WithData("status", SfcStatusEnum.Invalid.GetDescription());
+                    //break;
+                    case SfcStatusEnum.Delete:
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", sfc).WithData("status", SfcStatusEnum.Delete.GetDescription());
+                    //break;
+                    case SfcStatusEnum.Invalid:
+                        throw new CustomerValidationException(nameof(ErrorCode.MES19707)).WithData("code", sfc).WithData("status", SfcStatusEnum.Invalid.GetDescription());
+                    //break;
+                    default:
+                        break;
+                }
+            }
+
             var manuProductBadRecordEntities = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySfcQuery {SFC= sfc,SiteId=_currentSite.SiteId??0 });
 
             var result=new List<MarkingCloseViewDto>();

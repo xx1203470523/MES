@@ -146,7 +146,11 @@ namespace Hymson.MES.Services.Services.Plan
 
                     if (!item.IsDaySpan)
                     {
-                        if (CountDown(item.StartTime) > CountDown(item.EndTime))
+                        int startd = CountDown(item.StartTime);
+                        int endd = CountDown(item.EndTime);
+                        if (startd == endd) { throw new CustomerValidationException(nameof(ErrorCode.MES19510)).WithData("type", item.ShiftType.GetDescription()); }
+
+                        if (startd > endd)
                         {
                             throw new CustomerValidationException(nameof(ErrorCode.MES19507));
                         }
@@ -161,7 +165,7 @@ namespace Hymson.MES.Services.Services.Plan
                         EndTime = item.EndTime,
                         IsDaySpan = item.IsDaySpan,
                         IsOverTime = item.IsOverTime,
-                        Remark = item.Remark,
+                        Remark = item.Remark ?? string.Empty,
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = _currentUser.UserName,
                         UpdatedBy = _currentUser.UserName,
@@ -218,14 +222,21 @@ namespace Hymson.MES.Services.Services.Plan
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            var planShiftEntity = await _planShiftRepository.GetByIdsAsync(ids);
+            if (planShiftEntity.Any(x => x.Status != SysDataStatusEnum.Build))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10106));
+            }
+
             //先删除
             await _planShiftRepository.DeletesDetailByIdAsync(ids);
-            return await _planShiftRepository.DeletesAsync(new DeleteCommand
-            {
-                Ids = ids,
-                DeleteOn = HymsonClock.Now(),
-                UserId = _currentUser.UserName
-            });
+            return await _planShiftRepository.DeletesByIdAsync(ids);
+            //return await _planShiftRepository.DeletesAsync(new DeleteCommand
+            //{
+            //    Ids = ids,
+            //    DeleteOn = HymsonClock.Now(),
+            //    UserId = _currentUser.UserName
+            //});
         }
 
         /// <summary>
@@ -323,11 +334,11 @@ namespace Hymson.MES.Services.Services.Plan
                 throw new CustomerValidationException(nameof(ErrorCode.MES10705));
             }
 
-            if(entity.Status== param.Status)
+            if (entity.Status == param.Status)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10127)).WithData("status", _localizationService.GetResource($"{typeof(SysDataStatusEnum).FullName}.{Enum.GetName(typeof(SysDataStatusEnum), entity.Status)}"));
             }
- 
+
             #endregion
 
             #region 操作数据库

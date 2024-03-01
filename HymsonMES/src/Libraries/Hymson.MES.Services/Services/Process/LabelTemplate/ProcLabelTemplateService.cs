@@ -65,9 +65,9 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task CreateProcLabelTemplateAsync(ProcLabelTemplateCreateDto procLabelTemplateCreateDto)
         {
             procLabelTemplateCreateDto.Name = procLabelTemplateCreateDto.Name.ToTrimSpace();
-            procLabelTemplateCreateDto.Path = procLabelTemplateCreateDto.Path.ToTrimSpace();
-            procLabelTemplateCreateDto.Remark = procLabelTemplateCreateDto.Remark ?? "".Trim();
-            //验证DTO
+            procLabelTemplateCreateDto.Path = procLabelTemplateCreateDto.Path?.ToTrimSpace();
+            procLabelTemplateCreateDto.Remark = (procLabelTemplateCreateDto.Remark ?? "").Trim();
+            // 验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(procLabelTemplateCreateDto);
 
             if (procLabelTemplateCreateDto.ProcLabelTemplateRelationCreateDto == null || string.IsNullOrEmpty(procLabelTemplateCreateDto.ProcLabelTemplateRelationCreateDto.PrintConfig))
@@ -75,10 +75,10 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
                 throw new CustomerValidationException(nameof(ErrorCode.MES10372));
             }
 
-            //DTO转换实体
+            // DTO转换实体
             var procLabelTemplateEntity = procLabelTemplateCreateDto.ToEntity<ProcLabelTemplateEntity>();
 
-            //验证模板名称是否重复
+            // 验证模板名称是否重复
             var foo = await QueryProcLabelTemplateByNameAsync(procLabelTemplateEntity.Name);
             if (foo != null)
             {
@@ -205,9 +205,9 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         public async Task ModifyProcLabelTemplateAsync(ProcLabelTemplateModifyDto procLabelTemplateModifyDto)
         {
             procLabelTemplateModifyDto.Name = procLabelTemplateModifyDto.Name.ToTrimSpace();
-            procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path.ToTrimSpace();
-            procLabelTemplateModifyDto.Remark = procLabelTemplateModifyDto.Remark ?? "".Trim();
-            procLabelTemplateModifyDto.Content = procLabelTemplateModifyDto.Content ?? "".Trim();
+            procLabelTemplateModifyDto.Path = procLabelTemplateModifyDto.Path?.ToTrimSpace();
+            procLabelTemplateModifyDto.Remark = (procLabelTemplateModifyDto.Remark ?? "").Trim();
+            procLabelTemplateModifyDto.Content = (procLabelTemplateModifyDto.Content ?? "").Trim();
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(procLabelTemplateModifyDto);
 
@@ -277,7 +277,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// </summary>
         /// <param name="labelTemplateId"></param>
         /// <returns></returns>
-        public async Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long labelTemplateId) 
+        public async Task<ProcLabelTemplateRelationDto?> QueryProcLabelTemplateRelationByLabelTemplateIdAsync(long labelTemplateId)
         {
             var procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(labelTemplateId);
             if (procLabelTemplateRelationEntity != null)
@@ -292,15 +292,15 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// 获取打印类对应的选项
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<PrintClassOptionDto>> GetPrintClassListAsync() 
+        public async Task<IEnumerable<PrintClassOptionDto>> GetPrintClassListAsync()
         {
             var printClassList = new List<PrintClassOptionDto>();
 
-             IEnumerable<Type> printClasses= await Task.FromResult(
-                 Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsClass && !type.IsAbstract && typeof(BasePrintData).IsAssignableFrom(type))
-            );
+            IEnumerable<Type> printClasses = await Task.FromResult(
+                Assembly.GetExecutingAssembly().GetTypes().Where(type => type.IsClass && !type.IsAbstract && typeof(BasePrintData).IsAssignableFrom(type))
+           );
 
-             foreach (var item in printClasses)
+            foreach (var item in printClasses)
             {
                 //var s = item.Attributes.GetDescription();
                 //var ss = item.GetCustomAttributes(typeof(DescriptionAttribute), true)?.FirstOrDefault();
@@ -311,7 +311,8 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
                 {
                     classDesc = ((DescriptionAttribute)classDescriptionAttribute).Description;
                 }
-                else {
+                else
+                {
                     classDesc = item.Name;
                 }
 
@@ -345,13 +346,13 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
 
                 printClassList.Add(new PrintClassOptionDto
                 {
-                    Label= classDesc,
-                    Value=item.FullName ?? item.Name,
+                    Label = classDesc,
+                    Value = item.FullName ?? item.Name,
                     PrintClassPropertyOptions = printClassPropertyOptions
                 });
             }
 
-            return  printClassList;
+            return printClassList;
         }
 
         /// <summary>
@@ -360,9 +361,9 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
         /// <param name="id"></param>
         /// <returns></returns>
         /// <exception cref="CustomerValidationException"></exception>
-        public async Task<PrintDataResultDto> GetAboutPrintDataAsync(long id) 
+        public async Task<PrintDataResultDto> GetAboutPrintDataAsync(long id)
         {
-            if (id==0) 
+            if (id == 0)
             {
                 throw new CustomerValidationException(ErrorCode.MES10374);
             }
@@ -391,19 +392,20 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //});
 
 
-            var printExecuteTask= await _printExecuteTaskRepository.GetByIdAsync(id);
+            var printExecuteTask = await _printExecuteTaskRepository.GetByIdAsync(id);
             ProcLabelTemplateRelationEntity? procLabelTemplateRelationEntity = null;
-            if (printExecuteTask == null || printExecuteTask.Id==0) 
+            if (printExecuteTask == null || printExecuteTask.Id == 0)
             {
                 //则去获取打印模板
                 procLabelTemplateRelationEntity = await _procLabelTemplateRelationRepository.GetByLabelTemplateIdAsync(id);//15528011388198912
 
-                if(procLabelTemplateRelationEntity == null)
+                if (procLabelTemplateRelationEntity == null)
                 {
                     throw new CustomerValidationException(ErrorCode.MES10375);
                 }
 
-                return new PrintDataResultDto {
+                return new PrintDataResultDto
+                {
                     ProcLabelTemplateRelationDto = procLabelTemplateRelationEntity.ToModel<ProcLabelTemplateRelationDto>(),
                     PrintBodies = ""
                 };
@@ -412,7 +414,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //则去获取打印模板
             long labelTemplateId = 0;
             var tryResult = long.TryParse(printExecuteTask.TemplateName, out labelTemplateId);
-            if (!tryResult) 
+            if (!tryResult)
             {
                 throw new CustomerValidationException(ErrorCode.MES10377);
             }
@@ -425,7 +427,7 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
                 throw new CustomerValidationException(ErrorCode.MES10376);
             }
 
-            #if DEBUG
+#if DEBUG
             //printExecuteTask.PrintBodies = JsonConvert.SerializeObject(new ProcPrintTestPrintDto() {
             //                Id=123,
             //                ProcureCode="后台-1002",
@@ -434,9 +436,11 @@ namespace Hymson.MES.Services.Services.Process.LabelTemplate
             //                WorkOrderType= "后台-"+PlanWorkOrderTypeEnum.TrialProduction.GetDescription(),
             //                OutTime=DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             //            });
-            #endif
+#endif
 
-            return new PrintDataResultDto() { ProcLabelTemplateRelationDto= procLabelTemplateRelationEntity.ToModel<ProcLabelTemplateRelationDto>(),
+            return new PrintDataResultDto()
+            {
+                ProcLabelTemplateRelationDto = procLabelTemplateRelationEntity.ToModel<ProcLabelTemplateRelationDto>(),
                 PrintBodies = printExecuteTask.PrintBodies
             };
         }

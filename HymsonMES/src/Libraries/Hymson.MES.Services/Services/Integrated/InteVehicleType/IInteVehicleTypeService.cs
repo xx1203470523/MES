@@ -18,16 +18,16 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="inteVehicleTypeCreateDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto inteVehicleTypeCreateDto);
+        Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto dto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="inteVehicleTypeModifyDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        Task ModifyInteVehicleTypeAsync(InteVehicleTypeModifyDto inteVehicleTypeModifyDto);
+        Task ModifyInteVehicleTypeAsync(InteVehicleTypeModifyDto dto);
 
         /// <summary>
         /// 批量删除

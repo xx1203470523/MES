@@ -1,20 +1,10 @@
-/*
- *creator: Karl
- *
- *describe: 设备参数组 仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-08-02 01:48:35
- */
-
 using Dapper;
 using Hymson.Infrastructure;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Integrated;
+using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -49,6 +39,17 @@ namespace Hymson.MES.Data.Repositories.Process
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, param);
+        }
+
+        /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(EntityByCodeQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetByCodeSql, query);
         }
 
         /// <summary>
@@ -194,25 +195,14 @@ namespace Hymson.MES.Data.Repositories.Process
         #endregion
 
         /// <summary>
-        /// 根据Code获取数据
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public async Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(ProcEquipmentGroupParamCodeQuery query)
-        {
-            using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetByCodeSql, query);
-        }
-
-        /// <summary>
         /// 根据关联信息（产品，工序，工艺组）获取数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<ProcEquipmentGroupParamEntity> GetByRelatesInformationAsync(ProcEquipmentGroupParamRelatesInformationQuery query)
+        public async Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByRelatesInformationAsync(ProcEquipmentGroupParamRelatesInformationQuery query)
         {
             using var conn = GetMESDbConnection();
-            return await conn.QueryFirstOrDefaultAsync<ProcEquipmentGroupParamEntity>(GetByRelatesInformationSql, query);
+            return await conn.QueryAsync<ProcEquipmentGroupParamEntity>(GetByRelatesInformationSql, query);
         }
 
         /// <summary>
@@ -227,6 +217,9 @@ namespace Hymson.MES.Data.Repositories.Process
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class ProcEquipmentGroupParamRepository
     {
         #region 
@@ -264,8 +257,8 @@ namespace Hymson.MES.Data.Repositories.Process
                             FROM `proc_equipment_group_param`  WHERE Id IN @Ids ";
         #endregion
 
-        const string GetByCodeSql = @"SELECT * 
-                            FROM `proc_equipment_group_param`  WHERE Code = @Code AND IsDeleted=0 AND SiteId=@SiteId ";
+        const string GetByCodeSql = "SELECT * FROM proc_equipment_group_param WHERE IsDeleted = 0 AND SiteId = @Site AND Code = @Code AND Version = @Version LIMIT 1";
+
         const string GetByRelatesInformationSql = @"SELECT * 
                             FROM `proc_equipment_group_param`  
                             WHERE ProductId = @ProductId 

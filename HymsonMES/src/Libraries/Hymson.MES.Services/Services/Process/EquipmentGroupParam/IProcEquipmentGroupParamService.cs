@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 设备参数组    服务接口 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-08-02 01:48:35
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Common;
 using Hymson.MES.Services.Dtos.Process;
@@ -26,16 +19,16 @@ namespace Hymson.MES.Services.Services.Process
         /// <summary>
         /// 新增
         /// </summary>
-        /// <param name="procEquipmentGroupParamCreateDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task<long> CreateProcEquipmentGroupParamAsync(ProcEquipmentGroupParamCreateDto procEquipmentGroupParamCreateDto);
+        Task<long> CreateAsync(ProcEquipmentGroupParamCreateDto saveDto);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="procEquipmentGroupParamModifyDto"></param>
+        /// <param name="saveDto"></param>
         /// <returns></returns>
-        Task ModifyProcEquipmentGroupParamAsync(ProcEquipmentGroupParamModifyDto procEquipmentGroupParamModifyDto);
+        Task ModifyAsync(ProcEquipmentGroupParamModifyDto saveDto);
 
         /// <summary>
         /// 删除
@@ -49,7 +42,7 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<int> DeletesProcEquipmentGroupParamAsync(long[] ids);
+        Task<int> DeletesAsync(long[] ids);
 
         /// <summary>
         /// 根据ID查询

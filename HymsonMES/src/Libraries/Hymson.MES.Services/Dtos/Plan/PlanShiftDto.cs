@@ -185,12 +185,12 @@ namespace Hymson.MES.Services.Dtos.Plan
         /// <summary>
         /// 开始时间
         /// </summary>
-        public string StartTime { get; set; }
+        public string? StartTime { get; set; }
 
         /// <summary>
         /// 结束时间
         /// </summary>
-        public string EndTime { get; set; }
+        public string? EndTime { get; set; }
 
         /// <summary>
         /// 是否跨天;0、否  1、 是
