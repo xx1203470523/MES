@@ -156,6 +156,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ISysReleaseRecordService, SysReleaseRecordService>();
 
             services.AddSingleton<IInteIntefaceLogService, InteIntefaceLogService>();
+            services.AddSingleton<IImportBasicDataService, ImportBasicDataService>();
             #endregion
 
             #region Process

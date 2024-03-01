@@ -73,7 +73,7 @@ namespace Hymson.MES.Core.Domain.Equipment
         /// 描述 :设备描述 
         /// 空值 : true  
         /// </summary>
-        public string EquipmentDesc { get; set; }
+        public string EquipmentDesc { get; set; } = "";
 
         /// <summary>
         /// 描述 :工作中心工厂id 
