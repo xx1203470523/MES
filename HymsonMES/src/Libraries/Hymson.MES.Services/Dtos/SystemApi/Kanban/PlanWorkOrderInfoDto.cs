@@ -108,4 +108,9 @@ public class PlanWorkOrderInfoQueryDto : QueryDtoAbstraction
     /// 工单编号
     /// </summary>
     public string? OrderCode { get; set; }
+
+    /// <summary>
+    /// 产品名称
+    /// </summary>
+    public string? ProductName { get; set; }
 }

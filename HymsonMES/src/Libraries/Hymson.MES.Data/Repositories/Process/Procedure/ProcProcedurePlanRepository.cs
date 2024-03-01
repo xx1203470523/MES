@@ -1,6 +1,7 @@
 ﻿
 
 using Dapper;
+using Google.Protobuf.WellKnownTypes;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Proc;
 using Hymson.MES.Data.Options;
@@ -400,6 +401,11 @@ public partial class ProcProcedurePlanRepository
         if (query.ProcedureId.HasValue)
         {
             sqlBuilder.Where("ProcedureId = @ProcedureId");
+        }
+
+        if (query.ProcedureIds?.Any() == true)
+        {
+            sqlBuilder.Where("ProcedureId IN @ProcedureIds");
         }
 
         if (!string.IsNullOrWhiteSpace(query.ProcedureIdLike))

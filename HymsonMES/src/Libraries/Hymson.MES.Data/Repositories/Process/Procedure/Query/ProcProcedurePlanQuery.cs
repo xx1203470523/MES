@@ -41,6 +41,11 @@ public class ProcProcedurePlanQuery : QueryAbstraction
     public long? ProcedureId { get; set; }
 
     /// <summary>
+    /// 工序Id
+    /// </summary>
+    public IEnumerable<long>? ProcedureIds { get; set; }
+
+    /// <summary>
     /// 工序Id模糊条件
     /// </summary>
     public string? ProcedureIdLike { get; set; }

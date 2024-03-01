@@ -21,7 +21,7 @@ public class ProcProcedurePlanEntity : BaseEntity
     /// <summary>
     /// 工序Id
     /// </summary>
-    public string? ProcedureId { get; set; }
+    public long? ProcedureId { get; set; }
 
 
     /// <summary>

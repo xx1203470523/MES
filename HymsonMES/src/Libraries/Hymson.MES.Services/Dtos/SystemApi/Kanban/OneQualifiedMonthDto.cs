@@ -29,7 +29,7 @@ public class OneQualifiedMonthQueryDto
     /// <summary>
     /// 风冷/液冷
     /// </summary>
-    public string? ProdcutName{ get; set; }
+    public string? ProductName{ get; set; }
 
     /// <summary>
     /// 风冷/液冷（分别对应不同产品）

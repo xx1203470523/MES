@@ -9,8 +9,11 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Plan;
+using Hymson.MES.Data.Repositories.Proc;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
+using Hymson.MES.Services.Dtos.Common;
+using Hymson.MES.Services.Dtos.SystemAp;
 using Hymson.MES.Services.Dtos.SystemApi;
 using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.Utils;
@@ -27,7 +30,9 @@ public class SystemApiService : ISystemApiService
 {
     private readonly ICurrentUser _currentUser;
 
+    private readonly IEquStatusRepository _equStatusRepository;
     private readonly IProcProcedureRepository _procProcedureRepository;
+    private readonly IProcProcedurePlanRepository _procProcedurePlanRepository;
     private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
     private readonly IProcProcessRouteRepository _processRouteRepository;
     private readonly IProcProcessRouteDetailLinkRepository _processRouteDetailLinkRepository;
@@ -48,7 +53,9 @@ public class SystemApiService : ISystemApiService
 
 
     public SystemApiService(ICurrentUser currentUser,
+        IEquStatusRepository equipmentStatusRepository,
         IProcProcedureRepository procProcedureRepository,
+        IProcProcedurePlanRepository procProcedurePlanRepository,
         IPlanWorkOrderRepository planWorkOrderRepository,
         IProcProcessRouteRepository processRouteRepository,
         IProcProcessRouteDetailLinkRepository processRouteDetailLinkRepository,
@@ -66,7 +73,9 @@ public class SystemApiService : ISystemApiService
         )
     {
         _currentUser = currentUser;
+        _equStatusRepository = equipmentStatusRepository;
         _procProcedureRepository = procProcedureRepository;
+        _procProcedurePlanRepository = procProcedurePlanRepository;
         _planWorkOrderRepository = planWorkOrderRepository;
         _processRouteRepository = processRouteRepository;
         _processRouteDetailLinkRepository = processRouteDetailLinkRepository;
@@ -83,6 +92,10 @@ public class SystemApiService : ISystemApiService
         _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
     }
 
+    #region 看板
+
+
+    #region 首页
 
     /// <summary>
     /// 首页——OEE趋势图
@@ -201,11 +214,20 @@ public class SystemApiService : ISystemApiService
     {
         PlanWorkOrderInfoViewDto result = new();
 
+        var productEntity = await _materialRepository.GetListAsync(new()
+        {
+            MaterialNameLike = queryDto.ProductName
+        });
+
+        //根据选择产品过滤工单
+        var productIds = productEntity.Select(a => a.Id).ToList();
+
         //获取工单信息
         var planWorkOrderEntity = await _planWorkOrderRepository.GetOneAsync(new()
         {
             OrderCode = queryDto.OrderCode,
-            StatusList = new() { PlanWorkOrderStatusEnum.InProduction }
+            StatusList = new() { PlanWorkOrderStatusEnum.InProduction },
+            ProductIds = productIds
         });
         if (planWorkOrderEntity == null) return result;
 
@@ -261,6 +283,10 @@ public class SystemApiService : ISystemApiService
 
         return result;
     }
+
+    #endregion
+
+    #region 质量模块
 
     /// <summary>
     /// 今日一次合格率（风冷/液冷）
@@ -347,7 +373,7 @@ public class SystemApiService : ISystemApiService
 
         var productEntities = await _materialRepository.GetListAsync(new()
         {
-            MaterialNameLike = queryDto.ProdcutName
+            MaterialNameLike = queryDto.ProductName
         });
 
         //根据选择产品过滤工单
@@ -357,7 +383,7 @@ public class SystemApiService : ISystemApiService
             ProductIds = productIds
         });
         var planWorkOrderIds = planWorkOrderEntities.Select(a => a.Id);
-        ;
+
         //获取每个段对应的设备 OP20，OP220，OP170，分别对应电芯，模组，Pack
         //计算每个段的产出只统计尾工序
         var procedureCodes = new string[] { "OP20", "OP220", "OP170" };
@@ -407,7 +433,7 @@ public class SystemApiService : ISystemApiService
 
 
             startDate = startDate.AddDays(1);
-            if (startDate.AddHours(1) == endDate) break;
+            if (startDate.AddDays(1) == endDate) break;
         }
 
         return result;
@@ -424,7 +450,7 @@ public class SystemApiService : ISystemApiService
 
         var productEntities = await _materialRepository.GetListAsync(new()
         {
-            MaterialNameLike = queryDto.ProdcutName
+            MaterialNameLike = queryDto.ProductName
         });
 
         //根据选择产品过滤工单
@@ -514,7 +540,179 @@ public class SystemApiService : ISystemApiService
             if (unQualifiedItem != null) unQualifiedItem.UnQualifiedQty += 1;
             else result.Add(new() { UnQualifiedName = unQualifiedEntity?.UnqualifiedCodeName ?? "", UnQualifiedQty = 1 });
         }
-        
+
         return result;
     }
+
+
+    #endregion
+
+    #region 生产板块
+
+    /// <summary>
+    /// 工序日产出滚动图
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<ProcedureDayOutputViewDto>> GetProcedureDayOutputAsync(ProcedureDayOutputQueryDto queryDto)
+    {
+        List<ProcedureDayOutputViewDto> result = new();
+
+        var productEntities = await _materialRepository.GetListAsync(new()
+        {
+            MaterialNameLike = queryDto.ProductName
+        });
+
+        //根据选择产品过滤工单
+        var productIds = productEntities.Select(a => a.Id).ToList();
+        var planWorkOrderEntities = await _planWorkOrderRepository.GetListAsync(new()
+        {
+            ProductIds = productIds
+        });
+        var planWorkOrderIds = planWorkOrderEntities.Select(a => a.Id);
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+        if (nowDate >= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00")))
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+            endDate = nowDate;
+        }
+        else
+        {
+            startDate = DateTime.Parse(nowDate.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
+            endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+        }
+
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
+        {
+            StartTime = startDate,
+            EndTime = endDate,
+            WorkOrderIds = planWorkOrderIds
+        });
+
+        var procedureIds = manuSfcSummaryEntities.Select(a => a.ProcedureId);
+        var procedureEntities = await _procProcedureRepository.GetByIdsAsync(procedureIds.ToArray());
+        var procedurePlanEntities = await _procProcedurePlanRepository.GetListAsync(new()
+        {
+            ProcedureIds = procedureIds
+        });
+
+        foreach (var item in procedureIds)
+        {
+            ProcedureDayOutputViewDto newItem = new();
+
+            var procedureEntity = procedureEntities.FirstOrDefault(a => a.Id == item);
+            var procedurePlanEntity = procedurePlanEntities.FirstOrDefault(b => b.ProcedureId == item);
+            var OutputQty = manuSfcSummaryEntities.Where(a => a.ProcedureId == item).Sum(a => a.Qty);
+
+            newItem.ProcedureName = procedureEntity?.Name;
+            newItem.OutputQty = OutputQty;
+            newItem.PlanQty = procedurePlanEntity?.PlanOutputQty;
+            newItem.PlanCompleteRate = newItem.PlanQty / newItem.OutputQty;
+
+            result.Add(newItem);
+
+        }
+
+
+
+
+        return result;
+    }
+
+    /// <summary>
+    /// 工序生产产能
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<ProductionCapacityViewDto>> GetProductionCapacityAsync(ProductionCapacityQueryDto queryDto)
+    {
+        List<ProductionCapacityViewDto> result = new();
+
+        var productEntities = await _materialRepository.GetListAsync(new()
+        {
+            MaterialNameLike = queryDto.ProductName
+        });
+
+        //根据选择产品过滤工单
+        var productIds = productEntities.Select(a => a.Id).ToList();
+        var planWorkOrderEntities = await _planWorkOrderRepository.GetListAsync(new()
+        {
+            ProductIds = productIds
+        });
+        var planWorkOrderIds = planWorkOrderEntities.Select(a => a.Id);
+
+
+        //获取每个段对应的设备 OP20，OP220，OP170，分别对应电芯，模组，Pack
+        //计算每个段的产出只统计尾工序
+        var procedureCodes = new string[] { "OP20", "OP220", "OP170" };
+        var ProcedureEntities = await _procProcedureRepository.GetByCodesAsync(procedureCodes, 123456);
+        var procedureIds = ProcedureEntities.Select(a => a.Id);
+        var procedurePlanEntities = await _procProcedurePlanRepository.GetListAsync(new() { ProcedureIds = procedureIds });
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+
+        startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00"));
+        endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+
+        var manuSfcSummaryEntities = await _manuSfcSummaryRepository.GetListAsync(new()
+        {
+            WorkOrderIds = planWorkOrderIds,
+            ProcedureIds = procedureIds.ToArray()
+        });
+
+        while (true)
+        {
+            foreach (var item in procedureCodes)
+            {
+                var procedure = ProcedureEntities.Where(a => a.Code == item).FirstOrDefault();
+                var procedurePlan = procedurePlanEntities.FirstOrDefault(a=>a.ProcedureId == procedure?.Id);
+
+                var summary = manuSfcSummaryEntities.Where(a => a.ProcedureId == procedure?.Id
+                && endDate >= startDate && endDate <= startDate.AddDays(1));
+
+                var planQty = procedurePlan?.PlanOutputQty;
+                var outputQty = summary.Sum(a => a.Qty);
+
+                ProductionCapacityViewDto newitem = new()
+                {
+                    EndTime = startDate.ToString("HH"),
+                    OutputQty = outputQty,
+                    PlanQty = planQty,
+                    CompletionRate = outputQty / planQty
+                };
+            }
+
+            startDate = startDate.AddDays(1);
+            if (startDate.AddDays(1) == endDate) break;
+        }
+
+
+        return result;
+    }
+
+    #endregion
+
+    #region 设备实时状态
+
+    /// <summary>
+    /// 查询设备运行状态
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<EquipmentStatusDto>> GetEquipmentStatusAsync()
+    {
+        List<EquipmentStatusDto> result = new();
+
+
+        return result;
+    }
+
+    #endregion
+
+    #endregion
+
 }

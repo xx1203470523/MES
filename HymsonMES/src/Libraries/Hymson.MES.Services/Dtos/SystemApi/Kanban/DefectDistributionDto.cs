@@ -32,7 +32,7 @@ public class DefectDistributionQueryDto
     /// <summary>
     /// 风冷/液冷
     /// </summary>
-    public string? ProdcutName { get; set; }
+    public string? ProductName { get; set; }
 
     /// <summary>
     /// 日期类型
