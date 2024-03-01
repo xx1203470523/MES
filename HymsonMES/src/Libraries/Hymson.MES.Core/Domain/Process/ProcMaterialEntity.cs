@@ -62,7 +62,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :物料描述 
         /// 空值 : true  
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
         /// <summary>
         /// 描述 :采购类型 

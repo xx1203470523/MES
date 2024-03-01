@@ -41,6 +41,7 @@
         public const string MES10132 = "编码不能包含特殊字符";
         public const string MES10133 = "未获取到导入数据！";
         public const string MES10134 = "未获取到导出数据！";
+        public const string MES10135 = "不允许删除【已启用】状态的数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -148,6 +149,8 @@
         public const string MES10376 = "没有获取对应打印任务的打印模板信息";
         public const string MES10377 = "打印任务的模板名称无法转为ID";
 
+        public const string MES10378 = "IP设定不符合规范!";
+
 
         #endregion
 
@@ -253,7 +256,8 @@
         public const string MES10533 = "条码[{sfc}]不在当前工序活动";
         public const string MES10534 = "有条码不是同一个产品";
         public const string MES10535 = "载具没有绑定条码";
-
+        public const string MES10536 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】已存在，请重新输入！";
+        public const string MES10537 = "功能类型【{Type}】+产品【{ProductCode}】+工序【{ProcedureCode}】+工艺设备组【{EquipmentGroupCode}】启用状态的已存在，请重新输入！";
         #endregion
 
         #region Bom 10600
@@ -337,6 +341,7 @@
         public const string MES10906 = "推送对象不允许有空格";
         public const string MES10907 = "私钥不允许有空格";
         public const string MES10908 = "关键字不允许有空格";
+        public const string MES10909 = "启用状态无法删除";
         #endregion
 
         #region 降级规则 11000
@@ -463,6 +468,7 @@
         public const string MES12123 = "工作中心状态不合法，请检查.";
         public const string MES12124 = "工作中心类型不合法，请检查.";
         public const string MES12125 = "对应工作中心数据不存在.";
+        public const string MES12126 = "存在已被关联产线,不允许重复关联!";
         #endregion
 
         #region 编码规则 12400
@@ -883,6 +889,7 @@
         public const string MES15727 = "配方详细中选择的操作需要有参数ID";
 
         public const string MES15728 = "设置编码【{code}】在当前操作中不允许重复！";
+        public const string MES15729 = "配方操作不允许重复！";
         #endregion
 
         #region 工单 16000
@@ -1705,6 +1712,10 @@
         public const string MES19416 = "接收水准不能小于0！";
         public const string MES19417 = "物料编码【{MaterialCode}】+ 客户【{CustomCode}】已在系统存在！";
         public const string MES19418 = "检验类型不允许设置多次！";
+        public const string MES19420 = "检验类型不能为空！";
+        public const string MES19419 = "校验水平不能为空！";
+        public const string MES19421 = "检验水准不能为空！";
+        public const string MES19422 = "接收水准不能为空！";
         #endregion
 
         #endregion
@@ -1727,6 +1738,8 @@
         public const string MES19506 = "班次类型不允许重复";
         public const string MES19507 = "未跨天班次的结束时间必须大于开始时间！";
         public const string MES19508 = "没有添加任何班次数据";
+        public const string MES19509 = "班制类型为空";
+        public const string MES19510 = "{type}开始时间与结束时间不能相同";
         #endregion
 
         #region Marking标识 19700
@@ -1735,7 +1748,7 @@
         public const string MES19703 = "产品序列码不允许为空!";
         public const string MES19704 = "发现工序【{code}】不存在!";
         public const string MES19705 = "拦截工序【{code}】不存在!";
-        public const string MES19706 = "产品序列码【{code}】不存在!";
+        public const string MES19706 = "产品序列码【{code}】暂无数据!";
         public const string MES19707 = "产品序列码【{code}】状态为【{status}】!";
         public const string MES19708 = "不合格代码【{code}】不存在!";
         public const string MES19709 = "产品序列码【{code}】信息不存在!";
@@ -1750,13 +1763,14 @@
         public const string MES19801 = "生产日历新增失败，可能存在相同年月的生产日历！";
         public const string MES19802 = "必须填写年份！";
         public const string MES19803 = "必须填写月份！";
-
+        public const string MES19804 = "日历{Dates}已启用无法被删除！";
         #endregion
 
         #region IQC检验项目
 
-        public const string MES19901 = "IQC检验项目编码不可重复";
+        public const string MES19901 = "IQC检验项目编码重复，或物料重复";
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
+        public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
 
         #endregion
     }

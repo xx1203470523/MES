@@ -215,7 +215,7 @@ namespace Hymson.MES.Services.Services.Process
 
             // 检查数据之前的状态是否允许修改
             var dbEntity = await _procProductParameterGroupRepository.GetByIdAsync(entity.Id) ?? throw new CustomerValidationException(nameof(ErrorCode.MES10104));
-            //验证某些状态是不能编辑的
+            // 验证某些状态是不能编辑的
             var canEditStatusEnum = new SysDataStatusEnum[] { SysDataStatusEnum.Build, SysDataStatusEnum.Retain };
             if (!canEditStatusEnum.Any(x => x == dbEntity.Status))
             {
@@ -351,7 +351,7 @@ namespace Hymson.MES.Services.Services.Process
                 {
                     dto.Code = parameterEntity.ParameterCode;
                     dto.Name = parameterEntity.ParameterName;
-                    dto.Unit = parameterEntity.ParameterUnit==null?"": parameterEntity.ParameterUnit;
+                    dto.Unit = parameterEntity.ParameterUnit == null ? "" : parameterEntity.ParameterUnit;
                     dto.DataType = parameterEntity.DataType;
                 }
 

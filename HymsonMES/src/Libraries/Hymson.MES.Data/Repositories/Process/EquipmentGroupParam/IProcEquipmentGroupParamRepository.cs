@@ -1,13 +1,7 @@
-/*
- *creator: Karl
- *
- *describe: 设备参数组仓储类 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-08-02 01:48:35
- */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Common.Query;
 
 namespace Hymson.MES.Data.Repositories.Process
 {
@@ -16,14 +10,13 @@ namespace Hymson.MES.Data.Repositories.Process
     /// </summary>
     public interface IProcEquipmentGroupParamRepository
     {
-        #region 
         /// <summary>
         /// 新增
         /// </summary>
         /// <param name="procEquipmentGroupParamEntity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(ProcEquipmentGroupParamEntity procEquipmentGroupParamEntity);
-        
+
         /// <summary>
         /// 批量新增
         /// </summary>
@@ -37,7 +30,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procEquipmentGroupParamEntity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcEquipmentGroupParamEntity procEquipmentGroupParamEntity);
-        
+
         /// <summary>
         /// 批量更新 
         /// </summary>
@@ -52,7 +45,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 批量删除
         /// </summary>
@@ -61,12 +54,19 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> DeletesAsync(DeleteCommand param);
 
         /// <summary>
+        /// 根据Code查询对象
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(EntityByCodeQuery query);
+
+        /// <summary>
         /// 根据ID获取数据
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcEquipmentGroupParamEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs批量获取数据
         /// </summary>
@@ -87,22 +87,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="query"></param>
         /// <returns></returns>
         Task<PagedInfo<ProcEquipmentGroupParamView>> GetPagedInfoAsync(ProcEquipmentGroupParamPagedQuery query);
-        #endregion
-
-        /// <summary>
-        /// 根据Code获取数据
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        Task<ProcEquipmentGroupParamEntity> GetByCodeAsync(ProcEquipmentGroupParamCodeQuery query);
-
 
         /// <summary>
         /// 根据关联信息（产品，工序，工艺组）获取数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        Task<ProcEquipmentGroupParamEntity> GetByRelatesInformationAsync(ProcEquipmentGroupParamRelatesInformationQuery query);
+        Task<IEnumerable<ProcEquipmentGroupParamEntity>> GetByRelatesInformationAsync(ProcEquipmentGroupParamRelatesInformationQuery query);
 
         /// <summary>
         /// 更新状态

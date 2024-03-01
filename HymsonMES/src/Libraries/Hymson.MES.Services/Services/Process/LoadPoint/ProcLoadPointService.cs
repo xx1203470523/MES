@@ -708,9 +708,13 @@ namespace Hymson.MES.Services.Services.Process
             using var memoryStream = new MemoryStream();
             await formFile.CopyToAsync(memoryStream).ConfigureAwait(false);
             var excelImportDtos = _excelService.Import<ImportLoadPointDto>(memoryStream);
-            //备份用户上传的文件，可选
+
+            /*
+            // 备份用户上传的文件，可选
             var stream = formFile.OpenReadStream();
             var uploadResult = await _minioService.PutObjectAsync(formFile.FileName, stream, formFile.ContentType);
+            */
+
             if (excelImportDtos == null || !excelImportDtos.Any())
             {
                 throw new CustomerValidationException("导入数据为空");

@@ -98,6 +98,20 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         Task<int> DeleteRangAsync(DeleteCommand param);
 
         /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteWorkCenterRelationByParentIdsAsync(DeleteCommand command);
+
+        /// <summary>
+        /// 删除（批量）
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        Task<int> DeleteResourceRelationByParentIdsAsync(DeleteCommand command);
+
+        /// <summary>
         /// 批量新增
         /// </summary>
         /// <param name="param"></param>
@@ -117,6 +131,13 @@ namespace Hymson.MES.Data.Repositories.Integrated.IIntegratedRepository
         /// <param name="Id"></param>
         /// <returns></returns>
         Task<IEnumerable<InteWorkCenterRelationView>> GetInteWorkCenterRelationAsync(long id);
+
+        /// <summary>
+        /// 获取工作中心关联
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        Task<IEnumerable<InteWorkCenterRelation>> GetInteWorkCenterRelationEntityAsync(InteWorkCenterRelationQuery inteWorkCenterRelationQuery);
 
         /// <summary>
         /// 根据资源ID获取数据

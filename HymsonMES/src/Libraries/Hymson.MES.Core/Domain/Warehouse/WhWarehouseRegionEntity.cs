@@ -29,7 +29,7 @@ namespace Hymson.MES.Core.Domain.WhWarehouseRegion
        /// <summary>
         /// 描述
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
        /// <summary>
         /// 状态;1、启用  2未启用

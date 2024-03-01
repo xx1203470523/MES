@@ -1,9 +1,4 @@
 ﻿using Hymson.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.Process
 {
@@ -16,6 +11,11 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 主键id
         /// </summary>
         public long Id { get; set; }
+
+        /// <summary>
+        /// 资源类型Id
+        /// </summary>
+        public long ResourceTypeId { get; set; }
 
         /// <summary>
         /// 描述 :资源类型 
@@ -33,7 +33,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// 描述 :描述 
         /// 空值 : true  
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         public long[] ResourceIds { get; set; }
 
@@ -148,7 +148,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 关联的资源Id

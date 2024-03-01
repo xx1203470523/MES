@@ -70,7 +70,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:equipmentGroupParam:insert")]
         public async Task<long> AddProcEquipmentGroupParamAsync([FromBody] ProcEquipmentGroupParamCreateDto parm)
         {
-            return await _procEquipmentGroupParamService.CreateProcEquipmentGroupParamAsync(parm);
+            return await _procEquipmentGroupParamService.CreateAsync(parm);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:equipmentGroupParam:update")]
         public async Task UpdateProcEquipmentGroupParamAsync([FromBody] ProcEquipmentGroupParamModifyDto parm)
         {
-             await _procEquipmentGroupParamService.ModifyProcEquipmentGroupParamAsync(parm);
+             await _procEquipmentGroupParamService.ModifyAsync(parm);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Hymson.MES.Api.Controllers.Process
         [PermissionDescription("proc:equipmentGroupParam:delete")]
         public async Task DeleteProcEquipmentGroupParamAsync([FromBody] long[] ids)
         {
-            await _procEquipmentGroupParamService.DeletesProcEquipmentGroupParamAsync(ids);
+            await _procEquipmentGroupParamService.DeletesAsync(ids);
         }
 
         #endregion

@@ -42,7 +42,7 @@ namespace Hymson.MES.Core.Domain.Process
         /// 描述 :说明 
         /// 空值 : true  
         /// </summary>
-        public string? Remark { get; set; }
+        public string? Remark { get; set; } = "";
 
     }
 }

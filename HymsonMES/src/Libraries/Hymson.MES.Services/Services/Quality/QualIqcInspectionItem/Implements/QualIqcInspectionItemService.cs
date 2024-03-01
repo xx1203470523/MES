@@ -88,15 +88,17 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
     /// <returns></returns>
     public async Task<PagedInfo<QualIqcInspectionItemOutputDto>> GetPagedAsync(QualIqcInspectionItemPagedQueryDto queryDto)
     {
+        var _siteId = _currentSite.SiteId;
+
         var materialIds = Enumerable.Empty<long>();
         if (!string.IsNullOrWhiteSpace(queryDto.MaterialCode))
         {
-            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { MaterialCode = queryDto.MaterialCode });
+            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _siteId, MaterialCode = queryDto.MaterialCode });
             materialIds = materialEntities.Select(m => m.Id);
         }
         if (!string.IsNullOrWhiteSpace(queryDto.MaterialName))
         {
-            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { MaterialName = queryDto.MaterialName });
+            var materialEntities = await _procMaterialRepository.GetProcMaterialEntitiesAsync(new ProcMaterialQuery { SiteId = _siteId, MaterialName = queryDto.MaterialName });
             materialIds = materialIds.Concat(materialEntities.Select(m => m.Id));
         }
         materialIds = materialIds.Distinct();
@@ -104,7 +106,7 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
         var supplierIds = Enumerable.Empty<long>();
         if (!string.IsNullOrWhiteSpace(queryDto.SupplierName))
         {
-            var supplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery { Name = queryDto.SupplierName });
+            var supplierEntities = await _whSupplierRepository.GetWhSupplierEntitiesAsync(new WhSupplierQuery { SiteId = _siteId, Name = queryDto.SupplierName });
             supplierIds = supplierEntities.Select(m => m.Id);
         }
 
@@ -117,7 +119,7 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
             Status = queryDto.Status,
             PageIndex = queryDto.PageIndex,
             PageSize = queryDto.PageSize,
-            SiteId = _currentSite.SiteId
+            SiteId = _siteId
         };
 
         var result = new PagedInfo<QualIqcInspectionItemOutputDto>(Enumerable.Empty<QualIqcInspectionItemOutputDto>(), query.PageIndex, query.PageSize);
@@ -142,6 +144,7 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
                     m.MaterialCode = materialEntity.MaterialCode;
                     m.MaterialName = materialEntity.MaterialName;
                     m.MaterialUnit = materialEntity.Unit;
+                    m.MaterialVersion = materialEntity.Version;
                 }
 
                 var supplierEntity = supplierEntities.FirstOrDefault(e => e.Id == m.SupplierId);
@@ -205,6 +208,7 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
             result.MaterialName = materialEntity.MaterialName;
             result.MaterialCode = materialEntity.MaterialCode;
             result.MaterialUnit = materialEntity.Unit;
+            result.MaterialVersion = materialEntity.Version;
         }
 
         var supplierEntity = await _whSupplierRepository.GetByIdAsync(result.SupplierId.GetValueOrDefault());

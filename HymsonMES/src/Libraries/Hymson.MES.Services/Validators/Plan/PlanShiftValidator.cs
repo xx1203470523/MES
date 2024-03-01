@@ -29,6 +29,7 @@ namespace Hymson.MES.Services.Validators.Plan
         /// </summary>
         public PlanShiftDetailValidator()
         {
+            RuleFor(x => x.ShiftType).IsInEnum().WithErrorCode(nameof(ErrorCode.MES19509));
             RuleFor(x => x.StartTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19503));
             RuleFor(x => x.EndTime).NotEmpty().WithErrorCode(nameof(ErrorCode.MES19504));
             //RuleFor(x => x.BatchNo).NotEmpty().WithErrorCode("11");

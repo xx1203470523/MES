@@ -67,7 +67,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 设置值信息
         /// </summary>
-        public List<ProcFormulaOperationSetSaveDto> FormulaOperationSetDtos { get; set; }
+        public List<ProcFormulaOperationSetSaveDto>? FormulaOperationSetDtos { get; set; }
 
     }
 

@@ -6,19 +6,14 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Process;
-using Hymson.MES.Core.Enums;
-using Hymson.MES.Core.Enums.Process;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Process.Query;
 using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using Minio.DataModel;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -66,7 +61,7 @@ namespace Hymson.MES.Services.Services.Process
         /// <param name="procFormulaOperationGroupRepository"></param>
         /// <param name="procFormulaOperationRepository"></param>
         /// <param name="procFormulaOperationGroupRelatiionRepository"></param>
-        public ProcFormulaOperationGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaOperationGroupSaveDto> validationSaveRules, 
+        public ProcFormulaOperationGroupService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<ProcFormulaOperationGroupSaveDto> validationSaveRules,
             IProcFormulaOperationGroupRepository procFormulaOperationGroupRepository,
             IProcFormulaOperationRepository procFormulaOperationRepository,
             IProcFormulaOperationGroupRelatiionRepository procFormulaOperationGroupRelatiionRepository)
@@ -93,7 +88,7 @@ namespace Hymson.MES.Services.Services.Process
                 throw new ValidationException(nameof(ErrorCode.MES10101));
             }
 
-            //验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(addDto.FormulaOperationGroup);
 
             addDto.FormulaOperationGroup.Code = addDto.FormulaOperationGroup.Code.Trim();
@@ -102,14 +97,14 @@ namespace Hymson.MES.Services.Services.Process
             // 更新时间
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
-            //验证是否编码唯一
+            // 验证是否编码唯一
             var entity = await _procFormulaOperationGroupRepository.GetByCodeAsync(addDto.FormulaOperationGroup.Code);
             if (entity != null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES11307));
             }
 
-            //DTO转换实体
+            // DTO转换实体
             var operationGroupEntity = addDto.FormulaOperationGroup.ToEntity<ProcFormulaOperationGroupEntity>();
             operationGroupEntity.Id = IdGenProvider.Instance.CreateId();
             operationGroupEntity.CreatedBy = updatedBy;
@@ -118,10 +113,14 @@ namespace Hymson.MES.Services.Services.Process
             operationGroupEntity.CreatedOn = updatedOn;
             operationGroupEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            //配方操作
+            // 配方操作
             List<ProcFormulaOperationGroupRelatiionEntity> operationList = new();
             if (addDto.FormulaOperationDtos != null && addDto.FormulaOperationDtos.Any())
             {
+                // 校验配方操作是否重复
+                var formulaOperationDict = addDto.FormulaOperationDtos.DistinctBy(x => x.Id);
+                if (formulaOperationDict.Count() < addDto.FormulaOperationDtos.Count) throw new CustomerValidationException(nameof(ErrorCode.MES15729));
+
                 foreach (var item in addDto.FormulaOperationDtos)
                 {
                     operationList.Add(new ProcFormulaOperationGroupRelatiionEntity
@@ -140,8 +139,8 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
-            //入库
-            using TransactionScope ts = TransactionHelper.GetTransactionScope();
+            // 入库
+            using var ts = TransactionHelper.GetTransactionScope();
             await _procFormulaOperationGroupRepository.InsertAsync(operationGroupEntity);
             if (addDto.FormulaOperationDtos != null && addDto.FormulaOperationDtos.Any())
             {
@@ -161,7 +160,7 @@ namespace Hymson.MES.Services.Services.Process
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new ValidationException(nameof(ErrorCode.MES10101));
 
-            //验证DTO
+            // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(addDto.FormulaOperationGroup);
 
             addDto.FormulaOperationGroup.Code = addDto.FormulaOperationGroup.Code.Trim();
@@ -171,10 +170,14 @@ namespace Hymson.MES.Services.Services.Process
             var updatedBy = _currentUser.UserName;
             var updatedOn = HymsonClock.Now();
 
-            //配方操作
+            // 配方操作
             List<ProcFormulaOperationGroupRelatiionEntity> operationList = new();
             if (addDto.FormulaOperationDtos != null && addDto.FormulaOperationDtos.Any())
             {
+                // 校验配方操作是否重复
+                var formulaOperationDict = addDto.FormulaOperationDtos.DistinctBy(x => x.Id);
+                if (formulaOperationDict.Count() < addDto.FormulaOperationDtos.Count) throw new CustomerValidationException(nameof(ErrorCode.MES15729));
+
                 foreach (var item in addDto.FormulaOperationDtos)
                 {
                     operationList.Add(new ProcFormulaOperationGroupRelatiionEntity
@@ -191,7 +194,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
-            //DTO转换实体
+            // DTO转换实体
             var operationGroupEntity = addDto.FormulaOperationGroup.ToEntity<ProcFormulaOperationGroupEntity>();
             operationGroupEntity.UpdatedBy = updatedBy;
             operationGroupEntity.UpdatedOn = updatedOn;
@@ -199,15 +202,14 @@ namespace Hymson.MES.Services.Services.Process
             //operationGroupEntity.CreatedOn = addDto.FormulaOperationGroup.CreatedOn;
             operationGroupEntity.SiteId = _currentSite.SiteId ?? 0;
 
-
-            //入库
+            // 入库
             using TransactionScope ts = TransactionHelper.GetTransactionScope();
             var command = new DeleteCommand()
             {
                 DeleteOn = HymsonClock.Now(),
                 UserId = _currentUser.UserName
             };
-            long[] ids = {};
+            long[] ids = { };
             Array.Resize(ref ids, ids.Length + 1);
             ids[^1] = operationGroupEntity.Id;
             command.Ids = ids;
@@ -263,12 +265,12 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcFormulaOperationGroupDto?> QueryProcFormulaOperationGroupByIdAsync(long id) 
+        public async Task<ProcFormulaOperationGroupDto?> QueryProcFormulaOperationGroupByIdAsync(long id)
         {
-           var procFormulaOperationGroupEntity = await _procFormulaOperationGroupRepository.GetByIdAsync(id);
-           if (procFormulaOperationGroupEntity == null) return null;
-           
-           return procFormulaOperationGroupEntity.ToModel<ProcFormulaOperationGroupDto>();
+            var procFormulaOperationGroupEntity = await _procFormulaOperationGroupRepository.GetByIdAsync(id);
+            if (procFormulaOperationGroupEntity == null) return null;
+
+            return procFormulaOperationGroupEntity.ToModel<ProcFormulaOperationGroupDto>();
         }
 
         /// <summary>
@@ -299,12 +301,12 @@ namespace Hymson.MES.Services.Services.Process
                 PageSize = pagedQueryDto.PageSize,
                 PageIndex = pagedQueryDto.PageIndex
             };
-            if(pagedQueryDto.Id != null)
+            if (pagedQueryDto.Id != null)
             {
                 var entities = await _procFormulaOperationGroupRelatiionRepository.
                     GetOperationIdsByGroupIdAsync(pagedQueryDto.Id ?? 0);
                 var aaa = entities.Select(x => x.FormulaOperationId).ToArray();
-                operationPageIndex.Ids =aaa;
+                operationPageIndex.Ids = aaa;
             }
 
             var dtos = new List<ProcFormulaOperationDto>();
@@ -312,11 +314,11 @@ namespace Hymson.MES.Services.Services.Process
             if (operationPageIndex.Ids != null && operationPageIndex.Ids.Any())
             {
                 var info = await _procFormulaOperationRepository.GetPagedInfoByIdsAsync(operationPageIndex);
-                foreach(var item in info.Data)
+                foreach (var item in info.Data)
                 {
                     dtos.Add(item.ToModel<ProcFormulaOperationDto>());
                 }
-                totalCount=info.TotalCount;
+                totalCount = info.TotalCount;
             }
             return new PagedInfo<ProcFormulaOperationDto>(dtos, pagedQueryDto.PageIndex, pagedQueryDto.PageSize, totalCount);
         }
@@ -326,11 +328,11 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="formulaOperationGroupId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcFormulaOperationDto>> GetFormulaOperationByFormulaOperationGroupIdAsync(long formulaOperationGroupId) 
+        public async Task<IEnumerable<ProcFormulaOperationDto>> GetFormulaOperationByFormulaOperationGroupIdAsync(long formulaOperationGroupId)
         {
             var formulaOperationGroupRelatiions = await _procFormulaOperationGroupRelatiionRepository.GetOperationIdsByGroupIdAsync(formulaOperationGroupId);
 
-            var formulaOperations= await _procFormulaOperationRepository.GetByIdsAsync(formulaOperationGroupRelatiions.Select(x => x.FormulaOperationId).ToArray());
+            var formulaOperations = await _procFormulaOperationRepository.GetByIdsAsync(formulaOperationGroupRelatiions.Select(x => x.FormulaOperationId).ToArray());
 
             return formulaOperations.Select(x => x.ToModel<ProcFormulaOperationDto>());
         }

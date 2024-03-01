@@ -75,10 +75,10 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// </summary>
         public DateTime? JudgmentOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 说明
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// 最后更新时间

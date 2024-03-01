@@ -7,6 +7,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Quality;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Process;
@@ -169,12 +170,17 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
-            var details = saveDto.Details.Select(s =>
+            List<QualIqcLevelDetailEntity> details = new();
+            foreach (var item in saveDto.Details)
             {
-                // 验证DTO
-                //_validationDetailRules.ValidateAndThrowAsync(s);
+                if (item.Type.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19420));
+                if (item.VerificationLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19421));
+                if (item.AcceptanceLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19422));
 
-                var detailEntity = s.ToEntity<QualIqcLevelDetailEntity>();
+                // 验证DTO
+                await _validationDetailRules.ValidateAndThrowAsync(item);
+
+                var detailEntity = item.ToEntity<QualIqcLevelDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
                 detailEntity.SiteId = entity.SiteId;
                 detailEntity.IqcLevelId = entity.Id;
@@ -183,12 +189,12 @@ namespace Hymson.MES.Services.Services.Quality
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
 
-                return detailEntity;
-            });
+                details.Add(detailEntity);
+            }
 
             // 每种检验类型只允许添加一次
             var typeCount = details.DistinctBy(s => s.Type).Count();
-            if (typeCount < details.Count())
+            if (typeCount < details.Count)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES19418));
             }
@@ -274,22 +280,27 @@ namespace Hymson.MES.Services.Services.Quality
             }
             #endregion
 
-            var details = saveDto.Details.Select(s =>
+            List<QualIqcLevelDetailEntity> details = new();
+            foreach (var item in saveDto.Details)
             {
-                // 验证DTO
-                //_validationDetailRules.ValidateAndThrowAsync(s);
+                if (item.Type.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19420));
+                if (item.VerificationLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19421));
+                if (item.AcceptanceLevel.HasValue == false) throw new CustomerValidationException(nameof(ErrorCode.MES19422));
 
-                var detailEntity = s.ToEntity<QualIqcLevelDetailEntity>();
+                // 验证DTO
+                await _validationDetailRules.ValidateAndThrowAsync(item);
+
+                var detailEntity = item.ToEntity<QualIqcLevelDetailEntity>();
                 detailEntity.Id = IdGenProvider.Instance.CreateId();
+                detailEntity.SiteId = entity.SiteId;
                 detailEntity.IqcLevelId = entity.Id;
                 detailEntity.CreatedBy = updatedBy;
                 detailEntity.CreatedOn = updatedOn;
                 detailEntity.UpdatedBy = updatedBy;
                 detailEntity.UpdatedOn = updatedOn;
-                detailEntity.SiteId = entity.SiteId;
 
-                return detailEntity;
-            });
+                details.Add(detailEntity);
+            }
 
             // 每种检验类型只允许添加一次
             var typeCount = details.DistinctBy(s => s.Type).Count();
@@ -323,6 +334,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
+            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+
+            var entities = await _qualIqcLevelRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            }
+
             return await _qualIqcLevelRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,

@@ -1,10 +1,3 @@
-/*
- *creator: Karl
- *
- *describe: 载具类型维护    服务 | 代码由框架生成
- *builder:  Karl
- *build datetime: 2023-07-12 10:37:17
- */
 using FluentValidation;
 using Hymson.Authentication;
 using Hymson.Authentication.JwtBearer.Security;
@@ -13,6 +6,7 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Domain.Integrated;
+using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -48,6 +42,20 @@ namespace Hymson.MES.Services.Services.Integrated
         private readonly IInteVehicleRepository _inteVehicleRepository;
         private readonly IInteVehicleFreightRepository _inteVehicleFreightRepository;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentUser"></param>
+        /// <param name="currentSite"></param>
+        /// <param name="inteVehicleTypeRepository"></param>
+        /// <param name="validationCreateRules"></param>
+        /// <param name="validationModifyRules"></param>
+        /// <param name="inteVehicleTypeVerifyRepository"></param>
+        /// <param name="validationInteVehicleTypeVerifyCreateRules"></param>
+        /// <param name="procMaterialRepository"></param>
+        /// <param name="procMaterialGroupRepository"></param>
+        /// <param name="inteVehicleRepository"></param>
+        /// <param name="inteVehicleFreightRepository"></param>
         public InteVehicleTypeService(ICurrentUser currentUser, ICurrentSite currentSite, IInteVehicleTypeRepository inteVehicleTypeRepository, AbstractValidator<InteVehicleTypeCreateDto> validationCreateRules, AbstractValidator<InteVehicleTypeModifyDto> validationModifyRules, IInteVehicleTypeVerifyRepository inteVehicleTypeVerifyRepository, AbstractValidator<InteVehicleTypeVerifyCreateDto> validationInteVehicleTypeVerifyCreateRules, IProcMaterialRepository procMaterialRepository, IProcMaterialGroupRepository procMaterialGroupRepository, IInteVehicleRepository inteVehicleRepository, IInteVehicleFreightRepository inteVehicleFreightRepository)
         {
             _currentUser = currentUser;
@@ -66,27 +74,27 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <summary>
         /// 创建
         /// </summary>
-        /// <param name="inteVehicleTypeCreateDto"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto inteVehicleTypeCreateDto)
+        public async Task<long> CreateInteVehicleTypeAsync(InteVehicleTypeCreateDto dto)
         {
-            //验证DTO
-            await _validationCreateRules.ValidateAndThrowAsync(inteVehicleTypeCreateDto);
+            // 验证DTO
+            await _validationCreateRules.ValidateAndThrowAsync(dto);
 
-            //DTO转换实体
-            var inteVehicleTypeEntity = inteVehicleTypeCreateDto.ToEntity<InteVehicleTypeEntity>();
-            inteVehicleTypeEntity.Id= IdGenProvider.Instance.CreateId();
+            // DTO转换实体
+            var inteVehicleTypeEntity = dto.ToEntity<InteVehicleTypeEntity>();
+            inteVehicleTypeEntity.Id = IdGenProvider.Instance.CreateId();
             inteVehicleTypeEntity.CreatedBy = _currentUser.UserName;
             inteVehicleTypeEntity.UpdatedBy = _currentUser.UserName;
             inteVehicleTypeEntity.CreatedOn = HymsonClock.Now();
             inteVehicleTypeEntity.UpdatedOn = HymsonClock.Now();
             inteVehicleTypeEntity.SiteId = _currentSite.SiteId ?? 0;
 
-            //验证是否编码唯一
-            var entity = await _inteVehicleTypeRepository.GetByCodeAsync( new InteVehicleTypeCodeQuery 
-            { 
-                Code =inteVehicleTypeEntity.Code.Trim(),
-                SiteId=_currentSite.SiteId??0 
+            // 验证是否编码唯一
+            var entity = await _inteVehicleTypeRepository.GetByCodeAsync(new InteVehicleTypeCodeQuery
+            {
+                Code = inteVehicleTypeEntity.Code.Trim(),
+                SiteId = _currentSite.SiteId ?? 0
             });
             if (entity != null)
             {
@@ -94,19 +102,19 @@ namespace Hymson.MES.Services.Services.Integrated
             }
 
             #region 处理 载具类型验证数据
-            var inteVehicleTypeVerifyEntitys=new List<InteVehicleTypeVerifyEntity>();
-            if (inteVehicleTypeCreateDto.VehicleTypeVerifyList.Any()) 
+            List<InteVehicleTypeVerifyEntity> detailEntities = new();
+            if (dto.VehicleTypeVerifyList != null && dto.VehicleTypeVerifyList.Any())
             {
-                foreach (var item in inteVehicleTypeCreateDto.VehicleTypeVerifyList)
+                foreach (var item in dto.VehicleTypeVerifyList)
                 {
                     //验证数据
                     await _validationInteVehicleTypeVerifyCreateRules.ValidateAndThrowAsync(item);
 
-                    inteVehicleTypeVerifyEntitys.Add(new InteVehicleTypeVerifyEntity()
+                    detailEntities.Add(new InteVehicleTypeVerifyEntity()
                     {
-                        VehicleTypeId= inteVehicleTypeEntity.Id,
-                        Type=item.Type,
-                        VerifyId=item.VerifyId,
+                        VehicleTypeId = inteVehicleTypeEntity.Id,
+                        Type = item.Type,
+                        VerifyId = item.VerifyId,
 
                         Id = IdGenProvider.Instance.CreateId(),
                         CreatedBy = _currentUser.UserName,
@@ -114,32 +122,84 @@ namespace Hymson.MES.Services.Services.Integrated
                         CreatedOn = HymsonClock.Now(),
                         UpdatedOn = HymsonClock.Now(),
                         SiteId = _currentSite.SiteId ?? 0,
-                });
+                    });
                 }
             }
             #endregion
 
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
+            using var ts = TransactionHelper.GetTransactionScope();
+            await _inteVehicleTypeRepository.InsertAsync(inteVehicleTypeEntity);
+            if (detailEntities.Any())
             {
-                //入库
-                await _inteVehicleTypeRepository.InsertAsync(inteVehicleTypeEntity);
-
-                if (inteVehicleTypeVerifyEntitys.Any())
-                    await _inteVehicleTypeVerifyRepository.InsertsAsync(inteVehicleTypeVerifyEntitys);
-
-                ts.Complete();
+                await _inteVehicleTypeVerifyRepository.InsertsAsync(detailEntities);
             }
+            ts.Complete();
             return inteVehicleTypeEntity.Id;
         }
 
         /// <summary>
-        /// 删除
+        /// 修改
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
-        public async Task DeleteInteVehicleTypeAsync(long id)
+        public async Task ModifyInteVehicleTypeAsync(InteVehicleTypeModifyDto dto)
         {
-            await _inteVehicleTypeRepository.DeleteAsync(id);
+            // 验证DTO
+            await _validationModifyRules.ValidateAndThrowAsync(dto);
+
+            // DTO转换实体
+            var inteVehicleTypeEntity = dto.ToEntity<InteVehicleTypeEntity>();
+            inteVehicleTypeEntity.UpdatedBy = _currentUser.UserName;
+            inteVehicleTypeEntity.UpdatedOn = HymsonClock.Now();
+
+            #region 处理 载具类型验证数据
+            List<InteVehicleTypeVerifyEntity> detailEntities = new();
+            if (dto.VehicleTypeVerifyList != null && dto.VehicleTypeVerifyList.Any())
+            {
+                foreach (var item in dto.VehicleTypeVerifyList)
+                {
+                    // 验证数据
+                    await _validationInteVehicleTypeVerifyCreateRules.ValidateAndThrowAsync(item);
+                    detailEntities.Add(new InteVehicleTypeVerifyEntity()
+                    {
+                        VehicleTypeId = inteVehicleTypeEntity.Id,
+                        Type = item.Type,
+                        VerifyId = item.VerifyId,
+
+                        Id = IdGenProvider.Instance.CreateId(),
+                        CreatedBy = _currentUser.UserName,
+                        UpdatedBy = _currentUser.UserName,
+                        CreatedOn = HymsonClock.Now(),
+                        UpdatedOn = HymsonClock.Now(),
+                        SiteId = _currentSite.SiteId ?? 0,
+                    });
+                }
+            }
+            #endregion
+
+            // 验证 载具（已使用该载具类型）绑定了产品序列码，则无法修改载具类型
+            var useInteVehicleEntities = await _inteVehicleRepository.GetByVehicleTypeIdsAsync(new InteVehicleVehicleTypeIdsQuery
+            {
+                SiteId = _currentSite.SiteId ?? 0,
+                VehicleTypeIds = new long[] { dto.Id }
+            });
+            if (useInteVehicleEntities.Any())
+            {
+                var freights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(useInteVehicleEntities.Select(x => x.Id).ToArray());
+                if (freights.Any(x => x.Qty > 0))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18518));
+                }
+            }
+
+            using var ts = TransactionHelper.GetTransactionScope();
+            await _inteVehicleTypeRepository.UpdateAsync(inteVehicleTypeEntity);
+            await _inteVehicleTypeVerifyRepository.DeletesTrueByVehicleTypeIdAsync(new long[] { inteVehicleTypeEntity.Id });
+            if (detailEntities.Any())
+            {
+                await _inteVehicleTypeVerifyRepository.InsertsAsync(detailEntities);
+            }
+            ts.Complete();
         }
 
         /// <summary>
@@ -149,9 +209,17 @@ namespace Hymson.MES.Services.Services.Integrated
         /// <returns></returns>
         public async Task<int> DeletesInteVehicleTypeAsync(long[] ids)
         {
-            //校验数据 ：判断哪个载具使用了载具类型
-            var vehicleEntitys= await _inteVehicleRepository.GetByVehicleTypeIdsAsync(new InteVehicleVehicleTypeIdsQuery() { SiteId = _currentSite.SiteId ?? 0, VehicleTypeIds = ids });
-            if (vehicleEntitys.Any()) 
+            if (!ids.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES10213));
+
+            var entities = await _inteVehicleTypeRepository.GetByIdsAsync(ids);
+            if (entities != null && entities.Any(a => a.Status == DisableOrEnableEnum.Enable))
+            {
+                throw new CustomerValidationException(nameof(ErrorCode.MES10135));
+            }
+
+            // 校验数据 ：判断哪个载具使用了载具类型
+            var vehicleEntitys = await _inteVehicleRepository.GetByVehicleTypeIdsAsync(new InteVehicleVehicleTypeIdsQuery() { SiteId = _currentSite.SiteId ?? 0, VehicleTypeIds = ids });
+            if (vehicleEntitys.Any())
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18517));
             }
@@ -180,7 +248,7 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="pagedInfo"></param>
         /// <returns></returns>
-        private static List<InteVehicleTypeDto> PrepareInteVehicleTypeDtos(PagedInfo<InteVehicleTypeEntity>   pagedInfo)
+        private static List<InteVehicleTypeDto> PrepareInteVehicleTypeDtos(PagedInfo<InteVehicleTypeEntity> pagedInfo)
         {
             var inteVehicleTypeDtos = new List<InteVehicleTypeDto>();
             foreach (var inteVehicleTypeEntity in pagedInfo.Data)
@@ -193,89 +261,18 @@ namespace Hymson.MES.Services.Services.Integrated
         }
 
         /// <summary>
-        /// 修改
-        /// </summary>
-        /// <param name="inteVehicleTypeModifyDto"></param>
-        /// <returns></returns>
-        public async Task ModifyInteVehicleTypeAsync(InteVehicleTypeModifyDto inteVehicleTypeModifyDto)
-        {
-             //验证DTO
-            await _validationModifyRules.ValidateAndThrowAsync(inteVehicleTypeModifyDto);
-
-            //DTO转换实体
-            var inteVehicleTypeEntity = inteVehicleTypeModifyDto.ToEntity<InteVehicleTypeEntity>();
-            inteVehicleTypeEntity.UpdatedBy = _currentUser.UserName;
-            inteVehicleTypeEntity.UpdatedOn = HymsonClock.Now();
-
-            #region 处理 载具类型验证数据
-            var inteVehicleTypeVerifyEntitys = new List<InteVehicleTypeVerifyEntity>();
-            if (inteVehicleTypeModifyDto.VehicleTypeVerifyList.Any())
-            {
-                foreach (var item in inteVehicleTypeModifyDto.VehicleTypeVerifyList)
-                {
-                    //验证数据
-                    await _validationInteVehicleTypeVerifyCreateRules.ValidateAndThrowAsync(item);
-
-                    inteVehicleTypeVerifyEntitys.Add(new InteVehicleTypeVerifyEntity()
-                    {
-                        VehicleTypeId = inteVehicleTypeEntity.Id,
-                        Type = item.Type,
-                        VerifyId = item.VerifyId,
-
-                        Id = IdGenProvider.Instance.CreateId(),
-                        CreatedBy = _currentUser.UserName,
-                        UpdatedBy = _currentUser.UserName,
-                        CreatedOn = HymsonClock.Now(),
-                        UpdatedOn = HymsonClock.Now(),
-                        SiteId = _currentSite.SiteId ?? 0,
-                    });
-                }
-            }
-            #endregion
-
-            //验证 载具（已使用该载具类型）绑定了产品序列码，则无法修改载具类型
-            var useInteVehicleEntities = await _inteVehicleRepository.GetByVehicleTypeIdsAsync(new InteVehicleVehicleTypeIdsQuery
-            {
-                SiteId = _currentSite.SiteId??0,
-                VehicleTypeIds = new long[] { inteVehicleTypeModifyDto.Id }
-            });
-            if (useInteVehicleEntities.Any())
-            {
-                var freights = await _inteVehicleFreightRepository.GetByVehicleIdsAsync(useInteVehicleEntities.Select(x => x.Id).ToArray());
-
-                if (freights.Any(x => x.Qty > 0))
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES18518));
-                }
-            }
-
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
-            {
-                await _inteVehicleTypeRepository.UpdateAsync(inteVehicleTypeEntity);
-
-                //先删除
-                await _inteVehicleTypeVerifyRepository.DeletesTrueByVehicleTypeIdAsync(new long[] { inteVehicleTypeEntity.Id });
-                if (inteVehicleTypeVerifyEntitys.Any())
-                    await _inteVehicleTypeVerifyRepository.InsertsAsync(inteVehicleTypeVerifyEntitys);
-
-                ts.Complete();
-            }
-
-        }
-
-        /// <summary>
         /// 根据ID查询
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<InteVehicleTypeDto> QueryInteVehicleTypeByIdAsync(long id) 
+        public async Task<InteVehicleTypeDto> QueryInteVehicleTypeByIdAsync(long id)
         {
-           var inteVehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(id);
-           if (inteVehicleTypeEntity != null) 
-           {
-               return inteVehicleTypeEntity.ToModel<InteVehicleTypeDto>();
-           }
-           throw new CustomerValidationException(nameof(ErrorCode.MES18501));
+            var inteVehicleTypeEntity = await _inteVehicleTypeRepository.GetByIdAsync(id);
+            if (inteVehicleTypeEntity != null)
+            {
+                return inteVehicleTypeEntity.ToModel<InteVehicleTypeDto>();
+            }
+            throw new CustomerValidationException(nameof(ErrorCode.MES18501));
         }
 
         /// <summary>
@@ -289,7 +286,7 @@ namespace Hymson.MES.Services.Services.Integrated
 
             var inteVehicleTypeVerifyDtos = new List<InteVehicleTypeVerifyDto>();
             #region 处理数据
-            if (inteVehicleTypeEntitys.Any()) 
+            if (inteVehicleTypeEntitys.Any())
             {
                 var materials = await _procMaterialRepository.GetByIdsAsync(inteVehicleTypeEntitys.Where(x => x.Type == VehicleTypeVerifyTypeEnum.Material).Select(x => x.VerifyId).Distinct().ToArray());
 
@@ -306,7 +303,7 @@ namespace Hymson.MES.Services.Services.Integrated
                         inteVehicleTypeVerifyDto.Version = material?.Version;
                         inteVehicleTypeVerifyDto.Name = material?.MaterialName;
                     }
-                    else 
+                    else
                     {
                         var materialGroup = materialGroups.FirstOrDefault(x => x.Id == item.VerifyId);
                         inteVehicleTypeVerifyDto.VerifyCode = materialGroup?.GroupCode;
