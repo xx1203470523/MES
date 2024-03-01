@@ -1111,7 +1111,7 @@
         public const string MES16743 = "此容器对该条码的存储已达到最大存储容量!";
         public const string MES16744 = "条码不存在!";
         public const string MES16745 = "此条码不存在工单信息!";
-        public const string MES16746 = "数据异常，包装容器不存在!";
+        public const string MES16746 = "该容器未进行过装载!";
         public const string MES16747 = "容器编码不存在!";
         public const string MES16748 = "卸载包装失败，容器卸载失败!";
         public const string MES16749 = "卸载包装失败，包装记录加载失败!";

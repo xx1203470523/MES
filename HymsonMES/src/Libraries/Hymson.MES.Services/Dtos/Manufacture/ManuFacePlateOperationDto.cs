@@ -44,11 +44,6 @@ public class ManuFacePlateCommonDto
 public class ManuFacePlatePackDto : ManuFacePlateCommonDto
 {
     /// <summary>
-    /// 包装容器Id
-    /// </summary>
-    public long? PackContainerId { get; set; }
-
-    /// <summary>
     /// 包装容器编码
     /// </summary>
     public string? PackContainerCode { get; set; }
