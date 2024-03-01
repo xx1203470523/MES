@@ -12,9 +12,9 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     public record CCDFileUploadCompleteDto : QknyBaseDto
     {
         /// <summary>
-        /// 条码文件信心
+        /// 条码文件信息
         /// </summary>
-        public List<CCDFileSfcDto> SfcList = new List<CCDFileSfcDto>();
+        public List<CCDFileSfcDto> SfcList { get; set; } = new List<CCDFileSfcDto>();
     }
 
     /// <summary>

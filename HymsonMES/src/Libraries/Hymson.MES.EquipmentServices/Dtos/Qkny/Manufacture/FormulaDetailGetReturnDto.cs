@@ -10,12 +10,17 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     /// <summary>
     /// 配方明细返回
     /// </summary>
-    public record FormulaDetailGetReturnDto : QknyBaseDto
+    public record FormulaDetailGetReturnDto 
     {
         /// <summary>
         /// 版本
         /// </summary>
         public string Version { get; set; } = "";
+
+        /// <summary>
+        /// 参数列表
+        /// </summary>
+        public List<FormulaParamList> ParamList { get; set; } = new List<FormulaParamList>();
     }
 
     /// <summary>
@@ -46,12 +51,12 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>  
         /// 参数编码  
         /// </summary>  
-        public string ParameterCode { get; set; } = "";
+        public string ParameCode { get; set; } = "";
 
         /// <summary>  
         /// 参数值  
         /// </summary>  
-        public string ParameterValue { get; set; } = "";
+        public string ParamValue { get; set; } = "";
 
         /// <summary>  
         /// 功能码  

@@ -142,9 +142,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("InboundMore")]
         [LogDescription("进站多个009", BusinessType.OTHER, "InboundMore009", ReceiverTypeEnum.MES)]
-        public async Task<InboundMoreReturnDto> InboundMoreAsync(InboundMoreDto dto)
+        public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
         {
-            InboundMoreReturnDto result = new InboundMoreReturnDto();
+            List<InboundMoreReturnDto> result = new List<InboundMoreReturnDto>();
+            for(var i = 0;i < dto.SfcList.Count; ++i)
+            {
+                InboundMoreReturnDto model = new InboundMoreReturnDto();
+                model.Code = 0;
+                model.Msg = "11";
+                model.Sfc = $"sfc00{i+1}";
+
+                result.Add(model);
+            }
 
             return result;
         }
@@ -157,9 +166,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("OutboundMore")]
         [LogDescription("出站多个010", BusinessType.OTHER, "OutboundMore010", ReceiverTypeEnum.MES)]
-        public async Task<OutboundMoreReturnDto> OutboundMoreAsync(OutboundMoreDto dto)
+        public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
         {
-            OutboundMoreReturnDto result = new OutboundMoreReturnDto();
+            List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
+            for (var i = 0; i < dto.SfcList.Count; ++i)
+            {
+                OutboundMoreReturnDto model = new OutboundMoreReturnDto();
+                model.Code = 0;
+                model.Msg = "11";
+                model.Sfc = $"sfc00{i + 1}";
+
+                result.Add(model);
+            }
 
             return result;
         }
@@ -190,6 +208,17 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<GetRecipeDetailReturnDto> GetRecipeDetailAsync(GetRecipeDetailDto dto)
         {
             GetRecipeDetailReturnDto result = new GetRecipeDetailReturnDto();
+
+            List<RecipeParamDto> paramList = new List<RecipeParamDto>();
+            for(var i = 0;i < 3; ++i)
+            {
+                RecipeParamDto param = new RecipeParamDto();
+                param.ParamCode = $"param{i}";
+                param.ParamValue = "";
+                param.ParamLower = "0";
+                param.ParamUpper = "1000";
+                result.ParamList.Add(param);
+            }
 
             return result;
         }
@@ -309,6 +338,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<List<string>> GenerateSfcAsync(GenerateSfcDto dto)
         {
             List<string> sfcList = new List<string>();
+            for(var i = 0;i < dto.Qty + 1; ++i)
+            {
+                sfcList.Add($"sfc00{i+1}");
+            }
 
             return sfcList;
         }
@@ -327,7 +360,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// CCD文件上传完成023"
+        /// CCD文件上传完成023
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -445,6 +478,16 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<List<FormulaListGetReturnDto>> FormulaListGetAsync(FormulaListGetDto dto)
         {
             List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
+            for(var i = 0;i < 3; ++i)
+            {
+                FormulaListGetReturnDto model = new FormulaListGetReturnDto();
+                model.FormulaCode = $"formulaCode{i+1}";
+                model.Version = "1.0";
+                model.ProductCode = $"productCode{i}";
+                model.LastUpdateOnTime = DateTime.Now;
+
+                list.Add(model);
+            }
 
             return list;
         }
@@ -457,11 +500,27 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("FormulaDetailGet")]
         [LogDescription("获取配方参数明细(制胶匀浆)032", BusinessType.OTHER, "FormulaDetailGet032", ReceiverTypeEnum.MES)]
-        public async Task<List<FormulaDetailGetReturnDto>> FormulaDetailGetAsync(FormulaDetailGetDto dto)
+        public async Task<FormulaDetailGetReturnDto> FormulaDetailGetAsync(FormulaDetailGetDto dto)
         {
-            List<FormulaDetailGetReturnDto> list = new List<FormulaDetailGetReturnDto>();
+            FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
+            result.Version = "1.0";
+            
+            for(var i = 0;i < 5; ++i)
+            {
+                FormulaParamList model = new FormulaParamList();
+                model.SepOrder = i + 1;
+                model.Category = "A|B|C";
+                model.MarterialCode = $"materialCode{i}";
+                model.MarerialGroupCode = $"MarerialGroupCode{i}";
+                model.ParameCode = $"ParameCode{i}";
+                model.ParamValue = $"ParamValue{i}";
+                model.FunctionCode = $"FunctionCode{i}";
+                model.Unit = $"Unit{i}";
 
-            return list;
+                result.ParamList.Add(model);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -513,13 +572,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         }
 
         /// <summary>
-        /// 037托盘NG电芯上报037
+        /// 托盘NG电芯上报037
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("ContainerNgReport")]
-        [LogDescription("037托盘NG电芯上报037", BusinessType.OTHER, "ContainerNgReport037", ReceiverTypeEnum.MES)]
+        [LogDescription("托盘NG电芯上报037", BusinessType.OTHER, "ContainerNgReport037", ReceiverTypeEnum.MES)]
         public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
         {
         }
@@ -556,8 +615,20 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("OutboundMultPolar")]
         [LogDescription("多极组产品出站040", BusinessType.OTHER, "OutboundMultPolar040", ReceiverTypeEnum.MES)]
-        public async Task OutboundMultPolarAsync(OutboundMultPolarDto dto)
+        public async Task<List<OutboundMoreReturnDto>> OutboundMultPolarAsync(OutboundMultPolarDto dto)
         {
+            List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
+            for (var i = 0; i < dto.SfcList.Count; ++i)
+            {
+                OutboundMoreReturnDto model = new OutboundMoreReturnDto();
+                model.Code = 0;
+                model.Msg = "11";
+                model.Sfc = $"sfc00{i + 1}";
+
+                result.Add(model);
+            }
+
+            return result;
         }
 
         /// <summary>

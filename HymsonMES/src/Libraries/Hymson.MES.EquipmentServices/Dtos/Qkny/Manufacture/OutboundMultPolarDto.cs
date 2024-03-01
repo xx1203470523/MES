@@ -14,6 +14,6 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
         /// <summary>
         /// 出站产品条码列表
         /// </summary>
-        public List<OutboundDto> SfcList { get; set; } = new List<OutboundDto>();
+        public List<QknyOutboundBaseDto> SfcList { get; set; } = new List<QknyOutboundBaseDto>();
     }
 }

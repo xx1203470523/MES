@@ -9,7 +9,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     /// <summary>
     /// 涂布获取下发条码(用于涂布CCD面密度)
     /// </summary>
-    public record CcdGetBarcodeReturnDto : QknyBaseDto
+    public record CcdGetBarcodeReturnDto
     {
         /// <summary>
         /// 条码

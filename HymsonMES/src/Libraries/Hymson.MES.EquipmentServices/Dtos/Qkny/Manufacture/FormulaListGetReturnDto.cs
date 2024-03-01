@@ -10,7 +10,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
     /// <summary>
     /// 配方列表获取
     /// </summary>
-    public record FormulaListGetReturnDto : QknyBaseDto
+    public record FormulaListGetReturnDto
     {
         /// <summary>
         /// 配方编码
