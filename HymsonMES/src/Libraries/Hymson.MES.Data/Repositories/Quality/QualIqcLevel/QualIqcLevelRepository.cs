@@ -165,7 +165,7 @@ namespace Hymson.MES.Data.Repositories.Quality
     public partial class QualIqcLevelRepository
     {
         const string GetPagedInfoDataSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_level /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows ";
-        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_level /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ ";
+        const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM qual_iqc_level /**innerjoin**/ /**leftjoin**/ /**where**/ ";
         const string GetEntitiesSqlTemplate = @"SELECT /**select**/ FROM qual_iqc_level /**where**/  ";
 
         const string InsertSql = "INSERT INTO qual_iqc_level(  `Id`, `MaterialId`, `SupplierId`, `Type`, `Level`, `Status`, AcceptanceLevel, `Remark`, `CreatedOn`, `CreatedBy`, `UpdatedBy`, `UpdatedOn`, `SiteId`, `IsDeleted`) VALUES (  @Id, @MaterialId, @SupplierId, @Type, @Level, @Status, @AcceptanceLevel, @Remark, @CreatedOn, @CreatedBy, @UpdatedBy, @UpdatedOn, @SiteId, @IsDeleted) ";
