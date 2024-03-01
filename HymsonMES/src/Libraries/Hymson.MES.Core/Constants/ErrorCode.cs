@@ -1772,5 +1772,14 @@
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
 
         #endregion
+
+        #region 基础数据导入 11600
+
+        public const string MES11601 = "导入的数据中设备编码重复！";
+        public const string MES11602 = "设备编码不能为空！";
+        public const string MES11603 = "设备名称不能为空！";
+        public const string MES11604 = "存放位置不能为空！";
+        public const string MES11605 = "使用状态不能为空！";
+        #endregion
     }
 }
