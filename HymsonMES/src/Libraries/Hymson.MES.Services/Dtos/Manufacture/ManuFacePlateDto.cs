@@ -115,7 +115,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 容器编码
         /// </summary>
-        public string ContainerCode { get; set; }
+        public string? ContainerCode { get; set; }
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// <summary>
         /// 容器编码
         /// </summary>
-        public string ContainerCode { get; set; }
+        public string? ContainerCode { get; set; }
     }
 
     /// <summary>
