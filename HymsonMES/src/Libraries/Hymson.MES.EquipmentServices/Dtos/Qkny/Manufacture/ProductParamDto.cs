@@ -7,14 +7,30 @@ using System.Threading.Tasks;
 namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture
 {
     /// <summary>
-    /// 容器出站
+    /// 产品参数上传
     /// </summary>
-    public record OutboundInContainerDto : QknyBaseDto
+    public record ProductParamDto : QknyBaseDto
     {
         /// <summary>
-        /// 容器
+        /// 容器条码
         /// </summary>
         public string ContainerCode { get; set; } = "";
+
+        /// <summary>
+        /// 出站产品条码列表
+        /// </summary>
+        public List<ProductParamSfcDto> SfcList { get; set; } = new List<ProductParamSfcDto>();
+    }
+
+    /// <summary>
+    /// 条码餐宿
+    /// </summary>
+    public record ProductParamSfcDto
+    {
+        /// <summary>
+        /// 条码
+        /// </summary>
+        public string Sfc { get; set; } = "";
 
         /// <summary>
         /// 参数列表

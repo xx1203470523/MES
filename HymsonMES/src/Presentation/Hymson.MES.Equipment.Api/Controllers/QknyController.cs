@@ -653,6 +653,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘出站(容器出站)041", BusinessType.OTHER, "OutboundInContainer041", ReceiverTypeEnum.MES)]
         public async Task OutboundInContainerAsync(OutboundInContainerDto dto)
         {
+            //TODO
+            //1. 托盘如果存在参数，在记录数据时，需要在额外记录托盘当时的条码
         }
 
         /// <summary>
@@ -667,7 +669,17 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
         }
 
-
+        /// <summary>
+        /// 产品参数上传043
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ProductParam")]
+        [LogDescription("产品参数上传043", BusinessType.OTHER, "ProductParam043", ReceiverTypeEnum.MES)]
+        public async Task ProductParamAsync(ProductParamDto dto)
+        {
+        }
 
 
 
