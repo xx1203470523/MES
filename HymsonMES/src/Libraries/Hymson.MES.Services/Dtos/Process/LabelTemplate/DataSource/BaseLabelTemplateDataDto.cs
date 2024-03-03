@@ -10,6 +10,6 @@ namespace Hymson.MES.Services.Dtos.Process.LabelTemplate.DataSource
     {
         public long SiteId { get; set; }
 
-        public string BarCode { get; set; }
+        public IEnumerable<string> BarCodes { get; set; }
     }
 }

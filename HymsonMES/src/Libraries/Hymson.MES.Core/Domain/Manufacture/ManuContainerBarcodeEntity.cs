@@ -6,6 +6,7 @@
  *build datetime: 2023-04-12 02:29:23
  */
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 using System.Reflection.Metadata.Ecma335;
 
 namespace Hymson.MES.Core.Domain.Manufacture
@@ -51,7 +52,7 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 物料版本
         /// </summary>
-        public string MaterialVersion { get; set; }
+        public string? MaterialVersion { get; set; }
         /// <summary>
         /// 生产工单Id
         /// </summary>
@@ -60,8 +61,11 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 状态;1：打开 2：关闭
         /// </summary>
-        public int Status { get; set; } = 1;
+        public ManuContainerBarcodeStatusEnum Status { get; set; } = ManuContainerBarcodeStatusEnum.Open;
 
-       
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public decimal Qty { get; set; } = 0;
     }
 }

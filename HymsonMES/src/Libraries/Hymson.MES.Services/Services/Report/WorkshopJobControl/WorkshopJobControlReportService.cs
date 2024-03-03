@@ -166,7 +166,7 @@ namespace Hymson.MES.Services.Services.Report
             }
             #region 查询基础数据
             //查询工单信息
-            var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId);
+            var workOrder = await _planWorkOrderRepository.GetByIdAsync(sfcInfo.WorkOrderId ?? 0);
             if (workOrder == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES18102)).WithData("sfc", sfc);

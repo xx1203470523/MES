@@ -208,7 +208,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuMarking
             var materialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
 
             //获取工单信息
-            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId);
+            var workOrderEntity = await _planWorkOrderRepository.GetByIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
 
             //查询条码在制表
             var sfcProduceEntities= await _manuSfcProduceRepository.GetListBySfcsAsync(new ManuSfcProduceBySfcsQuery()

@@ -515,7 +515,7 @@ namespace Hymson.MES.Services.Services.Process
             var entity = await _procFormulaRepository.GetByIdAsync(changeStatusCommand.Id);
             if (entity == null || entity.IsDeleted != 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10130));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10136));
             }
             if (entity.Status == changeStatusCommand.Status)
             {

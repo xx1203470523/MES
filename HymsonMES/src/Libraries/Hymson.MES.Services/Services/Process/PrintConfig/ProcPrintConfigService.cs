@@ -138,7 +138,7 @@ namespace Hymson.MES.Services.Services.Process.PrintConfig
 
             if (!IsValidIP(param.PrintIp))
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10378));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10379));
             }
 
                 var userName = _currentUser.UserName;

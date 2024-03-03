@@ -322,7 +322,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(packQuery);
             if (foo != null)
             {
-                var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
+                var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId.GetValueOrDefault());
                 throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("barcode", barcodeobj?.BarCode ?? foo.ContainerBarCodeId.ToString());
             }
             else
@@ -410,7 +410,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16731));
                     }
-                    if (barcodeobj.Status == (int)Core.Enums.Manufacture.ManuContainerBarcodeStatusEnum.Close || barcodeobj.IsDeleted == 1)
+                    if (barcodeobj.Status == ManuContainerBarcodeStatusEnum.Close || barcodeobj.IsDeleted == 1)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES16722)).WithData("packId", barcodeobj.Id);
                     }
@@ -466,7 +466,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             }
                             if (inte.Maximum == (packs.Count() + 1))
                             {
-                                barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                                barcodeobj.Status = ManuContainerBarcodeStatusEnum.Close;
 
                                 await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                             }
@@ -474,7 +474,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
                         else
                         {
-                            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                            barcodeobj.Status = ManuContainerBarcodeStatusEnum.Close;
 
                             await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                             throw new CustomerValidationException(nameof(ErrorCode.MES16717));
@@ -507,7 +507,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var foo = await _manuContainerPackRepository.GetByLadeBarCodeAsync(packQuery);
             if (foo != null)
             {
-                var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId);
+                var barcodeobj = await _manuContainerBarcodeRepository.GetByIdAsync(foo.ContainerBarCodeId.GetValueOrDefault());
                 throw new CustomerValidationException(nameof(ErrorCode.MES16721)).WithData("sfc", packQuery.LadeBarCode).WithData("barcode", barcodeobj?.BarCode ?? foo.ContainerBarCodeId.ToString());
             }
             else
@@ -518,7 +518,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16718));
 
                 //判断容器是否已关闭，只有关闭的才能装箱
-                if (prebarcodeobj.Status != (int)ManuContainerBarcodeStatusEnum.Close)
+                if (prebarcodeobj.Status != ManuContainerBarcodeStatusEnum.Close)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES16729)).WithData("barcode", prebarcodeobj.BarCode);
                 }
@@ -662,7 +662,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             }
                             if (inte.Maximum == (packs.Count() + 1))
                             {
-                                barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                                barcodeobj.Status = ManuContainerBarcodeStatusEnum.Close;
 
                                 await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                             }
@@ -671,7 +671,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         }
                         else
                         {
-                            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                            barcodeobj.Status = ManuContainerBarcodeStatusEnum.Close;
 
                             await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                             throw new CustomerValidationException(nameof(ErrorCode.MES16717));
@@ -1032,7 +1032,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             // 验证DTO
             await _validationUpdateStatusRules.ValidateAndThrowAsync(updateManuContainerBarcodeStatusDto);
             // 关闭操作必须要装箱数量达到最小包装数
-            if (updateManuContainerBarcodeStatusDto.Status == 2)
+            if (updateManuContainerBarcodeStatusDto.Status == ManuContainerBarcodeStatusEnum.Close)
             {
                 var container = await _inteContainerRepository.GetByIdAsync(containerBarcode.ContainerId);
                 // 查询已包装数
@@ -1053,7 +1053,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var rows = await _manuContainerBarcodeRepository.UpdateStatusAsync(manuContainerBarcodeEntity);
             if (rows <= 0)
             {
-                string errorCode = updateManuContainerBarcodeStatusDto.Status == 1 ? nameof(ErrorCode.MES16733) : nameof(ErrorCode.MES16734);
+                string errorCode = updateManuContainerBarcodeStatusDto.Status == ManuContainerBarcodeStatusEnum.Open ? nameof(ErrorCode.MES16733) : nameof(ErrorCode.MES16734);
                 throw new CustomerValidationException(errorCode);
             }
         }
