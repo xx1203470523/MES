@@ -541,6 +541,11 @@
         public const string MES12518 = "【{code}】容器未启用！";
         public const string MES12519 = "容器规格不存在！";
         public const string MES12520 = "【{code}】容器规格不存在！";
+        public const string MES12521 = "高度需要大于0";
+        public const string MES12522 = "长度需要大于0";
+        public const string MES12523 = "重量需要大于0";
+        public const string MES12524 = "宽度需要大于0";
+        public const string MES12525 = "最大填充重量需要大于0";
         #endregion
 
         #region 设备 12600
@@ -903,6 +908,7 @@
 
         public const string MES15728 = "设置编码【{code}】在当前操作中不允许重复！";
         public const string MES15729 = "配方操作不允许重复！";
+        public const string MES15730 = "步骤第{line}行下限不能大于上限";
         #endregion
 
         #region 工单 16000
