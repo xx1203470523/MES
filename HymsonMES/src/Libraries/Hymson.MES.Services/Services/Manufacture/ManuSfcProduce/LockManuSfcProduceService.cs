@@ -34,7 +34,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
             }
             await _validationLockRules.ValidateAndThrowAsync(parm);
 
-           
+
             switch (parm.OperationType)
             {
                 case
@@ -159,7 +159,7 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 }
 
                 //验证将来锁工序是否在条码所在工序之后
-                if (await _manuCommonOldService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId))
+                if (!await _manuCommonOldService.IsProcessStartBeforeEndAsync(sfcEntity.ProcessRouteId, sfcEntity.ProcedureId, parm.LockProductionId))
                 {
                     var validationFailure = new ValidationFailure();
                     if (validationFailure.FormattedMessagePlaceholderValues == null || !validationFailure.FormattedMessagePlaceholderValues.Any())
@@ -170,9 +170,14 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                     {
                         validationFailure.FormattedMessagePlaceholderValues.Add("CollectionIndex", sfc);
                     }
-                    validationFailure.FormattedMessagePlaceholderValues.Add("sfcproduction", sfc);
-                    validationFailure.FormattedMessagePlaceholderValues.Add("lockproductionname", sfc);
-                    validationFailure.ErrorCode = nameof(ErrorCode.MES15313);
+
+                    var procProcedureEntity = await _procProcedureRepository.GetByIdAsync(sfcEntity.ProcedureId);
+
+                    var lockProcProcedureEntity = await _procProcedureRepository.GetByIdAsync(parm.LockProductionId);
+
+                    validationFailure.FormattedMessagePlaceholderValues.Add("sfcproduction", procProcedureEntity.Code);
+                    validationFailure.FormattedMessagePlaceholderValues.Add("lockproductionname", lockProcProcedureEntity.Code);
+                    validationFailure.ErrorCode = nameof(ErrorCode.MES15314);
                     validationFailures.Add(validationFailure);
                 }
             }
@@ -517,13 +522,16 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 };
                 sfcStepList.Add(stepEntity);
                 unLockList.Add(sfc.Id);
-                manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                if (sfc.Status == SfcStatusEnum.Locked)
                 {
-                    Id = sfc.SFCId,
-                    CurrentStatus = sfc.Status,
-                    Status = sfc.BeforeLockedStatus ?? sfc.Status,
-                    UpdatedBy = _currentUser.UserName
-                });
+                    manuSfcUpdateStatusByIdCommands.Add(new ManuSfcUpdateStatusByIdCommand
+                    {
+                        Id = sfc.SFCId,
+                        CurrentStatus = sfc.Status,
+                        Status = sfc.BeforeLockedStatus ?? sfc.Status,
+                        UpdatedBy = _currentUser.UserName
+                    });
+                }
             }
             #endregion
 
@@ -536,12 +544,15 @@ namespace Hymson.MES.Services.Services.Manufacture.ManuSfcProduce
                 {
                     await _manuSfcProduceRepository.DeleteSfcProduceBusinesssAsync(new DeleteSfcProduceBusinesssCommand { SfcInfoIds = unLockList, BusinessType = ManuSfcProduceBusinessType.Lock });
                 }
-
+                var row = 0;
                 //条码状态修改
-                var row = await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
-                if (row != manuSfcUpdateStatusByIdCommands.Count)
+                if (manuSfcUpdateStatusByIdCommands != null && manuSfcUpdateStatusByIdCommands.Any())
                 {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15426));
+                    row += await _manuSfcRepository.ManuSfcUpdateStatuByIdRangeAsync(manuSfcUpdateStatusByIdCommands);
+                    if (row != manuSfcUpdateStatusByIdCommands.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15426));
+                    }
                 }
                 await _manuSfcProduceRepository.UnLockedSfcProcedureAsync(new UnLockedProcedureCommand
                 {
