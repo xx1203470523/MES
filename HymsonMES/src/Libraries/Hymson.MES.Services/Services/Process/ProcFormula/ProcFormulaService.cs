@@ -286,10 +286,19 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 组装详情数据
             var procFormulaDetailsEntitys = new List<ProcFormulaDetailsEntity>();
+
             if (saveDto.ProcFormulaDetailsDtos != null)
-                foreach (var detail in saveDto.ProcFormulaDetailsDtos)
+                foreach (var (detail, index) in saveDto.ProcFormulaDetailsDtos.Select((value, i) => (value, i)))
+                //foreach (var detail in saveDto.ProcFormulaDetailsDtos)
                 {
                     var detailEntity = detail.ToEntity<ProcFormulaDetailsEntity>();
+
+                    //校验上下限
+                    if ((detailEntity.UpperLimit - detailEntity.LowLimit) < 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index);
+                    }
+
                     detailEntity.Id = IdGenProvider.Instance.CreateId();
                     detailEntity.CreatedBy = _currentUser.UserName;
                     detailEntity.CreatedOn = updatedOn;
