@@ -955,7 +955,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
             if (process.ContainerBarcodeEntity.Status == ManuContainerBarcodeStatusEnum.Close)
             {
-                process.ContainerBarcodeEntity = await CreatedContainerBarcodeEntityAsync(process.FacePlateContainerPackEntity.ContainerId, process.InteContainerInfoEntity.Code, userName, siteId);
+                process.ContainerBarcodeEntity = await CreatedContainerBarcodeEntityAsync(process.ContainerBarcodeEntity.ContainerId, process.InteContainerInfoEntity.Code, userName, siteId);
             }
             else
             {
