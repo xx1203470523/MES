@@ -14,7 +14,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddManuServicesForXinShiJie(this IServiceCollection services)
         {
-            
+
             return services;
         }
 
@@ -25,7 +25,7 @@ namespace Hymson.MES.CoreServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddValidatorsForXinShiJie(IServiceCollection services)
         {
-            
+
             return services;
         }
 

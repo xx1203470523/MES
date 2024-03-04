@@ -72,7 +72,7 @@ public class QualIqcInspectionItemQuery : QueryAbstraction
     /// <summary>
     /// 状态 0、已禁用 2、启用
     /// </summary>
-    public YesOrNoEnum? Status { get; set; }
+    public DisableOrEnableEnum? Status { get; set; }
 
 
     /// <summary>
@@ -214,7 +214,7 @@ public class QualIqcInspectionItemPagedQuery : PagerInfo
     /// <summary>
     /// 状态 0、已禁用 2、启用
     /// </summary>
-    public YesOrNoEnum? Status { get; set; }
+    public DisableOrEnableEnum? Status { get; set; }
 
 
     /// <summary>

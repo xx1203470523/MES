@@ -11,7 +11,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
     /// <summary>
     /// 容器条码表 查询参数
     /// </summary>
-    public class ManuContainerBarcodeQuery
+    public partial class ManuContainerBarcodeQuery
     {
         /// <summary>
         /// 条码
@@ -21,7 +21,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <summary>
         /// 条码列表
         /// </summary>
-        public string[]? BarCodes { get; set; }
+        public IEnumerable<string>? BarCodes { get; set; }
 
         /// <summary>
         /// 站点id

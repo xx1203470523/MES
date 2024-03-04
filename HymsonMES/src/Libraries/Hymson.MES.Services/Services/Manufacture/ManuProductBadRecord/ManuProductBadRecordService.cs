@@ -206,7 +206,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
 
             //工单激活信息
-            var orderIds = sfcInfoEntities.Select(x => x.WorkOrderId).Distinct().ToArray();
+            var orderIds = sfcInfoEntities.Select(x => x.WorkOrderId ?? 0).Distinct().ToArray();
             var activeOrders = await _planWorkOrderActivationRepository.GetByWorkOrderIdsAsync(orderIds);
             //工单信息
             var planWorkOrders = await _planWorkOrderRepository.GetByIdsAsync(orderIds);
@@ -314,7 +314,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     Id = IdGenProvider.Instance.CreateId(),
                     SFC = sfc,
                     ProductId = sfcInfoEntity.ProductId,
-                    WorkOrderId = sfcInfoEntity.WorkOrderId,
+                    WorkOrderId = sfcInfoEntity.WorkOrderId ?? 0,
                     WorkCenterId = manuSfcProduceInfoEntity?.WorkCenterId,
                     ProductBOMId = manuSfcProduceInfoEntity?.ProductBOMId,
                     Qty = sfcEntity.Qty,
@@ -900,7 +900,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Id = IdGenProvider.Instance.CreateId(),
                 SFC = badReJudgmentDto.Sfc,
                 ProductId = manuSfcInfoEntity.ProductId,
-                WorkOrderId = manuSfcInfoEntity.WorkOrderId,
+                WorkOrderId = manuSfcInfoEntity.WorkOrderId ?? 0,
                 WorkCenterId = manuSfcProduceEntity?.WorkCenterId,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
                 Qty = manuSfcEntity.Qty,
@@ -962,7 +962,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 if (manuSfcProduceEntity == null)//完成品返修
                 {
                     //获取激活工单
-                    var activeOrder = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(manuSfcInfoEntity.WorkOrderId);
+                    var activeOrder = await _planWorkOrderActivationRepository.GetByWorkOrderIdAsync(manuSfcInfoEntity.WorkOrderId ?? 0);
                     if (activeOrder == null)
                     {
                         throw new CustomerValidationException(nameof(ErrorCode.MES15418));
@@ -1016,7 +1016,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
                             ProcessRouteId = manuSfcProduceEntity.ProcessRouteId, //badReJudgmentDto.BadProcessRouteId ?? 0,
-                            ProcedureId = manuSfcProduceEntity.ProductId,//processRouteProcedure.ProcedureId
+                            ProcedureId = manuSfcProduceEntity.ProcedureId,//processRouteProcedure.ProcedureId
                         }),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),
@@ -1069,7 +1069,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         BusinessContent = JsonConvert.SerializeObject(new SfcProduceRepairBo
                         {
                             ProcessRouteId = manuSfcProduceEntity.ProcessRouteId, //badReJudgmentDto.BadProcessRouteId ?? 0,
-                            ProcedureId = manuSfcProduceEntity.ProductId,//processRouteProcedure.ProcedureId
+                            ProcedureId = manuSfcProduceEntity.ProcedureId,//processRouteProcedure.ProcedureId
                         }),
                         SiteId = _currentSite.SiteId ?? 0,
                         CreatedOn = HymsonClock.Now(),

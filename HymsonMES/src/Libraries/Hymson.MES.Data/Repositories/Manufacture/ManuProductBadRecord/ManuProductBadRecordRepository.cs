@@ -5,6 +5,7 @@ using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Command;
 using Hymson.MES.Data.Repositories.Manufacture.ManuProductBadRecord.Query;
+using Hymson.Snowflake;
 using Microsoft.Extensions.Options;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -459,6 +460,9 @@ namespace Hymson.MES.Data.Repositories.Manufacture
             {
                 sqlBuilder.AddParameters(new { CreatedOnStart = pageQuery.CreatedOn[0], CreatedOnEnd = pageQuery.CreatedOn[1].AddDays(1) });
                 sqlBuilder.Where(" rbr.CreatedOn >= @CreatedOnStart AND  rbr.CreatedOn < @CreatedOnEnd ");
+
+                //sqlBuilder.AddParameters(new { StartId = IdGenProvider.GenerateStartId(pageQuery.CreatedOn[0]), EndId = IdGenProvider.GenerateEndId(pageQuery.CreatedOn[1].AddDays(1),false) });
+                //sqlBuilder.Where(" rbr.Id >= @StartId AND  rbr.Id < @EndId");
             }
 
             var offSet = (pageQuery.PageIndex - 1) * pageQuery.PageSize;

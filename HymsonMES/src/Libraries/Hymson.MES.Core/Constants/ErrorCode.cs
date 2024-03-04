@@ -5,7 +5,7 @@
     /// </summary>
     public static partial class ErrorCode
     {
-        #region  用户端错误 
+        #region  用户端错误
         public const string MES10100 = "请求实体不能为空";
         public const string MES10101 = "站点码获取失败，请重新登录！";
         public const string MES10102 = "删除失败Id 不能为空!";
@@ -36,12 +36,13 @@
         public const string MES10127 = "状态已经是[{status}],无法重复设置";
         public const string MES10128 = "变更状态的状态不能为新建";
         public const string MES10129 = "只有新建或者保留才能编辑";
-        public const string MES10130 = "操作数据丢失";
+        public const string MES10130 = "必填项不可为空";
         public const string MES10131 = "编码只能是英文或数字组合";
         public const string MES10132 = "编码不能包含特殊字符";
         public const string MES10133 = "未获取到导入数据！";
         public const string MES10134 = "未获取到导出数据！";
         public const string MES10135 = "不允许删除【已启用】状态的数据！";
+        public const string MES10136 = "操作数据丢失";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -148,8 +149,9 @@
         public const string MES10375 = "没有获取到对应打印任务数据或打印模板";
         public const string MES10376 = "没有获取对应打印任务的打印模板信息";
         public const string MES10377 = "打印任务的模板名称无法转为ID";
+        public const string MES10378 = "打印数据源{DataSourceName}不存在,无法打印,请查看标签模板";
 
-        public const string MES10378 = "IP设定不符合规范!";
+        public const string MES10379 = "IP设定不符合规范!";
 
 
         #endregion
@@ -418,6 +420,8 @@
         public const string MES11408 = "产品序列码【{sfc}】的降级规则不存在";
         public const string MES11409 = "当前录入的等级高于产品序列码【{sfc}】的降级等级";
         public const string MES11410 = "降级移除失败:有数据已经被移除了,请清除后重新处理";
+        public const string MES11411 = "产品序列码【{sfc}】状态为无效";
+        public const string MES11412 = "产品序列码【{sfc}】状态为删除";
 
         #endregion
 
@@ -511,23 +515,37 @@
         public const string MES12445 = "编码规则组成最多只有一行取值方式为可变值且分段值为%MULTIPLE_VARIABLE%的数据！";
         public const string MES12446 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%的数据需要填写自定义值！";
         public const string MES12447 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%数据中自定义值的区间值存在重复！";
+        public const string MES12448 = "包装序列码的容器编码不可为空";
+        public const string MES12449 = "包装序列码必须填写有效的容器编码";
         #endregion
 
         #region 容器维护 12500
         public const string MES12500 = "容器维护错误";
-        public const string MES12501 = "最大数量不能小于最小数量{Minimum}";
-        public const string MES12502 = "最大数量不能小于最小数量";
+        public const string MES12501 = "最大值不能小于最小值{Minimum}";
+        public const string MES12502 = "最大值不能小于最小值";
         public const string MES12503 = "同一物料/物料组只允许设置一次";
-        public const string MES12504 = "最小数量须为正整数";
-        public const string MES12505 = "最大数量须为正整数";
-        public const string MES12506 = "最小数量须大于0";
-        public const string MES12507 = "最大数量须大于0";
-        public const string MES12508 = "最大数量须大于最小数量";
+        public const string MES12504 = "最小值须为正整数";
+        public const string MES12505 = "最大值须为正整数";
+        public const string MES12506 = "最小值须大于0";
+        public const string MES12507 = "最大值须大于0";
+        public const string MES12508 = "最大值须大于最小值";
         public const string MES12509 = "只能删除新建状态的数据";
         public const string MES12510 = "非新建状态的数据不能修改为新建状态";
         public const string MES12511 = "状态不合法，请检查";
         public const string MES12512 = "保证等级不合法，请检查";
         public const string MES12513 = "没有找到对应的容器信息";
+        public const string MES12514 = "所有规格参数必须大于0";
+        public const string MES12515 = "同一容器只允许设置一次";
+        public const string MES12516 = "最小值/最大值必填！";
+        public const string MES12517 = "容器规格参数必填！";
+        public const string MES12518 = "【{code}】容器未启用！";
+        public const string MES12519 = "容器规格不存在！";
+        public const string MES12520 = "【{code}】容器规格不存在！";
+        public const string MES12521 = "高度需要大于0";
+        public const string MES12522 = "长度需要大于0";
+        public const string MES12523 = "重量需要大于0";
+        public const string MES12524 = "宽度需要大于0";
+        public const string MES12525 = "最大填充重量需要大于0";
         #endregion
 
         #region 设备 12600
@@ -890,6 +908,7 @@
 
         public const string MES15728 = "设置编码【{code}】在当前操作中不允许重复！";
         public const string MES15729 = "配方操作不允许重复！";
+        public const string MES15730 = "步骤第{line}行下限不能大于上限";
         #endregion
 
         #region 工单 16000
@@ -1149,41 +1168,85 @@
         #endregion
 
         #region 容器包装 MES 16700
-        public const string MES16701 = "容器包装，条码信息未找到";
-        public const string MES16702 = "容器包装，包装码不存在";
+        public const string MES16701 = "条码信息未找到";
+        public const string MES16702 = "包装码不存在";
 
-        public const string MES16704 = "容器包装，配置面板编号为空";
-        public const string MES16705 = "容器包装，配置面板不存在或未启用";
-        public const string MES16706 = "容器包装，配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
+        public const string MES16704 = "配置面板编号为空";
+        public const string MES16705 = "配置面板不存在或未启用";
+        public const string MES16706 = "配置面板不允许混工单,当前容器工单{first},当前条码工单{second}";
 
         public const string MES16710 = "不识别的类型：{key}";
         public const string MES16708 = "产品条码不能为空";
         public const string MES16709 = "作业返回空，请检查作业是否正确配置";
-        public const string MES16711 = "容器包装，配置面板不允许活动产品";
-        public const string MES16712 = "容器包装，配置面板不允许完成产品";
-        public const string MES16713 = "容器包装，配置面板不允许排队产品";
-        public const string MES16714 = "容器包装，工序信息未找到";
-        public const string MES16715 = "容器包装，工序中未指定包装等级";
-        public const string MES16716 = "容器包装，不允许混物料版本包装 ";
-        public const string MES16717 = "容器包装，超过了最大包装数量，不允许包装";
-        public const string MES16718 = "容器包装，未找到该条码的子级包装记录";
-        public const string MES16719 = "容器包装，物料编码没有维护容器规格";
-        public const string MES16720 = "容器包装，条码已报废";
-        public const string MES16721 = "容器包装，该条码{sfc}已装箱{barcode}";
-        public const string MES16722 = "容器包装，该包装{packId}已关闭或删除";
-        public const string MES16723 = "容器包装，包装数量未达到最小包装数，不允许关闭";
-        public const string MES16724 = "容器包装，资源信息未找到";
-        public const string MES16725 = "容器包装，资源对应资源类型和工序对应资源类型不一致";
+        public const string MES16711 = "配置面板不允许活动产品";
+        public const string MES16712 = "配置面板不允许完成产品";
+        public const string MES16713 = "配置面板不允许排队产品";
+        public const string MES16714 = "工序信息未找到";
+        public const string MES16715 = "工序中未指定包装等级";
+        public const string MES16716 = "不允许混物料版本包装 ";
+        public const string MES16717 = "超过了最大包装数量，不允许包装";
+        public const string MES16718 = "未找到该条码的子级包装记录";
+        public const string MES16719 = "物料编码没有维护容器规格";
+        public const string MES16720 = "条码已报废";
+        public const string MES16721 = "条码【{sfc}】已装箱【{barcode}】";
+        public const string MES16722 = "该包装{packId}已关闭或删除";
+        public const string MES16723 = "包装数量未达到最小包装数，不允许关闭";
+        public const string MES16724 = "资源信息未找到";
+        public const string MES16725 = "资源对应资源类型和工序对应资源类型不一致";
         public const string MES16726 = "容器编码不存在";
-        public const string MES16727 = "容器包装，二级包装只能装一级容器!";
-        public const string MES16728 = "容器包装，三级包装只能装二级容器!";
-        public const string MES16729 = "容器包装，容器{barcode}未关闭!";
+        public const string MES16727 = "二级包装只能装一级容器!";
+        public const string MES16728 = "三级包装只能装二级容器!";
+        public const string MES16729 = "容器{barcode}未关闭!";
         public const string MES16730 = "同一个容器不允许不同物料进行包装!";
-        public const string MES16731 = "容器包装，容器包装等级跟工序包装等级不匹配!";
+        public const string MES16731 = "容器包装等级跟工序包装等级不匹配!";
         public const string MES16732 = "装载信息不存在!";
         public const string MES16733 = "容器已打开!";
         public const string MES16734 = "容器已关闭!";
         public const string MES16735 = "产品{product}未维护包装编码规则,无法创建容器";
+        public const string MES16736 = "面板未绑定容器，请到面板维护添加绑定容器";
+        public const string MES16739 = "条码已在别的容器进行过装箱！";
+        public const string MES16740 = "容器未打开!";
+        public const string MES16741 = "【{code}】没有维护容器特性!";
+        public const string MES16742 = "此序列码不允许使用该容器进行包装!";
+        public const string MES16743 = "此容器对该条码的存储已达到最大存储容量!";
+        public const string MES16744 = "条码不存在!";
+        public const string MES16745 = "此条码不存在工单信息!";
+        public const string MES16746 = "该容器未进行过装载!";
+        public const string MES16747 = "容器编码不存在!";
+        public const string MES16748 = "卸载包装失败，容器卸载失败!";
+        public const string MES16749 = "卸载包装失败，包装记录加载失败!";
+        public const string MES16750 = "未选择关闭容器!";
+        public const string MES16751 = "需要解除装载的容器不存在!";
+        public const string MES16752 = "容器未装载任何内容!";
+        public const string MES16753 = "容器卸载失败，可能有部分容器正在操作中，请重试!";
+        public const string MES16754 = "需要移除的装载信息不存在";
+        public const string MES16755 = "【{code}】容器可装载的【{sfc}】数量已达上限";
+        public const string MES16756 = "【{code}】容器没有维护编码生成规则";
+        public const string MES16757 = "【{code}】容器编码生成失败";
+        public const string MES16758 = "容器关闭失败，容器可能已被关闭";
+        public const string MES16759 = "容器关闭失败，该容器未进行任何包装动作";
+        public const string MES16760 = "容器关闭失败，未找到容器【{code}】的规格信息";
+        public const string MES16761 = "容器关闭失败，未达到【{code}】可关闭的最小值";
+        public const string MES16762 = "容器装箱失败，不允许同一个容器中有不同工单的产品序列码";
+        public const string MES16763 = "容器装箱失败，不允许活动状态的产品序列码装入容器";
+        public const string MES16764 = "容器装箱失败，不允许完成状态的产品序列码装入容器";
+        public const string MES16765 = "容器装箱失败，不允许排队状态的产品序列码装入容器";
+        public const string MES16766 = "容器装箱失败，不允许同一个容器中有不同的版本的物料";
+        public const string MES16767 = "容器装箱失败，不同版本物料的容器编码必须相同";
+        public const string MES16768 = "容器装箱失败，容器维护中最小&最大数量必须相等";
+        public const string MES16769 = "容器装箱失败，该条码已装入此容器，请勿重复装箱";
+        public const string MES16770 = "容器打开失败，已达到可装载的最大数量，请先移除条码再打开容器";
+        public const string MES16771 = "容器打开失败，容器可能已被打开";
+        public const string MES16772 = "条码装载失败，未输入任何需要装载条码";        
+        public const string MES16773 = "容器装载失败，不允许混装不同类型的物件";
+        public const string MES16774 = "容器装载失败，存在锁定状态产品序列码，不允许包装！";
+        public const string MES16775 = "容器装载失败，被装载容器未关闭";
+        public const string MES16776 = "当前操作面板没有维护容器编码";
+        public const string MES16777 = "包装编码不存在";
+        public const string MES16778 = "容器装箱失败，未维护容器规格";
+        public const string MES16779 = "容器包装信息获取失败，未填写包装编码";
+        public const string MES16780 = "物料编码【{code}】没有维护容器规则！";
+        public const string MES16781 = "包装编码【{0}】已被包装，父包装编码为【{1}】";
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -1210,6 +1273,7 @@
         public const string MES16913 = "不能删除启用或保留的记录！";
         public const string MES16914 = "未找到能挂载物料条码的主物料!";
         public const string MES16915 = "物料条码【{barCode}】需选择要挂载的上料点！";
+        public const string MES16916 = "面板详细信息为空!";
         #endregion
 
         #region 条码打印 MES17000
@@ -1262,6 +1326,9 @@
         public const string MES17254 = "按钮中存在，作业为空，请检查！";
         public const string MES17255 = "未读取到有效作业，请检查！";
         public const string MES17256 = "作业参数【{Param}】获取失败，请检查！";
+
+        public const string MES17257 = "容器不存在！";
+        public const string MES17258 = "当前操作面板没有维护容器编码！";
         #endregion
 
         #region 在制维修 MES17300
@@ -1768,8 +1835,9 @@
 
         #region IQC检验项目
 
-        public const string MES19901 = "IQC检验项目编码不可重复";
+        public const string MES19901 = "IQC检验项目编码重复，或物料重复";
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
+        public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
 
         #endregion
 

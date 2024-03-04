@@ -35,7 +35,7 @@ public record QualIqcInspectionItemDto : BaseEntityDto
     /// <summary>
     /// 状态 0、已禁用 2、启用
     /// </summary>
-    public YesOrNoEnum? Status { get; set; }    
+    public DisableOrEnableEnum? Status { get; set; }    
 
     /// <summary>
     /// 备注
@@ -89,6 +89,11 @@ public record QualIqcInspectionItemOutputDto : QualIqcInspectionItemUpdateDto
     /// 物料单位
     /// </summary>
     public string? MaterialUnit {  get; set; }
+
+    /// <summary>
+    /// 物料版本
+    /// </summary>
+    public string? MaterialVersion { get; set; }
 
     /// <summary>
     /// 供应商编码
@@ -175,7 +180,7 @@ public class QualIqcInspectionItemPagedQueryDto : PagerInfo
     /// <summary>
     /// 状态 0、已禁用 2、启用
     /// </summary>
-    public YesOrNoEnum? Status { get; set; }
+    public DisableOrEnableEnum? Status { get; set; }
 }
 
 /// <summary>
