@@ -24,6 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddExcelService();
             services.AddMinioService(configuration);
             services.AddCoreService(configuration);
+            services.AddElasticsearchService(configuration);
             AddConfig(services, configuration);
 
             AddServices(services);
