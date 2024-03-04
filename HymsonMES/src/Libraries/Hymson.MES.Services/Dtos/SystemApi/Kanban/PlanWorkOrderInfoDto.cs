@@ -40,7 +40,7 @@ public class PlanWorkOrderInfoViewDto
     /// <summary>
     /// 工艺路线名称
     /// </summary>
-    public string ProcessRouteName { get; set; }
+    public string? ProcessRouteName { get; set; }
 
     /// <summary>
     /// 工单下达时间
@@ -75,12 +75,12 @@ public class PlanWorkOrderInfoViewDto
     /// <summary>
     /// 产品Id
     /// </summary>
-    public decimal ProductId { get; set; }
+    public decimal? ProductId { get; set; }
 
     /// <summary>
     /// 产品名称
     /// </summary>
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
 
     /// <summary>
     /// 综合良率
@@ -95,7 +95,7 @@ public class PlanWorkOrderInfoViewDto
     /// <summary>
     /// 电芯数量
     /// </summary>
-    public decimal CellQty { get; set; }
+    public decimal? CellQty { get; set; }
 }
 
 

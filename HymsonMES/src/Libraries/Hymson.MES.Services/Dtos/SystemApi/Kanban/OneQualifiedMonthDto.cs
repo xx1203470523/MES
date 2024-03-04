@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hymson.MES.Core.Enums.Report;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,10 +35,10 @@ public class OneQualifiedMonthQueryDto
     /// <summary>
     /// 风冷/液冷（分别对应不同产品）
     /// </summary>
-    public string Type { get; set; }
+    public string? Type { get; set; }
 
     /// <summary>
     /// 日/月
     /// </summary>
-    public string DateType { get; set; }
+    public DateTypeEnum? DateType { get; set; }
 }

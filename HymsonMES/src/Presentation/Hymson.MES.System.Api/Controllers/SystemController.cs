@@ -3,7 +3,10 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Report;
+using Hymson.MES.Services.Dtos.SystemAp;
+using Hymson.MES.Services.Dtos.SystemApi;
 using Hymson.MES.Services.Services.Report;
+using Hymson.MES.Services.Services.SystemApi;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
@@ -11,6 +14,7 @@ using Hymson.MES.SystemServices.Services.Plan;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Drawing.Printing;
+using System.Drawing.Text;
 using static Mysqlx.Notice.Warning.Types;
 
 namespace Hymson.MES.System.Api.Controllers
@@ -26,6 +30,8 @@ namespace Hymson.MES.System.Api.Controllers
         private readonly IPlanWorkOrderService _planWorkOrderService;
         private readonly IManuSfcCirculationService _manuSfcCirculationService;
         private readonly IProductTraceReportService _productTraceReportService;
+        private readonly ISystemApiService _systemApiService;
+
         /// <summary>
         /// 
         /// </summary>
@@ -33,15 +39,18 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="planWorkOrderService"></param>
         /// <param name="manuSfcCirculationService"></param>
         /// <param name="productTraceReportService"></param>
-        public SystemController(ILogger<SystemController> logger, 
-            IPlanWorkOrderService planWorkOrderService, 
+        /// <param name="systemApiService"></param>
+        public SystemController(ILogger<SystemController> logger,
+            IPlanWorkOrderService planWorkOrderService,
             IManuSfcCirculationService manuSfcCirculationService,
-            IProductTraceReportService productTraceReportService)
+            IProductTraceReportService productTraceReportService,
+            ISystemApiService systemApiService)
         {
             _logger = logger;
             _planWorkOrderService = planWorkOrderService;
             _manuSfcCirculationService = manuSfcCirculationService;
             _productTraceReportService = productTraceReportService;
+            _systemApiService = systemApiService;
         }
 
         /// <summary>
@@ -109,7 +118,7 @@ namespace Hymson.MES.System.Api.Controllers
         [Route("productprameter")]
         public async Task<IEnumerable<ManuSfcPrameterDto>> GetProductPrameterPagedListAsync(ManuSfcPrameterQueryDto manuSfcPrameterQueryDto)
         {
-           if (string.IsNullOrEmpty(manuSfcPrameterQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
+            if (string.IsNullOrEmpty(manuSfcPrameterQueryDto.SFC)) { throw new CustomerValidationException(nameof(ErrorCode.MES19203)); }
             ManuProductPrameterPagedQueryDto param = new ManuProductPrameterPagedQueryDto()
             {
                 SFC = manuSfcPrameterQueryDto.SFC,
@@ -117,7 +126,7 @@ namespace Hymson.MES.System.Api.Controllers
                 PageSize = 2000,
                 PageIndex = 1
             };
-            var manuProductParameterViewDtoList =  await _productTraceReportService.GetProductPrameterPagedListAsync(param);
+            var manuProductParameterViewDtoList = await _productTraceReportService.GetProductPrameterPagedListAsync(param);
 
             List<ManuSfcPrameterDto> manuSfcPrameterDtoList = new List<ManuSfcPrameterDto>();
             foreach (var ManuSfcCirculationViewDto in manuProductParameterViewDtoList.Data)
@@ -177,5 +186,93 @@ namespace Hymson.MES.System.Api.Controllers
             return manuSfcPrameterDtoList;
         }
 
+        #region 看板
+
+
+        /// <summary>
+        /// 首页-工单基本信息
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/planWorkOrderInfo")]
+        public async Task<IEnumerable<PlanWorkOrderInfoViewDto>> GetPlanWorkOrderInfoAsync([FromQuery]PlanWorkOrderInfoQueryDto queryDto)
+        {
+            return await _systemApiService.GetPlanWorkOrderInfoAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 首页-OEE趋势图
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/oeeTrendChart")]
+        public async Task<IEnumerable<OEETrendChartViewDto>> GetOEETrendChartAsync([FromQuery] OEETrendChartQueryDto queryDto)
+        {
+            return await _systemApiService.GetOEETrendChartAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 今日一次合格率（风冷/液冷）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/oneQualifiedRate")]
+        public async Task<OneQualifiedViewDto> GetOneQualifiedRateAsync([FromQuery] OneQualifiedQueryDto queryDto)
+        {
+            return await _systemApiService.GetOneQualifiedRateAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 按月获取一次合格率（风冷/液冷）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/monthOneQualifiedRate")]
+        async Task<IEnumerable<OneQualifiedMonthViewDto>> GetMonthOneQualifiedRateAsync([FromQuery] OneQualifiedMonthQueryDto queryDto)
+        {
+            return await _systemApiService.GetMonthOneQualifiedRateAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 电芯，模组，Pack获取不良分布（日/月，风冷/液冷）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/defectDistribution")]
+        public async Task<IEnumerable<DefectDistributionViewDto>> GetDefectDistributionAsync([FromQuery] DefectDistributionQueryDto queryDto)
+        {
+            return await _systemApiService.GetDefectDistributionAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 工序日产出滚动图
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/procedureDayOutput")]
+        public async Task<IEnumerable<ProcedureDayOutputViewDto>> GetProcedureDayOutputAsync([FromQuery] ProcedureDayOutputQueryDto queryDto)
+        {
+            return await _systemApiService.GetProcedureDayOutputAsync(queryDto);
+        }
+
+        /// <summary>
+        /// 工序生产产能
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/productionCapacity")]
+        public async Task<IEnumerable<ProductionCapacityViewDto>> GetProductionCapacityAsync([FromQuery] ProductionCapacityQueryDto queryDto)
+        {
+            return await _systemApiService.GetProductionCapacityAsync(queryDto);
+        }
+
+        #endregion
     }
-}
+}                                     

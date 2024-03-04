@@ -147,7 +147,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuSfcSummaryQuery"></param>
         /// <returns></returns>
-        Task<ManuSfcSummaryView> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery manuSfcSummaryQuery);
+        Task<IEnumerable<ManuSfcSummaryView>> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery manuSfcSummaryQuery);
 
         #endregion
     }

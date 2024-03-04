@@ -103,6 +103,7 @@ namespace Hymson.MES.System.Api
             app.UseAuthorization();
 
             app.MapControllers();
+
             app.Run();
         }
 
@@ -113,15 +114,14 @@ namespace Hymson.MES.System.Api
         /// <param name="services"></param>
         private static void AddSwaggerGen(IServiceCollection services)
         {
-#if DEBUG
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "MES 系统对接",
-                    Description = "MES 系统对接",
+                    Title = "MES Web API",
+                    Description = "MES Web API",
                     TermsOfService = new Uri("https://www.hymson.com/"),
                     Contact = new OpenApiContact
                     {
@@ -139,10 +139,11 @@ namespace Hymson.MES.System.Api
                 var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
-                var xmlFilename2 = $"Hymson.MES.SystemServices.xml";
+                var xmlFilename2 = $"Hymson.MES.Services.xml";
                 options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename2));
 
                 options.OperationFilter<AddResponseHeadersFilter>();
+                //options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
 
                 // 在header 中添加token，传递到后台
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
@@ -167,7 +168,6 @@ namespace Hymson.MES.System.Api
                     }
                 });
             });
-#endif
         }
 
         /// <summary>

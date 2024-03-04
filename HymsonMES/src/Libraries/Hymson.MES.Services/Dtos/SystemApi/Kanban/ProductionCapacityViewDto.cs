@@ -36,10 +36,10 @@ public class ProductionCapacityQueryDto
     /// <summary>
     /// 风冷/液冷（分别对应不同产品）
     /// </summary>
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
 
     /// <summary>
     /// 条码类型
     /// </summary>
-    public SFCTypeEnum Type { get; set; }
+    public SFCTypeEnum? Type { get; set; }
 }

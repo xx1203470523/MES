@@ -48,6 +48,7 @@ using Hymson.MES.Services.Services.Report.EquHeartbeatReport;
 using Hymson.MES.Services.Services.Report.ManuProductParameterReport;
 using Hymson.MES.Services.Services.Report.PackBindOtherReport;
 using Hymson.MES.Services.Services.Report.ProductionManagePanel;
+using Hymson.MES.Services.Services.SystemApi;
 using Hymson.MES.Services.Services.Warehouse;
 using Hymson.MES.Services.Validators.Equipment;
 using Hymson.MES.Services.Validators.Integrated;
@@ -91,6 +92,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+            #region SystemApi
+
+            services.AddSingleton<ISystemApiService, SystemApiService>();
+
+            #endregion
+
             #region Equipment
             services.AddSingleton<IEquConsumableService, EquConsumableService>();
             services.AddSingleton<IEquConsumableTypeService, EquConsumableTypeService>();

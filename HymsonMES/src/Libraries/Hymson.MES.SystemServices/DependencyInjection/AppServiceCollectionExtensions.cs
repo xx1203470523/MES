@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 using Hymson.MES.Services.Services.Report;
+using Hymson.MES.Services.Services.Report.EquAlarmReport;
+using Hymson.MES.Services.Services.SystemApi;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
@@ -38,6 +40,13 @@ namespace Hymson.MES.SystemServices.DependencyInjection
         /// <returns></returns>
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
+            #region SystemApi
+
+            services.AddSingleton<ISystemApiService, SystemApiService>();
+            services.AddSingleton<IEquAlarmReportService, EquAlarmReportService>();
+
+            #endregion
+
             #region Plan
             services.AddSingleton<IPlanWorkOrderService, PlanWorkOrderService>();
             #endregion

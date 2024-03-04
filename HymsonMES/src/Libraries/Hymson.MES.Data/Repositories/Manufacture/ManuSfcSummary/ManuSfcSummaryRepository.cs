@@ -324,7 +324,7 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
-    public async Task<ManuSfcSummaryView> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery query)
+    public async Task<IEnumerable<ManuSfcSummaryView>> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery query)
     {
         SqlBuilder sqlBuilder = new SqlBuilder();
 
@@ -334,10 +334,10 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
         sqlBuilder.AddParameters(query);
 
         if (query.WorkOrderId != null)
-            sqlBuilder.Where("OrderId= @OrderId");
+            sqlBuilder.Where("WorkOrderId IN @WorkOrderId");
 
         using var conn = GetMESDbConnection();
-        return await conn.QueryFirstOrDefaultAsync<ManuSfcSummaryView>(sqlTemplete.RawSql, sqlTemplete.Parameters);
+        return await conn.QueryAsync<ManuSfcSummaryView>(sqlTemplete.RawSql, sqlTemplete.Parameters);
     }
 
     #endregion
@@ -393,7 +393,7 @@ public partial class ManuSfcSummaryRepository
 
     #region 扩展
 
-    const string GetManuSFcSummaryViewSql = "SELECT mss.WorkOrderId,  SUM(Qty) OutputQty,SUM(FirstQualityStatus) OneQualified,sum(QualityStatus) QualifiedQty  FROM manu_sfc_summary mss WHERE /**where**/ GROUP BY WorkOrderId ";
+    const string GetManuSFcSummaryViewSql = "SELECT mss.WorkOrderId,  SUM(Qty) OutputQty,SUM(FirstQualityStatus) OneQualified,sum(QualityStatus) QualifiedQty  FROM manu_sfc_summary mss  /**where**/ GROUP BY WorkOrderId ";
 
     #endregion
 }
@@ -585,6 +585,15 @@ public partial class ManuSfcSummaryRepository
             sqlBuilder.Where("ProductId IN @ProductIds");
         }
 
+        if (query.StartTime != null)
+        {
+            sqlBuilder.Where("EndTime >=@StartTime");
+        }
+
+        if (query.EndTime != null)
+        {
+            sqlBuilder.Where("EndTime <=@EndTime");
+        }
 
         sqlBuilder.Where("IsDeleted = 0");
 

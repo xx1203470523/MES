@@ -22,11 +22,6 @@ public class ManuSfcSummaryView
     public decimal? OutputQty { get; set; }
 
     /// <summary>
-    /// 不良数量
-    /// </summary>
-    public decimal? UnqualifiedQty { get; set; }
-
-    /// <summary>
     /// 良品数量
     /// </summary>
     public decimal? QualifiedQty { get; set; }
