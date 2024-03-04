@@ -1147,6 +1147,7 @@
         public const string MES16779 = "容器包装信息获取失败，未填写包装编码";
         public const string MES16780 = "物料编码【{code}】没有维护容器规则！";
         public const string MES16781 = "包装编码【{0}】已被包装，父包装编码为【{1}】";
+        public const string MES16782 = "容器未启用!";
         #endregion
 
         #region 绑定工单激活  MES16800
