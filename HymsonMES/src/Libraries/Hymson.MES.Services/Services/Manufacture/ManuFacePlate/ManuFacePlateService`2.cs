@@ -1306,20 +1306,13 @@ public partial class ManuFacePlateService : IManuFacePlateService
     /// <returns></returns>
     public async Task OpenPackContainerAsync(ManuFacePlateOpenContainerDto input)
     {
-        if (!input.PackContainerId.HasValue || input.PackContainerId == 0)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES16750));
-        }
-
         var siteId = _currentSite.SiteId.GetValueOrDefault();
-
-        var packContainerId = input.PackContainerId.GetValueOrDefault();
 
         #region 包装容器条码信息
 
         var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetOneAsync(new ManuContainerBarcodeQuery
         {
-            Id = packContainerId,
+            BarCode = input.packContainerCode,
             SiteId = siteId
         });
 
@@ -1430,7 +1423,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
         var updateCount = await _manuContainerBarcodeRepository.ChangeContainerStatusAsync(
             new CloseContainerCommand
             {
-                Id = packContainerId,
+                Id = manuContainerBarcodeEntity.Id,
                 Status = ManuContainerBarcodeStatusEnum.Open,
                 StatusCondition = ManuContainerBarcodeStatusEnum.Close
             });
@@ -1451,20 +1444,17 @@ public partial class ManuFacePlateService : IManuFacePlateService
     /// <returns></returns>
     public async Task ClosePackContainerAsync(ManuFacePlateCloseContainerDto input)
     {
-        if (!input.PackContainerId.HasValue || input.PackContainerId == 0)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES16750));
-        }
+
 
         var siteId = _currentSite.SiteId.GetValueOrDefault();
 
-        var packContainerId = input.PackContainerId.GetValueOrDefault();
+        //var packContainerId = input.PackContainerId.GetValueOrDefault();
 
         #region 包装容器条码信息
 
         var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetOneAsync(new ManuContainerBarcodeQuery
         {
-            Id = packContainerId,
+            BarCode = input.packContainerCode,
             SiteId = siteId
         });
 
@@ -1571,7 +1561,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
         var updateCount = await _manuContainerBarcodeRepository.ChangeContainerStatusAsync(
             new CloseContainerCommand
             {
-                Id = packContainerId,
+                Id = manuContainerBarcodeEntity.Id,
                 Status = ManuContainerBarcodeStatusEnum.Close,
                 StatusCondition = ManuContainerBarcodeStatusEnum.Open
             });
