@@ -51,7 +51,7 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 入厂日期
         /// </summary>
         [EpplusTableColumn(Header = "入厂日期", Order = 7)]
-        public DateTime? EntryDate { get; set; }
+        public string? EntryDate { get; set; }
 
         /// <summary>
         /// 质保期限(月)
@@ -106,5 +106,44 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         [EpplusTableColumn(Header = "设备描述", Order = 16)]
         public string EquipmentDesc { get; set; } = "";
+    }
+
+    public record class ImportResourceDto : BaseExcelDto
+    {
+        /// <summary>
+        /// 资源编码
+        /// </summary>
+        [EpplusTableColumn(Header = "资源编码(必填)", Order = 1)]
+        public string ResCode { get; set; }
+
+        /// <summary>
+        /// 资源名称
+        /// </summary>
+        [EpplusTableColumn(Header = "资源名称(必填)", Order = 2)]
+        public string ResName { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [EpplusTableColumn(Header = "描述", Order = 3)]
+        public string Remark { get; set; } = "";
+
+        /// <summary>
+        /// 资源类型(去资源类型表中匹配)
+        /// </summary>
+        [EpplusTableColumn(Header = "资源类型", Order = 4)]
+        public string? ResType { get; set; }
+
+        /// <summary>
+        /// 设备编码(去设备表中匹配)
+        /// </summary>
+        [EpplusTableColumn(Header = "设备编码", Order = 5)]
+        public string? EquipmentCode { get; set; }
+
+        /// <summary>
+        /// 是否主设备
+        /// </summary>
+        [EpplusTableColumn(Header = "是否主设备", Order = 6)]
+        public string? IsMain { get; set; }
     }
 }

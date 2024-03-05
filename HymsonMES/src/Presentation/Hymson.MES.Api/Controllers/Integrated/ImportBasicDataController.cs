@@ -40,10 +40,10 @@ namespace Hymson.MES.Api.Controllers.Integrated
         /// <param name="formFile"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("import")]
-        public async Task ImportDataAsync([FromForm(Name = "file")] IFormFile formFile)
+        [Route("importEqu")]
+        public async Task ImportEquDataAsync([FromForm(Name = "file")] IFormFile formFile)
         {
-             await _importBasicDataService.ImportDataAsync(formFile);
+             await _importBasicDataService.ImportEquDataAsync(formFile);
         }
     }
 }

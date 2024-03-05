@@ -12,6 +12,6 @@ namespace Hymson.MES.Services.Services.Integrated
         /// </summary>
         /// <param name="formFile"></param>
         /// <returns></returns>
-        Task ImportDataAsync(IFormFile formFile);
+        Task ImportEquDataAsync(IFormFile formFile);
     }
 }
