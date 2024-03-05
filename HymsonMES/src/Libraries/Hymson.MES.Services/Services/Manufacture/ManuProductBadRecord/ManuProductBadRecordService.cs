@@ -536,7 +536,9 @@ namespace Hymson.MES.Services.Services.Manufacture
             };
 
             //关闭了所有的不合格代码
-            if (!diffArr.Any())
+            //客户反馈尾工序不良录入时不需要更新条码状态（客户没有返工场景）
+            //if (!diffArr.Any())
+            if (false)
             {
                 // 条码步骤
                 sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadRejudgment, badReJudgmentDto.Remark ?? "", 1);
