@@ -538,7 +538,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             throw new CustomerValidationException(nameof(ErrorCode.MES16774));
         }
 
-        #endregion
+        #endregion        
 
         #region 包装容器是否打开
 
@@ -924,6 +924,10 @@ public partial class ManuFacePlateService : IManuFacePlateService
             Id = process.FacePlateContainerPackEntity.ContainerId,
             SiteId = siteId
         });
+        if(process.InteContainerInfoEntity.Status != Core.Enums.SysDataStatusEnum.Enable)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES16782));
+        }
 
         process.InteContainerFreightEntities = await _inteContainerFreightRepository.GetListAsync(new InteContainerFreightQuery
         {
