@@ -143,11 +143,18 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         #region 扩展
 
         /// <summary>
-        /// 获取生产汇总数据
+        /// 获取生产汇总数据(根据工单)
         /// </summary>
         /// <param name="manuSfcSummaryQuery"></param>
         /// <returns></returns>
         Task<IEnumerable<ManuSfcSummaryView>> GetManuSfcSummaryViewAsync(ManuSfcSummaryQuery manuSfcSummaryQuery);
+
+        /// <summary>
+        /// 获取生产汇总数据(根据产出时间)
+        /// </summary>
+        /// <param name="manuSfcSummaryQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ManuSfcSummaryDateView>> GetManuSfcSummaryDateAsync(ManuSfcSummaryQuery manuSfcSummaryQuery);
 
         #endregion
     }

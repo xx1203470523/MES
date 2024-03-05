@@ -9,6 +9,7 @@
 using Dapper;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums.Report;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.WMS.Data.Repositories.ManuManufacture;
@@ -317,7 +318,7 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
     }
     #endregion
 
-    #region MyRegion
+    #region 扩展
 
     /// <summary>
     /// 分组获取数据
@@ -338,6 +339,26 @@ public partial class ManuSfcSummaryRepository : BaseRepository, IManuSfcSummaryR
 
         using var conn = GetMESDbConnection();
         return await conn.QueryAsync<ManuSfcSummaryView>(sqlTemplete.RawSql, sqlTemplete.Parameters);
+    }
+
+    public async Task<IEnumerable<ManuSfcSummaryDateView>> GetManuSfcSummaryDateAsync(ManuSfcSummaryQuery query)
+    {
+        SqlBuilder sqlBuilder = new SqlBuilder();
+
+
+        string leftcount = query.DateType switch
+        {
+            DateTypeEnum.Day => "10",
+            DateTypeEnum.Month => "7",
+            _ => "0"
+        };
+
+        var sqlTemplete = sqlBuilder.AddTemplate(GetManuSfcSummaryGroupByEndTimeSql.Replace("@DateType", leftcount));
+
+        sqlBuilder.AddParameters(query);
+
+        using var conn = GetMESDbConnection();
+        return await conn.QueryAsync<ManuSfcSummaryDateView>(sqlTemplete.RawSql, sqlTemplete.Parameters);
     }
 
     #endregion
@@ -394,6 +415,8 @@ public partial class ManuSfcSummaryRepository
     #region 扩展
 
     const string GetManuSFcSummaryViewSql = "SELECT mss.WorkOrderId,  SUM(Qty) OutputQty,SUM(FirstQualityStatus) OneQualified,sum(QualityStatus) QualifiedQty  FROM manu_sfc_summary mss  /**where**/ GROUP BY WorkOrderId ";
+
+    const string GetManuSfcSummaryGroupByEndTimeSql = "SELECT LEFT(EndTime,@DateType) EndTime ,SUM(Qty) Qty,SUM(QualityStatus) QualityQty FROM manu_sfc_summary mss GROUP BY LEFT(EndTime,@DateType)";
 
     #endregion
 }

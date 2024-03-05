@@ -1,16 +1,16 @@
-﻿using Hymson.MES.Core.Enums;
+﻿using Hymson.MES.Core.Enums.Report;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.SystemApi;
+namespace Hymson.MES.Services.Dtos.SystemApi.Kanban;
 
 /// <summary>
-/// 设备运行状态
+/// 设备故障率
 /// </summary>
-public class EquipmentStatusViewDto
+public class EquFaultRateViewDto
 {
     /// <summary>
     /// 设备编码
@@ -23,17 +23,18 @@ public class EquipmentStatusViewDto
     public string? EquipmentName { get; set; }
 
     /// <summary>
-    /// 设备运行状态
+    /// 故障率
     /// </summary>
-    public EquipmentStateEnum? EquipmentStatus { get; set; }
+    public decimal? FaultRate { get; set; }
+}
 
+/// <summary>
+/// 设备故障率查询参数
+/// </summary>
+public class EquFaultRateQueryDto
+{
     /// <summary>
-    /// 设备运行状态
+    /// 查询日期类型
     /// </summary>
-    public string? EquipmentStatusName { get; set; }
-
-    /// <summary>
-    /// 实时时间
-    /// </summary>
-    public DateTime? LocalTime { get; set; }
+    public DateTypeEnum? DateType  { get; set; }
 }

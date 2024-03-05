@@ -1,6 +1,5 @@
 ﻿using Hymson.Authentication;
-using Hymson.MES.Core.Domain.Plan;
-using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Integrated;
@@ -13,18 +12,11 @@ using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Proc;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality.IQualityRepository;
-using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Dtos.SystemAp;
+using Hymson.MES.Services.Dtos.Equipment;
 using Hymson.MES.Services.Dtos.SystemApi;
+using Hymson.MES.Services.Dtos.SystemApi.Kanban;
 using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.Utils;
-using Minio.DataModel;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Services.SystemApi;
 
@@ -32,7 +24,6 @@ public class SystemApiService : ISystemApiService
 {
     private readonly ICurrentUser _currentUser;
 
-    private readonly IEquStatusRepository _equStatusRepository;
     private readonly IProcProcedureRepository _procProcedureRepository;
     private readonly IProcProcedurePlanRepository _procProcedurePlanRepository;
     private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
@@ -47,6 +38,8 @@ public class SystemApiService : ISystemApiService
     private readonly IProcResourceEquipmentBindRepository _procResourceEquipmentBindRepository;
     private readonly IEquEquipmentTheoryRepository _equEquipmentTheoryRepository;
     private readonly IEquAlarmReportService _equAlarmReportService;
+    private readonly IEquAlarmRepository _equAlarmRepository;
+    private readonly IEquStatusRepository _equStatusRepository;
 
     //不良相关
     private readonly IManuSfcStepNgRepository _manuSfcStepNgRepository;
@@ -55,7 +48,6 @@ public class SystemApiService : ISystemApiService
 
 
     public SystemApiService(ICurrentUser currentUser,
-        IEquStatusRepository equipmentStatusRepository,
         IProcProcedureRepository procProcedureRepository,
         IProcProcedurePlanRepository procProcedurePlanRepository,
         IPlanWorkOrderRepository planWorkOrderRepository,
@@ -69,6 +61,8 @@ public class SystemApiService : ISystemApiService
         IProcResourceEquipmentBindRepository procResourceEquipmentBindRepository,
         IEquEquipmentTheoryRepository equEquipmentTheoryRepository,
         IEquAlarmReportService equAlarmReportService,
+        IEquAlarmRepository equAlarmRepository,
+        IEquStatusRepository equipmentStatusRepository,
         IManuSfcStepNgRepository manuSfcStepNgRepository,
         IManuProductBadRecordRepository manuProductBadRecordRepository,
         IQualUnqualifiedCodeRepository qualUnqualifiedCodeRepository
@@ -89,6 +83,7 @@ public class SystemApiService : ISystemApiService
         _procResourceEquipmentBindRepository = procResourceEquipmentBindRepository;
         _equEquipmentTheoryRepository = equEquipmentTheoryRepository;
         _equAlarmReportService = equAlarmReportService;
+        _equAlarmRepository = equAlarmRepository;
         _manuSfcStepNgRepository = manuSfcStepNgRepository;
         _manuProductBadRecordRepository = manuProductBadRecordRepository;
         _qualUnqualifiedCodeRepository = qualUnqualifiedCodeRepository;
@@ -175,20 +170,20 @@ public class SystemApiService : ISystemApiService
                 var equipment = equipmentEntities.FirstOrDefault(a => a.Id == resourceBindEquipment?.Id);
                 var summary = manuSfcSummaryEntities.Where(a => a.ProcedureId == procedure?.Id
                 && endDate >= startDate && endDate <= startDate.AddHours(2));
-                var equipmenttheory = equipmentTheoryEntities.FirstOrDefault(a => a.EquipmentId == equipment?.Id);
+                var equipmenttheory = equipmentTheoryEntities.FirstOrDefault(a => a.EquipmentCode == equipment?.EquipmentCode)?.TheoryOutputQty ?? 0;
 
                 //停机时间
-                var equAlarm = equAlarmDurationTimeEntities.FirstOrDefault(a => a.EquipmentId == equipment?.Id);
+                var equAlarm = equAlarmDurationTimeEntities.FirstOrDefault(a => a.EquipmentId == equipment?.Id)?.DurationTime ?? 0;
 
-                var outputQty = summary.Sum(a => a.Qty);
-                var quanlifiedQty = summary.Sum(a => a.QualityStatus);
+                var outputQty = summary.Sum(a => a.Qty) ?? 0;
+                var quanlifiedQty = summary.Sum(a => a.QualityStatus) ?? 0;
 
                 OEETrendChartViewDto newitem = new()
                 {
                     EndTime = startDate.ToString("HH:30") + "-" + startDate.AddHours(2).ToString("HH:30"),
-                    OEE = ((equipmenttheory?.TheoryOnTime - (equAlarm?.DurationTime / 3600)) / equipmenttheory?.TheoryOnTime
-                    * quanlifiedQty / outputQty
-                    * outputQty / equipmenttheory?.TheoryOnTime) ?? 0,
+                    OEE = ((equipmenttheory - (equAlarm / 3600)) / (equipmenttheory == 0 ? 1 : equipmenttheory)
+                    * quanlifiedQty / (outputQty == 0 ? 1 : outputQty)
+                    * outputQty / (equipmenttheory == 0 ? 1 : equipmenttheory)),
                     Type = item switch
                     {
                         "OP020" => "电芯段",
@@ -201,8 +196,8 @@ public class SystemApiService : ISystemApiService
                 result.Add(newitem);
             }
 
-            startDate = startDate.AddHours(2);
             if (startDate.AddHours(2) == endDate) break;
+            startDate = startDate.AddHours(2);
         }
 
 
@@ -464,8 +459,8 @@ public class SystemApiService : ISystemApiService
             }
 
 
-            startDate = startDate.AddDays(1);
             if (startDate.AddDays(1) == endDate) break;
+            startDate = startDate.AddDays(1);
         }
 
         return result;
@@ -698,7 +693,7 @@ public class SystemApiService : ISystemApiService
 
         if (queryDto.Type != null)
         {
-            procedureCodes = procedureCodes.Where(a=>a == procedureCodes[(int)queryDto.Type]).ToArray();
+            procedureCodes = procedureCodes.Where(a => a == procedureCodes[(int)queryDto.Type]).ToArray();
         }
 
         while (true)
@@ -725,8 +720,8 @@ public class SystemApiService : ISystemApiService
                 result.Add(newitem);
             }
 
-            startDate = startDate.AddDays(1);
             if (startDate.AddDays(1) == endDate) break;
+            startDate = startDate.AddDays(1);
         }
 
         return result;
@@ -734,17 +729,219 @@ public class SystemApiService : ISystemApiService
 
     #endregion
 
-    #region 设备实时状态
+    #region 设备板块
 
     /// <summary>
     /// 查询设备运行状态
     /// </summary>
     /// <returns></returns>
-    public async Task<IEnumerable<EquipmentStatusDto>> GetEquipmentStatusAsync()
+    public async Task<IEnumerable<EquipmentStatusViewDto>> GetEquipmentStatusAsync()
     {
-        List<EquipmentStatusDto> result = new();
+        List<EquipmentStatusViewDto> result = new();
 
+        var equStatusEntities = await _equStatusRepository.GetListAsync(new() { });
 
+        var equipmentIds = equStatusEntities.Select(a => a.EquipmentId).ToArray();
+        var equipmentEntities = await _equEquipmentRepository.GetByIdsAsync(equipmentIds);
+
+        foreach (var item in equStatusEntities)
+        {
+            var equipmentEntity = equipmentEntities.FirstOrDefault(a => a.Id == item.EquipmentId);
+            if (equipmentEntity == null) continue;
+
+            result.Add(new()
+            {
+                EquipmentCode = equipmentEntity?.EquipmentCode,
+                EquipmentName = equipmentEntity?.EquipmentName,
+                LocalTime = item?.LocalTime,
+                EquipmentStatus = item?.EquipmentStatus,
+                EquipmentStatusName = item.EquipmentStatus.GetDescription()
+            });
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 设备运行状态分布
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<EquStatusDistributionViewDto>> GetEquipmentStatusDistributionAsync()
+    {
+        var equStatusEntities = await _equStatusRepository.GetListAsync(new() { });
+
+        var equipmentIds = equStatusEntities.Select(a => a.EquipmentId).ToArray();
+        var equipmentEntities = await _equEquipmentRepository.GetByIdsAsync(equipmentIds);
+
+        var result = equStatusEntities.GroupBy(a => a.EquipmentStatus)
+            .Select(a => new EquStatusDistributionViewDto
+            {
+                EquipmentStatus = a.Key,
+                Qty = a.Count(),
+                EquipmentStatusName = a.Key.GetDescription()
+            });
+
+        return result;
+    }
+
+    /// <summary>
+    /// 设备故障率（日/月）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<EquFaultRateViewDto>> GetEquFaultRateAsync(EquFaultRateQueryDto queryDto)
+    {
+        List<EquFaultRateViewDto> result = new();
+
+        var equipmentEntities = await _equEquipmentRepository.GetBaseListAsync();
+        var equipmentIds = equipmentEntities.Select(a => a.Id);
+
+        //获取计划开机时长
+        var equipmentTheoryEntities = await _equEquipmentTheoryRepository.GetListAsync(new() { });
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+
+        if (queryDto.DateType == DateTypeEnum.Month)
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00"));
+            endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+        }
+        else if (queryDto.DateType == DateTypeEnum.Day)
+        {
+            if (nowDate >= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00")))
+            {
+                startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+                endDate = nowDate;
+            }
+            else
+            {
+                startDate = DateTime.Parse(nowDate.AddDays(-1).ToString("yyyy-MM-dd 08:30:00"));
+                endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+            }
+        }
+        else
+            return result;
+
+        //获取停机时长
+        var equAlarmDurationTimeEntities = await _equAlarmReportService.GetEquAlarmDurationTimeAsync(new()
+        {
+            EquipmentIds = equipmentIds,
+            BeginTime = startDate,
+            EndTime = endDate
+        });
+
+        foreach (var item in equipmentEntities)
+        {
+            //计算停机时长
+            //单位转换为小时
+            var DurationTime = equAlarmDurationTimeEntities.FirstOrDefault(a => a.EquipmentId == item.Id)?.DurationTime / 3600 ?? 0;
+            var equPlanWorkTime = equipmentTheoryEntities.Where(a => a.EquipmentCode == item.EquipmentCode).FirstOrDefault()?.TheoryOnTime ?? 0;
+
+            result.Add(new()
+            {
+                EquipmentCode = item.EquipmentCode,
+                EquipmentName = item.EquipmentName,
+                FaultRate = Math.Round(equPlanWorkTime == 0 ? 0 : (equPlanWorkTime - DurationTime) / (equPlanWorkTime == 0 ? 1 : equPlanWorkTime), 4)
+            });
+
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 设备OEE趋势图（日/月）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<EquOEETrendChartViewDto>> GetEquOEETrendChartAsync(EquOEETrendChartQueryDto queryDto)
+    {
+        List<EquOEETrendChartViewDto> result = new();
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var searchEndDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+
+        if (queryDto.DateType == DateTypeEnum.Month)
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00")).AddYears(-1);
+            endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-01-01 08:30:00"));
+            searchEndDate = startDate.AddMonths(1);
+        }
+        else if (queryDto.DateType == DateTypeEnum.Day)
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-01 08:30:00"));
+            endDate = DateTime.Parse(nowDate.AddMonths(1).ToString("yyyy-MM-01 08:30:00"));
+            searchEndDate = startDate.AddDays(1);
+        }
+        else
+            return result;
+
+        //获取生产数据
+        var manuSfcSummary = await _manuSfcSummaryRepository.GetManuSfcSummaryDateAsync(new()
+        {
+            StartTime = startDate,
+            EndTime = endDate,
+            DateType = queryDto.DateType
+        });
+
+        //获取计划开机时长
+        var equipmentTheoryEntities = await _equEquipmentTheoryRepository.GetListAsync(new() { });
+        //获取停机时长
+        var equAlarmEntities = await _equAlarmRepository.GetListAsync(new()
+        {
+            CreatedOnEnd = startDate,
+            CreatedOnStart = endDate
+        });
+
+        while (true)
+        {
+            var leftCount = queryDto.DateType switch
+            {
+                DateTypeEnum.Day => 10,
+                DateTypeEnum.Month => 7,
+                _ => 0
+            };
+
+            //计算停机时长
+            var equAlarmEntitys = equAlarmEntities.Where(a => a.CreatedOn >= startDate && a.CreatedOn < searchEndDate);
+            var DurationTime = GetEquAlarmDurationTimeSum(equAlarmEntitys);
+
+            var equPlanWorkTime = equipmentTheoryEntities.Sum(a => a.TheoryOnTime) ?? 0;
+
+            var outputQty = manuSfcSummary.Where(a => a.EndTime == startDate.ToString("yyyy-MM-dd").Substring(leftCount))
+                .FirstOrDefault()?.OutputQty ?? 0;
+            var qualifiedQty = manuSfcSummary.Where(a => a.EndTime == startDate.ToString("yyyy-MM-dd").Substring(leftCount))
+                .FirstOrDefault()?.QualifiedQty ?? 0;
+
+            result.Add(new()
+            {
+                EndTime = queryDto.DateType switch { DateTypeEnum.Day => startDate.Day.ToString(), DateTypeEnum.Month => startDate.Month.ToString() + "月", _ => "" },
+                OEE = ((equPlanWorkTime - DurationTime) / equPlanWorkTime) * qualifiedQty / outputQty
+            });
+
+            if (queryDto.DateType == DateTypeEnum.Day)
+            {
+                if (startDate.AddDays(1) == endDate) break;
+                else
+                {
+                    startDate = startDate.AddDays(1);
+                    searchEndDate = startDate.AddDays(1);
+                }
+            }
+            if (queryDto.DateType == DateTypeEnum.Month)
+            {
+                if (startDate.AddMonths(1) == endDate) break;
+                else
+                {
+                    startDate = startDate.AddMonths(1);
+                    searchEndDate = startDate.AddMonths(1);
+                };
+            }
+        }
 
 
         return result;
@@ -752,6 +949,78 @@ public class SystemApiService : ISystemApiService
 
     #endregion
 
+
     #endregion
 
+
+    #region Common
+
+    /// <summary>
+    /// 计算停机时长
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    private decimal GetEquAlarmDurationTimeSum(IEnumerable<EquAlarmEntity> data)
+    {
+        EquAlarmDurationTimeDto result = new();
+
+        List<EquAlarmComputedDto> list = new List<EquAlarmComputedDto>();
+        foreach (var item in data)
+        {
+            EquAlarmComputedDto newitem = new EquAlarmComputedDto();
+            newitem.Status = item.Status;
+            newitem.EquipmentId = item.EquipmentId;
+
+            var exitsItem = list.FirstOrDefault(a => a.EquipmentId == item.EquipmentId);
+
+            if (exitsItem != null)
+            {
+                //触发
+                if (item.Status == Core.Enums.EquipmentAlarmStatusEnum.Trigger)
+                {
+                    if (item.Status == exitsItem.Status) continue;
+                    else
+                    {
+                        exitsItem.Status = item.Status;
+                        exitsItem.BeginTime = item.LocalTime;
+                        exitsItem.EndTime = null;
+                    }
+                }
+                else
+                {
+                    if (item.Status == exitsItem.Status) continue;
+                    else
+                    {
+                        if (exitsItem.BeginTime != null && exitsItem.EndTime != null)
+                        {
+                            exitsItem.DurationTime += exitsItem.EndTime.GetValueOrDefault().Subtract(exitsItem.BeginTime.GetValueOrDefault()).Milliseconds;
+                            exitsItem.BeginTime = null;
+                            exitsItem.EndTime = null;
+                            exitsItem.Status = null;
+                        }
+                    }
+                }
+            }
+            else
+            {
+
+                if (newitem.Status == Core.Enums.EquipmentAlarmStatusEnum.Trigger)
+                    newitem.BeginTime = item.LocalTime;
+                else
+                    newitem.EndTime = item.LocalTime;
+
+                if (newitem.BeginTime != null && newitem.EndTime != null)
+                    newitem.DurationTime = newitem.EndTime.GetValueOrDefault().Subtract(newitem.BeginTime.GetValueOrDefault()).Milliseconds;
+            }
+
+            list.Add(newitem);
+
+        }
+
+        var durationTime = list.Sum(a => a.DurationTime) ?? 0;
+
+        return durationTime;
+    }
+
+    #endregion
 }

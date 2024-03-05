@@ -1196,7 +1196,7 @@ namespace Hymson.MES.Services.Services.Process
             //var query = new ProcResourceQuery
             //{
             //    IdsArr = idsArr,
-            //    Status = (int)SysDataStatusEnum.Enable
+            //    EquipmentStatus = (int)SysDataStatusEnum.Enable
             //};
             //var resourceList = await _resourceRepository.GetByIdsAsync(query);
             //if (resourceList != null && resourceList.Any())
@@ -1383,7 +1383,7 @@ namespace Hymson.MES.Services.Services.Process
         //    var entity = new ProcResourceEntity
         //    {
         //        Id = param.Id,
-        //        Status = param.Status,
+        //        EquipmentStatus = param.EquipmentStatus,
         //        ResName = param.ResName,
         //        ResTypeId = param.ResTypeId,
         //        Remark = param.Remark ?? "",

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hymson.MES.Services.Dtos.SystemAp;
+namespace Hymson.MES.Services.Dtos.SystemApi;
 
 /// <summary>
 /// 工序日产出

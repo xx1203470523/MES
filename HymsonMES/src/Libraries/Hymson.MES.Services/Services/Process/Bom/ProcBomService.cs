@@ -295,7 +295,7 @@ namespace Hymson.MES.Services.Services.Process
 
             //判断需要删除的Bom是否是启用状态
             var bomList = await _procBomRepository.GetByIdsAsync(ids);
-            //if (bomList.Any(x => x.Status == SysDataStatusEnum.Enable))
+            //if (bomList.Any(x => x.EquipmentStatus == SysDataStatusEnum.Enable))
             //{
             //    throw new BusinessException(nameof(ErrorCode.MES10611));
             //}

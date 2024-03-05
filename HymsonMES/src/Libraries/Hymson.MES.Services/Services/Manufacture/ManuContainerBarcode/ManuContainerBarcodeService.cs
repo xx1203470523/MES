@@ -240,7 +240,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     throw new CustomerValidationException(nameof(ErrorCode.MES16711));
                 }
                 //是否允许完成产品
-                //if (sfcProduceEntity.Status == SfcProduceStatusEnum.Complete && !facePlateContainerPackEntity.IsAllowCompleteProduct)
+                //if (sfcProduceEntity.EquipmentStatus == SfcProduceStatusEnum.Complete && !facePlateContainerPackEntity.IsAllowCompleteProduct)
                 //{
                 //    throw new CustomerValidationException(nameof(ErrorCode.MES16712));
                 //}
@@ -376,7 +376,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //        }
                     //        if (inte.Maximum == (packs.Count() + 1))
                     //        {
-                    //            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //            barcodeobj.EquipmentStatus = (int)ManuContainerBarcodeStatusEnum.Close;
 
                     //            await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                     //        }
@@ -384,7 +384,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //    }
                     //    else
                     //    {
-                    //        barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //        barcodeobj.EquipmentStatus = (int)ManuContainerBarcodeStatusEnum.Close;
 
                     //        await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                     //        throw new CustomerValidationException(nameof(ErrorCode.MES16717));
@@ -590,7 +590,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //        }
                     //        if (inte.Maximum == (packs.Count() + 1))
                     //        {
-                    //            barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //            barcodeobj.EquipmentStatus = (int)ManuContainerBarcodeStatusEnum.Close;
 
                     //            await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                     //        }
@@ -599,7 +599,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                     //    }
                     //    else
                     //    {
-                    //        barcodeobj.Status = (int)ManuContainerBarcodeStatusEnum.Close;
+                    //        barcodeobj.EquipmentStatus = (int)ManuContainerBarcodeStatusEnum.Close;
 
                     //        await _manuContainerBarcodeRepository.UpdateAsync(barcodeobj);
                     //        throw new CustomerValidationException(nameof(ErrorCode.MES16717));
@@ -1131,7 +1131,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
             if (manuContainerBarcodeEntity != null)
             {
-                //if (manuContainerBarcodeEntity.Status == (int)ManuContainerBarcodeStatusEnum.Close)
+                //if (manuContainerBarcodeEntity.EquipmentStatus == (int)ManuContainerBarcodeStatusEnum.Close)
                 //{
                 //    return null;
                 //}

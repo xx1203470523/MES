@@ -6,6 +6,8 @@
  *build datetime: 2023-06-15 10:37:18
  */
 
+using Hymson.MES.Core.Enums.Report;
+
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
     /// <summary>
@@ -110,6 +112,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// 产品id组
         /// </summary>
         public IEnumerable<long>? ProductIds { get; set; }
+
+        /// <summary>
+        /// 查询日期类型
+        /// </summary>
+        public DateTypeEnum? DateType { get; set; }
     }
 
     /// <summary>

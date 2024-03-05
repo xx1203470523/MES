@@ -1,14 +1,6 @@
-﻿using Hymson.MES.Core.Domain.Quality;
-using Hymson.MES.Core.Enums.Integrated;
-using Hymson.MES.Core.Enums.Report;
-using Hymson.MES.Services.Dtos.SystemAp;
+﻿
 using Hymson.MES.Services.Dtos.SystemApi;
-using Hymson.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hymson.MES.Services.Dtos.SystemApi.Kanban;
 
 namespace Hymson.MES.Services.Services.SystemApi;
 
@@ -62,5 +54,31 @@ public interface ISystemApiService
     /// <param name="queryDto"></param>
     /// <returns></returns>
     Task<IEnumerable<ProductionCapacityViewDto>> GetProductionCapacityAsync(ProductionCapacityQueryDto queryDto);
+
+    /// <summary>
+    /// 设备运行状态
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<EquipmentStatusViewDto>> GetEquipmentStatusAsync();
+
+    /// <summary>
+    /// 设备运行状态分布
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<EquStatusDistributionViewDto>> GetEquipmentStatusDistributionAsync();
+
+    /// <summary>
+    /// 设备故障率（日/月）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    Task<IEnumerable<EquFaultRateViewDto>> GetEquFaultRateAsync(EquFaultRateQueryDto queryDto);
+
+    /// <summary>
+    /// 设备OEE趋势图（日/月）
+    /// </summary>
+    /// <param name="queryDto"></param>
+    /// <returns></returns>
+    Task<IEnumerable<EquOEETrendChartViewDto>> GetEquOEETrendChartAsync(EquOEETrendChartQueryDto queryDto);
 
 }

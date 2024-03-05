@@ -326,7 +326,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             //        ProcessRouteId = createDto.BadProcessRouteId ?? 0,
             //        ProcedureId = processRouteProcedure.ProcedureId,
             //        UpdatedBy = _currentUser.UserName,
-            //        Status = SfcProduceStatusEnum.lineUp,
+            //        EquipmentStatus = SfcProduceStatusEnum.lineUp,
             //        Ids = manuSfcs.Select(x => x.Id).ToArray()
             //    };
             //}
@@ -588,7 +588,7 @@ namespace Hymson.MES.Services.Services.Manufacture
 
                 //var productBadRecordList = await _manuProductBadRecordRepository.GetManuProductBadRecordEntitiesBySFCAsync(new ManuProductBadRecordBySFCQuery
                 //{
-                //    Status = ProductBadRecordStatusEnum.Open,
+                //    EquipmentStatus = ProductBadRecordStatusEnum.Open,
                 //    SFC = badReJudgmentDto.SFC,
                 //    SiteId = _currentSite.SiteId ?? 0
                 //});
@@ -601,7 +601,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //    }
                 //    else
                 //    {
-                //        item.Status = ProductBadRecordStatusEnum.Close;
+                //        item.EquipmentStatus = ProductBadRecordStatusEnum.Close;
                 //        item.Remark = unqualified.Remark ?? "";
                 //    }
                 //    item.UpdatedBy = _currentUser.UserName;

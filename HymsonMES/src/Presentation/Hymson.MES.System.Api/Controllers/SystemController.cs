@@ -1,10 +1,10 @@
-using Hymson.Infrastructure;
+
 using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Services.Dtos.Report;
-using Hymson.MES.Services.Dtos.SystemAp;
 using Hymson.MES.Services.Dtos.SystemApi;
+using Hymson.MES.Services.Dtos.SystemApi.Kanban;
 using Hymson.MES.Services.Services.Report;
 using Hymson.MES.Services.Services.SystemApi;
 using Hymson.MES.SystemServices.Dtos.Manufacture;
@@ -12,10 +12,6 @@ using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Drawing.Text;
-using static Mysqlx.Notice.Warning.Types;
 
 namespace Hymson.MES.System.Api.Controllers
 {
@@ -51,6 +47,12 @@ namespace Hymson.MES.System.Api.Controllers
             _manuSfcCirculationService = manuSfcCirculationService;
             _productTraceReportService = productTraceReportService;
             _systemApiService = systemApiService;
+        }
+
+        [HttpGet]
+        public async Task GetToken()
+        {
+
         }
 
         /// <summary>
@@ -196,7 +198,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("kanban/planWorkOrderInfo")]
-        public async Task<IEnumerable<PlanWorkOrderInfoViewDto>> GetPlanWorkOrderInfoAsync([FromQuery]PlanWorkOrderInfoQueryDto queryDto)
+        public async Task<IEnumerable<PlanWorkOrderInfoViewDto>> GetPlanWorkOrderInfoAsync([FromQuery] PlanWorkOrderInfoQueryDto queryDto)
         {
             return await _systemApiService.GetPlanWorkOrderInfoAsync(queryDto);
         }
@@ -232,7 +234,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("kanban/monthOneQualifiedRate")]
-        async Task<IEnumerable<OneQualifiedMonthViewDto>> GetMonthOneQualifiedRateAsync([FromQuery] OneQualifiedMonthQueryDto queryDto)
+        public async Task<IEnumerable<OneQualifiedMonthViewDto>> GetMonthOneQualifiedRateAsync([FromQuery] OneQualifiedMonthQueryDto queryDto)
         {
             return await _systemApiService.GetMonthOneQualifiedRateAsync(queryDto);
         }
@@ -273,6 +275,52 @@ namespace Hymson.MES.System.Api.Controllers
             return await _systemApiService.GetProductionCapacityAsync(queryDto);
         }
 
+        /// <summary>
+        /// 获取设备运行状态
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/equStatus")]
+        public async Task<IEnumerable<EquipmentStatusViewDto>> GetEquipmentStatusAsync()
+        {
+            return await _systemApiService.GetEquipmentStatusAsync();
+        }
+
+        /// <summary>
+        /// 设备运行状态分布
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/equStatusDistribution")]
+        public async Task<IEnumerable<EquStatusDistributionViewDto>> GetEquipmentStatusDistributionAsync()
+        {
+            return await _systemApiService.GetEquipmentStatusDistributionAsync();
+        }
+
+        /// <summary>
+        /// 获取设备故障率（日/月）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/equFaultRate")]
+        public async Task<IEnumerable<EquFaultRateViewDto>> GetEquFaultRateAsync([FromQuery] EquFaultRateQueryDto queryDto)
+        {
+            return await _systemApiService.GetEquFaultRateAsync(queryDto);
+        }
+
+        /// <summary>
+        /// OEE趋势图（日/月）
+        /// </summary>
+        /// <param name="queryDto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("kanban/equOEETrendChart")]
+        public async Task<IEnumerable<EquOEETrendChartViewDto>> GetEquOEETrendChartAsync([FromQuery] EquOEETrendChartQueryDto queryDto)
+        {
+            return await _systemApiService.GetEquOEETrendChartAsync(queryDto);
+        }
+
         #endregion
     }
-}                                     
+}

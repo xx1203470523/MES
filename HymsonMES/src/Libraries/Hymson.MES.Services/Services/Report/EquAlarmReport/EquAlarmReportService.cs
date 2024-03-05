@@ -86,6 +86,7 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
             var equAlarmEntities = await _equAlarmRepository.GetListAsync(new()
             {
                 EquipmentId = query.EquipmentId,
+                EquipmentIds = query.EquipmentIds,
                 CreatedOnEnd = query.EndTime,
                 CreatedOnStart = query.BeginTime
             });
@@ -117,9 +118,11 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
                         if (item.Status == exitsItem.Status) continue;
                         else
                         {
+                            exitsItem.EndTime = item.LocalTime;
+                            if (exitsItem.DurationTime == null) exitsItem.DurationTime = 0;
                             if (exitsItem.BeginTime != null && exitsItem.EndTime != null)
                             {
-                                exitsItem.DurationTime += exitsItem.EndTime.GetValueOrDefault().Subtract(exitsItem.BeginTime.GetValueOrDefault()).Milliseconds;
+                                exitsItem.DurationTime += exitsItem.EndTime.GetValueOrDefault().Subtract(exitsItem.BeginTime.GetValueOrDefault()).Seconds;
                                 exitsItem.BeginTime = null;
                                 exitsItem.EndTime = null;
                                 exitsItem.Status = null;
@@ -136,16 +139,17 @@ namespace Hymson.MES.Services.Services.Report.EquAlarmReport
                         newitem.EndTime = item.LocalTime;
 
                     if (newitem.BeginTime != null && newitem.EndTime != null)
-                        newitem.DurationTime = newitem.EndTime.GetValueOrDefault().Subtract(newitem.BeginTime.GetValueOrDefault()).Milliseconds;
-                }
+                        newitem.DurationTime += newitem.EndTime.GetValueOrDefault().Subtract(newitem.BeginTime.GetValueOrDefault()).Seconds;
 
-                list.Add(newitem);
+                    list.Add(newitem);
+                }
 
             }
 
             foreach (var item in list)
             {
-                result.Add(new() { 
+                result.Add(new()
+                {
                     EquipmentId = item.EquipmentId,
                     DurationTime = item.DurationTime
                 });

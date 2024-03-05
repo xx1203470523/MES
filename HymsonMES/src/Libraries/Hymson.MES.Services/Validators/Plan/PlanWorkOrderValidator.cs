@@ -63,7 +63,7 @@ namespace Hymson.MES.Services.Validators.Plan
         public PlanWorkOrderModifyValidator()
         {
             RuleFor(x => x.Id).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16032));
-            //RuleFor(x => x.Status).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
+            //RuleFor(x => x.EquipmentStatus).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16033));
 
             RuleFor(x => x.OrderCode).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16020));
             RuleFor(x => x.ProductId).NotEmpty().WithErrorCode(nameof(ErrorCode.MES16021));

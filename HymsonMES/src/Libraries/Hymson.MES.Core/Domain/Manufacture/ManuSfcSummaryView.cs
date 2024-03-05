@@ -31,3 +31,21 @@ public class ManuSfcSummaryView
     /// </summary>
     public decimal? OneQuanlifiedQty { get; set; }
 }
+
+public class ManuSfcSummaryDateView
+{
+    /// <summary>
+    /// 日期
+    /// </summary>
+    public string? EndTime { get; set; }
+
+    /// <summary>
+    /// 产出数
+    /// </summary>
+    public decimal? OutputQty { get; set; }
+
+    /// <summary>
+    /// 良品数量
+    /// </summary>
+    public decimal? QualifiedQty { get; set; }
+}

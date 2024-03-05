@@ -149,7 +149,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             var manuFacePlates = await _manuFacePlateRepository.GetByIdsAsync(ids);
             //if (manuFacePlates != null && manuFacePlates.Any())
             //{
-            //    var isAnyEnableOrRetain = manuFacePlates.Where(c => c.Status == SysDataStatusEnum.Enable || c.Status == SysDataStatusEnum.Retain).Any();
+            //    var isAnyEnableOrRetain = manuFacePlates.Where(c => c.EquipmentStatus == SysDataStatusEnum.Enable || c.EquipmentStatus == SysDataStatusEnum.Retain).Any();
             //    if (isAnyEnableOrRetain)
             //        throw new CustomerValidationException(nameof(ErrorCode.MES16913));
             //}

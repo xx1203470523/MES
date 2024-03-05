@@ -752,8 +752,8 @@ namespace Hymson.MES.Services.Services.Process.Procedure
             }
 
             var entitys = await _procProcedureRepository.GetByIdsAsync(idsArr);
-            //if (entitys.Any(a => a.Status == SysDataStatusEnum.Enable
-            //|| a.Status == SysDataStatusEnum.Retain) == true)
+            //if (entitys.Any(a => a.EquipmentStatus == SysDataStatusEnum.Enable
+            //|| a.EquipmentStatus == SysDataStatusEnum.Retain) == true)
             //{
             //    throw new CustomerValidationException(nameof(ErrorCode.MES10443));
             //}

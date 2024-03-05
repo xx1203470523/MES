@@ -123,7 +123,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         ///// <summary>
         // /// 不合格记录开关;1、开启  2、关闭
         // /// </summary>
-        // public int? Status { get; set; }
+        // public int? EquipmentStatus { get; set; }
 
         ///// <summary>
         // /// 不良来源;·1、设备复投不良  2、人工录入不良

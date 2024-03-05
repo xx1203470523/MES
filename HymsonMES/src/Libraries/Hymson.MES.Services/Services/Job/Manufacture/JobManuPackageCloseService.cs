@@ -96,7 +96,7 @@ namespace Hymson.MES.Services.Services.Job.Manufacture
             }
             int status = 2;//1打开，2关闭
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
-            defaultDto.Content?.Add("Status", $"{status}".ToString());
+            defaultDto.Content?.Add("EquipmentStatus", $"{status}".ToString());
             //当前状态不等于修改状态
             if (manuContainerBarcodeEntity.Status != status)
             {

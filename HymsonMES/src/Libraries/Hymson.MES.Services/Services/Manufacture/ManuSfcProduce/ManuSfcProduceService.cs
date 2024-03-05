@@ -1471,7 +1471,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             if (planWorkOrderEntity.Status == PlanWorkOrderStatusEnum.Closed)
             {
                 var statusMsg = _localizationService.GetResource($"Hymson.MES.Core.Enums.PlanWorkOrderStatusEnum.{Enum.GetName(typeof(PlanWorkOrderStatusEnum), planWorkOrderEntity.Status) ?? ""}");
-                throw new CustomerValidationException(nameof(ErrorCode.MES18009)).WithData("OrderCode", planWorkOrderEntity.OrderCode).WithData("Status", statusMsg);
+                throw new CustomerValidationException(nameof(ErrorCode.MES18009)).WithData("OrderCode", planWorkOrderEntity.OrderCode).WithData("EquipmentStatus", statusMsg);
             }
             //验证同一工艺路线 
             var processRouteIds = planWorkOrders.Select(it => it.ProcessRouteId).Distinct();
@@ -1800,7 +1800,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                             //await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
                             //{
                             //    Sfcs = manuSfcs,
-                            //    Status = SfcStatusEnum.Complete,
+                            //    EquipmentStatus = SfcStatusEnum.Complete,
                             //    IsUsed = YesOrNoEnum.Yes,
                             //    UserId = _currentUser.UserName,
                             //    UpdatedOn = HymsonClock.Now()
@@ -1852,7 +1852,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                         //if (notManuSfcs != null && notManuSfcs.Any()) await _manuSfcRepository.UpdateSfcStatusAndIsUsedAsync(new ManuSfcUpdateStatusAndIsUsedCommand
                         //{
                         //    Sfcs = notManuSfcs.ToArray(),
-                        //    Status = SfcStatusEnum.InProcess,
+                        //    EquipmentStatus = SfcStatusEnum.InProcess,
                         //    IsUsed = YesOrNoEnum.Yes,
                         //    UserId = _currentUser.UserName,
                         //    UpdatedOn = HymsonClock.Now()

@@ -1,3 +1,4 @@
+using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Equipment;
 
 namespace Hymson.MES.Data.Repositories.Equipment
@@ -7,6 +8,24 @@ namespace Hymson.MES.Data.Repositories.Equipment
     /// </summary>
     public interface IEquStatusRepository
     {
+        #region 查询
+
+        /// <summary>
+        /// 单条数据查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquStatusEntity> GetOneAsync(EquStatusQuery query);
+
+        /// <summary>
+        /// 数据集查询
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EquStatusEntity>> GetListAsync(EquStatusQuery query);
+
+        #endregion
+
         /// <summary>
         /// 新增
         /// </summary>

@@ -262,7 +262,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 throw whMaterialInventoryEntity.Status switch
                 {
                     WhMaterialInventoryStatusEnum.ToBeUsed => new CustomerValidationException(nameof(ErrorCode.MES16310)),
-                    _ => new CustomerValidationException(nameof(ErrorCode.MES16311)).WithData("Status", whMaterialInventoryEntity.Status.ToString()),
+                    _ => new CustomerValidationException(nameof(ErrorCode.MES16311)).WithData("EquipmentStatus", whMaterialInventoryEntity.Status.ToString()),
                 };
             }
             #endregion
@@ -346,7 +346,7 @@ namespace Hymson.MES.Services.Services.Manufacture
                 productInfo = new ManuFacePlateRepairProductInfoDto
                 {
                     SFC = manuSfcProduceEntit.SFC,
-                    Status = manuSfcProduceEntit.Status == SfcProduceStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324)),// manuSfcProduceEntit.Status.ToString(),
+                    Status = manuSfcProduceEntit.Status == SfcProduceStatusEnum.lineUp ? _localizationService.GetResource(nameof(ErrorCode.MES17323)) : _localizationService.GetResource(nameof(ErrorCode.MES17324)),// manuSfcProduceEntit.EquipmentStatus.ToString(),
                     ProcedureCode = procProcedureEntity.Code,
                     OrderCode = planWorkOrderEntity.OrderCode,
                     MaterialCode = procMaterialEntity.MaterialCode,

@@ -32,5 +32,5 @@ public class OneQualifiedQueryDto
     /// <summary>
     /// 风冷/液冷（分别对应不同产品）
     /// </summary>
-    public string ProductName { get; set; }
+    public string? ProductName { get; set; }
 }
