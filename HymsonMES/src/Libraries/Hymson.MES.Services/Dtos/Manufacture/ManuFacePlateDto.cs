@@ -112,6 +112,7 @@ namespace Hymson.MES.Services.Dtos.Manufacture
         /// </summary>
         public long SiteId { get; set; }
 
+
         /// <summary>
         /// 容器编码
         /// </summary>
