@@ -1,4 +1,5 @@
 using Hymson.MES.Core.Enums.Manufacture;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hymson.MES.Services.Dtos.Manufacture;
 
@@ -85,6 +86,11 @@ public class ManuFacePlateOpenContainerDto
     /// 包装容器
     /// </summary>
     public long? PackContainerId { get; set; }
+
+    /// <summary>
+    /// 包装容器包装编码
+    /// </summary>
+    public string? packContainerCode {  get; set; }
 }
 
 /// <summary>
@@ -96,6 +102,11 @@ public class ManuFacePlateCloseContainerDto
     /// 包装容器
     /// </summary>
     public long? PackContainerId { get; set; }
+
+    /// <summary>
+    /// 包装容器包装编码
+    /// </summary>
+    public string? packContainerCode { get; set; }
 }
 
 /// <summary>
