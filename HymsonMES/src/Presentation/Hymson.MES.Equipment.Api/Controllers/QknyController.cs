@@ -87,6 +87,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO 业务逻辑
             //1. 新增equ_equipment_alarm记录故障时间和恢复时间，用于统计每台设备故障具体时间和故障代码
+            //
         }
 
         /// <summary>
@@ -114,7 +115,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "CCDFileUploadComplete006", ReceiverTypeEnum.MES)]
         public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
         {
-
+            //TODO
+            //1. 新增表ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
+            //  明细和主表记录到一起
         }
 
         /// <summary>
@@ -127,6 +130,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取开机参数列表007", BusinessType.OTHER, "GetRecipeList007", ReceiverTypeEnum.MES)]
         public async Task<GetRecipeListReturnDto> GetRecipeListAsync(GetRecipeListDto dto)
         {
+            //TODO
+            //1. 获取proc_equipment_group_param表中type=1的数据，并转换成相应数据格式
+
             GetRecipeListReturnDto result = new GetRecipeListReturnDto();
 
             return result;
@@ -142,6 +148,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取开机参数明细008", BusinessType.OTHER, "GetRecipeDetail008", ReceiverTypeEnum.MES)]
         public async Task<GetRecipeDetailReturnDto> GetRecipeDetailAsync(GetRecipeDetailDto dto)
         {
+            //TODO
+            //1. 获取proc_equipment_group_param_detail开机参数明细，并转成相应格式
+
             GetRecipeDetailReturnDto result = new GetRecipeDetailReturnDto();
 
             List<RecipeParamDto> paramList = new List<RecipeParamDto>();
@@ -168,7 +177,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("开机参数校验采集009", BusinessType.OTHER, "Recipe009", ReceiverTypeEnum.MES)]
         public async Task RecipeAsync(RecipeDto dto)
         {
+            //TODO
+            //1. 校验开机参数是否启用状态
+            //2. 新增proc_recipe_record记录表，用于记录开机参数中设定的实际值
 
+            //新增开机参数记录表
         }
 
         /// <summary>
@@ -181,7 +194,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("原材料上料010", BusinessType.OTHER, "Feeding010", ReceiverTypeEnum.MES)]
         public async Task FeedingAsync(FeedingDto dto)
         {
-
+            //TODO
+            //-- 不校验物料是在wh_material_inventory物料库存表中
+            //1. 校验物料是否在lims系统发过来的条码表lims_material，验证是否存在及合格，以及生成日期
+            //2. 添加上料表信息manu_feeding
+            //3. 添加上料记录表信息manu_feeding_record
+            //
         }
 
         /// <summary>
@@ -194,7 +212,18 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("半成品上料011", BusinessType.OTHER, "HalfFeeding011", ReceiverTypeEnum.MES)]
         public async Task HalfFeedingAsync(HalfFeedingDto dto)
         {
-
+            //TODO
+            //1. 本用于涂布，辊分，模切，卷绕工序，现涂布，辊分，模切改为一个工单，这几个地方改为直接进站
+            //2. 校验条码是否在上工序产出(manu_sfc_produce)
+            //3. 走进站流程
+            /*
+             * select * from manu_sfc => 修改状态
+             * select * from manu_sfc_info msi => 不处理
+             * select * from manu_sfc_produce msp => 修改状态
+             * 
+             * select * from manu_sfc_step mss => 新增
+             */
+            //4. 下工序产出时，在制品表manu_sfc_produce删除进站条码，manu_sfc_step新增
         }
 
         /// <summary>
@@ -207,7 +236,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("上料呼叫Agv012", BusinessType.OTHER, "AgvUpMaterial012", ReceiverTypeEnum.MES)]
         public async Task AgvUpMaterialAsync(AgvUpMaterialDto dto)
         {
-
+            //TODO
+            //1. 针对涂布，辊分，模切，卷绕设备进行上料时，通过MES呼叫AGV，给AGV发一个任务
+            //2. 调用AGV接口，添加agv_task_record记录表进行记录，表中有字段区分上料还是下料
         }
 
         /// <summary>
@@ -220,7 +251,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("下料呼叫Agv013", BusinessType.OTHER, "AgvDownMaterial013", ReceiverTypeEnum.MES)]
         public async Task AgvDownMaterialAsync(AgvUpMaterialDto dto)
         {
-
+            //TODO
+            //1. 针对涂布，辊分，模切，卷绕设备进行下料时，通过MES呼叫AGV，给AGV发一个任务
+            //2. 调用AGV接口，添加agv_task_record记录表进行记录，表中有字段区分上料还是下料
         }
 
         /// <summary>
@@ -233,9 +266,13 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取配方列表(制胶匀浆)014", BusinessType.OTHER, "FormulaListGet014", ReceiverTypeEnum.MES)]
         public async Task<List<FormulaListGetReturnDto>> FormulaListGetAsync(FormulaListGetDto dto)
         {
+            //TODO
+            //1. 针对制胶匀浆设备时，在开机进行启动时，从MES获取配方列表
+            //2. 获取proc_formula表数据，并进行字段转换
+
             List<FormulaListGetReturnDto> list = new List<FormulaListGetReturnDto>();
             for (var i = 0; i < 3; ++i)
-            {
+            { 
                 FormulaListGetReturnDto model = new FormulaListGetReturnDto();
                 model.FormulaCode = $"formulaCode{i + 1}";
                 model.Version = "1.0";
@@ -258,6 +295,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取配方参数明细(制胶匀浆)015", BusinessType.OTHER, "FormulaDetailGet015", ReceiverTypeEnum.MES)]
         public async Task<FormulaDetailGetReturnDto> FormulaDetailGetAsync(FormulaDetailGetDto dto)
         {
+            //TODO
+            //1. 基于proc_formula，proc_formula_details表进行查询
+
             FormulaDetailGetReturnDto result = new FormulaDetailGetReturnDto();
             result.Version = "1.0";
 
@@ -289,6 +329,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("配方版本校验(制胶匀浆)016", BusinessType.OTHER, "FormulaVersionExamine016", ReceiverTypeEnum.MES)]
         public async Task FormulaVersionExamineAsync(FormulaVersionExamineDto dto)
         {
+            //TODO
+            //1. 查询表proc_formula进行配方版本的校验，确认是否是激活的版本
         }
 
         /// <summary>
@@ -301,7 +343,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料前校验(制胶匀浆)017", BusinessType.OTHER, "ConsumeEquBeforeCheck017", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquBeforeCheckAsync(ConsumeEquBeforeCheckDto dto)
         {
-
+            //TODO
+            //待确认？此时应该应该根据什么是查激活的工单以及对应的BOM
+            //1. 校验物料是否在工单BOM里
+            //2. 需要查询设备当前所在工序
         }
 
         /// <summary>
@@ -314,7 +359,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料(制胶匀浆)018", BusinessType.OTHER, "ConsumeEqu018", ReceiverTypeEnum.MES)]
         public async Task ConsumeEquAsync(ConsumeEquDto dto)
         {
-
+            //TODO
+            //1. 类似上料，上到搅拌机或者制胶机
         }
 
         /// <summary>
@@ -327,7 +373,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("上料完成(制胶匀浆)019", BusinessType.OTHER, "FeedingCompleted019", ReceiverTypeEnum.MES)]
         public async Task FeedingCompletedAsync(FeedingCompletedDto dto)
         {
-
+            //TODO
+            //1. 类似上料，粉料，匀浆上到中转罐或者料仓（上料点）
+            //
         }
 
         /// <summary>
@@ -340,6 +388,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备产出(制胶匀浆)020", BusinessType.OTHER, "OutputEqu020", ReceiverTypeEnum.MES)]
         public async Task<string> OutputEquAsync(QknyBaseDto dto)
         {
+            //TODO
+            //1. 根据工序返回对应的条码给设备
+            //2. 执行条码生成方法
+
             string sfc = "SFC001";
 
             return sfc;
@@ -355,7 +407,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("批次转移(制胶匀浆)021", BusinessType.OTHER, "BatchMove021", ReceiverTypeEnum.MES)]
         public async Task BatchMoveAsync(BatchMoveDto dto)
         {
-
+            //TODO
+            //1. 当浆料或胶液在罐体间转移后，上报浆料或胶液条码、重量、转出罐和转入罐的编码
+            //2. 处理罐子前后的数量
+            //3. 添加转移记录
         }
 
         /// <summary>
@@ -368,7 +423,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备投料非生产投料(制胶匀浆)022", BusinessType.OTHER, "ConsumeInNonProductionEqu022", ReceiverTypeEnum.MES)]
         public async Task ConsumeInNonProductionEquAsync(ConsumeInNonProductionEquDto dto)
         {
-
+            //TODO
+            //1. 使用NMP和DIW洗罐子用到
         }
 
         /// <summary>
@@ -381,6 +437,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("请求产出极卷码023", BusinessType.OTHER, "GenerateSfc023", ReceiverTypeEnum.MES)]
         public async Task<List<string>> GenerateSfcAsync(GenerateSfcDto dto)
         {
+            //TODO
+            //1. 根据数量下发对应的条码给设备
+            //2. 用的时候生成(需要的时候在生成条码)或从XX表里面取(提前生成就是下发，生成两个或者3个，)
+            //3. 考虑提前生成条码如何标记是否使用
+
             List<string> sfcList = new List<string>();
             for (var i = 0; i < dto.Qty + 1; ++i)
             {
@@ -400,7 +461,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产出米数上报024", BusinessType.OTHER, "OutboundMetersReport024", ReceiverTypeEnum.MES)]
         public async Task OutboundMetersReportAsync(OutboundMetersReportDto dto)
         {
-
+            //TODO
+            //1. 设备上报条码和对应的长度
+            //2. 去 manu_sfc，manu_sfc_produce 表修改条码的长度，manu_sfc根据manu_sfc_produce的id来
         }
 
         /// <summary>
@@ -413,6 +476,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取下发条码(用于CCD面密度)025", BusinessType.OTHER, "CcdGetBarcode025", ReceiverTypeEnum.MES)]
         public async Task<CcdGetBarcodeReturnDto> CcdGetBarcodeAsync(CCDFileUploadCompleteDto dto)
         {
+            //TODO
+            //1. 用于异常情况，返回设备产出最近的一个条码，从manu_sfc_produce中取
+
             CcdGetBarcodeReturnDto model = new CcdGetBarcodeReturnDto();
 
             return model;
@@ -428,7 +494,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备过程参数026", BusinessType.OTHER, "EquipmentProcessParam026", ReceiverTypeEnum.MES)]
         public async Task EquipmentProcessParamAsync(EquipmentProcessParamDto dto)
         {
-
+            //TODO
+            //1. 写入参数表，参考现有的EquipmentCollectionAsync，
+            //2. 支持错误参数不NG，记录或者忽略
         }
 
         /// <summary>
@@ -441,7 +509,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品进站027", BusinessType.OTHER, "Inbound027", ReceiverTypeEnum.MES)]
         public async Task InboundAsync(InboundDto dto)
         {
-
+            //TODO
+            //1. 上工序出站校验
+            //2. 是否合格校验
+            //3. 支持重复进站（重复进站当前系统能否处理，系统会有个将两条记录移到另一条记录）
+            //4. 参考现有进站
         }
 
         /// <summary>
@@ -454,7 +526,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品进站028", BusinessType.OTHER, "Outbound028", ReceiverTypeEnum.MES)]
         public async Task OutboundAsync(OutboundDto dto)
         {
-
+            //TODO
+            //1. 添加参数记录
+            //2. 参考现有出站
         }
 
         /// <summary>
@@ -467,6 +541,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("进站多个029", BusinessType.OTHER, "InboundMore029", ReceiverTypeEnum.MES)]
         public async Task<List<InboundMoreReturnDto>> InboundMoreAsync(InboundMoreDto dto)
         {
+            //TODO
+            //1. 参考现有进站
+
             List<InboundMoreReturnDto> result = new List<InboundMoreReturnDto>();
             for(var i = 0;i < dto.SfcList.Count; ++i)
             {
@@ -491,6 +568,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("出站多个030", BusinessType.OTHER, "OutboundMore030", ReceiverTypeEnum.MES)]
         public async Task<List<OutboundMoreReturnDto>> OutboundMoreAsync(OutboundMoreDto dto)
         {
+            //TODO
+            //1. 参考现有出站
+
             List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
             for (var i = 0; i < dto.SfcList.Count; ++i)
             {
@@ -515,6 +595,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("多极组产品出站031", BusinessType.OTHER, "OutboundMultPolar031", ReceiverTypeEnum.MES)]
         public async Task<List<OutboundMoreReturnDto>> OutboundMultPolarAsync(OutboundMultPolarDto dto)
         {
+            //TODO
+            //1. 极组和极组绑定
+            //2. 校验极组是否合格
+            //3. 校验上工序是否合格
+            //4. 考虑系统如何方便追溯
+
             List<OutboundMoreReturnDto> result = new List<OutboundMoreReturnDto>();
             for (var i = 0; i < dto.SfcList.Count; ++i)
             {
@@ -539,6 +625,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("电芯极组绑定产品出站032", BusinessType.OTHER, "OutboundSfcPolar032", ReceiverTypeEnum.MES)]
         public async Task OutboundSfcPolarAsync(OutboundSfcPolarDto dto)
         {
+            //TODO
+            //1. 将极组和电芯进行绑定
+            //2. 考虑系统如何追溯
         }
 
         /// <summary>
@@ -551,6 +640,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("电芯码下发033", BusinessType.OTHER, "GenerateCellSfc033", ReceiverTypeEnum.MES)]
         public async Task<string> GenerateCellSfcAsync(GenerateCellSfcDto dto)
         {
+            //TODO
+            //1. 生成条码进行下发
+            //2. 参考现有创建条码 CreateBarcodeBySemiProductIdAsync，CreateBarcodeByWorkOrderIdAsync
+
             string sfc = "SFC001";
 
             return sfc;
@@ -566,7 +659,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("补液数据上报034", BusinessType.OTHER, "FillingData034", ReceiverTypeEnum.MES)]
         public async Task FillingDataAsync(FillingDataDto dto)
         {
-
+            //TODO
+            //1. 新增表进行记录
         }
 
         /// <summary>
@@ -579,6 +673,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("空托盘校验035", BusinessType.OTHER, "EmptyContainerCheck035", ReceiverTypeEnum.MES)]
         public async Task EmptyContainerCheckAsync(EmptyContainerCheckDto dto)
         {
+            //TODO
+            //2. 校验托盘是否存在系统中（待确认）
+            //3. 托盘(载具)表 inte_vehicle_freight_stack 是否存在数据
         }
 
         /// <summary>
@@ -591,6 +688,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("单电芯校验036", BusinessType.OTHER, "ContainerSfcCheck036", ReceiverTypeEnum.MES)]
         public async Task ContainerSfcCheckAsync(ContainerSfcCheckDto dto)
         {
+            //TODO
+            //1. 校验电芯是否合格
+            //2. 校验电芯是否在托盘中 inte_vehicle_freight_stack
+            //3. 校验电芯是否在上工序出站
+            //4. 新增表inte_vehicle_check_record电芯校验记录表，用于绑定 inte_vehicle_check_record，绑定时不需要再次校验
         }
 
         /// <summary>
@@ -603,7 +705,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘电芯绑定(在制品容器)037", BusinessType.OTHER, "BindContainer037", ReceiverTypeEnum.MES)]
         public async Task BindContainerAsync(BindContainerDto dto)
         {
-
+            //TODO
+            //1. 校验托盘数量
+            //2. 校验电芯是否已经做校验 inte_vehicle_check_record
+            //3. 托盘和电芯做绑定，删除电芯校验记录表 inte_vehicle_check_record
+            //4. inte_vehicle_freight_stack 添加绑定数据
+            //5. inte_vehicle_freight_record 添加绑定记录
         }
 
         /// <summary>
@@ -616,7 +723,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘电芯解绑(在制品容器)038", BusinessType.OTHER, "UnBindContainer038", ReceiverTypeEnum.MES)]
         public async Task UnBindContainerAsync(UnBindContainerDto dto)
         {
-
+            //TODO
+            //1. 校验电芯是否在托盘中
+            //2. inte_vehicle_freight_stack 删除绑定数据
+            //3. 添加 inte_vehicle_freight_record 解绑记录
         }
 
         /// <summary>
@@ -629,6 +739,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘NG电芯上报039", BusinessType.OTHER, "ContainerNgReport039", ReceiverTypeEnum.MES)]
         public async Task ContainerNgReportAsync(ContainerNgReportDto dto)
         {
+            //TODO
+            //1. inte_vehicle_freight_stack 删除绑定数据
+            //2. 添加冗余表 inte_vehicle_freight_ng_record，NG解绑记录
+            //3. 添加 inte_vehicle_freight_record 解绑记录
+            //4. 添加电芯NG记录 manu_product_bad_record
         }
 
         /// <summary>
@@ -641,6 +756,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("托盘进站(容器进站)040", BusinessType.OTHER, "InboundInContainer040", ReceiverTypeEnum.MES)]
         public async Task InboundInContainerAsync(InboundInContainerDto dto)
         {
+            //TODO
+            //1. 参考 InBoundCarrierAsync 进站
         }
 
         /// <summary>
@@ -655,6 +772,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //1. 托盘如果存在参数，在记录数据时，需要在额外记录托盘当时的条码
+            //2. 添加托盘出站记录
         }
 
         /// <summary>
@@ -667,6 +785,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("工装寿命上报042", BusinessType.OTHER, "ToolLife042", ReceiverTypeEnum.MES)]
         public async Task ToolLifeAsync(ToolLifeDto dto)
         {
+            //TODO
+            //1. 添加设备工装寿命记录表，进行数据更新或者插入
         }
 
         /// <summary>
@@ -679,20 +799,8 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("产品参数上传043", BusinessType.OTHER, "ProductParam043", ReceiverTypeEnum.MES)]
         public async Task ProductParamAsync(ProductParamDto dto)
         {
+            //TODO
+            //1. 参考ProductCollectionAsync
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
