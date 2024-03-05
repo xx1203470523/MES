@@ -6,7 +6,6 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Plan;
@@ -14,15 +13,10 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Plan;
 using Hymson.MES.Data.Repositories.Plan.Query;
 using Hymson.MES.Services.Dtos.Common;
-using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Plan;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
-using IdGen;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.Xml;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Plan

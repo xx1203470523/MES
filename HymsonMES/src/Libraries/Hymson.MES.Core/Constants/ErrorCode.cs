@@ -1,4 +1,4 @@
-﻿namespace Hymson.MES.Core.Constants
+namespace Hymson.MES.Core.Constants
 {
     /// <summary>
     /// 错误码
@@ -1248,6 +1248,8 @@
         public const string MES16780 = "物料编码【{code}】没有维护容器规则！";
         public const string MES16781 = "包装编码【{0}】已被包装，父包装编码为【{1}】";
         public const string MES16782 = "容器未启用!";
+        public const string MES16783 = "生产过站面板不存在或未启用"; 
+
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -1752,6 +1754,9 @@
         public const string MES19224 = "仓库不存在,请确认仓库编码!";
         public const string MES19225 = "库区不存在,请确认库区编码!";
         public const string MES19226 = "货架不存在,请确认货架编码!";
+
+        public const string MES19227 = "{ReceiptNum}收货单重复";
+        public const string MES19228 = "{ShipmentNum}出货单重复";
         #endregion
 
         #region 发布记录 19300 
