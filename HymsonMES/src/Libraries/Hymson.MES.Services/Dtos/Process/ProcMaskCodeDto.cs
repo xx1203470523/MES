@@ -31,7 +31,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 掩码规则列表
         /// </summary>
-        public List<ProcMaskCodeRuleDto> RuleList { get; set; } = new();
+        public List<ProcMaskCodeRuleDto> Details { get; set; } = new();
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ namespace Hymson.MES.Services.Dtos.Process
         /// <summary>
         /// 掩码规则列表
         /// </summary>
-        public IEnumerable<ProcMaskCodeRuleDto> RuleList { get; set; }
+        public IEnumerable<ProcMaskCodeRuleDto> Details { get; set; }
     }
 
     /// <summary>

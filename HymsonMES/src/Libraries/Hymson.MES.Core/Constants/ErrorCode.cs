@@ -330,7 +330,7 @@
         public const string MES10810 = "掩码编码不能为空";
         public const string MES10811 = "掩码编码最大长度为50";
         public const string MES10812 = "掩码名称最大长度为50";
-
+        public const string MES10813 = "掩码匹配方式重复";
 
         #endregion
 
