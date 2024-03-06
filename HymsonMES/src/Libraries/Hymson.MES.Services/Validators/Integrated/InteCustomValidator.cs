@@ -8,13 +8,14 @@
 using FluentValidation;
 using Hymson.MES.Core.Constants;
 using Hymson.MES.Services.Dtos.Integrated;
+using System.Text.RegularExpressions;
 
 namespace Hymson.MES.Services.Validators.Integrated
 {
     /// <summary>
     /// 客户维护 更新 验证
     /// </summary>
-    internal class InteCustomCreateValidator: AbstractValidator<InteCustomCreateDto>
+    internal class InteCustomCreateValidator : AbstractValidator<InteCustomCreateDto>
     {
         public InteCustomCreateValidator()
         {
@@ -62,5 +63,6 @@ namespace Hymson.MES.Services.Validators.Integrated
             RuleFor(x => x.Describe).MaximumLength(255).WithErrorCode(nameof(ErrorCode.MES18408));
             RuleFor(x => x.Telephone).MaximumLength(50).WithErrorCode(nameof(ErrorCode.MES18409));
         }
+ 
     }
 }
