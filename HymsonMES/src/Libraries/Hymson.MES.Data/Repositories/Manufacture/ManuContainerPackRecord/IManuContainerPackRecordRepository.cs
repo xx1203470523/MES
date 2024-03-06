@@ -29,7 +29,7 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="manuContainerPackRecordEntitys"></param>
         /// <returns></returns>
-        Task<int> InsertsAsync(List<ManuContainerPackRecordEntity> manuContainerPackRecordEntitys);
+        Task<int> InsertsAsync(IEnumerable<ManuContainerPackRecordEntity> manuContainerPackRecordEntitys);
 
         /// <summary>
         /// 更新

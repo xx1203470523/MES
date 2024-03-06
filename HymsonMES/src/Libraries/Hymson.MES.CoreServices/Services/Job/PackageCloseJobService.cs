@@ -89,7 +89,7 @@ namespace Hymson.MES.CoreServices.Services.Job
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES16702));
             }
-            int status = 2;//1打开，2关闭
+            ManuContainerBarcodeStatusEnum status = ManuContainerBarcodeStatusEnum.Close;//1打开，2关闭
             defaultDto.Content?.Add("Operation", ManuContainerPackagJobReturnTypeEnum.JobManuPackageCloseService.ParseToInt().ToString());
             defaultDto.Content?.Add("Status", $"{status}".ToString());
             //当前状态不等于修改状态

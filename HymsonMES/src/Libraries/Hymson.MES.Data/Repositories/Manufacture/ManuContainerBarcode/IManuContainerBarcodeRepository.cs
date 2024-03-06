@@ -7,6 +7,7 @@
  */
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Data.Repositories.Common.Command;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
@@ -126,6 +127,14 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         Task<PagedInfo<ManuContainerBarcodeQueryView>> GetPagedInfoAsync(ManuContainerBarcodePagedQuery query);
 
         Task<PagedInfo<ManuContainerBarcodeEntity>> GetPagedListAsync(ManuContainerBarcodePagedQuery manuContainerBarcodePagedQuery);
+        Task<ManuContainerBarcodeEntity> GetOneAsync(ManuContainerBarcodeQuery query);
+        Task<IEnumerable<ManuContainerBarcodeEntity>> GetListAsync(ManuContainerBarcodeQuery query);
+        Task<int> IncrementQtyAsync(IncrementQtyCommand command);
+        Task<int> ChangeContainerStatusAsync(CloseContainerCommand command);
+        Task<int> InsertReAsync(ManuContainerBarcodeEntity entity);
+        Task<int> RefreshQtyAsync(RefreshQtyCommand command);
+        Task<int> ClearQtyAsync(ClearQtyCommand command);
+        Task<int> RefreshStatusAsync(RefreshStatusCommand command);
         #endregion
     }
 }

@@ -16,6 +16,7 @@ using Hymson.MES.Services.Dtos.Process;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
+using System.Collections.Generic;
 using System.Transactions;
 
 namespace Hymson.MES.Services.Services.Process
@@ -113,7 +114,7 @@ namespace Hymson.MES.Services.Services.Process
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
-            if (saveDto.ProcFormulaDetailsDtos != null&& saveDto.ProcFormulaDetailsDtos.Any()) 
+            if (saveDto.ProcFormulaDetailsDtos != null && saveDto.ProcFormulaDetailsDtos.Any())
             {
                 foreach (var item in saveDto.ProcFormulaDetailsDtos)
                 {
@@ -154,8 +155,8 @@ namespace Hymson.MES.Services.Services.Process
             }
 
             #region 验证 配方编码 + 版本是否唯一
-            var formulaByCodeAndVersion = await _procFormulaRepository.GetByCodeAndVersionAsync(new ProcFormulaByCodeAndVersion {SiteId=_currentSite.SiteId??0,Code= saveDto.Code,Version=saveDto.Version });
-            if (formulaByCodeAndVersion != null) throw new CustomerValidationException(nameof(ErrorCode.MES15703)).WithData("code", saveDto.Code).WithData("version",saveDto.Version);
+            var formulaByCodeAndVersion = await _procFormulaRepository.GetByCodeAndVersionAsync(new ProcFormulaByCodeAndVersion { SiteId = _currentSite.SiteId ?? 0, Code = saveDto.Code, Version = saveDto.Version });
+            if (formulaByCodeAndVersion != null) throw new CustomerValidationException(nameof(ErrorCode.MES15703)).WithData("code", saveDto.Code).WithData("version", saveDto.Version);
             #endregion
 
             // 更新时间
@@ -172,11 +173,19 @@ namespace Hymson.MES.Services.Services.Process
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             #region 组装详情数据
-            var procFormulaDetailsEntitys=new List<ProcFormulaDetailsEntity>();
-            if(saveDto.ProcFormulaDetailsDtos!=null)
-                foreach (var detail in saveDto.ProcFormulaDetailsDtos)
+            var procFormulaDetailsEntitys = new List<ProcFormulaDetailsEntity>();
+            if (saveDto.ProcFormulaDetailsDtos != null)
+                foreach (var (detail, index) in saveDto.ProcFormulaDetailsDtos.Select((value, i) => (value, i)))
+                //foreach (var detail in saveDto.ProcFormulaDetailsDtos)
                 {
-                    var detailEntity= detail.ToEntity<ProcFormulaDetailsEntity>();
+                    var detailEntity = detail.ToEntity<ProcFormulaDetailsEntity>();
+
+                    //校验上下限
+                    if ((detailEntity.UpperLimit - detailEntity.LowLimit) < 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index);
+                    }
+
                     detailEntity.Id = IdGenProvider.Instance.CreateId();
                     detailEntity.CreatedBy = updatedBy;
                     detailEntity.CreatedOn = updatedOn;
@@ -187,15 +196,15 @@ namespace Hymson.MES.Services.Services.Process
                     detailEntity.FormulaId = entity.Id;
                     procFormulaDetailsEntitys.Add(detailEntity);
                 }
-            
+
             #endregion
 
             var row = 0;
-            using (TransactionScope ts = TransactionHelper.GetTransactionScope()) 
+            using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
-                row= await _procFormulaRepository.InsertAsync(entity);
+                row = await _procFormulaRepository.InsertAsync(entity);
 
-                if(procFormulaDetailsEntitys.Any()) await _procFormulaDetailsRepository.InsertRangeAsync(procFormulaDetailsEntitys);
+                if (procFormulaDetailsEntitys.Any()) await _procFormulaDetailsRepository.InsertRangeAsync(procFormulaDetailsEntitys);
 
                 ts.Complete();
             }
@@ -215,7 +224,7 @@ namespace Hymson.MES.Services.Services.Process
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
-            if (saveDto.Id <= 0) 
+            if (saveDto.Id <= 0)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15711));
             }
@@ -227,27 +236,27 @@ namespace Hymson.MES.Services.Services.Process
                 }
 
             var procFormula = await _procFormulaRepository.GetByIdAsync(saveDto.Id);
-            if (procFormula == null) 
+            if (procFormula == null)
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES15701));
             }
 
             //校验 详情中 某些参数不能为空
-            if (saveDto.ProcFormulaDetailsDtos != null && saveDto.ProcFormulaDetailsDtos.Any()) 
+            if (saveDto.ProcFormulaDetailsDtos != null && saveDto.ProcFormulaDetailsDtos.Any())
             {
                 //查询操作
                 var formulaOperations = await _procFormulaOperationRepository.GetByIdsAsync(saveDto.ProcFormulaDetailsDtos.Select(x => x.FormulaOperationId).Distinct().ToArray());
 
                 foreach (var item in saveDto.ProcFormulaDetailsDtos)
                 {
-                    var formulaOperation = formulaOperations.FirstOrDefault(x=>x.Id==item.FormulaOperationId);
+                    var formulaOperation = formulaOperations.FirstOrDefault(x => x.Id == item.FormulaOperationId);
 
                     if (formulaOperation == null) throw new CustomerValidationException(nameof(ErrorCode.MES15723)).WithData("id", item.FormulaOperationId);
 
-                    switch (formulaOperation.Type)  
+                    switch (formulaOperation.Type)
                     {
                         case Core.Enums.Process.FormulaOperationTypeEnum.Material:
-                            if(!item.MaterialId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15724));
+                            if (!item.MaterialId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15724));
                             break;
                         case Core.Enums.Process.FormulaOperationTypeEnum.MaterialGroup:
                             if (!item.MaterialGroupId.HasValue) throw new CustomerValidationException(nameof(ErrorCode.MES15725));
@@ -268,7 +277,7 @@ namespace Hymson.MES.Services.Services.Process
                 }
             }
 
-                var updatedOn = HymsonClock.Now();
+            var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
             var entity = saveDto.ToEntity<ProcFormulaEntity>();
@@ -277,10 +286,19 @@ namespace Hymson.MES.Services.Services.Process
 
             #region 组装详情数据
             var procFormulaDetailsEntitys = new List<ProcFormulaDetailsEntity>();
+
             if (saveDto.ProcFormulaDetailsDtos != null)
-                foreach (var detail in saveDto.ProcFormulaDetailsDtos)
+                foreach (var (detail, index) in saveDto.ProcFormulaDetailsDtos.Select((value, i) => (value, i)))
+                //foreach (var detail in saveDto.ProcFormulaDetailsDtos)
                 {
                     var detailEntity = detail.ToEntity<ProcFormulaDetailsEntity>();
+
+                    //校验上下限
+                    if ((detailEntity.UpperLimit - detailEntity.LowLimit) < 0)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES15730)).WithData("line", index);
+                    }
+
                     detailEntity.Id = IdGenProvider.Instance.CreateId();
                     detailEntity.CreatedBy = _currentUser.UserName;
                     detailEntity.CreatedOn = updatedOn;
@@ -358,21 +376,21 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<ProcFormulaViewDto?> QueryByIdAsync(long id) 
+        public async Task<ProcFormulaViewDto?> QueryByIdAsync(long id)
         {
-           var procFormulaEntity = await _procFormulaRepository.GetByIdAsync(id);
-           if (procFormulaEntity == null) return null;
+            var procFormulaEntity = await _procFormulaRepository.GetByIdAsync(id);
+            if (procFormulaEntity == null) return null;
 
             var procFormulaViewDto = procFormulaEntity.ToModel<ProcFormulaViewDto>();
 
-            if (procFormulaEntity.MaterialId > 0) 
+            if (procFormulaEntity.MaterialId > 0)
             {
-                var material= await _procMaterialRepository.GetByIdAsync(procFormulaEntity.MaterialId);
-                if (material != null) 
+                var material = await _procMaterialRepository.GetByIdAsync(procFormulaEntity.MaterialId);
+                if (material != null)
                 {
                     procFormulaViewDto.MaterialCode = material.MaterialCode;
                     procFormulaViewDto.MaterialName = material.MaterialName;
-                    procFormulaViewDto.MaterialVersion = material.Version??""; 
+                    procFormulaViewDto.MaterialVersion = material.Version ?? "";
                 }
             }
             if (procFormulaEntity.ProcedureId > 0)
@@ -384,7 +402,7 @@ namespace Hymson.MES.Services.Services.Process
                     procFormulaViewDto.ProcedureCode = procedure.Code;
                 }
             }
-            if (procFormulaEntity.EquipmentGroupId > 0) 
+            if (procFormulaEntity.EquipmentGroupId > 0)
             {
                 var processEquipmentGroupEntity = await _procProcessEquipmentGroupRepository.GetByIdAsync(procFormulaEntity.EquipmentGroupId);
                 if (processEquipmentGroupEntity != null)
@@ -396,7 +414,7 @@ namespace Hymson.MES.Services.Services.Process
 
             if (procFormulaEntity.FormulaOperationGroupId > 0)
             {
-                var formulaOperationGroupEntity  = await _procFormulaOperationGroupRepository.GetByIdAsync(procFormulaEntity.FormulaOperationGroupId);
+                var formulaOperationGroupEntity = await _procFormulaOperationGroupRepository.GetByIdAsync(procFormulaEntity.FormulaOperationGroupId);
                 if (formulaOperationGroupEntity != null)
                 {
                     procFormulaViewDto.FormulaOperationGroupCode = formulaOperationGroupEntity.Code;
@@ -428,18 +446,18 @@ namespace Hymson.MES.Services.Services.Process
         /// </summary>
         /// <param name="formulaId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcFormulaDetailsViewDto>> GetFormulaDetailsByFormulaIdAsync(long formulaId) 
+        public async Task<IEnumerable<ProcFormulaDetailsViewDto>> GetFormulaDetailsByFormulaIdAsync(long formulaId)
         {
-            var formulaDetails=  await _procFormulaDetailsRepository.GetFormulaDetailsByFormulaIdAsync(formulaId);
+            var formulaDetails = await _procFormulaDetailsRepository.GetFormulaDetailsByFormulaIdAsync(formulaId);
 
-            if (formulaDetails == null||!formulaDetails.Any()) return Enumerable.Empty<ProcFormulaDetailsViewDto>();
+            if (formulaDetails == null || !formulaDetails.Any()) return Enumerable.Empty<ProcFormulaDetailsViewDto>();
 
             //查找物料
             var materialIds = formulaDetails.Where(x => x.MaterialId.HasValue).Select(x => x.MaterialId!.Value).Distinct().ToArray();
             var materials = (materialIds != null && materialIds.Any()) ? await _procMaterialRepository.GetByIdsAsync(materialIds) : null;
 
             //查找物料组
-            var materialGroupIds= formulaDetails.Where(x => x.MaterialGroupId.HasValue).Select(x => x.MaterialGroupId!.Value).Distinct().ToArray();
+            var materialGroupIds = formulaDetails.Where(x => x.MaterialGroupId.HasValue).Select(x => x.MaterialGroupId!.Value).Distinct().ToArray();
             var materialGroups = materialGroupIds.Any() ? await _procMaterialGroupRepository.GetByIdsAsync(materialGroupIds) : null;
 
             //查找参数
@@ -448,24 +466,24 @@ namespace Hymson.MES.Services.Services.Process
 
             var formulaDetailViewDtos = new List<ProcFormulaDetailsViewDto>();
 
-            foreach (var item in formulaDetails) 
+            foreach (var item in formulaDetails)
             {
-                var formulaDetailViewDto=item.ToModel<ProcFormulaDetailsViewDto>();
+                var formulaDetailViewDto = item.ToModel<ProcFormulaDetailsViewDto>();
 
                 var material = materials?.FirstOrDefault(x => x.Id == item.MaterialId);
-                if (material != null) 
+                if (material != null)
                 {
-                    formulaDetailViewDto.MaterialCode= material.MaterialCode;
+                    formulaDetailViewDto.MaterialCode = material.MaterialCode;
                 }
 
-                var materialGroup =  materialGroups?.FirstOrDefault(x => x.Id == item.MaterialGroupId);
+                var materialGroup = materialGroups?.FirstOrDefault(x => x.Id == item.MaterialGroupId);
                 if (materialGroup != null)
                 {
                     formulaDetailViewDto.MaterialGroupCode = materialGroup.GroupCode;
                 }
 
                 var parameter = parameters?.FirstOrDefault(x => x.Id == item.ParameterId);
-                if (parameter != null) 
+                if (parameter != null)
                 {
                     formulaDetailViewDto.ParameterCode = parameter.ParameterCode;
                 }
@@ -474,7 +492,7 @@ namespace Hymson.MES.Services.Services.Process
             }
 
 
-            return formulaDetailViewDtos.OrderBy(x=>x.Serial).ToList();
+            return formulaDetailViewDtos.OrderBy(x => x.Serial).ToList();
         }
 
 
@@ -515,7 +533,7 @@ namespace Hymson.MES.Services.Services.Process
             var entity = await _procFormulaRepository.GetByIdAsync(changeStatusCommand.Id);
             if (entity == null || entity.IsDeleted != 0)
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES10130));
+                throw new CustomerValidationException(nameof(ErrorCode.MES10136));
             }
             if (entity.Status == changeStatusCommand.Status)
             {
@@ -524,16 +542,16 @@ namespace Hymson.MES.Services.Services.Process
             #endregion
 
             //当是需要更改为启用状态时 判断是否 物料 + 工序 是否已经有启用状态的的配方
-            if (changeStatusCommand.Status== SysDataStatusEnum.Enable) 
+            if (changeStatusCommand.Status == SysDataStatusEnum.Enable)
             {
-                var sameEnableFormulas = await _procFormulaRepository.GetEntitiesAsync(new ProcFormulaQuery { SiteId = _currentSite.SiteId??0,MaterialId= entity.MaterialId,ProcedureId=entity.ProcedureId,Status= SysDataStatusEnum.Enable }) ;
+                var sameEnableFormulas = await _procFormulaRepository.GetEntitiesAsync(new ProcFormulaQuery { SiteId = _currentSite.SiteId ?? 0, MaterialId = entity.MaterialId, ProcedureId = entity.ProcedureId, Status = SysDataStatusEnum.Enable });
 
-                if (sameEnableFormulas != null && sameEnableFormulas.Any()) 
+                if (sameEnableFormulas != null && sameEnableFormulas.Any())
                 {
                     var material = await _procMaterialRepository.GetByIdAsync(entity.MaterialId);
                     var procedure = await _procProcedureRepository.GetByIdAsync(entity.ProcedureId);
 
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode??"").WithData("procedureCode",procedure?.Code??"");
+                    throw new CustomerValidationException(nameof(ErrorCode.MES15702)).WithData("materialCode", material?.MaterialCode ?? "").WithData("procedureCode", procedure?.Code ?? "");
                 }
             }
 

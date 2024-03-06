@@ -957,6 +957,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                 disposalResult = ProductBadDisposalResultEnum.Repair;
                 sfcProduceEntity.IsRepair = TrueOrFalseEnum.Yes;
 
+                // 记录当前工序信息
                 responseBo.SFCProduceBusinessEntity = new ManuSfcProduceBusinessEntity
                 {
                     Id = IdGenProvider.Instance.CreateId(),
@@ -966,7 +967,7 @@ namespace Hymson.MES.CoreServices.Services.Job
                     BusinessContent = new SfcProduceRepairBo
                     {
                         ProcessRouteId = sfcProduceEntity.ProcessRouteId,
-                        ProcedureId = sfcProduceEntity.ProcedureId
+                        ProcedureId = commonBo.ProcedureId
                     }.ToSerialize(),
                     CreatedBy = commonBo.UserName,
                     CreatedOn = commonBo.Time,

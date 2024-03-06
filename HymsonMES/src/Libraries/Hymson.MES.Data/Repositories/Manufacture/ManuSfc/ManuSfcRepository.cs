@@ -1,10 +1,13 @@
 using Dapper;
+using Hymson.DbConnection.Abstractions;
 using Hymson.Infrastructure;
 using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Microsoft.Extensions.Options;
+using MySql.Data.MySqlClient;
+using ConnectionOptions = Hymson.MES.Data.Options.ConnectionOptions;
 
 namespace Hymson.MES.Data.Repositories.Manufacture
 {
@@ -374,6 +377,17 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         }
 
         /// <summary>
+        /// 查询List
+        /// </summary>
+        /// <param name="manuSfcQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetAllManuSfcEntitiesAsync(EntityBySFCsQuery manuSfcQuery)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcEntity>(GetAllSFCsSql, manuSfcQuery);
+        }
+
+        /// <summary>
         /// 新增
         /// </summary>
         /// <param name="manuSfcEntity"></param>
@@ -606,6 +620,28 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetAllBySFCsAsync(EntityBySFCsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcEntity>(GetAllBySFCsql, query);
+        }
+
+        /// <summary>
+        /// 获取在制SFC（批量）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ManuSfcEntity>> GetProduceBySFCsAsync(EntityBySFCsQuery query)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<ManuSfcEntity>(GetProduceBySFCsql, query);
+        }
+
+        /// <summary>
+        /// 获取SFC（批量）
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ManuSfcEntity>> GetBySFCsAsync(EntityBySFCsQuery query)
         {
             using var conn = GetMESDbConnection();
@@ -698,10 +734,12 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         const string GetByIdsSql = @"SELECT * FROM `manu_sfc`  WHERE Id IN @Ids ";
 
         const string GetBySFCSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC = @SFC";
+        const string GetProduceBySFCsql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs   AND Type=1";
+        const string GetAllBySFCsql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs ";
         const string GetBySFCsNewSql = @"SELECT * FROM `manu_sfc` WHERE SiteId = @SiteId AND SFC IN @SFCs";
         const string GetBySFCsSql = @"SELECT * FROM `manu_sfc`  WHERE SFC IN @SFCs AND IsDeleted=0 ";
         const string GetSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs; ";
-
+        const string GetAllSFCsSql = @"SELECT * FROM manu_sfc WHERE SiteId = @SiteId AND IsDeleted = 0 AND SFC IN @SFCs ; ";
         const string GetManSfcAboutInfoBySfcSql = @"SELECT ms.*, 
                                 msi.WorkOrderId,msi.ProductId,
                                 pwo.OrderCode as WorkOrderCode, 

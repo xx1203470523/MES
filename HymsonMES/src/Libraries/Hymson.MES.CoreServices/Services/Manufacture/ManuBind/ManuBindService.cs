@@ -947,7 +947,7 @@ namespace Hymson.MES.CoreServices.Services.Manufacture
                 SiteId = param.SiteId,
                 SFC = param.SFC,
                 ProductId = manuSfc.ProductId,
-                WorkOrderId = manuSfc.WorkOrderId,
+                WorkOrderId = manuSfc.WorkOrderId ?? 0,
                 ProductBOMId = manuSfcProduceEntity?.ProductBOMId,
                 ProcedureId = param.ProcedureId,
                 Qty = sfc.Qty,

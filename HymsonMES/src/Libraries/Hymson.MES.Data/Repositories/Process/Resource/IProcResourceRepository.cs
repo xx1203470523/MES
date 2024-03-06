@@ -51,7 +51,7 @@ namespace Hymson.MES.Data.Repositories.Process
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(long[] ids);
+        Task<IEnumerable<ProcResourceEntity>> GetListByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 根据资源Code查询资源数据
@@ -131,11 +131,25 @@ namespace Hymson.MES.Data.Repositories.Process
         Task<int> InsertAsync(ProcResourceEntity entity);
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="resourceEntities"></param>
+        /// <returns></returns>
+        Task<int> InsertsAsync(IEnumerable<ProcResourceEntity> resourceEntities);
+
+        /// <summary>
         /// 更新资源类型维护数据
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(ProcResourceEntity entity);
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="procResourceEntities"></param>
+        /// <returns></returns>
+        Task<int> UpdatesAsync(IEnumerable<ProcResourceEntity> procResourceEntities);
 
         /// <summary>
         /// 更新资源类型数据
@@ -185,6 +199,13 @@ namespace Hymson.MES.Data.Repositories.Process
         /// <param name="procMaterialEntitys"></param>
         /// <returns></returns>
         Task<int> UpdateStatusAsync(ChangeStatusCommand command);
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="procResourceQuery"></param>
+        /// <returns></returns>
+        Task<IEnumerable<ProcResourceEntity>> GetEntitiesAsync(ProcResourceQuery procResourceQuery);
 
     }
 }

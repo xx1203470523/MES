@@ -7,9 +7,11 @@ using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.Localization.Services;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Manufacture;
 using Hymson.MES.Core.Domain.Plan;
 using Hymson.MES.Core.Domain.Warehouse;
 using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Manufacture;
 using Hymson.MES.Core.Enums.Warehouse;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Manufacture;
@@ -53,6 +55,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// 条码信息表 仓储
         /// </summary>
         private readonly IManuSfcRepository _manuSfcRepository;
+        private readonly IManuSfcInfoRepository _manuSfcInfoRepository;
 
         private readonly AbstractValidator<WhMaterialInventoryCreateDto> _validationCreateRules;
         private readonly AbstractValidator<WhMaterialInventoryModifyDto> _validationModifyRules;
@@ -69,6 +72,7 @@ namespace Hymson.MES.Services.Services.Warehouse
         /// <param name="whMaterialStandingbookRepository"></param>
         /// <param name="whSupplierRepository"></param>
         /// <param name="manuSfcRepository"></param>
+        /// <param name="manuSfcInfoRepository"></param>
         /// <param name="validationCreateRules"></param>
         /// <param name="validationModifyRules"></param>
         public WhMaterialInventoryService(ICurrentUser currentUser, ICurrentSite currentSite,
@@ -78,6 +82,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             IWhMaterialStandingbookRepository whMaterialStandingbookRepository,
             IWhSupplierRepository whSupplierRepository,
             IManuSfcRepository manuSfcRepository,
+            IManuSfcInfoRepository manuSfcInfoRepository,
             AbstractValidator<WhMaterialInventoryCreateDto> validationCreateRules,
             AbstractValidator<WhMaterialInventoryModifyDto> validationModifyRules)
         {
@@ -89,6 +94,7 @@ namespace Hymson.MES.Services.Services.Warehouse
             _whMaterialStandingbookRepository = whMaterialStandingbookRepository;
             _whSupplierRepository = whSupplierRepository;
             _manuSfcRepository = manuSfcRepository;
+            _manuSfcInfoRepository = manuSfcInfoRepository;
             _validationCreateRules = validationCreateRules;
             _validationModifyRules = validationModifyRules;
         }
@@ -129,6 +135,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             //List<ManuSfcEntity> sfcEntities = new();
             List<WhMaterialInventoryEntity> materialInventories = new();
             List<WhMaterialStandingbookEntity> materialStandingBooks = new();
+            List<ManuSfcEntity> manuSfcEntities = new();
+            List<ManuSfcInfoEntity> manuSfcInfoEntities = new();
 
             // 检查条码Id是否在物料里面
             var procMaterials = await _procMaterialRepository.GetByIdsAsync(requestDtos.Select(it => it.MaterialId).Distinct());
@@ -181,6 +189,33 @@ namespace Hymson.MES.Services.Services.Warehouse
                 await CheckMaterialBarCodeAnyAsync(item.MaterialBarCode);
 
                 #region 数据组装
+
+                var manuSfcEntity = new ManuSfcEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SFC = item.MaterialBarCode,
+                    Qty = item.QuantityResidue,
+                    Type = SfcTypeEnum.NoProduce,
+                    IsUsed = YesOrNoEnum.No,
+                    Status = SfcStatusEnum.Complete,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                };
+
+                manuSfcEntities.Add(manuSfcEntity);
+
+                manuSfcInfoEntities.Add(new ManuSfcInfoEntity
+                {
+                    Id = IdGenProvider.Instance.CreateId(),
+                    SiteId = _currentSite.SiteId ?? 0,
+                    SfcId = manuSfcEntity.Id,
+                    ProductId = materialEntity.Id,
+                    IsUsed = true,
+                    CreatedBy = _currentUser.UserName,
+                    UpdatedBy = _currentUser.UserName,
+                });
+
                 // 物料库存
                 materialInventories.Add(new WhMaterialInventoryEntity
                 {
@@ -240,6 +275,8 @@ namespace Hymson.MES.Services.Services.Warehouse
             using var trans = TransactionHelper.GetTransactionScope();
             rows += await _whMaterialInventoryRepository.InsertsAsync(materialInventories);
             rows += await _whMaterialStandingbookRepository.InsertsAsync(materialStandingBooks);
+            rows += await _manuSfcRepository.InsertRangeAsync(manuSfcEntities);
+            rows += await _manuSfcInfoRepository.InsertsAsync(manuSfcInfoEntities);
             trans.Complete();
 
             if (rows == 0) throw new CustomerValidationException(nameof(ErrorCode.MES15105));

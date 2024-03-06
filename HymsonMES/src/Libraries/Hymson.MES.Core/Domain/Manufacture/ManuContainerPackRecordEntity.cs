@@ -1,4 +1,5 @@
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums.Manufacture;
 
 namespace Hymson.MES.Core.Domain.Manufacture
 {
@@ -38,6 +39,6 @@ namespace Hymson.MES.Core.Domain.Manufacture
         /// <summary>
         /// 操作类型;1、装载2、移除
         /// </summary>
-        public int OperateType { get; set; } = 1;
+        public ManuContainerPackRecordOperateTypeEnum OperateType { get; set; } = ManuContainerPackRecordOperateTypeEnum.Load;
     }
 }

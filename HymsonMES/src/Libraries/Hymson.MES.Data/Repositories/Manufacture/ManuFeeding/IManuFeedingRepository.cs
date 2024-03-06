@@ -99,5 +99,11 @@ namespace Hymson.MES.Data.Repositories.Manufacture
         /// <returns></returns>
         Task<IEnumerable<ManuFeedingEntity>> GetByFeedingPointIdAndResourceIdsAsync(GetByFeedingPointIdAndResourceIdsQuery query);
 
+        /// <summary>
+        /// 获取上料信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        //Task<ManuFeedingEntity> GetOneAsync(ManuFeedingQuery query);
     }
 }

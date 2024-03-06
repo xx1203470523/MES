@@ -306,9 +306,9 @@ namespace Hymson.MES.Data.Repositories.Integrated.InteWorkCenter
             //sqlBuilder.Where("SiteId = @SiteId");
             sqlBuilder.AddParameters(inteWorkCenterRelationQuery);
 
-            if (inteWorkCenterRelationQuery.SubWorkCenterIds != null && inteWorkCenterRelationQuery.SubWorkCenterIds.Any()) {
+            //if (inteWorkCenterRelationQuery.SubWorkCenterIds != null && inteWorkCenterRelationQuery.SubWorkCenterIds.Any()) {
                 sqlBuilder.Where("SubWorkCenterId IN @SubWorkCenterIds");
-            }
+            //}
 
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<InteWorkCenterRelation>(templateData.RawSql, templateData.Parameters);

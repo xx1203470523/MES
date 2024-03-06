@@ -6,6 +6,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Process;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -39,6 +40,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
+        /// 批量插入
+        /// </summary>
+        /// <param name="equipmentEntities"></param>
+        /// <returns></returns>
+        public async Task<int> InsertsAsync(IEnumerable<EquEquipmentEntity> equipmentEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(InsertSql, equipmentEntities);
+        }
+
+        /// <summary>
         /// equipmentUnitEntity
         /// </summary>
         /// <param name="entity"></param>
@@ -47,6 +59,17 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(UpdateSql, equipmentUnitEntity);
+        }
+
+        /// <summary>
+        /// 批量更新
+        /// </summary>
+        /// <param name="equipmentEntities"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatesAsync(IEnumerable<EquEquipmentEntity> equipmentEntities)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.ExecuteAsync(UpdateSql, equipmentEntities);
         }
 
         /// <summary>
@@ -153,7 +176,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         }
 
         /// <summary>
-        /// equipmentQuery
+        /// 根据条件查询
         /// </summary>
         /// <param name="equipmentQuery"></param>
         /// <returns></returns>
@@ -161,6 +184,14 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (equipmentQuery.EquipmentCodes != null && equipmentQuery.EquipmentCodes.Any())
+            {
+                sqlBuilder.Where(" EquipmentCode in @EquipmentCodes ");
+            }
             using var conn = GetMESDbConnection();
             var equipmentEntities = await conn.QueryAsync<EquEquipmentEntity>(template.RawSql, equipmentQuery);
             return equipmentEntities;
@@ -254,7 +285,7 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         const string GetByEquipmentCodeSql = "SELECT * FROM `equ_equipment` WHERE IsDeleted = 0 AND SiteId = @Site AND EquipmentCode = @Code;";
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset,@Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM equ_equipment EE /**innerjoin**/ /**leftjoin**/ /**where**/";
-        const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment` WHERE SiteId = @SiteId AND `IsDeleted` = 0;";
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment` /**where**/ ";
         /// <summary>
         /// 
         /// </summary>
