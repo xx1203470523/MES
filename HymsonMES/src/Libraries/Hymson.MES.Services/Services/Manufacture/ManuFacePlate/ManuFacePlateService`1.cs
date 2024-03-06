@@ -720,8 +720,9 @@ namespace Hymson.MES.Services.Services.Manufacture
                 Site = _currentSite.SiteId
             });
 
-            if (manuFacePlateEntity != null)
-            {
+            if (manuFacePlateEntity == null)
+                throw new CustomerValidationException(nameof(ErrorCode.MES16783)); 
+   
                 long resourceId = 0;
                 long procedureId = 0;
 
@@ -865,11 +866,8 @@ namespace Hymson.MES.Services.Services.Manufacture
                     }
                 }
                 #endregion
-            }
-            else
-            {
-                throw new CustomerValidationException(nameof(ErrorCode.MES16705));
-            }
+ 
+        
 
             return facePlateQueryDto;
         }                

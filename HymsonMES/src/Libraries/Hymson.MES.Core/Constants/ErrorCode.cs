@@ -330,7 +330,7 @@
         public const string MES10810 = "掩码编码不能为空";
         public const string MES10811 = "掩码编码最大长度为50";
         public const string MES10812 = "掩码名称最大长度为50";
-
+        public const string MES10813 = "掩码匹配方式重复";
 
         #endregion
 
@@ -778,7 +778,7 @@
         public const string MES15311 = "将来锁锁定工序不存在";
         public const string MES15312 = "条码不是在制品！";
         public const string MES15313 = "条码已经锁定，无法添加将来锁";
-        public const string MES15314 = "锁定工序{sfcproduction}不在条码所在工序{lockproductionname}之后";
+        public const string MES15314 = "锁定工序{lockproductionname}不在条码所在工序{sfcproduction}之后";
         public const string MES15315 = "条码存在及时锁定，无法添加及时锁";
         public const string MES15316 = "条码未被锁定，无法执行解锁操作";
         public const string MES15317 = "将来锁工序{lockproduction}不在条码所在工序之后";
@@ -1247,6 +1247,8 @@
         public const string MES16779 = "容器包装信息获取失败，未填写包装编码";
         public const string MES16780 = "物料编码【{code}】没有维护容器规则！";
         public const string MES16781 = "包装编码【{0}】已被包装，父包装编码为【{1}】";
+        public const string MES16782 = "容器未启用!";
+        public const string MES16783 = "生产过站面板不存在或未启用";  
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -1499,6 +1501,7 @@
         public const string MES18408 = "描述最大长度为255";
         public const string MES18409 = "电话最大长度为50";
         public const string MES18410 = "客户编码不允许有空格";
+        public const string MES18411 = "匹配中国手机号码或固定电话错误";
 
         #endregion
 
@@ -1751,6 +1754,9 @@
         public const string MES19224 = "仓库不存在,请确认仓库编码!";
         public const string MES19225 = "库区不存在,请确认库区编码!";
         public const string MES19226 = "货架不存在,请确认货架编码!";
+
+        public const string MES19227 = "{ReceiptNum}收货单重复";
+        public const string MES19228 = "{ShipmentNum}出货单重复";
         #endregion
 
         #region 发布记录 19300 

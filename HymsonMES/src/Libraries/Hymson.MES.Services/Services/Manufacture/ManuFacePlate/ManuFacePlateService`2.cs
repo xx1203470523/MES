@@ -538,7 +538,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             throw new CustomerValidationException(nameof(ErrorCode.MES16774));
         }
 
-        #endregion
+        #endregion        
 
         #region 包装容器是否打开
 
@@ -924,6 +924,10 @@ public partial class ManuFacePlateService : IManuFacePlateService
             Id = process.FacePlateContainerPackEntity.ContainerId,
             SiteId = siteId
         });
+        if(process.InteContainerInfoEntity.Status != Core.Enums.SysDataStatusEnum.Enable)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES16782));
+        }
 
         process.InteContainerFreightEntities = await _inteContainerFreightRepository.GetListAsync(new InteContainerFreightQuery
         {
@@ -955,7 +959,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
             if (process.ContainerBarcodeEntity.Status == ManuContainerBarcodeStatusEnum.Close)
             {
-                process.ContainerBarcodeEntity = await CreatedContainerBarcodeEntityAsync(process.FacePlateContainerPackEntity.ContainerId, process.InteContainerInfoEntity.Code, userName, siteId);
+                process.ContainerBarcodeEntity = await CreatedContainerBarcodeEntityAsync(process.ContainerBarcodeEntity.ContainerId, process.InteContainerInfoEntity.Code, userName, siteId);
             }
             else
             {
@@ -1306,20 +1310,13 @@ public partial class ManuFacePlateService : IManuFacePlateService
     /// <returns></returns>
     public async Task OpenPackContainerAsync(ManuFacePlateOpenContainerDto input)
     {
-        if (!input.PackContainerId.HasValue || input.PackContainerId == 0)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES16750));
-        }
-
         var siteId = _currentSite.SiteId.GetValueOrDefault();
-
-        var packContainerId = input.PackContainerId.GetValueOrDefault();
 
         #region 包装容器条码信息
 
         var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetOneAsync(new ManuContainerBarcodeQuery
         {
-            Id = packContainerId,
+            BarCode = input.packContainerCode,
             SiteId = siteId
         });
 
@@ -1430,7 +1427,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
         var updateCount = await _manuContainerBarcodeRepository.ChangeContainerStatusAsync(
             new CloseContainerCommand
             {
-                Id = packContainerId,
+                Id = manuContainerBarcodeEntity.Id,
                 Status = ManuContainerBarcodeStatusEnum.Open,
                 StatusCondition = ManuContainerBarcodeStatusEnum.Close
             });
@@ -1451,20 +1448,17 @@ public partial class ManuFacePlateService : IManuFacePlateService
     /// <returns></returns>
     public async Task ClosePackContainerAsync(ManuFacePlateCloseContainerDto input)
     {
-        if (!input.PackContainerId.HasValue || input.PackContainerId == 0)
-        {
-            throw new CustomerValidationException(nameof(ErrorCode.MES16750));
-        }
+
 
         var siteId = _currentSite.SiteId.GetValueOrDefault();
 
-        var packContainerId = input.PackContainerId.GetValueOrDefault();
+        //var packContainerId = input.PackContainerId.GetValueOrDefault();
 
         #region 包装容器条码信息
 
         var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetOneAsync(new ManuContainerBarcodeQuery
         {
-            Id = packContainerId,
+            BarCode = input.packContainerCode,
             SiteId = siteId
         });
 
@@ -1571,7 +1565,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
         var updateCount = await _manuContainerBarcodeRepository.ChangeContainerStatusAsync(
             new CloseContainerCommand
             {
-                Id = packContainerId,
+                Id = manuContainerBarcodeEntity.Id,
                 Status = ManuContainerBarcodeStatusEnum.Close,
                 StatusCondition = ManuContainerBarcodeStatusEnum.Open
             });
