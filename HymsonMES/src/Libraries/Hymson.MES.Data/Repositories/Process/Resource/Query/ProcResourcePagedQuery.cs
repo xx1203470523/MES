@@ -82,6 +82,11 @@ namespace Hymson.MES.Data.Repositories.Process.Resource
         /// 资源类型Id
         /// </summary>
         public long? ResTypeId { get; set; }
+
+        /// <summary>
+        /// 资源编码列表
+        /// </summary>
+        public string[]? ResCodes { get; set; }
     }
 
     /// <summary>

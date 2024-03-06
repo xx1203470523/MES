@@ -4,6 +4,7 @@ using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup.Query;
 using Microsoft.Extensions.Options;
 using static Dapper.SqlMapper;
@@ -142,6 +143,28 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
 
             return new PagedInfo<EquEquipmentGroupEntity>(entities, pagedQuery.PageIndex, pagedQuery.PageSize, totalCount);
         }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="equipmentGroupQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<EquEquipmentGroupEntity>> GetEntitiesAsync(EquEquipmentGroupQuery equipmentGroupQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (equipmentGroupQuery.EquipmentGroupCodes != null && equipmentGroupQuery.EquipmentGroupCodes.Any())
+            {
+                sqlBuilder.Where(" EquipmentGroupCode in @EquipmentGroupCodes ");
+            }
+            using var conn = GetMESDbConnection();
+            var equipmentEntities = await conn.QueryAsync<EquEquipmentGroupEntity>(template.RawSql, equipmentGroupQuery);
+            return equipmentEntities;
+        }
     }
 
     /// <summary>
@@ -160,5 +183,6 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup
                             FROM `equ_equipment_group`  WHERE IsDeleted = @IsDeleted AND Id = @Id ";
         const string GetByIdsSql = @"SELECT * FROM `equ_equipment_group`  WHERE Id IN @ids and IsDeleted=0  ";
         const string GetByCodeSql = "SELECT * FROM equ_equipment_group WHERE `IsDeleted` = 0 AND SiteId = @Site AND EquipmentGroupCode = @Code LIMIT 1";
+        const string GetEntitiesSqlTemplate = "SELECT * FROM `equ_equipment_group` /**where**/ ";
     }
 }

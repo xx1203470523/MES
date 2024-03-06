@@ -1,8 +1,10 @@
 ﻿using Dapper;
 using Hymson.Infrastructure;
+using Hymson.MES.Core.Domain.Equipment;
 using Hymson.MES.Core.Domain.Process;
 using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Process.ResourceType;
 using Hymson.MES.Data.Repositories.Process.ResourceType.View;
 using Microsoft.Extensions.Options;
@@ -167,6 +169,28 @@ namespace Hymson.MES.Data.Repositories.Process
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeleteSql, new { UpdatedBy = command.UserId, UpdatedOn = command.DeleteOn, Ids = command.Ids });
         }
+
+        /// <summary>
+        /// 根据条件查询
+        /// </summary>
+        /// <param name="resourceTypeQuery"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<ProcResourceTypeEntity>> GetEntitiesAsync(ProcResourceTypeQuery resourceTypeQuery)
+        {
+            var sqlBuilder = new SqlBuilder();
+            var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+
+            sqlBuilder.Where("IsDeleted=0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (resourceTypeQuery.ResTypes != null && resourceTypeQuery.ResTypes.Any())
+            {
+                sqlBuilder.Where(" ResType in @ResType ");
+            }
+            using var conn = GetMESDbConnection();
+            var resourceTypeEntities = await conn.QueryAsync<ProcResourceTypeEntity>(template.RawSql, resourceTypeQuery);
+            return resourceTypeEntities;
+        }
     }
 
     /// <summary>
@@ -176,6 +200,7 @@ namespace Hymson.MES.Data.Repositories.Process
     {
         const string GetByIdSql = "select * from proc_resource_type where Id =@Id and IsDeleted =0 ";
         const string GetByCodeSql = "select * from proc_resource_type where SiteId =@SiteId and ResType = @ResType and IsDeleted =0 ";
+        const string GetEntitiesSqlTemplate = "select * from `proc_resource_type` /**where**/ ";
 
         const string GetPagedInfoDataSqlTemplate = "SELECT /**select**/ FROM proc_resource_type a /**innerjoin**/ /**leftjoin**/ /**where**/ /**orderby**/ LIMIT @Offset, @Rows";
         const string GetPagedInfoCountSqlTemplate = "SELECT COUNT(*) FROM proc_resource_type a /**innerjoin**/ /**leftjoin**/ /**where**/ ";
