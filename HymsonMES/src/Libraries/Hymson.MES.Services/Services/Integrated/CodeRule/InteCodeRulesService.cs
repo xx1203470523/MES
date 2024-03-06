@@ -193,31 +193,45 @@ namespace Hymson.MES.Services.Services.Integrated
                 }
             }
 
-            using TransactionScope ts = TransactionHelper.GetTransactionScope();
-
-            int response = 0;
-
-            ////入库
-            //response = await _inteCodeRulesRepository.InsertAsync(inteCodeRulesEntity);
-
-            response = await _inteCodeRulesRepository.InsertReAsync(inteCodeRulesEntity);
-
-            if (response <= 0)
+            try
             {
-                throw new CustomerValidationException(nameof(ErrorCode.MES12402));
-            }
+                using TransactionScope ts = TransactionHelper.GetTransactionScope();
 
-            if (inteCodeRulesMakeEntitys.Count > 0)
-            {
-                //编码组成
-                response = await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
-                if (response < inteCodeRulesMakeEntitys.Count)
+                int response = 0;
+
+                ////入库
+                //response = await _inteCodeRulesRepository.InsertAsync(inteCodeRulesEntity);
+
+                response = await _inteCodeRulesRepository.InsertReAsync(inteCodeRulesEntity);
+
+                if (response <= 0)
                 {
                     throw new CustomerValidationException(nameof(ErrorCode.MES12402));
                 }
-            }
 
-            ts.Complete();
+                if (inteCodeRulesMakeEntitys.Count > 0)
+                {
+                    //编码组成
+                    response = await _inteCodeRulesMakeRepository.InsertsAsync(inteCodeRulesMakeEntitys);
+                    if (response < inteCodeRulesMakeEntitys.Count)
+                    {
+                        throw new CustomerValidationException(nameof(ErrorCode.MES12402));
+                    }
+                }
+
+                ts.Complete();
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("inte_code_rules.uniq_ContainerInfoId_CodeType_SiteId_IsDeleted"))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES12450)).WithData("code", inteCodeRulesCreateDto.ContainerCode ?? "");
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         /// <summary>

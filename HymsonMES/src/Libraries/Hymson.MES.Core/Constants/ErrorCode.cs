@@ -506,6 +506,7 @@
         public const string MES12447 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%数据中自定义值的区间值存在重复！";
         public const string MES12448 = "包装序列码的容器编码不可为空";
         public const string MES12449 = "包装序列码必须填写有效的容器编码";
+        public const string MES12450 = "容器{code}编码规则已存在，请删除原规则再进行新增!";
         #endregion
 
         #region 容器维护 12500
