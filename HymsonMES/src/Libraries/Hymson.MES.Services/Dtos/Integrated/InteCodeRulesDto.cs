@@ -300,6 +300,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public CodeRuleCodeTypeEnum? CodeType { get; set; }
 
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string? ContainerCode { get; set; }
+
+        /// <summary>
+        /// 容器名称
+        /// </summary>
+        public string? ContainerName { get; set; }
+
     }
 
     public record class InteCodeRulesPageViewDto : BaseEntityDto

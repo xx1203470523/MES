@@ -117,6 +117,18 @@ namespace Hymson.MES.Data.Repositories.Integrated
                 sqlBuilder.Where(" cr.CodeType = @CodeType ");
             }
 
+            if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.ContainerCode))
+            {
+                inteCodeRulesPagedQuery.ContainerCode = $"%{inteCodeRulesPagedQuery.ContainerCode}%";
+                sqlBuilder.Where(" c.CODE like @ContainerCode ");
+            }
+
+            if (!string.IsNullOrWhiteSpace(inteCodeRulesPagedQuery.ContainerName))
+            {
+                inteCodeRulesPagedQuery.ContainerName = $"%{inteCodeRulesPagedQuery.ContainerName}%";
+                sqlBuilder.Where(" c.NAME like @ContainerName ");
+            }
+
             var offSet = (inteCodeRulesPagedQuery.PageIndex - 1) * inteCodeRulesPagedQuery.PageSize;
             sqlBuilder.AddParameters(new { OffSet = offSet });
             sqlBuilder.AddParameters(new { Rows = inteCodeRulesPagedQuery.PageSize });
@@ -237,7 +249,8 @@ FROM
                                     /**where**/ Order by cr.CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                                             FROM `inte_code_rules` cr
-                                            LEFT JOIN proc_material m on cr.ProductId=m.Id  
+                                            LEFT JOIN proc_material m on cr.ProductId=m.Id
+                                            LEFT JOIN inte_container_info c ON cr.ContainerInfoId = c.Id
                                             /**where**/ ";
         const string GetInteCodeRulesEntitiesSqlTemplate = @"SELECT 
                                             /**select**/
