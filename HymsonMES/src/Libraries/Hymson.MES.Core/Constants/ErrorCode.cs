@@ -1,4 +1,4 @@
-namespace Hymson.MES.Core.Constants
+﻿namespace Hymson.MES.Core.Constants
 {
     /// <summary>
     /// 错误码
@@ -1211,7 +1211,7 @@ namespace Hymson.MES.Core.Constants
         public const string MES16743 = "此容器对该条码的存储已达到最大存储容量!";
         public const string MES16744 = "条码不存在!";
         public const string MES16745 = "此条码不存在工单信息!";
-        public const string MES16746 = "找不到该容器!";
+        public const string MES16746 = "该容器未进行过装载!";
         public const string MES16747 = "容器编码不存在!";
         public const string MES16748 = "卸载包装失败，容器卸载失败!";
         public const string MES16749 = "卸载包装失败，包装记录加载失败!";
@@ -1248,8 +1248,7 @@ namespace Hymson.MES.Core.Constants
         public const string MES16780 = "物料编码【{code}】没有维护容器规则！";
         public const string MES16781 = "包装编码【{0}】已被包装，父包装编码为【{1}】";
         public const string MES16782 = "容器未启用!";
-        public const string MES16783 = "生产过站面板不存在或未启用"; 
-
+        public const string MES16783 = "生产过站面板不存在或未启用";  
         #endregion
 
         #region 绑定工单激活  MES16800
@@ -1502,6 +1501,7 @@ namespace Hymson.MES.Core.Constants
         public const string MES18408 = "描述最大长度为255";
         public const string MES18409 = "电话最大长度为50";
         public const string MES18410 = "客户编码不允许有空格";
+        public const string MES18411 = "匹配中国手机号码或固定电话错误";
 
         #endregion
 

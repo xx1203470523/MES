@@ -721,7 +721,7 @@ namespace Hymson.MES.Services.Services.Manufacture
             });
 
             if (manuFacePlateEntity == null)
-                throw new CustomerValidationException(nameof(ErrorCode.MES16782)); 
+                throw new CustomerValidationException(nameof(ErrorCode.MES16783)); 
    
                 long resourceId = 0;
                 long procedureId = 0;
