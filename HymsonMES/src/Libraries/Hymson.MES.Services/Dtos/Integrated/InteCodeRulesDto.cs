@@ -383,7 +383,6 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 更新时间;更新时间
         /// </summary>
         public DateTime UpdatedOn { get; set; }
-
         
         /// <summary>
         /// 物料编码
@@ -399,6 +398,16 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string ContainerCode {  get; set; }
+
+        /// <summary>
+        /// 容器名称
+        /// </summary>
+        public string ContainerName { get; set; }
     }
 
     public record class InteCodeRulesDetailViewDto : BaseEntityDto 
