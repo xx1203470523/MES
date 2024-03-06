@@ -118,9 +118,13 @@ namespace Hymson.MES.Services.Services.Process
             {
                 throw new CustomerValidationException(nameof(ErrorCode.MES10502)).WithData("parameterCode", procParameterEntity.ParameterCode);
             }
+            try
+            {
+                //入库
+                await _procParameterRepository.InsertAsync(procParameterEntity);
+            }
+            catch (Exception ex) { throw new CustomerValidationException(ex.ToString()); }
 
-            //入库
-            await _procParameterRepository.InsertAsync(procParameterEntity);
             return procParameterEntity.Id;
         }
 

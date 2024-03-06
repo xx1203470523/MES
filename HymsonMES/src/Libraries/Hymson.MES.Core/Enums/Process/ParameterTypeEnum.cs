@@ -25,6 +25,12 @@ namespace Hymson.MES.Core.Enums
         /// </summary>
         [Description("质量")]
         IQC = 8,
+
+        /// <summary>
+        /// oqc
+        /// </summary>
+        [Description("OQC")]
+        OQC = 9,
     }
 
 

@@ -25,6 +25,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using System.Transactions;
 using Hymson.Minio;
+using System.Text.RegularExpressions;
 
 
 namespace Hymson.MES.Services.Services.Integrated
@@ -83,6 +84,13 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             //验证DTO
             await _validationCreateRules.ValidateAndThrowAsync(inteCustomCreateDto);
+
+            if(inteCustomCreateDto.Telephone != null) {
+                if (!BeAValidPhone(inteCustomCreateDto.Telephone))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18411));
+                }
+            }
 
             //DTO转换实体
             var inteCustomEntity = inteCustomCreateDto.ToEntity<InteCustomEntity>();
@@ -167,6 +175,14 @@ namespace Hymson.MES.Services.Services.Integrated
         {
             //验证DTO
             await _validationModifyRules.ValidateAndThrowAsync(inteCustomModifyDto);
+
+            if (inteCustomModifyDto.Telephone != null)
+            {
+                if (!BeAValidPhone(inteCustomModifyDto.Telephone))
+                {
+                    throw new CustomerValidationException(nameof(ErrorCode.MES18411));
+                }
+            }
 
             //DTO转换实体
             var inteCustomEntity = inteCustomModifyDto.ToEntity<InteCustomEntity>();
@@ -389,6 +405,24 @@ namespace Hymson.MES.Services.Services.Integrated
                 Path = uploadResult.AbsoluteUrl,
             };
 
+        }
+
+        /// <summary>
+        /// 电话校验
+        /// </summary>
+        /// <param name="phoneNumber"></param>
+        /// <returns></returns>
+        private bool BeAValidPhone(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber)) return false;
+
+            // 中国手机号码的正则表达式
+            var mobileRegex = @"^1[3-9]\d{9}$";
+            // 中国固定电话的正则表达式
+            var telephoneRegex = @"^0\d{2,3}-?\d{7,8}$";
+
+            // 检查是否匹配中国手机号码或固定电话
+            return Regex.IsMatch(phoneNumber, mobileRegex) || Regex.IsMatch(phoneNumber, telephoneRegex);
         }
 
     }
