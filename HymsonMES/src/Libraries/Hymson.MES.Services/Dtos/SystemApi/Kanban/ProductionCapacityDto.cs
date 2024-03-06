@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Hymson.MES.Services.Dtos.SystemApi;
 
+/// <summary>
+/// 不良分布
+/// </summary>
 public class ProductionCapacityViewDto
 {
     /// <summary>
@@ -30,16 +33,18 @@ public class ProductionCapacityViewDto
     public decimal? CompletionRate { get; set; }
 }
 
-
+/// <summary>
+/// 不良分布
+/// </summary>
 public class ProductionCapacityQueryDto
 {
     /// <summary>
-    /// 风冷/液冷（分别对应不同产品）
+    /// 产品名称（风冷/液冷）
     /// </summary>
     public string? ProductName { get; set; }
 
     /// <summary>
-    /// 条码类型
+    /// 工序类型（0=Cell,1=Module,2=Pack）
     /// </summary>
     public SFCTypeEnum? Type { get; set; }
 }

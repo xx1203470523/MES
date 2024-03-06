@@ -30,7 +30,7 @@ public class OneQualifiedViewDto
 public class OneQualifiedQueryDto
 {
     /// <summary>
-    /// 风冷/液冷（分别对应不同产品）
+    /// 产品名称（风冷/液冷）
     /// </summary>
     public string? ProductName { get; set; }
 }

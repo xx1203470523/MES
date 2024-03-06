@@ -28,17 +28,7 @@ public class OneQualifiedMonthViewDto
 public class OneQualifiedMonthQueryDto
 {
     /// <summary>
-    /// 风冷/液冷
+    /// 产品名称（风冷/液冷）
     /// </summary>
     public string? ProductName{ get; set; }
-
-    /// <summary>
-    /// 风冷/液冷（分别对应不同产品）
-    /// </summary>
-    public string? Type { get; set; }
-
-    /// <summary>
-    /// 日/月
-    /// </summary>
-    public DateTypeEnum? DateType { get; set; }
 }

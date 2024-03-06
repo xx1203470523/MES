@@ -17,6 +17,7 @@ using Hymson.MES.Services.Dtos.SystemApi;
 using Hymson.MES.Services.Dtos.SystemApi.Kanban;
 using Hymson.MES.Services.Services.Report.EquAlarmReport;
 using Hymson.Utils;
+using MySqlX.XDevAPI.Common;
 
 namespace Hymson.MES.Services.Services.SystemApi;
 
@@ -29,6 +30,7 @@ public class SystemApiService : ISystemApiService
     private readonly IPlanWorkOrderRepository _planWorkOrderRepository;
     private readonly IProcProcessRouteRepository _processRouteRepository;
     private readonly IProcProcessRouteDetailLinkRepository _processRouteDetailLinkRepository;
+    private readonly IProcProcessRouteDetailNodeRepository _procProcessRouteDetailNodeRepository;
     private readonly IProcMaterialRepository _materialRepository;
     private readonly IInteWorkCenterRepository _inteWorkCenterRepository;
 
@@ -53,6 +55,7 @@ public class SystemApiService : ISystemApiService
         IPlanWorkOrderRepository planWorkOrderRepository,
         IProcProcessRouteRepository processRouteRepository,
         IProcProcessRouteDetailLinkRepository processRouteDetailLinkRepository,
+        IProcProcessRouteDetailNodeRepository procProcessRouteDetailNodeRepository,
         IProcMaterialRepository materialRepository,
         IInteWorkCenterRepository inteWorkCenterRepository,
         IManuSfcSummaryRepository manuSfcSummaryRepository,
@@ -75,6 +78,7 @@ public class SystemApiService : ISystemApiService
         _planWorkOrderRepository = planWorkOrderRepository;
         _processRouteRepository = processRouteRepository;
         _processRouteDetailLinkRepository = processRouteDetailLinkRepository;
+        _procProcessRouteDetailNodeRepository = procProcessRouteDetailNodeRepository;
         _materialRepository = materialRepository;
         _inteWorkCenterRepository = inteWorkCenterRepository;
         _manuSfcSummaryRepository = manuSfcSummaryRepository;
@@ -202,6 +206,76 @@ public class SystemApiService : ISystemApiService
 
 
         return result;
+    }
+
+    /// <summary>
+    /// 获取Pack生产数据
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<PackProductionViewDto>> GetPackProductionAsync(PackProductionQueryDto queryDto)
+    {
+        List<PackProductionViewDto> list = new();
+
+        var planWorkOrderEntity = await _planWorkOrderRepository.GetOneAsync(new() { OrderCode = queryDto.OrderCode });
+
+        var proceRouteEntity = await _processRouteRepository.GetByIdAsync(planWorkOrderEntity.ProcessRouteId);
+        if (proceRouteEntity == null) return list;
+
+        var proceRouteDetailEntities = await _procProcessRouteDetailNodeRepository.GetListAsync(new() { ProcessRouteId = proceRouteEntity.Id });
+
+        var lastProcedureId = proceRouteDetailEntities.OrderByDescending(a => a.SerialNo).FirstOrDefault()?.ProcedureId;
+
+        var procedureEntity = await _procProcedureRepository.GetByIdAsync(lastProcedureId.GetValueOrDefault());
+        var procedureTheoryEntity = await _procProcedurePlanRepository.GetOneAsync(new() { ProcedureId = procedureEntity.Id });
+        var planOutputQty = (procedureTheoryEntity.PlanOutputQty * 2) ?? 0;
+
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var nowDate = HymsonClock.Now();
+        if (nowDate >= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00")) && nowDate <= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 20:30:00")))
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+            endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 20:30:00"));
+        }
+        else if (nowDate <= DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00")))
+        {
+            startDate = DateTime.Parse(nowDate.AddDays(-1).ToString("yyyy-MM-dd 20:30:00"));
+            endDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 08:30:00"));
+        }
+        else
+        {
+            startDate = DateTime.Parse(nowDate.ToString("yyyy-MM-dd 20:30:00"));
+            endDate = DateTime.Parse(nowDate.AddDays(1).ToString("yyyy-MM-dd 08:30:00"));
+        }
+
+        var manuSFCSummary = await _manuSfcSummaryRepository.GetListAsync(new()
+        {
+            StartTime = startDate,
+            EndTime = endDate,
+            WorkOrderId = planWorkOrderEntity.Id,
+            ProcedureId = lastProcedureId
+        });
+
+
+        while (true)
+        {
+            var newItem = new PackProductionViewDto();
+            var outputQty = manuSFCSummary.Where(a => a.EndTime >= startDate && a.EndTime < startDate.AddHours(2)).Sum(a => a.Qty);
+
+            list.Add(new PackProductionViewDto()
+            {
+                EndTime = startDate.ToString("HH:mm") + "-" + startDate.AddHours(2).ToString("HH:mm"),
+                OutputQty = outputQty,
+                PlanOutputQty = planOutputQty * 2,
+                PlanCompletionRate = outputQty / ((planOutputQty * 2) == 0 ? 1 : (planOutputQty * 2))
+            });
+
+
+            if (startDate.AddHours(2) == endDate) break;
+            startDate = startDate.AddHours(2);
+        }
+
+        return list;
     }
 
     /// <summary>

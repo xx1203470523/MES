@@ -110,7 +110,7 @@ public class PlanWorkOrderInfoQueryDto : QueryDtoAbstraction
     public string? OrderCode { get; set; }
 
     /// <summary>
-    /// 产品名称
+    /// 产品名称（风冷/液冷）
     /// </summary>
     public string? ProductName { get; set; }
 }

@@ -34,7 +34,7 @@ public class EquFaultRateViewDto
 public class EquFaultRateQueryDto
 {
     /// <summary>
-    /// 查询日期类型
+    /// 日期类型（0=日，2=月）
     /// </summary>
     public DateTypeEnum? DateType  { get; set; }
 }

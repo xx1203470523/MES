@@ -21,6 +21,12 @@ public interface ISystemApiService
     Task<IEnumerable<OEETrendChartViewDto>> GetOEETrendChartAsync(OEETrendChartQueryDto queryDto);
 
     /// <summary>
+    /// 获取Pack生产数据
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<PackProductionViewDto>> GetPackProductionAsync(PackProductionQueryDto queryDto);
+
+    /// <summary>
     /// 今日一次合格率（风冷/液冷）
     /// </summary>
     /// <param name="queryDto"></param>

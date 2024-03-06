@@ -50,12 +50,6 @@ namespace Hymson.MES.System.Api.Controllers
             _systemApiService = systemApiService;
         }
 
-        [HttpGet]
-        public async Task GetToken()
-        {
-
-        }
-
         /// <summary>
         /// 工单同步
         /// </summary>
@@ -203,6 +197,19 @@ namespace Hymson.MES.System.Api.Controllers
         public async Task<IEnumerable<PlanWorkOrderInfoViewDto>> GetPlanWorkOrderInfoAsync([FromQuery] PlanWorkOrderInfoQueryDto queryDto)
         {
             return await _systemApiService.GetPlanWorkOrderInfoAsync(queryDto);
+        }
+
+        /// <summary>
+        /// Pack生产数据
+        /// </summary>
+        /// <param></param>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("kanban/packProduction")]
+        public async Task<IEnumerable<PackProductionViewDto>> GetPackProductionAsync([FromQuery] PackProductionQueryDto queryDto)
+        {
+            return await _systemApiService.GetPackProductionAsync(queryDto);
         }
 
         /// <summary>

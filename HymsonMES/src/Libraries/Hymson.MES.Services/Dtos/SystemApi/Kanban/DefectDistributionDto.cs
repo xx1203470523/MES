@@ -30,17 +30,17 @@ public class DefectDistributionViewDto
 public class DefectDistributionQueryDto
 {
     /// <summary>
-    /// 风冷/液冷
+    /// 产品名称（风冷/液冷）
     /// </summary>
     public string? ProductName { get; set; }
 
     /// <summary>
-    /// 日期类型
+    /// 日期类型（0=日，2=月）
     /// </summary>
     public DateTypeEnum? DateType { get; set; } = DateTypeEnum.Day;
 
     /// <summary>
-    /// Cell,Module,Pack
+    /// 工序类型（0=Cell,1=Module,2=Pack）
     /// </summary>
     public SFCTypeEnum? Type { get; set; } = SFCTypeEnum.Cell;
 }

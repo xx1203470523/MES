@@ -34,7 +34,7 @@ public class OEETrendChartViewDto
 public class OEETrendChartQueryDto
 {
     /// <summary>
-    /// 单据编号
+    /// 工单编号
     /// </summary>
     public string? OrderCode { get; set; }
 }

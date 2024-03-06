@@ -537,14 +537,14 @@ namespace Hymson.MES.Services.Services.Manufacture
 
             //关闭了所有的不合格代码
             //客户反馈尾工序不良录入时不需要更新条码状态（客户没有返工场景）
-            //if (!diffArr.Any())
-            if (false)
+            if (!diffArr.Any())
             {
                 // 条码步骤
                 sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadRejudgment, badReJudgmentDto.Remark ?? "", 1);
                 //获取工艺路线节点
                 var isLast = await IsLastProcedureIdAsync(manuSfc.ProcessRouteId, manuSfc.ProcedureId);
-                if (isLast)
+                //清安：尾工序不更新完成状态，继续生产
+                if (false)
                 {
                     var manuSfcInfoUpdate = new ManuSfcUpdateCommand
                     {
@@ -615,10 +615,13 @@ namespace Hymson.MES.Services.Services.Manufacture
                 //判断当前工序是否末工序
                 var manuSfcProduceBusinessEntity = new ManuSfcProduceBusinessEntity();
 
-                if (!badReJudgmentDto.BadProcessRouteId.HasValue || badReJudgmentDto.BadProcessRouteId == 0)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES15408));
-                }
+                ////清安没有不良品返工工艺路线
+                //if (badReJudgmentDto.BadProcessRouteId.HasValue)
+                //{
+                //    if (badReJudgmentDto.BadProcessRouteId == 0)
+                //        throw new CustomerValidationException(nameof(ErrorCode.MES15408));
+                //}
+
                 var processRouteProcedure = await _manuCommonOldService.GetFirstProcedureAsync(badReJudgmentDto.BadProcessRouteId ?? 0);
                 // 条码步骤
                 sfcStepEntity = CreateSFCStepEntity(manuSfc, ManuSfcStepTypeEnum.BadRejudgment, badReJudgmentDto.Remark ?? "");

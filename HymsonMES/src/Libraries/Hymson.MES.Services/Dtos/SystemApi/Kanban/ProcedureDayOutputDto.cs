@@ -43,7 +43,7 @@ public class ProcedureDayOutputViewDto
 public class ProcedureDayOutputQueryDto
 {
     /// <summary>
-    /// 风冷/液冷（分别对应不同产品）
+    /// 产品名称（风冷/液冷）
     /// </summary>
     public string? ProductName { get; set; }
 }

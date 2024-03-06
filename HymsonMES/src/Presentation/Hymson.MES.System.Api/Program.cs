@@ -55,6 +55,7 @@ namespace Hymson.MES.System.Api
             builder.Services.AddLocalization();
             builder.Services.AddMinioService(builder.Configuration);
             builder.Services.AddExcelService();
+
 #if DEBUG
             builder.Services.AddHttpLogging(logging =>
             {
