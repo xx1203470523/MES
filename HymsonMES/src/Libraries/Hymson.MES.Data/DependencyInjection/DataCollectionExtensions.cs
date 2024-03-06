@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.EquEquipmentLoginRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipmentGroup;
@@ -384,6 +385,10 @@ namespace Microsoft.Extensions.DependencyInjection
             #region ESOP 
             services.AddSingleton<IProcEsopFileRepository, ProcEsopFileRepository>();
             services.AddSingleton<IProcEsopRepository, ProcEsopRepository>();
+            #endregion
+
+            #region 顷刻
+            services.AddSingleton<IEquEquipmentLoginRecordRepository, EquEquipmentLoginRecordRepository>();
             #endregion
 
             return services;

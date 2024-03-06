@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Hymson.Infrastructure.Mapper;
+using Hymson.MES.Core.Domain.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 
 namespace Hymson.MES.EquipmentServices.Mapper
 {
@@ -26,6 +28,7 @@ namespace Hymson.MES.EquipmentServices.Mapper
             //CreateMap<EquConsumablePagedQueryDto, EquSparePartPagedQuery>();
 
             //CreateMap<EquSparePartEntity, EquConsumableDto>();
+            CreateMap<EquEquipmentLoginRecordSaveDto, EquEquipmentLoginRecordEntity>();
             #endregion
 
         }

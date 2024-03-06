@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hymson.MES.Core.Constants
+{
+    /// <summary>
+    /// 顷刻能源错误代码15000-16000
+    /// </summary>
+    public static partial class ErrorCode
+    {
+        #region 基础通用校验
+
+        /// <summary>
+        /// 设备资源编码没有正确关联工序线体
+        /// </summary>
+        public const string MES45001 = "设备资源编码没有正确关联工序线体";
+
+        #endregion
+
+        #region 操作员登录
+
+        /// <summary>
+        /// 设备没有维护对应的账号密码
+        /// </summary>
+        public const string MES45011 = "【{EquipmentCode}】设备没有维护对应的账号密码";
+
+        /// <summary>
+        /// 设备上传的账号密码错误
+        /// </summary>
+        public const string MES45012 = "【{EquipmentCode}】设备上传的账号密码错误";
+        #endregion
+    }
+}

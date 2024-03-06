@@ -4,8 +4,12 @@ using Hymson.MES.EquipmentServices.Dtos.InBound;
 using Hymson.MES.EquipmentServices.Services.Common;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection;
+using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.Manufacture;
+using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Validators.EquEquipmentLoginRecord;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -46,6 +50,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManufactureService, ManufactureService>();
             services.AddSingleton<IProcessCollectionService, ProcessCollectionService>();
             services.AddSingleton<ISfcBindingService, SfcBindingService>();
+
+            #region 顷刻
+            services.AddSingleton<IQknyService, QknyService>();
+            services.AddSingleton<IEquEquipmentLoginRecordService, EquEquipmentLoginRecordService>();
+            #endregion
         }
 
         /// <summary>
@@ -70,6 +79,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<OutBoundMoreDto>, OutBoundMoreValidator>();//出站（多个）
 
             services.AddSingleton<AbstractValidator<SfcBindingDto>, SfcBindingValidator>();
+
+            #region 顷刻
+            services.AddSingleton<AbstractValidator<EquEquipmentLoginRecordSaveDto>, EquEquipmentLoginRecordSaveValidator>();
+            #endregion
         }
 
     }

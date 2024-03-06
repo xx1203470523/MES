@@ -33,6 +33,7 @@
 	<ItemGroup>
 	  <Folder Include="Bos\Manufacture\" />
 	  <Folder Include="Services\Bootup\" />
+	  <Folder Include="Validators\Manufacture\Qkny\" />
 	</ItemGroup>
 
 </Project>
