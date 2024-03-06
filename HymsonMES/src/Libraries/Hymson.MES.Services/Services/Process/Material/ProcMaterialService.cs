@@ -318,10 +318,13 @@ namespace Hymson.MES.Services.Services.Process
             var procMaterialPagedQuery = procMaterialPagedQueryDto.ToQuery<ProcMaterialPagedQuery>();
             procMaterialPagedQuery.SiteId = _currentSite.SiteId ?? 0;
 
+            var materialGroupEntities = await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode });
+
             //判断是否需要查询物料组编码 -- 全匹配查询
             if (!string.IsNullOrWhiteSpace(procMaterialPagedQueryDto.MaterialGroupCode))
             {
-                var materialGroup = (await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
+                //var materialGroup = (await _procMaterialGroupRepository.GetProcMaterialGroupEntitiesAsync(new ProcMaterialGroupQuery() { SiteId = _currentSite.SiteId ?? 0, GroupCode = procMaterialPagedQueryDto.MaterialGroupCode })).FirstOrDefault();
+                var materialGroup = materialGroupEntities.FirstOrDefault();
                 if (materialGroup == null)
                 {
                     return new PagedInfo<ProcMaterialDto>(new List<ProcMaterialDto>(), procMaterialPagedQueryDto.PageIndex, procMaterialPagedQueryDto.PageSize, 0);
@@ -333,6 +336,14 @@ namespace Hymson.MES.Services.Services.Process
 
             //实体到DTO转换 装载数据
             List<ProcMaterialDto> procMaterialDtos = PrepareProcMaterialDtos(pagedInfo);
+
+            //获取物料组信息
+            foreach (var item in procMaterialDtos)
+            {
+                var materialGroupEntity = materialGroupEntities.Where(a => a.Id == item.GroupId).FirstOrDefault();
+                item.MaterialGroupCode = materialGroupEntity?.GroupCode ?? "";
+            }
+
             return new PagedInfo<ProcMaterialDto>(procMaterialDtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
