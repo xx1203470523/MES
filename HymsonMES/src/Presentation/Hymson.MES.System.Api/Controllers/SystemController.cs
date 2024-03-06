@@ -11,6 +11,7 @@ using Hymson.MES.SystemServices.Dtos.Manufacture;
 using Hymson.MES.SystemServices.Dtos.Plan;
 using Hymson.MES.SystemServices.Services.Manufacture;
 using Hymson.MES.SystemServices.Services.Plan;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hymson.MES.System.Api.Controllers
@@ -197,6 +198,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/planWorkOrderInfo")]
         public async Task<IEnumerable<PlanWorkOrderInfoViewDto>> GetPlanWorkOrderInfoAsync([FromQuery] PlanWorkOrderInfoQueryDto queryDto)
         {
@@ -209,6 +211,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/oeeTrendChart")]
         public async Task<IEnumerable<OEETrendChartViewDto>> GetOEETrendChartAsync([FromQuery] OEETrendChartQueryDto queryDto)
         {
@@ -221,6 +224,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/oneQualifiedRate")]
         public async Task<OneQualifiedViewDto> GetOneQualifiedRateAsync([FromQuery] OneQualifiedQueryDto queryDto)
         {
@@ -233,6 +237,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/monthOneQualifiedRate")]
         public async Task<IEnumerable<OneQualifiedMonthViewDto>> GetMonthOneQualifiedRateAsync([FromQuery] OneQualifiedMonthQueryDto queryDto)
         {
@@ -245,6 +250,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/defectDistribution")]
         public async Task<IEnumerable<DefectDistributionViewDto>> GetDefectDistributionAsync([FromQuery] DefectDistributionQueryDto queryDto)
         {
@@ -257,6 +263,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/procedureDayOutput")]
         public async Task<IEnumerable<ProcedureDayOutputViewDto>> GetProcedureDayOutputAsync([FromQuery] ProcedureDayOutputQueryDto queryDto)
         {
@@ -269,6 +276,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/productionCapacity")]
         public async Task<IEnumerable<ProductionCapacityViewDto>> GetProductionCapacityAsync([FromQuery] ProductionCapacityQueryDto queryDto)
         {
@@ -280,6 +288,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/equStatus")]
         public async Task<IEnumerable<EquipmentStatusViewDto>> GetEquipmentStatusAsync()
         {
@@ -291,6 +300,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/equStatusDistribution")]
         public async Task<IEnumerable<EquStatusDistributionViewDto>> GetEquipmentStatusDistributionAsync()
         {
@@ -303,6 +313,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/equFaultRate")]
         public async Task<IEnumerable<EquFaultRateViewDto>> GetEquFaultRateAsync([FromQuery] EquFaultRateQueryDto queryDto)
         {
@@ -315,6 +326,7 @@ namespace Hymson.MES.System.Api.Controllers
         /// <param name="queryDto"></param>
         /// <returns></returns>
         [HttpGet]
+        [AllowAnonymous]
         [Route("kanban/equOEETrendChart")]
         public async Task<IEnumerable<EquOEETrendChartViewDto>> GetEquOEETrendChartAsync([FromQuery] EquOEETrendChartQueryDto queryDto)
         {
