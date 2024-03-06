@@ -227,11 +227,17 @@ namespace Hymson.MES.Data.Repositories.Integrated
 
     public partial class InteCodeRulesRepository
     {
-        const string GetPagedInfoDataSqlTemplate = @"SELECT 
-                                        cr.*,
-                                        m.MaterialCode, m.MaterialName,m.Version as MaterialVersion
-                                    FROM `inte_code_rules` cr
-                                    LEFT JOIN proc_material m on cr.ProductId=m.Id
+        const string GetPagedInfoDataSqlTemplate = @"SELECT
+	cr.*,
+	m.MaterialCode,
+	m.MaterialName,
+	m.Version AS MaterialVersion,
+	c.CODE AS ContainerCode,
+	c.NAME AS ContainerName 
+FROM
+	`inte_code_rules` cr
+	LEFT JOIN proc_material m ON cr.ProductId = m.Id
+	LEFT JOIN inte_container_info c ON cr.ContainerInfoId = c.Id
                                     /**where**/ Order by cr.CreatedOn desc LIMIT @Offset,@Rows ";
         const string GetPagedInfoCountSqlTemplate = @"SELECT COUNT(1) 
                                             FROM `inte_code_rules` cr

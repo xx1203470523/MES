@@ -166,9 +166,13 @@ namespace Hymson.MES.Services.Services.Integrated
                 if (repeats != null && repeats.Any())
                 {
                     if (inteCodeRulesCreateDto.CodeType == CodeRuleCodeTypeEnum.ProcessControlSeqCode)
+                    {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12401)).WithData("productId", inteCodeRulesCreateDto.ProductId.GetValueOrDefault());
+                    }                        
                     else
+                    {
                         throw new CustomerValidationException(nameof(ErrorCode.MES12403)).WithData("productId", inteCodeRulesCreateDto.ProductId.GetValueOrDefault());
+                    }
                 }
             }
 
