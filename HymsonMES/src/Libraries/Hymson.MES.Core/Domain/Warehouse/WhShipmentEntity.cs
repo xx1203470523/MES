@@ -23,7 +23,7 @@ namespace Hymson.MES.Core.Domain.WhShipment
        /// <summary>
         /// 客户id
         /// </summary>
-        public long CustomId { get; set; }
+        public long CustomerId { get; set; }
 
        /// <summary>
         /// 计划出现时间

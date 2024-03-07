@@ -28,7 +28,12 @@ namespace Hymson.MES.Core.Domain.WHMaterialReceiptDetail
        /// <summary>
         /// 供应商生产批次
         /// </summary>
-        public string MaterialBatch { get; set; }
+        public string SupplierBatch { get; set; }
+
+        /// <summary>
+        /// 内部批次
+        /// </summary>
+        public string InternalBatch { get; set; }
 
        /// <summary>
         /// 计划发货数量

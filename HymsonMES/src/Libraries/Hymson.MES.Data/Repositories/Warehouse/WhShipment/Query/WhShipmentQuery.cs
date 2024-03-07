@@ -5,6 +5,6 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
     /// </summary>
     public class WhShipmentQuery
     {
-        public string ShipmentNum { get; set; }
+        public string? ShipmentNum { get; set; }
     }
 }
