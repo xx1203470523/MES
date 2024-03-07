@@ -2,9 +2,11 @@
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.EquEquipmentHeartRecord;
 using Hymson.MES.Core.Domain.EquEquipmentLoginRecord;
+using Hymson.MES.Core.Domain.ManuEquipmentStatusTime;
 using Hymson.MES.Core.Domain.ManuEuqipmentNewestInfoEntity;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 
 namespace Hymson.MES.EquipmentServices.Mapper
@@ -35,6 +37,7 @@ namespace Hymson.MES.EquipmentServices.Mapper
             CreateMap<EquEquipmentLoginRecordSaveDto, EquEquipmentLoginRecordEntity>();
             CreateMap<ManuEuqipmentNewestInfoSaveDto, ManuEuqipmentNewestInfoEntity>();
             CreateMap<EquEquipmentHeartRecordSaveDto, EquEquipmentHeartRecordEntity>();
+            CreateMap<ManuEquipmentStatusTimeSaveDto, ManuEquipmentStatusTimeEntity>();
             #endregion
 
         }

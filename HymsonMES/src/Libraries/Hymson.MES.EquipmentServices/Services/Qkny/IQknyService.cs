@@ -25,5 +25,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task HeartbeatAsync(HeartbeatDto dto);
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task StateAsync(StateDto dto);
     }
 }

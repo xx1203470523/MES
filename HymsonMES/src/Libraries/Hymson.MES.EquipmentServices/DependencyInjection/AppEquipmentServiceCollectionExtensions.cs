@@ -11,12 +11,15 @@ using Hymson.MES.EquipmentServices.Validators.Manufacture;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Validators.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Validators.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Validators.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Validators.ManuEuqipmentNewestInfo;
 using Microsoft.Extensions.Configuration;
 
@@ -64,7 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLoginRecordService, EquEquipmentLoginRecordService>();
             services.AddSingleton<IManuEuqipmentNewestInfoService, ManuEuqipmentNewestInfoService>();
             services.AddSingleton<IEquEquipmentHeartRecordService, EquEquipmentHeartRecordService>();
-            
+            services.AddSingleton<IManuEquipmentStatusTimeService, ManuEquipmentStatusTimeService>();
             #endregion
         }
 
@@ -97,6 +100,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<AbstractValidator<EquEquipmentLoginRecordSaveDto>, EquEquipmentLoginRecordSaveValidator>();
             services.AddSingleton<AbstractValidator<ManuEuqipmentNewestInfoSaveDto>, ManuEuqipmentNewestInfoSaveValidator>();
             services.AddSingleton<AbstractValidator<EquEquipmentHeartRecordSaveDto>, EquEquipmentHeartRecordSaveValidator>();
+            services.AddSingleton<AbstractValidator<ManuEquipmentStatusTimeSaveDto>, ManuEquipmentStatusTimeSaveValidator>();
             #endregion
         }
 

@@ -17,6 +17,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteJobClass;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
+using Hymson.MES.Data.Repositories.ManuEquipmentStatusTime;
 using Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Parameter;
@@ -394,6 +395,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEquEquipmentLoginRecordRepository, EquEquipmentLoginRecordRepository>();
             services.AddSingleton<IManuEuqipmentNewestInfoRepository, ManuEuqipmentNewestInfoRepository>();
             services.AddSingleton<IEquEquipmentHeartRecordRepository, EquEquipmentHeartRecordRepository>();
+            services.AddSingleton<IManuEquipmentStatusTimeRepository, ManuEquipmentStatusTimeRepository>();
             #endregion
 
             return services;

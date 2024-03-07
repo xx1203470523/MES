@@ -77,9 +77,10 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备状态上报003", BusinessType.OTHER, "State003", ReceiverTypeEnum.MES)]
         public async Task StateAsync(StateDto dto)
         {
+            await _qknyService.StateAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最新状态和最后时间
-            //2. 新增equ_equipment_status_time记录每个状态持续的时间
+            //2. 新增 equ_equipment_status_time 记录每个状态持续的时间
         }
 
         /// <summary>

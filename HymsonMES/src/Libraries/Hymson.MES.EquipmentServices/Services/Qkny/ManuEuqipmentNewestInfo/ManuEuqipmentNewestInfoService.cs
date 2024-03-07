@@ -111,6 +111,7 @@ namespace Hymson.MES.Services.Services.ManuEuqipmentNewestInfo
                     model.Heart = string.Empty;
                     model.LoginResult = string.Empty;
                     model.StatusUpdatedOn = model.UpdatedOn;
+                    model.DownReason = saveDto.DownReason;
                 }
                 else if (saveDto.Type == NewestInfoEnum.Login)
                 {

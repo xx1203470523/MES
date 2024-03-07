@@ -27,16 +27,7 @@ namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo
         public async Task<int> InsertAsync(ManuEuqipmentNewestInfoEntity entity)
         {
             using var conn = GetMESDbConnection();
-            try
-            {
-                return await conn.ExecuteAsync(InsertSql, entity);
-            }
-            catch (Exception ex)
-            {
-                string str = ex.ToString();
-                string str1 = ex.StackTrace;
-            }
-            return 1;
+            return await conn.ExecuteAsync(InsertSql, entity);
         }
 
         /// <summary>
@@ -193,7 +184,7 @@ namespace Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo
 
         const string UpdateSqlHeart = "UPDATE manu_euqipment_newest_info SET Heart = @Heart, HeartUpdatedOn = @HeartUpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
         const string UpdateSqlLogin = "UPDATE manu_euqipment_newest_info SET LoginResult = @LoginResult, LoginResultUpdatedOn = @LoginResultUpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn WHERE Id = @Id ";
-        const string UpdateSqlStatus = "UPDATE manu_euqipment_newest_info SET tatus = @Status, StatusUpdatedOn = @StatusUpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, DownReason = @DownReason WHERE Id = @Id ";
+        const string UpdateSqlStatus = "UPDATE manu_euqipment_newest_info SET Status = @Status, StatusUpdatedOn = @StatusUpdatedOn, UpdatedBy = @UpdatedBy, UpdatedOn = @UpdatedOn, DownReason = @DownReason WHERE Id = @Id ";
 
         const string DeleteSql = "UPDATE manu_euqipment_newest_info SET IsDeleted = Id WHERE Id = @Id ";
         const string DeletesSql = "UPDATE manu_euqipment_newest_info SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";

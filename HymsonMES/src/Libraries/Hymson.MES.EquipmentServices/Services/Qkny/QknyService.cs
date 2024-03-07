@@ -10,9 +10,11 @@ using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
+using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Services.ManuEuqipmentNewestInfo;
 using Hymson.Snowflake;
 using Hymson.Utils;
@@ -63,6 +65,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IEquEquipmentHeartRecordService _equEquipmentHeartRecordService;
 
         /// <summary>
+        /// 状态上报
+        /// </summary>
+        private readonly IManuEquipmentStatusTimeService _manuEquipmentStatusTimeService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -70,14 +77,16 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IEquEquipmentLoginRecordService equEquipmentLoginRecordService,
             IManuEuqipmentNewestInfoService manuEuqipmentNewestInfoService,
             IEquEquipmentHeartRecordService equEquipmentHeartRecordService,
+            IManuEquipmentStatusTimeService manuEquipmentStatusTimeService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
             _equEquipmentVerifyRepository = equEquipmentVerifyRepository;
             _equEquipmentLoginRecordService = equEquipmentLoginRecordService;
             _manuEuqipmentNewestInfoService = manuEuqipmentNewestInfoService;
-            _validationOperationLoginDto = validationOperationLoginDto;
             _equEquipmentHeartRecordService = equEquipmentHeartRecordService;
+            _manuEquipmentStatusTimeService = manuEquipmentStatusTimeService;
+            _validationOperationLoginDto = validationOperationLoginDto;
         }
 
         /// <summary>
@@ -166,6 +175,41 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             //4. 数据库操作
             using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
             await _equEquipmentHeartRecordService.AddAsync(heartRecordDto);
+            await _manuEuqipmentNewestInfoService.AddOrUpdateAsync(newestDto);
+            trans.Complete();
+        }
+
+        /// <summary>
+        /// 状态上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task StateAsync(StateDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 添加状态时间
+            ManuEquipmentStatusTimeSaveDto statusDto = new ManuEquipmentStatusTimeSaveDto();
+            statusDto.EquipmentId = equResModel.EquipmentId;
+            statusDto.NextStatus = dto.StateCode.ToUpper();
+            statusDto.CreatedBy = equResModel.EquipmentCode;
+            statusDto.EquipmentDownReason = dto.DownReason;
+            //3. 记录最新状态
+            ManuEuqipmentNewestInfoSaveDto newestDto = new ManuEuqipmentNewestInfoSaveDto();
+            newestDto.Id = IdGenProvider.Instance.CreateId();
+            newestDto.Type = NewestInfoEnum.Status;
+            newestDto.Status = dto.StateCode.ToUpper();
+            newestDto.StatusUpdateOn = HymsonClock.Now();
+            newestDto.CreatedOn = newestDto.StatusUpdateOn;
+            newestDto.CreatedBy = equResModel.EquipmentCode;
+            newestDto.UpdatedOn = newestDto.StatusUpdateOn;
+            newestDto.UpdatedBy = equResModel.EquipmentCode;
+            newestDto.SiteId = equResModel.SiteId;
+            newestDto.EquipmentId = equResModel.EquipmentId;
+            newestDto.DownReason = dto.DownReason;
+            //4. 数据库操作
+            using var trans = TransactionHelper.GetTransactionScope(TransactionScopeOption.Required, IsolationLevel.ReadCommitted);
+            await _manuEquipmentStatusTimeService.AddAsync(statusDto);
             await _manuEuqipmentNewestInfoService.AddOrUpdateAsync(newestDto);
             trans.Complete();
         }
