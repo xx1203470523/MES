@@ -101,7 +101,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                         Id = IdGenProvider.Instance.CreateId(),
                         MaterialReceiptId = entity.Id,
                         MaterialId = item.MaterialId,
-                        MaterialBatch = item.MaterialBatch,
+                        SupplierBatch = item.MaterialBatch,
                         PlanQty = item.PlanQty,
                         PlanTime = item.PlanTime,
                         Remark = item.Remark,

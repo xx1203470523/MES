@@ -17,7 +17,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> InsertAsync(WhMaterialReceiptEntity entity);
-        
+
         /// <summary>
         /// 新增（批量）
         /// </summary>
@@ -39,7 +39,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <param name="entity"></param>
         /// <returns></returns>
         Task<int> UpdateAsync(WhMaterialReceiptEntity entity);
-        
+
         /// <summary>
         /// 更新（批量）
         /// </summary>
@@ -53,7 +53,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <param name="id"></param>
         /// <returns></returns>
         Task<int> DeleteAsync(long id);
-        
+
         /// <summary>
         /// 软删除（批量）
         /// </summary>
@@ -62,7 +62,7 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         Task<int> DeletesAsync(DeleteCommand command);
 
 
-        Task<int> DeletesDetailByIdAsync(long[] ids);      
+        Task<int> DeletesDetailByIdAsync(long[] ids);
 
         /// <summary>
         /// 根据ID获取数据
@@ -70,13 +70,13 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <param name="id"></param>
         /// <returns></returns>
         Task<WhMaterialReceiptEntity> GetByIdAsync(long id);
-    
+
         /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        Task<IEnumerable<WhMaterialReceiptEntity>> GetByIdsAsync(long[] ids);
+        Task<IEnumerable<WhMaterialReceiptEntity>> GetByIdsAsync(IEnumerable<long> ids);
 
         /// <summary>
         /// 获取List
@@ -84,13 +84,31 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <param name="query"></param>
         /// <returns></returns>
         Task<IEnumerable<WhMaterialReceiptEntity>> GetEntitiesAsync(WhMaterialReceiptQuery query);
-        
+
         /// <summary>
         /// 分页查询
         /// </summary>
         /// <param name="pagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<WhMaterialReceiptEntity>> GetPagedListAsync(WhMaterialReceiptPagedQuery pagedQuery);
+
+
+
+
+        /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<WHMaterialReceiptDetailEntity> GetDetailByIdAsync(long id);
+
+        /// <summary>
+        /// 根据IDs获取数据（批量）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByIdsAsync(IEnumerable<long> ids);
+
 
     }
 }
