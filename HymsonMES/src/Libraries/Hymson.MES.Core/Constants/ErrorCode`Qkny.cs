@@ -18,6 +18,16 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45001 = "设备资源编码没有正确关联工序线体";
 
+        /// <summary>
+        /// 设备编码不能为空
+        /// </summary>
+        public const string MES45002 = "（EquipmentCode)设备编码字段不能为空";
+
+        /// <summary>
+        /// 资源编码不能为空
+        /// </summary>
+        public const string MES45003 = "（ResourceCode)资源编码字段不能为空";
+
         #endregion
 
         #region 操作员登录
@@ -31,6 +41,11 @@ namespace Hymson.MES.Core.Constants
         /// 设备上传的账号密码错误
         /// </summary>
         public const string MES45012 = "【{EquipmentCode}】设备上传的账号密码错误";
+
+        /// <summary>
+        /// 用户名或密码不能为空
+        /// </summary>
+        public const string MES45013 = "用户名或密码不能为空";
         #endregion
     }
 }

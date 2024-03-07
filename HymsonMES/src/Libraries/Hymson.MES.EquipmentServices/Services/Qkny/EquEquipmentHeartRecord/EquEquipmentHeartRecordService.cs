@@ -5,20 +5,22 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.EquEquipmentHeartRecord;
 using Hymson.MES.Core.Domain.EquEquipmentLoginRecord;
 using Hymson.MES.Data.Repositories.Common.Command;
-using Hymson.MES.Data.Repositories.EquEquipmentLoginRecord;
-using Hymson.MES.Data.Repositories.EquEquipmentLoginRecord.Query;
+using Hymson.MES.Data.Repositories.EquEquipmentHeartRecord;
+using Hymson.MES.Data.Repositories.EquEquipmentHeartRecord.Query;
+using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.Snowflake;
 using Hymson.Utils;
 
-namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
+namespace Hymson.MES.Services.Services.EquEquipmentHeartRecord
 {
     /// <summary>
-    /// 服务（操作员登录记录） 
+    /// 服务（设备心跳登录记录） 
     /// </summary>
-    public class EquEquipmentLoginRecordService : IEquEquipmentLoginRecordService
+    public class EquEquipmentHeartRecordService : IEquEquipmentHeartRecordService
     {
         /// <summary>
         /// 当前用户
@@ -32,12 +34,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// <summary>
         /// 参数验证器
         /// </summary>
-        private readonly AbstractValidator<EquEquipmentLoginRecordSaveDto> _validationSaveRules;
+        private readonly AbstractValidator<EquEquipmentHeartRecordSaveDto> _validationSaveRules;
 
         /// <summary>
-        /// 仓储接口（操作员登录记录）
+        /// 仓储接口（设备心跳登录记录）
         /// </summary>
-        private readonly IEquEquipmentLoginRecordRepository _equEquipmentLoginRecordRepository;
+        private readonly IEquEquipmentHeartRecordRepository _equEquipmentHeartRecordRepository;
 
         /// <summary>
         /// 构造函数
@@ -45,14 +47,14 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// <param name="currentUser"></param>
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
-        /// <param name="equEquipmentLoginRecordRepository"></param>
-        public EquEquipmentLoginRecordService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquEquipmentLoginRecordSaveDto> validationSaveRules, 
-            IEquEquipmentLoginRecordRepository equEquipmentLoginRecordRepository)
+        /// <param name="equEquipmentHeartRecordRepository"></param>
+        public EquEquipmentHeartRecordService(ICurrentUser currentUser, ICurrentSite currentSite, AbstractValidator<EquEquipmentHeartRecordSaveDto> validationSaveRules, 
+            IEquEquipmentHeartRecordRepository equEquipmentHeartRecordRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
-            _equEquipmentLoginRecordRepository = equEquipmentLoginRecordRepository;
+            _equEquipmentHeartRecordRepository = equEquipmentHeartRecordRepository;
         }
 
         /// <summary>
@@ -60,12 +62,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> AddAsync(EquEquipmentLoginRecordSaveDto saveDto)
+        public async Task<int> AddAsync(EquEquipmentHeartRecordSaveDto saveDto)
         {
             // DTO转换实体
-            var entity = saveDto.ToEntity<EquEquipmentLoginRecordEntity>();
+            var entity = saveDto.ToEntity<EquEquipmentHeartRecordEntity>();
             // 保存
-            return await _equEquipmentLoginRecordRepository.InsertAsync(entity);
+            return await _equEquipmentHeartRecordRepository.InsertAsync(entity);
         }
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> CreateAsync(EquEquipmentLoginRecordSaveDto saveDto)
+        public async Task<int> CreateAsync(EquEquipmentHeartRecordSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -86,7 +88,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
             var updatedOn = HymsonClock.Now();
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<EquEquipmentLoginRecordEntity>();
+            var entity = saveDto.ToEntity<EquEquipmentHeartRecordEntity>();
             entity.Id = IdGenProvider.Instance.CreateId();
             entity.CreatedBy = updatedBy;
             entity.CreatedOn = updatedOn;
@@ -95,7 +97,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
             entity.SiteId = _currentSite.SiteId ?? 0;
 
             // 保存
-            return await _equEquipmentLoginRecordRepository.InsertAsync(entity);
+            return await _equEquipmentHeartRecordRepository.InsertAsync(entity);
         }
 
         /// <summary>
@@ -103,7 +105,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// </summary>
         /// <param name="saveDto"></param>
         /// <returns></returns>
-        public async Task<int> ModifyAsync(EquEquipmentLoginRecordSaveDto saveDto)
+        public async Task<int> ModifyAsync(EquEquipmentHeartRecordSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
             if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
@@ -112,11 +114,11 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
 
             // DTO转换实体
-            var entity = saveDto.ToEntity<EquEquipmentLoginRecordEntity>();
+            var entity = saveDto.ToEntity<EquEquipmentHeartRecordEntity>();
             entity.UpdatedBy = _currentUser.UserName;
             entity.UpdatedOn = HymsonClock.Now();
 
-            return await _equEquipmentLoginRecordRepository.UpdateAsync(entity);
+            return await _equEquipmentHeartRecordRepository.UpdateAsync(entity);
         }
 
         /// <summary>
@@ -126,7 +128,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// <returns></returns>
         public async Task<int> DeleteAsync(long id)
         {
-            return await _equEquipmentLoginRecordRepository.DeleteAsync(id);
+            return await _equEquipmentHeartRecordRepository.DeleteAsync(id);
         }
 
         /// <summary>
@@ -136,7 +138,7 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// <returns></returns>
         public async Task<int> DeletesAsync(long[] ids)
         {
-            return await _equEquipmentLoginRecordRepository.DeletesAsync(new DeleteCommand
+            return await _equEquipmentHeartRecordRepository.DeletesAsync(new DeleteCommand
             {
                 Ids = ids,
                 DeleteOn = HymsonClock.Now(),
@@ -149,12 +151,12 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<EquEquipmentLoginRecordDto?> QueryByIdAsync(long id) 
+        public async Task<EquEquipmentHeartRecordDto?> QueryByIdAsync(long id) 
         {
-           var equEquipmentLoginRecordEntity = await _equEquipmentLoginRecordRepository.GetByIdAsync(id);
-           if (equEquipmentLoginRecordEntity == null) return null;
+           var equEquipmentHeartRecordEntity = await _equEquipmentHeartRecordRepository.GetByIdAsync(id);
+           if (equEquipmentHeartRecordEntity == null) return null;
            
-           return equEquipmentLoginRecordEntity.ToModel<EquEquipmentLoginRecordDto>();
+           return equEquipmentHeartRecordEntity.ToModel<EquEquipmentHeartRecordDto>();
         }
 
         /// <summary>
@@ -162,15 +164,15 @@ namespace Hymson.MES.Services.Services.EquEquipmentLoginRecord
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        public async Task<PagedInfo<EquEquipmentLoginRecordDto>> GetPagedListAsync(EquEquipmentLoginRecordPagedQueryDto pagedQueryDto)
+        public async Task<PagedInfo<EquEquipmentHeartRecordDto>> GetPagedListAsync(EquEquipmentHeartRecordPagedQueryDto pagedQueryDto)
         {
-            var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentLoginRecordPagedQuery>();
+            var pagedQuery = pagedQueryDto.ToQuery<EquEquipmentHeartRecordPagedQuery>();
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
-            var pagedInfo = await _equEquipmentLoginRecordRepository.GetPagedListAsync(pagedQuery);
+            var pagedInfo = await _equEquipmentHeartRecordRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
-            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentLoginRecordDto>());
-            return new PagedInfo<EquEquipmentLoginRecordDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+            var dtos = pagedInfo.Data.Select(s => s.ToModel<EquEquipmentHeartRecordDto>());
+            return new PagedInfo<EquEquipmentHeartRecordDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
         }
 
     }

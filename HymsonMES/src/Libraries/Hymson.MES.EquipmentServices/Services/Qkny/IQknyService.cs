@@ -18,5 +18,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task OperatorLoginAsync(OperationLoginDto dto);
+
+        /// <summary>
+        /// 心跳
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task HeartbeatAsync(HeartbeatDto dto);
     }
 }

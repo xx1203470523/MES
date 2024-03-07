@@ -1,5 +1,6 @@
 ﻿using Hymson.MES.Data.Options;
 using Hymson.MES.Data.Repositories.Common;
+using Hymson.MES.Data.Repositories.EquEquipmentHeartRecord;
 using Hymson.MES.Data.Repositories.EquEquipmentLoginRecord;
 using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
@@ -16,6 +17,7 @@ using Hymson.MES.Data.Repositories.Integrated.InteContainer;
 using Hymson.MES.Data.Repositories.Integrated.InteJob;
 using Hymson.MES.Data.Repositories.Integrated.InteJobClass;
 using Hymson.MES.Data.Repositories.Integrated.InteWorkCenter;
+using Hymson.MES.Data.Repositories.ManuEuqipmentNewestInfo;
 using Hymson.MES.Data.Repositories.Manufacture;
 using Hymson.MES.Data.Repositories.Parameter;
 using Hymson.MES.Data.Repositories.Plan;
@@ -389,6 +391,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             #region 顷刻
             services.AddSingleton<IEquEquipmentLoginRecordRepository, EquEquipmentLoginRecordRepository>();
+            services.AddSingleton<IEquEquipmentLoginRecordRepository, EquEquipmentLoginRecordRepository>();
+            services.AddSingleton<IManuEuqipmentNewestInfoRepository, ManuEuqipmentNewestInfoRepository>();
+            services.AddSingleton<IEquEquipmentHeartRecordRepository, EquEquipmentHeartRecordRepository>();
             #endregion
 
             return services;

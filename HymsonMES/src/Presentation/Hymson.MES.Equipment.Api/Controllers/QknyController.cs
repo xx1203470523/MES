@@ -64,6 +64,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最后心跳时间
+            await _qknyService.HeartbeatAsync(dto);
         }
 
         /// <summary>

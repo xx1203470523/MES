@@ -54,7 +54,5 @@ namespace Hymson.MES.Core.Domain.EquEquipmentLoginRecord
         /// 站点Id
         /// </summary>
         public long SiteId { get; set; }
-
-       
     }
 }
