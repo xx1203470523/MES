@@ -69,14 +69,19 @@ public partial class ManuFacePlateService : IManuFacePlateService
         public ManuContainerBarcodeEntity ContainerBarcodeEntity { get; set; }
 
         /// <summary>
-        /// 包装容器容器信息
+        /// 包装容器基础信息
         /// </summary>
         public InteContainerInfoEntity InteContainerInfoEntity { get; set; }
 
         /// <summary>
-        /// 包装容器容器规格信息
+        /// 包装容器所有规格信息
         /// </summary>
         public IEnumerable<InteContainerFreightEntity> InteContainerFreightEntities { get; set; } = Enumerable.Empty<InteContainerFreightEntity>();
+
+        /// <summary>
+        /// 包装容器检索出的规格信息
+        /// </summary>
+        public InteContainerFreightEntity? InteContainerFreightEntity { get; set; }
 
         /// <summary>
         /// 包装容器已包装的装载信息
@@ -169,11 +174,6 @@ public partial class ManuFacePlateService : IManuFacePlateService
         public ManuContainerPackRecordEntity ContainerPackRecordEntity { get; set; }
 
         /// <summary>
-        /// 预包装容器规格信息
-        /// </summary>
-        public InteContainerFreightEntity? InteContainerFreightEntity { get; set; }
-
-        /// <summary>
         /// 执行模式
         /// </summary>
         public ExecuteModeEnum? ExecuteMode { get; set; } = ExecuteModeEnum.None;
@@ -248,7 +248,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
     }
 
     /// <summary>
-    /// 容器条码实体创建
+    /// 包装容器条码创建
     /// </summary>
     /// <param name="containerId"></param>
     /// <param name="containerCode"></param>
@@ -924,7 +924,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             Id = process.FacePlateContainerPackEntity.ContainerId,
             SiteId = siteId
         });
-        if(process.InteContainerInfoEntity.Status != Core.Enums.SysDataStatusEnum.Enable)
+        if (process.InteContainerInfoEntity.Status != Core.Enums.SysDataStatusEnum.Enable)
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES16782));
         }
@@ -960,6 +960,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             if (process.ContainerBarcodeEntity.Status == ManuContainerBarcodeStatusEnum.Close)
             {
                 process.ContainerBarcodeEntity = await CreatedContainerBarcodeEntityAsync(process.ContainerBarcodeEntity.ContainerId, process.InteContainerInfoEntity.Code, userName, siteId);
+                process.ExecuteMode = ExecuteModeEnum.NewContainerBarcode;
             }
             else
             {
@@ -1215,12 +1216,26 @@ public partial class ManuFacePlateService : IManuFacePlateService
                 Ids = result.ManuContainerPackIds,
                 SiteId = siteId
             });
-
-        var firstManuContainerPackEntity = manuContainerPackEntities.FirstOrDefault();
-
         if (manuContainerPackEntities == null || !manuContainerPackEntities.Any())
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES16754));
+        }
+
+        var theFirstManuContainerPackEntity = manuContainerPackEntities.FirstOrDefault();
+        if (theFirstManuContainerPackEntity == null)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES16754));
+        }
+
+        var manuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetByIdAsync(theFirstManuContainerPackEntity.ContainerBarCodeId.GetValueOrDefault());
+        if (manuContainerBarcodeEntity == null)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES16754));
+        }
+
+        if(manuContainerBarcodeEntity.Status == ManuContainerBarcodeStatusEnum.Close)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES16734));
         }
 
         var manuContainerPackRecordEntities = manuContainerPackEntities.Select(m =>
@@ -1244,10 +1259,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
             throw new CustomerValidationException(nameof(ErrorCode.MES16749));
         }
 
-        if (firstManuContainerPackEntity != null)
-        {
-            await _manuContainerBarcodeRepository.RefreshQtyAsync(new RefreshQtyCommand { Id = firstManuContainerPackEntity.ContainerBarCodeId.GetValueOrDefault() });
-        }
+        await _manuContainerBarcodeRepository.RefreshQtyAsync(new RefreshQtyCommand { Id = manuContainerBarcodeEntity.Id });
 
         scope.Complete();
 
@@ -1266,6 +1278,11 @@ public partial class ManuFacePlateService : IManuFacePlateService
         if (manuContainerBarcodeEntity == null)
         {
             throw new CustomerValidationException(nameof(ErrorCode.MES16751));
+        }
+
+        if (manuContainerBarcodeEntity.Status == ManuContainerBarcodeStatusEnum.Close)
+        {
+            throw new CustomerValidationException(nameof(ErrorCode.MES16734));
         }
 
         var siteId = _currentSite.SiteId.GetValueOrDefault();
@@ -1355,68 +1372,68 @@ public partial class ManuFacePlateService : IManuFacePlateService
 
         #region 包装容器包装信息
 
-        var manuContainerPackEntities = await _manuContainerPackRepository.GetListAsync(new ManuContainerPackQuery
-        {
-            ContainerBarCodeId = manuContainerBarcodeEntity.Id,
-            SiteId = siteId
-        });
+        //var manuContainerPackEntities = await _manuContainerPackRepository.GetListAsync(new ManuContainerPackQuery
+        //{
+        //    ContainerBarCodeId = manuContainerBarcodeEntity.Id,
+        //    SiteId = siteId
+        //});
 
         #endregion
 
         #region 验证容器是否为最大包装数量
 
-        var firstManuContainerPackEntity = manuContainerPackEntities.FirstOrDefault();
-        if (firstManuContainerPackEntity != null)
-        {
-            if (firstManuContainerPackEntity.PackType == ManuContainerBarcodePackTypeEnum.ManuSfc)
-            {
-                var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
-                {
-                    SFC = firstManuContainerPackEntity.LadeBarCode,
-                    SiteId = siteId
-                });
+        //var firstManuContainerPackEntity = manuContainerPackEntities.FirstOrDefault();
+        //if (firstManuContainerPackEntity != null)
+        //{
+        //    if (firstManuContainerPackEntity.PackType == ManuContainerBarcodePackTypeEnum.ManuSfc)
+        //    {
+        //        var manuSfcEntity = await _manuSfcRepository.GetBySFCAsync(new EntityBySFCQuery
+        //        {
+        //            SFC = firstManuContainerPackEntity.LadeBarCode,
+        //            SiteId = siteId
+        //        });
 
-                var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
+        //        var manuSfcInfoEntity = await _manuSfcInfoRepository.GetBySFCAsync(manuSfcEntity.Id);
 
-                var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
+        //        var procMaterialEntity = await _procMaterialRepository.GetByIdAsync(manuSfcInfoEntity.ProductId);
 
-                var containerFreightEntity = containerFreightEntities.FirstOrDefault(m => m.MaterialId == procMaterialEntity.Id);
-                if (containerFreightEntity == null)
-                {
-                    containerFreightEntity = containerFreightEntities.FirstOrDefault(m => m.MaterialGroupId == procMaterialEntity.GroupId);
-                }
+        //        var containerFreightEntity = containerFreightEntities.FirstOrDefault(m => m.MaterialId == procMaterialEntity.Id);
+        //        if (containerFreightEntity == null)
+        //        {
+        //            containerFreightEntity = containerFreightEntities.FirstOrDefault(m => m.MaterialGroupId == procMaterialEntity.GroupId);
+        //        }
 
-                if (containerFreightEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16760)).WithData("code", containerInfoEntity.Code);
-                }
+        //        if (containerFreightEntity == null)
+        //        {
+        //            throw new CustomerValidationException(nameof(ErrorCode.MES16760)).WithData("code", containerInfoEntity.Code);
+        //        }
 
-                if (manuContainerBarcodeEntity.Qty >= containerFreightEntity.Maximum)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16770)).WithData("code", manuSfcEntity.SFC);
-                }
-            }
-            else if (firstManuContainerPackEntity.PackType == ManuContainerBarcodePackTypeEnum.Container)
-            {
-                var packedManuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetOneAsync(
-                    new ManuContainerBarcodeQuery
-                    {
-                        BarCode = firstManuContainerPackEntity.LadeBarCode,
-                        SiteId = siteId
-                    });
+        //        if (manuContainerBarcodeEntity.Qty >= containerFreightEntity.Maximum)
+        //        {
+        //            throw new CustomerValidationException(nameof(ErrorCode.MES16770)).WithData("code", manuSfcEntity.SFC);
+        //        }
+        //    }
+        //    else if (firstManuContainerPackEntity.PackType == ManuContainerBarcodePackTypeEnum.Container)
+        //    {
+        //        var packedManuContainerBarcodeEntity = await _manuContainerBarcodeRepository.GetOneAsync(
+        //            new ManuContainerBarcodeQuery
+        //            {
+        //                BarCode = firstManuContainerPackEntity.LadeBarCode,
+        //                SiteId = siteId
+        //            });
 
-                var containerFreightEntity = containerFreightEntities.FirstOrDefault(m => m.FreightContainerId == packedManuContainerBarcodeEntity.ContainerId);
-                if (containerFreightEntity == null)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16760)).WithData("code", containerInfoEntity.Code);
-                }
+        //        var containerFreightEntity = containerFreightEntities.FirstOrDefault(m => m.FreightContainerId == packedManuContainerBarcodeEntity.ContainerId);
+        //        if (containerFreightEntity == null)
+        //        {
+        //            throw new CustomerValidationException(nameof(ErrorCode.MES16760)).WithData("code", containerInfoEntity.Code);
+        //        }
 
-                if (manuContainerBarcodeEntity.Qty >= containerFreightEntity.Maximum)
-                {
-                    throw new CustomerValidationException(nameof(ErrorCode.MES16770)).WithData("code", packedManuContainerBarcodeEntity.BarCode);
-                }
-            }
-        }
+        //        if (manuContainerBarcodeEntity.Qty >= containerFreightEntity.Maximum)
+        //        {
+        //            throw new CustomerValidationException(nameof(ErrorCode.MES16770)).WithData("code", packedManuContainerBarcodeEntity.BarCode);
+        //        }
+        //    }
+        //}
 
         #endregion
 
@@ -1448,11 +1465,7 @@ public partial class ManuFacePlateService : IManuFacePlateService
     /// <returns></returns>
     public async Task ClosePackContainerAsync(ManuFacePlateCloseContainerDto input)
     {
-
-
         var siteId = _currentSite.SiteId.GetValueOrDefault();
-
-        //var packContainerId = input.PackContainerId.GetValueOrDefault();
 
         #region 包装容器条码信息
 
