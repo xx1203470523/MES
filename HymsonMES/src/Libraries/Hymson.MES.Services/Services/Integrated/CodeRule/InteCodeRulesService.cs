@@ -438,7 +438,7 @@ namespace Hymson.MES.Services.Services.Integrated
                 var inteCodeRulesDetailViewDto = inteCodeRulesEntity.ToModel<InteCodeRulesDetailViewDto>();
 
                 //查询关联数据
-                var material = await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId, _currentSite.SiteId ?? 0);
+                var material = await _procMaterialRepository.GetByIdAsync(inteCodeRulesEntity.ProductId.GetValueOrDefault(), _currentSite.SiteId ?? 0);
                 if (material != null)
                 {
                     inteCodeRulesDetailViewDto.MaterialCode = material.MaterialCode;
