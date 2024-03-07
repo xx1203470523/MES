@@ -37,5 +37,15 @@ namespace Hymson.MES.Data.Repositories.Plan
         /// 物料版本
         /// </summary>
         public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 容器编码
+        /// </summary>
+        public string ContainerCode { get; set; }
+
+        /// <summary>
+        /// 容器名称
+        /// </summary>
+        public string ContainerName { get; set; }
     }
 }

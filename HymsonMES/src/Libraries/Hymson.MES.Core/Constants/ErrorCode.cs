@@ -331,7 +331,7 @@
         public const string MES10810 = "掩码编码不能为空";
         public const string MES10811 = "掩码编码最大长度为50";
         public const string MES10812 = "掩码名称最大长度为50";
-
+        public const string MES10813 = "掩码匹配方式重复";
 
         #endregion
 
@@ -518,6 +518,7 @@
         public const string MES12447 = "编码规则组成取值方式为可变值且分段值为%MULTIPLE_VARIABLE%数据中自定义值的区间值存在重复！";
         public const string MES12448 = "包装序列码的容器编码不可为空";
         public const string MES12449 = "包装序列码必须填写有效的容器编码";
+        public const string MES12450 = "容器{code}编码规则已存在，请删除原规则再进行新增!";
         #endregion
 
         #region 容器维护 12500
@@ -1846,6 +1847,16 @@
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
 
+        #endregion
+
+        #region 基础数据导入 11600
+
+        public const string MES11601 = "导入的数据中设备编码重复！";
+        public const string MES11602 = "设备编码不能为空！";
+        public const string MES11603 = "设备名称不能为空！";
+        public const string MES11604 = "存放位置不能为空！";
+        public const string MES11605 = "使用状态不能为空！";
+        public const string MES11606 = "导入的数据中资源编码重复！";
         #endregion
     }
 }

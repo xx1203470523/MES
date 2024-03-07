@@ -138,7 +138,7 @@ namespace Hymson.MES.Api.Controllers.Warehouse
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpDelete]
         [Route("delete")]
         [LogDescription("供应商管理", BusinessType.DELETE)]
         [PermissionDescription("wh:supplier:delete")]
