@@ -330,12 +330,12 @@ namespace Hymson.MES.Services.Services.Quality
                 new InteAttachmentBaseDto
                 {
                      Name = "附件1",
-                     Path = "http://192.168.0.208/zentao/file-download-6189.html?tid=lre3e428"
+                     Path = "//172.16.11.24:9000/user-center/4c/7a/测试.docx"
                 },
                 new InteAttachmentBaseDto
                 {
                     Name = "附件2",
-                    Path = "http://192.168.0.208/zentao/file-download-6189.html?tid=lre3e428"
+                    Path = "//172.16.11.24:9000/user-center/4c/7a/测试.docx"
                 }
             };
 
