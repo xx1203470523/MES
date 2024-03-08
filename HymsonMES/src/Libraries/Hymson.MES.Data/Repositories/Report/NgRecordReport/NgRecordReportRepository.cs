@@ -141,11 +141,11 @@ public partial class NgRecordReportRepository
         }
         if (query.BeginTime != null)
         {
-            sqlBuilder.Where("mss.EndTime >= @BeginTime");
+            sqlBuilder.Where($"mss.EndTime < '{query.BeginTime?.ToString("yyyy-MM-dd")}'");
         }
         if (query.EndTime != null)
         {
-            sqlBuilder.Where("mss.EndTime < @EndTime");
+            sqlBuilder.Where($"mss.EndTime < '{query.EndTime?.ToString("yyyy-MM-dd")}'");
         }
         if (query.QualityStatus != null)
         {
