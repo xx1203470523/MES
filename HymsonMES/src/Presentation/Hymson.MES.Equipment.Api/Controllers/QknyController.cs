@@ -31,6 +31,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         private readonly IQknyService _qknyService;
 
         /// <summary>
+        /// 是否调试
+        /// </summary>
+        private readonly bool IS_DEBUG = true;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyController(IEquEquipmentRepository equEquipmentRepository, IQknyService qknyService)
@@ -49,6 +54,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("操作员登录001", BusinessType.OTHER, "OperatorLoginMes001", ReceiverTypeEnum.MES)]
         public async Task OperatorLoginAsync(OperationLoginDto dto)
         {
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
+
             await _qknyService.OperatorLoginAsync(dto);
         }
 
@@ -62,6 +72,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备心跳002", BusinessType.OTHER, "Heartbeat002", ReceiverTypeEnum.MES)]
         public async Task HeartbeatAsync(HeartbeatDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最后心跳时间
             //2. 记录心跳记录
@@ -78,6 +93,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备状态上报003", BusinessType.OTHER, "State003", ReceiverTypeEnum.MES)]
         public async Task StateAsync(StateDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
             await _qknyService.StateAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最新状态和最后时间
@@ -95,6 +115,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备运行报警信息004", BusinessType.OTHER, "Alarm004", ReceiverTypeEnum.MES)]
         public async Task AlarmAsync(AlarmDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
             await _qknyService.AlarmAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_alarm记录故障时间和恢复时间，用于统计每台设备故障具体时间和故障代码
@@ -125,6 +150,11 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "CCDFileUploadComplete006", ReceiverTypeEnum.MES)]
         public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
             await _qknyService.CcdFileUploadCompleteAsync(dto);
             //TODO
             //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
@@ -141,6 +171,21 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("获取开机参数列表007", BusinessType.OTHER, "GetRecipeList007", ReceiverTypeEnum.MES)]
         public async Task<List<GetRecipeListReturnDto>> GetRecipeListAsync(GetRecipeListDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                List<GetRecipeListReturnDto> resultList = new List<GetRecipeListReturnDto>();
+                for (int i = 0;i < 5; ++i)
+                {
+                    GetRecipeListReturnDto model = new GetRecipeListReturnDto();
+                    model.RecipeCode = $"recipe{i}";
+                    model.ProductCode = $"product{i}";
+                    model.Version = i.ToString();
+                    model.LastUpdateOnTime = DateTime.Now;
+                    resultList.Add(model);
+                }
+                return resultList;
+            }
+
             var result = await _qknyService.GetRecipeListAsync(dto);
             return result;
             //TODO
