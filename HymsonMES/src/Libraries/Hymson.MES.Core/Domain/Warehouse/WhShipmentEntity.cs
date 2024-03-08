@@ -15,26 +15,26 @@ namespace Hymson.MES.Core.Domain.WhShipment
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 出货单号
         /// </summary>
         public string ShipmentNum { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 客户id
         /// </summary>
         public long CustomerId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 计划出现时间
         /// </summary>
-        public string PlanShipmentTime { get; set; }
+        public DateTime? PlanShipmentTime { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
 
-       
+
     }
 }

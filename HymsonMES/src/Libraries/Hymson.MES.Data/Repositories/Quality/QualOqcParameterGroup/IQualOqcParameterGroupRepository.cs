@@ -67,6 +67,13 @@ namespace Hymson.MES.Data.Repositories.Quality
         Task<IEnumerable<QualOqcParameterGroupEntity>> GetByIdsAsync(long[] ids);
 
         /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<QualOqcParameterGroupEntity> GetEntityAsync(QualOqcParameterGroupQuery query);
+
+        /// <summary>
         /// 获取List
         /// </summary>
         /// <param name="query"></param>

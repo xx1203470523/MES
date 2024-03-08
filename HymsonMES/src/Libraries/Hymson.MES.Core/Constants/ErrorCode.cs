@@ -43,6 +43,7 @@
         public const string MES10134 = "未获取到导出数据！";
         public const string MES10135 = "不允许删除【已启用】状态的数据！";
         public const string MES10136 = "操作数据丢失";
+        public const string MES10137 = "只允许删除【待检验】状态的数据！";
 
         #region 物料 10200
         public const string MES10200 = "物料维护错误";
@@ -428,6 +429,20 @@
         #region ESOP维护 11500
         public const string MES11500 = "ESOP已存在同一物料、工序、状态数据";
         public const string MES11501 = "不能删除启用状态的数据";
+        #endregion
+
+        #region OQC检验任务 11800
+
+        public const string MES11800 = "选中数据不属于同一出货单";
+        public const string MES11801 = "出货单不存在";
+        public const string MES11802 = "AQL检验水平不存在";
+        public const string MES11803 = "AQL检验计划不存在";
+        public const string MES11804 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目不存在或未激活";
+        public const string MES11805 = "客户【{CustomerCode}】物料【{MaterialCode}】对应OQC检验项目下检验参数不能为空";
+        public const string MES11806 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平不能为空";
+        public const string MES11807 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平下检验类型不能为空";
+        public const string MES11808 = "客户【{CustomerCode}】物料【{MaterialCode}】OQC检验水平下检验类型【{InspectionType}】未维护";
+
         #endregion
 
         #region 作业12000

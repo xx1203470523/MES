@@ -894,6 +894,9 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualOqcLevelDetailDto, QualOqcLevelDetailEntity>();
             CreateMap<QualOqcLevelDetailEntity, QualOqcLevelDetailDto>();
 
+            CreateMap<QualIqcOrderPagedQueryDto, QualIqcOrderPagedQuery>();
+            CreateMap<QualIqcOrderEntity, QualIqcOrderDto>();
+            
 
             #region QualIqcInspectionItem
 
