@@ -1,9 +1,6 @@
 ﻿namespace Hymson.MES.CoreServices.Bos.Quality
 {
-    /// <summary>
-    /// 业务类（AQL检验水平）
-    /// </summary>
-    public class AQLLevelBo
+    public class AQLPlanBo
     {
         /// <summary>
         /// 检验标准
@@ -11,50 +8,53 @@
         public string Standard { get; set; }
 
         /// <summary>
-        /// 批次最小数量
+        /// 样本代码
         /// </summary>
-        public int Min { get; set; }
+        public string Code { get; set; }
 
         /// <summary>
-        /// 批次最大数量
+        /// T
         /// </summary>
-        public int Max { get; set; }
+        public int T { get; set; }
 
         /// <summary>
         /// VII
         /// </summary>
-        public string VII { get; set; }
+        public int VII { get; set; }
 
         /// <summary>
         /// VI
         /// </summary>
-        public string VI { get; set; }
+        public int VI { get; set; }
 
         /// <summary>
         /// V
         /// </summary>
-        public string V { get; set; }
+        public int V { get; set; }
 
         /// <summary>
         /// IV
         /// </summary>
-        public string IV { get; set; }
+        public int IV { get; set; }
 
         /// <summary>
         /// III
         /// </summary>
-        public string III { get; set; }
+        public int III { get; set; }
 
         /// <summary>
         /// II
         /// </summary>
-        public string II { get; set; }
+        public int II { get; set; }
 
         /// <summary>
         /// I
         /// </summary>
-        public string I { get; set; }
+        public int I { get; set; }
 
+        /// <summary>
+        /// R
+        /// </summary>
+        public int R { get; set; }
     }
-
 }

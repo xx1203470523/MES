@@ -70,5 +70,21 @@ namespace Hymson.MES.Services
             return AutoMapperConfiguration.Mapper.Map<TQuery>(dto);
         }
 
+        /// <summary>
+        /// 转换到实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="baseEntity"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static TEntity ToEntity<TEntity>(this BaseEntity baseEntity) where TEntity : BaseEntity
+        {
+            if (baseEntity == null)
+            {
+                throw new ArgumentNullException(nameof(baseEntity));
+            }
+            return AutoMapperConfiguration.Mapper.Map<TEntity>(baseEntity);
+        }
+
     }
 }
