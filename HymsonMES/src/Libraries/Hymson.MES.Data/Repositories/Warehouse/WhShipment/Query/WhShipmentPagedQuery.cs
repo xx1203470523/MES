@@ -12,5 +12,15 @@ namespace Hymson.MES.Data.Repositories.WhShipment.Query
         /// </summary>
         public long SiteId { get; set; }
 
+        /// <summary>
+        /// 出货单号
+        /// </summary>
+        public string? ShipmentNum { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime[]? TimeStamp { get; set; }
+
     }
 }

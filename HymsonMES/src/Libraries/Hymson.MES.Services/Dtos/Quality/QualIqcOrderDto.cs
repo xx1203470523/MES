@@ -1,0 +1,227 @@
+using Hymson.Infrastructure;
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
+
+namespace Hymson.MES.Services.Dtos.Quality
+{
+    /// <summary>
+    /// iqc检验单新增/更新Dto
+    /// </summary>
+    public record QualIqcOrderSaveDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 站点ID
+        /// </summary>
+        public long SiteId { get; set; }
+
+        /// <summary>
+        /// 检验单号
+        /// </summary>
+        public string InspectionOrder { get; set; }
+
+        /// <summary>
+        /// 物料id
+        /// </summary>
+        public long? MaterialId { get; set; }
+
+        /// <summary>
+        /// 供应商Id
+        /// </summary>
+        public long? SupplierId { get; set; }
+
+        /// <summary>
+        /// qual_iqc_inspection_item_copy 的Id
+        /// </summary>
+        public string IqcInspectionItemId { get; set; }
+
+        /// <summary>
+        /// 收货单详情Id
+        /// </summary>
+        public long? MaterialReceiptDetailId { get; set; }
+
+        /// <summary>
+        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// </summary>
+        public bool Status { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public bool? IsQualified { get; set; }
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+        /// <summary>
+        /// 删除标识
+        /// </summary>
+        public long IsDeleted { get; set; }
+
+
+    }
+
+    /// <summary>
+    /// iqc检验单Dto
+    /// </summary>
+    public record QualIqcOrderDto : BaseEntityDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 检验单号
+        /// </summary>
+        public string InspectionOrder { get; set; }
+
+        /// <summary>
+        /// 收货单号
+        /// </summary>
+        public string ReceiptNum { get; set; }
+
+        /// <summary>
+        /// 物料Id
+        /// </summary>
+        public long MaterialId { get; set; }
+
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+
+        /// <summary>
+        /// 物料名称
+        /// </summary>
+        public string MaterialName { get; set; }
+
+        /// <summary>
+        /// 物料版本
+        /// </summary>
+        public string MaterialVersion { get; set; }
+
+        /// <summary>
+        /// 供应商ID
+        /// </summary>
+        public long SupplierId { get; set; }
+
+        /// <summary>
+        /// 供应商编码
+        /// </summary>
+        public string SupplierCode { get; set; }
+
+        /// <summary>
+        /// 供应商名称
+        /// </summary>
+        public string SupplierName { get; set; }
+
+        /// <summary>
+        /// 供应商批次
+        /// </summary>
+        public string SupplierBatch { get; set; }
+
+        /// <summary>
+        /// 内部
+        /// </summary>
+        public string InternalBatch { get; set; }
+
+        /// <summary>
+        /// 规格型号
+        /// </summary>
+        public string Specifications { get; set; }
+
+        /// <summary>
+        /// qual_iqc_inspection_item_copy 的Id
+        /// </summary>
+        public string IqcInspectionItemId { get; set; }
+
+        /// <summary>
+        /// 收货单详情Id
+        /// </summary>
+        public long? MaterialReceiptDetailId { get; set; }
+
+        /// <summary>
+        /// 计划发货数量
+        /// </summary>
+        public decimal? PlanQty { get; set; }
+
+        /// <summary>
+        /// 计划发货数量
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
+        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// </summary>
+        public InspectionStatusEnum Status { get; set; }
+
+        /// <summary>
+        /// 状态;1、待检验2、检验中3、已检验4、已关闭
+        /// </summary>
+        public string StatusText { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public TrueOrFalseEnum IsQualified { get; set; }
+
+        /// <summary>
+        /// 是否合格;0、不合格 1、合格
+        /// </summary>
+        public string IsQualifiedText { get; set; }
+
+        /// <summary>
+        /// 报检人
+        /// </summary>
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// 报检时间
+        /// </summary>
+        public DateTime? CreatedOn { get; set; }
+
+        /// <summary>
+        /// 更新人
+        /// </summary>
+        public string UpdatedBy { get; set; }
+
+        /// <summary>
+        /// 更新时间
+        /// </summary>
+        public DateTime? UpdatedOn { get; set; }
+
+    }
+
+    /// <summary>
+    /// iqc检验单分页Dto
+    /// </summary>
+    public class QualIqcOrderPagedQueryDto : PagerInfo { }
+
+}
