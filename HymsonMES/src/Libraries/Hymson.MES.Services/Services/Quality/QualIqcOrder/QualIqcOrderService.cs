@@ -401,10 +401,8 @@ namespace Hymson.MES.Services.Services.Quality
             var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
             if (snapshotEntity == null) return Array.Empty<InspectionParameterDetailDto>();
 
-            /*
             var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetBySnapshotIdAsync(snapshotEntity.Id);
             if (detailEntities == null) return Array.Empty<InspectionParameterDetailDto>();
-            */
 
             List<InspectionParameterDetailDto> list = new();
             return list;

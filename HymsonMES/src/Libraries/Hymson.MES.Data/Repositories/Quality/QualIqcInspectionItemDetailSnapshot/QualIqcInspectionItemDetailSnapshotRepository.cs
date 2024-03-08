@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -97,11 +97,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetBySnapshotIdAsync(long snapshotId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(GetBySnapshotIdSql, new { IqcInspectionItemSnapshotId = snapshotId });
+        }
+
+        /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcInspectionItemDetailSnapshotEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(GetByIdsSql, new { Ids = ids });
@@ -170,6 +181,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeletesSql = "UPDATE qual_iqc_inspection_item_detail_snapshot SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_iqc_inspection_item_detail_snapshot WHERE Id = @Id ";
+        const string GetBySnapshotIdSql = @"SELECT * FROM qual_iqc_inspection_item_detail_snapshot WHERE IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId ";
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_inspection_item_detail_snapshot WHERE Id IN @Ids ";
 
     }
