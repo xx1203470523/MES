@@ -5,7 +5,7 @@ namespace Hymson.MES.Core.Domain.Quality
     /// <summary>
     /// 数据实体（IQC检验项目被）   
     /// qual_iqc_inspection_item_snapshot
-    /// @author User
+    /// @author Czhipu
     /// @date 2024-03-06 02:20:42
     /// </summary>
     public class QualIqcInspectionItemSnapshotEntity : BaseEntity

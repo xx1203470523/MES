@@ -48,7 +48,7 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 仓储接口（iqc检验类型）
         /// </summary>
-        //private readonly IQualOqcOrderTypeRepository _qualOqcOrderTypeRepository;
+        private readonly IQualIqcOrderTypeRepository _qualIqcOrderTypeRepository;
 
         /// <summary>
         /// 仓储接口（收货单）
@@ -72,13 +72,14 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="currentSite"></param>
         /// <param name="validationSaveRules"></param>
         /// <param name="qualIqcOrderRepository"></param>
+        /// <param name="qualIqcOrderTypeRepository"></param>
         /// <param name="whMaterialReceiptRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
         public QualIqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIqcOrderSaveDto> validationSaveRules,
             IQualIqcOrderRepository qualIqcOrderRepository,
-            //IQualOqcOrderTypeRepository qualOqcOrderTypeRepository,
+            IQualIqcOrderTypeRepository qualIqcOrderTypeRepository,
             IWhMaterialReceiptRepository whMaterialReceiptRepository,
             IProcMaterialRepository procMaterialRepository,
             IWhSupplierRepository whSupplierRepository)
@@ -87,7 +88,7 @@ namespace Hymson.MES.Services.Services.Quality
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualIqcOrderRepository = qualIqcOrderRepository;
-            //_qualOqcOrderTypeRepository = qualOqcOrderTypeRepository;
+            _qualIqcOrderTypeRepository = qualIqcOrderTypeRepository;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
@@ -256,11 +257,15 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 根据ID查询类型
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long id)
+        public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
         {
-            //var types = await _qualOqcOrderTypeRepository.GetByIdsAsync(id);
+            /*
+            var entities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(orderId);
+            return entities.Select(s => s.ToModel<QualIqcOrderTypeBaseDto>());
+            */
+
             await Task.CompletedTask;
 
             // TODO 测试数据

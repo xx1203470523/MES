@@ -79,7 +79,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public async Task<int> DeletesAsync(DeleteCommand command) 
+        public async Task<int> DeletesAsync(DeleteCommand command)
         {
             using var conn = GetMESDbConnection();
             return await conn.ExecuteAsync(DeletesSql, command);
@@ -97,11 +97,22 @@ namespace Hymson.MES.Data.Repositories.Quality
         }
 
         /// <summary>
+        /// 根据ID获取数据
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<QualIqcOrderTypeEntity>> GetByOrderIdAsync(long orderId)
+        {
+            using var conn = GetMESDbConnection();
+            return await conn.QueryAsync<QualIqcOrderTypeEntity>(GetByOrderIdSql, new { IQCOrderId = orderId });
+        }
+
+        /// <summary>
         /// 根据IDs获取数据（批量）
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderTypeEntity>> GetByIdsAsync(long[] ids) 
+        public async Task<IEnumerable<QualIqcOrderTypeEntity>> GetByIdsAsync(long[] ids)
         {
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcOrderTypeEntity>(GetByIdsSql, new { Ids = ids });
@@ -170,6 +181,7 @@ namespace Hymson.MES.Data.Repositories.Quality
         const string DeletesSql = "UPDATE qual_iqc_order_type SET IsDeleted = Id, UpdatedBy = @UserId, UpdatedOn = @DeleteOn WHERE Id IN @Ids";
 
         const string GetByIdSql = @"SELECT * FROM qual_iqc_order_type WHERE Id = @Id ";
+        const string GetByOrderIdSql = @"SELECT * FROM qual_iqc_order_type WHERE IQCOrderId = @IQCOrderId ";
         const string GetByIdsSql = @"SELECT * FROM qual_iqc_order_type WHERE Id IN @Ids ";
 
     }

@@ -54,9 +54,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 根据ID查询类型
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long id);
+        Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId);
 
         /// <summary>
         /// 根据ID查询附件
