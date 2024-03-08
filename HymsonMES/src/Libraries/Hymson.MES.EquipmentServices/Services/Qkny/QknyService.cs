@@ -8,10 +8,12 @@ using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
+using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
 using Hymson.MES.Services.Dtos.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Dtos.ManuEquipmentStatusTime;
 using Hymson.MES.Services.Dtos.ManuEuqipmentNewestInfo;
+using Hymson.MES.Services.Services.EquEquipmentAlarm;
 using Hymson.MES.Services.Services.EquEquipmentHeartRecord;
 using Hymson.MES.Services.Services.EquEquipmentLoginRecord;
 using Hymson.MES.Services.Services.ManuEquipmentStatusTime;
@@ -70,6 +72,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly IManuEquipmentStatusTimeService _manuEquipmentStatusTimeService;
 
         /// <summary>
+        /// 报警
+        /// </summary>
+        private readonly IEquEquipmentAlarmService _equEquipmentAlarmService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -78,6 +85,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuEuqipmentNewestInfoService manuEuqipmentNewestInfoService,
             IEquEquipmentHeartRecordService equEquipmentHeartRecordService,
             IManuEquipmentStatusTimeService manuEquipmentStatusTimeService,
+            IEquEquipmentAlarmService equEquipmentAlarmService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -86,6 +94,8 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuEuqipmentNewestInfoService = manuEuqipmentNewestInfoService;
             _equEquipmentHeartRecordService = equEquipmentHeartRecordService;
             _manuEquipmentStatusTimeService = manuEquipmentStatusTimeService;
+            _equEquipmentAlarmService = equEquipmentAlarmService;
+            //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
 
@@ -215,6 +225,31 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         }
 
         /// <summary>
+        /// 故障上报
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task AlarmAsync(AlarmDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 添加故障记录
+            EquEquipmentAlarmSaveDto saveDto = new EquEquipmentAlarmSaveDto();
+            saveDto.Id = IdGenProvider.Instance.CreateId();
+            saveDto.EquipmentId = equResModel.EquipmentId;
+            saveDto.Status = dto.Status;
+            saveDto.AlarmCode = dto.AlarmCode.ToUpper();
+            saveDto.AlarmMsg = dto.AlarmMsg;
+            saveDto.AlarmLevel = dto.AlarmLevel.ToUpper();
+            saveDto.CreatedBy = equResModel.EquipmentCode;
+            saveDto.CreatedOn = HymsonClock.Now();
+            saveDto.UpdatedBy = saveDto.CreatedBy;
+            saveDto.UpdatedOn = saveDto.CreatedOn;
+            saveDto.SiteId = equResModel.SiteId;
+            await _equEquipmentAlarmService.AddAsync(saveDto);
+        }
+
+        /// <summary>
         /// 获取设备资源对应的基础信息
         /// </summary>
         /// <param name="param"></param>
@@ -231,5 +266,6 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             }
             return equResAllModel;
         }
+
     }
 }

@@ -17,7 +17,7 @@ namespace Hymson.MES.EquipmentServices.Dtos.Qkny.Common
         public string Status { get; set; } = "";
 
         /// <summary>
-        /// 故障详细信息
+        /// 报警详细信息
         /// </summary>
         public string AlarmMsg { get; set; } = "";
 

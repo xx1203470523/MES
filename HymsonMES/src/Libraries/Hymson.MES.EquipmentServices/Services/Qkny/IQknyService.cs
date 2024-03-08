@@ -32,5 +32,12 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         /// <param name="dto"></param>
         /// <returns></returns>
         Task StateAsync(StateDto dto);
+
+        /// <summary>
+        /// 报警
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task AlarmAsync(AlarmDto dto);
     }
 }

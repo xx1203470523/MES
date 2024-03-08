@@ -64,6 +64,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最后心跳时间
+            //2. 记录心跳记录
             await _qknyService.HeartbeatAsync(dto);
         }
 
@@ -85,6 +86,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
 
         /// <summary>
         /// 设备运行报警信息004
+        /// 报警不一定停机，状态不一定会发生切换
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -93,9 +95,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备运行报警信息004", BusinessType.OTHER, "Alarm004", ReceiverTypeEnum.MES)]
         public async Task AlarmAsync(AlarmDto dto)
         {
+            await _qknyService.AlarmAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_alarm记录故障时间和恢复时间，用于统计每台设备故障具体时间和故障代码
-            //
         }
 
         /// <summary>
