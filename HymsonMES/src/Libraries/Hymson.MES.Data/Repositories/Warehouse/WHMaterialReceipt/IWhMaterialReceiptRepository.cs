@@ -92,9 +92,6 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <returns></returns>
         Task<PagedInfo<WhMaterialReceiptEntity>> GetPagedListAsync(WhMaterialReceiptPagedQuery pagedQuery);
 
-
-
-
         /// <summary>
         /// 根据receiptId获取明细数据
         /// </summary>
@@ -115,6 +112,13 @@ namespace Hymson.MES.Data.Repositories.WHMaterialReceipt
         /// <param name="ids"></param>
         /// <returns></returns>
         Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByIdsAsync(IEnumerable<long> ids);
+
+        /// <summary>
+        /// 根据主表Id查明细
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<WHMaterialReceiptDetailEntity>> GetDetailsByReceiptIdsAsync(IEnumerable<long> ids);
 
 
     }

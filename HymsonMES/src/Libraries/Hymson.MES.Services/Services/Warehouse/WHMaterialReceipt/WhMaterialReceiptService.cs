@@ -15,6 +15,7 @@ using Hymson.MES.Data.Repositories.WHMaterialReceipt;
 using Hymson.MES.Data.Repositories.WHMaterialReceipt.Query;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.WHMaterialReceipt;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.Snowflake;
 using Hymson.Utils;
 using Hymson.Utils.Tools;
@@ -88,7 +89,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         public async Task CreateAsync(WhMaterialReceiptSaveDto saveDto)
         {
             // 判断是否有获取到站点码 
-            if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
+            //if (_currentSite.SiteId == 0) throw new CustomerValidationException(nameof(ErrorCode.MES10101));
 
             // 验证DTO
             await _validationSaveRules.ValidateAndThrowAsync(saveDto);
@@ -105,7 +106,9 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
             entity.IsDeleted = 0;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            //entity.SiteId = _currentSite.SiteId ?? 0;
+            //临时
+            entity.SiteId = saveDto.SiteId;
 
             //是否重复收货单号
             var isReceip = await _whMaterialReceiptRepository.GetEntitiesAsync(new WhMaterialReceiptQuery { ReceiptNum = entity.ReceiptNum });
@@ -121,7 +124,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                     {
                         Id = IdGenProvider.Instance.CreateId(),
                         MaterialReceiptId = entity.Id,
-                        MaterialId = item.MaterialId,
+                        MaterialId = item.MaterialId ?? 0,
                         SupplierBatch = item.SupplierBatch,
                         PlanQty = item.PlanQty,
                         InternalBatch = item.InternalBatch,
@@ -131,7 +134,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                         CreatedOn = updatedOn,
                         UpdatedBy = updatedBy,
                         UpdatedOn = updatedOn,
-                        SiteId = _currentSite.SiteId ?? 0
+                        SiteId = entity.SiteId
                     });
                 }
 
@@ -142,7 +145,7 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
             {
                 await _whMaterialReceiptRepository.InsertAsync(entity);
                 //先删除
-                await _whMaterialReceiptRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
+                //await _whMaterialReceiptRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
                 if (details.Any())
                     await _whMaterialReceiptRepository.InsertDetailAsync(details);
 
@@ -217,12 +220,16 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
         public async Task<PagedInfo<WhMaterialReceiptDto>> GetPagedListAsync(WhMaterialReceiptPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhMaterialReceiptPagedQuery>();
+
             pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+
             var pagedInfo = await _whMaterialReceiptRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据
             var dtos = await PrepareDtos(pagedInfo.Data);
             return new PagedInfo<WhMaterialReceiptDto>(dtos, pagedInfo.PageIndex, pagedInfo.PageSize, pagedInfo.TotalCount);
+
+
         }
 
         /// <summary>
@@ -239,7 +246,8 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
             var receiptDic = receiptEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取产品
-            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
+            //var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Where(w => w.MaterialId.HasValue).Select(x => x.MaterialId!.Value));
+            var materialEntities = await _procMaterialRepository.GetByIdsAsync(entities.Select(x => x.MaterialId));
             var materialDic = materialEntities.ToDictionary(x => x.Id, x => x);
 
             // 读取供应商
@@ -267,16 +275,16 @@ namespace Hymson.MES.Services.Services.WHMaterialReceipt
                 }
 
                 // 产品
-                if (entity.MaterialId.HasValue)
+                //if (entity.MaterialId.HasValue)
+                //{
+                var materialEntity = materialDic[entity.MaterialId];
+                if (materialEntity != null)
                 {
-                    var materialEntity = materialDic[entity.MaterialId.Value];
-                    if (materialEntity != null)
-                    {
-                        dto.MaterialCode = materialEntity.MaterialCode;
-                        dto.MaterialName = materialEntity.MaterialName;
-                        dto.MaterialVersion = materialEntity.Version ?? "";
-                    }
+                    dto.MaterialCode = materialEntity.MaterialCode;
+                    dto.MaterialName = materialEntity.MaterialName;
+                    dto.MaterialVersion = materialEntity.Version ?? "";
                 }
+                //}
 
                 dtos.Add(dto);
             }
