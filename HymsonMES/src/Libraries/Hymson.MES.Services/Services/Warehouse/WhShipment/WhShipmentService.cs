@@ -84,7 +84,7 @@ namespace Hymson.MES.Services.Services.WhShipment
             entity.CreatedOn = updatedOn;
             entity.UpdatedBy = updatedBy;
             entity.UpdatedOn = updatedOn;
-            entity.SiteId = _currentSite.SiteId ?? 0;
+            //entity.SiteId = _currentSite.SiteId ?? 0;
 
             var isEntiy = await _whShipmentRepository.GetEntitiesAsync(new WhShipmentQuery { ShipmentNum = entity.ShipmentNum });
             if (isEntiy.Any()) throw new CustomerValidationException(nameof(ErrorCode.MES19228)).WithData("ShipmentNum", entity.ShipmentNum);
@@ -131,18 +131,20 @@ namespace Hymson.MES.Services.Services.WhShipment
 
             using (TransactionScope ts = TransactionHelper.GetTransactionScope())
             {
+                try { 
                 await _whShipmentRepository.InsertAsync(entity);
                 //先删除 DETAIL
-                await _whShipmentRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
+                //await _whShipmentRepository.DeletesDetailByIdAsync(new long[] { entity.Id });
                 //先删除 BARCORDS
-                await _whShipmentRepository.DeletesBarcodeByDetailIdAsync(new long[] { entity.Id });
+                //await _whShipmentRepository.DeletesBarcodeByDetailIdAsync(new long[] { entity.Id });
 
                 if (details.Any())
                     await _whShipmentRepository.InsertRangeAsync(details);
 
                 if (barcods.Any())
                     await _whShipmentRepository.InsertRangeAsync(barcods);
-
+                }
+                catch (Exception ex) { }
                 ts.Complete();
             }
 
@@ -215,7 +217,7 @@ namespace Hymson.MES.Services.Services.WhShipment
         public async Task<PagedInfo<WhShipmentDto>> GetPagedListAsync(WhShipmentPagedQueryDto pagedQueryDto)
         {
             var pagedQuery = pagedQueryDto.ToQuery<WhShipmentPagedQuery>();
-            pagedQuery.SiteId = _currentSite.SiteId ?? 0;
+            //pagedQuery.SiteId = _currentSite.SiteId ?? 0;
             var pagedInfo = await _whShipmentRepository.GetPagedListAsync(pagedQuery);
 
             // 实体到DTO转换 装载数据

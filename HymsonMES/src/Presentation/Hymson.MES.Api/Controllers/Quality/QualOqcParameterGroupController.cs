@@ -1,15 +1,17 @@
 using Hymson.Infrastructure;
 using Hymson.MES.Services.Dtos.Quality;
+//using Hymson.MES.Services.Dtos.QualityOqcParameterGroup;
 using Hymson.MES.Services.Services.Quality;
+//using Hymson.MES.Services.Services.QualityOqcParameterGroup;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Hymson.MES.Api.Controllers.Quality
+namespace Hymson.MES.Api.Controllers.QualityOqcParameterGroup
 {
     /// <summary>
     /// 控制器（OQC检验参数组）
-    /// @author xiaofei
-    /// @date 2024-03-04 01:37:57
+    /// @author Jam
+    /// @date 2024-03-07 01:47:16
     /// </summary>
     [Authorize]
     [ApiController]
@@ -46,7 +48,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("create")]
         public async Task AddAsync([FromBody] QualOqcParameterGroupSaveDto saveDto)
         {
-            await _qualOqcParameterGroupService.CreateAsync(saveDto);
+             await _qualOqcParameterGroupService.CreateAsync(saveDto);
         }
 
         /// <summary>
@@ -58,7 +60,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [Route("update")]
         public async Task UpdateAsync([FromBody] QualOqcParameterGroupSaveDto saveDto)
         {
-            await _qualOqcParameterGroupService.ModifyAsync(saveDto);
+             await _qualOqcParameterGroupService.ModifyAsync(saveDto);
         }
 
         /// <summary>
