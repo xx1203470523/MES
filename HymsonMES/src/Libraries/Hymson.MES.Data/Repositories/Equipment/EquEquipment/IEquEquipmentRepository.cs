@@ -4,6 +4,7 @@ using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Common.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Command;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
 
 namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
 {
@@ -116,5 +117,16 @@ namespace Hymson.MES.Data.Repositories.Equipment.EquEquipment
         /// <param name="equipmentPagedQuery"></param>
         /// <returns></returns>
         Task<PagedInfo<EquEquipmentPageView>> GetPagedListAsync(EquEquipmentPagedQuery pagedQuery);
+
+        #region 顷刻项目
+
+        /// <summary>
+        /// 根据设备编码+资源编码查询 设备，资源，资源类型，工序，线体，车间 基础信息
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        Task<EquEquipmentResAllView> GetEquResAllAsync(EquResAllQuery query);
+
+        #endregion
     }
 }

@@ -1,8 +1,11 @@
 ﻿using Hymson.Infrastructure.Exceptions;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
+using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.EquipmentServices;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Services.Qkny;
 using Hymson.Utils;
 using Hymson.Web.Framework.Attributes;
 using Microsoft.AspNetCore.Http;
@@ -18,11 +21,27 @@ namespace Hymson.MES.Equipment.Api.Controllers
     public class QknyController : ControllerBase
     {
         /// <summary>
+        /// 仓储接口（设备注册）
+        /// </summary>
+        private readonly IEquEquipmentRepository _equEquipmentRepository;
+
+        /// <summary>
+        /// 设备接口服务
+        /// </summary>
+        private readonly IQknyService _qknyService;
+
+        /// <summary>
+        /// 是否调试
+        /// </summary>
+        private readonly bool IS_DEBUG = false;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
-        public QknyController()
+        public QknyController(IEquEquipmentRepository equEquipmentRepository, IQknyService qknyService)
         {
-
+            _equEquipmentRepository = equEquipmentRepository;
+            _qknyService = qknyService;
         }
 
         /// <summary>
@@ -35,15 +54,12 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("操作员登录001", BusinessType.OTHER, "OperatorLoginMes001", ReceiverTypeEnum.MES)]
         public async Task OperatorLoginAsync(OperationLoginDto dto)
         {
-            //List<string> list = null;
-            //int count = list.Count;
+            if(IS_DEBUG == true)
+            {
+                return;
+            }
 
-            //throw new CustomerValidationException(nameof(ErrorCode.MES10100));
-
-            //TODO 业务逻辑
-            //1. 校验用户名密码是否和设备匹配(equ_equipment_verify)
-            //2. 新增equ_equipment_login_record表，记录用户登录时间，统计每个用户的使用时间
-
+            await _qknyService.OperatorLoginAsync(dto);
         }
 
         /// <summary>
@@ -56,8 +72,15 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备心跳002", BusinessType.OTHER, "Heartbeat002", ReceiverTypeEnum.MES)]
         public async Task HeartbeatAsync(HeartbeatDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最后心跳时间
+            //2. 记录心跳记录
+            await _qknyService.HeartbeatAsync(dto);
         }
 
         /// <summary>
@@ -70,13 +93,20 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备状态上报003", BusinessType.OTHER, "State003", ReceiverTypeEnum.MES)]
         public async Task StateAsync(StateDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.StateAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_newest_info记录设备最新状态和最后时间
-            //2. 新增equ_equipment_status_time记录每个状态持续的时间
+            //2. 新增 equ_equipment_status_time 记录每个状态持续的时间
         }
 
         /// <summary>
         /// 设备运行报警信息004
+        /// 报警不一定停机，状态不一定会发生切换
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
@@ -85,9 +115,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("设备运行报警信息004", BusinessType.OTHER, "Alarm004", ReceiverTypeEnum.MES)]
         public async Task AlarmAsync(AlarmDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.AlarmAsync(dto);
             //TODO 业务逻辑
             //1. 新增equ_equipment_alarm记录故障时间和恢复时间，用于统计每台设备故障具体时间和故障代码
-            //
         }
 
         /// <summary>
@@ -115,8 +150,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [LogDescription("CCD文件上传完成006", BusinessType.OTHER, "CCDFileUploadComplete006", ReceiverTypeEnum.MES)]
         public async Task CcdFileUploadCompleteAsync(CCDFileUploadCompleteDto dto)
         {
+            if (IS_DEBUG == true)
+            {
+                return;
+            }
+
+            await _qknyService.CcdFileUploadCompleteAsync(dto);
             //TODO
-            //1. 新增表ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
+            //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
             //  明细和主表记录到一起
         }
 
@@ -128,14 +169,29 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("GetRecipeList")]
         [LogDescription("获取开机参数列表007", BusinessType.OTHER, "GetRecipeList007", ReceiverTypeEnum.MES)]
-        public async Task<GetRecipeListReturnDto> GetRecipeListAsync(GetRecipeListDto dto)
+        public async Task<List<GetRecipeListReturnDto>> GetRecipeListAsync(GetRecipeListDto dto)
         {
-            //TODO
-            //1. 获取proc_equipment_group_param表中type=1的数据，并转换成相应数据格式
+            if (IS_DEBUG == true)
+            {
+                List<GetRecipeListReturnDto> resultList = new List<GetRecipeListReturnDto>();
+                for (int i = 0;i < 5; ++i)
+                {
+                    GetRecipeListReturnDto model = new GetRecipeListReturnDto();
+                    model.RecipeCode = $"recipe{i}";
+                    model.ProductCode = $"product{i}";
+                    model.Version = i.ToString();
+                    model.LastUpdateOnTime = DateTime.Now;
+                    resultList.Add(model);
+                }
+                return resultList;
+            }
 
-            GetRecipeListReturnDto result = new GetRecipeListReturnDto();
-
+            var result = await _qknyService.GetRecipeListAsync(dto);
             return result;
+            //TODO
+            //1. 获取 proc_equipment_group_param 表中type=1的数据，并转换成相应数据格式
+            //2. 对应系统 Recipe参数 功能
+            //3. 校验是否已经维护基础数据（）
         }
 
         /// <summary>
@@ -196,9 +252,9 @@ namespace Hymson.MES.Equipment.Api.Controllers
         {
             //TODO
             //-- 不校验物料是在wh_material_inventory物料库存表中
-            //1. 校验物料是否在lims系统发过来的条码表lims_material，验证是否存在及合格，以及生成日期
-            //2. 添加上料表信息manu_feeding
-            //3. 添加上料记录表信息manu_feeding_record
+            //1. 校验物料是否在lims系统发过来的条码表lims_material(wh_material_inventory)，验证是否存在及合格，以及生成日期
+            //2. 添加上料表信息 manu_feeding
+            //3. 添加上料记录表信息 manu_feeding_record
             //
         }
 
@@ -529,6 +585,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
             //TODO
             //1. 添加参数记录
             //2. 参考现有出站
+            //3. 产出扣料(新视界)，根据上传物料列表
         }
 
         /// <summary>
@@ -596,7 +653,7 @@ namespace Hymson.MES.Equipment.Api.Controllers
         public async Task<List<OutboundMoreReturnDto>> OutboundMultPolarAsync(OutboundMultPolarDto dto)
         {
             //TODO
-            //1. 极组和极组绑定
+            //1. 极组和极组绑定（新视界极组条码接收）
             //2. 校验极组是否合格
             //3. 校验上工序是否合格
             //4. 考虑系统如何方便追溯

@@ -110,17 +110,17 @@ namespace Hymson.MES.Equipment.Api
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "MES 设备对接",
-                    Description = "MES 设备对接",
+                    Title = "MES EQU",
+                    Description = "MES EQU",
                     TermsOfService = new Uri("https://www.hymson.com/"),
                     Contact = new OpenApiContact
                     {
-                        Name = "靳毅",
+                        Name = "QknyMes",
                         Url = new Uri("https://www.hymson.com/")
                     },
                     License = new OpenApiLicense
                     {
-                        Name = "海目星激光",
+                        Name = "hymson",
                         Url = new Uri("https://www.hymson.com/")
                     }
                 });
