@@ -6,6 +6,7 @@ using Hymson.MES.EquipmentServices.Services.Common;
 using Hymson.MES.EquipmentServices.Services.Manufacture;
 using Hymson.MES.EquipmentServices.Services.Parameter.ProcessCollection;
 using Hymson.MES.EquipmentServices.Services.Qkny;
+using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
 using Hymson.MES.EquipmentServices.Services.SfcBinding;
 using Hymson.MES.EquipmentServices.Validators.Manufacture;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
@@ -76,6 +77,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IManuEquipmentStatusTimeService, ManuEquipmentStatusTimeService>();
             services.AddSingleton<IEquEquipmentAlarmService, EquEquipmentAlarmService>();
             services.AddSingleton<ICcdFileUploadCompleteRecordService, CcdFileUploadCompleteRecordService>();
+            services.AddSingleton<IProcEquipmentGroupParamService, ProcEquipmentGroupParamService>();
             #endregion
         }
 

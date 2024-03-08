@@ -6,8 +6,10 @@ using Hymson.MES.Data.Repositories.Equipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.Query;
 using Hymson.MES.Data.Repositories.Equipment.EquEquipment.View;
+using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Common;
 using Hymson.MES.EquipmentServices.Dtos.Qkny.Manufacture;
+using Hymson.MES.EquipmentServices.Services.Qkny.PowerOnParam;
 using Hymson.MES.EquipmentServices.Validators.Manufacture.Qkny;
 using Hymson.MES.Services.Dtos.CcdFileUploadCompleteRecord;
 using Hymson.MES.Services.Dtos.EquEquipmentAlarm;
@@ -85,6 +87,11 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
         private readonly ICcdFileUploadCompleteRecordService _ccdFileUploadCompleteRecordService;
 
         /// <summary>
+        /// 开机参数
+        /// </summary>
+        private readonly IProcEquipmentGroupParamService _procEquipmentGroupParamService;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public QknyService(IEquEquipmentRepository equEquipmentRepository,
@@ -95,6 +102,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             IManuEquipmentStatusTimeService manuEquipmentStatusTimeService,
             IEquEquipmentAlarmService equEquipmentAlarmService,
             ICcdFileUploadCompleteRecordService ccdFileUploadCompleteRecordService,
+            IProcEquipmentGroupParamService procEquipmentGroupParamService,
             AbstractValidator<OperationLoginDto> validationOperationLoginDto)
         {
             _equEquipmentRepository = equEquipmentRepository;
@@ -105,6 +113,7 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             _manuEquipmentStatusTimeService = manuEquipmentStatusTimeService;
             _equEquipmentAlarmService = equEquipmentAlarmService;
             _ccdFileUploadCompleteRecordService = ccdFileUploadCompleteRecordService;
+            _procEquipmentGroupParamService = procEquipmentGroupParamService;
             //校验器
             _validationOperationLoginDto = validationOperationLoginDto;
         }
@@ -292,6 +301,37 @@ namespace Hymson.MES.EquipmentServices.Services.Qkny
             await _ccdFileUploadCompleteRecordService.AddMultAsync(saveDtoList);
             //1. 新增表 ccd_file_upload_complete_record，用于记录每个条码对应的CCD文件路径及是否合格
             //2. 明细和主表记录到一张表
+        }
+
+        /// <summary>
+        /// 获取配方列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        public async Task<List<GetRecipeListReturnDto>> GetRecipeListAsync(GetRecipeListDto dto)
+        {
+            //1. 获取设备基础信息
+            EquEquipmentResAllView equResModel = await GetEquResAllAsync(dto);
+            //2. 获取数据
+            ProcEquipmentGroupParamEquProductQuery query = new ProcEquipmentGroupParamEquProductQuery();
+            query.EquipmentId = equResModel.EquipmentId;
+            query.ProductCode = dto.ProductCode;
+            var paramList = await _procEquipmentGroupParamService.QueryByEquProductAsync(query);
+            List<GetRecipeListReturnDto> resultList = new List<GetRecipeListReturnDto>();
+            foreach (var item in paramList)
+            {
+                GetRecipeListReturnDto result = new GetRecipeListReturnDto();
+                result.RecipeCode = item.Code;
+                result.ProductCode = item.MaterialCode;
+                result.Version = item.Version;
+                result.LastUpdateOnTime = item.UpdatedOn ?? item.CreatedOn;
+                resultList.Add(result);
+            }
+            return resultList;
+
+            //TODO
+            //1. 获取 proc_equipment_group_param 表中type=1的数据，并转换成相应数据格式
+            //2. 对应系统 Recipe参数 功能
         }
 
         /// <summary>

@@ -47,5 +47,16 @@ namespace Hymson.MES.Core.Constants
         /// </summary>
         public const string MES45013 = "用户名或密码不能为空";
         #endregion
+
+        #region 开机参数
+
+        /// <summary>
+        /// 设备没有维护对应的开机参数
+        /// </summary>
+        public const string MES45021 = "设备没有维护对应的开机参数，请检查开机参数是否启用或是否关联到对应的设备组";
+
+        #endregion
+
+
     }
 }

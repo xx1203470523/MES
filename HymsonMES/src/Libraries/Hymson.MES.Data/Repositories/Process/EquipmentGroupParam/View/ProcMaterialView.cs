@@ -19,4 +19,21 @@ namespace Hymson.MES.Data.Repositories.Process
 
         public string ProcedureName { get; set; }
     }
+
+    #region 顷刻
+
+    /// <summary>
+    /// 根据设备ID和产品型号查询
+    /// 配方编码，版本，产品编码，最后更新时间
+    /// </summary>
+    public class ProcEquipmentGroupParamEquProductView : ProcEquipmentGroupParamEntity
+    {
+        /// <summary>
+        /// 物料编码
+        /// </summary>
+        public string MaterialCode { get; set; }
+    }
+
+    #endregion
+
 }

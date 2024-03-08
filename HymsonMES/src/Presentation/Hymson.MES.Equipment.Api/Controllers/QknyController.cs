@@ -139,14 +139,14 @@ namespace Hymson.MES.Equipment.Api.Controllers
         [HttpPost]
         [Route("GetRecipeList")]
         [LogDescription("获取开机参数列表007", BusinessType.OTHER, "GetRecipeList007", ReceiverTypeEnum.MES)]
-        public async Task<GetRecipeListReturnDto> GetRecipeListAsync(GetRecipeListDto dto)
+        public async Task<List<GetRecipeListReturnDto>> GetRecipeListAsync(GetRecipeListDto dto)
         {
-            //TODO
-            //1. 获取proc_equipment_group_param表中type=1的数据，并转换成相应数据格式
-
-            GetRecipeListReturnDto result = new GetRecipeListReturnDto();
-
+            var result = await _qknyService.GetRecipeListAsync(dto);
             return result;
+            //TODO
+            //1. 获取 proc_equipment_group_param 表中type=1的数据，并转换成相应数据格式
+            //2. 对应系统 Recipe参数 功能
+            //3. 校验是否已经维护基础数据（）
         }
 
         /// <summary>
