@@ -3,6 +3,7 @@ using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Parameter;
 using Hymson.MES.Core.Domain.Process;
+using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.CoreServices.Bos.Job;
 using Hymson.MES.CoreServices.Bos.Parameter;
 using Hymson.MES.CoreServices.Dtos.Parameter;
@@ -21,6 +22,7 @@ namespace Hymson.MES.CoreServices.Mapper
         {
             CreateRequestBoMaps();
             CreateParameterBoMaps();
+            CreateQualityBoMaps();
         }
 
         /// <summary>
@@ -54,6 +56,15 @@ namespace Hymson.MES.CoreServices.Mapper
             CreateMap<ParameterBo, ManuProductParameterEntity>();
             CreateMap<ProcProductParameterGroupDetailEntity, ProcProductParameterGroupDetailBo>();
             CreateMap<EquipmentParameterDto, EquipmentParameterEntity>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void CreateQualityBoMaps()
+        {
+            CreateMap<QualOqcParameterGroupEntity, QualOqcParameterGroupSnapshootEntity>();
+            CreateMap<QualOqcParameterGroupDetailEntity, QualOqcParameterGroupDetailSnapshootEntity>();
         }
 
         /// <summary>
