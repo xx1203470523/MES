@@ -5,10 +5,12 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
+using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
 using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
+using Hymson.MES.Data.Repositories.Integrated;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Quality;
 using Hymson.MES.Data.Repositories.Quality.Query;
@@ -18,6 +20,7 @@ using Hymson.MES.Services.Dtos.Integrated;
 using Hymson.MES.Services.Dtos.Quality;
 using Hymson.Snowflake;
 using Hymson.Utils;
+using Hymson.Utils.Tools;
 
 namespace Hymson.MES.Services.Services.Quality
 {
@@ -51,6 +54,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IQualIqcOrderTypeRepository _qualIqcOrderTypeRepository;
 
         /// <summary>
+        /// 仓储接口（iqc检验样本附件）
+        /// </summary>
+        private readonly IQualIqcOrderAnnexRepository _qualIqcOrderAnnexRepository;
+
+        /// <summary>
         /// 仓储接口（收货单）
         /// </summary>
         private readonly IWhMaterialReceiptRepository _whMaterialReceiptRepository;
@@ -66,6 +74,11 @@ namespace Hymson.MES.Services.Services.Quality
         private readonly IWhSupplierRepository _whSupplierRepository;
 
         /// <summary>
+        /// 仓储接口（附件维护）
+        /// </summary>
+        private readonly IInteAttachmentRepository _inteAttachmentRepository;
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="currentUser"></param>
@@ -73,25 +86,31 @@ namespace Hymson.MES.Services.Services.Quality
         /// <param name="validationSaveRules"></param>
         /// <param name="qualIqcOrderRepository"></param>
         /// <param name="qualIqcOrderTypeRepository"></param>
+        /// <param name="qualIqcOrderAnnexRepository"></param>
         /// <param name="whMaterialReceiptRepository"></param>
         /// <param name="procMaterialRepository"></param>
         /// <param name="whSupplierRepository"></param>
+        /// <param name="inteAttachmentRepository"></param>
         public QualIqcOrderService(ICurrentUser currentUser, ICurrentSite currentSite,
             AbstractValidator<QualIqcOrderSaveDto> validationSaveRules,
             IQualIqcOrderRepository qualIqcOrderRepository,
             IQualIqcOrderTypeRepository qualIqcOrderTypeRepository,
+            IQualIqcOrderAnnexRepository qualIqcOrderAnnexRepository,
             IWhMaterialReceiptRepository whMaterialReceiptRepository,
             IProcMaterialRepository procMaterialRepository,
-            IWhSupplierRepository whSupplierRepository)
+            IWhSupplierRepository whSupplierRepository,
+            IInteAttachmentRepository inteAttachmentRepository)
         {
             _currentUser = currentUser;
             _currentSite = currentSite;
             _validationSaveRules = validationSaveRules;
             _qualIqcOrderRepository = qualIqcOrderRepository;
             _qualIqcOrderTypeRepository = qualIqcOrderTypeRepository;
+            _qualIqcOrderAnnexRepository = qualIqcOrderAnnexRepository;
             _whMaterialReceiptRepository = whMaterialReceiptRepository;
             _procMaterialRepository = procMaterialRepository;
             _whSupplierRepository = whSupplierRepository;
+            _inteAttachmentRepository = inteAttachmentRepository;
         }
 
 
@@ -147,13 +166,20 @@ namespace Hymson.MES.Services.Services.Quality
         }
 
         /// <summary>
-        /// 删除
+        /// 删除检验单附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderAnnexId"></param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync(long id)
+        public async Task<int> DeleteAttachmentByIdAsync(long orderAnnexId)
         {
-            return await _qualIqcOrderRepository.DeleteAsync(id);
+            var attachmentEntity = await _qualIqcOrderAnnexRepository.GetByIdAsync(orderAnnexId);
+            if (attachmentEntity == null) return default;
+
+            var rows = 0;
+            using var trans = TransactionHelper.GetTransactionScope();
+            rows += await _inteAttachmentRepository.DeleteAsync(attachmentEntity.AnnexId);
+            rows += await _qualIqcOrderAnnexRepository.DeleteAsync(attachmentEntity.Id);
+            return rows;
         }
 
         /// <summary>
@@ -259,14 +285,12 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
+        public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId)
         {
             /*
             var entities = await _qualIqcOrderTypeRepository.GetByOrderIdAsync(orderId);
             return entities.Select(s => s.ToModel<QualIqcOrderTypeBaseDto>());
             */
-
-            await Task.CompletedTask;
 
             // TODO 测试数据
             List<QualIqcOrderTypeBaseDto> list = new()
@@ -287,43 +311,48 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             };
 
-            return list;
+            return await Task.FromResult(list);
         }
 
         /// <summary>
         /// 根据ID查询附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync(long id)
+        public async Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(long orderId)
         {
+            var iqcOrderAnnexs = await _qualIqcOrderAnnexRepository.GetByOrderIdAsync(orderId);
+            if (iqcOrderAnnexs == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(iqcOrderAnnexs.Select(s => s.AnnexId));
+            if (attachmentEntities == null) return Array.Empty<InteAttachmentBaseDto>();
+
+            List<InteAttachmentBaseDto> dtos = new();
+            foreach (var item in iqcOrderAnnexs)
+            {
+                var dto = new InteAttachmentBaseDto
+                {
+                    Id = item.Id,
+                    AttachmentId = item.AnnexId
+                };
+
+                var attachmentEntity = attachmentEntities.FirstOrDefault(f => f.Id == item.AnnexId);
+                if (attachmentEntity == null)
+                {
+                    dto.Name = "附件不存在";
+                    dto.Path = "";
+                    dtos.Add(dto);
+                    continue;
+                }
+
+                dto.Name = attachmentEntity.Name;
+                dto.Path = attachmentEntity.Path;
+                dtos.Add(dto);
+            }
+
+            return dtos;
+
             /*
-            var inteMessageManageEntity = await _inteMessageManageRepository.GetByIdAsync(id);
-            if (inteMessageManageEntity == null) return null;
-
-            var dto = inteMessageManageEntity.ToModel<InteMessageManageHandleDto>();
-
-            // 读取附件
-            var messageManageAnalysisReportAttachmentEntities = await _inteMessageManageAnalysisReportAttachmentRepository.GetEntitiesAsync(new InteMessageManageAnalysisReportAttachmentQuery { MessageManageId = inteMessageManageEntity.Id });
-            var messageManageHandleProgrammeAttachmentEntities = await _inteMessageManageHandleProgrammeAttachmentRepository.GetEntitiesAsync(new InteMessageManageHandleProgrammeAttachmentQuery { MessageManageId = inteMessageManageEntity.Id });
-
-            var reasonAttachmentIds = messageManageAnalysisReportAttachmentEntities.Select(x => x.AttachmentId).ToList();
-            var handleAttachmentIds = messageManageHandleProgrammeAttachmentEntities.Select(x => x.AttachmentId).ToList();
-
-            var attachmentIds = reasonAttachmentIds.Union(handleAttachmentIds);
-            var attachmentEntities = await _inteAttachmentRepository.GetByIdsAsync(attachmentIds);
-
-            dto.ReasonAttachments = attachmentEntities.Where(x => reasonAttachmentIds.Contains(x.Id)).Select(x => x.ToModel<InteAttachmentBaseDto>());
-            dto.HandleAttachments = attachmentEntities.Where(x => handleAttachmentIds.Contains(x.Id)).Select(x => x.ToModel<InteAttachmentBaseDto>());
-
-            return dto;
-             */
-
-
-
-            //var types = await _qualOqcOrderTypeRepository.GetByIdsAsync(id);
-            await Task.CompletedTask;
-
             // TODO 测试数据
             List<InteAttachmentBaseDto> list = new()
             {
@@ -339,17 +368,21 @@ namespace Hymson.MES.Services.Services.Quality
                 }
             };
 
-            return list;
+            return await Task.FromResult(list);
+            */
         }
 
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long id)
+        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
         {
-            await Task.CompletedTask;
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
+            if (entity == null) return Array.Empty<InspectionParameterDetailDto>();
+
+
 
             List<InspectionParameterDetailDto> list = new();
             return list;
@@ -358,9 +391,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long id)
+        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
         {
             await Task.CompletedTask;
 

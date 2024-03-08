@@ -24,11 +24,11 @@ namespace Hymson.MES.Services.Services.Quality
         Task<int> ModifyAsync(QualIqcOrderSaveDto saveDto);
 
         /// <summary>
-        /// 删除
+        /// 删除检验单附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderAnnexId"></param>
         /// <returns></returns>
-        Task<int> DeleteAsync(long id);
+        Task<int> DeleteAttachmentByIdAsync(long orderAnnexId);
 
         /// <summary>
         /// 批量删除
@@ -56,28 +56,28 @@ namespace Hymson.MES.Services.Services.Quality
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId);
+        Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryOrderTypeListByIdAsync(long orderId);
 
         /// <summary>
         /// 根据ID查询附件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync(long id);
+        Task<IEnumerable<InteAttachmentBaseDto>> QueryOrderAttachmentListByIdAsync(long orderId);
 
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long id);
+        Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId);
 
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long id);
+        Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId);
 
     }
 }

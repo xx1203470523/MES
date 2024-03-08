@@ -39,6 +39,18 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
 
+        
+
+        /// <summary>
+        /// 删除检验单附件
+        /// </summary>
+        /// <param name="orderAnnexId"></param>
+        /// <returns></returns>
+        [HttpDelete("attachment/delete")]
+        public async Task DeleteAttachmentByIdAsync(long orderAnnexId)
+        {
+            await _qualIqcOrderService.DeleteAttachmentByIdAsync(orderAnnexId);
+        }
 
         /// <summary>
         /// 删除（iqc检验单）
@@ -51,6 +63,20 @@ namespace Hymson.MES.Api.Controllers.Quality
         {
             await _qualIqcOrderService.DeletesAsync(ids);
         }
+
+        /// <summary>
+        /// 生成IQC检验单
+        /// </summary>
+        /// <param name="requestDto"></param>
+        /// <returns></returns>
+        [HttpPost("generated")]
+        public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
+        {
+            // TODO 生成IQC检验单
+            return await Task.FromResult(0);
+        }
+
+
 
         /// <summary>
         /// 查询详情（iqc检验单）
@@ -75,20 +101,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIqcOrderService.GetPagedListAsync(pagedQueryDto);
         }
 
-
-
-        /// <summary>
-        /// 生成IQC检验单
-        /// </summary>
-        /// <param name="requestDto"></param>
-        /// <returns></returns>
-        [HttpPost("generated")]
-        public async Task<long> GeneratedOrderAsync([FromBody] GenerateInspectionDto requestDto)
-        {
-            // TODO 生成IQC检验单
-            return await Task.FromResult(0);
-        }
-
         /// <summary>
         /// 查询检验类型
         /// </summary>
@@ -97,7 +109,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpGet("type/{orderId}")]
         public async Task<IEnumerable<QualIqcOrderTypeBaseDto>> QueryTypeListByIdAsync(long orderId)
         {
-            return await _qualIqcOrderService.QueryTypeListByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryOrderTypeListByIdAsync(orderId);
         }
 
         /// <summary>
@@ -108,7 +120,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         [HttpGet("attachment/{orderId}")]
         public async Task<IEnumerable<InteAttachmentBaseDto>> QueryAttachmentListByIdAsync(long orderId)
         {
-            return await _qualIqcOrderService.QueryAttachmentListByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryOrderAttachmentListByIdAsync(orderId);
         }
 
         /// <summary>
@@ -133,9 +145,6 @@ namespace Hymson.MES.Api.Controllers.Quality
             return await _qualIqcOrderService.QueryDetailSampleByIdAsync(orderId);
         }
 
-        // TODO 保存
-
-        // TODO 完成
 
     }
 }

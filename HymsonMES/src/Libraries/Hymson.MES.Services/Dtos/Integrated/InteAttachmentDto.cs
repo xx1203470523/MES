@@ -7,12 +7,22 @@ namespace Hymson.MES.Services.Dtos.Integrated
     /// </summary>
     public record InteAttachmentBaseDto : BaseEntityDto
     {
-       /// <summary>
+        /// <summary>
+        /// 关键表主键ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// 附件ID
+        /// </summary>
+        public long AttachmentId { get; set; }
+
+        /// <summary>
         /// 文件名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 文件路径
         /// </summary>
         public string Path { get; set; }
@@ -29,12 +39,12 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public long Id { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 文件名称
         /// </summary>
         public string Name { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 文件路径
         /// </summary>
         public string Path { get; set; }
@@ -44,37 +54,37 @@ namespace Hymson.MES.Services.Dtos.Integrated
         /// </summary>
         public string Remark { get; set; } = "";
 
-       /// <summary>
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 创建人
         /// </summary>
         public string CreatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新人
         /// </summary>
         public string UpdatedBy { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 更新时间
         /// </summary>
         public DateTime? UpdatedOn { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 站点ID
         /// </summary>
         public long SiteId { get; set; }
 
-       /// <summary>
+        /// <summary>
         /// 删除标识
         /// </summary>
         public long IsDeleted { get; set; }
 
-       
+
     }
 
     /// <summary>

@@ -1,3 +1,6 @@
+using Hymson.MES.Core.Enums;
+using Hymson.MES.Core.Enums.Quality;
+
 namespace Hymson.MES.Services.Dtos.Quality
 {
     /// <summary>
@@ -50,7 +53,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 参数数据类型
         /// </summary>
-        public int ParameterDataType { get; set; }
+        public DataTypeEnum ParameterDataType { get; set; }
 
         /// <summary>
         /// 检验器具
@@ -80,7 +83,7 @@ namespace Hymson.MES.Services.Dtos.Quality
         /// <summary>
         /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
         /// </summary>
-        public int InspectionType { get; set; }
+        public IQCInspectionTypeEnum InspectionType { get; set; }
 
     }
 
