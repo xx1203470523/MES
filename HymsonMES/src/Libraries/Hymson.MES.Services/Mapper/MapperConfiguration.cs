@@ -441,7 +441,6 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<InteMessageManageEntity, InteMessageManageCloseDto>();
             CreateMap<InteMessageManageView, InteMessageManageDto>();
             CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
-            CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
             #endregion
 
             #region InteCustomField
@@ -905,7 +904,8 @@ namespace Hymson.MES.Services.Mapper
             CreateMap<QualIqcOrderPagedQueryDto, QualIqcOrderPagedQuery>();
             CreateMap<QualIqcOrderEntity, QualIqcOrderDto>();
             CreateMap<QualIqcOrderTypeEntity, QualIqcOrderTypeBaseDto>();
-            CreateMap<InteAttachmentEntity, InteAttachmentBaseDto>();
+            CreateMap<QualIqcInspectionItemDetailSnapshotEntity, OrderParameterDetailDto>();
+            
 
             #region QualIqcInspectionItem
 

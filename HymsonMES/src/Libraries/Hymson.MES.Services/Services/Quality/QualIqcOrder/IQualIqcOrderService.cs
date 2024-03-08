@@ -68,9 +68,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId);
+        Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(OrderParameterDetailQueryDto requestDto);
 
         /// <summary>
         /// 查询检验单样本数据

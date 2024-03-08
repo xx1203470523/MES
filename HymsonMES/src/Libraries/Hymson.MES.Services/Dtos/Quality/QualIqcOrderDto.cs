@@ -249,7 +249,24 @@ namespace Hymson.MES.Services.Dtos.Quality
     /// <summary>
     /// 检验参数Dto
     /// </summary>
-    public record OrderParameterDetailDto
+    public record OrderParameterDetailQueryDto
+    {
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public long OrderId { get; set; }
+
+        /// <summary>
+        /// 检验类型;1、常规检验2、外观检验3、包装检验4、特殊性检验5、破坏性检验
+        /// </summary>
+        public IQCInspectionTypeEnum InspectionType { get; set; }
+
+    }
+
+    /// <summary>
+    /// 检验参数Dto
+    /// </summary>
+    public record OrderParameterDetailDto : BaseEntityDto
     {
         /// <summary>
         /// 主键

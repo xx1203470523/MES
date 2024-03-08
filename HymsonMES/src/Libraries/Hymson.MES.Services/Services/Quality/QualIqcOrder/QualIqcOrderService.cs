@@ -5,9 +5,7 @@ using Hymson.Infrastructure;
 using Hymson.Infrastructure.Exceptions;
 using Hymson.Infrastructure.Mapper;
 using Hymson.MES.Core.Constants;
-using Hymson.MES.Core.Domain.Integrated;
 using Hymson.MES.Core.Domain.Quality;
-using Hymson.MES.Core.Enums;
 using Hymson.MES.Core.Enums.Quality;
 using Hymson.MES.Data.Repositories.Common.Command;
 using Hymson.MES.Data.Repositories.Integrated;
@@ -391,21 +389,24 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(OrderParameterDetailQueryDto requestDto)
         {
-            var entity = await _qualIqcOrderRepository.GetByIdAsync(orderId);
+            var entity = await _qualIqcOrderRepository.GetByIdAsync(requestDto.OrderId);
             if (entity == null) return Array.Empty<OrderParameterDetailDto>();
 
             var snapshotEntity = await _qualIqcInspectionItemSnapshotRepository.GetByIdAsync(entity.IqcInspectionItemSnapshotId);
             if (snapshotEntity == null) return Array.Empty<OrderParameterDetailDto>();
 
-            var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetBySnapshotIdAsync(snapshotEntity.Id);
+            var detailEntities = await _qualIqcInspectionItemDetailSnapshotRepository.GetEntitiesAsync(new QualIqcInspectionItemDetailSnapshotQuery
+            {
+                IqcInspectionItemSnapshotId = snapshotEntity.Id,
+                InspectionType = requestDto.InspectionType
+            });
             if (detailEntities == null) return Array.Empty<OrderParameterDetailDto>();
 
-            List<OrderParameterDetailDto> list = new();
-            return list;
+            return detailEntities.Select(s => s.ToModel<OrderParameterDetailDto>());
         }
 
         /// <summary>

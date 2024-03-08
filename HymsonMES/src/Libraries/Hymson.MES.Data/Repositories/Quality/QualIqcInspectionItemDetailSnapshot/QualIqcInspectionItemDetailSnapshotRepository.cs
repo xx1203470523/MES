@@ -127,6 +127,19 @@ namespace Hymson.MES.Data.Repositories.Quality
         {
             var sqlBuilder = new SqlBuilder();
             var template = sqlBuilder.AddTemplate(GetEntitiesSqlTemplate);
+            sqlBuilder.Select("*");
+            sqlBuilder.Where("IsDeleted = 0");
+            sqlBuilder.Where("SiteId = @SiteId");
+
+            if (query.IqcInspectionItemSnapshotId.HasValue)
+            {
+                sqlBuilder.Where("IqcInspectionItemSnapshotId = @IqcInspectionItemSnapshotId");
+            }
+            if (query.InspectionType.HasValue)
+            {
+                sqlBuilder.Where("InspectionType = @InspectionType");
+            }
+
             using var conn = GetMESDbConnection();
             return await conn.QueryAsync<QualIqcInspectionItemDetailSnapshotEntity>(template.RawSql, query);
         }

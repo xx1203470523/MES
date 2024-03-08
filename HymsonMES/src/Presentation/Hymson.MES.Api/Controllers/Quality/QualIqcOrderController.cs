@@ -39,7 +39,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         }
 
 
-        
+
 
         /// <summary>
         /// 删除检验单附件
@@ -94,8 +94,7 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// </summary>
         /// <param name="pagedQueryDto"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("pagelist")]
+        [HttpGet("pagelist")]
         public async Task<PagedInfo<QualIqcOrderDto>> QueryPagedListAsync([FromQuery] QualIqcOrderPagedQueryDto pagedQueryDto)
         {
             return await _qualIqcOrderService.GetPagedListAsync(pagedQueryDto);
@@ -126,12 +125,12 @@ namespace Hymson.MES.Api.Controllers.Quality
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="requestDto"></param>
         /// <returns></returns>
-        [HttpGet("snapshot/{orderId}")]
-        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
+        [HttpGet("snapshot")]
+        public async Task<IEnumerable<OrderParameterDetailDto>> QueryDetailSnapshotByIdAsync([FromQuery] OrderParameterDetailQueryDto requestDto)
         {
-            return await _qualIqcOrderService.QueryDetailSnapshotByIdAsync(orderId);
+            return await _qualIqcOrderService.QueryDetailSnapshotByIdAsync(requestDto);
         }
 
         /// <summary>
