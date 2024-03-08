@@ -1859,6 +1859,7 @@
         public const string MES19901 = "IQC检验项目编码重复，或物料重复";
         public const string MES19902 = "IQC检验项目不存在，可能操作时被删除或数据异常";
         public const string MES19903 = "IQC检验项目必须填写物料，且物料信息必须准确";
+        public const string MES19904 = "以下启用的IQC检验项目不允许删除，{codes}";
 
         #endregion
 

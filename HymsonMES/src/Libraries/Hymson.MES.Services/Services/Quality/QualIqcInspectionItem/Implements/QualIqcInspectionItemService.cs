@@ -13,6 +13,8 @@ using Hymson.MES.Services.Dtos.Qual;
 using Hymson.MES.Data.Repositories.Process;
 using Hymson.MES.Data.Repositories.Warehouse;
 using Hymson.Utils.Tools;
+using Hymson.MES.CoreServices.Bos.Manufacture;
+using System.Text;
 
 namespace Hymson.MES.Services.Qual;
 
@@ -121,6 +123,7 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
             PageSize = queryDto.PageSize,
             SiteId = _siteId
         };
+        query.Sorting = "Id Desc";
 
         var result = new PagedInfo<QualIqcInspectionItemOutputDto>(Enumerable.Empty<QualIqcInspectionItemOutputDto>(), query.PageIndex, query.PageSize);
 
@@ -341,6 +344,18 @@ public class QualIqcInspectionItemService : IQualIqcInspectionItemService
     public async Task DeleteAsync(QualIqcInspectionItemDeleteDto deleteDto)
     {
         await _validationDeleteRules.ValidateAndThrowAsync(deleteDto);
+
+        var qualIqcInspectionItemEntities = await _qualIqcInspectionItemRepository.GetListAsync(new QualIqcInspectionItemQuery { Ids = deleteDto.Ids });
+        if (qualIqcInspectionItemEntities.Any(m => m.Status == Core.Enums.DisableOrEnableEnum.Enable))
+        {
+            var codes = new StringBuilder();
+            foreach (var item in qualIqcInspectionItemEntities.Where(m => m.Status == Core.Enums.DisableOrEnableEnum.Enable))
+            {
+                codes.Append(item.Code);
+                codes.Append(',');
+            }
+            throw new CustomerValidationException(nameof(ErrorCode.MES19904)).WithData("codes", codes.ToString());
+        }
 
         var command = new DeleteCommand { Ids = deleteDto.Ids };
 
