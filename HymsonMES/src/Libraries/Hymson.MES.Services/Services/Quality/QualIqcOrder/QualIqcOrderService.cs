@@ -366,9 +366,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 查询检验单快照数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long id)
+        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSnapshotByIdAsync(long orderId)
         {
             await Task.CompletedTask;
 
@@ -379,9 +379,9 @@ namespace Hymson.MES.Services.Services.Quality
         /// <summary>
         /// 查询检验单样本数据
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="orderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long id)
+        public async Task<IEnumerable<InspectionParameterDetailDto>> QueryDetailSampleByIdAsync(long orderId)
         {
             await Task.CompletedTask;
 
