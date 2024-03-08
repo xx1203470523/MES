@@ -13,6 +13,11 @@ namespace Hymson.MES.Core.Domain.Quality
     public class QualIqcInspectionItemDetailSnapshotEntity : BaseEntity
     {
         /// <summary>
+        /// qual_iqc_inspection_item_snapshot 的Id
+        /// </summary>
+        public long IqcInspectionItemSnapshotId { get; set; }
+
+        /// <summary>
         /// 参数Id proc_parameter 的id
         /// </summary>
         public long ParameterId { get; set; }
