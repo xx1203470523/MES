@@ -74,6 +74,7 @@ using Hymson.MES.Services.Dtos.Quality;
 using Hymson.MES.Services.Dtos.Report;
 using Hymson.MES.Services.Dtos.Warehouse;
 using Hymson.MES.Services.Dtos.WHMaterialReceipt;
+using Hymson.MES.Services.Dtos.WHMaterialReceiptDetail;
 using Hymson.MES.Services.Dtos.WhShipment;
 using Hymson.MES.Services.Dtos.WhWareHouse;
 using Hymson.MES.Services.Dtos.WhWarehouseLocation;
@@ -789,15 +790,24 @@ namespace Hymson.MES.Services.Mapper
 
             #endregion
 
-            #region WhMaterialReceipt
-            CreateMap<WhShipmentSaveDto, WhShipmentEntity>();
+            #region WhShipment
+            CreateMap<WhShipmentSaveDto,WhShipmentEntity>();
             CreateMap<WhShipmentEntity, WhShipmentDto>();
             CreateMap<WhShipmentPagedQueryDto, WhShipmentPagedQuery>();
             #endregion
 
-            CreateMap<WhMaterialReceiptPagedQueryDto, WhMaterialReceiptPagedQuery>();
+ 
+
+
+            #region WhMaterialReceipt
+            CreateMap<WhMaterialReceiptEntity, WhMaterialReceiptOutDto>();
+            CreateMap<WhMaterialReceiptSaveDto, WhMaterialReceiptEntity>();
             CreateMap<WhMaterialReceiptEntity, WhMaterialReceiptDto>();
             CreateMap<WHMaterialReceiptDetailEntity, ReceiptMaterialDetailDto>();
+
+            CreateMap<WHMaterialReceiptDetailEntity, WHMaterialReceiptDetailDto>();
+            CreateMap<WhMaterialReceiptPagedQueryDto, WhMaterialReceiptPagedQuery>();
+            #endregion
 
         }
 
